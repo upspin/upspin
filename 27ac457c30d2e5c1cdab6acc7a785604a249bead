@@ -1,0 +1,724 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0b1ef349_8a6b2f64",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "delete?",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_aa70eb4e",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "putReqDone ?",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_ca75273e",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "if nil doesn\u0027t have any special meaning here (ie, if endpoint will always be set) then this needn\u0027t be a pointer",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_4abcd79b",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "i\u0027d make this a map to bool, it leads to simpler code",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_ea7ae32a",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "if you remove first, do you need O_APPEND?\n\nwhat if you don\u0027t remove first, and replace O_APPEND with O_TRUNC ?",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_4a8a1700",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "grpc/dircacheserver.openLog",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_0a801fe0",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "suggestion: invert this conditional and put the \u0027return finish\u0027 in the else block",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_2a7ddb20",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "use op",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_6a87d3f6",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "\u0027all all\u0027? there\u0027s a missing word. convert?",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_2aa6bb98",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "return l.file.Close()",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_2aaf9b64",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 275,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "i\u0027d name this cacheableGlob as this determines whether a glob can be cached",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_cac7e731",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "I wouldn\u0027t say \"overly paranoid\". it\u0027s just necessary, because this is what guards against /foo/*/bar/*, right?",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_6ab993aa",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "with a bool map value, this becomes\nif !children[n] {",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_8ae6cfd3",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "nonexistent or non-existent",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_4ad5b7cb",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 355,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "s/i/k/",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_aaeb8b9a",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "case lookupReq, globReq:",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_cae0c7b9",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 375,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "add a default case logging an unexpected request type?\nprobably a bit paranoid but might reveal issues before they become problematic.",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_2ad87b04",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 382,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "s/i/k/",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_eae583c6",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 396,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "this will convert \"foo@example.com/\" into \"foo@example.com\"\nis that right?",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_0adbbf03",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 411,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "s/i/k/",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_6ad273e6",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 426,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "s/i/k/",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_8a07af8c",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 429,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "if v, ok :\u003d l.lru.Get(k); !ok {",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_aa0c6baf",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 430,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "perhaps add an explicit \"complete: false\" here, otherwise the reader might assume (as I did) that a subsequent glob of this directory would return only this specific entry.",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_ca11a7c6",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 453,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "_, err :\u003d l.file.Write(buf)\nreturn err",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_ea1663bb",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 459,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "don\u0027t leave me hangin!",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_0a1c9fd8",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 465,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "I\u0027d still use errors.Match in here, in case we decide to change error matching semantics at some point.\n\nand it can be\n\nreturn errors.Match(errors.E(errors.NotExist), err)",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_2a195be9",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 643,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "map to bool",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_4a269730",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 687,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "no need for time.Duration here\njust 2*sinceRefreshed\n\nalso put time.Hour in a constant somewhere",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_6a23531f",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 704,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "log it with log.Error. this shouldn\u0027t really happen, and we really want to know if it does",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_8af08f78",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 727,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "you only ever call this as the method on clogEntry, so drop the wrapper and make this the method?",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_aaf54b67",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 744,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "deserves a comment",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_caea8786",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 761,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "how about this?\n\nif ee.de \u003d\u003d nil || ee.de.Sequence !\u003d de.Sequence {\n  return false\n}",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_eaef4393",
+        "filename": "grpc/dircacheserver/log_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "drop the Str part of this. NotExist will already print as \"item does not exist\"",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_6afc334b",
+        "filename": "grpc/dircacheserver/log_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "use ep1 or ep2 here?",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_2a023b71",
+        "filename": "grpc/dircacheserver/log_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "estr \u003d strings.TrimSpace(estr)",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_4aff7740",
+        "filename": "grpc/dircacheserver/log_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "var (\n ep1 \u003d \n ep2 \u003d\n)",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_6a551363",
+        "filename": "grpc/dircacheserver/server.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "this feels dangerous, if clog potentially contains fields that shouldn\u0027t be copied (like mutexes). it may be fine now, but in the future it might change.\n\nmake clog a pointer field?",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_ea682337",
+        "filename": "grpc/dircacheserver/server.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "i\u0027d just pass a non-pointer endpoint value. save a bunch of assigning back and forth, and potentially avoid allocations (the values might live all on the stack)",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_2a34fb3c",
+        "filename": "grpc/dircacheserver/server.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "it seems bad to hold this lock while making a Glob request. is it really necessary? do we care enough about de-duplicating inflight requests? seems like it should be fine to make the request and just write the result to the cache.",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_4a31374c",
+        "filename": "grpc/dircacheserver/server.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "ditto here",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_846b2664",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "I\u0027m okay with this, but why the change?",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_c4e0beb9",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 618,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T00:54:11Z",
+      "side": 1,
+      "message": "and",
+      "range": {
+        "startLine": 618,
+        "startChar": 47,
+        "endLine": 618,
+        "endChar": 50
+      },
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
