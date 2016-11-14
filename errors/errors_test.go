@@ -2,14 +2,28 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+// +build !debug
+
 package errors
 
 import (
 	"io"
+	"os"
+	"os/exec"
 	"testing"
 
 	"upspin.io/upspin"
 )
+
+func TestDebug(t *testing.T) {
+	// Test with -tags debug to run the tests in debug_test.go
+	cmd := exec.Command("go", "test", "-tags", "debug")
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		t.Fatalf("external go test failed: %v", err)
+	}
+}
 
 func TestMarshal(t *testing.T) {
 	path := upspin.PathName("jane@doe.com/file")
