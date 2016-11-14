@@ -62,8 +62,9 @@ func testGetErrors(t *testing.T, r *testenv.Runner) {
 		t.Fatal(r.Diag())
 	}
 
-	// Give the reader a specific (non-read) right and
-	// it should see a permission error.
+	// Give the reader a specific (non-read) right and they should be able
+	// to get an incomplete DirEntry with Lookup and a "permission" error
+	// for a Get. A Get of a missing file should return "not exist".
 	for _, right := range []string{"list", "write", "create", "delete"} {
 		r.As(ownerName)
 		r.Put(access, right+":"+readerName)
@@ -75,24 +76,17 @@ func testGetErrors(t *testing.T, r *testenv.Runner) {
 		if !r.Match(errPermission) {
 			t.Fatalf("%s: %s", right, r.Diag())
 		}
-		if right == "list" {
-			r.DirLookup(file)
-			if !r.GotIncompleteEntry(file) {
-				t.Fatalf(r.Diag())
-			}
+		r.DirLookup(file)
+		if !r.GotIncompleteEntry(file) {
+			t.Fatalf(r.Diag())
 		}
-
+		r.Get(file)
+		if !r.Match(errPermission) {
+			t.Fatal(r.Diag())
+		}
 		r.Get(missingFile)
-		if right == "list" {
-			// Can only see if the file exists with list rights.
-			if !r.Match(errNotExist) {
-				t.Fatal(r.Diag())
-			}
-		} else {
-			// Without list rights cannot probe the name space.
-			if !r.Match(errPrivate) {
-				t.Fatal(r.Diag())
-			}
+		if !r.Match(errNotExist) {
+			t.Fatal(r.Diag())
 		}
 	}
 
@@ -505,9 +499,9 @@ func testMakeDirectoryErrors(t *testing.T, r *testenv.Runner) {
 		t.Fatal(r.Diag())
 	}
 
-	// Lookup should fail as the writer.
+	// Lookup should return an incomplete entry as the writer.
 	r.DirLookup(subdir)
-	if !r.Match(errPermission) {
+	if !r.GotIncompleteEntry(subdir) {
 		t.Fatal(r.Diag())
 	}
 
