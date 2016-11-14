@@ -208,9 +208,9 @@ func (s *server) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 	}
 	if err != nil {
 		if errors.Match(errNotExist, err) {
-			if canList, _, err := s.hasRight(access.List, p, o); err != nil {
+			if canAny, _, err := s.hasRight(access.AnyRight, p, o); err != nil {
 				return nil, err
-			} else if !canList {
+			} else if !canAny {
 				return nil, errors.E(op, name, errors.Private)
 			}
 		}
@@ -226,13 +226,16 @@ func (s *server) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, err)
 	}
 	if !canRead {
-		canList, _, err := s.hasRight(access.List, p, o)
+		canAny, _, err := s.hasRight(access.AnyRight, p, o)
 		if err != nil {
 			return nil, errors.E(op, err)
 		}
-		if !canList {
+		if !canAny {
 			return nil, s.errPerm(op, p, o)
 		}
+		// Make a copy and mark incomplete.
+		e := *entry
+		entry = &e
 		entry.MarkIncomplete()
 	}
 	return entry, nil

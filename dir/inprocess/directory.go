@@ -491,9 +491,9 @@ func (s *server) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	entry, err := s.lookup(op, parsed, true)
 	if err != nil {
 		if errors.Match(notExist, err) {
-			if canList, err := s.can(access.List, parsed); err != nil {
+			if canAny, err := s.can(access.AnyRight, parsed); err != nil {
 				return nil, err
-			} else if !canList {
+			} else if !canAny {
 				return nil, errors.E(op, pathName, errors.Private)
 			}
 		}
@@ -505,11 +505,11 @@ func (s *server) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, err)
 	}
 	if !canRead {
-		canList, err := s.can(access.List, parsed)
+		canAny, err := s.can(access.AnyRight, parsed)
 		if err != nil {
 			return nil, errors.E(op, err)
 		}
-		if !canList {
+		if !canAny {
 			return nil, s.errPerm(op, parsed)
 		}
 		entry.MarkIncomplete()
@@ -595,7 +595,7 @@ func (s *server) listDir(dirName upspin.PathName) ([]*upspin.DirEntry, error) {
 		return nil, errors.E(op, dir.Name, errors.NotDir)
 	}
 
-	// Check that we have list rights for any file in the directory.
+	// Check that we have list rights for the directory.
 	canList, err := s.can(access.List, parsed)
 	if err != nil {
 		// TODO(adg): this error needs sanitizing
