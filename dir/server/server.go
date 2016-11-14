@@ -211,9 +211,9 @@ func (s *server) lookupWithPermissions(op string, name upspin.PathName, opts ...
 	}
 	if err != nil {
 		if errors.Match(errNotExist, err) {
-			if canList, _, err := s.hasRight(access.List, p, opts...); err != nil {
+			if canAny, _, err := s.hasRight(access.AnyRight, p, opts...); err != nil {
 				return nil, err
-			} else if !canList {
+			} else if !canAny {
 				return nil, errors.E(op, name, errors.Private)
 			}
 		}
@@ -229,13 +229,16 @@ func (s *server) lookupWithPermissions(op string, name upspin.PathName, opts ...
 		return nil, errors.E(op, err)
 	}
 	if !canRead {
-		canList, _, err := s.hasRight(access.List, p, opts...)
+		canAny, _, err := s.hasRight(access.AnyRight, p, opts...)
 		if err != nil {
 			return nil, errors.E(op, err)
 		}
-		if !canList {
+		if !canAny {
 			return nil, s.errPerm(op, p, opts...)
 		}
+		// Make a copy and mark incomplete.
+		e := *entry
+		entry = &e
 		entry.MarkIncomplete()
 	}
 	return entry, nil
