@@ -16,6 +16,24 @@
       "revId": "df9cedcbb74c54a868cff57cf666bf0fd01665d6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0b1ef349_8aaa4f6f",
+        "filename": "errors/errors_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-14T10:37:00Z",
+      "side": 1,
+      "message": "agree it doesn\u0027t seem right but I also don\u0027t have better ideas.\nadopted your suggestion",
+      "parentUuid": "0b97d3c5_d7acf4d6",
+      "revId": "df9cedcbb74c54a868cff57cf666bf0fd01665d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
