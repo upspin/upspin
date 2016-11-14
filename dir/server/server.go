@@ -200,6 +200,11 @@ func (s *server) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 	}
 
 	entry, err := s.lookup(op, p, entryMustBeClean, o)
+	if entry != nil {
+		// Make a copy of the entry before returning it anywhere.
+		e := *entry
+		entry = &e
+	}
 
 	// Check if the user can know about the file at all. If not, to prevent
 	// leaking its existence, return NotExist.
@@ -208,9 +213,9 @@ func (s *server) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 	}
 	if err != nil {
 		if errors.Match(errNotExist, err) {
-			if canList, _, err := s.hasRight(access.List, p, o); err != nil {
+			if canAny, _, err := s.hasRight(access.AnyRight, p, o); err != nil {
 				return nil, err
-			} else if !canList {
+			} else if !canAny {
 				return nil, errors.E(op, name, errors.Private)
 			}
 		}
@@ -226,11 +231,11 @@ func (s *server) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, err)
 	}
 	if !canRead {
-		canList, _, err := s.hasRight(access.List, p, o)
+		canAny, _, err := s.hasRight(access.AnyRight, p, o)
 		if err != nil {
 			return nil, errors.E(op, err)
 		}
-		if !canList {
+		if !canAny {
 			return nil, s.errPerm(op, p, o)
 		}
 		entry.MarkIncomplete()
