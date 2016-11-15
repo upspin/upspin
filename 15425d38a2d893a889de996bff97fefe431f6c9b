@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_19d42dd7",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-15T22:43:36Z",
+      "side": 1,
+      "message": "os.File.ReadAt doesn\u0027t seek. It uses a different system call.",
+      "parentUuid": "10ad446a_f32e12e8",
+      "revId": "15425d38a2d893a889de996bff97fefe431f6c9b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "10ad446a_93c47fa2",
         "filename": "dir/server/tree/tree.go",
         "patchSetId": 13
