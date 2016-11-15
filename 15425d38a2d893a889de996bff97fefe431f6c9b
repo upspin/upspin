@@ -73,6 +73,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_99a33d4e",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-15T22:48:49Z",
+      "side": 1,
+      "message": "Ok, but I should probably not be doing a ton of work on the log here since this more about the Tree (I had another CL for the log, but we decided to do this in one big one). I\u0027ve put a TODO for now.",
+      "parentUuid": "10ad446a_19d42dd7",
+      "revId": "15425d38a2d893a889de996bff97fefe431f6c9b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "10ad446a_93c47fa2",
         "filename": "dir/server/tree/tree.go",
         "patchSetId": 13
