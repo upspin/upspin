@@ -122,6 +122,19 @@ func (f *upspinFS) Root() (fs.Node, error) {
 	return f.root, nil
 }
 
+// Statfs implements fs.Statfser.  We make up the response just to keep FUSE happy.
+func (f *upspinFS) Statfs(ctx gContext.Context, req *fuse.StatfsRequest, resp *fuse.StatfsResponse) error {
+	resp.Blocks = 1000000000 // Total data blocks in file system.
+	resp.Bfree = 1000000000  // Free blocks in file system.
+	resp.Bavail = 1000000000 // Free blocks in file system if you're not root.
+	resp.Files = 100000      // Total files in file system.
+	resp.Ffree = 100000      // Free files in file system.
+	resp.Bsize = 64 * 1024   // Block size
+	resp.Namelen = 256       // Maximum file name length?
+	resp.Frsize = 1          // Fragment size, smallest addressable data size in the file system.
+	return nil
+}
+
 func (f *upspinFS) allocNode(parent *node, name string, mode os.FileMode, size uint64, mtime time.Time) *node {
 	n := &node{f: f}
 	now := time.Now()
@@ -849,11 +862,11 @@ func do(ctx upspin.Context, mountpoint string) chan bool {
 		fuse.FSName("upspin"),
 		fuse.Subtype("fs"),
 		fuse.LocalVolume(),
-		fuse.VolumeName(string(f.context.UserName())),
+		fuse.VolumeName(fmt.Sprintf("%s-%s", f.context.DirEndpoint().NetAddr, f.context.UserName())),
 		fuse.DaemonTimeout("240"),
 		//fuse.OSXDebugFuseKernel(),
 		//fuse.NoAppleDouble(),
-		fuse.NoAppleXattr(),
+		//fuse.NoAppleXattr(),
 	)
 	if err != nil {
 		log.Fatalf("fuse.Mount failed: %s", err)
