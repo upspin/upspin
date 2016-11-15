@@ -16,6 +16,24 @@
       "revId": "3044c2052156de9de32193ed30ae050fb2a23560",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_738f827d",
+        "filename": "dir/remote/remote.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-11-15T21:40:37Z",
+      "side": 1,
+      "message": "I thought the input err was being passed through.   I\u0027ll read more closely.",
+      "parentUuid": "b0ff186b_b2144009",
+      "revId": "3044c2052156de9de32193ed30ae050fb2a23560",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
