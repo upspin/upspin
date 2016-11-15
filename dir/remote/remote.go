@@ -47,14 +47,17 @@ func (r *remote) Glob(pattern string) ([]*upspin.DirEntry, error) {
 		Pattern: pattern,
 	}
 	resp, err := r.dirClient.Glob(gCtx, req, callOpt)
-	err = finishAuth(err)
-	if err != nil {
-		return nil, op.error(errors.IO, err)
+	errAuth := finishAuth(err)
+	if errAuth != nil && !errors.Match(errors.E(errors.Internal), errAuth) {
+		return nil, op.error(errors.IO, errAuth)
 	}
 
 	err = unmarshalError(resp.Error)
 	if err != nil && err != upspin.ErrFollowLink {
 		return nil, op.error(err)
+	}
+	if errAuth != nil {
+		return nil, op.error(errAuth)
 	}
 	entries, pErr := proto.UpspinDirEntries(resp.Entries)
 	if pErr != nil {
