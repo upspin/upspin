@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "10ad446a_d450aa7d",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-15T00:38:21Z",
+      "side": 1,
+      "message": "It\u0027s probably better if this becomes lookup and the old lookup becomes innerLookup or forceLookup. As is, lookup also has options, so it\u0027s not clear what distinguishes them.\n\nAlternatively, this could be called lookupWithValidation or lookupWithAccessCheck, etc.\n\nThanks.",
+      "revId": "000612c761d0f01f3a21060a67ea9182c9d67c02",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_54e03ab1",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 524,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-15T00:38:21Z",
+      "side": 1,
+      "message": "s/bvalid/valid/",
+      "revId": "000612c761d0f01f3a21060a67ea9182c9d67c02",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_942c720a",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 535,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-15T00:38:21Z",
+      "side": 1,
+      "message": "tree.List does not sort the list. It does not matter here because serverutil.Glob does sort at the end, confirm?",
+      "revId": "000612c761d0f01f3a21060a67ea9182c9d67c02",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
