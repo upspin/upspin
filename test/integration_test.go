@@ -304,6 +304,7 @@ var integrationTests = []struct {
 	{"GroupAccess", testGroupAccess},
 	{"Watch", testWatchCurrent},
 	{"WatchErrors", testWatchErrors},
+	{"DirEntryClobber", testDirEntryClobber},
 
 	// Each of these tests depend on the output of the previous one.
 	{"NoReadersAllowed", testNoReadersAllowed},
