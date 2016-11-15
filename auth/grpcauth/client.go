@@ -308,7 +308,10 @@ func (ac *AuthClientService) NewAuthContext() (ctx gContext.Context, opt grpc.Ca
 
 		token, ok := header[authTokenKey]
 		if !ok || len(token) != 1 {
-			return errors.E(op, errors.Permission, errors.Str("no auth token in response header"))
+			// Authentication failed, but the error message is in
+			// the RPC response, so let the client proceed to
+			// unmarshal the error and report it to the user.
+			return nil
 		}
 		now := time.Now()
 
