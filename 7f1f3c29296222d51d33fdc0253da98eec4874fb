@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "0b1ef349_6d552d63",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-15T00:26:54Z",
+      "side": 1,
+      "message": "Yeah, but the caller of Lookup may still mutate the entry, corrupting the tree internals. I can adopt your change with the understanding that the code is still wrong. Probably it\u0027s the tree that should be making the copy.",
+      "parentUuid": "10ad446a_f47b662a",
+      "revId": "7f1f3c29296222d51d33fdc0253da98eec4874fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "10ad446a_949f923b",
         "filename": "dir/server/server.go",
         "patchSetId": 1
