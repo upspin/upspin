@@ -7,10 +7,12 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 
 	yaml "gopkg.in/yaml.v2"
 
 	"upspin.io/factotum"
+	"upspin.io/key/usercache"
 	"upspin.io/upspin"
 	"upspin.io/user"
 )
@@ -70,7 +72,54 @@ same YAML format printed by the command without the -put flag.
 			s.exit(err)
 		}
 		fmt.Printf("%s\n", blob)
+		if name != s.context.UserName() {
+			continue
+		}
+		// When it's the user asking about herself, the result comes
+		// from the context and may disagree with the value in the
+		// key store. This is a common source of error so we want to
+		// diagnose it. To do that, we wipe the key cache and go again.
+		// This will wipe the memory of our remembered context and
+		// reload it from the key server.
+		usercache.ResetGlobal()
+		keyU, err := keyServer.Lookup(name)
+		if err != nil {
+			s.exit(err)
+		}
+		if keyU.Name != u.Name {
+			// Inconceivable but check anyway.
+			s.exitf("user name mismatch between context (%s) and key server (%s)",
+				u.Name, keyU.Name)
+		}
+		if keyU.PublicKey != u.PublicKey {
+			// Inconceivable but check anyway.
+			s.exitf("public key mismatch between context and key server")
+		}
+		// There must be dir servers defined in both and we expect agreement.
+		if !equalEndpoints(keyU.Dirs, u.Dirs) {
+			log.Printf("context: %s", u.Dirs)
+			log.Printf("key server: %s", u.Dirs)
+			s.exitf("dir server mismatch between context and key server")
+		}
+		// Remote stores need not be defined (yet).
+		if len(keyU.Stores) > 0 && !equalEndpoints(keyU.Stores, u.Stores) {
+			log.Printf("context: %s", u.Stores)
+			log.Printf("key server: %s", u.Stores)
+			s.exitf("store server mismatch between context and key server")
+		}
 	}
+}
+
+func equalEndpoints(a, b []upspin.Endpoint) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i, e := range a {
+		if e != b[i] {
+			return false
+		}
+	}
+	return true
 }
 
 func (s *State) putUser(keyServer upspin.KeyServer, inFile string, force bool) {
