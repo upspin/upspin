@@ -67,6 +67,8 @@ var (
 	prefix = flag.String("prefix", "", "A `string` that begins all resource names")
 	domain = flag.String("domain", "", "The base domain `name` for the Upspin services")
 
+	machineType = flag.String("machinetype", "n1-standard-1", "GCP machine type for servers")
+
 	keyserver = flag.String("keyserver", defaultKeyServer, "Key server `host:port` (empty means use this cluster's KeyServer)")
 
 	create = flag.Bool("create", false, "Create cloud services")
@@ -102,6 +104,8 @@ func main() {
 		Project: *project,
 		Region:  region,
 		Zone:    *zone,
+
+		MachineType: *machineType,
 
 		Prefix: *prefix,
 		Domain: *domain,
@@ -159,6 +163,10 @@ type Config struct {
 	Project string
 	Region  string
 	Zone    string
+
+	// Machine type is the type of machine to use for Store and Dir servers.
+	// Example: "n1-standard-1", "f1-micro", "g1-small".
+	MachineType string
 
 	// Prefix is a string that is used as the prefix for all resource names
 	// (buckets, disks, clusters, etc). It may be empty. By varying Prefix
@@ -646,6 +654,24 @@ func (c *Config) createNetwork() error {
 		AutoCreateSubnetworks: true,
 	}
 	op, err := svc.Networks.Insert(c.Project, network).Do()
+	err = okReason("alreadyExists", c.waitOp(svc, op, err))
+	if err != nil {
+		return err
+	}
+
+	// Setup SSH firewall rule.
+	ssh := &compute.Firewall{
+		Name:         "ssh",
+		Network:      op.TargetLink,
+		SourceRanges: []string{"0.0.0.0/0"},
+		Allowed: []*compute.FirewallAllowed{
+			{
+				IPProtocol: "tcp",
+				Ports:      []string{"22"},
+			},
+		},
+	}
+	op, err = svc.Firewalls.Insert(c.Project, ssh).Do()
 	return okReason("alreadyExists", c.waitOp(svc, op, err))
 }
 
@@ -716,7 +742,7 @@ func (c *Config) createCluster() error {
 			InitialNodeCount: 2,
 			NodeConfig: &container.NodeConfig{
 				DiskSizeGb:  10,
-				MachineType: "n1-standard-1",
+				MachineType: c.MachineType,
 				OauthScopes: []string{
 					// Required for mounting persistent disk.
 					compute.ComputeScope,
@@ -1058,15 +1084,12 @@ func wrap(s string, err error) error {
 
 func okReason(reason string, err error) error {
 	if e, ok := err.(*googleapi.Error); ok && len(e.Errors) > 0 {
-		ok := true
 		for _, e := range e.Errors {
 			if e.Reason != reason {
-				ok = false
+				return err
 			}
 		}
-		if ok {
-			return nil
-		}
+		return nil
 	}
 	return err
 }
