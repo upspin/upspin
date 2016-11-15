@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "10ad446a_f47b662a",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-15T00:23:25Z",
+      "side": 1,
+      "message": "Thanks for catching this. I did not notice it when we added \"MarkIncomplete\". A week or two ago I almost closed issue #41 saying we don\u0027t mutate the entry except in Glob. It was true then.\n\nBy the way, I\u0027d prefer if you did this below, on line 241.",
+      "revId": "7f1f3c29296222d51d33fdc0253da98eec4874fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_949f923b",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-15T00:23:25Z",
+      "side": 1,
+      "message": "You can make a copy of the entry here instead. It\u0027s what we do in Glob too. Thanks.",
+      "revId": "7f1f3c29296222d51d33fdc0253da98eec4874fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_3491fe30",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 572,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-15T00:23:25Z",
+      "side": 1,
+      "message": "Glob does this too.",
+      "revId": "7f1f3c29296222d51d33fdc0253da98eec4874fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
