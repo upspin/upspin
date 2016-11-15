@@ -16,6 +16,24 @@
       "revId": "282e135020365f1dbc8fd4a1cbe74044b32cffef",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b0ff186b_722bf845",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-15T21:25:01Z",
+      "side": 1,
+      "message": "This is in the client, though. A logic change here should not affect security in the server, which is still doing access checks and refusing to serve unauthenticated users.",
+      "parentUuid": "10ad446a_a435b797",
+      "revId": "282e135020365f1dbc8fd4a1cbe74044b32cffef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
