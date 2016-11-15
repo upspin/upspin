@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_27da2908",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-15T16:45:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0ff186b_1270ac49",
+      "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b0ff186b_7275b839",
         "filename": "dir/server/tree/tree.go",
         "patchSetId": 12
@@ -30,6 +48,24 @@
       "writtenOn": "2016-11-15T03:11:41Z",
       "side": 1,
       "message": "delete",
+      "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_c729d5f8",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 356,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-15T16:45:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0ff186b_7275b839",
       "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_67f6e172",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 358,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-15T16:45:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0ff186b_527a342b",
+      "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b0ff186b_b27e001c",
         "filename": "dir/server/tree/tree.go",
         "patchSetId": 12
@@ -64,6 +118,24 @@
       "writtenOn": "2016-11-15T03:11:41Z",
       "side": 1,
       "message": "these errors can never happen, so don\u0027t bother checking",
+      "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_e7097197",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 813,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-15T16:45:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0ff186b_b27e001c",
       "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_e750917d",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-15T16:45:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0ff186b_927bfc2b",
+      "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b0ff186b_f288880a",
         "filename": "dir/server/tree/watch.go",
         "patchSetId": 12
@@ -98,6 +188,24 @@
       "writtenOn": "2016-11-15T03:11:41Z",
       "side": 1,
       "message": "unbuffered, i think\notherwise we can\u0027t distinguish between \"client has received the event\" and \"the event has sat in the channel buffer for a year\"",
+      "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_4743a5af",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-15T16:45:18Z",
+      "side": 1,
+      "message": "Unbuffered works for now given we\u0027re in a goroutine. But it may not be the ideal solution in all cases. Let\u0027s go with that for now.\nDone.",
+      "parentUuid": "b0ff186b_f288880a",
       "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_a731394b",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-15T16:45:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0ff186b_d28584f0",
+      "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b0ff186b_f2b6c8b9",
         "filename": "dir/server/tree/watch.go",
         "patchSetId": 12
@@ -132,6 +258,24 @@
       "writtenOn": "2016-11-15T03:11:41Z",
       "side": 1,
       "message": "this should be of buffer size 1.\nso if a server has work to do but it\u0027s not ready to receive from hasWork, it\u0027ll get the message eventually.",
+      "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_e7b6518c",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-15T16:45:18Z",
+      "side": 1,
+      "message": "I was afraid of having to stop the tree, but I guess 10 or 100 would have the same problem, just at the expense of more memory.\nDone.",
+      "parentUuid": "b0ff186b_f2b6c8b9",
       "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -155,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_07b4cd81",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-15T16:45:18Z",
+      "side": 1,
+      "message": "It is for that particular subtree. I clarified the comment.",
+      "parentUuid": "b0ff186b_b2a56088",
+      "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b0ff186b_728c9819",
         "filename": "dir/server/tree/watch.go",
         "patchSetId": 12
@@ -166,6 +328,24 @@
       "writtenOn": "2016-11-15T03:11:41Z",
       "side": 1,
       "message": "sendEvent ?",
+      "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_e7ddf1cd",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-15T16:45:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0ff186b_728c9819",
       "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -189,6 +369,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_a7d7f9a9",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-15T16:45:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0ff186b_72c3f828",
+      "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b0ff186b_b2ac406c",
         "filename": "dir/server/tree/watch.go",
         "patchSetId": 12
@@ -200,6 +398,24 @@
       "writtenOn": "2016-11-15T03:11:41Z",
       "side": 1,
       "message": "shouldn\u0027t you be sending an error event and closing the channel in this case?",
+      "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_279229e7",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-15T16:45:18Z",
+      "side": 1,
+      "message": "Maybe. The problem is knowing which errors not to send. If it\u0027s a timeout, we shouldn\u0027t send it, because it will only compound the problem. I created a sentinel error for that now.\n\nDone.",
+      "parentUuid": "b0ff186b_b2ac406c",
       "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -223,6 +439,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_e7417176",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-15T16:45:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0ff186b_92a93c5c",
+      "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b0ff186b_32e050b1",
         "filename": "dir/server/tree/watch.go",
         "patchSetId": 12
@@ -240,6 +474,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_a73b79fa",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-15T16:45:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0ff186b_32e050b1",
+      "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b0ff186b_d2b3c4c7",
         "filename": "dir/server/tree/watch.go",
         "patchSetId": 12
@@ -251,6 +503,42 @@
       "writtenOn": "2016-11-15T03:11:41Z",
       "side": 1,
       "message": "Nothing bad happened. If the server isn\u0027t ready to receive from hasWork then  it\u0027s busy doing actual work. It\u0027ll get around to teh work eventually.",
+      "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_871afd96",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-15T16:45:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0ff186b_d2b3c4c7",
+      "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_e708914c",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-15T16:45:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0ff186b_d2b3c4c7",
       "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
