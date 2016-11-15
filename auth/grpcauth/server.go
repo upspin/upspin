@@ -66,6 +66,9 @@ const (
 	// authRequestKey is the key for inline user authentication.
 	authRequestKey = "upspinauthrequest"
 
+	// authErrorKey is the key for inline user authentication errors.
+	authErrorKey = "upspinautherror"
+
 	// proxyRequestKey key is for inline proxy configuration requests.
 	proxyRequestKey = "upspinproxyrequest"
 
@@ -136,32 +139,46 @@ func generateRandomToken() (string, error) {
 // GetSessionFromContext looks for an authentication token or request in the
 // given context, finds or creates a session for that token or request,
 // and returns that session.
-func (s *secureServerImpl) GetSessionFromContext(ctx gContext.Context) (auth.Session, error) {
+func (s *secureServerImpl) GetSessionFromContext(ctx gContext.Context) (session auth.Session, err error) {
 	const op = "auth/grpcauth.GetSessionFromContext"
+	defer func() {
+		if err == nil {
+			return
+		}
+		// Capture session setup errors and
+		// send them to the client in a GRPC header.
+		header := metadata.MD{authErrorKey: []string{err.Error()}}
+		if err := grpc.SendHeader(ctx, header); err != nil {
+			log.Error.Printf("%v: failed to send GRPC header: %v", op, err)
+		}
+		// Attach the op to the error here, because the client doesn't
+		// care that this error originated in this function.
+		err = errors.E(op, err)
+	}()
 	md, ok := metadata.FromContext(ctx)
 	if !ok {
-		return nil, errors.E(op, errors.Invalid, errors.Str("invalid request metadata"))
+		return nil, errors.E(errors.Invalid, errors.Str("invalid request metadata"))
 	}
 	if tok, ok := md[authTokenKey]; ok && len(tok) == 1 {
-		return s.validateToken(op, ctx, tok[0])
+		return s.validateToken(ctx, tok[0])
 	}
 	proxyRequest, ok := md[proxyRequestKey]
 	if ok && len(proxyRequest) != 1 {
-		return nil, errors.E(op, errors.Invalid, errors.Str("invalid proxy request in metadata"))
+		return nil, errors.E(errors.Invalid, errors.Str("invalid proxy request in metadata"))
 	}
 	authRequest, ok := md[authRequestKey]
 	if ok && len(authRequest) != 4 {
-		return nil, errors.E(op, errors.Invalid, errors.Str("invalid auth request in metadata"))
+		return nil, errors.E(errors.Invalid, errors.Str("invalid auth request in metadata"))
 	}
 	if authRequest == nil {
-		return nil, errors.E(op, errors.Invalid, errors.Str("no auth token or request in metadata"))
+		return nil, errors.E(errors.Invalid, errors.Str("no auth token or request in metadata"))
 	}
-	return s.handleSessionRequest(op, ctx, authRequest, proxyRequest)
+	return s.handleSessionRequest(ctx, authRequest, proxyRequest)
 }
 
-func (s *secureServerImpl) validateToken(op string, ctx gContext.Context, authToken string) (auth.Session, error) {
+func (s *secureServerImpl) validateToken(ctx gContext.Context, authToken string) (auth.Session, error) {
 	if len(authToken) < authTokenEntropyLen {
-		return nil, errors.E(op, errors.Invalid, errors.Str("invalid auth token"))
+		return nil, errors.E(errors.Invalid, errors.Str("invalid auth token"))
 	}
 
 	// Get the session for this authToken
@@ -170,7 +187,7 @@ func (s *secureServerImpl) validateToken(op string, ctx gContext.Context, authTo
 		// We don't know this client or have forgotten about it. We must authenticate.
 		// Log it so we can track how often this happens. Maybe we need to increase the session cache size.
 		log.Debug.Printf("Got token from user but there's no session for it.")
-		return nil, errors.E(op, errors.Permission, errUnauthenticated)
+		return nil, errors.E(errors.Permission, errUnauthenticated)
 	}
 
 	// If session has expired, forcibly remove it from the cache and return an error.
@@ -180,17 +197,17 @@ func (s *secureServerImpl) validateToken(op string, ctx gContext.Context, authTo
 	}
 	if session.Expires().Before(timeFunc()) {
 		auth.ClearSession(authToken)
-		return nil, errors.E(op, errors.Permission, errExpired)
+		return nil, errors.E(errors.Permission, errExpired)
 	}
 
 	return session, nil
 }
 
-func (s *secureServerImpl) handleSessionRequest(op string, ctx gContext.Context, authRequest []string, proxyRequest []string) (auth.Session, error) {
+func (s *secureServerImpl) handleSessionRequest(ctx gContext.Context, authRequest []string, proxyRequest []string) (auth.Session, error) {
 	// Validate the username.
 	user := upspin.UserName(authRequest[0])
 	if err := valid.UserName(user); err != nil {
-		return nil, errors.E(op, user, err)
+		return nil, errors.E(user, err)
 	}
 
 	var now time.Time
@@ -203,19 +220,19 @@ func (s *secureServerImpl) handleSessionRequest(op string, ctx gContext.Context,
 	// Get user's public key.
 	key, err := s.config.Lookup(user)
 	if err != nil {
-		return nil, errors.E(op, user, err)
+		return nil, errors.E(user, err)
 	}
 
 	// Validate signature.
 	if err := verifyUser(key, authRequest, clientAuthMagic, now); err != nil {
-		return nil, errors.E(op, errors.Permission, user, errors.Errorf("invalid signature: %v", err))
+		return nil, errors.E(errors.Permission, user, errors.Errorf("invalid signature: %v", err))
 	}
 
 	// Generate an auth token and bind it to a session for the client.
 	expiration := now.Add(authTokenDuration)
 	authToken, err := generateRandomToken()
 	if err != nil {
-		return nil, errors.E(op, err)
+		return nil, err
 	}
 	header := metadata.MD{authTokenKey: []string{authToken}}
 
@@ -224,19 +241,19 @@ func (s *secureServerImpl) handleSessionRequest(op string, ctx gContext.Context,
 	if len(proxyRequest) == 1 {
 		ep, err = upspin.ParseEndpoint(proxyRequest[0])
 		if err != nil {
-			return nil, errors.E(op, errors.Invalid, errors.Errorf("invalid proxy endpoint: %v", err))
+			return nil, errors.E(errors.Invalid, errors.Errorf("invalid proxy endpoint: %v", err))
 		}
 		// Authenticate the server to the user.
 		authMsg, err := signUser(s.config.Context, serverAuthMagic)
 		if err != nil {
-			return nil, errors.E(op, errors.Permission, err)
+			return nil, errors.E(errors.Permission, err)
 		}
 		header[authRequestKey] = authMsg
 	}
 
 	session := auth.NewSession(user, expiration, authToken, ep, nil)
 	if err := grpc.SendHeader(ctx, header); err != nil {
-		return nil, errors.E(op, err)
+		return nil, err
 	}
 	return session, nil
 }
