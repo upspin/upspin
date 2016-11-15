@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b0ff186b_b2144009",
+        "filename": "dir/remote/remote.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-15T21:27:10Z",
+      "side": 1,
+      "message": "this is wrong. now we\u0027re not checking the err above.\ni don\u0027t think this accomplishes anything apart from making the code more complicated. will discuss in the meeting.",
+      "revId": "3044c2052156de9de32193ed30ae050fb2a23560",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
