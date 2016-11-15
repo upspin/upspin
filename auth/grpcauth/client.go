@@ -308,7 +308,11 @@ func (ac *AuthClientService) NewAuthContext() (ctx gContext.Context, opt grpc.Ca
 
 		token, ok := header[authTokenKey]
 		if !ok || len(token) != 1 {
-			return errors.E(op, errors.Permission, errors.Str("no auth token in response header"))
+			authErr, ok := header[authErrorKey]
+			if !ok || len(authErr) != 1 {
+				return errors.E(op, errors.Invalid, errors.Str("server did not respond to our authentication request"))
+			}
+			return errors.E(op, errors.Permission, errors.Str(authErr[0]))
 		}
 		now := time.Now()
 
