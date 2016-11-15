@@ -33,8 +33,10 @@ import (
 	"time"
 
 	"cloud.google.com/go/storage"
+	"container/list"
 	"golang.org/x/oauth2/google"
 	cloudtrace "google.golang.org/api/cloudtrace/v1"
+	"google.golang.org/api/compute/v0.beta"
 	compute "google.golang.org/api/compute/v1"
 	container "google.golang.org/api/container/v1"
 	dns "google.golang.org/api/dns/v1"
@@ -66,6 +68,8 @@ var (
 
 	prefix = flag.String("prefix", "", "A `string` that begins all resource names")
 	domain = flag.String("domain", "", "The base domain `name` for the Upspin services")
+
+	machineType = flag.String("machinetype", "n1-standard-1", "GCP machine type for servers")
 
 	keyserver = flag.String("keyserver", defaultKeyServer, "Key server `host:port` (empty means use this cluster's KeyServer)")
 
@@ -102,6 +106,8 @@ func main() {
 		Project: *project,
 		Region:  region,
 		Zone:    *zone,
+
+		MachineType: *machineType,
 
 		Prefix: *prefix,
 		Domain: *domain,
@@ -159,6 +165,10 @@ type Config struct {
 	Project string
 	Region  string
 	Zone    string
+
+	// Machine type is the type of machine to use for Store and Dir servers.
+	// Example: "n1-standard-1", "f1-micro", "g1-small".
+	MachineType string
 
 	// Prefix is a string that is used as the prefix for all resource names
 	// (buckets, disks, clusters, etc). It may be empty. By varying Prefix
@@ -223,31 +233,31 @@ func (c *Config) Create() error {
 		// Cluster depends on network.
 		errc <- wrap("cluster", c.createCluster())
 	}()
+	/*
+		count++
+		go func() {
+			if err := wrap("buckets", c.createBuckets()); err != nil {
+				errc <- err
+				return
+			}
+			// Base image depends on storage buckets.
+			errc <- wrap("base", c.buildBaseImage())
+		}()
 
-	count++
-	go func() {
-		if err := wrap("buckets", c.createBuckets()); err != nil {
-			errc <- err
-			return
-		}
-		// Base image depends on storage buckets.
-		errc <- wrap("base", c.buildBaseImage())
-	}()
+		count++
+		go func() {
+			if err := wrap("addresses", c.createAddresses()); err != nil {
+				errc <- err
+				return
+			}
+			errc <- wrap("zone", c.createZone())
+		}()
 
-	count++
-	go func() {
-		if err := wrap("addresses", c.createAddresses()); err != nil {
-			errc <- err
-			return
-		}
-		errc <- wrap("zone", c.createZone())
-	}()
-
-	count++
-	go func() {
-		errc <- wrap("disks", c.createDisks())
-	}()
-
+		count++
+		go func() {
+			errc <- wrap("disks", c.createDisks())
+		}()
+	*/
 	// Wait for the above concurrent tasks to complete.
 	for i := 0; i < count; i++ {
 		if err := <-errc; err != nil {
@@ -646,6 +656,26 @@ func (c *Config) createNetwork() error {
 		AutoCreateSubnetworks: true,
 	}
 	op, err := svc.Networks.Insert(c.Project, network).Do()
+	//	err = okReason("alreadyExists", c.waitOp(svc, op, err))
+	if err != nil {
+		return err
+	}
+
+	fmt.Printf("=== network created: %s\n", network.SelfLink)
+
+	// Setup SSH firewall rule.
+	ssh := &compute.Firewall{
+		Name:         "ssh",
+		Network:      network.SelfLink,
+		SourceRanges: []string{"0.0.0.0/0"},
+		Allowed: []*compute.FirewallAllowed{
+			{
+				IPProtocol: "tcp",
+				Ports:      []string{"22"},
+			},
+		},
+	}
+	op, err = svc.Firewalls.Insert(c.Project, ssh).Do()
 	return okReason("alreadyExists", c.waitOp(svc, op, err))
 }
 
@@ -716,7 +746,7 @@ func (c *Config) createCluster() error {
 			InitialNodeCount: 2,
 			NodeConfig: &container.NodeConfig{
 				DiskSizeGb:  10,
-				MachineType: "n1-standard-1",
+				MachineType: c.MachineType,
 				OauthScopes: []string{
 					// Required for mounting persistent disk.
 					compute.ComputeScope,
