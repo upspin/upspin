@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "10ad446a_a435b797",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-11-15T16:23:36Z",
+      "side": 1,
+      "message": "It makes me nervous that \"Authentication failed\" returns the same way as \"Authentication verified\".   I\u0027ve started to look for the consequences elsewhere if we return errors.E(op,errors.Internal,\"missing authToken\") and deal specifically with that error return to print the RPC\u0027s error message.",
+      "revId": "282e135020365f1dbc8fd4a1cbe74044b32cffef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
