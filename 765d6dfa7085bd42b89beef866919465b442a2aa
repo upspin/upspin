@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b0ff186b_f2c2483f",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-16T01:17:58Z",
+      "side": 1,
+      "message": "I\u0027m concerned that there are code paths that would lead here. What are they? Can we make this check unnecessary?",
+      "revId": "765d6dfa7085bd42b89beef866919465b442a2aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b0ff186b_b2b8c0c9",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-16T01:17:58Z",
+      "side": 1,
+      "message": "you should also select on \u003c-w.done, and shut down the watcher if you receive a message there.",
+      "revId": "765d6dfa7085bd42b89beef866919465b442a2aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b0ff186b_d2bf44ad",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-16T01:17:58Z",
+      "side": 1,
+      "message": "how would w.events \u003d\u003d nil at this point? this smells bad",
+      "revId": "765d6dfa7085bd42b89beef866919465b442a2aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b0ff186b_32acd086",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-16T01:17:58Z",
+      "side": 1,
+      "message": "I think, at the top of this loop, you should put this:\n\nselect {\ncase \u003c-w.done:\n  return 0, nil\ndefault:\n}\n\nSo that if the client decides it\u0027s had enough, the server does as little work as possible.",
+      "revId": "765d6dfa7085bd42b89beef866919465b442a2aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b0ff186b_92b5bcd1",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-16T01:17:58Z",
+      "side": 1,
+      "message": "you need to close the channel after this, too.",
+      "revId": "765d6dfa7085bd42b89beef866919465b442a2aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
