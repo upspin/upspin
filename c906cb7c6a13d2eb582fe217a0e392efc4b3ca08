@@ -353,6 +353,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_ede62767",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-16T03:24:28Z",
+      "side": 1,
+      "message": "This is the behavior Dave wants though. He wants to replicate and entire tree.\n\nAnd it\u0027s also consistent with the behavior of any order \u003e\u003d 0. We send everything that gets touched under a certain path. Why do something differently on -1 and then revert back to sending updates on everything under the path?\n\nPerhaps we could change order to mean: a negative number X means the current state of -X elements down the path. So, for -1, we would do what you suggest. -2 means path p plus its children, -3 their children also, -99 up to 98 levels down from p, and so on. Seems weird tho.\n\nThoughts?",
+      "parentUuid": "b0ff186b_32c5f04e",
+      "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b0ff186b_728c9819",
         "filename": "dir/server/tree/watch.go",
         "patchSetId": 12
@@ -470,6 +488,24 @@
       "side": 1,
       "message": "The API specifically says that it sends timeout errors.\nI think we should always assume that the client will eventually catch up.",
       "parentUuid": "10ad446a_279229e7",
+      "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_6d41d755",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-16T03:24:28Z",
+      "side": 1,
+      "message": "This is also something Dave was very much against. I think it kind of makes little sense to send an error if you got a timeout on an unbuffered channel. Won\u0027t you get another error again and have to wait yet more time to send it?",
+      "parentUuid": "b0ff186b_d2e8e4c5",
       "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
