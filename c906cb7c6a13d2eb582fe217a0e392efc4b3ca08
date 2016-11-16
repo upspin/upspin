@@ -282,6 +282,24 @@
     },
     {
       "key": {
+        "uuid": "b0ff186b_f2eb68bf",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-16T01:17:58Z",
+      "side": 1,
+      "message": "Yeah, there\u0027s a school of thought that it\u0027s rarely useful to ever have a buffered channel of size \u003e1. I think this is one of those cases.",
+      "parentUuid": "10ad446a_e7b6518c",
+      "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b0ff186b_b2a56088",
         "filename": "dir/server/tree/watch.go",
         "patchSetId": 12
@@ -311,6 +329,24 @@
       "side": 1,
       "message": "It is for that particular subtree. I clarified the comment.",
       "parentUuid": "b0ff186b_b2a56088",
+      "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b0ff186b_32c5f04e",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-16T01:17:58Z",
+      "side": 1,
+      "message": "I know it is, but I don\u0027t think we should send every entry in the subtree either. It\u0027s impractical to send the entire state of a large subtree any time someone wants to start watching a tree.\n\nYou already get that, and more, with offset\u003d0, and offset\u003d-1 is the only other way to find the current offset. A call with offset\u003d-1 should not be so expensive.",
+      "parentUuid": "10ad446a_07b4cd81",
       "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -416,6 +452,24 @@
       "side": 1,
       "message": "Maybe. The problem is knowing which errors not to send. If it\u0027s a timeout, we shouldn\u0027t send it, because it will only compound the problem. I created a sentinel error for that now.\n\nDone.",
       "parentUuid": "b0ff186b_b2ac406c",
+      "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b0ff186b_d2e8e4c5",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-16T01:17:58Z",
+      "side": 1,
+      "message": "The API specifically says that it sends timeout errors.\nI think we should always assume that the client will eventually catch up.",
+      "parentUuid": "10ad446a_279229e7",
       "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
