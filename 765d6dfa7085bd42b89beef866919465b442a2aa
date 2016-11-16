@@ -124,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "b0ff186b_9559264a",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-16T21:39:10Z",
+      "side": 1,
+      "message": "Yes, but that\u0027s *after* you\u0027ve done all the work.\nIf there\u0027s been a lot of activity outside the watched path, this loop might read a lot of the log before finally giving up.",
+      "parentUuid": "10ad446a_d51411bd",
+      "revId": "765d6dfa7085bd42b89beef866919465b442a2aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b0ff186b_92b5bcd1",
         "filename": "dir/server/tree/watch.go",
         "patchSetId": 17
