@@ -54,11 +54,11 @@ func TestParseMailFailDKIM_HardFailure(t *testing.T) {
 func TestParseBody(t *testing.T) {
 	const valid = `
 
-I am foo@bar.com
-My public key is
-p256
-1063349993423423435345345345345345340
-3453453457828271720003453453245354698
+I am foo@bar.com;
+My public key is:
+p256;
+1063349993423423435345345345345345340;
+3453453457828271720003453453245354698;
 Signature:
 122323423:199993211232983
 
@@ -92,8 +92,8 @@ Signature:
 
 func TestParseBody_MissingLines(t *testing.T) {
 	const missing = `
-I am foo@bar.com
-My public key is
+I am foo@bar.com;
+My public key is:
 foo
 `
 	_, _, _, err := ParseBody(missing)
@@ -105,8 +105,8 @@ foo
 
 func TestParseBody_HTMLAndEmptyLines(t *testing.T) {
 	const funky = `
-   I *am* bla@bleh.com   *
-   	*My public key is *
+   I *am* bla@bleh.com  ; *
+   	*My public key is: *
    	p256*
 ` + "\r" + `
    	          999*9*9
@@ -144,7 +144,35 @@ func TestParseBody_HTMLAndEmptyLines(t *testing.T) {
 	if got, want := sig, expectedSig; !reflect.DeepEqual(got, want) {
 		t.Errorf("sig = %v, want = %v", got, want)
 	}
+}
 
+func TestParseBody_NoNewLines(t *testing.T) {
+	const funky = `I am bla@bleh.com;My public key is:p256;12345;9876;Signature:5555:6666`
+
+	userName, pubKey, sig, err := ParseBody(funky)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got, want := userName, upspin.UserName("bla@bleh.com"); got != want {
+		t.Errorf("userName = %q, want = %q", got, want)
+	}
+	if got, want := pubKey, upspin.PublicKey("p256\n12345\n9876\n"); got != want {
+		t.Errorf("pubKey = %q, want = %q", got, want)
+	}
+	var rs, ss big.Int
+	if _, ok := rs.SetString("5555", 10); !ok {
+		t.Fatal("cannot parse R signature")
+	}
+	if _, ok := ss.SetString("6666", 10); !ok {
+		t.Fatal("cannot parse S signature")
+	}
+	expectedSig := upspin.Signature{
+		R: &rs,
+		S: &ss,
+	}
+	if got, want := sig, expectedSig; !reflect.DeepEqual(got, want) {
+		t.Errorf("sig = %v, want = %v", got, want)
+	}
 }
 
 func newRequest(t *testing.T, data string) *http.Request {

@@ -111,16 +111,17 @@ should take those two addresses as arguments.
 		s.exit(err)
 	}
 
-	const mailTemplate = `I am %s
-My public key is
-%s
+	const mailTemplate = `I am %s;
+My public key is:
+%s;
 Signature:
 %s:%s
 `
-	msg := fmt.Sprintf(mailTemplate, ctx.UserName(), pubKey,
+	keyLines := strings.Replace(pubKey, "\n", ";\n", 3)
+	msg := fmt.Sprintf(mailTemplate, ctx.UserName(), keyLines,
 		sig.R.String(), sig.S.String())
 
-	fmt.Printf("To complete your registration, send email to signup@key.upspin.io with the following contents:\n%s\n", msg)
+	fmt.Printf("\nTo complete your registration, send email to signup@key.upspin.io with the following contents:\n\n%s\n", msg)
 }
 
 func wipeUpspinEnvironment() {
