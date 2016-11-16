@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_12015f6a",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-16T18:03:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0ff186b_b2b8c0c9",
+      "revId": "765d6dfa7085bd42b89beef866919465b442a2aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b0ff186b_d2bf44ad",
         "filename": "dir/server/tree/watch.go",
         "patchSetId": 17
@@ -47,6 +65,24 @@
       "writtenOn": "2016-11-16T01:17:58Z",
       "side": 1,
       "message": "how would w.events \u003d\u003d nil at this point? this smells bad",
+      "revId": "765d6dfa7085bd42b89beef866919465b442a2aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_52359735",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-16T18:03:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0ff186b_d2bf44ad",
       "revId": "765d6dfa7085bd42b89beef866919465b442a2aa",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -70,6 +106,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_d51411bd",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-16T18:03:37Z",
+      "side": 1,
+      "message": "No need. sendEvent below already does that.",
+      "parentUuid": "b0ff186b_32acd086",
+      "revId": "765d6dfa7085bd42b89beef866919465b442a2aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b0ff186b_92b5bcd1",
         "filename": "dir/server/tree/watch.go",
         "patchSetId": 17
@@ -81,6 +135,24 @@
       "writtenOn": "2016-11-16T01:17:58Z",
       "side": 1,
       "message": "you need to close the channel after this, too.",
+      "revId": "765d6dfa7085bd42b89beef866919465b442a2aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_75199df1",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-16T18:03:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0ff186b_92b5bcd1",
       "revId": "765d6dfa7085bd42b89beef866919465b442a2aa",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
