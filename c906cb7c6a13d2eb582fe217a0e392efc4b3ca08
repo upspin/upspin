@@ -371,6 +371,24 @@
     },
     {
       "key": {
+        "uuid": "b0ff186b_355dda99",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-16T07:30:30Z",
+      "side": 1,
+      "message": "OK, let\u0027s try it as-is.",
+      "parentUuid": "10ad446a_ede62767",
+      "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b0ff186b_728c9819",
         "filename": "dir/server/tree/watch.go",
         "patchSetId": 12
@@ -506,6 +524,24 @@
       "side": 1,
       "message": "This is also something Dave was very much against. I think it kind of makes little sense to send an error if you got a timeout on an unbuffered channel. Won\u0027t you get another error again and have to wait yet more time to send it?",
       "parentUuid": "b0ff186b_d2e8e4c5",
+      "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b0ff186b_15625651",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-16T07:30:30Z",
+      "side": 1,
+      "message": "Well you can try to send the error event with a longer timeout, and maybe fail eventually. \n\nAlthough I suppose we could just make the channel closing being the signal that the consumer is too slow. I just worry about bugs on the client side. We should try to make the API easy to use, even if it makes the code more complicated on this side.",
+      "parentUuid": "10ad446a_6d41d755",
       "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
