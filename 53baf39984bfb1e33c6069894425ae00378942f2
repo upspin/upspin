@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b0ff186b_b20a80d1",
+        "filename": "cmd/upspin/user.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-16T00:24:07Z",
+      "side": 1,
+      "message": "why? it\u0027s quite likely, actually",
+      "revId": "53baf39984bfb1e33c6069894425ae00378942f2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b0ff186b_b2f1e0b5",
+        "filename": "cmd/upspin/user.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-16T00:24:07Z",
+      "side": 1,
+      "message": "maybe collect these errors together and print them all if any of them mismatch? should lead to fewer diagnostic round trips",
+      "revId": "53baf39984bfb1e33c6069894425ae00378942f2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
