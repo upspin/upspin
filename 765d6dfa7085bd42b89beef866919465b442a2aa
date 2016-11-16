@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "b0ff186b_d563aeed",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-16T21:56:08Z",
+      "side": 1,
+      "message": "in the case of any of these errors, we need to return an error event to the caller",
+      "revId": "765d6dfa7085bd42b89beef866919465b442a2aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b0ff186b_f2c2483f",
         "filename": "dir/server/tree/watch.go",
         "patchSetId": 17
