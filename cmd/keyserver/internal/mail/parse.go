@@ -89,11 +89,11 @@ func parseDKIM(s string) (domain, status string, err error) {
 // States in the email parsing state machine.
 // Refer to this template to understand the states:
 /*
-   I am foo@bar.com
-   My public key is
-   p256
-   1063349993423423435345345345345345340
-   3453453457828271720003453453245354698
+   I am foo@bar.com;
+   My public key is:
+   p256;
+   1063349993423423435345345345345345340;
+   3453453457828271720003453453245354698;
    Signature:
    123453534534:32423423423
 */
@@ -106,10 +106,14 @@ func ParseBody(data string) (upspin.UserName, upspin.PublicKey, upspin.Signature
 	var sig upspin.Signature
 
 	clean := strings.TrimSpace(data)
+	clean = strings.Replace(clean, ";", "\n", -1)
+	clean = strings.Replace(clean, "My public key is:", "My public key is:\n", 1)
+	clean = strings.Replace(clean, "Signature:", "Signature:\n", 1)
+	clean = strings.TrimSpace(clean)
+
 	// HTML markers are converted to a * by Gmail.
-	// Yahoo strips all HTML and does not
-	// replace it.
-	// TODO: figure out what others do.
+	// Yahoo strips all HTML and removes new lines.
+	// TODO: figure out what others do with HTML.
 	clean = strings.Replace(clean, "*", "", -1)
 
 	lines := strings.Split(clean, "\n")
@@ -143,7 +147,7 @@ func ParseBody(data string) (upspin.UserName, upspin.PublicKey, upspin.Signature
 	}
 	userName := upspin.UserName(line[len(userPrefix):])
 
-	const keyPreamble = "My public key is"
+	const keyPreamble = "My public key is:"
 	if !advanceTo(keyPreamble) {
 		return "", "", sig, errors.E(op, errors.Invalid, errors.Str("missing key preamble line"))
 	}
