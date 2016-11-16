@@ -300,6 +300,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_3523251c",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-16T18:03:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0ff186b_f2eb68bf",
+      "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b0ff186b_b2a56088",
         "filename": "dir/server/tree/watch.go",
         "patchSetId": 12
@@ -383,6 +401,24 @@
       "side": 1,
       "message": "OK, let\u0027s try it as-is.",
       "parentUuid": "10ad446a_ede62767",
+      "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_f52cad0a",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-16T18:03:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0ff186b_355dda99",
       "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -542,6 +578,24 @@
       "side": 1,
       "message": "Well you can try to send the error event with a longer timeout, and maybe fail eventually. \n\nAlthough I suppose we could just make the channel closing being the signal that the consumer is too slow. I just worry about bugs on the client side. We should try to make the API easy to use, even if it makes the code more complicated on this side.",
       "parentUuid": "10ad446a_6d41d755",
+      "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_350a458c",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-16T18:03:37Z",
+      "side": 1,
+      "message": "Let\u0027s try. Now sending the error with 3x timeout.\nDone.",
+      "parentUuid": "b0ff186b_15625651",
       "revId": "c906cb7c6a13d2eb582fe217a0e392efc4b3ca08",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
