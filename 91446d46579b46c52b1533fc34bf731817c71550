@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b0ff186b_35903a9f",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 18
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-16T21:56:08Z",
+      "side": 1,
+      "message": "instead of this, return a sentinel value errClose",
+      "revId": "91446d46579b46c52b1533fc34bf731817c71550",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b0ff186b_1595368f",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 18
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-16T21:56:08Z",
+      "side": 1,
+      "message": "delete this",
+      "revId": "91446d46579b46c52b1533fc34bf731817c71550",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b0ff186b_b5838a55",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 18
+      },
+      "lineNbr": 268,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-16T21:56:08Z",
+      "side": 1,
+      "message": "If you make *only* this loop and sendCurrentAndWatch, responsible for sending errors and closing w.events, then you don\u0027t need the atomic guard, and you can be sure you\u0027re never sending to w.events after it is closed.",
+      "revId": "91446d46579b46c52b1533fc34bf731817c71550",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b0ff186b_758ac26e",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 18
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-16T21:56:08Z",
+      "side": 1,
+      "message": "if err \u003d\u003d errClose || err \u003d\u003d errTimeout {\n  close(w.events)\n  return\n}",
+      "revId": "91446d46579b46c52b1533fc34bf731817c71550",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b0ff186b_558fbe7c",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 18
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-16T21:56:08Z",
+      "side": 1,
+      "message": "close(w.events)",
+      "revId": "91446d46579b46c52b1533fc34bf731817c71550",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
