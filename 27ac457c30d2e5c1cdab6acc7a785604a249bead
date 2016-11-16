@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_9cf56663",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b1ef349_8a6b2f64",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0b1ef349_aa70eb4e",
         "filename": "grpc/dircacheserver/log.go",
         "patchSetId": 7
@@ -30,6 +48,24 @@
       "writtenOn": "2016-11-14T00:54:11Z",
       "side": 1,
       "message": "putReqDone ?",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_f35cd33a",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Got rid of it.",
+      "parentUuid": "0b1ef349_aa70eb4e",
       "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_b37dfb88",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Most of the entries will have the same endpoint.  I expected a pointer would take less space then copying the struct for each one.  Am I wrong?",
+      "parentUuid": "0b1ef349_ca75273e",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0b1ef349_4abcd79b",
         "filename": "grpc/dircacheserver/log.go",
         "patchSetId": 7
@@ -64,6 +118,24 @@
       "writtenOn": "2016-11-14T00:54:11Z",
       "side": 1,
       "message": "i\u0027d make this a map to bool, it leads to simpler code",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_33a6eba5",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b1ef349_4abcd79b",
       "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_33aa6a4f",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "I want O_APPEND because I no longer append to log file under a lock.  However, I could add the O_TRUNC and avoid the explicit remove.  However, the explicit remove fixes some problems, like the user accidentally changing permissions on the log file as he/she thrashes around so I think I\u0027ll keep it.",
+      "parentUuid": "0b1ef349_ea7ae32a",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0b1ef349_4a8a1700",
         "filename": "grpc/dircacheserver/log.go",
         "patchSetId": 7
@@ -98,6 +188,24 @@
       "writtenOn": "2016-11-14T00:54:11Z",
       "side": 1,
       "message": "grpc/dircacheserver.openLog",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_93e0feb2",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Done - for this one and all the others.",
+      "parentUuid": "0b1ef349_4a8a1700",
       "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_b3cf3a16",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b1ef349_0a801fe0",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0b1ef349_2a7ddb20",
         "filename": "grpc/dircacheserver/log.go",
         "patchSetId": 7
@@ -132,6 +258,24 @@
       "writtenOn": "2016-11-14T00:54:11Z",
       "side": 1,
       "message": "use op",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_d3c0b6e9",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b1ef349_2a7ddb20",
       "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -155,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_3c0a328c",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b1ef349_6a87d3f6",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0b1ef349_2aa6bb98",
         "filename": "grpc/dircacheserver/log.go",
         "patchSetId": 7
@@ -166,6 +328,24 @@
       "writtenOn": "2016-11-14T00:54:11Z",
       "side": 1,
       "message": "return l.file.Close()",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_f3d4d2a6",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Crap, brain really in neutral here.  Done",
+      "parentUuid": "0b1ef349_2aa6bb98",
       "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -189,6 +369,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_d36e7619",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 275,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b1ef349_2aaf9b64",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0b1ef349_cac7e731",
         "filename": "grpc/dircacheserver/log.go",
         "patchSetId": 7
@@ -200,6 +398,24 @@
       "writtenOn": "2016-11-14T00:54:11Z",
       "side": 1,
       "message": "I wouldn\u0027t say \"overly paranoid\". it\u0027s just necessary, because this is what guards against /foo/*/bar/*, right?",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_33890ab6",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "The overly paranoid part is that the user could have escaped the special characters to match those characters in file names.  I\u0027ll explain better.  Thanks.",
+      "parentUuid": "0b1ef349_cac7e731",
       "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -223,6 +439,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_b3265a7c",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Done here and everywhere else.  Thanks.  I never quite groked that accessing a non-existant element returned the default value.",
+      "parentUuid": "0b1ef349_6ab993aa",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0b1ef349_8ae6cfd3",
         "filename": "grpc/dircacheserver/log.go",
         "patchSetId": 7
@@ -234,6 +468,24 @@
       "writtenOn": "2016-11-14T00:54:11Z",
       "side": 1,
       "message": "nonexistent or non-existent",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_1c01766a",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b1ef349_8ae6cfd3",
       "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -257,6 +509,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_5c07ee81",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 355,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b1ef349_4ad5b7cb",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0b1ef349_aaeb8b9a",
         "filename": "grpc/dircacheserver/log.go",
         "patchSetId": 7
@@ -268,6 +538,24 @@
       "writtenOn": "2016-11-14T00:54:11Z",
       "side": 1,
       "message": "case lookupReq, globReq:",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_bc5dc29a",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b1ef349_aaeb8b9a",
       "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -291,6 +579,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_dc62fe50",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 375,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b1ef349_cae0c7b9",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0b1ef349_2ad87b04",
         "filename": "grpc/dircacheserver/log.go",
         "patchSetId": 7
@@ -302,6 +608,24 @@
       "writtenOn": "2016-11-14T00:54:11Z",
       "side": 1,
       "message": "s/i/k/",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_f31b7234",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 382,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b1ef349_2ad87b04",
       "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -325,6 +649,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_5342860d",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 396,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "It was fine as long as I was consistent but I dumped this in favor of just DropPath.",
+      "parentUuid": "0b1ef349_eae583c6",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0b1ef349_0adbbf03",
         "filename": "grpc/dircacheserver/log.go",
         "patchSetId": 7
@@ -336,6 +678,24 @@
       "writtenOn": "2016-11-14T00:54:11Z",
       "side": 1,
       "message": "s/i/k/",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_b3fc1a99",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 411,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b1ef349_0adbbf03",
       "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -359,6 +719,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_7306a2d1",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 426,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b1ef349_6ad273e6",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0b1ef349_8a07af8c",
         "filename": "grpc/dircacheserver/log.go",
         "patchSetId": 7
@@ -370,6 +748,24 @@
       "writtenOn": "2016-11-14T00:54:11Z",
       "side": 1,
       "message": "if v, ok :\u003d l.lru.Get(k); !ok {",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_13f2ceb8",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 429,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b1ef349_8a07af8c",
       "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -393,6 +789,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_93debe2c",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 430,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b1ef349_aa0c6baf",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0b1ef349_ca11a7c6",
         "filename": "grpc/dircacheserver/log.go",
         "patchSetId": 7
@@ -404,6 +818,24 @@
       "writtenOn": "2016-11-14T00:54:11Z",
       "side": 1,
       "message": "_, err :\u003d l.file.Write(buf)\nreturn err",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_b3cada5c",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 453,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b1ef349_ca11a7c6",
       "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -427,6 +859,60 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_339d8a54",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 459,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b1ef349_ea1663bb",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_73ab026d",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 459,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Its the elevator joke.  That\u0027s when the doors opened and I walked out.",
+      "parentUuid": "0b1ef349_ea1663bb",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_13a08e84",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 459,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b1ef349_ea1663bb",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0b1ef349_0a1c9fd8",
         "filename": "grpc/dircacheserver/log.go",
         "patchSetId": 7
@@ -438,6 +924,24 @@
       "writtenOn": "2016-11-14T00:54:11Z",
       "side": 1,
       "message": "I\u0027d still use errors.Match in here, in case we decide to change error matching semantics at some point.\n\nand it can be\n\nreturn errors.Match(errors.E(errors.NotExist), err)",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_56511450",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 465,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b1ef349_0a1c9fd8",
       "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -461,6 +965,42 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_7656904b",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 643,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b1ef349_2a195be9",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_36581873",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 643,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b1ef349_2a195be9",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0b1ef349_4a269730",
         "filename": "grpc/dircacheserver/log.go",
         "patchSetId": 7
@@ -472,6 +1012,24 @@
       "writtenOn": "2016-11-14T00:54:11Z",
       "side": 1,
       "message": "no need for time.Duration here\njust 2*sinceRefreshed\n\nalso put time.Hour in a constant somewhere",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_16671cd0",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 687,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b1ef349_4a269730",
       "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -529,6 +1087,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_96deac2c",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 744,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b1ef349_aaf54b67",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0b1ef349_caea8786",
         "filename": "grpc/dircacheserver/log.go",
         "patchSetId": 7
@@ -540,6 +1116,24 @@
       "writtenOn": "2016-11-14T00:54:11Z",
       "side": 1,
       "message": "how about this?\n\nif ee.de \u003d\u003d nil || ee.de.Sequence !\u003d de.Sequence {\n  return false\n}",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_f6112005",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 761,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b1ef349_caea8786",
       "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -563,6 +1157,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_9d01ee22",
+        "filename": "grpc/dircacheserver/log_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b1ef349_eaef4393",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0b1ef349_6afc334b",
         "filename": "grpc/dircacheserver/log_test.go",
         "patchSetId": 7
@@ -574,6 +1186,24 @@
       "writtenOn": "2016-11-14T00:54:11Z",
       "side": 1,
       "message": "use ep1 or ep2 here?",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_bde94a3a",
+        "filename": "grpc/dircacheserver/log_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b1ef349_6afc334b",
       "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -597,6 +1227,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_bd386ae7",
+        "filename": "grpc/dircacheserver/log_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b1ef349_2a023b71",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0b1ef349_4aff7740",
         "filename": "grpc/dircacheserver/log_test.go",
         "patchSetId": 7
@@ -608,6 +1256,24 @@
       "writtenOn": "2016-11-14T00:54:11Z",
       "side": 1,
       "message": "var (\n ep1 \u003d \n ep2 \u003d\n)",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_7d1bd28d",
+        "filename": "grpc/dircacheserver/log_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b1ef349_4aff7740",
       "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -631,6 +1297,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_fddd82cd",
+        "filename": "grpc/dircacheserver/server.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b1ef349_6a551363",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0b1ef349_ea682337",
         "filename": "grpc/dircacheserver/server.go",
         "patchSetId": 7
@@ -642,6 +1326,24 @@
       "writtenOn": "2016-11-14T00:54:11Z",
       "side": 1,
       "message": "i\u0027d just pass a non-pointer endpoint value. save a bunch of assigning back and forth, and potentially avoid allocations (the values might live all on the stack)",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_bd6e2a18",
+        "filename": "grpc/dircacheserver/server.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "The endpoint gets stored in each log entry.  I\u0027m intentionally using the pointer to avoid the potential 100000 copies.",
+      "parentUuid": "0b1ef349_ea682337",
       "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -665,6 +1367,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_dd0f664f",
+        "filename": "grpc/dircacheserver/server.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "It isn\u0027t for deduplicating inflight requests, it is to keep the cache contents consistent with the server and temporally consistent with different requests from the same machine.  For example, if a delete happens while the glob is in flight and completes first, the cache will contain the deleted item.  Not a (huge) problem if it is done by a program on another machine but a real pain if done by the same program. However, I did change the next version to have a lock hashed on the directory name which splits this out by a factor of whatever I want the cache size to be.",
+      "parentUuid": "0b1ef349_2a34fb3c",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0b1ef349_4a31374c",
         "filename": "grpc/dircacheserver/server.go",
         "patchSetId": 7
@@ -676,6 +1396,24 @@
       "writtenOn": "2016-11-14T00:54:11Z",
       "side": 1,
       "message": "ditto here",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_7dfc3201",
+        "filename": "grpc/dircacheserver/server.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Ditto explanation.",
+      "parentUuid": "0b1ef349_4a31374c",
       "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -699,6 +1437,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_dd2e86e8",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Odd, it must have been an accident.  My current version doesn\u0027t have the change.  Might have been a global change that I later undid.",
+      "parentUuid": "0b1ef349_846b2664",
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0b1ef349_c4e0beb9",
         "filename": "upspin/upspin.go",
         "patchSetId": 7
@@ -710,6 +1466,30 @@
       "writtenOn": "2016-11-14T00:54:11Z",
       "side": 1,
       "message": "and",
+      "range": {
+        "startLine": 618,
+        "startChar": 47,
+        "endLine": 618,
+        "endChar": 50
+      },
+      "revId": "27ac457c30d2e5c1cdab6acc7a785604a249bead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_ddbd2667",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 618,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-16T18:23:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b1ef349_c4e0beb9",
       "range": {
         "startLine": 618,
         "startChar": 47,
