@@ -54,7 +54,8 @@ assumed to refer to the store defined in the user's context.
 		for _, arg := range fs.Args() {
 			err := store.Delete(upspin.Reference(arg))
 			if err != nil {
-				s.exit(err)
+				// Keep going, for consistency with loop below.
+				s.fail(err)
 			}
 		}
 		return
@@ -72,12 +73,14 @@ assumed to refer to the store defined in the user's context.
 				var err error
 				store, err = bind.StoreServer(s.context, prevEndpoint)
 				if err != nil {
-					s.exit(err)
+					s.exit(err) // Not much to do now.
 				}
 			}
 			err := store.Delete(block.Location.Reference)
 			if err != nil {
-				s.exit(err)
+				// Here we keep going, to keep it possible to delete
+				// other existing references.
+				s.fail(err)
 			}
 		}
 	}
