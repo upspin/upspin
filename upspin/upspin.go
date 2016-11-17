@@ -401,8 +401,13 @@ type DirServer interface {
 	// When the provided done channel is closed the event channel is closed
 	// by the server.
 	//
+	// The caller must have AnyRight to watch name. Events for which the
+	// caller does not have enough rights to watch will be suppressed, or if
+	// the caller does have rights but not Read right, the entry will be
+	// marked incomplete.
+	//
 	// If the caller does not consume events in a timely fashion
-	// the server will send an Event contaning an ErrTimeout.
+	// the server will send an Event containing an ErrTimeout.
 	//
 	// If this server does not support this method it returns
 	// ErrNotSupported.
