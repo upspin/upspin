@@ -265,6 +265,24 @@
     },
     {
       "key": {
+        "uuid": "b0ff186b_95380691",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-17T05:01:45Z",
+      "side": 1,
+      "message": "Oh, I meant errClose",
+      "parentUuid": "10ad446a_5509f34c",
+      "revId": "798b9eda653bb909e8c16dcde0b0f077040fd57b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b0ff186b_551cde51",
         "filename": "dir/server/tree/watch.go",
         "patchSetId": 19
