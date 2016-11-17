@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "50b17cf0_0bdfad53",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-17T20:58:51Z",
+      "side": 1,
+      "message": "I like my spelling better.  My cat was standing on the keyboard and I didn\u0027t notice what he had changed...",
+      "parentUuid": "10ad446a_10d5d7a0",
+      "revId": "5cb7a87d6ed9b6540813ee5e846af5c0beb569b0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "10ad446a_d0cf3f15",
         "filename": "grpc/dircacheserver/server.go",
         "patchSetId": 9
@@ -30,6 +48,24 @@
       "writtenOn": "2016-11-16T18:52:12Z",
       "side": 1,
       "message": "\"$HOME not defined\"",
+      "revId": "5cb7a87d6ed9b6540813ee5e846af5c0beb569b0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "50b17cf0_0b85ed26",
+        "filename": "grpc/dircacheserver/server.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-17T20:58:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "10ad446a_d0cf3f15",
       "revId": "5cb7a87d6ed9b6540813ee5e846af5c0beb569b0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
