@@ -16,6 +16,24 @@
       "revId": "fd7e5a964290ac85bf1ad9c304c54986e1cef72d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_68ef72cf",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 20
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-17T16:39:10Z",
+      "side": 1,
+      "message": "It was exported because it was an indication that the tree could use it (as opposed to close, that it shouldn\u0027t). But then I\u0027d have to export Watch itself. Unexported.\n\nChanged to isClosed.\n\nDone.",
+      "parentUuid": "b0ff186b_d5328eac",
+      "revId": "fd7e5a964290ac85bf1ad9c304c54986e1cef72d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
