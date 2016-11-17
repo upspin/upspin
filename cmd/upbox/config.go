@@ -170,10 +170,10 @@ func ConfigFromFile(name string) (*Config, error) {
 	// Set or evaluate DirServer and StoreServer fields.
 	for _, u := range cfg.Users {
 		if err := setServer(&cfg, &u.DirServer, "dirserver"); err != nil {
-			return nil, fmt.Errorf("user %q %v", err)
+			return nil, fmt.Errorf("user %q: %v", u.Name, err)
 		}
 		if err := setServer(&cfg, &u.StoreServer, "storeserver"); err != nil {
-			return nil, fmt.Errorf("user %q %v", err)
+			return nil, fmt.Errorf("user %q: %v", u.Name, err)
 		}
 	}
 
