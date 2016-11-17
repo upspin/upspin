@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b0ff186b_d5328eac",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 20
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-17T05:23:05Z",
+      "side": 1,
+      "message": "this shouldn\u0027t be exported, right?\nand it should be isClosed",
+      "revId": "fd7e5a964290ac85bf1ad9c304c54986e1cef72d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
