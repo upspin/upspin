@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_f5333f25",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-17T04:59:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0ff186b_35f4bad7",
+      "revId": "798b9eda653bb909e8c16dcde0b0f077040fd57b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b0ff186b_55f33eed",
         "filename": "dir/server/tree/watch.go",
         "patchSetId": 19
@@ -30,6 +48,24 @@
       "writtenOn": "2016-11-17T01:16:53Z",
       "side": 1,
       "message": "need to call w.close after sendError in each of these cases",
+      "revId": "798b9eda653bb909e8c16dcde0b0f077040fd57b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_5542537b",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-17T04:59:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0ff186b_55f33eed",
       "revId": "798b9eda653bb909e8c16dcde0b0f077040fd57b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_153cdbf1",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-17T04:59:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0ff186b_350dda1f",
+      "revId": "798b9eda653bb909e8c16dcde0b0f077040fd57b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b0ff186b_1512563f",
         "filename": "dir/server/tree/watch.go",
         "patchSetId": 19
@@ -64,6 +118,24 @@
       "writtenOn": "2016-11-17T01:16:53Z",
       "side": 1,
       "message": "and here",
+      "revId": "798b9eda653bb909e8c16dcde0b0f077040fd57b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_3539d701",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-17T04:59:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0ff186b_1512563f",
       "revId": "798b9eda653bb909e8c16dcde0b0f077040fd57b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_d515e368",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-17T04:59:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0ff186b_15f9b6cf",
+      "revId": "798b9eda653bb909e8c16dcde0b0f077040fd57b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b0ff186b_75ee4207",
         "filename": "dir/server/tree/watch.go",
         "patchSetId": 19
@@ -98,6 +188,24 @@
       "writtenOn": "2016-11-17T01:16:53Z",
       "side": 1,
       "message": "move this into the success case, for clarity",
+      "revId": "798b9eda653bb909e8c16dcde0b0f077040fd57b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_f51a5f97",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-17T04:59:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0ff186b_75ee4207",
       "revId": "798b9eda653bb909e8c16dcde0b0f077040fd57b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -121,6 +229,42 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_5509f34c",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-17T04:59:39Z",
+      "side": 1,
+      "message": "But I note that this is a bit abusing errTimeout since this is not a timeout. I guess it doesn\u0027t matter.",
+      "parentUuid": "b0ff186b_b500aae2",
+      "revId": "798b9eda653bb909e8c16dcde0b0f077040fd57b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_b524e7d3",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-17T04:59:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0ff186b_b500aae2",
+      "revId": "798b9eda653bb909e8c16dcde0b0f077040fd57b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b0ff186b_551cde51",
         "filename": "dir/server/tree/watch.go",
         "patchSetId": 19
@@ -132,6 +276,24 @@
       "writtenOn": "2016-11-17T01:16:53Z",
       "side": 1,
       "message": "put at the top\n\ndefer w.close()\n\nand then the breaks above become \u0027return\u0027",
+      "revId": "798b9eda653bb909e8c16dcde0b0f077040fd57b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_15137b7f",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-17T04:59:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0ff186b_551cde51",
       "revId": "798b9eda653bb909e8c16dcde0b0f077040fd57b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -155,6 +317,24 @@
     },
     {
       "key": {
+        "uuid": "10ad446a_d5fc0303",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-17T04:59:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0ff186b_d5072ef6",
+      "revId": "798b9eda653bb909e8c16dcde0b0f077040fd57b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b0ff186b_f50a3200",
         "filename": "dir/server/tree/watch.go",
         "patchSetId": 19
@@ -166,6 +346,24 @@
       "writtenOn": "2016-11-17T01:16:53Z",
       "side": 1,
       "message": "this is impossible with my suggested change, i don\u0027t think it\u0027s worth doing the check here.\n\n(and if you were going to do the check, you\u0027d want to use this: https://golang.org/pkg/sync/atomic/#CompareAndSwapInt32)",
+      "revId": "798b9eda653bb909e8c16dcde0b0f077040fd57b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "10ad446a_b5fb8705",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-17T04:59:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0ff186b_f50a3200",
       "revId": "798b9eda653bb909e8c16dcde0b0f077040fd57b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
