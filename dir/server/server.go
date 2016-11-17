@@ -11,6 +11,7 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"upspin.io/access"
 	"upspin.io/cache"
@@ -686,8 +687,109 @@ func (s *server) WhichAccess(name upspin.PathName) (*upspin.DirEntry, error) {
 }
 
 // Watch implements upspin.DirServer.Watch.
-func (s *server) Watch(upspin.PathName, int64, <-chan struct{}) (<-chan upspin.Event, error) {
-	return nil, upspin.ErrNotSupported
+func (s *server) Watch(name upspin.PathName, order int64, done <-chan struct{}) (<-chan upspin.Event, error) {
+	const op = "dir/server.Watch"
+	o, m := newOptMetric(op)
+	defer m.Done()
+
+	p, err := path.Parse(name)
+	if err != nil {
+		return nil, errors.E(op, name, err)
+	}
+
+	// Check whether the user has Any right on p.
+	hasAny, link, err := s.hasRight(access.AnyRight, p, o)
+	if err == upspin.ErrFollowLink {
+		_, err = s.errLink(op, link, o)
+		return nil, err
+	}
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+	if !hasAny {
+		return nil, errors.E(op, errors.Private, name)
+	}
+
+	tree, err := s.loadTreeFor(p.User(), o)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+
+	// Establish a channel with the tree and start a goroutine that filters
+	// out requests not visible by the caller.
+	treeEvents, err := tree.Watch(p, order, done)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+	events := make(chan upspin.Event, 1)
+
+	go s.watch(op, treeEvents, events)
+
+	return events, nil
+}
+
+// watcher runs in a goroutine reading events from the tree and passing them
+// along to the original caller, but first verifying whether the user has rights
+// to know about the event.
+func (s *server) watch(op string, treeEvents <-chan *upspin.Event, outEvents chan<- upspin.Event) {
+	const sendTimeout = time.Minute
+
+	t := time.NewTimer(sendTimeout)
+	defer close(outEvents)
+	defer t.Stop()
+
+	for {
+		e, ok := <-treeEvents
+		if !ok {
+			// Tree closed channel. Close outgoing event as well.
+			return
+		}
+		if e.Entry == nil {
+			// It's likely an error. Pass it along. We're sure to
+			// have treeEvents closed in the next loop.
+			outEvents <- *e
+			continue
+		}
+
+		// Check permissions on e.Entry.
+
+		p, err := path.Parse(e.Entry.Name)
+		if err != nil {
+			outEvents <- upspin.Event{Error: errors.E(op, err)}
+			return
+		}
+		hasAny, _, err := s.hasRight(access.AnyRight, p)
+		if err != nil {
+			outEvents <- upspin.Event{Error: errors.E(op, err)}
+			return
+		}
+		if !hasAny {
+			continue
+		}
+		hasRead, _, err := s.hasRight(access.Read, p)
+		if err != nil {
+			outEvents <- upspin.Event{Error: errors.E(op, err)}
+			return
+		}
+		if !hasRead {
+			entry := *e.Entry
+			entry.MarkIncomplete()
+			e.Entry = &entry
+		}
+		// Send e on outEvents, with a timeout.
+		if !t.Stop() {
+			<-t.C
+		}
+		t.Reset(sendTimeout)
+		select {
+		case outEvents <- *e:
+			// OK, sent.
+		case <-t.C:
+			// Timed out.
+			log.Printf("%s: timeout sending event for %s", op, s.userName)
+			return
+		}
+	}
 }
 
 // Dial implements upspin.Dialer.
