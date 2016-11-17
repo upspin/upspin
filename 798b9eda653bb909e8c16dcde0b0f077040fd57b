@@ -1,0 +1,174 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b0ff186b_35f4bad7",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-17T01:16:53Z",
+      "side": 1,
+      "message": "you don\u0027t need to do an atomic store here. there\u0027s no way anything else can be reading this value, as you just created it.\ninstead, you can just put it in the struct literal above.\n\nhowever, I think it\u0027s probably cleaner to swap the meaning around and have be named \"complete\" or \"finished\" and have its default value of zero be sufficient",
+      "revId": "798b9eda653bb909e8c16dcde0b0f077040fd57b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b0ff186b_55f33eed",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-17T01:16:53Z",
+      "side": 1,
+      "message": "need to call w.close after sendError in each of these cases",
+      "revId": "798b9eda653bb909e8c16dcde0b0f077040fd57b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b0ff186b_350dda1f",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-17T01:16:53Z",
+      "side": 1,
+      "message": "I think you need sendError here",
+      "revId": "798b9eda653bb909e8c16dcde0b0f077040fd57b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b0ff186b_1512563f",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-17T01:16:53Z",
+      "side": 1,
+      "message": "and here",
+      "revId": "798b9eda653bb909e8c16dcde0b0f077040fd57b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b0ff186b_15f9b6cf",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-17T01:16:53Z",
+      "side": 1,
+      "message": "put the common, success case first",
+      "revId": "798b9eda653bb909e8c16dcde0b0f077040fd57b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b0ff186b_75ee4207",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-17T01:16:53Z",
+      "side": 1,
+      "message": "move this into the success case, for clarity",
+      "revId": "798b9eda653bb909e8c16dcde0b0f077040fd57b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b0ff186b_b500aae2",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-17T01:16:53Z",
+      "side": 1,
+      "message": "delete this, and just do this here:\n\nreturn 0, errTimeout\n\nonly the functions watch and sendCurrentAndWatch should call w.close",
+      "revId": "798b9eda653bb909e8c16dcde0b0f077040fd57b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b0ff186b_551cde51",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-17T01:16:53Z",
+      "side": 1,
+      "message": "put at the top\n\ndefer w.close()\n\nand then the breaks above become \u0027return\u0027",
+      "revId": "798b9eda653bb909e8c16dcde0b0f077040fd57b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b0ff186b_d5072ef6",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-17T01:16:53Z",
+      "side": 1,
+      "message": "return atomic.LoadInt32(\u0026w.active) \u003d\u003d 1",
+      "revId": "798b9eda653bb909e8c16dcde0b0f077040fd57b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b0ff186b_f50a3200",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-17T01:16:53Z",
+      "side": 1,
+      "message": "this is impossible with my suggested change, i don\u0027t think it\u0027s worth doing the check here.\n\n(and if you were going to do the check, you\u0027d want to use this: https://golang.org/pkg/sync/atomic/#CompareAndSwapInt32)",
+      "revId": "798b9eda653bb909e8c16dcde0b0f077040fd57b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
