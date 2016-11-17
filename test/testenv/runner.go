@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"runtime"
 	"strings"
+	"time"
 
 	"upspin.io/client"
 	"upspin.io/errors"
@@ -29,7 +30,8 @@ import (
 // 		t.Fatal(r.Diag())
 // 	}
 type Runner struct {
-	// Entry holds the result of the most recent Put or MakeDirectory operation.
+	// Entry holds the result of the most recent Put, DirLookup or
+	// MakeDirectory operation.
 	Entry *upspin.DirEntry
 
 	// Entries holds the result of the most recent Glob operation.
@@ -38,8 +40,13 @@ type Runner struct {
 	// Data holds the result of the most recent Get operation.
 	Data string
 
+	// Events holds the event channel returned by the most recent DirWatch
+	// operation for the current user.
+	Events <-chan upspin.Event
+
 	user    upspin.UserName
 	clients map[upspin.UserName]upspin.Client
+	events  map[upspin.UserName]<-chan upspin.Event
 
 	err     error
 	errFile string
@@ -50,6 +57,7 @@ type Runner struct {
 func NewRunner() *Runner {
 	return &Runner{
 		clients: make(map[upspin.UserName]upspin.Client),
+		events:  make(map[upspin.UserName]<-chan upspin.Event),
 	}
 }
 
@@ -83,6 +91,7 @@ func (r *Runner) As(u upspin.UserName) {
 		return
 	}
 	r.user = u
+	r.Events = r.events[u]
 }
 
 // Get performs a Get request as the user
@@ -179,6 +188,82 @@ func (r *Runner) DirLookup(p upspin.PathName) {
 	entry, err := dir.Lookup(p)
 	r.Entry = entry
 	r.setErr(err)
+}
+
+// DirWatch performs a Watch request to the user's underlying DirServer and
+// populates the Runner's Events channel with the DirServer's returned Event
+// channel. It returns the done channel for this watcher, if successful.
+func (r *Runner) DirWatch(p upspin.PathName, order int64) chan struct{} {
+	if r.err != nil {
+		return nil
+	}
+	dir, err := r.clients[r.user].DirServer(p)
+	if err != nil {
+		r.setErr(err)
+		return nil
+	}
+	done := make(chan struct{})
+	events, err := dir.Watch(p, order, done)
+	r.Events = events
+	r.events[r.user] = events
+	r.setErr(err)
+	return done
+}
+
+// GotEvent reports whether the next Event in the Events channel has the given
+// name and blocks and if not  notes the discrepancy as the last error state.
+func (r *Runner) GotEvent(p upspin.PathName, withBlocks bool) bool {
+	if r.Failed() {
+		return false
+	}
+	if r.Events == nil {
+		r.lastErr = errors.Str("nil event channel")
+		_, r.errFile, r.errLine, _ = runtime.Caller(1)
+		return false
+	}
+	var e upspin.Event
+	var ok bool
+	select {
+	case e, ok = <-r.Events:
+	case <-time.After(time.Second):
+		r.lastErr = errors.Str("event channel timed out")
+		_, r.errFile, r.errLine, _ = runtime.Caller(1)
+		return false
+	}
+	if !ok {
+		r.lastErr = errors.Str("event channel closed")
+		_, r.errFile, r.errLine, _ = runtime.Caller(1)
+		return false
+	}
+	if e.Error != nil {
+		r.lastErr = e.Error
+		_, r.errFile, r.errLine, _ = runtime.Caller(1)
+		return false
+	}
+	if e.Entry == nil {
+		r.lastErr = errors.Errorf("got nil entry, want %q", p)
+		_, r.errFile, r.errLine, _ = runtime.Caller(1)
+		return false
+	}
+	if e.Entry.Name == p {
+		hasBlocks := len(e.Entry.Blocks) > 0
+		if withBlocks {
+			if hasBlocks {
+				return true
+			}
+			r.lastErr = errors.Errorf("expected blocks present for %q", p)
+			_, r.errFile, r.errLine, _ = runtime.Caller(1)
+			return false
+		} else if hasBlocks {
+			r.lastErr = errors.Errorf("expected no blocks present for %q, got %d", p, len(e.Entry.Blocks))
+			_, r.errFile, r.errLine, _ = runtime.Caller(1)
+			return false
+		}
+		return true
+	}
+	r.lastErr = errors.Errorf("got %q, want %q", e.Entry.Name, p)
+	_, r.errFile, r.errLine, _ = runtime.Caller(1)
+	return false
 }
 
 // GotEntry reports whether the Entry has the given name
