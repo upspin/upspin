@@ -124,6 +124,23 @@ func globError(err error) *proto.EntriesError {
 	return &proto.EntriesError{Error: errors.MarshalError(err)}
 }
 
+// Watch implements proto.Watch.
+func (s *server) Watch(req *proto.DirWatchRequest, stream proto.Dir_WatchServer) error {
+	op := logf("Watch %q %d", req.Name, req.Order)
+
+	dir, err := s.dirFor(stream.Context())
+	if err != nil {
+		// FIX
+		return op.entryError(nil, err)
+	}
+
+	done := make(chan struct{})
+	//events, err := dir.Watch(req.Name, req.Order, done)
+
+	// We must send the first error, even if it's nil.
+	//stream.Send()
+}
+
 // Delete implements proto.DirServer.
 func (s *server) Delete(ctx gContext.Context, req *proto.DirDeleteRequest) (*proto.EntryError, error) {
 	op := logf("Delete %q", req.Name)
