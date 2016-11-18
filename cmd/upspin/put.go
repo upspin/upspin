@@ -4,7 +4,10 @@
 
 package main
 
-import "flag"
+import (
+	"flag"
+	"upspin.io/upspin"
+)
 
 func (s *State) put(args ...string) {
 	const help = `
@@ -22,7 +25,7 @@ TODO: Delete in favor of cp?
 	}
 
 	data := s.readAll(*inFile)
-	_, err := s.client.Put(s.globOneUpspinPath(fs.Arg(0)), data)
+	_, err := s.client.Put(upspin.PathName(fs.Arg(0)), data)
 	if err != nil {
 		s.exit(err)
 	}
