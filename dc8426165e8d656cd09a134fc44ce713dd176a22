@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "707a00f8_68b2039b",
+        "filename": "cmd/upspin/put.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-18T19:15:06Z",
+      "side": 1,
+      "message": "why is this change in this CL?\nwhen you revert a CL, please revert only that CL.\nyou can even do it through the gerrit UI",
+      "revId": "dc8426165e8d656cd09a134fc44ce713dd176a22",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
