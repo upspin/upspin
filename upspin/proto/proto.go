@@ -216,3 +216,5 @@ func DirEntryBytes(ude []*upspin.DirEntry) ([][]byte, error) {
 	}
 	return b, nil
 }
+
+func DirWatchRequest()
