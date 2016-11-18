@@ -216,3 +216,44 @@ func DirEntryBytes(ude []*upspin.DirEntry) ([][]byte, error) {
 	}
 	return b, nil
 }
+
+// UpspinEvent converts a proto.DirWatchResponse to upspin.Event
+func UpspinEvent(event *Event) (*upspin.Event, error) {
+	entry, err := UpspinDirEntry(event.Entry)
+	if err != nil {
+		return nil, err
+	}
+	e := &upspin.Event{
+		Entry:  entry, // may be nil.
+		Order:  event.Order,
+		Delete: event.Delete,
+		Error:  errors.UnmarshalError(event.Error),
+	}
+	return e, nil
+}
+
+// EventProto converts an upspin.Event to proto.Event.
+func EventProto(event *upspin.Event) (*Event, error) {
+	if event == nil {
+		// TODO: Is this right?
+		return nil, nil
+	}
+	var b []byte
+	if event.Entry != nil {
+		var mErr error
+		b, mErr = event.Entry.Marshal()
+		if mErr != nil {
+			return nil, mErr
+		}
+	}
+	var err []byte
+	if event.Error != nil {
+		err = errors.MarshalError(event.Error)
+	}
+	return &Event{
+		Entry:  b,
+		Order:  event.Order,
+		Delete: event.Delete,
+		Error:  err,
+	}, nil
+}
