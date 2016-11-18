@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "707a00f8_88a57788",
+        "filename": "cmd/keyserver/internal/mail/parse.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-18T00:48:04Z",
+      "side": 1,
+      "message": "tags",
+      "range": {
+        "startLine": 114,
+        "startChar": 9,
+        "endLine": 114,
+        "endChar": 16
+      },
+      "revId": "a7a5cc50f67bad8dbe67b8735a47e04ce59bc9dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
