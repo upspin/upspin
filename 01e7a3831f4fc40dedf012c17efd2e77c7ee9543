@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "707a00f8_887e571c",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 691,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-18T00:34:11Z",
+      "side": 1,
+      "message": "outEvents chan\u003c- upspin.Event",
+      "revId": "01e7a3831f4fc40dedf012c17efd2e77c7ee9543",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "707a00f8_c8884f0b",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 732,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-18T00:34:11Z",
+      "side": 1,
+      "message": "I think you need to move all the timeout handling stuff from tree to here.\nOtherwise the logic is always one send behind.\n\nImagine the client stops receiving, but there\u0027s only one event to be sent (for now). The tree succeeds in sending to the server, and the server blocks forever sending to the client. The tree has no idea that the event was never received, and so the resources are held indefinitely (or at least until another event comes along).",
+      "revId": "01e7a3831f4fc40dedf012c17efd2e77c7ee9543",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "707a00f8_a87b1b2b",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 737,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-18T00:34:11Z",
+      "side": 1,
+      "message": "this function isn\u0027t really worth it, since you can just write\n\noutEvents \u003c- upspin.Event{Error: err}\nwhich is only a few characters longer than\nsendErrorEvent(outEvents, err)",
+      "revId": "01e7a3831f4fc40dedf012c17efd2e77c7ee9543",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "707a00f8_28972b29",
+        "filename": "test/testenv/runner.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-18T00:34:11Z",
+      "side": 1,
+      "message": "add DirLookup",
+      "revId": "01e7a3831f4fc40dedf012c17efd2e77c7ee9543",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "707a00f8_488c5f19",
+        "filename": "test/testenv/runner.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-18T00:34:11Z",
+      "side": 1,
+      "message": "Events holds the event channel returned by the most recent DirWatch operation for the current user.",
+      "revId": "01e7a3831f4fc40dedf012c17efd2e77c7ee9543",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "707a00f8_08926738",
+        "filename": "test/testenv/runner.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-11-18T00:34:11Z",
+      "side": 1,
+      "message": "you should add a timeout here.",
+      "revId": "01e7a3831f4fc40dedf012c17efd2e77c7ee9543",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
