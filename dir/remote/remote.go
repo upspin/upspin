@@ -9,6 +9,7 @@ package remote
 import (
 	"fmt"
 	"io"
+	"strings"
 
 	"upspin.io/auth/grpcauth"
 	"upspin.io/bind"
@@ -50,6 +51,7 @@ func (r *remote) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	resp, err := r.dirClient.Glob(gCtx, req, callOpt)
 	err = finishAuth(err)
 	if err != nil {
+		r.checkGrpc(err)
 		return nil, op.error(errors.IO, err)
 	}
 
@@ -88,6 +90,7 @@ func (r *remote) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	}
 	resp, err := r.dirClient.Put(gCtx, req, callOpt)
 	err = finishAuth(err)
+	r.checkGrpc(err)
 	return op.entryError(resp, err)
 }
 
@@ -104,6 +107,7 @@ func (r *remote) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, error)
 	}
 	resp, err := r.dirClient.WhichAccess(gCtx, req, callOpt)
 	err = finishAuth(err)
+	r.checkGrpc(err)
 	return op.entryError(resp, err)
 }
 
@@ -120,6 +124,7 @@ func (r *remote) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	}
 	resp, err := r.dirClient.Delete(gCtx, req, callOpt)
 	err = finishAuth(err)
+	r.checkGrpc(err)
 	return op.entryError(resp, err)
 }
 
@@ -136,6 +141,7 @@ func (r *remote) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	}
 	resp, err := r.dirClient.Lookup(gCtx, req, callOpt)
 	err = finishAuth(err)
+	r.checkGrpc(err)
 	return op.entryError(resp, err)
 }
 
@@ -374,4 +380,20 @@ func (op *operation) entryError(p *proto.EntryError, err error) (*upspin.DirEntr
 		return nil, op.error(unmarshalErr)
 	}
 	return entry, op.error(err)
+}
+
+// GRPC will call back a server if HTTP2 signals that the underlying connection has
+// been terminated. However, shiould the server be unreachable, GRPC will poison
+// the connection and no longer retry the connection returning a transport error on
+// all subsequent RPCs. As a result we will not survive server bounces.
+//
+// To remedy this, we must recognize this condition and remove the service
+// from bind's cache and close the GRPC connection. While grpc has an internal
+// ConnectivityState called Shutdown that indicates this condition we have no
+// access to it. Instead we must examine the error return from GRPC RPCs.
+func (r *remote) checkGrpc(err error) {
+	if err == nil || !strings.Contains(err.Error(), "transport: dial") {
+		return
+	}
+	bind.Release(r)
 }
