@@ -158,6 +158,22 @@ message DirWhichAccessRequest {
     string name = 1;
 }
 
+message DirWatchRequest {
+    string name = 1;
+    int64 order = 2;
+}
+
+// The first response in the stream is whether dir.Watch succeeded. If it
+// didn't, the error field contains the error and no streaming happens. If it
+// did succeed the error is nil and subsequent streams are from the Events
+// channel.
+message Event {
+    bytes entry = 1;
+    int64 order = 2;
+    bool delete = 3;
+    bytes error = 4;
+}
+
 service Dir{
     // Service methods:
     rpc Endpoint (EndpointRequest) returns (EndpointResponse) {}
@@ -168,4 +184,5 @@ service Dir{
     rpc Glob (DirGlobRequest) returns (EntriesError) {}
     rpc Delete (DirDeleteRequest) returns (EntryError) {}
     rpc WhichAccess (DirWhichAccessRequest) returns (EntryError) {}
+    rpc Watch (DirWatchRequest) returns (stream Event) {}
 }

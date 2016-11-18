@@ -139,8 +139,22 @@ func (r *remote) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 }
 
 // Watch implements upspin.DirServer.
-func (r *remote) Watch(upspin.PathName, int64, <-chan struct{}) (<-chan upspin.Event, error) {
-	return nil, upspin.ErrNotSupported
+func (r *remote) Watch(name upspin.PathName, order int64, done <-chan struct{}) (<-chan upspin.Event, error) {
+	op := opf("Watch", "%q %d", name, order)
+
+	gCtx, callOpt, finishAuth, err := r.NewAuthContext()
+	if err != nil {
+		return nil, op.error(err)
+	}
+	req := &proto.DirWatchRequest{
+		Name:  string(name),
+		Order: order,
+	}
+	resp, err := r.dirClient.Watch(gCtx, req, callOpt)
+	err = finishAuth(err)
+	//
+	// TODO: return a new channel
+	return nil, nil
 }
 
 // Endpoint implements upspin.StoreServer.Endpoint.
