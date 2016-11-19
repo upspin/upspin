@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "700680a0_0f920639",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-19T06:25:33Z",
+      "side": 1,
+      "message": "redial",
+      "revId": "9fb99f0623111565092549802e3798292a6422c2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "700680a0_ef96922a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-19T06:25:33Z",
+      "side": 1,
+      "message": "remedy",
+      "revId": "9fb99f0623111565092549802e3798292a6422c2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "700680a0_af909a2d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-19T06:25:33Z",
+      "side": 1,
+      "message": "s/$./",
+      "revId": "9fb99f0623111565092549802e3798292a6422c2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "700680a0_cf8bce00",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-19T06:25:33Z",
+      "side": 1,
+      "message": "its",
+      "revId": "9fb99f0623111565092549802e3798292a6422c2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "700680a0_8fa6f690",
+        "filename": "dir/remote/remote.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-19T06:25:33Z",
+      "side": 1,
+      "message": "s/is //",
+      "revId": "9fb99f0623111565092549802e3798292a6422c2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "700680a0_6fa3c282",
+        "filename": "dir/remote/remote.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-19T06:25:33Z",
+      "side": 1,
+      "message": "server",
+      "revId": "9fb99f0623111565092549802e3798292a6422c2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "700680a0_4fa0fe73",
+        "filename": "dir/remote/remote.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 292,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-11-19T06:25:33Z",
+      "side": 1,
+      "message": "s/  / /",
+      "revId": "9fb99f0623111565092549802e3798292a6422c2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
