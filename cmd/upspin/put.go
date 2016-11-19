@@ -6,6 +6,8 @@ package main
 
 import (
 	"flag"
+
+	"upspin.io/path"
 	"upspin.io/upspin"
 )
 
@@ -25,7 +27,24 @@ TODO: Delete in favor of cp?
 	}
 
 	data := s.readAll(*inFile)
-	_, err := s.client.Put(upspin.PathName(fs.Arg(0)), data)
+	// Must be a valid Upspin name.
+	parsed, err := path.Parse(upspin.PathName(fs.Arg(0)))
+	if err != nil {
+		s.exit(err)
+	}
+	name := parsed.Path()
+	if hasGlobChar(parsed.String()) {
+		// If there is a metacharacter in the last element, the whole path
+		// must exist. Otherwise, only the path up to the last element (its
+		// directory) must exist. We call Glob appropriately.
+		if hasGlobChar(parsed.Elem(parsed.NElem() - 1)) {
+			dir := s.globOneUpspinPath(parsed.Drop(1).String())
+			name = path.Join(dir, parsed.Elem(parsed.NElem()-1))
+		} else {
+			name = s.globOneUpspinPath(parsed.String())
+		}
+	}
+	_, err = s.client.Put(name, data)
 	if err != nil {
 		s.exit(err)
 	}
