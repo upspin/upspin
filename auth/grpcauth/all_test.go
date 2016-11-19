@@ -12,6 +12,7 @@ import (
 	"os"
 	"path/filepath"
 	"testing"
+	"time"
 
 	gContext "golang.org/x/net/context"
 
@@ -143,7 +144,15 @@ func startClient(port string) {
 	}
 	ctx = context.SetCertPool(ctx, pool)
 
-	authClient, err := NewGRPCClient(ctx, upspin.NetAddr("localhost:"+port), KeepAliveInterval, Secure, upspin.Endpoint{})
+	// Try a few times because the server may not be up yet.
+	var authClient *AuthClientService
+	for i := 0; i < 10; i++ {
+		authClient, err = NewGRPCClient(ctx, upspin.NetAddr("localhost:"+port), KeepAliveInterval, Secure, upspin.Endpoint{})
+		if err == nil {
+			break
+		}
+		time.Sleep(50 * time.Millisecond)
+	}
 	if err != nil {
 		log.Fatal(err)
 	}
