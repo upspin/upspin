@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "700680a0_5739b692",
+        "filename": "dir/remote/remote.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-19T00:23:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "700680a0_775dda33",
+      "revId": "62d81e587ec062760e7eb55f38c14e567494fda3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "700680a0_97296e9e",
         "filename": "dir/remote/remote.go",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2016-11-19T00:08:07Z",
       "side": 1,
       "message": "remedy",
+      "revId": "62d81e587ec062760e7eb55f38c14e567494fda3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "700680a0_17333eb3",
+        "filename": "dir/remote/remote.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-19T00:23:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "700680a0_97296e9e",
       "revId": "62d81e587ec062760e7eb55f38c14e567494fda3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "700680a0_f7f66ab7",
+        "filename": "dir/remote/remote.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-19T00:23:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "700680a0_174d7e87",
+      "revId": "62d81e587ec062760e7eb55f38c14e567494fda3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "700680a0_3739a2eb",
         "filename": "dir/remote/remote.go",
         "patchSetId": 3
@@ -64,6 +118,24 @@
       "writtenOn": "2016-11-19T00:08:07Z",
       "side": 1,
       "message": "maybe bind.Release should call Close?",
+      "revId": "62d81e587ec062760e7eb55f38c14e567494fda3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "700680a0_9705eec4",
+        "filename": "dir/remote/remote.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-11-19T00:23:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "700680a0_3739a2eb",
       "revId": "62d81e587ec062760e7eb55f38c14e567494fda3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
