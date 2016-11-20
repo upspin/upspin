@@ -469,7 +469,7 @@ func (le *LogEntry) unmarshal(r *checker) error {
 	}
 	leftOver, err := le.Entry.Unmarshal(data)
 	if err != nil {
-		return errors.E(op, err)
+		return errors.E(op, errors.IO, err)
 	}
 	if len(leftOver) != 0 {
 		return errors.E(op, errors.IO, errors.Errorf("%d bytes left; log misaligned", len(leftOver)))

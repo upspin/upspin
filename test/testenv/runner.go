@@ -221,23 +221,8 @@ func (r *Runner) GotEvent(p upspin.PathName, withBlocks bool) bool {
 		_, r.errFile, r.errLine, _ = runtime.Caller(1)
 		return false
 	}
-	var e upspin.Event
-	var ok bool
-	select {
-	case e, ok = <-r.Events:
-	case <-time.After(time.Second):
-		r.lastErr = errors.Str("event channel timed out")
-		_, r.errFile, r.errLine, _ = runtime.Caller(1)
-		return false
-	}
-	if !ok {
-		r.lastErr = errors.Str("event channel closed")
-		_, r.errFile, r.errLine, _ = runtime.Caller(1)
-		return false
-	}
-	if e.Error != nil {
-		r.lastErr = e.Error
-		_, r.errFile, r.errLine, _ = runtime.Caller(1)
+	e := r.getNextEvent()
+	if e == nil {
 		return false
 	}
 	if e.Entry == nil {
@@ -264,6 +249,29 @@ func (r *Runner) GotEvent(p upspin.PathName, withBlocks bool) bool {
 	r.lastErr = errors.Errorf("got %q, want %q", e.Entry.Name, p)
 	_, r.errFile, r.errLine, _ = runtime.Caller(1)
 	return false
+}
+
+func (r *Runner) getNextEvent() *upspin.Event {
+	var e upspin.Event
+	var ok bool
+	select {
+	case e, ok = <-r.Events:
+	case <-time.After(time.Second):
+		r.setErr(errors.Str("event channel timed out"))
+		_, r.errFile, r.errLine, _ = runtime.Caller(2)
+		return nil
+	}
+	if !ok {
+		r.setErr(errors.Str("event channel closed"))
+		_, r.errFile, r.errLine, _ = runtime.Caller(2)
+		return nil
+	}
+	if e.Error != nil {
+		r.setErr(e.Error)
+		_, r.errFile, r.errLine, _ = runtime.Caller(2)
+		return nil
+	}
+	return &e
 }
 
 // GotEntry reports whether the Entry has the given name
@@ -414,6 +422,17 @@ func (r *Runner) Match(want error) bool {
 		r.lastErr = errors.Errorf("got error:\n\t%v\nwant:\n\t%v", got, want)
 	}
 	return false
+}
+
+// GotErrorEvent checks whether the Event returned an error that matches the
+// given error and if not it notes the discrepancy as the last error state;
+// otherwise it clears the error.
+func (r *Runner) GotErrorEvent(want error) bool {
+	if r.Failed() {
+		return false
+	}
+	r.getNextEvent()
+	return r.Match(want)
 }
 
 // Diag returns a string containing the most recent saved error

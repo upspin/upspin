@@ -84,3 +84,28 @@ func testWatchCurrent(t *testing.T, r *testenv.Runner) {
 		t.Fatalf("Channel had more events: %v", e)
 	}
 }
+
+// Test some error conditions.
+
+func testWatchErrors(t *testing.T, r *testenv.Runner) {
+	const (
+		base = ownerName + "/watch-errors"
+		file = base + "/aFile"
+	)
+
+	r.As(ownerName)
+	r.MakeDirectory(base)
+	r.Put(file, "dummy")
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+
+	r.DirWatch(base, 3)
+	if r.Match(upspin.ErrNotSupported) {
+		t.Logf("Watch not supported in this DirServer")
+		return
+	}
+	if !r.GotErrorEvent(errors.E(errors.IO)) {
+		t.Fatal(r.Diag())
+	}
+}
