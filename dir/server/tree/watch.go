@@ -244,6 +244,7 @@ func (w *watcher) sendError(err error) {
 // given offset until it reaches the end of the log. It returns the next offset
 // to read.
 func (w *watcher) sendEventFromLog(offset int64) (int64, error) {
+	const op = "dir/server/tree.sendEventFromLog"
 	curr := offset
 	for {
 		// Is the receiver still interested in reading events?
@@ -255,7 +256,7 @@ func (w *watcher) sendEventFromLog(offset int64) (int64, error) {
 
 		logs, next, err := w.log.ReadAt(1, curr)
 		if err != nil {
-			return next, err
+			return next, errors.E(op, errors.IO, errors.Errorf("cannot read log at order %d: %v", curr, err))
 		}
 		if len(logs) != 1 {
 			// End of log.
