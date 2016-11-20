@@ -303,6 +303,7 @@ var integrationTests = []struct {
 	{"ReadAccess", testReadAccess},
 	{"GroupAccess", testGroupAccess},
 	{"Watch", testWatchCurrent},
+	{"WatchErrors", testWatchErrors},
 
 	// Each of these tests depend on the output of the previous one.
 	{"NoReadersAllowed", testNoReadersAllowed},
