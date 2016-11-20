@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "700680a0_920179e8",
+        "filename": "cmd/upspin/put.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-20T00:37:27Z",
+      "side": 1,
+      "message": "If the file doesn\u0027t exist, globOneUpspinPath exits and we can\u0027t put a new file.\n\nThis ends up doing a Lookup() in globUpspin and on error it calls s.exit(err). There will always be an error returned from a non-existing file.",
+      "revId": "0f40d67cfbeb2411ab2f17a1835c0d198b343e3b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
