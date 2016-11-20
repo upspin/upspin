@@ -190,6 +190,13 @@ func (s *server) WhichAccess(ctx gContext.Context, req *proto.DirWhichAccessRequ
 	return op.entryError(de, err)
 }
 
+// Watch implements proto.Watch.
+func (s *server) Watch(stream proto.Dir_WatchServer) error {
+	return stream.Send(&proto.Event{
+		Error: errors.MarshalError(upspin.ErrNotSupported),
+	})
+}
+
 // Endpoint implements proto.DirServer.
 func (s *server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*proto.EndpointResponse, error) {
 
