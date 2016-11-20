@@ -123,7 +123,7 @@ func TestMarshal(t *testing.T) {
 	for _, bad := range badLogEntries {
 		_, err := bad.marshal()
 		if err == nil {
-			t.Errorf("%s: marshal should have failed", bad)
+			t.Errorf("%s: marshal should have failed", &bad)
 		}
 	}
 }
@@ -185,11 +185,11 @@ func TestLogFile(t *testing.T) {
 		e := l.lookup(good.ep, good.name)
 		if i == 0 {
 			if e == nil {
-				t.Errorf("%s: expected but not found", &good, err)
+				t.Errorf("%s: expected but not found", &good)
 			}
 		} else {
 			if e != nil {
-				t.Errorf("%s: not expected but found", &good, err)
+				t.Errorf("%s: not expected but found", &good)
 			}
 		}
 	}
