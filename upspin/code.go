@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt" // Cannot use Upspin's error package because it would introduce a dependency cycle.
 	"sort"
+	"strings"
 	"time"
 )
 
@@ -527,5 +528,10 @@ func QuoteGlob(p PathName) PathName {
 // through QuoteGlob). For example, given ann@machine.com/foo, it will
 // return ann@machine.com/foo/*.
 func AllFilesGlob(dir PathName) string {
-	return string(QuoteGlob(dir)) + "/*"
+	str := string(QuoteGlob(dir))
+	// Avoid doubling a final slash.
+	if strings.HasSuffix(str, "/") {
+		return str + "*"
+	}
+	return str + "/*"
 }
