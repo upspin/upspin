@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "700680a0_0542e55e",
+        "filename": "dir/remote/remote.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-20T18:46:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "700680a0_25396902",
+      "revId": "bd0b87c327482dbce8bfa587da47b4b1787919e5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "700680a0_85425579",
         "filename": "upspin/proto/proto.go",
         "patchSetId": 8
@@ -30,6 +48,24 @@
       "writtenOn": "2016-11-20T14:13:42Z",
       "side": 1,
       "message": "s/$/./",
+      "revId": "bd0b87c327482dbce8bfa587da47b4b1787919e5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "700680a0_652c01aa",
+        "filename": "upspin/proto/proto.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-20T18:46:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "700680a0_85425579",
       "revId": "bd0b87c327482dbce8bfa587da47b4b1787919e5",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "700680a0_253609fa",
+        "filename": "upspin/proto/proto.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-20T18:46:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "700680a0_653f61e9",
+      "revId": "bd0b87c327482dbce8bfa587da47b4b1787919e5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "700680a0_453c5df2",
         "filename": "upspin/proto/proto.go",
         "patchSetId": 8
@@ -64,6 +118,24 @@
       "writtenOn": "2016-11-20T14:13:42Z",
       "side": 1,
       "message": "maybe not, but i\u0027m not sure. i\u0027ve had problems with passing nil values to GRPC. you should find out. if it\u0027s not, then make sure that the system treats all fields being zero the same as a nil event.",
+      "revId": "bd0b87c327482dbce8bfa587da47b4b1787919e5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "700680a0_a540b953",
+        "filename": "upspin/proto/proto.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-20T18:46:59Z",
+      "side": 1,
+      "message": "It seems it would cause an error. The caller can check, but to make it simpler, if err\u003d\u003dnil I will not return a nil Event. \n\nTested again on upspin-test.\n\nDone.",
+      "parentUuid": "700680a0_453c5df2",
       "revId": "bd0b87c327482dbce8bfa587da47b4b1787919e5",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
