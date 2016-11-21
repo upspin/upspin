@@ -10,7 +10,6 @@ import (
 	"strings"
 
 	"upspin.io/errors"
-	"upspin.io/log"
 	"upspin.io/path"
 	"upspin.io/upspin"
 )
@@ -61,7 +60,7 @@ func Glob(pattern string, lookup LookupFunc, ls ListFunc) ([]*upspin.DirEntry, e
 
 	basePath := p.First(firstMeta)                 // Path without the meta component.
 	basePattern := p.First(firstMeta + 1).String() // Pattern including first meta component.
-	patternTail := strings.TrimPrefix(pattern, basePattern)
+	patternTail := strings.TrimPrefix(p.String(), basePattern)
 
 	// The return values of this function.
 	var result []*upspin.DirEntry
@@ -72,7 +71,6 @@ func Glob(pattern string, lookup LookupFunc, ls ListFunc) ([]*upspin.DirEntry, e
 	entries, err := ls(basePath.Path())
 	if err != nil {
 		if err == upspin.ErrFollowLink {
-			log.Debug.Println("hey?", entries, err)
 			return entries, err
 		}
 		return nil, errors.E(basePath.Path(), err)

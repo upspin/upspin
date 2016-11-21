@@ -54,15 +54,17 @@ func TestGlob(t *testing.T) {
 			}
 			return nil, errNotExist
 		}
-		return nil, nil
 	}
 	ls := func(name upspin.PathName) ([]*upspin.DirEntry, error) {
 		t.Logf("ls(%q)", name)
 		switch name {
 		case root:
-			// Let's say we have read permission for the root,
-			// but not list.
-			return nil, errPermission
+			return []*upspin.DirEntry{
+				{
+					Name: dir,
+					Attr: upspin.AttrDirectory,
+				},
+			}, nil
 		case dir:
 			// Return the entries deliberately out-of-order to make
 			// sure they are sorted.
@@ -119,7 +121,8 @@ func TestGlob(t *testing.T) {
 	}
 
 	testGlob(root, nil, root)
-	testGlob(root+"/*", errPermission)
+	testGlob(root+"*", nil, dir)
+	testGlob(root+"/*", nil, dir) // double slash.
 	testGlob(user+"/dir", nil, dir)
 	testGlob(user+"/dir/*", nil, file, link, private, public)
 	testGlob(user+"/dir/*/*", errLink, link, pubDir, pubFile)
@@ -127,6 +130,7 @@ func TestGlob(t *testing.T) {
 	testGlob(user+"/dir/p*/file", nil, pubFile)
 	testGlob(user+"/dir/p*/*", nil, pubDir, pubFile)
 	testGlob(user+"/dir/p*/*/*", nil, pubDirFile)
+	testGlob(user+"/dir/private/*", errPermission)
 	testGlob(user+"/dir/*/dir/*", errLink, link, pubDirFile)
 }
 

@@ -325,7 +325,7 @@ func TestOnlyOwnerCanGlob(t *testing.T) {
 	// no one else can.
 	s = newDirServerForTesting(t, "spy@nsa.gov")
 	_, err = s.Glob(snapshotUser + "/*")
-	expectedErr := errors.E(errNotExist, upspin.PathName(snapshotUser+"/*"))
+	expectedErr := errors.E(errNotExist, errors.E(upspin.PathName(snapshotUser+"/")))
 	if !errors.Match(expectedErr, err) {
 		t.Fatalf("err = %v, want = %v", err, expectedErr)
 	}

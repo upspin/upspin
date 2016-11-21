@@ -379,6 +379,55 @@ func TestGlobDoesNotRemoveRoot(t *testing.T) {
 	}
 }
 
+// Check regression: This was a bug in serverutil.Glob.
+func TestGlobMultiSlashPattern(t *testing.T) {
+	const (
+		otherUser       = "joe@somewhere.com"
+		dirName         = otherUser + "/"
+		pathName        = dirName + "x"
+		oneSlashPattern = dirName + "*"
+		twoSlashPattern = dirName + "/*"
+	)
+	s := newDirServerForTesting(t, otherUser)
+	entry := &upspin.DirEntry{
+		Name:       dirName,
+		SignedName: dirName,
+		Packing:    upspin.PlainPack,
+		Attr:       upspin.AttrDirectory,
+		Writer:     serverName,
+		Sequence:   upspin.SeqIgnore,
+	}
+	_, err := s.Put(entry)
+	if err != nil {
+		t.Fatal(err)
+	}
+	entry = &upspin.DirEntry{
+		Name:       pathName,
+		SignedName: pathName,
+		Packing:    upspin.PlainPack,
+		Writer:     serverName,
+		Sequence:   upspin.SeqIgnore,
+	}
+	_, err = s.Put(entry)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ents, err := s.Glob(oneSlashPattern)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(ents) != 1 {
+		t.Fatal("no results from Glob with one slash")
+	}
+	ents, err = s.Glob(twoSlashPattern)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(ents) != 1 {
+		t.Fatal("no results from Glob with two slashes")
+	}
+}
+
 func TestGlob(t *testing.T) {
 	sOwner := newDirServerForTesting(t, userName)
 
