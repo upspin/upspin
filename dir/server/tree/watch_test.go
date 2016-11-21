@@ -25,7 +25,6 @@ func TestWatchFromBeginning(t *testing.T) {
 	}
 
 	p, _ := mkdir(t, tree, context, "/")
-	t.Logf("===p: %s", p.Path())
 
 	ch, err := tree.Watch(p, 0, make(chan struct{}))
 	if err != nil {
@@ -140,10 +139,10 @@ func TestWatchFromMiddle(t *testing.T) {
 	}
 
 	// Watch for events that happened from a specific log order and on,
-	// for a subdirectory. The magic number below (163) is the log offset
+	// for a subdirectory. The magic number below (175) is the log offset
 	// right after "mkdir /orig/sub2/".
 	done := make(chan struct{})
-	ch, err := tree.Watch(mkpath(t, userName+"/orig/sub1"), 163, done)
+	ch, err := tree.Watch(mkpath(t, userName+"/orig/sub1"), 175, done)
 	if err != nil {
 		t.Fatal(err)
 	}
