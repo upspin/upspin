@@ -125,7 +125,7 @@ func TestForceSnapshotVersioning(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	mockTime++ // Pretend one second has elapsed (our time resolution).
+	mockTime.addSecond(1) // Pretend one second has elapsed (our time resolution).
 
 	// Force two new snapshots.
 	err = s.takeSnapshot(dstPath, canonicalUser+"/")
@@ -133,7 +133,7 @@ func TestForceSnapshotVersioning(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	mockTime++ // Another second has elapsed.
+	mockTime.addSecond(1) // Another second has elapsed.
 
 	err = s.takeSnapshot(dstPath, canonicalUser+"/")
 	if err != nil {

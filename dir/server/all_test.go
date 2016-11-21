@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sync"
 	"testing"
 	"time"
 
@@ -43,7 +44,7 @@ const (
 
 var (
 	testDir  string
-	mockTime upspin.Time
+	mockTime *mockClock
 )
 
 func TestMakeRoot(t *testing.T) {
@@ -740,7 +741,7 @@ func TestForgetsRemoteGroupFiles(t *testing.T) {
 	}
 
 	// Simulate we loaded the family Group through some remote server.
-	s.remoteGroups.Add(upspin.PathName(familyGroupName), lastLoad(mockTime))
+	s.remoteGroups.Add(upspin.PathName(familyGroupName), lastLoad(mockTime.now()))
 	err = access.AddGroup(familyGroupName, []byte(familyGroupContents))
 	if err != nil {
 		t.Fatal(err)
@@ -754,7 +755,7 @@ func TestForgetsRemoteGroupFiles(t *testing.T) {
 
 	// Now time moves forward and the Group file granting reader read right
 	// expires.
-	mockTime += 10 // 10 seconds later (expiration time is just a milli).
+	mockTime.addSecond(10) // 10 seconds later (expiration time is just a milli).
 	time.Sleep(2 * remoteGroupDuration)
 
 	// Lookup now fails because the Group file granting permission is not
@@ -987,6 +988,27 @@ func checkDirEntry(testName string, got, want *upspin.DirEntry) error {
 	return nil
 }
 
+type mockClock struct {
+	mu   sync.Mutex
+	time upspin.Time
+}
+
+func newMockClock(now upspin.Time) *mockClock {
+	return &mockClock{time: now}
+}
+
+func (m *mockClock) now() upspin.Time {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return m.time
+}
+
+func (m *mockClock) addSecond(n int) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.time += upspin.Time(n)
+}
+
 var generatorInstance upspin.DirServer
 
 func newDirServerForTesting(t *testing.T, userName upspin.UserName) *server {
@@ -1040,12 +1062,12 @@ func newDirServerForTesting(t *testing.T, userName upspin.UserName) *server {
 	}
 	if generatorInstance == nil {
 		remoteGroupDuration = 50 * time.Millisecond
-		mockTime = upspin.Now()
+		mockTime = newMockClock(upspin.Now())
 		generatorInstance, err = New(ctx, "logDir="+testDir)
 		if err != nil {
 			t.Fatal(err)
 		}
-		generatorInstance.(*server).now = func() upspin.Time { return mockTime }
+		generatorInstance.(*server).now = func() upspin.Time { return mockTime.now() }
 	}
 	// Get a new instance properly initialized for this user.
 	svr, err := generatorInstance.Dial(userCtx, endpointInProcess)
