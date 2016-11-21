@@ -39,7 +39,7 @@ func TestMarshalUnmarshal(t *testing.T) {
 		t.Fatal(err)
 	}
 	var newEntry LogEntry
-	r := &countingByteReader{rd: bufio.NewReader(bytes.NewReader(buf))}
+	r := newChecker(bufio.NewReader(bytes.NewReader(buf)))
 	err = newEntry.unmarshal(r)
 	if err != nil {
 		t.Fatal(err)
@@ -256,6 +256,28 @@ func TestListUsers(t *testing.T) {
 		"jose+photos@ortega.com",
 	}) {
 		t.Fatal("users don't match")
+	}
+}
+
+func TestChecksum(t *testing.T) {
+	for i, tc := range []struct {
+		buf    []byte
+		chksum [4]byte
+	}{
+		{buf: []byte{}, chksum: [4]byte{0xde, 0xad, 0xbe, 0xef}},
+		{buf: []byte{0xff}, chksum: [4]byte{0x21, 0xad, 0xbe, 0xef}},
+		{buf: []byte{0xff, 0xff}, chksum: [4]byte{0x21, 0x52, 0xbe, 0xef}},
+		{buf: []byte{0xff, 0xff, 0xff}, chksum: [4]byte{0x21, 0x52, 0x41, 0xef}},
+		{buf: []byte{0, 0, 0, 0}, chksum: [4]byte{0xde, 0xad, 0xbe, 0xef}},
+		{buf: []byte{0, 0, 0, 0, 1}, chksum: [4]byte{0xdf, 0xad, 0xbe, 0xef}},
+		{buf: []byte{0, 0, 0, 0, 0xff}, chksum: [4]byte{0x21, 0xad, 0xbe, 0xef}},
+		{buf: []byte{0xaa, 0x55, 0xff, 0x00, 0xab, 0x7f}, chksum: [4]byte{0xdf, 0x87, 0x41, 0xef}},
+		{buf: []byte{1, 2, 3, 4, 5, 6, 7}, chksum: [4]byte{0xda, 0xa9, 0xba, 0xeb}},
+	} {
+		chksum := checksum(tc.buf)
+		if tc.chksum != chksum {
+			t.Errorf("%d: chksum = %x, want = %x", i, chksum, tc.chksum)
+		}
 	}
 }
 
