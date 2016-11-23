@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8d175b37_cd04897f",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-11-23T23:25:35Z",
+      "side": 1,
+      "message": "Code looks perfect, but just for my own edification...\nWhy not instead \"defer l.accessLock.RUnlock()\" here?",
+      "revId": "f55951b87a7f620f29978ee0377740066064a400",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
