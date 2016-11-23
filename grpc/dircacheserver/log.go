@@ -185,6 +185,7 @@ func openLog(ctx upspin.Context, dir string, period time.Duration) (*clog, error
 	// At this point we have the old file open as 'f' and the new one as 'l.file'.
 
 	// Read as much as we can into memory. A bad read is treated as the end of the log.
+	l.accessLock.RLock()
 	rd := bufio.NewReader(f)
 	for {
 		var e clogEntry
@@ -228,11 +229,13 @@ func openLog(ctx upspin.Context, dir string, period time.Duration) (*clog, error
 		}
 		e := ev.(*clogEntry)
 		if err := l.append(e); err != nil {
+			l.accessLock.RUnlock()
 			log.Error.Printf("%s: %s", op, err)
 			return nil, errors.E(op, err)
 		}
 	}
 
+	l.accessLock.RUnlock()
 	return finish(op, l, tfn, fn)
 }
 
