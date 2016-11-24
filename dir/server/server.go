@@ -655,18 +655,19 @@ func (s *server) Watch(name upspin.PathName, order int64, done <-chan struct{}) 
 		return nil, errors.E(op, name, err)
 	}
 
-	// Check whether the user has Any right on p.
-	hasAny, link, err := s.hasRight(access.AnyRight, p, o)
-	if err == upspin.ErrFollowLink {
-		_, err = s.errLink(op, link, o)
-		return nil, err
-	}
-	if err != nil {
-		return nil, errors.E(op, err)
-	}
-	if !hasAny {
-		return nil, errors.E(op, errors.Private, name)
-	}
+	/*
+		// Check whether the user has Any right on p.
+		hasAny, link, err := s.hasRight(access.AnyRight, p, o)
+		if err == upspin.ErrFollowLink {
+			_, err = s.errLink(op, link, o)
+			return nil, err
+		}
+		if err != nil {
+			return nil, errors.E(op, err)
+		}
+		if !hasAny {
+			return nil, errors.E(op, errors.Private, name)
+		}*/
 
 	tree, err := s.loadTreeFor(p.User(), o)
 	if err != nil {
@@ -710,7 +711,6 @@ func (s *server) watch(op string, treeEvents <-chan *upspin.Event, outEvents cha
 		}
 
 		// Check permissions on e.Entry.
-
 		p, err := path.Parse(e.Entry.Name)
 		if err != nil {
 			outEvents <- upspin.Event{Error: errors.E(op, err)}
