@@ -92,8 +92,8 @@ type Factotum interface {
 	// Returns error "no such key" if factotum doesn't hold the necessary private key.
 	ScalarMult(keyHash []byte, c elliptic.Curve, x, y *big.Int) (sx, sy *big.Int, err error)
 
-	// UserSign assists in authenticating to Upspin servers.
-	UserSign(hash []byte) (Signature, error)
+	// Sign signs a slice of bytes with the factotum's private key.
+	Sign(hash []byte) (Signature, error)
 
 	// Pop derives a Factotum that defaults to the previous key.
 	Pop() Factotum

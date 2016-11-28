@@ -30,7 +30,6 @@
 package grpcauth
 
 import (
-	"crypto/ecdsa"
 	"crypto/rand"
 	"fmt"
 	"math/big"
@@ -303,14 +302,11 @@ func verifyUser(key upspin.PublicKey, msg []string, magic string, now time.Time)
 
 	// Validate signature.
 	hash := []byte(msg[0] + magic + msg[1])
-	ecdsaPubKey, _, err := factotum.ParsePublicKey(key)
+	err = factotum.Verify(hash, upspin.Signature{R: &rs, S: &ss}, key)
 	if err != nil {
-		return err
+		errors.Errorf("signature fails to validate using the provided key: %s", err)
 	}
-	if ecdsa.Verify(ecdsaPubKey, hash, &rs, &ss) {
-		return nil
-	}
-	return errors.Str("signature fails to validate using the provided key")
+	return nil
 }
 
 // signUser creates a GRPC context header authenticating the local user.
@@ -326,7 +322,7 @@ func signUser(ctx upspin.Context, magic string) ([]string, error) {
 	// Discourage replay attacks.
 	now := time.Now().UTC().Format(time.ANSIC)
 	userString := string(ctx.UserName())
-	sig, err := f.UserSign([]byte(userString + magic + now))
+	sig, err := f.Sign([]byte(userString + magic + now))
 	if err != nil {
 		log.Error.Printf("proxyRequest signing server user: %v", err)
 		return nil, err
