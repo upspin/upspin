@@ -50,6 +50,7 @@ var commands = map[string]func(*State, ...string){
 	"repack":        (*State).repack,
 	"rotate":        (*State).rotate,
 	"rm":            (*State).rm,
+	"setupdomain":   (*State).setupdomain,
 	"share":         (*State).share,
 	"signup":        (*State).signup,
 	"snapshot":      (*State).snapshot,
@@ -394,7 +395,7 @@ func (s *State) globOneLocal(pattern string) string {
 func (s *State) openLocal(path string) *os.File {
 	f, err := os.Open(path)
 	if err != nil {
-		s.exitf(err.Error())
+		s.exit(err)
 	}
 	return f
 }
@@ -402,9 +403,23 @@ func (s *State) openLocal(path string) *os.File {
 func (s *State) createLocal(path string) *os.File {
 	f, err := os.Create(path)
 	if err != nil {
-		s.exitf(err.Error())
+		s.exit(err)
 	}
 	return f
+}
+
+func (s *State) mkdirLocal(path string) {
+	err := os.Mkdir(path, 0700)
+	if err != nil {
+		s.exit(err)
+	}
+}
+
+func (s *State) mkdirAllLocal(path string) {
+	err := os.MkdirAll(path, 0700)
+	if err != nil {
+		s.exit(err)
+	}
 }
 
 // intFlag returns the value of the named integer flag in the flag set.
