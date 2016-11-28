@@ -30,7 +30,6 @@
 package grpcauth
 
 import (
-	"crypto/ecdsa"
 	"crypto/rand"
 	"fmt"
 	"math/big"
@@ -303,14 +302,11 @@ func verifyUser(key upspin.PublicKey, msg []string, magic string, now time.Time)
 
 	// Validate signature.
 	hash := []byte(msg[0] + magic + msg[1])
-	ecdsaPubKey, _, err := factotum.ParsePublicKey(key)
+	err = factotum.Verify(hash, upspin.Signature{R: &rs, S: &ss}, key)
 	if err != nil {
-		return err
+		errors.Errorf("signature fails to validate using the provided key: %s", err)
 	}
-	if ecdsa.Verify(ecdsaPubKey, hash, &rs, &ss) {
-		return nil
-	}
-	return errors.Str("signature fails to validate using the provided key")
+	return nil
 }
 
 // signUser creates a GRPC context header authenticating the local user.

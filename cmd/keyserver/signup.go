@@ -12,7 +12,6 @@ package main
 //
 
 import (
-	"crypto/ecdsa"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -205,14 +204,7 @@ func (m *mailHandler) dialForUser(name upspin.UserName) (upspin.KeyServer, error
 
 func validateSignature(u upspin.UserName, k upspin.PublicKey, sig upspin.Signature) error {
 	hash := []byte(string(u) + string(k))
-	ecdsaPubKey, _, err := factotum.ParsePublicKey(k)
-	if err != nil {
-		return err
-	}
-	if !ecdsa.Verify(ecdsaPubKey, hash, sig.R, sig.S) {
-		return errors.E(errors.Invalid, errors.Str("signature does not match"))
-	}
-	return nil
+	return factotum.Verify(hash, sig, k)
 }
 
 // sendMail sends email to a recipient with a given subject and contents.
