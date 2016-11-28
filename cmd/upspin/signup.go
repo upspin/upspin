@@ -106,7 +106,7 @@ should take those two addresses as arguments.
 	pubKey := strings.TrimSpace(string(f.PublicKey()))
 
 	// Sign the username and key.
-	sig, err := f.UserSign([]byte(string(ctx.UserName()) + pubKey))
+	sig, err := f.Sign([]byte(string(ctx.UserName()) + pubKey))
 	if err != nil {
 		s.exit(err)
 	}

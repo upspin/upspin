@@ -195,8 +195,8 @@ func (f factotum) ScalarMult(keyHash []byte, curve elliptic.Curve, x, y *big.Int
 	return
 }
 
-// UserSign assists in authenticating to Upspin servers.
-func (f factotum) UserSign(hash []byte) (upspin.Signature, error) {
+// Sign signs a slice of bytes with the factotum's private key.
+func (f factotum) Sign(hash []byte) (upspin.Signature, error) {
 	// no logging or constraining hash, because will change to TokenBinding anyway
 	fk := f.keys[f.current]
 	r, s, err := ecdsa.Sign(rand.Reader, &fk.ecdsaKeyPair, hash)
@@ -204,6 +204,19 @@ func (f factotum) UserSign(hash []byte) (upspin.Signature, error) {
 		return sig0, err
 	}
 	return upspin.Signature{R: r, S: s}, nil
+}
+
+// Verify verifies whether the given hash's signature was signed by the private
+// key corresponding to the given public key.
+func Verify(hash []byte, sig upspin.Signature, key upspin.PublicKey) error {
+	ecdsaPubKey, _, err := ParsePublicKey(key)
+	if err != nil {
+		return err
+	}
+	if !ecdsa.Verify(ecdsaPubKey, hash, sig.R, sig.S) {
+		return errors.E(errors.Invalid, errors.Str("signature does not match"))
+	}
+	return nil
 }
 
 // Pop derives a Factotum by switching default from the current to the previous key.
