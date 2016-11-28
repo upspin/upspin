@@ -32,7 +32,8 @@ var (
 	// Log sets the level of logging (implements flag.Value).
 	Log logFlag
 
-	// Project is the project name on GCP; used by servers only.
+	// Project is the project name on GCP; used by servers and
+	// cmd/upspin setupdomain.
 	Project = ""
 
 	// ServerKind is the implementation kind of this server.
