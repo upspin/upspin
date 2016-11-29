@@ -110,10 +110,6 @@ func Rename(from, to string) error {
 	if !ok {
 		return fmt.Errorf("old file doesn't exist: %s", from)
 	}
-	_, ok = state.mapping[to]
-	if ok {
-		return fmt.Errorf("new file exists: %s", to)
-	}
 	if err := os.Rename(from, to); err != nil {
 		return err
 	}

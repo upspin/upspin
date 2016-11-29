@@ -17,7 +17,6 @@ import (
 
 	"bazil.org/fuse"
 
-	"upspin.io/access"
 	"upspin.io/bind"
 	"upspin.io/client"
 	os "upspin.io/cmd/upspinfs/internal/ose"
@@ -84,14 +83,16 @@ func (c *cache) mkTemp() string {
 // create creates a file in the cache.
 // The corresponding node should be locked.
 func (c *cache) create(h *handle) error {
+	const op = "upspinfs/cache.create"
+
 	if h.n.cf != nil {
-		return errors.E(errors.IO, errors.Str("create of an open file"))
+		return errors.E(op, errors.IO, errors.Str("create of an open file"))
 	}
 	cf := &cachedFile{c: c, dirty: true}
 	cf.fname = c.mkTemp()
 	var err error
 	if cf.file, err = os.OpenFile(cf.fname, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0700); err != nil {
-		return err
+		return errors.E(op, err)
 	}
 	h.n.cf = cf
 	return nil
@@ -100,7 +101,8 @@ func (c *cache) create(h *handle) error {
 // open opens the cached version of a file.  If it isn't cached, first retrieve it from the store.
 // The corresponding node should be locked.
 func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
-	op := "open"
+	const op = "upspinfs/cache.open"
+
 	n := h.n
 	name := n.uname
 	if n.cf != nil {
@@ -113,12 +115,13 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 	// the directory to see what the reference is.
 	dir, err := n.f.dirLookup(n.user)
 	if err != nil {
-		return err
+		return errors.E(op, err)
 	}
 	entry, err := dir.Lookup(name)
 	if err != nil {
-		// TODO: implement links.
-		return err
+		// We don't implement links in the standard way. Instead we
+		// let FUSE to it but stating every file it walks.
+		return errors.E(op, err)
 	}
 
 	// firstError remembers the first error we saw. If we fail completely we return it.
@@ -169,7 +172,7 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 	var file *os.File // The open cache file.
 	var at int64      // The write offset into the cache file.
 	if file, err = os.OpenFile(tmpName, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0700); err != nil {
-		return err
+		return errors.E(op, err)
 	}
 Blocks:
 	for b := 0; ; b++ {
@@ -264,11 +267,13 @@ func (cf *cachedFile) close() {
 
 // clone copies the first size bytes of the old cf.file into a new temp file that replaces it.
 func (cf *cachedFile) clone(size int64) error {
+	const op = "upspinfs/cache.clone"
+
 	fname := cf.c.mkTemp()
 	var err error
 	file, err := os.OpenFile(fname, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0700)
 	if err != nil {
-		return err
+		return errors.E(op, err)
 	}
 	buf := make([]byte, 128*1024)
 	for at := int64(0); size < 0 || at < size; {
@@ -277,7 +282,7 @@ func (cf *cachedFile) clone(size int64) error {
 			wn, werr := file.WriteAt(buf[:rn], at)
 			if werr != nil {
 				file.Close()
-				return werr
+				return errors.E(op, werr)
 			}
 			at += int64(wn)
 		}
@@ -286,7 +291,7 @@ func (cf *cachedFile) clone(size int64) error {
 		}
 		if rerr != nil {
 			file.Close()
-			return rerr
+			return errors.E(op, rerr)
 		}
 	}
 	cf.file.Close()
@@ -300,10 +305,12 @@ func (cf *cachedFile) clone(size int64) error {
 // truncate truncates a currently open cached file.  If it represents a reference in the store,
 // copy it rather than truncating in place.
 func (cf *cachedFile) truncate(n *node, size int64) error {
+	const op = "upspinfs/cache.truncate"
+
 	// This is the easy case.
 	if cf.dirty {
 		if err := os.Truncate(cf.fname, size); err != nil {
-			return err
+			return errors.E(op, err)
 		}
 		return nil
 	}
@@ -336,6 +343,7 @@ func (cf *cachedFile) writeAt(buf []byte, offset int64) (int, error) {
 
 // writeBack writes the cached file to the store if it is dirty. Called with node locked.
 func (cf *cachedFile) writeBack(h *handle) error {
+	const op = "upspinfs/cache.writeBack"
 	n := h.n
 
 	// Nothing to do if the cache file isn't dirty.
@@ -346,7 +354,7 @@ func (cf *cachedFile) writeBack(h *handle) error {
 	// Read the whole file into memory. Hope it fits.
 	info, err := cf.file.Stat()
 	if err != nil {
-		return err
+		return errors.E(op, err)
 	}
 	cleartext := make([]byte, info.Size())
 	var sofar int64
@@ -359,14 +367,8 @@ func (cf *cachedFile) writeBack(h *handle) error {
 			break
 		}
 		if err != nil {
-			return err
+			return errors.E(op, err)
 		}
-	}
-
-	// Hack because zero length access files don't work.
-	// TODO(p): fix when 0 length access files are allowed.
-	if len(cleartext) == 0 && access.IsAccessFile(n.uname) {
-		cleartext = []byte("\n")
 	}
 
 	// Use the client library to write it back.  Try multiple times on error.
@@ -377,24 +379,20 @@ func (cf *cachedFile) writeBack(h *handle) error {
 			break
 		}
 		if tries > 5 || !strings.Contains(err.Error(), "unreachable") {
-			return err
+			return errors.E(op, err)
 		}
 		time.Sleep(100 * time.Millisecond)
 	}
 
 	// Rename it to reflect the actual reference in the store so that new
-	// opens will find the cached version.  Assume a single block.  Don't rename
-	// zero length files, not worth it.
+	// opens will find the cached version.  Assume a single block.
 	// TODO(p): what if it isn't a single block?
-	if size, err := de.Size(); err != nil || size == 0 {
-		return nil
-	}
 	cdir, fname := cf.c.cacheName(de)
 	if err := os.Rename(cf.fname, fname); err != nil {
 		// Otherwise rename to the common name.
 		os.Mkdir(cdir, 0700)
 		if err := os.Rename(cf.fname, fname); err != nil {
-			return err
+			return errors.E(op, err)
 		}
 	}
 	cf.fname = fname
@@ -405,10 +403,12 @@ func (cf *cachedFile) writeBack(h *handle) error {
 
 // putRedirect assumes that the target fits in a single block.
 func (c *cache) putRedirect(n *node, target upspin.PathName) error {
+	const op = "upspinfs/cache.putRedirect"
+
 	// Use the client library to write it.
 	_, err := c.client.PutLink(target, n.uname)
 	if err != nil {
-		return err
+		return errors.E(op, err)
 	}
 	return nil
 }
