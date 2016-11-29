@@ -355,6 +355,7 @@ func (n *node) openFile(context gContext.Context, req *fuse.OpenRequest, resp *f
 
 	h := allocHandle(n)
 	if err := n.f.cache.open(h, req.Flags); err != nil {
+		log.Debug.Printf("open returns %s", err)
 		return nil, e2e(errors.E(op, err, n.uname))
 	}
 	return h, nil

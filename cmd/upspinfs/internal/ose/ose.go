@@ -165,6 +165,11 @@ func (file *File) Stat() (os.FileInfo, error) {
 	return file.f.Stat()
 }
 
+// Stat returns the status of a file.
+func Stat(name string) (os.FileInfo, error) {
+	return os.Stat(name)
+}
+
 // ReadAt performs a random access read of an encrypted file and returns the
 // decrypted content.
 func (file *File) ReadAt(b []byte, off int64) (int, error) {
