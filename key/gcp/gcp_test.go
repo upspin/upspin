@@ -280,6 +280,68 @@ func TestPutWildcardUser(t *testing.T) {
 	}
 }
 
+func TestIsDomainAdminPutOther(t *testing.T) {
+	const (
+		// domainAdmin is an admin for otherDude's domain.
+		domainAdmin = "bob@master.com"
+		otherDude   = "other@dude.com"
+	)
+
+	// TODO: remove. private key for adminUser, in case we need to re-sign.
+	// 11800604018168684216396938405296093432939224474051178621583939344408283302881
+	adminUser := &upspin.User{
+		Name:      domainAdmin,
+		PublicKey: upspin.PublicKey("p256\n62228065460130146166322304009949936354246855520378802047526662328716273924278\n48155412082998869412015845655980388194815503975296004540397518519544801723416\n"),
+	}
+	adminJSON := marshalUser(t, adminUser, !isAdmin)
+
+	user := &upspin.User{
+		Name:      otherDude,
+		PublicKey: upspin.PublicKey("adminUser can Put this"),
+	}
+	userJSON := marshalUser(t, user, !isAdmin)
+
+	// New server for domainAdmin.
+	u, mockGCP := newKeyServerWithMocking(domainAdmin, domainAdmin, adminJSON)
+
+	// Server will lookup other user as well.
+	mockGCP.Ref = append(mockGCP.Ref, otherDude)
+	mockGCP.Data = append(mockGCP.Data, userJSON)
+
+	// Setup fake DNS domain with domain admin's signature.
+	lookupTXT := func(domain string) ([]string, error) {
+		if domain == "dude.com" {
+			return []string{
+				"some unrelated TXT field",
+				"upspin:aaabbbbbbb1234-bbccfffeeeddd0003344347273", // someone else's signature.
+				"upspin:d49d89c8f534cc46811a5e5525569a662530cba953ebd811dd7506bebe6cf386-9e625c4aea2f2c5594b7570d8f6d600dd1b020560f27588c86385e7a14021994",
+			}, nil
+		}
+		return nil, errors.Str("no host found")
+	}
+	u.lookupTXT = lookupTXT
+
+	err := u.Put(user)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Verify that GCP received the Put.
+	if len(mockGCP.PutRef) != 1 || len(mockGCP.PutContents) != 1 {
+		t.Fatalf("num calls = %d, want = 1", len(mockGCP.PutRef))
+	}
+	if mockGCP.PutRef[0] != otherDude {
+		t.Errorf("put = %s, want = %s", mockGCP.PutRef[0], otherDude)
+	}
+	savedUser, isAdmin := unmarshalUser(t, mockGCP.PutContents[0])
+	if !reflect.DeepEqual(*savedUser, *user) {
+		t.Errorf("saved = %v, want = %v", savedUser, adminUser)
+	}
+	if isAdmin {
+		t.Error("Expected user not to be an admin")
+	}
+}
+
 // marshalUser marshals the user struct and whether the user is an admin into JSON bytes.
 func marshalUser(t *testing.T, user *upspin.User, isAdmin bool) []byte {
 	ue := userEntry{
@@ -320,8 +382,13 @@ func newKeyServerWithMocking(user upspin.UserName, ref string, data []byte) (*se
 		PutRef:      make([]string, 0, 1),
 	}
 	s := &server{
-		storage: mockGCP,
-		user:    user,
+		storage:   mockGCP,
+		user:      user,
+		lookupTXT: mockLookupTXT,
 	}
 	return s, mockGCP
+}
+
+func mockLookupTXT(domain string) ([]string, error) {
+	return nil, nil
 }
