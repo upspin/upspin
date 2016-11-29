@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "903934bb_be6f4d69",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 381,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-29T02:48:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ed30d7ea_2fdb050c",
+      "revId": "e74ca27b25990c78d5c206502372f21efd75f941",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ed30d7ea_4fe651d0",
         "filename": "dir/server/tree/log_test.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-11-29T01:48:43Z",
       "side": 1,
       "message": "i would drop the field names here. they aren\u0027t required and just add noise.",
+      "revId": "e74ca27b25990c78d5c206502372f21efd75f941",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "903934bb_7e86b5fc",
+        "filename": "dir/server/tree/log_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-29T02:48:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ed30d7ea_4fe651d0",
       "revId": "e74ca27b25990c78d5c206502372f21efd75f941",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
