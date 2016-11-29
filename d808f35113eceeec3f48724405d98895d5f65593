@@ -16,6 +16,24 @@
       "revId": "d808f35113eceeec3f48724405d98895d5f65593",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "903934bb_e374ce3f",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-29T01:23:07Z",
+      "side": 1,
+      "message": "Good point. Changed to Sign and Verify. The user portion is confusing, IMO.",
+      "parentUuid": "f01d104e_fe40e154",
+      "revId": "d808f35113eceeec3f48724405d98895d5f65593",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
