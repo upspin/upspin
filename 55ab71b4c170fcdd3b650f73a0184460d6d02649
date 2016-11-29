@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "903934bb_6bd8b0db",
+        "filename": "cmd/upspinfs/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-29T16:56:41Z",
+      "side": 1,
+      "message": "Up to you, but elsewhere in the code we\u0027ve been using \"const op \u003d\" instead.",
+      "revId": "55ab71b4c170fcdd3b650f73a0184460d6d02649",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "903934bb_8bd5e4a2",
+        "filename": "cmd/upspinfs/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-29T16:56:41Z",
+      "side": 1,
+      "message": "ditto.",
+      "revId": "55ab71b4c170fcdd3b650f73a0184460d6d02649",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
