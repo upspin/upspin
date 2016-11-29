@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f01d104e_fe40e154",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-11-29T00:01:59Z",
+      "side": 1,
+      "message": "Maybe change to UserVerify to make clearer that this is associated with the function above.\n(Or rename both to something better.)",
+      "revId": "d808f35113eceeec3f48724405d98895d5f65593",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
