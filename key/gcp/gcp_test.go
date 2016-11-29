@@ -280,6 +280,67 @@ func TestPutWildcardUser(t *testing.T) {
 	}
 }
 
+func TestIsDomainAdminPutOther(t *testing.T) {
+	const (
+		domainAdmin = "bob@master.com" // bob has keys in key/testdata.
+		otherDude   = "other@dude.com"
+	)
+
+	adminUser := &upspin.User{
+		Name: domainAdmin,
+		Stores: []upspin.Endpoint{
+			{
+				Transport: upspin.Remote,
+				NetAddr:   upspin.NetAddr("some.place:443"),
+			},
+		},
+		PublicKey: upspin.PublicKey("[need a real key]"),
+	}
+	adminJSON := marshalUser(t, adminUser, !isAdmin)
+
+	user := &upspin.User{
+		Name:      otherDude,
+		PublicKey: upspin.PublicKey("adminUser can Put this"),
+	}
+	userJSON := marshalUser(t, user, !isAdmin)
+
+	// New server for domainAdmin.
+	u, mockGCP := newKeyServerWithMocking(domainAdmin, domainAdmin, adminJSON)
+
+	// Server will lookup other user as well.
+	mockGCP.Ref = append(mockGCP.Ref, otherDude)
+	mockGCP.Data = append(mockGCP.Data, userJSON)
+
+	// Setup fake DNS domain with domain admin's signature.
+	lookupForMasterDomain := func(domain string) ([]string, error) {
+		if domain == "dude.com" {
+			return []string{""}, nil
+		}
+		return nil, errors.Str("no host found")
+	}
+	u.lookupTXT = lookupForMasterDomain
+
+	err := u.Put(user)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Verify that GCP received the Put.
+	if len(mockGCP.PutRef) != 1 || len(mockGCP.PutContents) != 1 {
+		t.Fatalf("num calls = %d, want = 1", len(mockGCP.PutRef))
+	}
+	if mockGCP.PutRef[0] != domainAdmin {
+		t.Errorf("put = %s, want = %s", mockGCP.PutRef[0], domainAdmin)
+	}
+	savedUser, isAdmin := unmarshalUser(t, mockGCP.PutContents[0])
+	if !reflect.DeepEqual(*savedUser, *user) {
+		t.Errorf("saved = %v, want = %v", savedUser, adminUser)
+	}
+	if isAdmin {
+		t.Error("Expected user not to be an admin")
+	}
+}
+
 // marshalUser marshals the user struct and whether the user is an admin into JSON bytes.
 func marshalUser(t *testing.T, user *upspin.User, isAdmin bool) []byte {
 	ue := userEntry{
@@ -320,8 +381,13 @@ func newKeyServerWithMocking(user upspin.UserName, ref string, data []byte) (*se
 		PutRef:      make([]string, 0, 1),
 	}
 	s := &server{
-		storage: mockGCP,
-		user:    user,
+		storage:   mockGCP,
+		user:      user,
+		lookupTXT: mockLookupTXT,
 	}
 	return s, mockGCP
+}
+
+func mockLookupTXT(domain string) ([]string, error) {
+	return nil, nil
 }
