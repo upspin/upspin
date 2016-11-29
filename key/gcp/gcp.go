@@ -8,10 +8,14 @@ package gcp
 
 import (
 	"encoding/json"
+	"math/big"
+	"net"
+	"strings"
 	"sync"
 
 	"upspin.io/cloud/storage"
 	"upspin.io/errors"
+	"upspin.io/factotum"
 	"upspin.io/log"
 	"upspin.io/upspin"
 	"upspin.io/user"
@@ -37,7 +41,11 @@ func New(options ...string) (upspin.KeyServer, error) {
 		return nil, errors.E(op, err)
 	}
 	log.Debug.Printf("Configured GCP user: %v", options)
-	return &server{storage: s, refCount: &refCount{count: 1}}, nil
+	return &server{
+		storage:   s,
+		refCount:  &refCount{count: 1},
+		lookupTXT: net.LookupTXT,
+	}, nil
 }
 
 // server is the implementation of the KeyServer Service on GCP.
@@ -47,6 +55,10 @@ type server struct {
 
 	// The name of the user accessing this server, set by Dial.
 	user upspin.UserName
+
+	// lookupTXT is a DNS lookup function that returns all TXT fields for a
+	// domain. It should alias net.LookupTXT except in tests.
+	lookupTXT func(domain string) ([]string, error)
 }
 
 var _ upspin.KeyServer = (*server)(nil)
@@ -85,16 +97,15 @@ func (s *server) Put(u *upspin.User) error {
 	if err := valid.User(u); err != nil {
 		return errors.E(op, err)
 	}
-	if err := s.canPut(op, u.Name); err != nil {
-		return err
-	}
 
 	// Retrieve info about the user we want to Put.
 	isAdmin := false
+	newUser := false
 	entry, err := s.fetchUserEntry(op, u.Name)
 	switch {
 	case errors.Match(errors.E(errors.NotExist), err):
 		// OK; adding new user.
+		newUser = true
 	case err != nil:
 		return err
 	default:
@@ -102,12 +113,17 @@ func (s *server) Put(u *upspin.User) error {
 		isAdmin = entry.IsAdmin
 	}
 
+	if err := s.canPut(op, u.Name, newUser); err != nil {
+		return err
+	}
+
 	// Set IsAdmin to what it was before or false by default.
 	return s.putUserEntry(op, &userEntry{User: *u, IsAdmin: isAdmin})
 }
 
-// canPut reports whether the current logged-in user can Put the target user.
-func (s *server) canPut(op string, target upspin.UserName) error {
+// canPut reports whether the current logged-in user can Put the (new or
+// existing) target user.
+func (s *server) canPut(op string, target upspin.UserName, isTargetNew bool) error {
 	name, suffix, domain, err := user.Parse(target)
 	if err != nil {
 		return errors.E(op, err)
@@ -129,16 +145,26 @@ func (s *server) canPut(op string, target upspin.UserName) error {
 			return nil
 		}
 	}
-	// Finally, check whether the current user is an admin.
+	// Check whether the current user is a global admin.
 	entry, err := s.fetchUserEntry(op, s.user)
 	if err != nil {
 		return err
 	}
-	if !entry.IsAdmin {
-		return errors.E(op, errors.Permission, s.user, errors.Str("not an administrator"))
+	if entry.IsAdmin {
+		return nil
 	}
-	// Is admin. Proceed.
-	return nil
+	// Finally, for a newly-created user, check whether the logged-in user
+	// owns the domain (and is thus allowed to create new users).
+	if !isTargetNew {
+		// Even domain admins cannot update their users.
+		return errors.E(op, errors.Permission, s.user)
+	}
+	err = s.verifyOwns(s.user, entry.User.PublicKey, domain)
+	if err == nil {
+		// User owns the domain for the target user.
+		return nil
+	}
+	return errors.E(op, errors.Permission, s.user, err)
 }
 
 // fetchUserEntry reads the user entry for a given user from permanent storage on GCP.
@@ -170,6 +196,53 @@ func (s *server) putUserEntry(op string, entry *userEntry) error {
 		return errors.E(op, errors.IO, err)
 	}
 	return nil
+}
+
+// verifyOwns verifies whether the named user owns the given domain name, as
+// per the domain name's upspin TXT field signature.
+func (s *server) verifyOwns(u upspin.UserName, pubKey upspin.PublicKey, domain string) error {
+	txts, err := s.lookupTXT(domain)
+	if err != nil {
+		return errors.E(errors.IO, err)
+	}
+	lastErr := errors.Str("not an administrator")
+	const prefix = "upspin:"
+	for _, txt := range txts {
+		if len(txt) < len(prefix)+20 {
+			// not enough data.
+			continue
+		}
+		if !strings.HasPrefix(txt, prefix) {
+			continue
+		}
+		// Is there a signature with two segments after the prefix?
+		sigFields := strings.Split(txt[len(prefix):], "-")
+		if len(sigFields) != 2 {
+			continue
+		}
+		// Parse signature.
+		var sig upspin.Signature
+		var rs, ss big.Int
+		if _, ok := rs.SetString(sigFields[0], 16); !ok {
+			lastErr = errors.E(errors.Invalid, errors.Str("invalid signature field0"))
+			continue
+		}
+		if _, ok := ss.SetString(sigFields[1], 16); !ok {
+			lastErr = errors.E(errors.Invalid, errors.Str("invalid signature field1"))
+			continue
+		}
+		sig.R = &rs
+		sig.S = &ss
+
+		log.Debug.Printf("Verifying if %q owns %q with pubKey: %q. Got sig: %q", u, domain, pubKey, txt[len(prefix):])
+		msg := "upspin-domain:" + domain + "-" + string(u)
+		lastErr = factotum.Verify([]byte(msg), sig, pubKey)
+		if lastErr == nil {
+			// Success!
+			return nil
+		}
+	}
+	return lastErr
 }
 
 // Dial implements upspin.Service.
