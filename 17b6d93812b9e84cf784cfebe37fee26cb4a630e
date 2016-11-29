@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "903934bb_e65777e5",
+        "filename": "cmd/upspin/setupdomain.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-29T18:30:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ed30d7ea_afd815da",
+      "revId": "17b6d93812b9e84cf784cfebe37fee26cb4a630e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ed30d7ea_efde1dc8",
         "filename": "cmd/upspin/setupdomain.go",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2016-11-29T05:44:10Z",
       "side": 1,
       "message": "isn\u0027t this handled by the global flags?",
+      "revId": "17b6d93812b9e84cf784cfebe37fee26cb4a630e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "903934bb_861f9b22",
+        "filename": "cmd/upspin/setupdomain.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-29T18:30:24Z",
+      "side": 1,
+      "message": "Ah yes, good point. However, how do I stress its importance here? cmd/upspin-deploy requires it. \n\nI\u0027ve put the project on the help line, so maybe this fixes it.\n\nDone.",
+      "parentUuid": "ed30d7ea_efde1dc8",
       "revId": "17b6d93812b9e84cf784cfebe37fee26cb4a630e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "903934bb_c6dd1332",
+        "filename": "cmd/upspin/setupdomain.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-29T18:30:24Z",
+      "side": 1,
+      "message": "This one is not global. It\u0027s repeated from keygen. I think it should exist here too, no?",
+      "parentUuid": "ed30d7ea_cfdb61d6",
+      "revId": "17b6d93812b9e84cf784cfebe37fee26cb4a630e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ed30d7ea_8fd559a4",
         "filename": "cmd/upspin/setupdomain.go",
         "patchSetId": 3
@@ -64,6 +118,24 @@
       "writtenOn": "2016-11-29T05:44:10Z",
       "side": 1,
       "message": "why is this one in line when the others are all consts above?  be consistent.\n\nalso i might pull the monsters out of the function altogether as they\u0027re kinda ugly.",
+      "revId": "17b6d93812b9e84cf784cfebe37fee26cb4a630e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "903934bb_06d80b3e",
+        "filename": "cmd/upspin/setupdomain.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-29T18:30:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ed30d7ea_8fd559a4",
       "revId": "17b6d93812b9e84cf784cfebe37fee26cb4a630e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
