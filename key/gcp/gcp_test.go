@@ -6,11 +6,14 @@ package gcp
 
 import (
 	"encoding/json"
+	"os"
+	"path/filepath"
 	"reflect"
 	"testing"
 
 	"upspin.io/cloud/storage/storagetest"
 	"upspin.io/errors"
+	"upspin.io/factotum"
 	"upspin.io/upspin"
 )
 
@@ -280,6 +283,86 @@ func TestPutWildcardUser(t *testing.T) {
 	}
 }
 
+func TestIsDomainAdminPutOther(t *testing.T) {
+	const (
+		// domainAdmin is an admin for otherDude's domain.
+		domainAdmin = "bob@master.com"
+		otherDude   = "other@dude.com"
+	)
+
+	// Get the test key for bob.
+	f, err := factotum.NewFromDir(repo("key/testdata/bob"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	adminUser := &upspin.User{
+		Name:      domainAdmin,
+		PublicKey: f.PublicKey(),
+	}
+	adminJSON := marshalUser(t, adminUser, !isAdmin)
+
+	// New server for domainAdmin.
+	u, mockGCP := newKeyServerWithMocking(domainAdmin, domainAdmin, adminJSON)
+
+	// Setup fake DNS domain with domain admin's signature.
+	lookupTXT := func(domain string) ([]string, error) {
+		if domain == "dude.com" {
+			return []string{
+				"some unrelated TXT field",
+				"upspin:aaabbbbbbb1234-bbccfffeeeddd0003344347273", // someone else's signature.
+				"upspin:39b3c02492b39fcb8f22a4255235de6e1656f471738f7b8f61445b4938fba658-bae1618c8c42ced79f0a14b5208dfc8ecd4ad103d805117adebe595f447872a9",
+			}, nil
+		}
+		return nil, errors.Str("no host found")
+	}
+	u.lookupTXT = lookupTXT
+
+	// adminUser will now Put a new user record for otherDude.
+	user := &upspin.User{
+		Name:      otherDude,
+		PublicKey: upspin.PublicKey("adminUser can Put this"),
+	}
+	err = u.Put(user)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Verify that GCP received the Put.
+	if len(mockGCP.PutRef) != 1 || len(mockGCP.PutContents) != 1 {
+		t.Fatalf("num calls = %d, want = 1", len(mockGCP.PutRef))
+	}
+	if mockGCP.PutRef[0] != otherDude {
+		t.Errorf("put = %s, want = %s", mockGCP.PutRef[0], otherDude)
+	}
+	savedUser, isAdmin := unmarshalUser(t, mockGCP.PutContents[0])
+	if !reflect.DeepEqual(*savedUser, *user) {
+		t.Errorf("saved = %v, want = %v", savedUser, adminUser)
+	}
+	if isAdmin {
+		t.Error("Expected user not to be an admin")
+	}
+
+	// Not try to update otherDude's record and fail. Even domain admins
+	// cannot do that.
+
+	// Get a new server.
+	otherDudeJSON := mockGCP.PutContents[0]
+	u, mockGCP = newKeyServerWithMocking(domainAdmin, domainAdmin, adminJSON)
+	mockGCP.Data = append(mockGCP.Data, otherDudeJSON)
+	mockGCP.Ref = append(mockGCP.Ref, otherDude)
+
+	user = &upspin.User{
+		Name:      otherDude,
+		PublicKey: upspin.PublicKey("adminUser cannot update a user!"),
+	}
+	err = u.Put(user)
+	expectedErr := errors.E(errors.Permission, upspin.UserName(domainAdmin))
+	if !errors.Match(expectedErr, err) {
+		t.Fatalf("err = %s, want = %s", err, expectedErr)
+	}
+}
+
 // marshalUser marshals the user struct and whether the user is an admin into JSON bytes.
 func marshalUser(t *testing.T, user *upspin.User, isAdmin bool) []byte {
 	ue := userEntry{
@@ -320,8 +403,22 @@ func newKeyServerWithMocking(user upspin.UserName, ref string, data []byte) (*se
 		PutRef:      make([]string, 0, 1),
 	}
 	s := &server{
-		storage: mockGCP,
-		user:    user,
+		storage:   mockGCP,
+		user:      user,
+		lookupTXT: mockLookupTXT,
 	}
 	return s, mockGCP
+}
+
+func mockLookupTXT(domain string) ([]string, error) {
+	return nil, nil
+}
+
+// repo returns the local pathname of a file in the upspin repository.
+func repo(dir string) string {
+	gopath := os.Getenv("GOPATH")
+	if len(gopath) == 0 {
+		panic("no GOPATH")
+	}
+	return filepath.Join(gopath, "src/upspin.io/"+dir)
 }
