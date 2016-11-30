@@ -68,6 +68,7 @@ type node struct {
 	attr       fuse.Attr        // Attributes of this node, e.g. POSIX mode bits.
 	handles    map[*handle]bool // Handles (open instances) of this node.
 	link       upspin.PathName  // If this is a symlink, the target.
+	noWB       bool             // Don't write back if set.
 
 	// cached info.
 	cf *cachedFile        // Local file system contents of this node.
@@ -444,9 +445,13 @@ func (n *node) Remove(context gContext.Context, req *fuse.RemoveRequest) error {
 	// Fix the node maps.
 	f := n.f
 	f.Lock()
+	fn := f.nodeMap[uname]
 	delete(f.nodeMap, uname)
 	f.enoentMap[uname] = time.Now().Add(defaultEnoentDuration)
 	f.Unlock()
+
+	// Avoid write back if the file is currently in use.
+	fn.noWB = true
 
 	// Forget the directory entry.
 	for i, de := range n.de {
@@ -655,7 +660,7 @@ func (h *handle) Release(context gContext.Context, req *fuse.ReleaseRequest) err
 	h.n.Lock()
 	defer h.n.Unlock()
 	var err error
-	if h.n.cf != nil {
+	if h.n.cf != nil && !h.n.noWB {
 		err = h.n.cf.writeBack(h)
 		if err != nil {
 			err = e2e(errors.E(op, h.n.uname, err))
@@ -709,7 +714,7 @@ func (n *node) Rename(ctx gContext.Context, req *fuse.RenameRequest, newDir fs.N
 	newPath := path.Join(newDir.(*node).uname, req.NewName)
 	if err := n.f.client.Rename(oldPath, newPath); err != nil {
 		// FUSE semantics state that a rename should
-		// remove the target it it exists.
+		// remove the target if it exists.
 		if !errors.Match(errors.E(errors.Exist), err) {
 			return e2e(errors.E(op, oldPath, err))
 		}
