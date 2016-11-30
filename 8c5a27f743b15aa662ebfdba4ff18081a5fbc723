@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "903934bb_5479bf6c",
+        "filename": "key/gcp/gcp.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-11-30T19:45:18Z",
+      "side": 1,
+      "message": "I\u0027d be more comfortable if we only do this test when first creating a new domain.   After that, let\u0027s remember the owner.\n\nDNS does get hijacked;  we don\u0027t want a temporary mistake to give away everything.",
+      "revId": "8c5a27f743b15aa662ebfdba4ff18081a5fbc723",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "903934bb_94e5f71e",
+        "filename": "key/gcp/gcp.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-11-30T19:45:18Z",
+      "side": 1,
+      "message": "This may be ok but normally I think of signing not just a bare string but also some tag in front, so a signature for one purpose can\u0027t be replayed for some other purpose.",
+      "revId": "8c5a27f743b15aa662ebfdba4ff18081a5fbc723",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
