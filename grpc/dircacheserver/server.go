@@ -93,10 +93,7 @@ func (s *server) Lookup(ctx gContext.Context, req *proto.DirLookupRequest) (*pro
 	lock := s.clog.lock(name)
 	defer s.clog.unlock(lock)
 	if e := s.clog.lookup(ep, name); e != nil {
-		if e.de != nil {
-			return op.entryError(e.de, e.error)
-		}
-		return nil, e.error
+		return op.entryError(e.de, e.error)
 	}
 
 	de, err := dir.Lookup(name)
