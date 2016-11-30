@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "903934bb_8fa31e81",
+        "filename": "key/gcp/gcp.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-30T20:08:58Z",
+      "side": 1,
+      "message": "Two problems:\n\n1) That poses a problem of when to revoke it. If the domain gets transferred, deleting the TXT entries will not remove the user as the owner of the domain.\n\n2) It\u0027s also complicated by the fact that the keyserver does not know when a new domain is added. So, determining how long to trust a DNS entry is a problem. In other words, what should this function do to check that the domain is new or newly transferred? We\u0027d need some other mechanism like the owner sending a message to the keyserver to tell it to start ignoring these TXT entries. And we\u0027d need to keep track of that message.\n\nBoth seem messy to solve. \n\nI\u0027m open to ideas though. Here are some thoughts:\n\n- How can I tell DNSSEC is on? Maybe one can only be and admin for a domain with DNSSEC enabled?\n- Can we instruct the keyserver to only talk to a Google DNS? I think that wouldn\u0027t change anything as DNSes defer to others upchain anyway. \n- Can we follow the path to the authoritative DNS and only ask that server?\n- Is trying three times from 3 trustworthy public DNSes to get a consistent view of the world a valid mitigation strategy?\n\nThat\u0027s all I can think of right now... Food for the meeting today...",
+      "parentUuid": "903934bb_5479bf6c",
+      "revId": "8c5a27f743b15aa662ebfdba4ff18081a5fbc723",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "903934bb_94e5f71e",
         "filename": "key/gcp/gcp.go",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2016-11-30T19:45:18Z",
       "side": 1,
       "message": "This may be ok but normally I think of signing not just a bare string but also some tag in front, so a signature for one purpose can\u0027t be replayed for some other purpose.",
+      "revId": "8c5a27f743b15aa662ebfdba4ff18081a5fbc723",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "903934bb_d4120f09",
+        "filename": "key/gcp/gcp.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-11-30T20:08:58Z",
+      "side": 1,
+      "message": "Good point. Done here and in the CL that introduces the setupdomain subcommand.",
+      "parentUuid": "903934bb_94e5f71e",
       "revId": "8c5a27f743b15aa662ebfdba4ff18081a5fbc723",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
