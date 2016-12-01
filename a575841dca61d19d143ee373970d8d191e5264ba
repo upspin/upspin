@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ad5a5f66_c3b5bc82",
+        "filename": "cmd/upspin/keygen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-12-01T02:36:07Z",
+      "side": 1,
+      "message": "It would be nice if the flag name matched the upspin/rc configuration name.    (Just an offhand comment;  there may be sound reasons why this is not feasible.)",
+      "revId": "a575841dca61d19d143ee373970d8d191e5264ba",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
