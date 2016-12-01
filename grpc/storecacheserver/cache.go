@@ -156,7 +156,7 @@ func (c *storeCache) get(ctx upspin.Context, ref upspin.Reference, e upspin.Endp
 
 		// At this point the ref is either cached or in the process of being cached.
 		if cr.busy {
-			// It is being cached.  Wait untill it's done.
+			// It is being cached.  Wait until it's done.
 			cr.hold.Wait()
 			// Loop rather than break because the attempt may have failed.
 			cr.Unlock()
