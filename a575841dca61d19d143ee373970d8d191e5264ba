@@ -16,6 +16,24 @@
       "revId": "a575841dca61d19d143ee373970d8d191e5264ba",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ad5a5f66_a3608826",
+        "filename": "cmd/upspin/keygen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-12-01T02:45:38Z",
+      "side": 1,
+      "message": "Oh , you mean \"-secrets\"? That\u0027s a good idea. I\u0027m game if others agree. Takes two seconds...",
+      "parentUuid": "ad5a5f66_c3b5bc82",
+      "revId": "a575841dca61d19d143ee373970d8d191e5264ba",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
