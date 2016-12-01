@@ -25,12 +25,12 @@ them) and creates a proof of domain ownership challenge.
 If using Google Cloud Platform (GCP), the project name must be specified with
 -project, so that cmd/upspin-deploy can find the config files.
 
-If only proof of domain ownership is needed, set -where=/dev/null.
+If only proof of domain ownership is needed, set -where="".
 `
 		noProquint = ""
 	)
 	fs := flag.NewFlagSet("setupdomain", flag.ExitOnError)
-	where := fs.String("where", "", "`directory` to store private configuration files; default $HOME/upspin/deploy")
+	where := fs.String("where", filepath.Join(os.Getenv("HOME"), "upspin", "deploy"), "`directory` to store private configuration files")
 	curveName := fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
 	s.parseFlags(fs, args, help, "[-project=<gcp_project_name>] setup-domain [-where=$HOME/upspin/deploy] <domain_name>")
 	if fs.NArg() != 1 {
@@ -49,19 +49,21 @@ If only proof of domain ownership is needed, set -where=/dev/null.
 		s.exitf("no such curve %q", *curveName)
 	}
 
-	if *where == "" {
-		home := os.Getenv("HOME")
-		if len(home) == 0 {
-			s.exitf("no home directory")
+	dstDir := *where
+	if dstDir == "" {
+		tmpDir, err := ioutil.TempDir("", "setup-domain-")
+		if err != nil {
+			s.exit(err)
 		}
-		*where = filepath.Join(home, "upspin", "deploy")
+		defer os.RemoveAll(tmpDir)
+		dstDir = tmpDir
 	}
 
-	*where = filepath.Join(*where, flags.Project)
+	dstDir = filepath.Join(dstDir, flags.Project)
 
-	dirServerPath := filepath.Join(*where, "dirserver")
+	dirServerPath := filepath.Join(dstDir, "dirserver")
 	s.mkdirAllLocal(dirServerPath)
-	storeServerPath := filepath.Join(*where, "storeserver")
+	storeServerPath := filepath.Join(dstDir, "storeserver")
 	s.mkdirAllLocal(storeServerPath)
 
 	// Generate keys for the dirserver and the storeserver.
@@ -100,8 +102,9 @@ If only proof of domain ownership is needed, set -where=/dev/null.
 	}
 	err = ioutil.WriteFile(filepath.Join(dirServerPath, "symmsecret.upspinkey"), symmSecret[:], 0600)
 
-	fmt.Printf("Configuration files for domain %q written to %q\n", domain, *where)
-
+	if *where != "" {
+		fmt.Printf("Configuration files for domain %q written to %q\n", domain, dstDir)
+	}
 	msg := "upspin-domain:" + domain + "-" + string(s.context.UserName())
 	sig, err := s.context.Factotum().Sign([]byte(msg))
 	if err != nil {

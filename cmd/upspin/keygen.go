@@ -36,7 +36,7 @@ See the description for rotate for information about updating keys.
 	fs := flag.NewFlagSet("keygen", flag.ExitOnError)
 	curveName := fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
 	secret := fs.String("secretseed", "", "128 bit secret `seed` in proquint format")
-	where := fs.String("where", "", "`directory` to store keys; default $HOME/.ssh")
+	where := fs.String("where", filepath.Join(os.Getenv("HOME"), ".ssh"), "`directory` to store keys")
 	s.parseFlags(fs, args, help, "keygen [-curve=256] [-secret=seed] [-where=$HOME/.ssh]")
 	if fs.NArg() != 0 {
 		fs.Usage()
@@ -56,19 +56,14 @@ See the description for rotate for information about updating keys.
 		s.exitf("creating keys: %v", err)
 	}
 
-	keyDir := *where
-	if keyDir == "" {
-		home := os.Getenv("HOME")
-		if len(home) == 0 {
-			log.Fatal("no home directory")
-		}
-		keyDir = filepath.Join(home, ".ssh")
+	if *where == "" {
+		s.exitf("-where must not be empty")
 	}
-	err = saveKeys(keyDir)
+	err = saveKeys(*where)
 	if err != nil {
 		s.exitf("saving previous keys failed(%v); keys not generated", err)
 	}
-	err = writeKeys(keyDir, public, private, proquintStr)
+	err = writeKeys(*where, public, private, proquintStr)
 	if err != nil {
 		s.exitf("writing keys: %v", err)
 	}
