@@ -70,6 +70,24 @@
       "revId": "c55848e96de9c1c9fb6493238733c6d09d536df2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ed4a9797_fcb509b0",
+        "filename": "cmd/upspin/setupdomain.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-01T01:19:13Z",
+      "side": 1,
+      "message": "sgtm",
+      "parentUuid": "ad5a5f66_00332a54",
+      "revId": "c55848e96de9c1c9fb6493238733c6d09d536df2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
