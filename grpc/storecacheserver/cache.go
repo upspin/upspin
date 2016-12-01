@@ -10,8 +10,10 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 	"sync"
 	"sync/atomic"
+	"time"
 
 	"upspin.io/bind"
 	"upspin.io/cache"
@@ -188,36 +190,50 @@ func (c *storeCache) get(ctx upspin.Context, ref upspin.Reference, e upspin.Endp
 		return true
 	}
 
-	// Loop over referred locations.
-	var data []byte
-	knownLocs := make(map[upspin.Location]bool)
-	where := []upspin.Location{upspin.Location{Endpoint: e, Reference: ref}}
-	for i := 0; i < len(where); i++ { // Not range loop - where changes as we run.
-		loc := where[i]
-		store, err := bind.StoreServer(ctx, loc.Endpoint)
-		if isError(err) {
-			continue
-		}
-		var locs []upspin.Location
-		data, _, locs, err = store.Get(loc.Reference) // TODO: Use refdata.
-		if isError(err) {
-			continue // locs guaranteed to be nil.
-		}
-		if locs == nil && err == nil {
-			// Success, maybe cache the data.
-			// TODO: Use refdata information to cache.
-			if err := cr.saveToCacheFile(file, data); err != nil {
-				log.Info.Printf("saving cached ref %s to %s: %s", string(ref), file, err)
+	// If we only see 503 errors, retry in the hope we can live through it.
+	for tries := 0; tries < 3; tries++ {
+		var fatal bool
+
+		// Loop over referred locations.
+		var data []byte
+		knownLocs := make(map[upspin.Location]bool)
+		where := []upspin.Location{upspin.Location{Endpoint: e, Reference: ref}}
+		for i := 0; i < len(where); i++ { // Not range loop - where changes as we run.
+			loc := where[i]
+			store, err := bind.StoreServer(ctx, loc.Endpoint)
+			if isError(err) {
+				continue
 			}
-			return data, nil, nil
-		}
-		// Add new locs to the list. Skip ones already there - they've been processed.
-		for _, newLoc := range locs {
-			if _, found := knownLocs[newLoc]; !found {
-				where = append(where, newLoc)
-				knownLocs[newLoc] = true
+			var locs []upspin.Location
+
+			// In case of a 503 error, retry a few times.
+			data, _, locs, err = store.Get(loc.Reference) // TODO: Use refdata.
+			if isError(err) {
+				if !strings.Contains(err.Error(), "503") {
+					fatal = true
+				}
+				continue // locs guaranteed to be nil.
+			}
+			if locs == nil && err == nil {
+				// Success, maybe cache the data.
+				// TODO: Use refdata information to cache.
+				if err := cr.saveToCacheFile(file, data); err != nil {
+					log.Info.Printf("saving cached ref %s to %s: %s", string(ref), file, err)
+				}
+				return data, nil, nil
+			}
+			// Add new locs to the list. Skip ones already there - they've been processed.
+			for _, newLoc := range locs {
+				if _, found := knownLocs[newLoc]; !found {
+					where = append(where, newLoc)
+					knownLocs[newLoc] = true
+				}
 			}
 		}
+		if fatal {
+			break
+		}
+		time.Sleep(250 * time.Millisecond)
 	}
 
 	// Failure.
