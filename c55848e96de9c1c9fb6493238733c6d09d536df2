@@ -34,6 +34,24 @@
       "revId": "c55848e96de9c1c9fb6493238733c6d09d536df2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ed4a9797_dc9dad42",
+        "filename": "cmd/upspin/setupdomain.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-01T00:46:29Z",
+      "side": 1,
+      "message": "If you set the actual flag default to $HOME/upspin/deploy, then the user can override with -where\u003d",
+      "parentUuid": "ad5a5f66_5d618fba",
+      "revId": "c55848e96de9c1c9fb6493238733c6d09d536df2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
