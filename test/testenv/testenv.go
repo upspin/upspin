@@ -79,6 +79,8 @@ type Env struct {
 	StoreServer upspin.StoreServer
 	DirServer   upspin.DirServer
 
+	DirServerContext upspin.Context
+
 	tmpDir     string
 	exitCalled bool
 }
@@ -162,6 +164,7 @@ func New(setup *Setup) (*Env, error) {
 				env.rmTmpDir()
 				return nil, errors.E(op, err)
 			}
+			env.DirServerContext = ctx
 		}
 		dirServerMux.Register(dirEndpoint, env.DirServer)
 
@@ -183,19 +186,19 @@ func New(setup *Setup) (*Env, error) {
 	env.Context = ctx
 
 	// Create a testuser, and set the context to the one for the user.
-	ctx, err := env.NewUser(setup.OwnerName)
+	userCtx, err := env.NewUser(setup.OwnerName)
 	if err != nil {
 		env.rmTmpDir()
 		return nil, errors.E(op, err)
 	}
-	env.Context = ctx
+	env.Context = userCtx
 
-	if err := makeRootIfNotExist(ctx); err != nil {
+	if err := makeRootIfNotExist(userCtx); err != nil {
 		env.rmTmpDir()
 		return nil, errors.E(op, err)
 	}
 
-	env.Client = client.New(ctx)
+	env.Client = client.New(userCtx)
 	return env, nil
 }
 
