@@ -140,15 +140,18 @@ func (f *upspinFS) allocNode(parent *node, name string, mode os.FileMode, size u
 	n := &node{f: f}
 	now := time.Now()
 	n.attr = fuse.Attr{
-		Valid:  defaultValid,
-		Mode:   mode,
-		Atime:  now,
-		Ctime:  mtime,
-		Mtime:  mtime,
-		Crtime: mtime,
-		Uid:    uint32(f.uid),
-		Gid:    uint32(f.gid),
-		Size:   size,
+		Valid:     defaultValid,
+		Mode:      mode,
+		Atime:     now,
+		Ctime:     mtime,
+		Mtime:     mtime,
+		Crtime:    mtime,
+		Uid:       uint32(f.uid),
+		Gid:       uint32(f.gid),
+		Size:      size,
+		Blocks:    (size + 511) / 512,
+		BlockSize: 4096,
+		Nlink:     1,
 	}
 	if parent == nil {
 		n.t = rootNode

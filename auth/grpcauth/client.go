@@ -44,7 +44,6 @@ type AuthClientService struct {
 	authToken        string
 	lastTokenRefresh time.Time
 	lastNetActivity  time.Time // last known time of some network activity.
-	proxyConfigured  bool
 }
 
 // SecurityLevel defines the security required of a GRPC connection.
@@ -202,7 +201,6 @@ func (ac *AuthClientService) dialWithKeepAlive(target string, timeout time.Durat
 	// Invalidate auth token and mark proxy as not configured.
 	ac.mu.Lock()
 	ac.authToken = ""
-	ac.proxyConfigured = false
 	ac.mu.Unlock()
 
 	c, err := net.DialTimeout("tcp", target, timeout)
@@ -246,15 +244,6 @@ func (ac *AuthClientService) isProxy() bool {
 	return ac.proxyFor.Transport != upspin.Unassigned
 }
 
-func (ac *AuthClientService) proxyNeedsConfiguration() bool {
-	if !ac.isProxy() {
-		return false
-	}
-	ac.mu.Lock()
-	defer ac.mu.Unlock()
-	return !ac.proxyConfigured
-}
-
 // NewAuthContext sets up a gContext, GRPC CallOption, and finishAuth function
 // for authenticating GRPC requests. If a request token is available, it puts
 // that token in the context as GRPC metadata. If the request token is not
@@ -296,7 +285,7 @@ func (ac *AuthClientService) NewAuthContext() (ctx gContext.Context, opt grpc.Ca
 		return nil, nil, nil, errors.E(op, err)
 	}
 	md := metadata.MD{authRequestKey: authMsg}
-	if ac.proxyNeedsConfiguration() {
+	if ac.isProxy() {
 		md[proxyRequestKey] = []string{ac.proxyFor.String()}
 	}
 	ctx = metadata.NewContext(ctx, md)
@@ -332,7 +321,6 @@ func (ac *AuthClientService) NewAuthContext() (ctx gContext.Context, opt grpc.Ca
 		defer ac.mu.Unlock()
 		ac.authToken = token[0]
 		ac.lastTokenRefresh = now
-		ac.proxyConfigured = ac.isProxy()
 		return nil
 	}
 	return
