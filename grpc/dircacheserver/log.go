@@ -544,7 +544,7 @@ func (l *clog) addToLRU(e *clogEntry, changed bool) {
 // addToGlob creates the glob if it doesn't exist and adds an entry to it.
 func (l *clog) addToGlob(e *clogEntry) {
 	dirName := path.DropPath(e.name, 1)
-	if dirName == "" {
+	if dirName == e.name {
 		return
 	}
 	var ge *clogEntry
@@ -567,6 +567,9 @@ func (l *clog) addToGlob(e *clogEntry) {
 // removeFromGlob removes an entry from a glob, should that glob exist.
 func (l *clog) removeFromGlob(e *clogEntry) {
 	dirName := path.DropPath(e.name, 1)
+	if dirName == e.name {
+		return
+	}
 	k := lruKey{name: dirName, ep: *e.ep, glob: true}
 	if v, ok := l.lru.Get(k); ok {
 		ge := v.(*clogEntry)

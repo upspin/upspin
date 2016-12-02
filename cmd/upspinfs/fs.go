@@ -332,9 +332,7 @@ func (n *node) openDir(context gContext.Context, req *fuse.OpenRequest, resp *fu
 	}
 	pattern := path.Join(n.uname, "*")
 	de, err := dir.Glob(string(pattern))
-	log.Debug.Printf("Glob returned %s", err)
 	if err != nil {
-		// TODO: implement links.
 		return nil, e2e(errors.E(op, err, n.uname))
 	}
 	n.Lock()
