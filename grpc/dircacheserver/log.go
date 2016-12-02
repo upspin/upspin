@@ -65,7 +65,7 @@ const (
 )
 
 // noAccessFile is used to indicate we did a WhichAccess and it returned no DirEntry.
-const noAccessFile = "no known Access file"
+const noAccessFile = upspin.PathName("no known Access file")
 
 // clogEntry corresponds to an cached operation.
 type clogEntry struct {
@@ -104,6 +104,7 @@ type clog struct {
 	lru             *cache.LRU // [lruKey]*clogEntry
 	exit            chan bool  // closed to request refresher to die
 	refresherExited chan bool  // closed to signal the refresher has exited or is about to exit
+	readingLog      bool       // true while we are reading the log.
 
 	// accessLock keeps everyone else out when we are traversing the whole LRU to
 	// update Access files.
@@ -155,7 +156,9 @@ func openLog(ctx upspin.Context, dir string, period time.Duration) (*clog, error
 		exit:            make(chan bool),
 		refresherExited: make(chan bool),
 		hashLock:        make([]sync.Mutex, 100),
+		readingLog:      true,
 	}
+	defer func() { l.readingLog = false }()
 
 	fn := ospath.Join(dir, "dircache.clog")
 	tfn := fn + ".tmp"
@@ -228,6 +231,7 @@ func openLog(ctx upspin.Context, dir string, period time.Duration) (*clog, error
 			break
 		}
 		e := ev.(*clogEntry)
+
 		if err := l.append(e); err != nil {
 			l.accessLock.RUnlock()
 			log.Error.Printf("%s: %s", op, err)
@@ -448,53 +452,73 @@ func (l *clog) logGlobRequest(ep *upspin.Endpoint, pattern upspin.PathName, err 
 func (l *clog) append(e *clogEntry) error {
 	const op = "grpc/dircacheserver.append"
 
+	if l.updateLRU(e) == 0 {
+		return nil
+	}
+
 	if err := l.appendToLogFile(e); err != nil {
 		return errors.E(op, errors.IO, err)
 	}
-	l.updateLRU(e)
 	return nil
 }
 
 // updateLRU adds the entry to the in core LRU version of the clog. We don't remember errors
 // in the LRU (other than ErrFollowLink). However, we do use them to remove things from the LRU.
-func (l *clog) updateLRU(e *clogEntry) {
+//
+// updateLRU returns non zero if the state was changed other than updated refresh times.
+func (l *clog) updateLRU(e *clogEntry) (changes int) {
 	if e.error != nil {
 		// Remember links.  All cases are equivalent, i.e., treat them like a lookup.
 		if e.error == upspin.ErrFollowLink {
 			e.request = lookupReq
-			l.addToLRU(e, false)
-			l.addToGlob(e)
+			changes += l.addToLRU(e)
+			changes += l.addToGlob(e)
 			return
 		}
 		if !errors.Match(notExist, e.error) {
+			log.Debug.Printf("updateLRU %s error %s", e.name, e.error)
 			return
 		}
-		// Remove from everywhere possible.
-		k := lruKey{name: e.name, ep: *e.ep, glob: e.request == globReq}
-		l.lru.Remove(k)
-		l.removeFromGlob(e)
-		l.removeAccess(e)
-		// Add back in as a non-existent file.
-		e.request = lookupReq
-		l.addToLRU(e, true)
+		// Recursively remove from everywhere possible.
+		if e.request == globReq {
+			for k := range e.children {
+				ae := &clogEntry{
+					request: globReq,
+					name:    k,
+					error:   e.error,
+					ep:      e.ep,
+					de:      e.de,
+				}
+				changes += l.updateLRU(ae)
+			}
+		}
+		changes += l.removeFromLRU(e, true)
+		changes += l.removeFromLRU(e, false)
+		changes += l.removeFromGlob(e)
+		changes += l.removeAccess(e)
+		// If not reading the log, add back in as a non-existent file.
+		if !l.readingLog {
+			e.request = lookupReq
+			changes += l.addToLRU(e)
+		}
 		return
 	}
 
 	// At this point, only requests have gotten through.
 	switch e.request {
 	case deleteReq:
-		l.lru.Remove(lruKey{name: e.name, ep: *e.ep, glob: true})
-		l.lru.Remove(lruKey{name: e.name, ep: *e.ep, glob: false})
-		l.removeFromGlob(e)
-		l.removeAccess(e)
+		changes += l.removeFromLRU(e, true)
+		changes += l.removeFromLRU(e, false)
+		changes += l.removeFromGlob(e)
+		changes += l.removeAccess(e)
 	case putReq:
-		l.addToLRU(e, true)
-		l.addToGlob(e)
-		l.addAccess(e)
+		changes += l.addToLRU(e)
+		changes += l.addToGlob(e)
+		changes += l.addAccess(e)
 	case lookupReq, globReq:
-		l.addToLRU(e, false)
-		l.addToGlob(e)
-		l.addAccess(e)
+		changes += l.addToLRU(e)
+		changes += l.addToGlob(e)
+		changes += l.addAccess(e)
 	case whichAccessReq:
 		// Log the access file itself as a lookup.
 		if e.de != nil {
@@ -505,44 +529,60 @@ func (l *clog) updateLRU(e *clogEntry) {
 				ep:      e.ep,
 				de:      e.de,
 			}
-			l.addAccess(ae)
+			changes += l.addAccess(ae)
 		}
 
 		// Add it to the specific entry.
 		dirName := path.DropPath(e.name, 1)
 		v, ok := l.lru.Get(lruKey{name: dirName, ep: *e.ep, glob: true})
 		if ok {
+			newVal := noAccessFile
 			if e.de != nil {
-				v.(*clogEntry).access = e.de.Name
-			} else {
-				v.(*clogEntry).access = noAccessFile
+				newVal = e.de.Name
+			}
+			if v.(*clogEntry).access != newVal {
+				changes++
+				v.(*clogEntry).access = newVal
 			}
 		}
 	default:
 		log.Printf("unknown request type: %s", e)
 	}
+	return
 }
 
 // addToLRU adds an entry to the LRU updating times used for refresh.
-func (l *clog) addToLRU(e *clogEntry, changed bool) {
+// Return non zero if state other than the refresh time has changed.
+func (l *clog) addToLRU(e *clogEntry) (changes int) {
+	changes = 1
 	e.refreshed = time.Now()
 	e.changed = e.refreshed
 	k := lruKey{name: e.name, ep: *e.ep, glob: e.request == globReq}
-	if !changed {
-		if v, ok := l.lru.Get(k); ok {
-			oe := v.(*clogEntry)
-			if match(e, oe.de, oe.error) {
-				// Don't update change time if nothing has changed.
-				// This is strictly for refresh decision.
-				e.changed = oe.changed
-			}
+	if v, ok := l.lru.Get(k); ok {
+		oe := v.(*clogEntry)
+		if match(e, oe.de, oe.error) {
+			// Don't update change time if nothing has changed.
+			// This is strictly for refresh decision.
+			e.changed = oe.changed
+			changes = 0
 		}
 	}
 	l.lru.Add(k, e)
+	return changes
+}
+
+// removeFromLRU removes an entry from the LRU.
+// Return non zero if state other than the refresh time has changed.
+func (l *clog) removeFromLRU(e *clogEntry, isGlob bool) int {
+	v := l.lru.Remove(lruKey{name: e.name, ep: *e.ep, glob: isGlob})
+	if v != nil {
+		return 1
+	}
+	return 0
 }
 
 // addToGlob creates the glob if it doesn't exist and adds an entry to it.
-func (l *clog) addToGlob(e *clogEntry) {
+func (l *clog) addToGlob(e *clogEntry) (changes int) {
 	dirName := path.DropPath(e.name, 1)
 	if dirName == e.name {
 		return
@@ -561,11 +601,15 @@ func (l *clog) addToGlob(e *clogEntry) {
 	} else {
 		ge = v.(*clogEntry)
 	}
+	if !ge.children[e.name] {
+		changes = 1
+	}
 	ge.children[e.name] = true
+	return
 }
 
 // removeFromGlob removes an entry from a glob, should that glob exist.
-func (l *clog) removeFromGlob(e *clogEntry) {
+func (l *clog) removeFromGlob(e *clogEntry) (changes int) {
 	dirName := path.DropPath(e.name, 1)
 	if dirName == e.name {
 		return
@@ -574,29 +618,34 @@ func (l *clog) removeFromGlob(e *clogEntry) {
 	if v, ok := l.lru.Get(k); ok {
 		ge := v.(*clogEntry)
 		if ge.children[e.name] {
+			changes = 1
 			delete(ge.children, e.name)
 		}
 	}
+	return
 }
 
 // addAccess adds an access pointer to its directory and removes one
 // from all descendant directories that point to an ascendant of the
 // access file's directory.
-func (l *clog) addAccess(e *clogEntry) {
+func (l *clog) addAccess(e *clogEntry) (changes int) {
 	if !access.IsAccessFile(e.name) {
 		return
 	}
 	l.accessLock.RUnlock()
 	l.accessLock.Lock()
 
-	// Add the access to its immediate directory.
+	// Add the access reference to its immediate directory.
 	dirName := path.DropPath(e.name, 1)
 	v, ok := l.lru.Get(lruKey{name: dirName, ep: *e.ep, glob: true})
 	if ok {
-		v.(*clogEntry).access = e.name
+		if v.(*clogEntry).access != e.name {
+			changes++
+			v.(*clogEntry).access = e.name
+		}
 	}
 
-	// Remove the access file for any descendant that points at an ascendant.
+	// Remove the access reference for any descendant that points at an ascendant.
 	iter := l.lru.NewIterator()
 	for {
 		_, v, ok := iter.GetAndAdvance()
@@ -611,30 +660,37 @@ func (l *clog) addAccess(e *clogEntry) {
 			continue
 		}
 		if len(ne.access) < len(e.name) {
-			ne.access = ""
+			// This is different than noAccessFile because the
+			// empty string means that we don't know.
+			if ne.access != "" {
+				changes++
+				ne.access = ""
+			}
 		}
 	}
 	l.accessLock.Unlock()
 	l.accessLock.RLock()
+	return
 }
 
 // removeAccess removes an access pointer from its directory and removes it
 // from any descendant directory.
-func (l *clog) removeAccess(e *clogEntry) {
+func (l *clog) removeAccess(e *clogEntry) (changes int) {
 	if !access.IsAccessFile(e.name) {
 		return
 	}
 	l.accessLock.RUnlock()
 	l.accessLock.Lock()
 
-	// Remove the access from its immediately directory.
+	// Remove this access reference from its immediately directory.
 	dirName := path.DropPath(e.name, 1)
 	v, ok := l.lru.Get(lruKey{name: dirName, ep: *e.ep, glob: true})
 	if ok {
 		v.(*clogEntry).access = ""
+		changes++
 	}
 
-	// Remove this access file from any descendant.
+	// Remove this access reference from any descendant.
 	iter := l.lru.NewIterator()
 	for {
 		_, v, ok := iter.GetAndAdvance()
@@ -649,11 +705,13 @@ func (l *clog) removeAccess(e *clogEntry) {
 			continue
 		}
 		if ne.access == e.name {
+			changes++
 			ne.access = ""
 		}
 	}
 	l.accessLock.Unlock()
 	l.accessLock.RLock()
+	return
 }
 
 // appendToLogFile appends to the clog file.
@@ -923,11 +981,12 @@ func (l *clog) refresh(e *clogEntry) bool {
 	defer l.unlock(lock)
 	switch e.request {
 	case globReq:
-		entries, err := dir.Glob(string(e.name))
+		pattern := path.Join(e.name, "/*")
+		entries, err := dir.Glob(string(pattern))
 		if !cacheableError(err) {
 			return false
 		}
-		l.logGlobRequest(e.ep, e.name, err, entries)
+		l.logGlobRequest(e.ep, pattern, err, entries)
 	default:
 		de, err := dir.Lookup(e.name)
 		if !cacheableError(err) {
