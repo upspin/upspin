@@ -247,7 +247,7 @@ func (c *storeCache) put(data []byte, store upspin.StoreServer) (upspin.Referenc
 	// TODO(p): Use refdata information.
 	refdata, err := store.Put(data)
 	if err != nil {
-		return refdata.Reference, err
+		return upspin.Reference("???"), err
 	}
 	ref := refdata.Reference
 
