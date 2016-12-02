@@ -21,11 +21,11 @@ import (
 	"upspin.io/store/filesystem"
 	"upspin.io/store/gcp"
 	"upspin.io/store/inprocess"
-	"upspin.io/store/perm"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
 
 	// We need the directory transports to fetch write permissions.
+	"upspin.io/serverutil/perm"
 	_ "upspin.io/transports"
 )
 
@@ -72,7 +72,10 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	store = perm.WrapStore(ctx, store)
+	store, err = perm.WrapStore(ctx, store)
+	if err != nil {
+		log.Fatal("Error wrapping store: %s", err)
+	}
 	s := storeserver.New(ctx, store, grpcSecureServer, upspin.NetAddr(flags.NetAddr))
 	proto.RegisterStoreServer(grpcSecureServer.GRPCServer(), s)
 
