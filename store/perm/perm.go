@@ -21,29 +21,10 @@ package perm
 
 import (
 	"sync"
-	"time"
 
-	"upspin.io/access"
-	"upspin.io/bind"
-	"upspin.io/client/clientutil"
 	"upspin.io/errors"
-	"upspin.io/log"
-	"upspin.io/path"
+	serverPerm "upspin.io/serverutil/perm"
 	"upspin.io/upspin"
-	"upspin.io/user"
-)
-
-const (
-	// StoreWritersGroupFile is the name of the Group file relative to this
-	// StoreServer's users's Group that dictates which users can write or
-	// mutate the store.
-	StoreWritersGroupFile = "StoreWriters"
-
-	// pollInterval is how often to poll for updates to the permission file.
-	pollInterval = 2 * time.Minute
-
-	// retryTimeout is the interval between re-attempts between failures.
-	retryTimeout = 10 * time.Second
 )
 
 // Store performs permission checking for StoreServer implementations.
@@ -52,7 +33,7 @@ type Store struct {
 
 	serverCtx upspin.Context
 	user      upspin.UserName
-	perm      *perm // permission control for this StoreServer.
+	perm      *serverPerm.Perm
 }
 
 // perm tracks the users allowed to write to the Store.
@@ -72,10 +53,8 @@ func WrapStore(ctx upspin.Context, store upspin.StoreServer) *Store {
 		StoreServer: store,
 		serverCtx:   ctx,
 		user:        ctx.UserName(),
-		perm:        &perm{},
+		perm:        serverPerm.New(ctx),
 	}
-	s.perm.firstRun.Add(1)
-	go s.updateLoop()
 	return s
 }
 
@@ -83,7 +62,7 @@ func WrapStore(ctx upspin.Context, store upspin.StoreServer) *Store {
 func (s *Store) Put(data []byte) (*upspin.Refdata, error) {
 	const op = "store/perm.Put"
 
-	if !s.perm.isWriter(s.user) {
+	if !s.perm.IsWriter(s.user) {
 		return nil, errors.E(op, s.user, errors.Permission, errors.Errorf("user not authorized"))
 	}
 	return s.StoreServer.Put(data)
@@ -93,7 +72,7 @@ func (s *Store) Put(data []byte) (*upspin.Refdata, error) {
 func (s *Store) Delete(ref upspin.Reference) error {
 	const op = "store/perm.Delete"
 
-	if !s.perm.isWriter(s.user) {
+	if !s.perm.IsWriter(s.user) {
 		return errors.E(op, s.user, errors.Permission, errors.Errorf("user not authorized"))
 	}
 	return s.StoreServer.Delete(ref)
@@ -110,159 +89,4 @@ func (s *Store) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service,
 	newS.user = context.UserName()
 	newS.StoreServer = service.(upspin.StoreServer)
 	return &newS, nil
-}
-
-// updateLoop continuously looks for updates on this StoreServer's permissions.
-// It must be run in a goroutine before calling IsMutationAllowed.
-func (s *Store) updateLoop() {
-	lastErr := s.update()
-	if lastErr != nil {
-		log.Error.Printf("store/perm: error updating StoreServer's writers: %s", lastErr)
-	}
-	s.perm.firstRun.Done()
-
-	for {
-		err := s.update()
-		if err != nil {
-			if lastErr == nil || err.Error() != lastErr.Error() {
-				log.Error.Printf("store/perm: error updating StoreServer's writers: %s", err)
-			}
-			time.Sleep(retryTimeout)
-			continue
-		}
-		lastErr = err
-		time.Sleep(pollInterval)
-	}
-}
-
-// update retrieves and parses the Group file that rules over this
-// StoreServer's allowed writers.
-func (s *Store) update() error {
-	entry, err := s.lookupGroupFile()
-	if err != nil {
-		// If the group file does not exist, reset writers map.
-		if errors.Match(errors.E(errors.NotExist), err) {
-			s.perm.deleteUsers()
-			return nil
-		}
-		return err
-	}
-	users, err := s.allowedWriters(entry)
-	if err != nil {
-		return err
-	}
-	s.perm.set(users)
-	return nil
-}
-
-// lookupGroupFile looks up the Group file that rules over this StoreServer.
-func (s *Store) lookupGroupFile() (*upspin.DirEntry, error) {
-	return s.lookup(upspin.PathName(string(s.serverCtx.UserName()) + "/Group/" + StoreWritersGroupFile))
-}
-
-// allowedWriters reads the contents of the entry, interprets it exactly as
-// an access Group file, expanding recursively if needed, and returns the slice
-// of users allowed to write to the store.
-func (s *Store) allowedWriters(entry *upspin.DirEntry) ([]upspin.UserName, error) {
-	// Pretend this is an Access file, so we can easily use it to retrieve a
-	// slice of  all authorized users.
-	fakeAccess := "w,d:" + entry.Name
-	acc, err := access.Parse(upspin.PathName(s.serverCtx.UserName())+"/", []byte(fakeAccess))
-	if err != nil {
-		return nil, err
-	}
-
-	return acc.Users(access.Write, s.load)
-}
-
-// load loads the contents of a name from the StoreServer.
-// Intended for use with access.Users.
-func (s *Store) load(name upspin.PathName) ([]byte, error) {
-	entry, err := s.lookup(name)
-	if err != nil {
-		return nil, err
-	}
-	// TODO: use an entry cache here.
-
-	return clientutil.ReadAll(s.serverCtx, entry)
-}
-
-// lookup performs a directory entry lookup on the canonical DirServer for
-// the path.
-func (s *Store) lookup(name upspin.PathName) (*upspin.DirEntry, error) {
-	parsed, err := path.Parse(name)
-	if err != nil {
-		return nil, err
-	}
-	key, err := bind.KeyServer(s.serverCtx, s.serverCtx.KeyEndpoint())
-	if err != nil {
-		return nil, err
-	}
-	u, err := key.Lookup(parsed.User())
-	if err != nil {
-		return nil, err
-	}
-	var firstErr error
-	check := func(err error) error {
-		if firstErr == nil {
-			firstErr = err
-		}
-		return err
-	}
-	for _, e := range u.Dirs {
-		dir, err := bind.DirServer(s.serverCtx, e)
-		if check(err) != nil {
-			// Skip bad bind.
-			continue
-		}
-		return dir.Lookup(parsed.Path())
-	}
-	if firstErr != nil {
-		return nil, firstErr
-	}
-	return nil, errors.E(errors.NotExist, parsed.Path(), errors.Str("no dir entry for path"))
-}
-
-// isWriter reports whether the user has mutation privileges on the
-// StoreServer.
-func (p *perm) isWriter(u upspin.UserName) bool {
-	p.firstRun.Wait()
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	// Everyone is allowed if there is no control Group yet.
-	if p.writers == nil {
-		return true
-	}
-	// If the special user "all@upspin.io" is present, allow all.
-	if p.writers[access.AllUsers] {
-		return true
-	}
-	// Is this exact user allowed?
-	if p.writers[u] {
-		return true
-	}
-	// Maybe the domain is wildcarded. Check this case last as it's the most
-	// expensive.
-	_, _, domain, err := user.Parse(u)
-	if err != nil {
-		// Should never happen at this point.
-		log.Error.Printf("store/perm: unexpected error: %s", err)
-		return false
-	}
-	return p.writers[upspin.UserName("*@"+domain)]
-}
-
-func (p *perm) set(users []upspin.UserName) {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	p.writers = make(map[upspin.UserName]bool)
-	for _, u := range users {
-		p.writers[u] = true
-	}
-}
-
-func (p *perm) deleteUsers() {
-	p.mu.Lock()
-	p.writers = nil
-	p.mu.Unlock()
 }
