@@ -32,7 +32,7 @@ func TestNoGroupFileAllowsAll(t *testing.T) {
 		"foo@bar.com",
 		"nobody@nobody.org",
 	} {
-		if !store.perm.isWriter(user) {
+		if !store.perm.IsWriter(user) {
 			t.Errorf("user %q is not allowed; expected allowed", user)
 		}
 	}
@@ -55,7 +55,7 @@ func TestAllowsOnlyOwner(t *testing.T) {
 	store := WrapStore(ownerEnv.Context, ownerEnv.StoreServer)
 
 	// Owner is allowed.
-	if !store.perm.isWriter(owner) {
+	if !store.perm.IsWriter(owner) {
 		t.Errorf("Owner is not allowed, expected allowed")
 	}
 
@@ -65,7 +65,7 @@ func TestAllowsOnlyOwner(t *testing.T) {
 		"foo@bar.com",
 		"nobody@nobody.org",
 	} {
-		if store.perm.isWriter(user) {
+		if store.perm.IsWriter(user) {
 			t.Errorf("user %q is allowed; expected not allowed", user)
 		}
 	}
@@ -124,7 +124,7 @@ func TestIncludeRemoteGroups(t *testing.T) {
 		writer,
 		randomDude,
 	} {
-		if !store.perm.isWriter(user) {
+		if !store.perm.IsWriter(user) {
 			t.Errorf("user %q is not allowed; expected allowed", user)
 		}
 	}
@@ -136,7 +136,7 @@ func TestIncludeRemoteGroups(t *testing.T) {
 		"god@heaven.infinite",
 		"nobody@nobody.org",
 	} {
-		if store.perm.isWriter(user) {
+		if store.perm.IsWriter(user) {
 			t.Errorf("user %q is allowed; expected not allowed", user)
 		}
 	}
@@ -168,7 +168,7 @@ func TestLifeCycle(t *testing.T) {
 		"foo@bar.com",
 		"nobody@nobody.org",
 	} {
-		if !store.perm.isWriter(user) {
+		if !store.perm.IsWriter(user) {
 			t.Errorf("user %q is not allowed; expected allowed", user)
 		}
 	}
@@ -192,7 +192,7 @@ func TestLifeCycle(t *testing.T) {
 		"fred@example.com",
 		"shirley@example.com",
 	} {
-		if !store.perm.isWriter(user) {
+		if !store.perm.IsWriter(user) {
 			t.Errorf("User %s is not allowed, expected allowed", user)
 		}
 	}
@@ -203,7 +203,7 @@ func TestLifeCycle(t *testing.T) {
 		"foo@bar.com",
 		"nobody@nobody.org",
 	} {
-		if store.perm.isWriter(user) {
+		if store.perm.IsWriter(user) {
 			t.Errorf("user %q is allowed; expected not allowed", user)
 		}
 	}
