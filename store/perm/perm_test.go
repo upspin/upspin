@@ -9,6 +9,7 @@ import (
 
 	"upspin.io/access"
 	"upspin.io/errors"
+	serverutil "upspin.io/serverutil/perm"
 	"upspin.io/test/testenv"
 	"upspin.io/upspin"
 )
@@ -18,7 +19,7 @@ const (
 	writer = "carla@writer.io" // carla has keys in key/testdata/carla.
 
 	groupDir    = owner + "/Group"
-	ownersGroup = groupDir + "/" + StoreWritersGroupFile
+	ownersGroup = groupDir + "/" + serverutil.WritersGroupFile
 )
 
 func TestNoGroupFileAllowsAll(t *testing.T) {
@@ -32,7 +33,7 @@ func TestNoGroupFileAllowsAll(t *testing.T) {
 		"foo@bar.com",
 		"nobody@nobody.org",
 	} {
-		if !store.perm.isWriter(user) {
+		if !store.perm.IsWriter(user) {
 			t.Errorf("user %q is not allowed; expected allowed", user)
 		}
 	}
@@ -55,7 +56,7 @@ func TestAllowsOnlyOwner(t *testing.T) {
 	store := WrapStore(ownerEnv.Context, ownerEnv.StoreServer)
 
 	// Owner is allowed.
-	if !store.perm.isWriter(owner) {
+	if !store.perm.IsWriter(owner) {
 		t.Errorf("Owner is not allowed, expected allowed")
 	}
 
@@ -65,7 +66,7 @@ func TestAllowsOnlyOwner(t *testing.T) {
 		"foo@bar.com",
 		"nobody@nobody.org",
 	} {
-		if store.perm.isWriter(user) {
+		if store.perm.IsWriter(user) {
 			t.Errorf("user %q is allowed; expected not allowed", user)
 		}
 	}
@@ -124,7 +125,7 @@ func TestIncludeRemoteGroups(t *testing.T) {
 		writer,
 		randomDude,
 	} {
-		if !store.perm.isWriter(user) {
+		if !store.perm.IsWriter(user) {
 			t.Errorf("user %q is not allowed; expected allowed", user)
 		}
 	}
@@ -136,7 +137,7 @@ func TestIncludeRemoteGroups(t *testing.T) {
 		"god@heaven.infinite",
 		"nobody@nobody.org",
 	} {
-		if store.perm.isWriter(user) {
+		if store.perm.IsWriter(user) {
 			t.Errorf("user %q is allowed; expected not allowed", user)
 		}
 	}
@@ -168,7 +169,7 @@ func TestLifeCycle(t *testing.T) {
 		"foo@bar.com",
 		"nobody@nobody.org",
 	} {
-		if !store.perm.isWriter(user) {
+		if !store.perm.IsWriter(user) {
 			t.Errorf("user %q is not allowed; expected allowed", user)
 		}
 	}
@@ -181,7 +182,7 @@ func TestLifeCycle(t *testing.T) {
 	}
 
 	// Force a re-computation of the permissions.
-	err = store.update()
+	err = store.perm.update()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -192,7 +193,7 @@ func TestLifeCycle(t *testing.T) {
 		"fred@example.com",
 		"shirley@example.com",
 	} {
-		if !store.perm.isWriter(user) {
+		if !store.perm.IsWriter(user) {
 			t.Errorf("User %s is not allowed, expected allowed", user)
 		}
 	}
@@ -203,7 +204,7 @@ func TestLifeCycle(t *testing.T) {
 		"foo@bar.com",
 		"nobody@nobody.org",
 	} {
-		if store.perm.isWriter(user) {
+		if store.perm.IsWriter(user) {
 			t.Errorf("user %q is allowed; expected not allowed", user)
 		}
 	}
@@ -259,7 +260,7 @@ func TestIntegration(t *testing.T) {
 	}
 
 	// Force re-reading permissions file.
-	err = ownerStore.update()
+	err = ownerStore.perm.update()
 	if err != nil {
 		t.Fatal(err)
 	}
