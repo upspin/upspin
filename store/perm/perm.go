@@ -34,11 +34,6 @@ import (
 )
 
 const (
-	// StoreWritersGroupFile is the name of the Group file relative to this
-	// StoreServer's users's Group that dictates which users can write or
-	// mutate the store.
-	StoreWritersGroupFile = "StoreWriters"
-
 	// pollInterval is how often to poll for updates to the permission file.
 	pollInterval = 2 * time.Minute
 
@@ -157,7 +152,7 @@ func (s *Store) update() error {
 
 // lookupGroupFile looks up the Group file that rules over this StoreServer.
 func (s *Store) lookupGroupFile() (*upspin.DirEntry, error) {
-	return s.lookup(upspin.PathName(string(s.serverCtx.UserName()) + "/Group/" + StoreWritersGroupFile))
+	return s.lookup(upspin.PathName(string(s.serverCtx.UserName()) + "/Group/" + upspin.WritersGroupFile))
 }
 
 // allowedWriters reads the contents of the entry, interprets it exactly as

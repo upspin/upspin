@@ -18,7 +18,7 @@ const (
 	writer = "carla@writer.io" // carla has keys in key/testdata/carla.
 
 	groupDir    = owner + "/Group"
-	ownersGroup = groupDir + "/" + StoreWritersGroupFile
+	ownersGroup = groupDir + "/" + upspin.WritersGroupFile
 )
 
 func TestNoGroupFileAllowsAll(t *testing.T) {

@@ -296,6 +296,14 @@ var (
 // when evaluating a single path name.
 const MaxLinkHops = 20
 
+// WritersGroupFile is the name of a Group file that both the DirServer and
+// the StoreServer look for when deciding whether a user is allowed to modify
+// their storage. When the Group file is not present, every Upspin user is
+// allowed to write or modify the DirServer and the StoreServer. The contents
+// of a WritersGroupFile is the same as any Group file: a list of users allowed
+// access.
+const WritersGroupFile = "Writers"
+
 // DirServer manages the name space for one or more users.
 type DirServer interface {
 	Dialer
