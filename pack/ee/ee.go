@@ -357,7 +357,7 @@ func (ee ee) Unpack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockUnpacke
 			cipher:       blockCipher,
 		}, nil
 	}
-	return nil, errors.E(op, errors.Permission, d.Name, me, errors.Str("could not find wrapped key"))
+	return nil, errors.E(op, errors.CannotDecrypt, d.Name, me)
 }
 
 type blockUnpacker struct {
