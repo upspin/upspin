@@ -16,6 +16,24 @@
       "revId": "9e310ef43981bb709e6dc3b83ef3ad2d32a9d07a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2d8f4f3f_cedb037d",
+        "filename": "errors/errors.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-12-05T22:06:01Z",
+      "side": 1,
+      "message": "no wrapped key for user; owner must reshare item",
+      "parentUuid": "2d8f4f3f_8ed1fb62",
+      "revId": "9e310ef43981bb709e6dc3b83ef3ad2d32a9d07a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
