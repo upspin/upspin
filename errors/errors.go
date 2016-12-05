@@ -61,17 +61,18 @@ type Kind uint8
 
 // Kinds of errors.
 const (
-	Other      Kind = iota // Unclassified error. This value is not printed in the error message.
-	Invalid                // Invalid operation for this type of item.
-	Permission             // Permission denied.
-	IO                     // External I/O error such as network failure.
-	Exist                  // Item already exists.
-	NotExist               // Item does not exist.
-	IsDir                  // Item is a directory.
-	NotDir                 // Item is not a directory..
-	NotEmpty               // Directory not empty.
-	Private                // Information withheld.
-	Internal               // Internal error or inconsistency.
+	Other         Kind = iota // Unclassified error. This value is not printed in the error message.
+	Invalid                   // Invalid operation for this type of item.
+	Permission                // Permission denied.
+	IO                        // External I/O error such as network failure.
+	Exist                     // Item already exists.
+	NotExist                  // Item does not exist.
+	IsDir                     // Item is a directory.
+	NotDir                    // Item is not a directory..
+	NotEmpty                  // Directory not empty.
+	Private                   // Information withheld.
+	Internal                  // Internal error or inconsistency.
+	CannotDecrypt             // No wrapped key for user with read access.
 )
 
 func (k Kind) String() string {
@@ -98,6 +99,8 @@ func (k Kind) String() string {
 		return "information withheld"
 	case Internal:
 		return "internal error"
+	case CannotDecrypt:
+		return `no wrapped key for user; owner must "upspin share -fix"`
 	}
 	return "unknown error kind"
 }
