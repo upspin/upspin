@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "2d8f4f3f_6e904f9e",
+        "filename": "errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-12-05T19:12:56Z",
+      "side": 1,
+      "message": "I like Dave\u0027s suggestion but would spell it\n\nCannotDecrypt // No wrapped key for user with read access.\n\nThe problem with NeedShareFix is that the recipe for repair is in the part we don\u0027t show users.",
+      "parentUuid": "cdddd35f_6ab8520f",
+      "revId": "51de3d3618125e07ae063427211dcad2bd95526f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cdddd35f_f7242b77",
         "filename": "errors/errors.go",
         "patchSetId": 1
@@ -66,6 +84,24 @@
       "side": 1,
       "message": "I\u0027m definitely open to whatever we all agree on.   As I understand it, the problem is that foran ordinary user \"no key\" or \"no wrapped key found\" is inscrutable.   By hinting at \"share -fix\" we hope that the file reader, or at least the file owner when the reader complains, will be reminded that they forgot to run \"upspin share -fix\" after changing Access.",
       "parentUuid": "cdddd35f_f7242b77",
+      "revId": "51de3d3618125e07ae063427211dcad2bd95526f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2d8f4f3f_8e849b60",
+        "filename": "errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-12-05T19:12:56Z",
+      "side": 1,
+      "message": "This is unusual, putting a command to run in the error string. But it might actually be the right solution. Maybe\n\nreturn `no wrapped key for user; run \"upspin share -fix\"`",
+      "parentUuid": "cdddd35f_2a4eca83",
       "revId": "51de3d3618125e07ae063427211dcad2bd95526f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
