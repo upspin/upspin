@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "cdddd35f_2d6b8409",
+        "filename": "errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-12-05T19:44:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2d8f4f3f_6e904f9e",
+      "revId": "51de3d3618125e07ae063427211dcad2bd95526f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cdddd35f_f7242b77",
         "filename": "errors/errors.go",
         "patchSetId": 1
@@ -101,6 +119,24 @@
       "writtenOn": "2016-12-05T19:12:56Z",
       "side": 1,
       "message": "This is unusual, putting a command to run in the error string. But it might actually be the right solution. Maybe\n\nreturn `no wrapped key for user; run \"upspin share -fix\"`",
+      "parentUuid": "cdddd35f_2a4eca83",
+      "revId": "51de3d3618125e07ae063427211dcad2bd95526f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cdddd35f_0d99e80b",
+        "filename": "errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-12-05T19:44:06Z",
+      "side": 1,
+      "message": "Done",
       "parentUuid": "cdddd35f_2a4eca83",
       "revId": "51de3d3618125e07ae063427211dcad2bd95526f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
