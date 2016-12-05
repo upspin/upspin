@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "cdddd35f_cd71a0c0",
+        "filename": "cmd/upspinfs/errors_unix.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-12-05T20:10:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2d8f4f3f_ce7ea382",
+      "revId": "9acdc16c0b258f30b700a4b4fb6aa53fbe6ed8c5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2d8f4f3f_ee7b5f8f",
         "filename": "pack/ee/ee.go",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2016-12-05T19:49:24Z",
       "side": 1,
       "message": "you don\u0027t need the Str because CannotDecrypt already says that",
+      "revId": "9acdc16c0b258f30b700a4b4fb6aa53fbe6ed8c5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cdddd35f_ed6c5ce6",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 360,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-12-05T20:10:31Z",
+      "side": 1,
+      "message": "Done.     (Thanks, I realize I\u0027m still confused about when the string gets used.)",
+      "parentUuid": "2d8f4f3f_ee7b5f8f",
       "revId": "9acdc16c0b258f30b700a4b4fb6aa53fbe6ed8c5",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
