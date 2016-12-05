@@ -51,12 +51,13 @@ var errnoToKind = map[syscall.Errno]errors.Kind{
 }
 
 var kindToErrno = map[errors.Kind]syscall.Errno{
-	errors.Permission: syscall.EPERM,
-	errors.Exist:      syscall.EEXIST,
-	errors.NotExist:   syscall.ENOENT,
-	errors.IsDir:      syscall.EISDIR,
-	errors.NotDir:     syscall.ENOTDIR,
-	errors.NotEmpty:   syscall.ENOTEMPTY,
+	errors.Permission:    syscall.EPERM,
+	errors.Exist:         syscall.EEXIST,
+	errors.NotExist:      syscall.ENOENT,
+	errors.IsDir:         syscall.EISDIR,
+	errors.NotDir:        syscall.ENOTDIR,
+	errors.NotEmpty:      syscall.ENOTEMPTY,
+	errors.CannotDecrypt: syscall.EPERM,
 }
 
 func notSupported(s string) *errnoError {
