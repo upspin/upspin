@@ -33,6 +33,24 @@
       "revId": "51de3d3618125e07ae063427211dcad2bd95526f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cdddd35f_2a4eca83",
+        "filename": "errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-12-05T18:37:54Z",
+      "side": 1,
+      "message": "I\u0027m definitely open to whatever we all agree on.   As I understand it, the problem is that foran ordinary user \"no key\" or \"no wrapped key found\" is inscrutable.   By hinting at \"share -fix\" we hope that the file reader, or at least the file owner when the reader complains, will be reminded that they forgot to run \"upspin share -fix\" after changing Access.",
+      "parentUuid": "cdddd35f_f7242b77",
+      "revId": "51de3d3618125e07ae063427211dcad2bd95526f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
