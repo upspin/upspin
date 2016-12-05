@@ -88,16 +88,16 @@ same YAML format printed by the command without the -put flag.
 		}
 		var buf bytes.Buffer
 		if keyU.Name != u.Name {
-			fmt.Fprintf(&buf, "user name in context: %s", u.Name)
+			fmt.Fprintf(&buf, "user name in context: %s\n", u.Name)
 			fmt.Fprintf(&buf, "user name in key server: %s", keyU.Name)
 		}
 		if keyU.PublicKey != u.PublicKey {
-			fmt.Fprintf(&buf, "public key mismatch")
+			fmt.Fprintf(&buf, "public key in context does not match key server")
 		}
 		// There must be dir servers defined in both and we expect agreement.
 		if !equalEndpoints(keyU.Dirs, u.Dirs) {
-			fmt.Fprintf(&buf, "dirs in context: %s", u.Dirs)
-			fmt.Fprintf(&buf, "dirs in key server: %s", u.Dirs)
+			fmt.Fprintf(&buf, "dirs in context: %s\n", u.Dirs)
+			fmt.Fprintf(&buf, "dirs in key server: %s", keyU.Dirs)
 		}
 		// Remote stores need not be defined (yet).
 		if len(keyU.Stores) > 0 && !equalEndpoints(keyU.Stores, u.Stores) {
