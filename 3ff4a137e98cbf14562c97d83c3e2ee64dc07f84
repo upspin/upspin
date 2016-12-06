@@ -1,0 +1,271 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2d8f4f3f_6ede8f2b",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-06T05:20:14Z",
+      "side": 1,
+      "message": "Instead of creating a new package, put this in package serverutil (as with glob)\n\nthen make the constructor NewPerm",
+      "revId": "3ff4a137e98cbf14562c97d83c3e2ee64dc07f84",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2d8f4f3f_917d9e22",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-06T05:20:14Z",
+      "side": 1,
+      "message": "s/stores/specifies/",
+      "revId": "3ff4a137e98cbf14562c97d83c3e2ee64dc07f84",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2d8f4f3f_71791234",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-06T05:20:14Z",
+      "side": 1,
+      "message": "put the exported and unexported consts in separate blocks",
+      "revId": "3ff4a137e98cbf14562c97d83c3e2ee64dc07f84",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2d8f4f3f_d18726f8",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-06T05:20:14Z",
+      "side": 1,
+      "message": "Perm tracks the set of users with write access to a server, as specified by the Writers Group file.",
+      "revId": "3ff4a137e98cbf14562c97d83c3e2ee64dc07f84",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2d8f4f3f_b17a9a25",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-06T05:20:14Z",
+      "side": 1,
+      "message": "drop the \".Watch\".\n\nAnd if you say this about WatchFunc you should say it about LookupFunc too",
+      "revId": "3ff4a137e98cbf14562c97d83c3e2ee64dc07f84",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2d8f4f3f_51c25626",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-06T05:20:14Z",
+      "side": 1,
+      "message": "suggestion: move this into the updateLoop function",
+      "revId": "3ff4a137e98cbf14562c97d83c3e2ee64dc07f84",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2d8f4f3f_d1a00677",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-06T05:20:14Z",
+      "side": 1,
+      "message": "const op ?",
+      "range": {
+        "startLine": 88,
+        "startChar": 16,
+        "endLine": 88,
+        "endChar": 31
+      },
+      "revId": "3ff4a137e98cbf14562c97d83c3e2ee64dc07f84",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2d8f4f3f_11b8ceaa",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-06T05:20:14Z",
+      "side": 1,
+      "message": "eventually? it should be immediately after an error",
+      "range": {
+        "startLine": 96,
+        "startChar": 12,
+        "endLine": 96,
+        "endChar": 58
+      },
+      "revId": "3ff4a137e98cbf14562c97d83c3e2ee64dc07f84",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2d8f4f3f_31bdca9b",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-06T05:20:14Z",
+      "side": 1,
+      "message": "this function does not seem worth its weight",
+      "revId": "3ff4a137e98cbf14562c97d83c3e2ee64dc07f84",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2d8f4f3f_8ea01b88",
+        "filename": "serverutil/perm/perm_test.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-06T05:20:14Z",
+      "side": 1,
+      "message": "could make a helper to do this that takes a testing.T and testenv.Env",
+      "revId": "3ff4a137e98cbf14562c97d83c3e2ee64dc07f84",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2d8f4f3f_ee97df30",
+        "filename": "serverutil/perm/perm_test.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-06T05:20:14Z",
+      "side": 1,
+      "message": "don\u0027t rely on sleeps, or this test will be flaky.\nyou need to use a hook, something like this:\n\nhttps://youtu.be/ndmB0bj7eyw?t\u003d1951",
+      "revId": "3ff4a137e98cbf14562c97d83c3e2ee64dc07f84",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2d8f4f3f_6eaccf83",
+        "filename": "serverutil/perm/perm_test.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-06T05:20:14Z",
+      "side": 1,
+      "message": "please put this up the top, after the constants and global vars\nthe first thing i did reading this file was go find setup",
+      "revId": "3ff4a137e98cbf14562c97d83c3e2ee64dc07f84",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2d8f4f3f_0ead0b82",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-06T05:20:14Z",
+      "side": 1,
+      "message": "add an error return",
+      "revId": "3ff4a137e98cbf14562c97d83c3e2ee64dc07f84",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2d8f4f3f_2eb2c7e4",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-06T05:20:14Z",
+      "side": 1,
+      "message": "instead of logging, return the error",
+      "revId": "3ff4a137e98cbf14562c97d83c3e2ee64dc07f84",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2d8f4f3f_4ea713a2",
+        "filename": "test/testenv/testenv.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-06T05:20:14Z",
+      "side": 1,
+      "message": "set it after the switch, otherwise it won\u0027t be set for inprocess",
+      "revId": "3ff4a137e98cbf14562c97d83c3e2ee64dc07f84",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
