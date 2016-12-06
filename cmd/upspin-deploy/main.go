@@ -579,6 +579,7 @@ func (c *Config) copyDockerfile(dir, server string) error {
 func (c *Config) prepareConfig(data []byte, server string) []byte {
 	data = bytes.Replace(data, []byte("PREFIX"), []byte(c.Prefix), -1)
 	data = bytes.Replace(data, []byte("PROJECT"), []byte(c.Project), -1)
+	data = bytes.Replace(data, []byte("STORESERVERUSER"), []byte(c.storeServerUserName()), -1)
 
 	bucket := ""
 	switch server {

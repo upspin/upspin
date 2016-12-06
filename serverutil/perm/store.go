@@ -20,7 +20,6 @@ package perm
 import (
 	"upspin.io/bind"
 	"upspin.io/errors"
-	"upspin.io/path"
 	"upspin.io/upspin"
 )
 
@@ -42,7 +41,7 @@ func WrapStore(ctx upspin.Context, store upspin.StoreServer) (*Store, error) {
 		user:        ctx.UserName(),
 	}
 	var err error
-	s.perm, err = New(ctx, ctx.UserName())
+	s.perm, err = New(ctx, ctx.UserName(), s.lookup, s.watch)
 	if err != nil {
 		return nil, err
 	}
@@ -82,38 +81,18 @@ func (s *Store) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service,
 	return &newS, nil
 }
 
-// lookup performs a directory entry lookup on the canonical DirServer for
-// the path.
 func (s *Store) lookup(name upspin.PathName) (*upspin.DirEntry, error) {
-	parsed, err := path.Parse(name)
+	dir, err := bind.DirServerFor(s.serverCtx, name)
 	if err != nil {
 		return nil, err
 	}
-	key, err := bind.KeyServer(s.serverCtx, s.serverCtx.KeyEndpoint())
+	return dir.Lookup(name)
+}
+
+func (s *Store) watch(name upspin.PathName, order int64, done <-chan struct{}) (<-chan upspin.Event, error) {
+	dir, err := bind.DirServerFor(s.serverCtx, name)
 	if err != nil {
 		return nil, err
 	}
-	u, err := key.Lookup(parsed.User())
-	if err != nil {
-		return nil, err
-	}
-	var firstErr error
-	check := func(err error) error {
-		if firstErr == nil {
-			firstErr = err
-		}
-		return err
-	}
-	for _, e := range u.Dirs {
-		dir, err := bind.DirServer(s.serverCtx, e)
-		if check(err) != nil {
-			// Skip bad bind.
-			continue
-		}
-		return dir.Lookup(parsed.Path())
-	}
-	if firstErr != nil {
-		return nil, firstErr
-	}
-	return nil, errors.E(errors.NotExist, parsed.Path(), errors.Str("no dir entry for path"))
+	return dir.Watch(name, order, done)
 }
