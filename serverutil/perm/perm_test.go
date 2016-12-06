@@ -25,7 +25,7 @@ const (
 
 func TestNoGroupFileAllowsAll(t *testing.T) {
 	ownerEnv := setupEnv(t)
-	perm, err := New(ownerEnv.Context, owner)
+	perm, err := New(ownerEnv.Context, owner, ownerEnv.DirServer.Lookup, ownerEnv.DirServer.Watch)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -58,7 +58,7 @@ func TestAllowsOnlyOwner(t *testing.T) {
 		t.Fatal(r.Diag())
 	}
 
-	perm, err := New(ownerEnv.Context, owner)
+	perm, err := New(ownerEnv.Context, owner, ownerEnv.DirServer.Lookup, ownerEnv.DirServer.Watch)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -95,7 +95,7 @@ func TestAllowsOthersAndWildcard(t *testing.T) {
 		t.Fatal(r.Diag())
 	}
 
-	perm, err := New(ownerEnv.Context, owner)
+	perm, err := New(ownerEnv.Context, owner, ownerEnv.DirServer.Lookup, ownerEnv.DirServer.Watch)
 	if err != nil {
 		t.Fatal(err)
 	}

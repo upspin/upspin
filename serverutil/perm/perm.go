@@ -10,7 +10,6 @@ import (
 	"time"
 
 	"upspin.io/access"
-	"upspin.io/bind"
 	"upspin.io/client/clientutil"
 	"upspin.io/errors"
 	"upspin.io/log"
@@ -26,7 +25,7 @@ const (
 
 const (
 	// retryTimeout is the interval between re-attempts between failures.
-	retryTimeout = 10 * time.Second
+	retryTimeout = 30 * time.Second
 )
 
 // Perm tracks the set of users with write access to a server, as specified by
@@ -38,6 +37,9 @@ type Perm struct {
 	targetUser upspin.UserName
 	targetFile upspin.PathName
 
+	lookup LookupFunc
+	watch  WatchFunc
+
 	done   chan struct{}
 	events <-chan upspin.Event
 
@@ -47,21 +49,39 @@ type Perm struct {
 	writers      map[upspin.UserName]bool
 }
 
+// LookupFunc looks up name, as defined by upspin.DirServer.
+type LookupFunc func(upspin.PathName) (*upspin.DirEntry, error)
+
+// WatchFunc watches name, as defined by upspin.DirServer.
+type WatchFunc func(upspin.PathName, int64, <-chan struct{}) (<-chan upspin.Event, error)
+
+// Errors used for comparison.
+var (
+	errPrivate    = errors.E(errors.Private)
+	errPermission = errors.E(errors.Permission)
+	errNotExist   = errors.E(errors.NotExist)
+)
+
 // New creates a new Perm monitoring the target user's Writers Group file, using
 // the provided Lookup function for lookups and the Watch function to watch
 // changes on the writers file. The target user is typically the user name of a
 // server, such as a StoreServer or a DirServer.
-func New(ctx upspin.Context, target upspin.UserName) (*Perm, error) {
+func New(ctx upspin.Context, target upspin.UserName, lookup LookupFunc, watch WatchFunc) (*Perm, error) {
 	const op = "serverutil/perm.New"
 	p := &Perm{
 		ctx:        ctx,
 		targetUser: target,
 		targetFile: upspin.PathName(target) + "/Group/" + WritersGroupFile,
+		lookup:     lookup,
+		watch:      watch,
 	}
 	p.eventCond = sync.NewCond(&p.mu)
 	err := p.Update()
 	if err != nil {
-		log.Error.Printf("%s: %s", op, err)
+		if !(errors.Match(errPrivate, err) || errors.Match(errPermission, err) || errors.Match(errNotExist, err)) {
+			return nil, errors.E(op, err)
+		}
+		// Otherwise, okay. We will keep watching.
 	}
 	go p.updateLoop()
 	return p, nil
@@ -71,11 +91,16 @@ func New(ctx upspin.Context, target upspin.UserName) (*Perm, error) {
 // It must be run in a goroutine.
 func (p *Perm) updateLoop() {
 	const op = "serverutil/perm.updateLoop"
-	err := p.watchTarget()
-	if err != nil {
-		log.Error.Printf("%s: %s", op, err)
-	}
 	for {
+		if p.events == nil {
+			// Channel is not yet open. Open now.
+			err := p.watchTarget()
+			if err != nil {
+				log.Error.Printf("%s: %s", op, err)
+				time.Sleep(retryTimeout)
+				continue
+			}
+		}
 		e, ok := <-p.events
 		if !ok {
 			// Channel was closed. Re-open.
@@ -98,7 +123,7 @@ func (p *Perm) updateLoop() {
 		if e.Delete {
 			p.deleteUsers()
 		}
-		err = p.updateUsers(e.Entry)
+		err := p.updateUsers(e.Entry)
 		if err != nil {
 			log.Error.Printf("%s: updateUsers: %s", op, err)
 		}
@@ -173,22 +198,6 @@ func (p *Perm) load(name upspin.PathName) ([]byte, error) {
 		return nil, err
 	}
 	return clientutil.ReadAll(p.ctx, entry)
-}
-
-func (p *Perm) lookup(name upspin.PathName) (*upspin.DirEntry, error) {
-	dir, err := bind.DirServerFor(p.ctx, name)
-	if err != nil {
-		return nil, err
-	}
-	return dir.Lookup(name)
-}
-
-func (p *Perm) watch(name upspin.PathName, order int64, done <-chan struct{}) (<-chan upspin.Event, error) {
-	dir, err := bind.DirServerFor(p.ctx, name)
-	if err != nil {
-		return nil, err
-	}
-	return dir.Watch(name, order, done)
 }
 
 // IsWriter reports whether the user has write privileges on this Perm.
