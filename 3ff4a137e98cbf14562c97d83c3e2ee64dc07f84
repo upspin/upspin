@@ -434,6 +434,41 @@
     },
     {
       "key": {
+        "uuid": "6dcea7f1_c878af33",
+        "filename": "serverutil/perm/perm_test.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-06T23:12:11Z",
+      "side": 1,
+      "message": "Well, like I said, the first thing I did as the *reader* of this file was go and look at what setup did. If you leave it here, you inconvenience everyone else who reads the file.\n\nI\u0027ll leave it up to you, but I strongly disapprove of leaving it here. :-)",
+      "parentUuid": "0d2feb23_987999e8",
+      "revId": "3ff4a137e98cbf14562c97d83c3e2ee64dc07f84",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6dcea7f1_287eab1c",
+        "filename": "store/perm/perm.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-06T23:12:11Z",
+      "side": 1,
+      "message": "why are you renaming this here?",
+      "revId": "3ff4a137e98cbf14562c97d83c3e2ee64dc07f84",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2d8f4f3f_0ead0b82",
         "filename": "store/perm/perm.go",
         "patchSetId": 9
