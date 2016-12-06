@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "0d2feb23_d5fcbc01",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-12-06T18:20:05Z",
+      "side": 1,
+      "message": "See below.",
+      "parentUuid": "2d8f4f3f_2eac87d4",
+      "revId": "0d7adea4777f0adc05369f929e667356b968b18c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2d8f4f3f_6ea68ff6",
         "filename": "serverutil/perm/perm.go",
         "patchSetId": 6
@@ -30,6 +48,24 @@
       "writtenOn": "2016-12-06T05:20:14Z",
       "side": 1,
       "message": "unfinished sentence",
+      "revId": "0d7adea4777f0adc05369f929e667356b968b18c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0d2feb23_b5fb4005",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-12-06T18:20:05Z",
+      "side": 1,
+      "message": "This is from version 6. No longer applies.",
+      "parentUuid": "2d8f4f3f_6ea68ff6",
       "revId": "0d7adea4777f0adc05369f929e667356b968b18c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
