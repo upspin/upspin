@@ -21,6 +21,7 @@ import (
 	"upspin.io/grpc/dirserver"
 	"upspin.io/log"
 	"upspin.io/metric"
+	"upspin.io/serverutil/perm"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
 
@@ -39,7 +40,7 @@ import (
 const serverName = "dirserver"
 
 func main() {
-	flags.Parse("addr", "config", "context", "https", "kind", "log", "project", "tls")
+	flags.Parse("addr", "config", "context", "https", "kind", "storeservername", "log", "project", "tls")
 
 	if flags.Project != "" {
 		log.Connect(flags.Project, serverName)
@@ -72,6 +73,14 @@ func main() {
 	}
 	if err != nil {
 		log.Fatalf("Setting up DirServer: %v", err)
+	}
+	if flags.StoreServerName != "" {
+		dir, err = perm.WrapDir(ctx, upspin.UserName(flags.StoreServerName), dir)
+		if err != nil {
+			log.Fatal("Can't wrap DirServer: %s", err)
+		}
+	} else {
+		log.Printf("Warning: no Writers Group file protection -- all access permitted")
 	}
 
 	config := auth.Config{Lookup: auth.PublicUserKeyService(ctx)}
