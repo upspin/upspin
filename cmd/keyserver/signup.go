@@ -268,7 +268,9 @@ func snapshotUser(u upspin.UserName) (upspin.UserName, error) {
 // account has been created. It must be filled in with: userName, pubKey,
 // userName and snapshotUser, in this order.
 const mailTemplate = `
-Your account %q with public key\n%s\nhas been created.
+Your account %q with public key
+%s
+has been created.
 
 Next, deploy your servers. Follow instructions from cmd/upspin-deploy. Then edit
 your upspin/rc to include the newly-deployed servers.
