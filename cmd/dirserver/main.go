@@ -33,6 +33,7 @@ import (
 	_ "upspin.io/pack/symm"
 
 	// Load required transports
+	"upspin.io/serverutil/perm"
 	_ "upspin.io/transports"
 )
 
@@ -72,6 +73,12 @@ func main() {
 	}
 	if err != nil {
 		log.Fatalf("Setting up DirServer: %v", err)
+	}
+	if flags.StoreServerName != "" {
+		dir, err = perm.WrapDir(ctx, flags.StoreServerName, dir)
+		if err != nil {
+			log.Fatal("Can't wrap DirServer: %s", err)
+		}
 	}
 
 	config := auth.Config{Lookup: auth.PublicUserKeyService(ctx)}
