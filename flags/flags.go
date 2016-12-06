@@ -39,6 +39,9 @@ var (
 	// ServerKind is the implementation kind of this server.
 	ServerKind = "inprocess"
 
+	// StoreServerName is the Upspin user name of the StoreServer.
+	StoreServerUser = ""
+
 	// TLSCertFile and TLSKeyFile specify the location of a TLS
 	// certificate/key pair used for serving TLS (HTTPS).
 	TLSCertFile string
@@ -69,6 +72,9 @@ var flags = map[string]func(){
 	},
 	"kind": func() {
 		flag.StringVar(&ServerKind, "kind", ServerKind, "server implementation `kind` (inprocess, gcp)")
+	},
+	"storeservername": func() {
+		flag.StringVar(&StoreServerUser, "storeserveruser", StoreServerUser, "user name of the StoreServer")
 	},
 	"tls": func() {
 		flag.StringVar(&TLSCertFile, "tls_cert", TLSCertFile, "TLS Certificate `file` in PEM format")
