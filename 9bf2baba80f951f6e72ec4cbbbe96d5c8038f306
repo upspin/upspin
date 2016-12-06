@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0d2feb23_55d50cd3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-12-06T15:48:06Z",
+      "side": 1,
+      "message": "helpas is in italian. :-)",
+      "revId": "9bf2baba80f951f6e72ec4cbbbe96d5c8038f306",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0d2feb23_751fe8d3",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-12-06T15:48:06Z",
+      "side": 1,
+      "message": "you only use this on line 539, maybe you can move this there (unless it\u0027s used in other files in this package).",
+      "revId": "9bf2baba80f951f6e72ec4cbbbe96d5c8038f306",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
