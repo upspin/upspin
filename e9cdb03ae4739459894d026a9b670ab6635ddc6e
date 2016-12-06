@@ -16,6 +16,24 @@
       "revId": "e9cdb03ae4739459894d026a9b670ab6635ddc6e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cdddd35f_bde9ddfb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5075
+      },
+      "writtenOn": "2016-12-06T03:27:02Z",
+      "side": 1,
+      "message": "Is the preferred style to name the primary component of the change if the commit has to touch multiple components (e.g. when changing an interface)? Probably not relevant for the small bugfixes that I may send when trying this out, but I\u0027d still like to know the style.",
+      "parentUuid": "2d8f4f3f_2ee487f5",
+      "revId": "e9cdb03ae4739459894d026a9b670ab6635ddc6e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
