@@ -16,6 +16,24 @@
       "revId": "415c79bfbd868d8c309aea97d3a9f3e898bf7394",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6dcea7f1_686ee319",
+        "filename": "cmd/upspin-deploy/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-07T05:05:00Z",
+      "side": 1,
+      "message": "The answer to the first two questions is \"I don\u0027t know.\" Which is sad. I\u0027d like to make this more robust, however...\n\nThere is a Service Management API we can use, but ironically you need to enable it before you can use it! (catch-22). The gcloud tool uses a separate authentication token to get around this, which is why I\u0027m shelling out to gcloud instead of using that API. :-/",
+      "parentUuid": "0d2feb23_8157dd1c",
+      "revId": "415c79bfbd868d8c309aea97d3a9f3e898bf7394",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
