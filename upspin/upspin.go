@@ -394,17 +394,17 @@ type DirServer interface {
 	WhichAccess(name PathName) (*DirEntry, error)
 
 	// Watch returns a channel of Events that affect the specified path and
-	// any of its descendents, beginning at the specified order (an opaque,
+	// any of its descendants, beginning at the specified order (an opaque,
 	// monotonic value that denotes a position in the event log).
 	// If order is zero, all events known to the DirServer are sent.
-	// If order is -1, the current entry for the specified path is sent.
-	// When the provided done channel is closed the event channel is closed
-	// by the server.
+	// If order is -1, the current entries under the specified path are
+	// sent first, then all subsequent events. When the provided done
+	// channel is closed the event channel is closed by the server.
 	//
-	// The caller must have AnyRight to watch name. Events for which the
-	// caller does not have enough rights to watch will be suppressed, or if
-	// the caller does have rights but not Read right, the entry will be
-	// marked incomplete.
+	// The caller must have one or more of the Upspin access rights to watch
+	// name. Events for which the caller does not have enough rights to
+	// watch will be suppressed, or if the caller does have rights but not
+	// Read right, the entry will be marked incomplete.
 	//
 	// If the caller does not consume events in a timely fashion
 	// the server will send an Event containing an ErrTimeout.
