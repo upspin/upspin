@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0d2feb23_41dc6575",
+        "filename": "cmd/upspin-deploy/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1002,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-12-07T05:25:40Z",
+      "side": 1,
+      "message": "Hmm, not everyone wants to use other people\u0027s dns servers. I think this message should say what it does now plus something like \"or manually configure your DNS A record to point dir.\u003cdomain\u003e to x.x.x.x and store.\u003cdomain\u003e to y.y.y.y\"\n\nYou know the names already and it\u0027s an API query to find the relevant IPs.",
+      "revId": "a4aa010b4d94617e101bb4e4b4be999b1fb88730",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
