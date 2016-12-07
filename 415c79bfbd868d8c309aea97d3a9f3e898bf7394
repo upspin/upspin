@@ -34,6 +34,24 @@
       "revId": "415c79bfbd868d8c309aea97d3a9f3e898bf7394",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0d2feb23_617c0189",
+        "filename": "cmd/upspin-deploy/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-12-07T05:19:58Z",
+      "side": 1,
+      "message": "SG. \n\nPerhaps the long-term solution is to use gcloud to enable the service mgt API and then programmatically verify which ones are on and off and flip the required ones? That would prevent future parsing errors since just flipping that one on seems safer as you don\u0027t need to list anything.\n\nJust a thought.",
+      "parentUuid": "6dcea7f1_686ee319",
+      "revId": "415c79bfbd868d8c309aea97d3a9f3e898bf7394",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
