@@ -11,7 +11,6 @@ package main
 // TODO(adg): kubectl delete services
 // TODO(adg): delete container registry entries
 // TODO(adg): only create base image once, check if it exists
-// TODO(adg): display name servers to use after creation
 
 import (
 	"bytes"
@@ -992,23 +991,26 @@ func (c *Config) createZone() error {
 		Name:        name,
 		Description: "upspin cluster",
 	}
-	_, err = svc.ManagedZones.Create(c.Project, zone).Do()
+	zone, err = svc.ManagedZones.Create(c.Project, zone).Do()
 	err = okReason("alreadyExists", err)
 	if err != nil {
 		return err
 	}
 
+	addrs := map[string]string{} // [host]ip
 	var records []*dns.ResourceRecordSet
 	for _, s := range c.servers() {
 		ip, err := c.ipAddress(s)
 		if err != nil {
 			return err
 		}
+		host := c.hostName(s)
 		records = append(records, &dns.ResourceRecordSet{
-			Name:    c.hostName(s) + ".",
+			Name:    host + ".",
 			Type:    "A",
 			Rrdatas: []string{ip},
 		})
+		addrs[host] = ip
 	}
 
 	change := &dns.Change{Additions: records}
@@ -1017,7 +1019,28 @@ func (c *Config) createZone() error {
 		time.Sleep(1 * time.Second)
 		change, err = svc.Changes.Get(c.Project, name, change.Id).Do()
 	}
-	return okReason("alreadyExists", err)
+	if err := okReason("alreadyExists", err); err != nil {
+		return err
+	}
+
+	if zone != nil {
+		fmt.Println("\n==== User action required ===\n")
+		fmt.Println("Please configure your registrar to delegate the domain")
+		fmt.Printf("\t%s\n", c.Domain)
+		fmt.Println("to these name servers:")
+		for _, s := range zone.NameServers {
+			fmt.Printf("\t%s\n", s)
+		}
+		fmt.Println()
+		fmt.Println("Alternatively, if you want to use your own name servers,")
+		fmt.Println("add A records for these hosts and IP addresses:")
+		for host, ip := range addrs {
+			fmt.Printf("\t%s\t%s\n", ip, host)
+		}
+		fmt.Println()
+	}
+
+	return nil
 }
 
 func (c *Config) deleteZone() error {
