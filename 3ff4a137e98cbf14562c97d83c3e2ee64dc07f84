@@ -452,6 +452,24 @@
     },
     {
       "key": {
+        "uuid": "0d2feb23_2f703586",
+        "filename": "serverutil/perm/perm_test.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-12-07T00:42:26Z",
+      "side": 1,
+      "message": "Ok, thanks. If it becomes a problem for others we can move (I\u0027m not sure how typical you or I are given only two  data points :-))",
+      "parentUuid": "6dcea7f1_c878af33",
+      "revId": "3ff4a137e98cbf14562c97d83c3e2ee64dc07f84",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6dcea7f1_287eab1c",
         "filename": "store/perm/perm.go",
         "patchSetId": 9
