@@ -11,7 +11,6 @@ package main
 // TODO(adg): kubectl delete services
 // TODO(adg): delete container registry entries
 // TODO(adg): only create base image once, check if it exists
-// TODO(adg): display name servers to use after creation
 
 import (
 	"bytes"
@@ -992,10 +991,21 @@ func (c *Config) createZone() error {
 		Name:        name,
 		Description: "upspin cluster",
 	}
-	_, err = svc.ManagedZones.Create(c.Project, zone).Do()
+	zone, err = svc.ManagedZones.Create(c.Project, zone).Do()
 	err = okReason("alreadyExists", err)
 	if err != nil {
 		return err
+	}
+
+	if zone != nil {
+		fmt.Println("\n==== User action required ===\n")
+		fmt.Println("Please configure your registrar to delegate the domain")
+		fmt.Printf("\t%s\n", c.Domain)
+		fmt.Println("to these name servers:")
+		for _, s := range zone.NameServers {
+			fmt.Printf("\t%s\n", s)
+		}
+		fmt.Println()
 	}
 
 	var records []*dns.ResourceRecordSet
