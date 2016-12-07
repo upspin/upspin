@@ -132,7 +132,7 @@ func (s *server) Watch(stream proto.Dir_WatchServer) error {
 		return err
 	}
 
-	op := logf("Watch %q %q", req.Name, req.Order)
+	op := logf("Watch %q %d", req.Name, req.Order)
 
 	dir, err := s.dirFor(stream.Context())
 	if err != nil {
