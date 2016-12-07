@@ -52,6 +52,24 @@
       "revId": "415c79bfbd868d8c309aea97d3a9f3e898bf7394",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6dcea7f1_08112718",
+        "filename": "cmd/upspin-deploy/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-07T22:44:47Z",
+      "side": 1,
+      "message": "I\u0027ll give this a try.\nI can try the service management api. If it fails, use gcloud to enable it, then try again.",
+      "parentUuid": "0d2feb23_617c0189",
+      "revId": "415c79bfbd868d8c309aea97d3a9f3e898bf7394",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
