@@ -1,0 +1,112 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6dcea7f1_683703a0",
+        "filename": "flags/flags.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-07T23:11:22Z",
+      "side": 1,
+      "message": "This should be StoreServerUser, as it is the user that runs the store. Not the name of the store server, which could be confused with a hostname",
+      "revId": "ed26bb8619a09eb7b2b12a254591f8d09979be17",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6dcea7f1_481b1f36",
+        "filename": "serverutil/perm/dir.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-07T23:11:22Z",
+      "side": 1,
+      "message": "delete",
+      "revId": "ed26bb8619a09eb7b2b12a254591f8d09979be17",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6dcea7f1_a848db2e",
+        "filename": "serverutil/perm/dir.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-07T23:11:22Z",
+      "side": 1,
+      "message": "Str",
+      "range": {
+        "startLine": 46,
+        "startChar": 61,
+        "endLine": 46,
+        "endChar": 67
+      },
+      "revId": "ed26bb8619a09eb7b2b12a254591f8d09979be17",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6dcea7f1_c8470f1b",
+        "filename": "serverutil/perm/dir_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-07T23:11:22Z",
+      "side": 1,
+      "message": "please put this in perm_test.go, since it uses a bunch of constants and functions declared in that file. makes it a lot harder to follow what\u0027s going on by separating them",
+      "revId": "ed26bb8619a09eb7b2b12a254591f8d09979be17",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6dcea7f1_283d0b80",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-07T23:11:22Z",
+      "side": 1,
+      "message": "might be clearer to write this as\n\nif !match(foo) \u0026\u0026 !match(bar) \u0026\u0026 !match(baz) {\n\nor maybe even\n\nswitch {\ncase errors.Match(errPrivate, err),\n  errors.Match(errPermission, err),\n  errors.Match(errNotExist, err):\n    // OK, keep watching.\ndefault:\n  return nil, errors.E(op, err)\n}",
+      "revId": "ed26bb8619a09eb7b2b12a254591f8d09979be17",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6dcea7f1_083ac787",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-07T23:11:22Z",
+      "side": 1,
+      "message": "Replace this block with\n\n  p.events \u003d nil\n  continue\n\nnow you can move the contents of the watchTarget method to line 97 and delete the method, and also delete the \u0027events\u0027 struct field",
+      "revId": "ed26bb8619a09eb7b2b12a254591f8d09979be17",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
