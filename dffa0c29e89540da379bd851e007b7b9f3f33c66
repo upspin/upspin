@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0d2feb23_e3fb3104",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 404,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-12-07T21:33:16Z",
+      "side": 1,
+      "message": "To my ear, it sounds more idiomatic to say \"must have rights to watch name.\"   But stick with what you have if it is more accurate technically.",
+      "revId": "dffa0c29e89540da379bd851e007b7b9f3f33c66",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
