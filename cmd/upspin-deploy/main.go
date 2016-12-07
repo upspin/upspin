@@ -11,9 +11,9 @@ package main
 // TODO(adg): kubectl delete services
 // TODO(adg): delete container registry entries
 // TODO(adg): only create base image once, check if it exists
+// TODO(adg): display name servers to use after creation
 
 // TODO(adg): Check that the Google Cloud project exists.
-// TODO(adg): Check that the relevant APIs are enabled.
 // TODO(adg): Check that we are authenticated.
 
 import (
@@ -46,19 +46,21 @@ import (
 // The user must first:
 // - Create a Google Cloud Project: https://cloud.google.com/iam-admin/projects
 //   - Make sure it has an associated Billing Account.
-// - Enable the Compute Engine API
-//   https://cloud.google.com/apis/api/compute_component/overview
-// - Enable the Container Engine API
-//   https://cloud.google.com/apis/api/container/overview
-// - Enable the Container Builder API
-//   https://cloud.google.com/apis/api/cloudbuild.googleapis.com/overview
-// - Enable the Cloud DNS API
-//   https://pantheon.corp.google.com/apis/api/dns.googleapis.com/overview
-// - Enable the Stackdriver Monitoring API
-//   https://pantheon.corp.google.com/apis/api/monitoring.googleapis.com/overview
 // - Authenticate using the gcloud tool:
 //   $ gcloud auth login
 //   $ gcloud auth application-default login
+
+// requiredAPIs lists the Google Cloud APIs required by an Upspin installation.
+var requiredAPIs = []string{
+	"cloudbuild.googleapis.com",
+	"cloudtrace.googleapis.com",
+	"compute_component",
+	"container",
+	"dns.googleapis.com",
+	"logging.googleapis.com",
+	"storage-api-json.googleapis.com",
+	"storage-component-json.googleapis.com",
+}
 
 var (
 	project = flag.String("project", "", "Google Cloud Project `ID`")
@@ -219,6 +221,10 @@ func (c *Config) Create() error {
 	}
 	log.Printf("Creating cloud services: Project=%q Zone=%q Prefix=%q", c.Project, c.Zone, c.Prefix)
 
+	if err := wrap("enableAPIs", c.enableAPIs()); err != nil {
+		return err
+	}
+
 	count := 0
 	errc := make(chan error)
 
@@ -356,6 +362,47 @@ func (c *Config) Deploy() error {
 	for i := 0; i < count; i++ {
 		if err := <-errc; err != nil {
 			return err
+		}
+	}
+
+	return nil
+}
+
+func (c *Config) enableAPIs() error {
+	// Make sure the "beta" gcloud commands are available.
+	// TODO(adg): when they move out of beta, remove this.
+	cmd := exec.Command("gcloud", "components", "install", "beta")
+	if out, err := cmd.CombinedOutput(); err != nil {
+		return fmt.Errorf("installing gcloud beta components: %v\n%s", err, out)
+	}
+
+	// See which APIs are enabled already.
+	var out bytes.Buffer
+	cmd = exec.Command("gcloud", "--project", c.Project, "beta", "service-management", "list")
+	cmd.Stdout = &out
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		return wrap("list services", err)
+	}
+
+	enabled := map[string]bool{}
+	for i, s := range strings.Split(string(bytes.TrimSpace(out.Bytes())), "\n") {
+		if i == 0 {
+			// Skip column headings.
+			continue
+		}
+		api := strings.Fields(s)[0]
+		enabled[api] = true
+	}
+
+	for _, api := range requiredAPIs {
+		if enabled[api] {
+			continue
+		}
+		log.Printf("Enabling API %q", api)
+		cmd := exec.Command("gcloud", "--project", c.Project, "beta", "service-management", "enable", api)
+		if out, err := cmd.CombinedOutput(); err != nil {
+			return fmt.Errorf("enabling API %q: %v\n%s", api, err, out)
 		}
 	}
 
