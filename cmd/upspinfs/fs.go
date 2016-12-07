@@ -584,6 +584,9 @@ func (n *node) Setattr(context gContext.Context, req *fuse.SetattrRequest, resp 
 			h.Release(context, nil)
 		}
 	}
+	if req.Valid.Mode() {
+		n.attr.Mode = req.Mode
+	}
 	if req.Valid.Mtime() {
 		// Set the modify time.
 		// TODO(p): should we actually set the modify time?
