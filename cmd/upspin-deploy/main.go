@@ -13,9 +13,6 @@ package main
 // TODO(adg): only create base image once, check if it exists
 // TODO(adg): display name servers to use after creation
 
-// TODO(adg): Check that the Google Cloud project exists.
-// TODO(adg): Check that we are authenticated.
-
 import (
 	"bytes"
 	"context"
@@ -122,6 +119,11 @@ func main() {
 	}
 	if *all {
 		cfg.Servers = validServers
+	}
+
+	if err := cfg.checkCredentials(); err != nil {
+		fmt.Fprintf(os.Stderr, "%v\n", err)
+		os.Exit(1)
 	}
 
 	if *delete != "" {
@@ -363,6 +365,21 @@ func (c *Config) Deploy() error {
 		if err := <-errc; err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+func (c *Config) checkCredentials() error {
+	cmd := exec.Command("gcloud", "auth", "application-default", "print-access-token")
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf(`Default credentials not available; try "gcloud auth application-default login".`)
+	}
+
+	cmd = exec.Command("gcloud", "projects", "describe", c.Project)
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		return fmt.Errorf(`Credentails not available; try "gcloud auth login".`)
 	}
 
 	return nil
