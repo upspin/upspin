@@ -16,6 +16,24 @@
       "revId": "dffa0c29e89540da379bd851e007b7b9f3f33c66",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0d2feb23_43e3051a",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 404,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-12-07T21:46:48Z",
+      "side": 1,
+      "message": "The problem is the question \"which one?\". \n\nDave pointed out that AnyRight is not a right. We really mean \"any one or more of the five Upspin rights\".",
+      "parentUuid": "0d2feb23_e3fb3104",
+      "revId": "dffa0c29e89540da379bd851e007b7b9f3f33c66",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
