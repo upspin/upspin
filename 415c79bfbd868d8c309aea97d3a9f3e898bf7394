@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0d2feb23_8157dd1c",
+        "filename": "cmd/upspin-deploy/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-12-07T05:02:41Z",
+      "side": 1,
+      "message": "How likely is this format to change? gcloud updates almost every other time I use it. Is there any clue you can use to detect changes and then panic or log?\n\nHow does gcloud talk to the API? It would be more robust if we could talk directly via HTTP or RPC.",
+      "revId": "415c79bfbd868d8c309aea97d3a9f3e898bf7394",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
