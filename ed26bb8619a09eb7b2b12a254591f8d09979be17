@@ -148,6 +148,24 @@
     },
     {
       "key": {
+        "uuid": "6dcea7f1_28f34bbf",
+        "filename": "serverutil/perm/dir_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-08T00:31:47Z",
+      "side": 1,
+      "message": "OK",
+      "parentUuid": "0d2feb23_866b6a07",
+      "revId": "ed26bb8619a09eb7b2b12a254591f8d09979be17",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6dcea7f1_283d0b80",
         "filename": "serverutil/perm/perm.go",
         "patchSetId": 4
