@@ -23,8 +23,40 @@ const (
 	writersGroup = groupDir + "/" + WritersGroupFile
 )
 
-func TestNoGroupFileAllowsAll(t *testing.T) {
+func TestCantFindFileDenyAll(t *testing.T) {
 	ownerEnv := setupEnv(t)
+	perm, err := New(ownerEnv.Context, owner, ownerEnv.DirServer.Lookup, ownerEnv.DirServer.Watch)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Everyone is denied, since we can't read the owner file.
+	for _, user := range []upspin.UserName{
+		owner,
+		writer,
+		"foo@bar.com",
+		"nobody@nobody.org",
+	} {
+		if perm.IsWriter(user) {
+			t.Errorf("user %q is allowed; expected not allowed", user)
+		}
+	}
+
+	ownerEnv.Exit()
+}
+
+func TestNoFileAllowsAll(t *testing.T) {
+	ownerEnv := setupEnv(t)
+
+	// Put a permissive Access file, now server knows the file is not there.
+	r := testenv.NewRunner()
+	r.AddUser(ownerEnv.Context)
+	r.As(owner)
+	r.Put(accessFile, accessContent) // So server can lookup the file.
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+
 	perm, err := New(ownerEnv.Context, owner, ownerEnv.DirServer.Lookup, ownerEnv.DirServer.Watch)
 	if err != nil {
 		t.Fatal(err)
@@ -33,7 +65,7 @@ func TestNoGroupFileAllowsAll(t *testing.T) {
 	// Everyone is allowed.
 	for _, user := range []upspin.UserName{
 		owner,
-		"writer",
+		writer,
 		"foo@bar.com",
 		"nobody@nobody.org",
 	} {
