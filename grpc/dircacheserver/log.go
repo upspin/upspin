@@ -125,7 +125,7 @@ type lruKey struct {
 }
 
 // LRUMax is the maximum number of entries in the LRU.
-const LRUMax = 100000
+const LRUMax = 10000
 
 func (l *clog) createLogFile(fn string) (err error) {
 	const op = "grpc/dircacheserver.createLogFile"
@@ -253,6 +253,19 @@ func finish(op string, l *clog, tfn, fn string) (*clog, error) {
 	return l, nil
 }
 
+func (l *clog) myDirServer(pathName upspin.PathName) bool {
+	name := string(pathName)
+	// Pull off the user name.
+	var userName string
+	slash := strings.IndexByte(name, '/')
+	if slash < 0 {
+		userName = name
+	} else {
+		userName = name[:slash]
+	}
+	return userName == string(l.ctx.UserName())
+}
+
 func (l *clog) close() error {
 	// Stop refresher.
 	close(l.exit)
@@ -365,6 +378,9 @@ func (l *clog) whichAccess(ep *upspin.Endpoint, name upspin.PathName) (*upspin.D
 }
 
 func (l *clog) logRequest(op request, ep *upspin.Endpoint, name upspin.PathName, err error, de *upspin.DirEntry) {
+	if !l.myDirServer(name) {
+		return
+	}
 	if !cacheableError(err) {
 		return
 	}
@@ -408,6 +424,9 @@ func cacheableGlob(p upspin.PathName) (upspin.PathName, bool) {
 }
 
 func (l *clog) logGlobRequest(ep *upspin.Endpoint, pattern upspin.PathName, err error, entries []*upspin.DirEntry) {
+	if !l.myDirServer(pattern) {
+		return
+	}
 	if !cacheableError(err) {
 		return
 	}
