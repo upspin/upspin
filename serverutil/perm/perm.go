@@ -43,7 +43,10 @@ type Perm struct {
 	mu           sync.Mutex // protects the fields below.
 	eventCounter int64      // counts events on channel; mostly for testing.
 	eventCond    *sync.Cond // informs when eventCounter is updated.
-	writers      map[upspin.UserName]bool
+
+	// writers is the set of users allowed to write. If it's nil, all users
+	// are allowed. An empty map means no one is allowed.
+	writers map[upspin.UserName]bool
 }
 
 // LookupFunc looks up name, as defined by upspin.DirServer.
@@ -57,6 +60,7 @@ var (
 	errPrivate    = errors.E(errors.Private)
 	errPermission = errors.E(errors.Permission)
 	errNotExist   = errors.E(errors.NotExist)
+	errIO         = errors.E(errors.IO) // TODO: too wide a definition.
 )
 
 // New creates a new Perm monitoring the target user's Writers Group file, using
@@ -71,7 +75,11 @@ func New(ctx upspin.Context, target upspin.UserName, lookup LookupFunc, watch Wa
 		targetFile: upspin.PathName(target) + "/Group/" + WritersGroupFile,
 		lookup:     lookup,
 		watch:      watch,
+		// Until we can prove the targetFile does not exist, we prohibit
+		// writes. An empty map means no one is allowed.
+		writers: make(map[upspin.UserName]bool),
 	}
+
 	p.eventCond = sync.NewCond(&p.mu)
 	err := p.Update()
 	if err != nil {
@@ -80,6 +88,8 @@ func New(ctx upspin.Context, target upspin.UserName, lookup LookupFunc, watch Wa
 			errors.Match(errPermission, err),
 			errors.Match(errNotExist, err):
 			// OK, keep watching.
+		case errors.Match(errIO, err):
+			// Ok. Maybe the servers are booting up.
 		default:
 			return nil, errors.E(op, err)
 		}
@@ -109,13 +119,13 @@ func (p *Perm) updateLoop() {
 		}
 		e, ok := <-events
 		if !ok {
-			// Channel was closed. Re-open.
 			events = nil
+			log.Printf("%s: watch channel closed. Re-opening...", op)
 			time.Sleep(retryTimeout)
 			continue
 		}
 		if e.Error != nil {
-			log.Error.Printf("%s: event error: %s", op, e.Error)
+			log.Error.Printf("%s: watch event error: %s", op, e.Error)
 			close(done)
 			continue // will next be !ok and re-start watcher.
 		}
@@ -192,7 +202,7 @@ func (p *Perm) load(name upspin.PathName) ([]byte, error) {
 func (p *Perm) IsWriter(u upspin.UserName) bool {
 	p.mu.Lock()
 	defer p.mu.Unlock()
-	// Everyone is allowed if there is no control Group yet.
+	// Everyone is allowed if there is no Writers Group file.
 	if p.writers == nil {
 		return true
 	}
