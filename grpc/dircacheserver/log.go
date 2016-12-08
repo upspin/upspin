@@ -32,10 +32,14 @@ package dircacheserver
 import (
 	"bufio"
 	"encoding/binary"
+	"flag"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
-	ospath "path"
+	"runtime"
+	"runtime/pprof"
+	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -61,7 +65,10 @@ const (
 	deleteReq
 	putReq
 	whichAccessReq
+	versionReq
 	maxReq
+
+	version = "4" // Must increment every time we change log file format.
 )
 
 // noAccessFile is used to indicate we did a WhichAccess and it returned no DirEntry.
@@ -75,16 +82,11 @@ type clogEntry struct {
 	// The error returned on a request.
 	error error
 
-	// ep is the endpoint used for refreshing an entry.
-	// TODO(p): What happens when the client uses a different
-	// directory server?
-	ep *upspin.Endpoint
-
 	// de is the directory entry returned by the RPC.
 	de *upspin.DirEntry
 
 	// The contents of a directory.
-	children map[upspin.PathName]bool
+	children map[string]bool
 	complete bool // true if the children are the complete set
 
 	// For directories, the Access file that pertains.
@@ -97,18 +99,28 @@ type clogEntry struct {
 
 // clog represents the replayable log of DirEntry changes.
 type clog struct {
-	ctx             upspin.Context
-	dir             string // directory clog lives in
-	refreshPeriod   time.Duration
-	file            *os.File   // file descriptor for the log
-	lru             *cache.LRU // [lruKey]*clogEntry
-	exit            chan bool  // closed to request refresher to die
-	refresherExited chan bool  // closed to signal the refresher has exited or is about to exit
-	readingLog      bool       // true while we are reading the log.
+	ctx           upspin.Context
+	dir           string        // directory clog lives in
+	refreshPeriod time.Duration // Duration between refreshes
+	maxDisk       int64         // most bytes taken by on disk logs
+	lru           *cache.LRU    // [lruKey]*clogEntry
+	epMap         *epMap        // map from users to endpoints
 
-	// accessLock keeps everyone else out when we are traversing the whole LRU to
+	exit            chan bool // closed to request refresher to die
+	refresherExited chan bool // closed to signal the refresher has exited or is about to exit
+	rotate          chan bool // sends signal rotater to rotate the logs
+	rotaterExited   chan bool // closed to signal the rotater has exited or is about to exit
+
+	// globalLock keeps everyone else out when we are traversing the whole LRU to
 	// update Access files.
-	accessLock sync.RWMutex
+	globalLock sync.RWMutex
+
+	// logFileLock provides exclusive access to the log file.
+	logFileLock sync.Mutex
+	file        *os.File
+	wr          *bufio.Writer
+	logSize     int64
+	order       int64
 
 	// hashLock synchronizes access to the same directory by multiple RPCs. Better
 	// performance than a single lock. Not as good as one per directory but dir
@@ -120,76 +132,177 @@ type clog struct {
 // the pattern could clash with a name.
 type lruKey struct {
 	name upspin.PathName
-	ep   upspin.Endpoint
 	glob bool
 }
 
 // LRUMax is the maximum number of entries in the LRU.
 const LRUMax = 10000
 
-func (l *clog) createLogFile(fn string) (err error) {
-	const op = "grpc/dircacheserver.createLogFile"
-	log.Debug.Printf("%s %s", op, fn)
+// oldestFirst and newestFirst are used to sort a directory.
+type oldestFirst []os.FileInfo
 
-	os.Remove(fn)
-	l.file, err = os.OpenFile(fn, os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0600)
-	if err != nil {
-		log.Error.Printf("%s: %s", op, err)
-		return errors.E(op, err)
-	}
-	return nil
-}
+func (a oldestFirst) Len() int           { return len(a) }
+func (a oldestFirst) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a oldestFirst) Less(i, j int) bool { return a[i].ModTime().Before(a[j].ModTime()) }
 
-// openLog reads the current log and starts a new one.
-// We return an error only if we couldn't create a new log.
-func openLog(ctx upspin.Context, dir string, period time.Duration) (*clog, error) {
+type newestFirst []os.FileInfo
+
+func (a newestFirst) Len() int           { return len(a) }
+func (a newestFirst) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a newestFirst) Less(i, j int) bool { return a[j].ModTime().Before(a[i].ModTime()) }
+
+// openLog reads the current log.
+// - dir is the directory for log files.
+// - maxDisk is an approximate limit on disk space for log files
+// - epMap is a map from user names to directory endpoints, maintained by the server
+func openLog(ctx upspin.Context, dir string, maxDisk int64, epMap *epMap) (*clog, error) {
 	const op = "grpc/dircacheserver.openLog"
 	log.Debug.Printf(op)
 	if err := os.MkdirAll(dir, 0700); err != nil {
 		return nil, err
 	}
 
+	if epMap == nil {
+		epMap = newEpMap()
+	}
 	l := &clog{
 		ctx:             ctx,
+		dir:             dir,
 		lru:             cache.NewLRU(LRUMax),
-		refreshPeriod:   period,
+		refreshPeriod:   2 * time.Minute,
+		maxDisk:         maxDisk,
 		exit:            make(chan bool),
 		refresherExited: make(chan bool),
+		rotate:          make(chan bool),
+		rotaterExited:   make(chan bool),
 		hashLock:        make([]sync.Mutex, 100),
-		readingLog:      true,
+		epMap:           epMap,
 	}
-	defer func() { l.readingLog = false }()
 
-	fn := ospath.Join(dir, "dircache.clog")
-	tfn := fn + ".tmp"
+	// updateLRU expect these to be held.
+	l.globalLock.RLock()
+	defer l.globalLock.RUnlock()
 
-	// Create a new log file.
-	if err := l.createLogFile(tfn); err != nil {
-		// We can't recover from this.
-		log.Error.Printf("%s: %s", op, err)
+	// Read the log files, oldest first. Remember highest Order encountered
+	// before an error.
+	f, err := os.Open(dir)
+	if err != nil {
 		return nil, err
 	}
+	infos, err := f.Readdir(0)
+	f.Close()
+	if err != nil {
+		return nil, err
+	}
+	sort.Sort(oldestFirst(infos))
+	highest := int64(-1)
+	for i := range infos {
+		err := l.readLogFile(l.dir + "/" + infos[i].Name())
+		if err != nil && highest == -1 {
+			highest = l.order
+		}
+	}
+	l.order = highest
 
-	// Open the old log file.  If one didn't exist, just rename the new log file and return.
+	// Start a new log.
+	l.rotateLog()
+
+	go l.refresher()
+	go l.rotater()
+	return l, nil
+}
+
+// rotateLog creates a new log file and removes enough old ones to stay under
+// the l.maxDisk limit.
+func (l *clog) rotateLog() {
+	const op = "grpc/dircacheserver.readLogFile"
+	// Flush current file.
+	l.logFileLock.Lock()
+	if l.wr != nil {
+		l.wr.Flush()
+	}
+	l.logFileLock.Unlock()
+
+	// Trim the logs.
+	f, err := os.Open(l.dir)
+	if err != nil {
+		log.Info.Printf("%s: %", op, err)
+		return
+	}
+	infos, err := f.Readdir(0)
+	f.Close()
+	if err != nil {
+		log.Info.Printf("%s: %", op, err)
+		return
+	}
+	sort.Sort(newestFirst(infos))
+	var len int64
+	for i := range infos {
+		len += infos[i].Size()
+		if len > 3*l.maxDisk/4 {
+			os.Remove(l.dir + "/" + infos[i].Name())
+		}
+	}
+
+	// Create a new log file and make it current.
+	f, err = ioutil.TempFile(l.dir, "clog")
+	if err != nil {
+		log.Info.Printf("%s: %", op, err)
+		return
+	}
+	l.logFileLock.Lock()
+	if l.file != nil {
+		l.wr.Flush()
+		l.file.Close()
+	}
+	l.file = f
+	l.wr = bufio.NewWriter(f)
+	l.logSize = 0
+	l.logFileLock.Unlock()
+
+	l.appendToLogFile(&clogEntry{request: versionReq, name: version})
+}
+
+// rotater is a goroutine that is woken whenever we need to trim the
+// logs to stay below the maxDisk limit.
+func (l *clog) rotater() {
+	for {
+		select {
+		case <-l.exit:
+			close(l.rotaterExited)
+			return
+		case <-l.rotate:
+		}
+		l.rotateLog()
+	}
+}
+
+// readLogFile reads a single log file. The log file must begin and end with a version record.
+func (l *clog) readLogFile(fn string) error {
+	const op = "grpc/dircacheserver.readLogFile"
+
+	// Open the log file.  If one didn't exist, just rename the new log file and return.
 	f, err := os.Open(fn)
 	if err != nil {
-		if !os.IsNotExist(err) {
-			// if we can't read the old log file, try renaning it for someone
-			// to look at if they want.
-			log.Error.Printf("%s: %s", op, err)
-			if err := os.Rename(fn, fn+".unreadable"); err != nil {
-				return nil, errors.E(op, err)
-			}
-		}
-		return finish(op, l, tfn, fn)
+		return err
 	}
 	defer f.Close()
 
-	// At this point we have the old file open as 'f' and the new one as 'l.file'.
-
-	// Read as much as we can into memory. A bad read is treated as the end of the log.
-	l.accessLock.RLock()
 	rd := bufio.NewReader(f)
+
+	// First request must be the right version.
+	var e clogEntry
+	if err := e.read(rd); err != nil {
+		log.Info.Printf("%s: %s", op, err)
+		return err
+	}
+	if e.request != versionReq {
+		log.Info.Printf("%s: log %s: first entry not version request", op, fn)
+		return badVersion
+	} else if e.name != version {
+		log.Info.Printf("%s: log %s: expected version %s got %s", op, fn, version, e.name)
+		return badVersion
+	}
 	for {
 		var e clogEntry
 		if err := e.read(rd); err != nil {
@@ -199,58 +312,29 @@ func openLog(ctx upspin.Context, dir string, period time.Duration) (*clog, error
 			log.Info.Printf("%s: %s", op, err)
 			break
 		}
-		log.Debug.Printf("%s: %s", op, &e)
 		switch e.request {
+		case versionReq:
+			log.Info.Printf("%s: verson other than first record", op)
+			break
 		case globReq:
 			// Since we first log all the contents of a directory before the glob,
 			// we need to first add all entries to a manufactured glob entry. Once
 			// we read the actual glob entry, we need to find this manufactured
 			// glob and mark it complete. If the directory was empty, that glob
 			// will not yet exist and we must manufacture it also.
-			v, ok := l.lru.Get(lruKey{name: e.name, ep: *e.ep, glob: true})
+			v, ok := l.lru.Get(lruKey{name: e.name, glob: true})
 			if ok {
 				e.children = v.(*clogEntry).children
 				e.complete = true
 			} else {
-				e.children = make(map[upspin.PathName]bool)
+				e.children = make(map[string]bool)
 			}
 			l.updateLRU(&e)
 		default:
 			l.updateLRU(&e)
 		}
 	}
-
-	// Write the resulting LRU to the new log. This is a compression step since
-	// it should be shorter than the original log: subsequent requests for
-	// the same name replace previous ones, deleteReqs remove entries, etc.
-	olru := l.lru
-	l.lru = cache.NewLRU(LRUMax)
-	for {
-		_, ev := olru.RemoveOldest()
-		if ev == nil {
-			break
-		}
-		e := ev.(*clogEntry)
-
-		if err := l.append(e); err != nil {
-			l.accessLock.RUnlock()
-			log.Error.Printf("%s: %s", op, err)
-			return nil, errors.E(op, err)
-		}
-	}
-
-	l.accessLock.RUnlock()
-	return finish(op, l, tfn, fn)
-}
-
-func finish(op string, l *clog, tfn, fn string) (*clog, error) {
-	if err := os.Rename(tfn, fn); err != nil {
-		log.Error.Printf("%s: %s", op, err)
-		return nil, errors.E(op, err)
-	}
-
-	go l.refresher()
-	return l, nil
+	return nil
 }
 
 func (l *clog) myDirServer(pathName upspin.PathName) bool {
@@ -267,9 +351,15 @@ func (l *clog) myDirServer(pathName upspin.PathName) bool {
 }
 
 func (l *clog) close() error {
-	// Stop refresher.
+	// Write out partials.
+	if l.wr != nil {
+		l.wr.Flush()
+	}
+
+	// Stop go routines.
 	close(l.exit)
 	<-l.refresherExited
+	<-l.rotaterExited
 
 	return l.file.Close()
 }
@@ -281,18 +371,22 @@ func (l *clog) lock(name upspin.PathName) *sync.Mutex {
 		hash = hash*7 + uint32(i)
 	}
 	lock := &l.hashLock[hash%uint32(len(l.hashLock))]
-	l.accessLock.RLock()
+	l.globalLock.RLock()
 	lock.Lock()
 	return lock
 }
 
 func (l *clog) unlock(lock *sync.Mutex) {
 	lock.Unlock()
-	l.accessLock.RUnlock()
+	l.globalLock.RUnlock()
 }
 
-func (l *clog) lookup(ep *upspin.Endpoint, name upspin.PathName) *clogEntry {
-	v, ok := l.lru.Get(lruKey{name: name, ep: *ep, glob: false})
+func (l *clog) lookup(name upspin.PathName) *clogEntry {
+	if *memprofile != "" && string(name) == string(l.ctx.UserName())+"/"+"memstats" {
+		dumpMemStats()
+	}
+
+	v, ok := l.lru.Get(lruKey{name: name, glob: false})
 	if ok {
 		return v.(*clogEntry)
 	}
@@ -300,7 +394,7 @@ func (l *clog) lookup(ep *upspin.Endpoint, name upspin.PathName) *clogEntry {
 	// Look for a complete globReq. If there is one and it doesn't list
 	// this name, we can return a NotExist error.
 	dirName := path.DropPath(name, 1)
-	v, ok = l.lru.Get(lruKey{name: dirName, ep: *ep, glob: true})
+	v, ok = l.lru.Get(lruKey{name: dirName, glob: true})
 	if !ok {
 		return nil
 	}
@@ -308,7 +402,7 @@ func (l *clog) lookup(ep *upspin.Endpoint, name upspin.PathName) *clogEntry {
 	if !e.complete {
 		return nil
 	}
-	if e.children[name] {
+	if e.children[lastElem(name)] {
 		// The glob entry contains this but we dropped the actual entry.
 		return nil
 	}
@@ -317,17 +411,16 @@ func (l *clog) lookup(ep *upspin.Endpoint, name upspin.PathName) *clogEntry {
 		name:    name,
 		request: lookupReq,
 		error:   errors.E(errors.NotExist, errors.Errorf("%s does not exist", name)),
-		ep:      ep,
 	}
 }
 
-func (l *clog) lookupGlob(ep *upspin.Endpoint, pattern upspin.PathName) (*clogEntry, []*upspin.DirEntry) {
+func (l *clog) lookupGlob(pattern upspin.PathName) (*clogEntry, []*upspin.DirEntry) {
 	dirPath, ok := cacheableGlob(pattern)
 	if !ok {
 		return nil, nil
 	}
 	// Lookup the glob.
-	v, ok := l.lru.Get(lruKey{name: dirPath, ep: *ep, glob: true})
+	v, ok := l.lru.Get(lruKey{name: dirPath, glob: true})
 	if !ok {
 		return nil, nil
 	}
@@ -338,7 +431,7 @@ func (l *clog) lookupGlob(ep *upspin.Endpoint, pattern upspin.PathName) (*clogEn
 	// Lookup all the individual entries.  If any are missing, no go.
 	var entries []*upspin.DirEntry
 	for n := range e.children {
-		v, ok := l.lru.Get(lruKey{name: n, ep: *ep, glob: false})
+		v, ok := l.lru.Get(lruKey{name: path.Join(e.name, n), glob: false})
 		if !ok {
 			e.complete = false
 			return nil, nil
@@ -353,10 +446,10 @@ func (l *clog) lookupGlob(ep *upspin.Endpoint, pattern upspin.PathName) (*clogEn
 	return v.(*clogEntry), entries
 }
 
-func (l *clog) whichAccess(ep *upspin.Endpoint, name upspin.PathName) (*upspin.DirEntry, bool) {
+func (l *clog) whichAccess(name upspin.PathName) (*upspin.DirEntry, bool) {
 	// Get name of access file.
 	dirName := path.DropPath(name, 1)
-	v, ok := l.lru.Get(lruKey{name: dirName, ep: *ep, glob: true})
+	v, ok := l.lru.Get(lruKey{name: dirName, glob: true})
 	if !ok {
 		return nil, false
 	}
@@ -369,7 +462,7 @@ func (l *clog) whichAccess(ep *upspin.Endpoint, name upspin.PathName) (*upspin.D
 	if e.access == noAccessFile {
 		return nil, true
 	}
-	v, ok = l.lru.Get(lruKey{name: e.access, ep: *e.ep})
+	v, ok = l.lru.Get(lruKey{name: e.access})
 	if !ok {
 		return nil, false
 	}
@@ -377,7 +470,7 @@ func (l *clog) whichAccess(ep *upspin.Endpoint, name upspin.PathName) (*upspin.D
 	return e.de, true
 }
 
-func (l *clog) logRequest(op request, ep *upspin.Endpoint, name upspin.PathName, err error, de *upspin.DirEntry) {
+func (l *clog) logRequest(op request, name upspin.PathName, err error, de *upspin.DirEntry) {
 	if !l.myDirServer(name) {
 		return
 	}
@@ -388,7 +481,6 @@ func (l *clog) logRequest(op request, ep *upspin.Endpoint, name upspin.PathName,
 		name:    name,
 		request: op,
 		error:   err,
-		ep:      ep,
 		de:      de,
 	}
 	l.append(e)
@@ -400,8 +492,7 @@ func (l *clog) logRequest(op request, ep *upspin.Endpoint, name upspin.PathName,
 			name:     name,
 			request:  globReq,
 			error:    err,
-			ep:       ep,
-			children: make(map[upspin.PathName]bool),
+			children: make(map[string]bool),
 			complete: true,
 		}
 		l.append(e)
@@ -423,7 +514,7 @@ func cacheableGlob(p upspin.PathName) (upspin.PathName, bool) {
 	return pp, true
 }
 
-func (l *clog) logGlobRequest(ep *upspin.Endpoint, pattern upspin.PathName, err error, entries []*upspin.DirEntry) {
+func (l *clog) logGlobRequest(pattern upspin.PathName, err error, entries []*upspin.DirEntry) {
 	if !l.myDirServer(pattern) {
 		return
 	}
@@ -436,20 +527,19 @@ func (l *clog) logGlobRequest(ep *upspin.Endpoint, pattern upspin.PathName, err 
 	}
 
 	// Log each entry.
-	children := make(map[upspin.PathName]bool)
+	children := make(map[string]bool)
 	for _, de := range entries {
-		children[de.Name] = true
-		// TODO(p): Put check for incomplete here.
-		l.logRequest(lookupReq, ep, de.Name, err, de)
+		children[lastElem(de.Name)] = true
+		l.logRequest(lookupReq, de.Name, err, de)
 	}
 
 	// If any files have disappeared from a preexisting glob, remove them.
-	v, ok := l.lru.Get(lruKey{name: dirName, ep: *ep, glob: true})
+	v, ok := l.lru.Get(lruKey{name: dirName, glob: true})
 	if ok {
 		oe := v.(*clogEntry)
 		for n := range oe.children {
 			if !children[n] {
-				e := &clogEntry{request: deleteReq, ep: ep, name: n}
+				e := &clogEntry{request: deleteReq, name: path.Join(dirName, n)}
 				l.append(e)
 			}
 		}
@@ -460,7 +550,6 @@ func (l *clog) logGlobRequest(ep *upspin.Endpoint, pattern upspin.PathName, err 
 		request:  globReq,
 		name:     dirName,
 		error:    err,
-		ep:       ep,
 		children: children,
 		complete: true,
 	}
@@ -471,13 +560,9 @@ func (l *clog) logGlobRequest(ep *upspin.Endpoint, pattern upspin.PathName, err 
 func (l *clog) append(e *clogEntry) error {
 	const op = "grpc/dircacheserver.append"
 
-	if l.updateLRU(e) == 0 {
-		return nil
-	}
+	l.updateLRU(e)
+	l.appendToLogFile(e)
 
-	if err := l.appendToLogFile(e); err != nil {
-		return errors.E(op, errors.IO, err)
-	}
 	return nil
 }
 
@@ -503,9 +588,8 @@ func (l *clog) updateLRU(e *clogEntry) (changes int) {
 			for k := range e.children {
 				ae := &clogEntry{
 					request: globReq,
-					name:    k,
+					name:    path.Join(e.name, k),
 					error:   e.error,
-					ep:      e.ep,
 					de:      e.de,
 				}
 				changes += l.updateLRU(ae)
@@ -515,11 +599,10 @@ func (l *clog) updateLRU(e *clogEntry) (changes int) {
 		changes += l.removeFromLRU(e, false)
 		changes += l.removeFromGlob(e)
 		changes += l.removeAccess(e)
-		// If not reading the log, add back in as a non-existent file.
-		if !l.readingLog {
-			e.request = lookupReq
-			changes += l.addToLRU(e)
-		}
+
+		// Add back in as a non-existent file.
+		e.request = lookupReq
+		changes += l.addToLRU(e)
 		return
 	}
 
@@ -545,7 +628,6 @@ func (l *clog) updateLRU(e *clogEntry) (changes int) {
 				request: lookupReq,
 				name:    e.de.Name,
 				error:   nil,
-				ep:      e.ep,
 				de:      e.de,
 			}
 			changes += l.addAccess(ae)
@@ -553,7 +635,7 @@ func (l *clog) updateLRU(e *clogEntry) (changes int) {
 
 		// Add it to the specific entry.
 		dirName := path.DropPath(e.name, 1)
-		v, ok := l.lru.Get(lruKey{name: dirName, ep: *e.ep, glob: true})
+		v, ok := l.lru.Get(lruKey{name: dirName, glob: true})
 		if ok {
 			newVal := noAccessFile
 			if e.de != nil {
@@ -576,7 +658,7 @@ func (l *clog) addToLRU(e *clogEntry) (changes int) {
 	changes = 1
 	e.refreshed = time.Now()
 	e.changed = e.refreshed
-	k := lruKey{name: e.name, ep: *e.ep, glob: e.request == globReq}
+	k := lruKey{name: e.name, glob: e.request == globReq}
 	if v, ok := l.lru.Get(k); ok {
 		oe := v.(*clogEntry)
 		if match(e, oe.de, oe.error) {
@@ -593,7 +675,7 @@ func (l *clog) addToLRU(e *clogEntry) (changes int) {
 // removeFromLRU removes an entry from the LRU.
 // Return non zero if state other than the refresh time has changed.
 func (l *clog) removeFromLRU(e *clogEntry, isGlob bool) int {
-	v := l.lru.Remove(lruKey{name: e.name, ep: *e.ep, glob: isGlob})
+	v := l.lru.Remove(lruKey{name: e.name, glob: isGlob})
 	if v != nil {
 		return 1
 	}
@@ -607,23 +689,23 @@ func (l *clog) addToGlob(e *clogEntry) (changes int) {
 		return
 	}
 	var ge *clogEntry
-	k := lruKey{name: dirName, ep: *e.ep, glob: true}
+	k := lruKey{name: dirName, glob: true}
 	if v, ok := l.lru.Get(k); !ok {
 		ge = &clogEntry{
 			request:  globReq,
 			name:     dirName,
-			ep:       e.ep,
-			children: make(map[upspin.PathName]bool),
+			children: make(map[string]bool),
 			complete: false,
 		}
 		l.lru.Add(k, ge)
 	} else {
 		ge = v.(*clogEntry)
 	}
-	if !ge.children[e.name] {
+	lelem := lastElem(e.name)
+	if !ge.children[lelem] {
 		changes = 1
+		ge.children[lelem] = true
 	}
-	ge.children[e.name] = true
 	return
 }
 
@@ -633,12 +715,13 @@ func (l *clog) removeFromGlob(e *clogEntry) (changes int) {
 	if dirName == e.name {
 		return
 	}
-	k := lruKey{name: dirName, ep: *e.ep, glob: true}
+	lelem := lastElem(e.name)
+	k := lruKey{name: dirName, glob: true}
 	if v, ok := l.lru.Get(k); ok {
 		ge := v.(*clogEntry)
-		if ge.children[e.name] {
+		if ge.children[lelem] {
 			changes = 1
-			delete(ge.children, e.name)
+			delete(ge.children, lelem)
 		}
 	}
 	return
@@ -651,12 +734,12 @@ func (l *clog) addAccess(e *clogEntry) (changes int) {
 	if !access.IsAccessFile(e.name) {
 		return
 	}
-	l.accessLock.RUnlock()
-	l.accessLock.Lock()
+	l.globalLock.RUnlock()
+	l.globalLock.Lock()
 
 	// Add the access reference to its immediate directory.
 	dirName := path.DropPath(e.name, 1)
-	v, ok := l.lru.Get(lruKey{name: dirName, ep: *e.ep, glob: true})
+	v, ok := l.lru.Get(lruKey{name: dirName, glob: true})
 	if ok {
 		if v.(*clogEntry).access != e.name {
 			changes++
@@ -687,23 +770,27 @@ func (l *clog) addAccess(e *clogEntry) (changes int) {
 			}
 		}
 	}
-	l.accessLock.Unlock()
-	l.accessLock.RLock()
+	l.globalLock.Unlock()
+	l.globalLock.RLock()
 	return
 }
 
-// removeAccess removes an access pointer from its directory and removes it
-// from any descendant directory.
+// removeAccess removes an access pointer from its directory and
+// from any descendant directory. Since it needs to run the LRU
+// it must lock out everyone else while it is doing it.
+//
+// removeAccess assumes that it was entered with globalLock.RLock held
+// and that it must upgrade that to globalLock.Lock to do its work.
 func (l *clog) removeAccess(e *clogEntry) (changes int) {
 	if !access.IsAccessFile(e.name) {
 		return
 	}
-	l.accessLock.RUnlock()
-	l.accessLock.Lock()
+	l.globalLock.RUnlock()
+	l.globalLock.Lock()
 
 	// Remove this access reference from its immediately directory.
 	dirName := path.DropPath(e.name, 1)
-	v, ok := l.lru.Get(lruKey{name: dirName, ep: *e.ep, glob: true})
+	v, ok := l.lru.Get(lruKey{name: dirName, glob: true})
 	if ok {
 		v.(*clogEntry).access = ""
 		changes++
@@ -728,22 +815,36 @@ func (l *clog) removeAccess(e *clogEntry) (changes int) {
 			ne.access = ""
 		}
 	}
-	l.accessLock.Unlock()
-	l.accessLock.RLock()
+	l.globalLock.Unlock()
+	l.globalLock.RLock()
 	return
 }
 
 // appendToLogFile appends to the clog file.
 func (l *clog) appendToLogFile(e *clogEntry) error {
 	buf, err := e.marshal()
-	if err != nil {
+	if buf == nil {
+		// Either an error or nothing to marshal.
 		return err
 	}
 
 	// Wrap with a count.
 	buf = appendBytes(nil, buf)
 
-	_, err = l.file.Write(buf)
+	l.logFileLock.Lock()
+	defer l.logFileLock.Unlock()
+	if l.file == nil {
+		return nil
+	}
+	n, err := l.wr.Write(buf)
+	l.logSize += int64(n)
+	if l.logSize > l.maxDisk/8 || err != nil {
+		// Don't block waking the goroutine,
+		select {
+		case l.rotate <- true:
+		default:
+		}
+	}
 	return err
 }
 
@@ -760,21 +861,45 @@ func cacheableError(err error) bool {
 
 var tooShort = errors.E(errors.Invalid, errors.Errorf("log entry too short"))
 var tooLong = errors.E(errors.Invalid, errors.Errorf("log entry too long"))
+var badVersion = errors.E(errors.Invalid, errors.Errorf("bad log file version"))
+
+// A marshalled entry is of the form:
+//   request-type: byte
+//   error: len + marshalled upspin.Error
+//   direntry: len + marshalled upspin.DirEntry
+//   if direntry == nil {
+//     name: string
+//   }
+//   if request-type == reqGlob {
+//     number-of-children: varint
+//     children: strings containing the last element of the child name.
+//   }
+//
+// Strings, directory entries, and errors are preceded by a
+// Varint byte count.
 
 // marshal packs the clogEntry into a new byte slice for storage.
 func (e *clogEntry) marshal() ([]byte, error) {
 	if e.request >= maxReq {
 		return nil, errors.Errorf("unknown clog operation %d", e.request)
 	}
-	var complete int
-	if e.complete {
-		complete = 1
+	if e.request == globReq && !e.complete {
+		return nil, nil
 	}
-	b := []byte{byte(e.request), byte(complete), byte(e.ep.Transport)}
-	b = appendString(b, string(e.ep.NetAddr))
-	b = appendString(b, string(e.name))
+	b := []byte{byte(e.request)}
 	b = appendError(b, e.error)
-	return appendDirEntry(b, e.de)
+	var err error
+	b, err = appendDirEntry(b, e.de)
+	if err != nil {
+		return nil, err
+	}
+	if e.de == nil {
+		b = appendString(b, string(e.name))
+	}
+	if e.request == globReq {
+		b = appendChildren(b, e.children)
+	}
+	return b, nil
 }
 
 // unmarshal unpacks the clogEntry from the byte slice. It unpacks into the receiver
@@ -787,23 +912,27 @@ func (e *clogEntry) unmarshal(b []byte) (err error) {
 	if e.request >= maxReq {
 		return errors.E(errors.Invalid, errors.Errorf("unknown clog operation %d", e.request))
 	}
-	e.complete = int(b[1]) != 0
-	e.ep = &upspin.Endpoint{}
-	e.ep.Transport = upspin.Transport(b[2])
-	var str string
-	if str, b, err = getString(b[3:]); err != nil {
-		return err
-	}
-	e.ep.NetAddr = upspin.NetAddr(str)
-	if str, b, err = getString(b); err != nil {
-		return err
-	}
-	e.name = upspin.PathName(str)
+	b = b[1:]
 	if e.error, b, err = getError(b); err != nil {
 		return err
 	}
 	if e.de, b, err = getDirEntry(b); err != nil {
 		return err
+	}
+	if e.de == nil {
+		var str string
+		if str, b, err = getString(b); err != nil {
+			return err
+		}
+		e.name = upspin.PathName(str)
+	} else {
+		e.name = e.de.Name
+	}
+	if e.request == globReq {
+		if e.children, b, err = getChildren(b); err != nil {
+			return err
+		}
+		e.complete = true
 	}
 	if len(b) != 0 {
 		return errors.E(errors.Invalid, errors.Errorf("log entry too long"))
@@ -847,7 +976,7 @@ func appendBytes(b, bytes []byte) []byte {
 func getBytes(b []byte) (data, remaining []byte, err error) {
 	u, n := binary.Varint(b)
 	if n == 0 {
-		return nil, b, nil
+		return nil, b, tooShort
 	}
 	b = b[n:]
 	if len(b) < int(u) {
@@ -912,6 +1041,34 @@ func getError(b []byte) (wrappedErr error, remaining []byte, err error) {
 	return
 }
 
+func appendChildren(b []byte, children map[string]bool) []byte {
+	var tmp [16]byte // For use by PutVarint.
+	n := binary.PutVarint(tmp[:], int64(len(children)))
+	b = append(b, tmp[:n]...)
+	for k := range children {
+		b = appendString(b, k)
+	}
+	return b
+}
+
+func getChildren(b []byte) (children map[string]bool, remaining []byte, err error) {
+	u, n := binary.Varint(b)
+	if n == 0 {
+		return nil, b, tooShort
+	}
+	remaining = b[n:]
+	children = make(map[string]bool)
+	for i := 0; i < int(u); i++ {
+		var s string
+		s, remaining, err = getString(remaining)
+		if err != nil {
+			return
+		}
+		children[s] = true
+	}
+	return
+}
+
 const maxRefreshPerRound = 50 // The max number of refreshes we will perform per refresh round
 
 // refresher is a goroutine that refreshes entries in the LRU.  It does this in
@@ -964,7 +1121,8 @@ func (l *clog) refreshLoop(iter *cache.Iterator, failed map[upspin.Endpoint]bool
 		e := v.(*clogEntry)
 
 		// Avoid any destinations we couldn't reach this round.
-		if failed[*e.ep] {
+		ep := l.epMap.Get(e.name)
+		if ep == nil || failed[*ep] {
 			continue
 		}
 
@@ -977,12 +1135,12 @@ func (l *clog) refreshLoop(iter *cache.Iterator, failed map[upspin.Endpoint]bool
 		sinceRefreshed := time.Since(e.refreshed)
 		l.unlock(lock)
 		if 2*sinceRefreshed > sinceChanged || sinceRefreshed > maxRefreshPeriod {
-			if l.refresh(e) {
+			if l.refresh(e, ep) {
 				log.Debug.Printf("dircacheserver: refresh %s OK\n", e.name)
 				n++
 			} else {
 				log.Debug.Printf("dircacheserver: refresh %s failed\n", e.name)
-				failed[*e.ep] = true
+				failed[*ep] = true
 			}
 		}
 	}
@@ -990,8 +1148,8 @@ func (l *clog) refreshLoop(iter *cache.Iterator, failed map[upspin.Endpoint]bool
 }
 
 // refresh refreshes a single entry. Returns true if the refresh happened.
-func (l *clog) refresh(e *clogEntry) bool {
-	dir, err := bind.DirServer(l.ctx, *e.ep)
+func (l *clog) refresh(e *clogEntry, ep *upspin.Endpoint) bool {
+	dir, err := bind.DirServer(l.ctx, *ep)
 	if err != nil {
 		// plumbing problem
 		return false
@@ -1005,13 +1163,13 @@ func (l *clog) refresh(e *clogEntry) bool {
 		if !cacheableError(err) {
 			return false
 		}
-		l.logGlobRequest(e.ep, pattern, err, entries)
+		l.logGlobRequest(pattern, err, entries)
 	default:
 		de, err := dir.Lookup(e.name)
 		if !cacheableError(err) {
 			return false
 		}
-		l.logRequest(lookupReq, e.ep, e.name, err, de)
+		l.logRequest(lookupReq, e.name, err, de)
 	}
 	return true
 }
@@ -1039,10 +1197,10 @@ func (l *clog) matchGlob(e *clogEntry, entries []*upspin.DirEntry, err error) bo
 	}
 	for _, de := range entries {
 		found := false
-		if !e.children[de.Name] {
+		if !e.children[lastElem(de.Name)] {
 			return false
 		}
-		v, ok := l.lru.Get(lruKey{name: de.Name, ep: *e.ep, glob: false})
+		v, ok := l.lru.Get(lruKey{name: de.Name, glob: false})
 		if !ok {
 			return false
 		}
@@ -1070,6 +1228,7 @@ var reqName = map[request]string{
 	deleteReq:      "delete",
 	putReq:         "put",
 	whichAccessReq: "whichAccess",
+	versionReq:     "version",
 }
 
 func (e *clogEntry) String() string {
@@ -1077,7 +1236,7 @@ func (e *clogEntry) String() string {
 	if e.request >= lookupReq && e.request < maxReq {
 		rv = reqName[e.request]
 	}
-	rv += fmt.Sprintf(" %s ep<%v>", e.name, *e.ep)
+	rv += fmt.Sprintf(" %s ", e.name)
 	if e.error != nil {
 		rv += fmt.Sprintf(" error<%s>", e.error)
 	}
@@ -1091,4 +1250,29 @@ func (e *clogEntry) String() string {
 		rv += " complete"
 	}
 	return rv
+}
+
+func lastElem(path upspin.PathName) string {
+	str := string(path)
+	lastSlash := strings.LastIndexByte(str, '/')
+	if lastSlash < 0 {
+		return ""
+	}
+	return str[lastSlash+1:]
+}
+
+var memprofile = flag.String("memprofile", "", "write memory profile to `file`")
+
+func dumpMemStats() {
+	if *memprofile != "" {
+		f, err := os.Create(*memprofile)
+		if err != nil {
+			log.Fatalf("could not create memory profile: %s", err)
+		}
+		runtime.GC() // get up-to-date statistics
+		if err := pprof.WriteHeapProfile(f); err != nil {
+			log.Fatalf("could not write memory profile: %s", err)
+		}
+		f.Close()
+	}
 }

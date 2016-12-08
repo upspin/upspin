@@ -11,7 +11,6 @@ import (
 	"reflect"
 	"strings"
 	"testing"
-	"time"
 
 	"upspin.io/context"
 	"upspin.io/errors"
@@ -22,22 +21,6 @@ var noError error
 var notExistError = errors.E(errors.NotExist)
 
 const testUser = "u@foo.com"
-
-var dirEnt = upspin.DirEntry{
-	Name:       "u@foo.com/a/directory",
-	SignedName: "u@foo.com/a/directory",
-	Packing:    upspin.EEPack,
-	Time:       123456,
-	Blocks: []upspin.DirBlock{
-		dirBlock1,
-		dirBlock2,
-	},
-	Link:     "",
-	Packdata: []byte{1, 2, 3, 4},
-	Attr:     upspin.AttrDirectory, // Just so it's not zero; this is not a semantically valid entry.
-	Sequence: 1234,
-	Writer:   "u@foo.com",
-}
 
 var dirBlock1 = upspin.DirBlock{
 	Location: upspin.Location{
@@ -64,6 +47,9 @@ var dirBlock2 = upspin.DirBlock{
 
 // compare compares two log enries for approximate equality.
 func compare(l, le *clogEntry) error {
+	if le == nil {
+		return errors.Errorf("%s not found", l)
+	}
 	estr := ""
 	if l.name != le.name {
 		estr += " names"
@@ -92,14 +78,16 @@ func compare(l, le *clogEntry) error {
 
 var (
 	ep1 = &upspin.Endpoint{Transport: upspin.InProcess, NetAddr: upspin.NetAddr("hoohaa")}
-	ep2 = &upspin.Endpoint{Transport: upspin.Remote, NetAddr: upspin.NetAddr("upspin.io:124")}
 )
 
 var goodLogEntries = []clogEntry{
-	{request: lookupReq, ep: ep1, name: upspin.PathName("u@foo.com/a/b/c"), error: noError, de: &dirEnt},
-	{request: lookupReq, ep: ep1, name: upspin.PathName("u@foo.com/a/b/c"), error: notExistError},
-	{request: lookupReq, ep: ep2, name: upspin.PathName("u@foo.com/a/b/c"), error: upspin.ErrFollowLink, de: &dirEnt},
-	{request: globReq, ep: ep2, name: upspin.PathName("u@foo.com/a/b/c"), error: noError, complete: true},
+	{request: lookupReq, name: upspin.PathName("u@foo.com/a/b/c"), error: noError},
+	{request: lookupReq, name: upspin.PathName("u@foo.com/a/b/c"), error: notExistError},
+	{request: lookupReq, name: upspin.PathName("u@foo.com/a/b/c"), error: upspin.ErrFollowLink},
+	{request: globReq, name: upspin.PathName("u@foo.com/a/b/c"),
+		children: map[string]bool{"q": true, "r": true, "s": true}, error: noError, complete: true},
+	{request: globReq, name: upspin.PathName("u@foo.com/a/b/c"),
+		children: map[string]bool{}, error: noError, complete: true},
 }
 
 var badLogEntries = []clogEntry{
@@ -108,6 +96,7 @@ var badLogEntries = []clogEntry{
 
 func TestMarshal(t *testing.T) {
 	for _, good := range goodLogEntries {
+		addDirEntry(&good)
 		b, err := good.marshal()
 		if err != nil {
 			t.Errorf("%s: marshal error %v", &good, err)
@@ -142,34 +131,36 @@ func TestLogFile(t *testing.T) {
 		t.Fatal("creating test directory")
 	}
 	defer os.RemoveAll(dir)
-	l, err := openLog(context.SetUserName(context.New(), testUser), dir, time.Hour)
+	l, err := openLog(context.SetUserName(context.New(), testUser), dir, 1000000, nil)
 	if err != nil {
 		t.Fatal("creating test log")
 	}
 
 	// Ensure that the log LRU contains what we put into it.
+	t.Logf("TestLogFile test LRU")
 	for _, name := range names {
-		good := clogEntry{request: putReq, ep: ep2, name: upspin.PathName(name), de: &dirEnt}
-		l.logRequest(good.request, good.ep, good.name, good.error, good.de)
+		good := mkClogEntry(putReq, name)
+		l.logRequest(good.request, good.name, good.error, good.de)
 	}
 	for _, name := range names {
-		good := clogEntry{request: putReq, ep: ep2, name: upspin.PathName(name), de: &dirEnt}
-		e := l.lookup(good.ep, good.name)
-		if err := compare(&good, e); err != nil {
+		good := mkClogEntry(putReq, name)
+		e := l.lookup(good.name)
+		if err := compare(good, e); err != nil {
 			t.Error(err)
 		}
 	}
 	l.close()
 
 	// Reopen and check the LRU contents.
-	l, err = openLog(context.SetUserName(context.New(), testUser), dir, time.Hour)
+	t.Logf("TestLogFile test LogFile")
+	l, err = openLog(context.SetUserName(context.New(), testUser), dir, 1000000, nil)
 	if err != nil {
 		t.Fatal("creating test log")
 	}
 	for _, name := range names {
-		good := clogEntry{request: putReq, ep: ep2, name: upspin.PathName(name), de: &dirEnt}
-		e := l.lookup(good.ep, good.name)
-		if err := compare(&good, e); err != nil {
+		good := mkClogEntry(putReq, name)
+		e := l.lookup(good.name)
+		if err := compare(good, e); err != nil {
 			t.Error(err)
 		}
 	}
@@ -179,12 +170,12 @@ func TestLogFile(t *testing.T) {
 		if i == 0 {
 			continue
 		}
-		good := clogEntry{request: deleteReq, ep: ep2, name: upspin.PathName(name)}
-		l.logRequest(good.request, good.ep, good.name, good.error, nil)
+		good := clogEntry{request: deleteReq, name: upspin.PathName(name)}
+		l.logRequest(good.request, good.name, good.error, nil)
 	}
 	for i, name := range names {
-		good := clogEntry{request: putReq, ep: ep2, name: upspin.PathName(name), de: &dirEnt}
-		e := l.lookup(good.ep, good.name)
+		good := mkClogEntry(putReq, name)
+		e := l.lookup(good.name)
 		if i == 0 {
 			if e == nil {
 				t.Errorf("%s: expected but not found", &good)
@@ -198,13 +189,13 @@ func TestLogFile(t *testing.T) {
 	l.close()
 
 	// Reopen and make sure it is still compressed.
-	l, err = openLog(context.SetUserName(context.New(), testUser), dir, time.Hour)
+	l, err = openLog(context.SetUserName(context.New(), testUser), dir, 1000000, nil)
 	if err != nil {
 		t.Fatal("creating test log")
 	}
 	for i, name := range names {
-		good := clogEntry{request: putReq, ep: ep2, name: upspin.PathName(name), de: &dirEnt}
-		e := l.lookup(good.ep, good.name)
+		good := mkClogEntry(putReq, name)
+		e := l.lookup(good.name)
 		if i == 0 {
 			if e == nil {
 				t.Errorf("%s: expected but not found", &good)
@@ -225,7 +216,7 @@ func TestLogGlob(t *testing.T) {
 		t.Fatal("creating test directory")
 	}
 	defer os.RemoveAll(dir)
-	l, err := openLog(context.SetUserName(context.New(), testUser), dir, time.Hour)
+	l, err := openLog(context.SetUserName(context.New(), testUser), dir, 1000000, nil)
 	if err != nil {
 		t.Fatal("creating test log")
 	}
@@ -233,15 +224,14 @@ func TestLogGlob(t *testing.T) {
 	// Log the glob entry.
 	var entries []*upspin.DirEntry
 	for i := 0; i < 10; i++ {
-		de := dirEnt
-		de.Name = upspin.PathName(fmt.Sprintf("u@foo.com/a/b/c/%d", i))
+		de := mkDirEntry(fmt.Sprintf("u@foo.com/a/b/c/%d", i))
 		de.Sequence = int64(upspin.SeqBase + i)
-		entries = append(entries, &de)
+		entries = append(entries, de)
 	}
-	l.logGlobRequest(ep2, "u@foo.com/a/b/c/*", nil, entries)
+	l.logGlobRequest("u@foo.com/a/b/c/*", nil, entries)
 
 	// Check for individual entries.
-	e, nentries := l.lookupGlob(ep2, "u@foo.com/a/b/c/*")
+	e, nentries := l.lookupGlob("u@foo.com/a/b/c/*")
 	if e == nil {
 		t.Fatalf("lookupGlob returned nil")
 	}
@@ -264,11 +254,11 @@ l:
 	t.Log("reopening log")
 
 	// Reopen, and ensure the glob services.
-	l, err = openLog(context.SetUserName(context.New(), testUser), dir, time.Hour)
+	l, err = openLog(context.SetUserName(context.New(), testUser), dir, 1000000, nil)
 	if err != nil {
 		t.Fatal("creating test log")
 	}
-	e, nentries = l.lookupGlob(ep2, "u@foo.com/a/b/c/*")
+	e, nentries = l.lookupGlob("u@foo.com/a/b/c/*")
 	if e == nil {
 		t.Fatalf("lookupGlob returned nil")
 	}
@@ -288,4 +278,38 @@ l2:
 		t.Fatalf("lookupGlob (after reopen) missing %v", *ode)
 	}
 	l.close()
+}
+
+func mkClogEntry(r request, name string) *clogEntry {
+	e := &clogEntry{
+		request: r,
+		name:    upspin.PathName(name),
+	}
+	addDirEntry(e)
+	return e
+}
+
+func addDirEntry(e *clogEntry) {
+	if e.error != nil && e.error != upspin.ErrFollowLink {
+		return
+	}
+	e.de = mkDirEntry(string(e.name))
+}
+
+func mkDirEntry(name string) *upspin.DirEntry {
+	return &upspin.DirEntry{
+		Name:       upspin.PathName(name),
+		SignedName: upspin.PathName(name),
+		Packing:    upspin.EEPack,
+		Time:       123456,
+		Blocks: []upspin.DirBlock{
+			dirBlock1,
+			dirBlock2,
+		},
+		Link:     "",
+		Packdata: []byte{1, 2, 3, 4},
+		Attr:     upspin.AttrNone,
+		Sequence: 1234,
+		Writer:   testUser,
+	}
 }
