@@ -34,7 +34,7 @@ var dirEnt = upspin.DirEntry{
 	},
 	Link:     "",
 	Packdata: []byte{1, 2, 3, 4},
-	Attr:     upspin.AttrDirectory, // Just so it's not zero; this is not a semantically valid entry.
+	Attr:     upspin.AttrNone,
 	Sequence: 1234,
 	Writer:   "u@foo.com",
 }
@@ -99,7 +99,10 @@ var goodLogEntries = []clogEntry{
 	{request: lookupReq, ep: ep1, name: upspin.PathName("u@foo.com/a/b/c"), error: noError, de: &dirEnt},
 	{request: lookupReq, ep: ep1, name: upspin.PathName("u@foo.com/a/b/c"), error: notExistError},
 	{request: lookupReq, ep: ep2, name: upspin.PathName("u@foo.com/a/b/c"), error: upspin.ErrFollowLink, de: &dirEnt},
-	{request: globReq, ep: ep2, name: upspin.PathName("u@foo.com/a/b/c"), error: noError, complete: true},
+	{request: globReq, ep: ep2, name: upspin.PathName("u@foo.com/a/b/c"),
+		children: map[string]bool{"q": true, "r": true, "s": true}, error: noError, complete: true},
+	{request: globReq, ep: ep2, name: upspin.PathName("u@foo.com/a/b/c"),
+		children: map[string]bool{}, error: noError, complete: true},
 }
 
 var badLogEntries = []clogEntry{
