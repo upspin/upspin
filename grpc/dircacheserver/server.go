@@ -7,10 +7,13 @@
 package dircacheserver
 
 import (
+	"flag"
 	"fmt"
 	"os"
 	ospath "path"
-	"time"
+	"runtime"
+	"runtime/pprof"
+	"sync"
 
 	gContext "golang.org/x/net/context"
 
@@ -28,6 +31,9 @@ type server struct {
 	ctx  upspin.Context
 	clog *clog
 
+	// epMap is a map of users to endpoints
+	epMap *epMap
+
 	// Automatically handles authentication by implementing the Authenticate server method.
 	grpcauth.SecureServer
 }
@@ -38,30 +44,35 @@ func New(ctx upspin.Context, ss grpcauth.SecureServer) (proto.DirServer, error) 
 	if len(homeDir) == 0 {
 		return nil, errors.Str("$HOME not defined")
 	}
-	clog, err := openLog(ctx, ospath.Join(homeDir, "upspin/dircache"), 2*time.Minute)
+	epMap := newEpMap()
+	clog, err := openLog(ctx, ospath.Join(homeDir, "upspin/dircache"), 20*1024*1024, epMap)
 	if err != nil {
 		return nil, err
 	}
 	return &server{
 		ctx:          ctx,
 		clog:         clog,
+		epMap:        epMap,
 		SecureServer: ss,
 	}, nil
 }
 
 // dirFor returns a DirServer instance bound to the user specified in the context.
-func (s *server) dirFor(ctx gContext.Context) (upspin.DirServer, *upspin.Endpoint, error) {
+func (s *server) dirFor(ctx gContext.Context, path upspin.PathName) (upspin.DirServer, error) {
 	// Validate that we have a session. If not, it's an auth error.
 	session, err := s.GetSessionFromContext(ctx)
 	if err != nil {
-		return nil, &upspin.Endpoint{}, err
+		return nil, err
 	}
-	e := session.ProxiedEndpoint()
-	if e.Transport == upspin.Unassigned {
-		return nil, &upspin.Endpoint{}, errors.Str("not yet configured")
+	ep := session.ProxiedEndpoint()
+	if ep.Transport == upspin.Unassigned {
+		return nil, errors.Str("not yet configured")
 	}
-	dir, err := bind.DirServer(s.ctx, e)
-	return dir, &e, err
+	dir, err := bind.DirServer(s.ctx, ep)
+	if err == nil {
+		s.epMap.Set(path, &ep)
+	}
+	return dir, err
 }
 
 // endpointFor returns a DirServer endpoint for the context.
@@ -83,46 +94,46 @@ func (s *server) endpointFor(ctx gContext.Context) (*upspin.Endpoint, error) {
 func (s *server) Lookup(ctx gContext.Context, req *proto.DirLookupRequest) (*proto.EntryError, error) {
 	op := logf("Lookup %q", req.Name)
 
-	dir, ep, err := s.dirFor(ctx)
+	name := path.Clean(upspin.PathName(req.Name))
+	dir, err := s.dirFor(ctx, name)
 	if err != nil {
 		op.log(err)
-		return op.entryError(nil, err)
+		return entryError(nil, err)
 	}
 
-	name := path.Clean(upspin.PathName(req.Name))
 	lock := s.clog.lock(name)
 	defer s.clog.unlock(lock)
-	if e := s.clog.lookup(ep, name); e != nil {
-		return op.entryError(e.de, e.error)
+	if e := s.clog.lookup(name); e != nil {
+		return entryError(e.de, e.error)
 	}
 
 	de, err := dir.Lookup(name)
-	s.clog.logRequest(lookupReq, ep, name, err, de)
+	s.clog.logRequest(lookupReq, name, err, de)
 
-	return op.entryError(de, err)
+	return entryError(de, err)
 }
 
 // Glob implements proto.DirServer.
 func (s *server) Glob(ctx gContext.Context, req *proto.DirGlobRequest) (*proto.EntriesError, error) {
 	op := logf("Glob %q", req.Pattern)
 
-	dir, ep, err := s.dirFor(ctx)
+	name := path.Clean(upspin.PathName(req.Pattern))
+	dir, err := s.dirFor(ctx, name)
 	if err != nil {
 		op.log(err)
-		return op.entriesError(nil, err)
+		return entriesError(nil, err)
 	}
 
-	name := path.Clean(upspin.PathName(req.Pattern))
 	lock := s.clog.lock(name)
 	defer s.clog.unlock(lock)
-	if e, entries := s.clog.lookupGlob(ep, name); e != nil {
-		return op.entriesError(entries, e.error)
+	if e, entries := s.clog.lookupGlob(name); e != nil {
+		return entriesError(entries, e.error)
 	}
 
 	entries, globReqErr := dir.Glob(string(name))
-	s.clog.logGlobRequest(ep, name, globReqErr, entries)
+	s.clog.logGlobRequest(name, globReqErr, entries)
 
-	return op.entriesError(entries, globReqErr)
+	return entriesError(entries, globReqErr)
 }
 
 // Put implements proto.DirServer.
@@ -135,56 +146,59 @@ func (s *server) Put(ctx gContext.Context, req *proto.DirPutRequest) (*proto.Ent
 	}
 	op := logf("Put %q", entry.Name)
 
-	dir, ep, err := s.dirFor(ctx)
+	dir, err := s.dirFor(ctx, entry.Name)
 	if err != nil {
-		return op.entryError(nil, err)
+		op.log(err)
+		return entryError(nil, err)
 	}
 
 	lock := s.clog.lock(entry.Name)
 	defer s.clog.unlock(lock)
 	de, err := dir.Put(entry)
-	s.clog.logRequest(putReq, ep, entry.Name, err, de)
+	s.clog.logRequest(putReq, entry.Name, err, de)
 
-	return op.entryError(de, err)
+	return entryError(de, err)
 }
 
 // Delete implements proto.DirServer.
 func (s *server) Delete(ctx gContext.Context, req *proto.DirDeleteRequest) (*proto.EntryError, error) {
 	op := logf("Delete %q", req.Name)
 
-	dir, ep, err := s.dirFor(ctx)
+	name := path.Clean(upspin.PathName(req.Name))
+	dir, err := s.dirFor(ctx, name)
 	if err != nil {
-		return op.entryError(nil, err)
+		op.log(err)
+		return entryError(nil, err)
 	}
 
-	name := path.Clean(upspin.PathName(req.Name))
 	lock := s.clog.lock(name)
 	defer s.clog.unlock(lock)
 	de, err := dir.Delete(name)
-	s.clog.logRequest(deleteReq, ep, name, err, de)
+	s.clog.logRequest(deleteReq, name, err, de)
 
-	return op.entryError(de, err)
+	return entryError(de, err)
 }
 
 // WhichAccess implements proto.DirServer.
 func (s *server) WhichAccess(ctx gContext.Context, req *proto.DirWhichAccessRequest) (*proto.EntryError, error) {
 	op := logf("WhichAccess %q", req.Name)
 
-	dir, ep, err := s.dirFor(ctx)
+	name := path.Clean(upspin.PathName(req.Name))
+	dir, err := s.dirFor(ctx, name)
 	if err != nil {
-		return op.entryError(nil, err)
+		op.log(err)
+		return entryError(nil, err)
 	}
 
-	name := path.Clean(upspin.PathName(req.Name))
 	lock := s.clog.lock(name)
 	defer s.clog.unlock(lock)
-	if de, ok := s.clog.whichAccess(ep, name); ok {
-		return op.entryError(de, nil)
+	if de, ok := s.clog.whichAccess(name); ok {
+		return entryError(de, nil)
 	}
 	de, err := dir.WhichAccess(name)
-	s.clog.logRequest(whichAccessReq, ep, name, err, de)
+	s.clog.logRequest(whichAccessReq, name, err, de)
 
-	return op.entryError(de, err)
+	return entryError(de, err)
 }
 
 // Watch implements proto.Watch.
@@ -226,7 +240,7 @@ func (op operation) log(err error) {
 
 // entryError performs the common operation of converting a directory entry
 // and error result pair into the corresponding protocol buffer.
-func (op operation) entryError(entry *upspin.DirEntry, err error) (*proto.EntryError, error) {
+func entryError(entry *upspin.DirEntry, err error) (*proto.EntryError, error) {
 	var b []byte
 	if entry != nil {
 		var mErr error
@@ -243,17 +257,89 @@ func (op operation) entryError(entry *upspin.DirEntry, err error) (*proto.EntryE
 
 // entriesError performs the common operation of converting a list of directory entries
 // and error result pair into the corresponding protocol buffer.
-func (op operation) entriesError(entries []*upspin.DirEntry, err error) (*proto.EntriesError, error) {
-	var b [][]byte
-	if entries != nil {
-		var mErr error
-		b, mErr = proto.DirEntryBytes(entries)
-		if mErr != nil {
-			return nil, mErr
-		}
+func entriesError(entries []*upspin.DirEntry, err error) (*proto.EntriesError, error) {
+	if err != nil && err != upspin.ErrFollowLink {
+		return globError(err), nil
+	}
+	// Fall through OK for ErrFollowLink.
+
+	b, mErr := proto.DirEntryBytes(entries)
+	if mErr != nil {
+		return globError(mErr), nil
 	}
 	return &proto.EntriesError{
 		Entries: b,
 		Error:   errors.MarshalError(err),
 	}, nil
+}
+
+func globError(err error) *proto.EntriesError {
+	return &proto.EntriesError{Error: errors.MarshalError(err)}
+}
+
+// epMap is a cache from user name to the endpoing of its directory server.
+type epMap struct {
+	sync.Mutex
+	m map[upspin.UserName]*upspin.Endpoint
+}
+
+func newEpMap() *epMap {
+	return &epMap{m: make(map[upspin.UserName]*upspin.Endpoint)}
+}
+
+func (c *epMap) Set(p upspin.PathName, ep *upspin.Endpoint) {
+	c.Lock()
+	if parsed, err := path.Parse(p); err != nil {
+		c.m[parsed.User()] = ep
+	}
+	c.Unlock()
+}
+
+func (c *epMap) Get(p upspin.PathName) *upspin.Endpoint {
+	c.Lock()
+	defer c.Unlock()
+	if parsed, err := path.Parse(p); err == nil {
+		return nil
+	} else {
+		return c.m[parsed.User()]
+	}
+}
+
+var memprofile = flag.String("memprofile", "", "write memory profile to `file`")
+
+func dumpMemStats() {
+	if *memprofile != "" {
+		f, err := os.Create(*memprofile)
+		if err != nil {
+			log.Fatalf("could not create memory profile: %s", err)
+		}
+		runtime.GC() // get up-to-date statistics
+		if err := pprof.WriteHeapProfile(f); err != nil {
+			log.Fatalf("could not write memory profile: %s", err)
+		}
+		f.Close()
+	}
+	dump("")
+}
+
+var oldm runtime.MemStats
+
+func dump(tag string) {
+	var m runtime.MemStats
+	runtime.ReadMemStats(&m)
+	log.Info.Printf("%s Alloc:\t%d\t%d\n", tag, int64(m.Alloc), int64(m.Alloc)-int64(oldm.Alloc))
+	log.Info.Printf("%s TotalAlloc:\t%d\t%d\n", tag, int64(m.TotalAlloc), int64(m.TotalAlloc)-int64(oldm.TotalAlloc))
+	log.Info.Printf("%s Sys:\t%d\t%d\n", tag, int64(m.Sys), int64(m.Sys)-int64(oldm.Sys))
+	log.Info.Printf("%s HeapAlloc:\t%d\t%d\n", tag, int64(m.HeapAlloc), int64(m.HeapAlloc)-int64(oldm.HeapAlloc))
+	log.Info.Printf("%s HeapSys:\t%d\t%d\n", tag, int64(m.HeapSys), int64(m.HeapSys)-int64(oldm.HeapSys))
+	log.Info.Printf("%s StackInuse:\t%d\t%d\n", tag, int64(m.StackInuse), int64(m.StackInuse)-int64(oldm.StackInuse))
+	log.Info.Printf("%s StackSys:\t%d\t%d\n", tag, int64(m.StackSys), int64(m.StackSys)-int64(oldm.StackSys))
+	log.Info.Printf("%s MSpanInuse:\t%d\t%d\n", tag, int64(m.MSpanInuse), int64(m.MSpanInuse)-int64(oldm.MSpanInuse))
+	log.Info.Printf("%s MSpanSys:\t%d\t%d\n", tag, int64(m.MSpanSys), int64(m.MSpanSys)-int64(oldm.MSpanSys))
+	log.Info.Printf("%s MCacheInuse:\t%d\t%d\n", tag, int64(m.MCacheInuse), int64(m.MCacheInuse)-int64(oldm.MCacheInuse))
+	log.Info.Printf("%s MCacheSys:\t%d\t%d\n", tag, int64(m.MCacheSys), int64(m.MCacheSys)-int64(oldm.MCacheSys))
+	log.Info.Printf("%s BuckHashSys:\t%d\t%d\n", tag, int64(m.BuckHashSys), int64(m.BuckHashSys)-int64(oldm.BuckHashSys))
+	log.Info.Printf("%s OtherSys:\t%d\t%d\n", tag, int64(m.OtherSys), int64(m.OtherSys)-int64(oldm.OtherSys))
+	log.Info.Printf("\n")
+	oldm = m
 }
