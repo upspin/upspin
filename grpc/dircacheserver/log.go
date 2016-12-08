@@ -106,10 +106,10 @@ type clog struct {
 	lru           *cache.LRU    // [lruKey]*clogEntry
 	epMap         *epMap        // map from users to endpoints
 
-	exit            chan bool // closed to request refresher to die
-	refresherExited chan bool // closed to signal the refresher has exited or is about to exit
-	rotate          chan bool // sends signal rotater to rotate the logs
-	rotaterExited   chan bool // closed to signal the rotater has exited or is about to exit
+	exit            chan bool // closing signals child routines to exit
+	refresherExited chan bool // closing confirms the refresher is exiting
+	rotate          chan bool // input signals the rotater to rotate the logs
+	rotaterExited   chan bool // closing confirms the rotater is exiting
 
 	// globalLock keeps everyone else out when we are traversing the whole LRU to
 	// update Access files.
