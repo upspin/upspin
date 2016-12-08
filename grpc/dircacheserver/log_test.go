@@ -21,6 +21,8 @@ import (
 var noError error
 var notExistError = errors.E(errors.NotExist)
 
+const testUser = "u@foo.com"
+
 var dirEnt = upspin.DirEntry{
 	Name:       "u@foo.com/a/directory",
 	SignedName: "u@foo.com/a/directory",
@@ -94,10 +96,10 @@ var (
 )
 
 var goodLogEntries = []clogEntry{
-	{request: lookupReq, ep: ep1, name: upspin.PathName("x@y.com/a/b/c"), error: noError, de: &dirEnt},
-	{request: lookupReq, ep: ep1, name: upspin.PathName("x@y.com/a/b/c"), error: notExistError},
-	{request: lookupReq, ep: ep2, name: upspin.PathName("x@y.com/a/b/c"), error: upspin.ErrFollowLink, de: &dirEnt},
-	{request: globReq, ep: ep2, name: upspin.PathName("x@y.com/a/b/c"), error: noError, complete: true},
+	{request: lookupReq, ep: ep1, name: upspin.PathName("u@foo.com/a/b/c"), error: noError, de: &dirEnt},
+	{request: lookupReq, ep: ep1, name: upspin.PathName("u@foo.com/a/b/c"), error: notExistError},
+	{request: lookupReq, ep: ep2, name: upspin.PathName("u@foo.com/a/b/c"), error: upspin.ErrFollowLink, de: &dirEnt},
+	{request: globReq, ep: ep2, name: upspin.PathName("u@foo.com/a/b/c"), error: noError, complete: true},
 }
 
 var badLogEntries = []clogEntry{
@@ -129,9 +131,9 @@ func TestMarshal(t *testing.T) {
 }
 
 var names = []string{
-	"test@u.com/a/file",
-	"test@u.com/a/b/file",
-	"test@u.com/a/b/c/file",
+	"u@foo.com/a/file",
+	"u@foo.com/a/b/file",
+	"u@foo.com/a/b/c/file",
 }
 
 func TestLogFile(t *testing.T) {
@@ -140,7 +142,7 @@ func TestLogFile(t *testing.T) {
 		t.Fatal("creating test directory")
 	}
 	defer os.RemoveAll(dir)
-	l, err := openLog(context.New(), dir, time.Hour)
+	l, err := openLog(context.SetUserName(context.New(), testUser), dir, time.Hour)
 	if err != nil {
 		t.Fatal("creating test log")
 	}
@@ -160,7 +162,7 @@ func TestLogFile(t *testing.T) {
 	l.close()
 
 	// Reopen and check the LRU contents.
-	l, err = openLog(context.New(), dir, time.Hour)
+	l, err = openLog(context.SetUserName(context.New(), testUser), dir, time.Hour)
 	if err != nil {
 		t.Fatal("creating test log")
 	}
@@ -196,7 +198,7 @@ func TestLogFile(t *testing.T) {
 	l.close()
 
 	// Reopen and make sure it is still compressed.
-	l, err = openLog(context.New(), dir, time.Hour)
+	l, err = openLog(context.SetUserName(context.New(), testUser), dir, time.Hour)
 	if err != nil {
 		t.Fatal("creating test log")
 	}
@@ -223,7 +225,7 @@ func TestLogGlob(t *testing.T) {
 		t.Fatal("creating test directory")
 	}
 	defer os.RemoveAll(dir)
-	l, err := openLog(context.New(), dir, time.Hour)
+	l, err := openLog(context.SetUserName(context.New(), testUser), dir, time.Hour)
 	if err != nil {
 		t.Fatal("creating test log")
 	}
@@ -232,14 +234,14 @@ func TestLogGlob(t *testing.T) {
 	var entries []*upspin.DirEntry
 	for i := 0; i < 10; i++ {
 		de := dirEnt
-		de.Name = upspin.PathName(fmt.Sprintf("x@y.com/a/b/c/%d", i))
+		de.Name = upspin.PathName(fmt.Sprintf("u@foo.com/a/b/c/%d", i))
 		de.Sequence = int64(upspin.SeqBase + i)
 		entries = append(entries, &de)
 	}
-	l.logGlobRequest(ep2, "x@y.com/a/b/c/*", nil, entries)
+	l.logGlobRequest(ep2, "u@foo.com/a/b/c/*", nil, entries)
 
 	// Check for individual entries.
-	e, nentries := l.lookupGlob(ep2, "x@y.com/a/b/c/*")
+	e, nentries := l.lookupGlob(ep2, "u@foo.com/a/b/c/*")
 	if e == nil {
 		t.Fatalf("lookupGlob returned nil")
 	}
@@ -262,11 +264,11 @@ l:
 	t.Log("reopening log")
 
 	// Reopen, and ensure the glob services.
-	l, err = openLog(context.New(), dir, time.Hour)
+	l, err = openLog(context.SetUserName(context.New(), testUser), dir, time.Hour)
 	if err != nil {
 		t.Fatal("creating test log")
 	}
-	e, nentries = l.lookupGlob(ep2, "x@y.com/a/b/c/*")
+	e, nentries = l.lookupGlob(ep2, "u@foo.com/a/b/c/*")
 	if e == nil {
 		t.Fatalf("lookupGlob returned nil")
 	}
