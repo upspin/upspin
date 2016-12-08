@@ -41,6 +41,7 @@ var commands = map[string]func(*State, ...string){
 	"cp":            (*State).cp,
 	"deletestorage": (*State).deletestorage,
 	"get":           (*State).get,
+	"getref":        (*State).getref,
 	"info":          (*State).info,
 	"keygen":        (*State).keygen,
 	"link":          (*State).link,
