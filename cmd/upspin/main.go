@@ -31,6 +31,7 @@ import (
 	// Load useful packers
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
+	_ "upspin.io/pack/symm" // For reading dirserver RC files.
 
 	// Load required transports
 	"upspin.io/transports"
@@ -52,6 +53,7 @@ var commands = map[string]func(*State, ...string){
 	"rotate":        (*State).rotate,
 	"rm":            (*State).rm,
 	"setup-domain":  (*State).setupdomain,
+	"setup-writers": (*State).setupwriters,
 	"share":         (*State).share,
 	"signup":        (*State).signup,
 	"snapshot":      (*State).snapshot,
