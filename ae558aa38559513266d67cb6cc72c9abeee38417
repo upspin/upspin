@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6d5147f4_b01218cf",
+        "filename": "cmd/upspin/getref.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-12-09T00:57:26Z",
+      "side": 1,
+      "message": "redirections?",
+      "revId": "ae558aa38559513266d67cb6cc72c9abeee38417",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6d5147f4_d0179cbd",
+        "filename": "cmd/upspin/getref.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-12-09T00:57:26Z",
+      "side": 1,
+      "message": "Redirection?",
+      "revId": "ae558aa38559513266d67cb6cc72c9abeee38417",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6d5147f4_f01ca0e2",
+        "filename": "cmd/upspin/getref.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-12-09T00:57:26Z",
+      "side": 1,
+      "message": "s/$/./",
+      "revId": "ae558aa38559513266d67cb6cc72c9abeee38417",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
