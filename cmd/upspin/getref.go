@@ -16,7 +16,7 @@ import (
 func (s *State) getref(args ...string) {
 	const help = `
 Getref writes to standard output the contents identified by the reference from
-the user's default store server. It does not resolve indirections.
+the user's default store server. It does not resolve redirections.
 `
 	fs := flag.NewFlagSet("getref", flag.ExitOnError)
 	outFile := fs.String("out", "", "output file (default standard output)")
@@ -38,14 +38,14 @@ the user's default store server. It does not resolve indirections.
 		s.exit(err)
 	}
 	if len(locs) > 0 {
-		fmt.Fprintf(os.Stderr, "Indirection detected:\n")
+		fmt.Fprintf(os.Stderr, "Redirection detected:\n")
 		for _, loc := range locs {
 			fmt.Fprintf(os.Stderr, "%+v\n", loc)
 		}
 		return
 	}
 
-	// Write to outfile or to stdout if none set
+	// Write to outfile or to stdout if none set.
 	var output *os.File
 	if *outFile == "" {
 		output = os.Stdout
