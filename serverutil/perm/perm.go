@@ -169,6 +169,7 @@ func (p *Perm) updateUsers(entry *upspin.DirEntry) error {
 	if err != nil {
 		return err
 	}
+	log.Printf("serverutil/perm: Setting writers to: %v", users)
 	p.set(users)
 	return nil
 }
