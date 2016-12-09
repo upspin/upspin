@@ -98,8 +98,7 @@ func main() {
 		http.Handle("/mail", mailHandler)
 	}
 
-	// TODO(adg): this needs to be changed to keyserver. But it involves some metadata on GCP.
-	const metadataKey = "userserver"
+	const metadataKey = "keyserver"
 
 	https.ListenAndServe(metadataKey, flags.HTTPSAddr, &https.Options{
 		CertFile: flags.TLSCertFile,
