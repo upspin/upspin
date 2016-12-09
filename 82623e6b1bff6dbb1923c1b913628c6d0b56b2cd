@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6d5147f4_50cf2c40",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-09T00:34:22Z",
+      "side": 1,
+      "message": "name it errIO",
+      "revId": "82623e6b1bff6dbb1923c1b913628c6d0b56b2cd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6d5147f4_d0da3c06",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-09T00:34:22Z",
+      "side": 1,
+      "message": "the comment about nil should be on the writers field itself",
+      "revId": "82623e6b1bff6dbb1923c1b913628c6d0b56b2cd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6d5147f4_30d2a8ed",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-09T00:34:22Z",
+      "side": 1,
+      "message": "this comment only makes sense for errTimeout.\nI think you should add a separate case, even though they are technically equivalent.",
+      "revId": "82623e6b1bff6dbb1923c1b913628c6d0b56b2cd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6d5147f4_f0df40f3",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-09T00:34:22Z",
+      "side": 1,
+      "message": "\"watch channel closed\"",
+      "revId": "82623e6b1bff6dbb1923c1b913628c6d0b56b2cd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6d5147f4_10d5a4d4",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-09T00:34:22Z",
+      "side": 1,
+      "message": "watch event error",
+      "revId": "82623e6b1bff6dbb1923c1b913628c6d0b56b2cd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
