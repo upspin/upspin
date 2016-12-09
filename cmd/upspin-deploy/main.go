@@ -216,10 +216,6 @@ func (c *Config) inProd() bool {
 }
 
 func (c *Config) Create() error {
-	if c.inProd() {
-		// HACK: see the comment on inProd.
-		return errors.New("cannot create services in upspin-prod/test")
-	}
 	log.Printf("Creating cloud services: Project=%q Zone=%q Prefix=%q", c.Project, c.Zone, c.Prefix)
 
 	if err := wrap("enableAPIs", c.enableAPIs()); err != nil {
@@ -274,10 +270,6 @@ func (c *Config) Create() error {
 }
 
 func (c *Config) Delete() error {
-	if c.inProd() {
-		// HACK: see the comment on inProd.
-		return errors.New("cannot delete services in upspin-prod/test")
-	}
 	log.Printf("Deleting cloud services: Project=%q Zone=%q Prefix=%q", c.Project, c.Zone, c.Prefix)
 
 	count := 0
@@ -926,18 +918,16 @@ func (c *Config) deleteBuckets() error {
 }
 
 func (c *Config) addressName(suffix string) string {
-	if c.inProd() {
-		// HACK: see the comment on inProd.
-		switch suffix {
-		case "dirserver":
-			return "directory"
-		case "storeserver":
-			return "store"
-		case "keyserver":
-			return "user"
-		}
+	name := suffix
+	switch suffix {
+	case "dirserver":
+		name = "dir"
+	case "storeserver":
+		name = "store"
+	case "keyserver":
+		name = "key"
 	}
-	return c.Prefix + suffix
+	return c.Prefix + name
 }
 
 func (c *Config) createAddresses() error {
@@ -1025,7 +1015,7 @@ func (c *Config) createZone() error {
 	}
 
 	if zone != nil {
-		fmt.Println("\n==== User action required ===\n")
+		fmt.Print("\n==== User action required ===\n\n")
 		fmt.Println("Please configure your registrar to delegate the domain")
 		fmt.Printf("\t%s\n", c.Domain)
 		fmt.Println("to these name servers:")
