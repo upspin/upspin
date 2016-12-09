@@ -108,7 +108,7 @@ func dialCache(op *operation, context upspin.Context, proxyFor upspin.Endpoint) 
 	authClient, err := grpcauth.NewGRPCClient(context, ce.NetAddr, grpcauth.KeepAliveInterval, grpcauth.NoSecurity, proxyFor)
 	if err != nil {
 		// On error dial direct.
-		op.error(errors.IO, ce, err)
+		op.error(errors.IO, err)
 		return nil
 	}
 
