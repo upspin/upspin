@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+
 	"upspin.io/flags"
 )
 
@@ -19,17 +20,20 @@ import (
 func (s *State) setupdomain(args ...string) {
 	const (
 		help = `
-Setupdomain generates all configuration files for a new domain (or overwrites
+Setup-domain generates all configuration files for a new domain (or overwrites
 them) and creates a proof of domain ownership challenge.
 
 If using Google Cloud Platform (GCP), the project name must be specified with
 -project, so that cmd/upspin-deploy can find the config files.
 
 If only proof of domain ownership is needed, set -where="".
+
+Once the domain has been set up and its servers deployed, use setup-writers to
+set access controls.
 `
 		noProquint = ""
 	)
-	fs := flag.NewFlagSet("setupdomain", flag.ExitOnError)
+	fs := flag.NewFlagSet("setup-domain", flag.ExitOnError)
 	where := fs.String("where", filepath.Join(os.Getenv("HOME"), "upspin", "deploy"), "`directory` to store private configuration files")
 	curveName := fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
 	s.parseFlags(fs, args, help, "[-project=<gcp_project_name>] setup-domain [-where=$HOME/upspin/deploy] <domain_name>")
@@ -38,7 +42,7 @@ If only proof of domain ownership is needed, set -where="".
 	}
 	domain := fs.Arg(0)
 	if domain == "" {
-		s.exitf("-domain must not be empty")
+		s.exitf("domain must be provided")
 	}
 	switch *curveName {
 	case "p256":
@@ -118,7 +122,7 @@ const (
 	rcFormat = `username: %s@%s
 dirserver: remote,dir.%s
 storeserver: remote,store.%s
-pack: %s
+packing: %s
 secrets: %s
 `
 	dnsMessageFormat = `
