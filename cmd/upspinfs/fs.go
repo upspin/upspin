@@ -594,11 +594,21 @@ func (n *node) Setattr(context gContext.Context, req *fuse.SetattrRequest, resp 
 	return nil
 }
 
-// Flush implements fs.HandleFlusher.Flush.  Called when a file is closed.  We can't
-// really do anything here because if it takes any significant time something in
-// the kernel or git times out the flush and we get errors.
+// Flush implements fs.HandleFlusher.Flush.  Called when a file is closed or synced.
 func (h *handle) Flush(context gContext.Context, req *fuse.FlushRequest) error {
-	return nil
+	const op = "upspinfs/fs.Flush"
+
+	// Write back to upspin.
+	h.n.Lock()
+	defer h.n.Unlock()
+	var err error
+	if h.n.cf != nil && !h.n.noWB {
+		err = h.n.cf.writeBack(h)
+		if err != nil {
+			err = e2e(errors.E(op, h.n.uname, err))
+		}
+	}
+	return err
 }
 
 // ReadDirAll implements fs.HandleReadDirAller.ReadDirAll.
@@ -654,8 +664,8 @@ func (h *handle) Write(context gContext.Context, req *fuse.WriteRequest, resp *f
 	return nil
 }
 
-// Release implements fs.HandleWriter.Release.  This corresponds to a user close and, if the file is dirty,
-// it is written back to the store.
+// Release implements fs.HandleWriter.Release. Similar to Flush but only when
+// a file is finally closed.
 // TODO(p): If we fail writing a file, should we try later asynchronously?
 func (h *handle) Release(context gContext.Context, req *fuse.ReleaseRequest) error {
 	const op = "upspinfs/fs.Release"
