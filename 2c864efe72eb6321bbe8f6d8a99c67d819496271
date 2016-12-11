@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6d5147f4_90135485",
+        "filename": "cmd/upspinfs/fs.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 597,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-12-11T21:40:32Z",
+      "side": 1,
+      "message": "just one space after period ending a sentence.",
+      "revId": "2c864efe72eb6321bbe8f6d8a99c67d819496271",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
