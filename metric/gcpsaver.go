@@ -7,13 +7,12 @@ package metric
 import (
 	"crypto/rand"
 	"fmt"
+	"sync/atomic"
 	"time"
 
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2/google"
 	trace "google.golang.org/api/cloudtrace/v1"
-
-	"sync/atomic"
 
 	"upspin.io/errors"
 	"upspin.io/log"
@@ -35,6 +34,9 @@ type gcpSaver struct {
 }
 
 var _ Saver = (*gcpSaver)(nil)
+
+// onFlush is called when data is saved to the backend. It's used in tests only.
+var onFlush = func() {}
 
 // NewGCPSaver returns a Saver that saves metrics to GCP Traces for a GCP projectID.
 // The caller must have enabled the StackDriver Traces API for the projectID and have sufficient permission
@@ -77,14 +79,45 @@ func (g *gcpSaver) NumProcessed() int32 {
 }
 
 func (g *gcpSaver) saverLoop() {
+	const (
+		batchTimeout = 250 * time.Millisecond
+		idleTimeout  = time.Hour
+	)
+	timer := time.NewTimer(idleTimeout)
+	var traces []*trace.Trace
 	for {
-		g.save(<-g.saverQueue)
+		select {
+		case metric := <-g.saverQueue:
+			traces = append(traces, g.prepareToSave(metric))
+			if len(traces) >= saveQueueLength {
+				// Buffer is full. Flush now.
+				g.save(traces)
+				traces = traces[:0]
+			}
+			// While we're getting new metrics, reset the timer so
+			// we have time to fill the buffer.
+			if !timer.Stop() {
+				<-timer.C
+			}
+			timer.Reset(batchTimeout)
+		case <-timer.C:
+			// Timer expired. Flush if there's anything to flush.
+			if len(traces) > 0 {
+				g.save(traces)
+				traces = traces[:0]
+			}
+			// Revert to the long timeout.
+			if !timer.Stop() {
+				<-timer.C
+			}
+			timer.Reset(idleTimeout)
+		}
 	}
 }
 
 // save serializes the metric in a GCP-friendly way and saves it to the
 // specific GCP backend configured when the Saver was created.
-func (g *gcpSaver) save(m *Metric) {
+func (g *gcpSaver) prepareToSave(m *Metric) *trace.Trace {
 	traceSpans := make([]*trace.TraceSpan, len(m.spans))
 	for i, s := range m.spans {
 		var annotation map[string]string
@@ -107,20 +140,23 @@ func (g *gcpSaver) save(m *Metric) {
 			}
 		}
 	}
-	traces := &trace.Traces{
-		Traces: []*trace.Trace{
-			&trace.Trace{
-				ProjectId: g.projectID,
-				TraceId:   makeTraceID(),
-				Spans:     traceSpans,
-			},
-		},
+	return &trace.Trace{
+		ProjectId: g.projectID,
+		TraceId:   makeTraceID(),
+		Spans:     traceSpans,
 	}
-	err := g.api.Save(traces)
+}
+
+func (g *gcpSaver) save(traces []*trace.Trace) {
+	batch := &trace.Traces{
+		Traces: traces,
+	}
+	err := g.api.Save(batch)
 	if err != nil {
 		log.Error.Printf("metric: error saving to GCP: %v", err)
 	}
-	atomic.AddInt32(&g.processed, 1)
+	atomic.AddInt32(&g.processed, int32(len(traces)))
+	onFlush()
 }
 
 func toKindString(k Kind) string {
