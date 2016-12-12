@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "6d5147f4_1057641e",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-12T03:58:20Z",
+      "side": 1,
+      "message": "eduardo originally wanted it \u0027setupdomain\u0027 and I asked that he change it.\nsent https://upspin-review.googlesource.com/6741 and it lgtm.",
+      "parentUuid": "6d5147f4_b0013824",
+      "revId": "7fa32bf3f7d7e31f6416c11622688550f247542a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6d5147f4_f0fbc003",
         "filename": "cmd/upspin/setupdomain.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-12-12T03:10:36Z",
       "side": 1,
       "message": "mention setup[-]writers",
+      "revId": "7fa32bf3f7d7e31f6416c11622688550f247542a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6d5147f4_9042745e",
+        "filename": "cmd/upspin/setupdomain.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-12T03:58:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6d5147f4_f0fbc003",
       "revId": "7fa32bf3f7d7e31f6416c11622688550f247542a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "6d5147f4_302b8893",
+        "filename": "cmd/upspin/setupwriters.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-12T03:58:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6d5147f4_10f12425",
+      "revId": "7fa32bf3f7d7e31f6416c11622688550f247542a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6d5147f4_30ee2842",
         "filename": "cmd/upspin/setupwriters.go",
         "patchSetId": 1
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "6d5147f4_50380ce6",
+        "filename": "cmd/upspin/setupwriters.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-12T03:58:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6d5147f4_30ee2842",
+      "revId": "7fa32bf3f7d7e31f6416c11622688550f247542a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6d5147f4_50ebac30",
         "filename": "cmd/upspin/setupwriters.go",
         "patchSetId": 1
@@ -81,6 +153,24 @@
       "writtenOn": "2016-12-12T03:10:36Z",
       "side": 1,
       "message": "-project is in global flags.",
+      "revId": "7fa32bf3f7d7e31f6416c11622688550f247542a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6d5147f4_703510ed",
+        "filename": "cmd/upspin/setupwriters.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-12T03:58:20Z",
+      "side": 1,
+      "message": "I think it\u0027s worth mentioning; you almost always want it.",
+      "parentUuid": "6d5147f4_50ebac30",
       "revId": "7fa32bf3f7d7e31f6416c11622688550f247542a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
