@@ -56,7 +56,7 @@ const (
 
 // saveQueueLength is the size of the saveQueue. Too large a queue might be wasteful and too
 // little means metrics start to take time in the critical path of instrumented services.
-const saveQueueLength = 16
+const saveQueueLength = 1024
 
 // saveQueue buffers metrics to be saved to the backend.
 var saveQueue = make(chan *Metric, saveQueueLength)
