@@ -75,6 +75,7 @@ should take those two addresses as arguments.
 	// Create an rc file for this new user.
 	const (
 		rcTemplate = `username: %s
+secrets: %s
 
 ### Please update these entries to refer to your servers
 ### and remove the leading # character.
@@ -82,7 +83,7 @@ should take those two addresses as arguments.
 # dirserver: remote,dir.example.com`
 	)
 
-	rcContents := fmt.Sprintf(rcTemplate, userName)
+	rcContents := fmt.Sprintf(rcTemplate, userName, *where)
 	err = ioutil.WriteFile(*rcFile, []byte(rcContents), 0640)
 	if err != nil {
 		s.exit(err)
