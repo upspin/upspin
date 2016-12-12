@@ -655,19 +655,6 @@ func (s *server) Watch(name upspin.PathName, order int64, done <-chan struct{}) 
 		return nil, errors.E(op, name, err)
 	}
 
-	// Check whether the user has Any right on p.
-	hasAny, link, err := s.hasRight(access.AnyRight, p, o)
-	if err == upspin.ErrFollowLink {
-		_, err = s.errLink(op, link, o)
-		return nil, err
-	}
-	if err != nil {
-		return nil, errors.E(op, err)
-	}
-	if !hasAny {
-		return nil, errors.E(op, errors.Private, name)
-	}
-
 	tree, err := s.loadTreeFor(p.User(), o)
 	if err != nil {
 		return nil, errors.E(op, err)

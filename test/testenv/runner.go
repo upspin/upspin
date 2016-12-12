@@ -257,12 +257,12 @@ func (r *Runner) getNextEvent() *upspin.Event {
 	select {
 	case e, ok = <-r.Events:
 	case <-time.After(time.Second):
-		r.setErr(errors.Str("event channel timed out"))
+		r.setErr(errors.E(errors.Str("event channel timed out")))
 		_, r.errFile, r.errLine, _ = runtime.Caller(2)
 		return nil
 	}
 	if !ok {
-		r.setErr(errors.Str("event channel closed"))
+		r.setErr(errors.E(errors.Str("event channel closed")))
 		_, r.errFile, r.errLine, _ = runtime.Caller(2)
 		return nil
 	}
