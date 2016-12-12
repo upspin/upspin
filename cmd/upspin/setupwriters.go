@@ -21,7 +21,7 @@ import (
 
 func (s *State) setupwriters(args ...string) {
 	const help = `
-Setup-writers creates or updates the Writers file for the given project.
+Setupwriters creates or updates the Writers file for the given project.
 The file lists the names of users granted access to write to the project's
 store server and create their own root on the directory server.
 
@@ -31,11 +31,11 @@ The user name used by the project's directory server is automatically included
 in the list, so that the directory server can use the store for its own data
 storage.
 
-This command is designed to operate on projects created by setup-domain.
+This command is designed to operate on projects created by setupdomain.
 `
-	fs := flag.NewFlagSet("setup-writers", flag.ExitOnError)
+	fs := flag.NewFlagSet("setupwriters", flag.ExitOnError)
 	where := fs.String("where", filepath.Join(os.Getenv("HOME"), "upspin", "deploy"), "`directory` containing private configuration files")
-	s.parseFlags(fs, args, help, "[-project=<gcp_project_name>] setup-writers [-where=$HOME/upspin/deploy] <user names>")
+	s.parseFlags(fs, args, help, "[-project=<gcp_project_name>] setupwriters [-where=$HOME/upspin/deploy] <user names>")
 
 	var users []upspin.UserName
 	for _, arg := range fs.Args() {
