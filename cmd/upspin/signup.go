@@ -40,6 +40,7 @@ should take those two addresses as arguments.
 	fs := flag.NewFlagSet("signup", flag.ExitOnError)
 	force := fs.Bool("force", false, "create a new user even if keys and rc file exist")
 	rcFile := fs.String("rc", "upspin/rc", "location of the rc file")
+	where := fs.String("where", filepath.Join(os.Getenv("HOME"), ".ssh"), "`directory` to store keys")
 	s.parseFlags(fs, args, help, "signup email_address")
 	if fs.NArg() != 1 {
 		fs.Usage()
@@ -79,8 +80,6 @@ should take those two addresses as arguments.
 ### and remove the leading # character.
 # storeserver: remote,store.example.com
 # dirserver: remote,dir.example.com`
-
-		defaultKeyServer = "remote,key.upspin.io:443"
 	)
 
 	rcContents := fmt.Sprintf(rcTemplate, userName)
@@ -90,7 +89,8 @@ should take those two addresses as arguments.
 	}
 
 	// Generate a new key.
-	s.keygen()
+	s.keygen("-where", *where)
+
 	// TODO: write better instructions.
 	fmt.Println("Write down the command above. You will need it if you lose your keys.")
 	// Now load the context. This time it should succeed.
