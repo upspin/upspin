@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a3d7fbc_905fa98f",
+        "filename": "cmd/upspin/setupwriters.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-12-12T04:24:00Z",
+      "side": 1,
+      "message": "You need an Access file either on the root or inside Group. Otherwise the dirserver won\u0027t be able to see the Writers file as it loads it as its own user.",
+      "revId": "dd2ad006eacea4db7ceaf83ba144e6888b789cc9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
