@@ -53,12 +53,13 @@ func testWatchCurrent(t *testing.T, r *testenv.Runner) {
 	}
 	close(done)
 
-	// Reader does not have rights to set a watcher.
+	// Reader can set a watcher, but will get no data due to lack of rights.
 	r.As(readerName)
-	r.DirWatch(base, -1)
-	if !r.Match(errors.E(errors.Private, upspin.PathName(base))) {
+	done = r.DirWatch(base, -1)
+	if !r.GotErrorEvent(errors.E(errors.Str("event channel timed out"))) {
 		t.Fatal(r.Diag())
 	}
+	close(done)
 
 	// Allow reader to list, but not read.
 	r.As(ownerName)
