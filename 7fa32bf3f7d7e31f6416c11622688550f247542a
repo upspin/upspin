@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6d5147f4_b0013824",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-12-12T03:10:36Z",
+      "side": 1,
+      "message": "deletestorage was one word. whichaccess is one word. perhaps these two should have no - although i am not convinced either way",
+      "revId": "7fa32bf3f7d7e31f6416c11622688550f247542a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6d5147f4_f0fbc003",
+        "filename": "cmd/upspin/setupdomain.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-12-12T03:10:36Z",
+      "side": 1,
+      "message": "mention setup[-]writers",
+      "revId": "7fa32bf3f7d7e31f6416c11622688550f247542a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6d5147f4_10f12425",
+        "filename": "cmd/upspin/setupwriters.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-12-12T03:10:36Z",
+      "side": 1,
+      "message": "explain what a Writers file is, briefly\n\nyou can do this by\n\nSetup[-]writers creates or updates the (sic) Writers file for the given project. The file lists\nthe names of users granted access ....",
+      "revId": "7fa32bf3f7d7e31f6416c11622688550f247542a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6d5147f4_30ee2842",
+        "filename": "cmd/upspin/setupwriters.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-12-12T03:10:36Z",
+      "side": 1,
+      "message": "s/created/already created/\n\nor maybe\n\ns/with/by/",
+      "revId": "7fa32bf3f7d7e31f6416c11622688550f247542a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6d5147f4_50ebac30",
+        "filename": "cmd/upspin/setupwriters.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-12-12T03:10:36Z",
+      "side": 1,
+      "message": "-project is in global flags.",
+      "revId": "7fa32bf3f7d7e31f6416c11622688550f247542a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
