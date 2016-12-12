@@ -7,6 +7,7 @@ package metric
 import (
 	"reflect"
 	"testing"
+	"time"
 
 	trace "google.golang.org/api/cloudtrace/v1"
 )
@@ -19,7 +20,8 @@ func TestLabelsAndAnnotations(t *testing.T) {
 	m.StartSpan("Span2").End()
 	m.Done()
 
-	saver.save(m)
+	newTrace := saver.prepareToSave(m)
+	saver.save([]*trace.Trace{newTrace})
 
 	// Sink should have one trace with two spans, both with the static labels and one with an annotation (the last one).
 	if len(sink.traces) != 1 {
@@ -59,7 +61,8 @@ func TestNoLabelsAndAnnotation(t *testing.T) {
 	m.StartSpan("Span2").End()
 	m.Done()
 
-	saver.save(m)
+	newTrace := saver.prepareToSave(m)
+	saver.save([]*trace.Trace{newTrace})
 
 	// Sink should have one trace with two spans, one with an annotation.
 	if len(sink.traces) != 1 {
@@ -80,6 +83,30 @@ func TestNoLabelsAndAnnotation(t *testing.T) {
 	var zeroMap map[string]string
 	if !reflect.DeepEqual(s2.Labels, zeroMap) {
 		t.Errorf("Expected s2.Labels to match %v, got %v", zeroMap, s2.Labels)
+	}
+}
+
+func TestBatchesMultipleMetrics(t *testing.T) {
+	sink := new(sinkTraces)
+	saver := newDummyGCPSaver(sink)
+
+	saveQueue = make(chan *Metric, 10)
+	saver.Register(saveQueue)
+
+	initialCount := NumProcessed()
+
+	m1 := New("metric1").StartSpan("Span1").SetAnnotation("comment17").End()
+	m1.Done()
+	m2 := New("metric2").StartSpan("Span2").End()
+	m2.Done()
+
+	// Allow time for metrics to propagate. This is not flaky because it's
+	// not very sensitive to the timeout -- we wait for up to a second.
+	for i := 0; saver.NumProcessed() < 2 && i < 100; i++ {
+		time.Sleep(10 * time.Millisecond)
+	}
+	if NumProcessed() != initialCount+saver.NumProcessed() {
+		t.Fatalf("Metrics saved = %d, want = %d", saver.NumProcessed(), NumProcessed())
 	}
 }
 
