@@ -20,7 +20,7 @@ import (
 func (s *State) setupdomain(args ...string) {
 	const (
 		help = `
-Setup-domain generates all configuration files for a new domain (or overwrites
+Setupdomain generates all configuration files for a new domain (or overwrites
 them) and creates a proof of domain ownership challenge.
 
 If using Google Cloud Platform (GCP), the project name must be specified with
@@ -28,15 +28,15 @@ If using Google Cloud Platform (GCP), the project name must be specified with
 
 If only proof of domain ownership is needed, set -where="".
 
-Once the domain has been set up and its servers deployed, use setup-writers to
+Once the domain has been set up and its servers deployed, use setupwriters to
 set access controls.
 `
 		noProquint = ""
 	)
-	fs := flag.NewFlagSet("setup-domain", flag.ExitOnError)
+	fs := flag.NewFlagSet("setupdomain", flag.ExitOnError)
 	where := fs.String("where", filepath.Join(os.Getenv("HOME"), "upspin", "deploy"), "`directory` to store private configuration files")
 	curveName := fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
-	s.parseFlags(fs, args, help, "[-project=<gcp_project_name>] setup-domain [-where=$HOME/upspin/deploy] <domain_name>")
+	s.parseFlags(fs, args, help, "[-project=<gcp_project_name>] setupdomain [-where=$HOME/upspin/deploy] <domain_name>")
 	if fs.NArg() != 1 {
 		fs.Usage()
 	}
@@ -55,7 +55,7 @@ set access controls.
 
 	dstDir := *where
 	if dstDir == "" {
-		tmpDir, err := ioutil.TempDir("", "setup-domain-")
+		tmpDir, err := ioutil.TempDir("", "setupdomain-")
 		if err != nil {
 			s.exit(err)
 		}
