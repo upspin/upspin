@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "6d5147f4_3082a853",
+        "filename": "cmd/upspin/setupwriters.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-12T05:08:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6d5147f4_b06cd8e5",
+      "revId": "58bd95e81ba763bfbfd5d62b2a851641506e63c6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6d5147f4_d0715cc0",
         "filename": "cmd/upspin/setupwriters.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2016-12-12T05:00:01Z",
       "side": 1,
       "message": "A wildcard permits ...\n\n(don\u0027t change subject)",
+      "revId": "58bd95e81ba763bfbfd5d62b2a851641506e63c6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6d5147f4_507f2c7e",
+        "filename": "cmd/upspin/setupwriters.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-12T05:08:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6d5147f4_d0715cc0",
       "revId": "58bd95e81ba763bfbfd5d62b2a851641506e63c6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "6d5147f4_707c3089",
+        "filename": "cmd/upspin/setupwriters.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-12T05:08:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6d5147f4_105cc436",
+      "revId": "58bd95e81ba763bfbfd5d62b2a851641506e63c6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6d5147f4_3059c847",
         "filename": "cmd/upspin/setupwriters.go",
         "patchSetId": 2
@@ -64,6 +118,24 @@
       "writtenOn": "2016-12-12T05:00:01Z",
       "side": 1,
       "message": "s/that //",
+      "revId": "58bd95e81ba763bfbfd5d62b2a851641506e63c6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6d5147f4_90bd140e",
+        "filename": "cmd/upspin/setupwriters.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-12T05:08:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6d5147f4_3059c847",
       "revId": "58bd95e81ba763bfbfd5d62b2a851641506e63c6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
