@@ -21,6 +21,7 @@ import (
 	"upspin.io/upspin"
 
 	_ "upspin.io/pack/plain" // Plain packer used when encoding an Access file.
+	// TODO(ehg) Change this from plain to eeintegrity, so client can trust Access.
 )
 
 // Client implements upspin.Client.
@@ -119,6 +120,8 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 	var packer upspin.Packer
 	if isAccessFile || isGroupFile {
 		packer = pack.Lookup(upspin.PlainPack)
+	} else if c.packForAll(accessEntry) {
+		packer = pack.Lookup(upspin.EEIntegrityPack)
 	} else {
 		// Encrypt data according to the preferred packer
 		// TODO: Do a Lookup in the parent directory to find the overriding packer.
@@ -308,6 +311,35 @@ func (c *Client) getReaders(op string, name upspin.PathName, accessEntry *upspin
 		return nil, err
 	}
 	return readers, nil
+}
+
+// packForAll returns true if all@upspin.io has read rights.
+// To prevent surprises, we insist "all" be the first listed user with read
+// rights, and listed directly in the Access file rather than via a Group file.
+// The default is false, for example if there are any errors in reading Access.
+func (c *Client) packForAll(accessEntry *upspin.DirEntry) bool {
+	if accessEntry == nil {
+		return false
+	}
+	accessData, err := c.Get(accessEntry.SignedName)
+	if err != nil {
+		return false
+	}
+	acc, err := access.Parse(accessEntry.SignedName, accessData)
+	if err != nil {
+		return false
+	}
+	readers := acc.List(access.Read)
+	if len(readers) < 1 {
+		return false
+	}
+	if readers[0].String() == "all@upspin.io" {
+		panic("packForAll misconception") // TODO(ehg) remove after testing
+	}
+	if readers[0].String() != "all@upspin.io/" {
+		return false
+	}
+	return true
 }
 
 func makeDirectoryLookupFn(dir upspin.DirServer, entry *upspin.DirEntry, s *metric.Span) (*upspin.DirEntry, error) {
