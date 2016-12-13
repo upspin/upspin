@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "fa6def43_6a3f53c9",
+        "filename": "metric/gcpsaver.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-12-13T23:59:10Z",
+      "side": 1,
+      "message": "How\u0027s 32? Give me a number and I\u0027ll use it. I did not find a limit on the API.",
+      "parentUuid": "6d5147f4_d3ffa688",
+      "revId": "5b84cdc25976e6658bcaee0c9a7090c1fc40f4ff",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6d5147f4_f304aac9",
         "filename": "metric/gcpsaver.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-12-13T22:55:57Z",
       "side": 1,
       "message": "this seems unnecessarily short\nI\u0027d go with 1 * time.Second ?",
+      "revId": "5b84cdc25976e6658bcaee0c9a7090c1fc40f4ff",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa6def43_8a53af2d",
+        "filename": "metric/gcpsaver.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-12-13T23:59:10Z",
+      "side": 1,
+      "message": "This impacts the test though. There\u0027s no way around it as the test must wait until all the info is in. I changed it to 250 ms.",
+      "parentUuid": "6d5147f4_f304aac9",
       "revId": "5b84cdc25976e6658bcaee0c9a7090c1fc40f4ff",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
