@@ -437,7 +437,7 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 			err = access.RemoveGroup(entry.Name)
 			if err != nil {
 				// Nothing to do but log.
-				log.Error.Printf("%s: Error removing group file: %s", op, err)
+				log.Error.Printf("%s: Error removing group file %s: %s", op, entry.Name, err)
 			}
 		}
 	}
