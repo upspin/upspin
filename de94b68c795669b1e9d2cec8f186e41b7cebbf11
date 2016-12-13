@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7a3d7fbc_d7d2bcb6",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-12-13T19:29:12Z",
+      "side": 1,
+      "message": "Name change done.\n\nI agree that we have to think about whether it is better to let the auto sharer do it.  Given that we\u0027re thinking of doing this in cacheserver, it might not matter too much in performance either way.  Anyway, to be discussed before taking this CL seriously.",
+      "parentUuid": "7a3d7fbc_571c8cdf",
+      "revId": "de94b68c795669b1e9d2cec8f186e41b7cebbf11",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a3d7fbc_bcc71f58",
         "filename": "client/client.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2016-12-13T19:18:57Z",
       "side": 1,
       "message": "Use access.All instead.",
+      "revId": "de94b68c795669b1e9d2cec8f186e41b7cebbf11",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a3d7fbc_57824c9e",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-12-13T19:29:12Z",
+      "side": 1,
+      "message": "Done.   access.AllUsers, actually.   I didn\u0027t do it because from reading the code (but not yet testing) I expected to get the other form with trailing slash.",
+      "parentUuid": "7a3d7fbc_bcc71f58",
       "revId": "de94b68c795669b1e9d2cec8f186e41b7cebbf11",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
