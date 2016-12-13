@@ -20,7 +20,8 @@ import (
 	"upspin.io/path"
 	"upspin.io/upspin"
 
-	_ "upspin.io/pack/plain" // Plain packer used when encoding an Access file.
+	_ "upspin.io/pack/eeintegrity" // Integrity packer used for Access/Group files.
+	_ "upspin.io/pack/plain"
 )
 
 // Client implements upspin.Client.
@@ -118,7 +119,7 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 	isGroupFile := access.IsGroupFile(name)
 	var packer upspin.Packer
 	if isAccessFile || isGroupFile {
-		packer = pack.Lookup(upspin.PlainPack)
+		packer = pack.Lookup(upspin.EEIntegrityPack)
 	} else {
 		// Encrypt data according to the preferred packer
 		// TODO: Do a Lookup in the parent directory to find the overriding packer.
@@ -638,8 +639,8 @@ func (c *Client) dupOrRename(op string, oldName, newName upspin.PathName, rename
 		return nil, errors.E(op, oldName, errors.Invalid, errors.Errorf("unrecognized Packing %d", c.context.Packing()))
 	}
 	if access.IsAccessFile(newName) || access.IsGroupFile(newName) {
-		if entry.Packing != upspin.PlainPack {
-			return nil, errors.E(op, oldName, errors.Invalid, errors.Str("can only link plain packed files to access or group files"))
+		if entry.Packing != upspin.EEIntegrityPack {
+			return nil, errors.E(op, oldName, errors.Invalid, errors.Str("can only link integrity-packed files to access or group files"))
 		}
 	}
 

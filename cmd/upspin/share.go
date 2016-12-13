@@ -151,7 +151,7 @@ func (s *State) shareCommand(fs *flag.FlagSet) {
 			continue
 		}
 		packer := lookupPacker(entry)
-		if packer.Packing() == upspin.PlainPack {
+		if packer.Packing() == upspin.PlainPack || packer.Packing() == upspin.EEIntegrityPack {
 			continue
 		}
 		users, keyUsers, self, err := s.sharer.readers(entry)
