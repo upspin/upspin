@@ -72,6 +72,24 @@
     },
     {
       "key": {
+        "uuid": "6d5147f4_9348be2f",
+        "filename": "cmd/upspin/signup.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-12-13T18:53:30Z",
+      "side": 1,
+      "message": "That\u0027s the point, to force the user to know all the details before starting. Did you see the new signup doc?\n\nOf course it\u0027s possible to have keys and no storage but use Upspin to see shared stuff, but we\u0027d like the signup process to be the same for everyone, at least from a \"how to get started\" point of view.",
+      "parentUuid": "7a3d7fbc_51601cb8",
+      "revId": "a5dead6ce7de9822d3f67653fdb616b80ca4746e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a3d7fbc_76f8b608",
         "filename": "cmd/upspin/signup.go",
         "patchSetId": 3
