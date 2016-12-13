@@ -86,29 +86,33 @@ func parseDKIM(s string) (domain, status string, err error) {
 	return strings.TrimSpace(fields[0][1:]), strings.TrimSpace(fields[1]), nil
 }
 
-// States in the email parsing state machine.
-// Refer to this template to understand the states:
-/*
-   I am foo@bar.com;
-   My public key is:
-   p256;
-   1063349993423423435345345345345345340;
-   3453453457828271720003453453245354698;
-   Signature:
-   123453534534:32423423423
-*/
+// SignupMessage represents the contents of a user signup message.
+type SignupMessage struct {
+	UserName  upspin.UserName
+	PublicKey upspin.PublicKey
+	Dir       upspin.Endpoint
+	Store     upspin.Endpoint
+	Signature upspin.Signature
+}
 
-// ParseBody parses the contents of the email and returns the user name,
-// public key and signature of the contents. No validation is performed other
-// than the format of the email.
-func ParseBody(data string) (upspin.UserName, upspin.PublicKey, upspin.Signature, error) {
+// ParseBody parses the signup email and returns its contents.
+// Only the email address and endpoints are (superficially) validated.
+func ParseBody(data string) (*SignupMessage, error) {
 	const op = "cmd/keyserver/internal/mail.ParseBody"
-	var sig upspin.Signature
+
+	const (
+		userPrefix    = "I am "
+		keyPreamble   = "My public key is:"
+		dirPreamble   = "My directory server is:"
+		storePreamble = "My store server is:"
+		sigPreamble   = "Signature:"
+	)
 
 	clean := strings.TrimSpace(data)
 	clean = strings.Replace(clean, ";", "\n", -1)
-	clean = strings.Replace(clean, "My public key is:", "My public key is:\n", 1)
-	clean = strings.Replace(clean, "Signature:", "Signature:\n", 1)
+	for _, p := range []string{keyPreamble, dirPreamble, storePreamble, sigPreamble} {
+		clean = strings.Replace(clean, p, p+"\n", 1)
+	}
 	clean = strings.TrimSpace(clean)
 
 	// HTML markers are converted to a * by Gmail.
@@ -118,7 +122,7 @@ func ParseBody(data string) (upspin.UserName, upspin.PublicKey, upspin.Signature
 
 	lines := strings.Split(clean, "\n")
 	if len(lines) < 7 {
-		return "", "", sig, errors.E(op, errors.Invalid, errors.Str("badly formatted email message"))
+		return nil, errors.E(op, errors.Invalid, errors.Str("badly formatted email message"))
 	}
 	i := 0
 	var line string
@@ -141,18 +145,15 @@ func ParseBody(data string) (upspin.UserName, upspin.PublicKey, upspin.Signature
 		return false
 	}
 
-	const userPrefix = "I am "
 	if !advanceTo(userPrefix) {
-		return "", "", sig, errors.E(op, errors.Invalid, errors.Str("missing username"))
+		return nil, errors.E(op, errors.Invalid, errors.Str("missing username"))
 	}
 	userName := upspin.UserName(line[len(userPrefix):])
 
-	const keyPreamble = "My public key is:"
-	if !advanceTo(keyPreamble) {
-		return "", "", sig, errors.E(op, errors.Invalid, errors.Str("missing key preamble line"))
-	}
-
 	// Key
+	if !advanceTo(keyPreamble) {
+		return nil, errors.E(op, errors.Invalid, errors.Str("missing key preamble line"))
+	}
 	var keyStr string
 	keyLines := 0
 	for keyLines < 3 && next() {
@@ -160,34 +161,50 @@ func ParseBody(data string) (upspin.UserName, upspin.PublicKey, upspin.Signature
 		keyLines++
 	}
 	if keyLines != 3 {
-		return "", "", sig, errors.E(op, errors.Invalid, errors.Errorf("invalid public key format: %q", keyStr))
+		return nil, errors.E(op, errors.Invalid, errors.Errorf("invalid public key format: %q", keyStr))
 	}
 	pubKey := upspin.PublicKey(keyStr)
 
-	const sigPreamble = "Signature:"
-	if !advanceTo(sigPreamble) {
-		return "", "", sig, errors.E(op, errors.Invalid, errors.Str("missing signature preamble line"))
+	// Dir endpoint
+	if !advanceTo(dirPreamble) || !next() {
+		return nil, errors.E(op, errors.Invalid, errors.Str("missing directory endpoint"))
+	}
+	dirEndpoint, err := upspin.ParseEndpoint(line)
+	if err != nil {
+		return nil, errors.E(op, err)
 	}
 
-	if !next() {
-		return "", "", sig, errors.E(errors.Invalid, errors.Str("missing signature"))
+	// Store endpoint
+	if !advanceTo(storePreamble) || !next() {
+		return nil, errors.E(op, errors.Invalid, errors.Str("missing store endpoint"))
+	}
+	storeEndpoint, err := upspin.ParseEndpoint(line)
+	if err != nil {
+		return nil, errors.E(op, err)
 	}
 
+	// Signature
+	if !advanceTo(sigPreamble) || !next() {
+		return nil, errors.E(op, errors.Invalid, errors.Str("missing signature"))
+	}
 	// TODO: parsing signature should move to package upspin. Signature
 	// should also not have pointers, but big.Ints directly.
-	sigFields := strings.Split(line, ":")
-	if len(sigFields) != 2 {
-		return "", "", sig, errors.E(errors.Invalid, errors.Errorf("invalid signature: %q", line))
-	}
 	var rs, ss big.Int
-	if _, ok := rs.SetString(sigFields[0], 10); !ok {
-		return "", "", sig, errors.E(errors.Invalid, errors.Errorf("invalid signature fragment: %q", sigFields[0]))
+	if _, ok := rs.SetString(line, 10); !ok {
+		return nil, errors.E(errors.Invalid, errors.Errorf("invalid signature fragment: %q", line))
 	}
-	if _, ok := ss.SetString(sigFields[1], 10); !ok {
-		return "", "", sig, errors.E(errors.Invalid, errors.Errorf("invalid signature fragment: %q", sigFields[1]))
+	if !next() {
+		return nil, errors.E(op, errors.Invalid, errors.Str("incomplete signature"))
 	}
-	sig.R = &rs
-	sig.S = &ss
+	if _, ok := ss.SetString(line, 10); !ok {
+		return nil, errors.E(errors.Invalid, errors.Errorf("invalid signature fragment: %q", line))
+	}
 
-	return userName, pubKey, sig, nil
+	return &SignupMessage{
+		UserName:  userName,
+		PublicKey: pubKey,
+		Dir:       *dirEndpoint,
+		Store:     *storeEndpoint,
+		Signature: upspin.Signature{R: &rs, S: &ss},
+	}, nil
 }

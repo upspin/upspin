@@ -53,39 +53,46 @@ func TestParseMailFailDKIM_HardFailure(t *testing.T) {
 
 func TestParseBody(t *testing.T) {
 	const valid = `
+I am user@example.com;
 
-I am foo@bar.com;
 My public key is:
 p256;
-1063349993423423435345345345345345340;
-3453453457828271720003453453245354698;
-Signature:
-122323423:199993211232983
+83922673973726686970347670581647300379835078300948665167320084717723306523592;
+78115541715671191820074837236093937930379738687624794541803785053378525884518;
 
+My directory server is:
+remote,dir.example.com:443;
+
+My store server is:
+remote,store.example.com:443;
+
+Signature:
+59892460675194553622079626787155461923229836210220164822721083629161655905375;
+25953070161271709422579643353811558936461156838619008381567108751975672744218;
 `
 
-	userName, pubKey, sig, err := ParseBody(valid)
+	msg, err := ParseBody(valid)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := userName, upspin.UserName("foo@bar.com"); got != want {
+	if got, want := msg.UserName, upspin.UserName("user@example.com"); got != want {
 		t.Errorf("userName = %q, want = %q", got, want)
 	}
-	if got, want := pubKey, upspin.PublicKey("p256\n1063349993423423435345345345345345340\n3453453457828271720003453453245354698\n"); got != want {
+	if got, want := msg.PublicKey, upspin.PublicKey("p256\n83922673973726686970347670581647300379835078300948665167320084717723306523592\n78115541715671191820074837236093937930379738687624794541803785053378525884518\n"); got != want {
 		t.Errorf("pubKey = %q, want = %q", got, want)
 	}
 	var rs, ss big.Int
-	if _, ok := rs.SetString("122323423", 10); !ok {
+	if _, ok := rs.SetString("59892460675194553622079626787155461923229836210220164822721083629161655905375", 10); !ok {
 		t.Fatal("cannot parse R signature")
 	}
-	if _, ok := ss.SetString("199993211232983", 10); !ok {
+	if _, ok := ss.SetString("25953070161271709422579643353811558936461156838619008381567108751975672744218", 10); !ok {
 		t.Fatal("cannot parse S signature")
 	}
 	expectedSig := upspin.Signature{
 		R: &rs,
 		S: &ss,
 	}
-	if got, want := sig, expectedSig; !reflect.DeepEqual(got, want) {
+	if got, want := msg.Signature, expectedSig; !reflect.DeepEqual(got, want) {
 		t.Errorf("sig = %v, want = %v", got, want)
 	}
 }
@@ -96,7 +103,7 @@ I am foo@bar.com;
 My public key is:
 foo
 `
-	_, _, _, err := ParseBody(missing)
+	_, err := ParseBody(missing)
 	expectedErr := errors.E(errors.Invalid, errors.Str("badly formatted email message"))
 	if !errors.Match(expectedErr, err) {
 		t.Errorf("err = %s, want = %s", err, expectedErr)
@@ -113,21 +120,21 @@ func TestParseBody_HTMLAndEmptyLines(t *testing.T) {
 
 
    102345***
-
+My directory server is:remote,dir.example.com:443;My store server is:remote,store.example.com:443;
      Signature:
-1234*:*1432*5*324
+1234*;     *1432*5*324
 
 
 	`
 
-	userName, pubKey, sig, err := ParseBody(funky)
+	msg, err := ParseBody(funky)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := userName, upspin.UserName("bla@bleh.com"); got != want {
+	if got, want := msg.UserName, upspin.UserName("bla@bleh.com"); got != want {
 		t.Errorf("userName = %q, want = %q", got, want)
 	}
-	if got, want := pubKey, upspin.PublicKey("p256\n99999\n102345\n"); got != want {
+	if got, want := msg.PublicKey, upspin.PublicKey("p256\n99999\n102345\n"); got != want {
 		t.Errorf("pubKey = %q, want = %q", got, want)
 	}
 	var rs, ss big.Int
@@ -141,22 +148,22 @@ func TestParseBody_HTMLAndEmptyLines(t *testing.T) {
 		R: &rs,
 		S: &ss,
 	}
-	if got, want := sig, expectedSig; !reflect.DeepEqual(got, want) {
+	if got, want := msg.Signature, expectedSig; !reflect.DeepEqual(got, want) {
 		t.Errorf("sig = %v, want = %v", got, want)
 	}
 }
 
 func TestParseBody_NoNewLines(t *testing.T) {
-	const funky = `I am bla@bleh.com;My public key is:p256;12345;9876;Signature:5555:6666`
+	const funky = `I am bla@bleh.com;My public key is:p256;12345;9876;My directory server is:remote,dir.example.com:443;My store server is:remote,store.example.com:443;;Signature:5555;6666`
 
-	userName, pubKey, sig, err := ParseBody(funky)
+	msg, err := ParseBody(funky)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := userName, upspin.UserName("bla@bleh.com"); got != want {
+	if got, want := msg.UserName, upspin.UserName("bla@bleh.com"); got != want {
 		t.Errorf("userName = %q, want = %q", got, want)
 	}
-	if got, want := pubKey, upspin.PublicKey("p256\n12345\n9876\n"); got != want {
+	if got, want := msg.PublicKey, upspin.PublicKey("p256\n12345\n9876\n"); got != want {
 		t.Errorf("pubKey = %q, want = %q", got, want)
 	}
 	var rs, ss big.Int
@@ -170,7 +177,7 @@ func TestParseBody_NoNewLines(t *testing.T) {
 		R: &rs,
 		S: &ss,
 	}
-	if got, want := sig, expectedSig; !reflect.DeepEqual(got, want) {
+	if got, want := msg.Signature, expectedSig; !reflect.DeepEqual(got, want) {
 		t.Errorf("sig = %v, want = %v", got, want)
 	}
 }

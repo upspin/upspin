@@ -31,7 +31,6 @@ If only proof of domain ownership is needed, set -where="".
 Once the domain has been set up and its servers deployed, use setupwriters to
 set access controls.
 `
-		noProquint = ""
 	)
 	fs := flag.NewFlagSet("setupdomain", flag.ExitOnError)
 	where := fs.String("where", filepath.Join(os.Getenv("HOME"), "upspin", "deploy"), "`directory` to store private configuration files")
@@ -71,6 +70,7 @@ set access controls.
 	s.mkdirAllLocal(storeServerPath)
 
 	// Generate keys for the dirserver and the storeserver.
+	var noProquint string
 	dirPublic, dirPrivate, _, err := createKeys(*curveName, noProquint)
 	if err != nil {
 		s.exit(err)
@@ -79,11 +79,11 @@ set access controls.
 	if err != nil {
 		s.exit(err)
 	}
-	err = writeKeys(dirServerPath, dirPublic, dirPrivate, noProquint)
+	err = writeKeys(dirServerPath, dirPublic, dirPrivate)
 	if err != nil {
 		s.exit(err)
 	}
-	err = writeKeys(storeServerPath, storePublic, storePrivate, noProquint)
+	err = writeKeys(storeServerPath, storePublic, storePrivate)
 	if err != nil {
 		s.exit(err)
 	}

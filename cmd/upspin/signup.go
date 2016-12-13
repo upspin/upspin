@@ -5,12 +5,15 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"net"
 	"os"
 	"path/filepath"
 	"strings"
+	"text/template"
 
 	"upspin.io/context"
 	"upspin.io/upspin"
@@ -19,30 +22,28 @@ import (
 
 func (s *State) signup(args ...string) {
 	const help = `
-Signup registers new users with Upspin. It creates a private/public
-key pair, stores the private key locally, and prepares to store the
-private key with the public upspin key server. It writes an intial
-"rc" file into $HOME/upspin/rc, holding the username and the location
-of the key server.
+Signup registers new users with Upspin. It creates a private/public key pair,
+stores the private key locally, and prepares to store the private key with the
+public upspin key server. It writes an "rc" file into $HOME/upspin/rc, holding
+the username and the location of the directory and store servers.
 
-As the final step, it writes the contents of a mail message to
-standard output. This message contains the public key to be registered
-with the key server. After running signup, the new user must mail
-this message to signup@key.upspin.io to complete the signup process.
-
-Once this is done, the user should update the rc file to hold the
-network addresses of the directory and store servers to use; the
-local adminstrator can provide this information.
-
-TODO: The last step should be done automatically. Perhaps signup
-should take those two addresses as arguments.
+As the final step, it writes the contents of a mail message to standard output.
+This message contains the information to be registered with the key server.
+After running signup, the new user must mail this message to
+signup@key.upspin.io to complete the signup process.
 `
 	fs := flag.NewFlagSet("signup", flag.ExitOnError)
 	force := fs.Bool("force", false, "create a new user even if keys and rc file exist")
 	rcFile := fs.String("rc", "upspin/rc", "location of the rc file")
 	where := fs.String("where", filepath.Join(os.Getenv("HOME"), ".ssh"), "`directory` to store keys")
-	s.parseFlags(fs, args, help, "signup email_address")
+	dirServer := fs.String("dir", "", "DirServer `address`")
+	storeServer := fs.String("store", "", "StoreServer `address`")
+	s.parseFlags(fs, args, help, "signup <-dir=address> <-store=address> <email>")
 	if fs.NArg() != 1 {
+		fs.Usage()
+	}
+	if *dirServer == "" || *storeServer == "" {
+		s.failf("-dir and -store must both be provided")
 		fs.Usage()
 	}
 
@@ -52,6 +53,17 @@ should take those two addresses as arguments.
 		s.exit(err)
 	}
 
+	// Parse -dir and -store flags as addresses and construct remote endpoints.
+	dirEndpoint, err := parseAddress(*dirServer)
+	if err != nil {
+		s.exitf("error parsing -dir=%q: %v", dirServer, err)
+	}
+	storeEndpoint, err := parseAddress(*storeServer)
+	if err != nil {
+		s.exitf("error parsing -store=%q: %v", storeServer, err)
+	}
+
+	// Parse user name.
 	uname, _, domain, err := user.Parse(upspin.UserName(fs.Arg(0)))
 	if err != nil {
 		s.exit(err)
@@ -72,28 +84,27 @@ should take those two addresses as arguments.
 		s.exitf("%s already exists", *rcFile)
 	}
 
-	// Create an rc file for this new user.
-	const (
-		rcTemplate = `username: %s
-secrets: %s
-
-### Please update these entries to refer to your servers
-### and remove the leading # character.
-# storeserver: remote,store.example.com
-# dirserver: remote,dir.example.com`
-	)
-
-	rcContents := fmt.Sprintf(rcTemplate, userName, *where)
-	err = ioutil.WriteFile(*rcFile, []byte(rcContents), 0640)
+	// Write the rc file.
+	var rcContents bytes.Buffer
+	err = rcTemplate.Execute(&rcContents, rcData{
+		UserName:  userName,
+		Dir:       dirEndpoint,
+		Store:     storeEndpoint,
+		SecretDir: *where,
+	})
 	if err != nil {
 		s.exit(err)
 	}
+	err = ioutil.WriteFile(*rcFile, rcContents.Bytes(), 0640)
+	if err != nil {
+		s.exit(err)
+	}
+	fmt.Println("Configuration file written to:")
+	fmt.Printf("\t%s\n\n", *rcFile)
 
 	// Generate a new key.
 	s.keygen("-where", *where)
 
-	// TODO: write better instructions.
-	fmt.Println("Write down the command above. You will need it if you lose your keys.")
 	// Now load the context. This time it should succeed.
 	ctx, err := context.FromFile(*rcFile)
 	if err != nil {
@@ -106,23 +117,78 @@ secrets: %s
 	}
 	pubKey := strings.TrimSpace(string(f.PublicKey()))
 
-	// Sign the username and key.
-	sig, err := f.Sign([]byte(string(ctx.UserName()) + pubKey))
+	// Sign the username, key, and dir and store endpoints.
+	sig, err := f.Sign([]byte(string(ctx.UserName()) + pubKey + dirEndpoint.String() + storeEndpoint.String()))
 	if err != nil {
 		s.exit(err)
 	}
 
-	const mailTemplate = `I am %s;
-My public key is:
-%s;
-Signature:
-%s:%s
-`
-	keyLines := strings.Replace(pubKey, "\n", ";\n", 3)
-	msg := fmt.Sprintf(mailTemplate, ctx.UserName(), keyLines,
-		sig.R.String(), sig.S.String())
+	var msg bytes.Buffer
+	err = mailTemplate.Execute(&msg, mailData{
+		UserName:  userName,
+		PublicKey: strings.Replace(pubKey, "\n", ";\n", 3),
+		Dir:       dirEndpoint,
+		Store:     storeEndpoint,
+		Signature: sig.R.String() + ";\n" + sig.S.String(),
+	})
+	if err != nil {
+		s.exit(err)
+	}
 
-	fmt.Printf("\nTo complete your registration, send email to signup@key.upspin.io with the following contents:\n\n%s\n", msg)
+	fmt.Println("To register your key with the key server,")
+	fmt.Println("copy this email message and send it to signup@key.upspin.io:")
+	fmt.Printf("%s\n", &msg)
+}
+
+type rcData struct {
+	UserName   upspin.UserName
+	Store, Dir *upspin.Endpoint
+	SecretDir  string
+}
+
+var rcTemplate = template.Must(template.New("rc").Parse(`
+username: {{.UserName}}
+secrets: {{.SecretDir}}
+storeserver: {{.Store}}
+dirserver: {{.Dir}}
+packing: ee
+`))
+
+type mailData struct {
+	UserName   upspin.UserName
+	PublicKey  string
+	Dir, Store *upspin.Endpoint
+	Signature  string
+}
+
+var mailTemplate = template.Must(template.New("mail").Parse(`
+I am {{.UserName}};
+
+My public key is:
+{{.PublicKey}};
+
+My directory server is:
+{{.Dir}};
+
+My store server is:
+{{.Store}};
+
+Signature:
+{{.Signature}};
+
+(End of message.)
+`))
+
+func parseAddress(a string) (*upspin.Endpoint, error) {
+	host, port, err := net.SplitHostPort(a)
+	if err != nil {
+		var err2 error
+		host, port, err2 = net.SplitHostPort(a + ":443")
+		if err2 != nil {
+			return nil, err
+		}
+	}
+	return upspin.ParseEndpoint(fmt.Sprintf("remote,%s:%s", host, port))
 }
 
 func wipeUpspinEnvironment() {
