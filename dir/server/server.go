@@ -336,9 +336,10 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, errors.Invalid, entry.Name, errors.Str("cannot make directory named Access"))
 	}
 
-	// Special files must use PlainPack.
-	if (isGroup || isAccess) && entry.Packing != upspin.PlainPack {
-		return nil, errors.E(op, p.Path(), errors.Invalid, errors.Str("must use PlainPack"))
+	// Special files must use integrity pack (plain text + signature).
+	isGroupFile := isGroup && !entry.IsDir()
+	if (isGroupFile || isAccess) && entry.Packing != upspin.EEIntegrityPack {
+		return nil, errors.E(op, p.Path(), errors.Invalid, errors.Str("must use integrity pack"))
 	}
 
 	if isAccess {
