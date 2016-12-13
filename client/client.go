@@ -114,11 +114,15 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 		return nil, errors.E(op, err)
 	}
 	name = evalEntry.Name
+	readers, err := c.getReaders(op, name, accessEntry)
+	if err != nil {
+		return nil, errors.E(op, name, err)
+	}
 
 	isAccessFile := access.IsAccessFile(name)
 	isGroupFile := access.IsGroupFile(name)
 	var packer upspin.Packer
-	if isAccessFile || isGroupFile {
+	if isAccessFile || isGroupFile || c.isReadableByAll(readers) {
 		packer = pack.Lookup(upspin.EEIntegrityPack)
 	} else {
 		// Encrypt data according to the preferred packer
@@ -161,7 +165,7 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 	}
 	ss.End()
 	ss = s.StartSpan("addReaders")
-	if err := c.addReaders(op, entry, accessEntry, packer); err != nil {
+	if err := c.addReaders(op, entry, packer, readers); err != nil {
 		return nil, err
 	}
 	ss.End()
@@ -226,7 +230,7 @@ func whichAccessLookupFn(dir upspin.DirServer, entry *upspin.DirEntry, s *metric
 // This call, if successful, will replace entry.Name with the value, after any
 // link evaluation, from the final call to WhichAccess. The caller may then
 // use that name or entry to avoid evaluating the links again.
-func (c *Client) addReaders(op string, entry, accessEntry *upspin.DirEntry, packer upspin.Packer) error {
+func (c *Client) addReaders(op string, entry *upspin.DirEntry, packer upspin.Packer, readers []upspin.UserName) error {
 	if packer.Packing() != upspin.EEPack {
 		return nil
 	}
@@ -234,11 +238,6 @@ func (c *Client) addReaders(op string, entry, accessEntry *upspin.DirEntry, pack
 	name := entry.Name
 
 	// Add other readers to Packdata.
-	readers, err := c.getReaders(op, name, accessEntry)
-	if err != nil {
-		return errors.E(op, name, err)
-	}
-
 	readersPublicKey := make([]upspin.PublicKey, len(readers)+1)
 	f := c.context.Factotum()
 	if f == nil {
@@ -279,7 +278,7 @@ func (c *Client) getReaders(op string, name upspin.PathName, accessEntry *upspin
 		return nil, nil
 	}
 	accessData, err := c.Get(accessEntry.Name)
-	if errors.Match(errors.E(errors.NotExist), err) || errors.Match(errors.E(errors.Permission), err) {
+	if errors.Match(errors.E(errors.NotExist), err) || errors.Match(errors.E(errors.Permission), err) || errors.Match(errors.E(errors.Private), err) {
 		// If we failed to get the Access file for access-control
 		// reasons, then we must not have read access and thus
 		// cannot know the list of readers.
@@ -309,6 +308,21 @@ func (c *Client) getReaders(op string, name upspin.PathName, accessEntry *upspin
 		return nil, err
 	}
 	return readers, nil
+}
+
+// isReadableByAll returns true if all@upspin.io has read rights.
+// The default is false, for example if there are any errors in reading Access.
+// To prevent surprises, we insist "all" be the first listed user with read
+// rights, and listed directly in the Access file rather than via a Group file.
+// TODO  Enforce group limitation; issue #122.
+func (c *Client) isReadableByAll(readers []upspin.UserName) bool {
+	if len(readers) < 1 {
+		return false
+	}
+	if readers[0] != access.AllUsers {
+		return false
+	}
+	return true
 }
 
 func makeDirectoryLookupFn(dir upspin.DirServer, entry *upspin.DirEntry, s *metric.Span) (*upspin.DirEntry, error) {
@@ -666,7 +680,11 @@ func (c *Client) dupOrRename(op string, oldName, newName upspin.PathName, rename
 		if err != nil {
 			return nil, errors.E(op, trueOldName, err)
 		}
-		if err := c.addReaders(op, entry, accessEntry, packer); err != nil {
+		readers, err := c.getReaders(op, trueOldName, accessEntry)
+		if err != nil {
+			return nil, errors.E(op, trueOldName, err)
+		}
+		if err := c.addReaders(op, entry, packer, readers); err != nil {
 			return nil, errors.E(trueOldName, err)
 		}
 	}
