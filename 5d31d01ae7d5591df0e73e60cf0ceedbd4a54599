@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa6def43_04f41665",
+        "filename": "cmd/upspin/share.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-12-13T21:38:13Z",
+      "side": 1,
+      "message": "I expect to see packers that wrap keys just like EEPack, but are based on other cryptosystems than elliptic curves.\n\nAt that point, we\u0027ll probably want to define some property of packers to query here.  For now, fine with me to just test !\u003dEEPack.",
+      "revId": "5d31d01ae7d5591df0e73e60cf0ceedbd4a54599",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
