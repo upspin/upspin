@@ -63,9 +63,21 @@ See the description for rotate for information about updating keys.
 	if err != nil {
 		s.exitf("saving previous keys failed(%v); keys not generated", err)
 	}
-	err = writeKeys(*where, public, private, proquintStr)
+	err = writeKeys(*where, public, private)
 	if err != nil {
 		s.exitf("writing keys: %v", err)
+	}
+	fmt.Println("Upspin private/public key pair written to:")
+	fmt.Printf("\t%s\n", filepath.Join(*where, "public.upspinkey"))
+	fmt.Printf("\t%s\n", filepath.Join(*where, "secret.upspinkey"))
+	fmt.Println("This key pair provides access to your Upspin identity and data.")
+	if proquintStr != "" {
+		fmt.Println("If you lose the keys you can re-create them by running this command:")
+		fmt.Printf("\tupspin keygen -secretseed %s\n", proquintStr)
+		fmt.Println("Write this command down and store it in a secure, private place.")
+		fmt.Println("Do not share your private key or this command with anyone.\n")
+	} else {
+		fmt.Println("Do not share your private key with anyone.\n")
 	}
 }
 
@@ -99,7 +111,7 @@ func createKeys(curveName, secret string) (public string, private, proquintStr s
 	return string(pub), priv, proquintStr, nil
 }
 
-func writeKeys(where, publicKey, privateKey, proquintStr string) error {
+func writeKeys(where, publicKey, privateKey string) error {
 	// Save the keys to files.
 	fdPrivate, err := os.Create(filepath.Join(where, "secret.upspinkey"))
 	if err != nil {
@@ -124,9 +136,6 @@ func writeKeys(where, publicKey, privateKey, proquintStr string) error {
 	err = fdPublic.Close()
 	if err != nil {
 		return err
-	}
-	if proquintStr != "" {
-		fmt.Printf("Keys generated. To recover them if lost, run:\n\tupspin keygen -secretseed %s\n", proquintStr)
 	}
 	return nil
 }
