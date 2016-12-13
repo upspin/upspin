@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "7a3d7fbc_56281299",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-12-13T05:31:23Z",
+      "side": 1,
+      "message": "Mind changing s/at/on/? This shows as \"signed up [at] Mon Dec 12....\"",
+      "revId": "a5dead6ce7de9822d3f67653fdb616b80ca4746e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7a3d7fbc_d611a273",
         "filename": "cmd/upspin/signup.go",
         "patchSetId": 3
