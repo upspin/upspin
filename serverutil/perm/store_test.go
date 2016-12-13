@@ -9,6 +9,7 @@ import (
 
 	"upspin.io/access"
 	"upspin.io/errors"
+	"upspin.io/log"
 	"upspin.io/test/testenv"
 	"upspin.io/upspin"
 )
@@ -113,11 +114,17 @@ func TestStoreIncludeRemoteGroups(t *testing.T) {
 	r.MakeDirectory(groupDir)
 	r.Put(writersGroup, ownersContents)
 	r.Put(otherGroupFile, otherGroupContents)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
 
+	log.Printf("=== going to wait...")
+	//store.perm.Update()
 	err = wait(store.perm, saved)
 	if err != nil {
 		t.Fatal(err)
 	}
+	log.Printf("=== done with wait...")
 
 	// owner, writer and randomDude are allowed.
 	for _, user := range []upspin.UserName{
