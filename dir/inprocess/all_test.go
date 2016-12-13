@@ -9,6 +9,8 @@ package inprocess
 import (
 	"bytes"
 	"fmt"
+	"os"
+	"path/filepath"
 	"sort"
 	"strings"
 	"sync/atomic"
@@ -17,11 +19,13 @@ import (
 	"upspin.io/bind"
 	"upspin.io/context"
 	"upspin.io/errors"
+	"upspin.io/factotum"
 	"upspin.io/pack"
 	"upspin.io/path"
 	"upspin.io/upspin"
 
 	_ "upspin.io/pack/debug"
+	_ "upspin.io/pack/eeintegrity"
 
 	keyserver "upspin.io/key/inprocess"
 	storeserver "upspin.io/store/inprocess"
@@ -52,6 +56,11 @@ func newContextAndServices(name upspin.UserName) (ctx upspin.Context, key upspin
 	ctx = context.SetKeyEndpoint(ctx, endpoint)
 	ctx = context.SetStoreEndpoint(ctx, endpoint)
 	ctx = context.SetDirEndpoint(ctx, endpoint)
+	f, err := factotum.NewFromDir(repo("key/testdata/dir-server"))
+	if err != nil {
+		panic(err)
+	}
+	ctx = context.SetFactotum(ctx, f)
 
 	key, _ = bind.KeyServer(ctx, ctx.KeyEndpoint())
 	store, _ = bind.StoreServer(ctx, ctx.KeyEndpoint())
@@ -62,12 +71,11 @@ func newContextAndServices(name upspin.UserName) (ctx upspin.Context, key upspin
 func setup() (upspin.Context, upspin.DirServer) {
 	userName := nextUser()
 	context, key, dir, _ := newContextAndServices(userName)
-	publicKey := upspin.PublicKey(fmt.Sprintf("key for %s", userName))
 	user := &upspin.User{
 		Name:      upspin.UserName(userName),
 		Dirs:      []upspin.Endpoint{context.DirEndpoint()},
 		Stores:    []upspin.Endpoint{context.StoreEndpoint()},
-		PublicKey: publicKey,
+		PublicKey: context.Factotum().PublicKey(),
 	}
 	err := key.Put(user)
 	if err != nil {
@@ -84,8 +92,8 @@ func storeData(t *testing.T, context upspin.Context, data []byte, name upspin.Pa
 	return storeDataHelper(t, context, data, name, context.Packing())
 }
 
-func storePlainData(t *testing.T, context upspin.Context, data []byte, name upspin.PathName) *upspin.DirEntry {
-	return storeDataHelper(t, context, data, name, upspin.PlainPack)
+func storePlainWithIntegrity(t *testing.T, context upspin.Context, data []byte, name upspin.PathName) *upspin.DirEntry {
+	return storeDataHelper(t, context, data, name, upspin.EEIntegrityPack)
 }
 
 func storeDataHelper(t *testing.T, context upspin.Context, data []byte, name upspin.PathName, packing upspin.Packing) *upspin.DirEntry {
@@ -671,7 +679,7 @@ func TestWhichAccess(t *testing.T) {
 		t.Errorf("expected no Access file, got %q", accessEntry.Name)
 	}
 	// Add an Access file to dir1.
-	entry = storePlainData(t, context, []byte("r:*@google.com\n"), accessFileName)
+	entry = storePlainWithIntegrity(t, context, []byte("r:*@google.com\n"), accessFileName)
 	_, err = dir.Put(entry)
 	if err != nil {
 		t.Fatal(err)
@@ -870,13 +878,13 @@ func TestWhichAccessLink(t *testing.T) {
 	}
 	// All is well. Now create two access files, a public one and a private one.
 	// The contents don't really matter, since DirServer doesn't evaluate links, but be thorough.
-	entry = storePlainData(t, context, []byte(""), privateAccessFileName) // Empty file means the owner (only) can read or list.
+	entry = storePlainWithIntegrity(t, context, []byte("\n"), privateAccessFileName) // TODO(ehg,r): why is empty a problem with integrity?
 	_, err = dir.Put(entry)
 	if err != nil {
 		t.Fatal(err)
 	}
 	allRights := fmt.Sprintf("*:%s\n", user)
-	entry = storePlainData(t, context, []byte(allRights), publicAccessFileName) // Empty file means the owner (only) can read or list.
+	entry = storePlainWithIntegrity(t, context, []byte(allRights), publicAccessFileName)
 	_, err = dir.Put(entry)
 	if err != nil {
 		t.Fatal(err)
@@ -903,4 +911,13 @@ func equal(d0, d1 *upspin.DirEntry) bool {
 		panic(err)
 	}
 	return bytes.Equal(b0, b1)
+}
+
+// repo returns the local pathname of a file in the upspin repository.
+func repo(dir string) string {
+	gopath := os.Getenv("GOPATH")
+	if len(gopath) == 0 {
+		panic("no GOPATH")
+	}
+	return filepath.Join(gopath, "src/upspin.io/"+dir)
 }

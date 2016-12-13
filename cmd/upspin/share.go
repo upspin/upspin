@@ -151,7 +151,7 @@ func (s *State) shareCommand(fs *flag.FlagSet) {
 			continue
 		}
 		packer := lookupPacker(entry)
-		if packer.Packing() == upspin.PlainPack {
+		if packer.Packing() == upspin.PlainPack || packer.Packing() == upspin.EEIntegrityPack {
 			continue
 		}
 		users, keyUsers, self, err := s.sharer.readers(entry)
@@ -203,7 +203,7 @@ func (s *Sharer) readers(entry *upspin.DirEntry) ([]upspin.UserName, string, boo
 	if packer == nil {
 		return users, "", self, errors.Errorf("no packer registered for packer %s", entry.Packing)
 	}
-	if packer.Packing() == upspin.PlainPack {
+	if packer.Packing() != upspin.EEPack { // TODO: add new sharing packers here.
 		return users, "", self, nil
 	}
 	hashes, err := packer.ReaderHashes(entry.Packdata)
