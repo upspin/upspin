@@ -59,7 +59,7 @@ func TestSaveKeygen(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer os.RemoveAll(dir)
-	err = writeKeys(dir, public, private, "")
+	err = writeKeys(dir, public, private)
 	if err != nil {
 		t.Fatalf("writing keys: %v", err)
 	}
@@ -97,7 +97,7 @@ func TestSaveKeygen(t *testing.T) {
 	if err != nil {
 		t.Fatalf("saving keys: %v", err)
 	}
-	err = writeKeys(dir, public, private, "")
+	err = writeKeys(dir, public, private)
 	if err != nil {
 		t.Fatalf("writing keys: %v", err)
 	}
