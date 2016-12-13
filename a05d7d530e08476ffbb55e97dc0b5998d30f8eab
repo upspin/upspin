@@ -16,6 +16,24 @@
       "revId": "a05d7d530e08476ffbb55e97dc0b5998d30f8eab",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7a3d7fbc_7621d6c4",
+        "filename": "cmd/upspin-deploy/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 921,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-12-13T05:21:24Z",
+      "side": 1,
+      "message": "No, that would create IP addresses with dirserver, storeserer, keyserver. We want the names to match the DNS entry. Take a look at any non-upspin domain. It\u0027s still wrong. Just removing the inprod switch does not fix it.",
+      "parentUuid": "6d5147f4_138daec1",
+      "revId": "a05d7d530e08476ffbb55e97dc0b5998d30f8eab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
