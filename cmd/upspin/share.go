@@ -151,7 +151,7 @@ func (s *State) shareCommand(fs *flag.FlagSet) {
 			continue
 		}
 		packer := lookupPacker(entry)
-		if packer.Packing() == upspin.PlainPack {
+		if packer.Packing() == upspin.PlainPack || packer.Packing() == upspin.EEIntegrityPack {
 			continue
 		}
 		users, keyUsers, self, err := s.sharer.readers(entry)
@@ -203,7 +203,11 @@ func (s *Sharer) readers(entry *upspin.DirEntry) ([]upspin.UserName, string, boo
 	if packer == nil {
 		return users, "", self, errors.Errorf("no packer registered for packer %s", entry.Packing)
 	}
-	if packer.Packing() == upspin.PlainPack {
+	// TODO: perhaps this should be packer.Packing() != upspin.EEPack? The
+	// switch below only works for EEPack. There is also Debug and Symm,
+	// which should not occur in regular use, but if we add new packers it
+	// won't work.
+	if packer.Packing() == upspin.PlainPack || packer.Packing() == upspin.EEIntegrityPack {
 		return users, "", self, nil
 	}
 	hashes, err := packer.ReaderHashes(entry.Packdata)
