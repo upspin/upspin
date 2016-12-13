@@ -21,13 +21,16 @@ import (
 	"upspin.io/dir/server/tree"
 	"upspin.io/errors"
 	"upspin.io/factotum"
+	"upspin.io/pack"
 	"upspin.io/path"
 	"upspin.io/upspin"
 
 	_ "upspin.io/pack/ee"
+	_ "upspin.io/pack/eeintegrity"
 	_ "upspin.io/pack/plain"
 
 	keyserver "upspin.io/key/inprocess"
+
 	storeserver "upspin.io/store/inprocess"
 )
 
@@ -48,7 +51,7 @@ var (
 )
 
 func TestMakeRoot(t *testing.T) {
-	s := newDirServerForTesting(t, userName)
+	s, _ := newDirServerForTesting(t, userName)
 	de, err := makeDirectory(s, userName+"/")
 	if err != nil {
 		t.Fatal(err)
@@ -101,7 +104,7 @@ func TestMakeRoot(t *testing.T) {
 // without a slash. This was a bug.
 func TestMakeRootNoSlash(t *testing.T) {
 	const userName = "wilma@flintstone.org"
-	s := newDirServerForTesting(t, userName)
+	s, _ := newDirServerForTesting(t, userName)
 	_, err := makeDirectory(s, userName) // Note: No terminal slash on this name.
 	if err != nil {
 		t.Fatal(err)
@@ -109,7 +112,7 @@ func TestMakeRootNoSlash(t *testing.T) {
 }
 
 func TestPut(t *testing.T) {
-	s := newDirServerForTesting(t, userName)
+	s, _ := newDirServerForTesting(t, userName)
 	de := &upspin.DirEntry{
 		Name:       userName + "/file1.txt",
 		SignedName: userName + "/file1.txt",
@@ -135,7 +138,7 @@ func TestPut(t *testing.T) {
 }
 
 func TestMakeDirectory(t *testing.T) {
-	s := newDirServerForTesting(t, userName)
+	s, _ := newDirServerForTesting(t, userName)
 	de, err := makeDirectory(s, userName+"/dir")
 	if err != nil {
 		t.Fatal(err)
@@ -159,7 +162,7 @@ func TestMakeDirectory(t *testing.T) {
 }
 
 func TestLink(t *testing.T) {
-	s := newDirServerForTesting(t, userName)
+	s, _ := newDirServerForTesting(t, userName)
 	de := &upspin.DirEntry{
 		Name:       userName + "/mylink",
 		SignedName: userName + "/mylink",
@@ -237,14 +240,14 @@ func TestLink(t *testing.T) {
 	}
 
 	// Get a server for otherUser, who has no right to see the link.
-	sOther := newDirServerForTesting(t, otherUser)
+	sOther, userCtx := newDirServerForTesting(t, otherUser)
 	de2, err = sOther.Lookup(userName + "/mylink")
 	if !errors.Match(errPrivate, err) {
 		t.Errorf("err = %v, want = %v", err, errPrivate)
 	}
 
 	// Now give otherUser some right.
-	_, err = putAccessFile(t, s, userName+"/Access", "*:"+userName+"\nc:"+otherUser)
+	_, err = putAccessOrGroupFile(t, s, userCtx, userName+"/Access", "*:"+userName+"\nc:"+otherUser)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -263,8 +266,8 @@ func TestLink(t *testing.T) {
 
 func TestWhichAccess(t *testing.T) {
 	const accessFile = "*: " + userName
-	s := newDirServerForTesting(t, userName)
-	de, err := putAccessFile(t, s, userName+"/Access", accessFile)
+	s, userCtx := newDirServerForTesting(t, userName)
+	de, err := putAccessOrGroupFile(t, s, userCtx, userName+"/Access", accessFile)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -285,7 +288,7 @@ func TestWhichAccess(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Add Access to dir1. New answer.
-	de2, err := putAccessFile(t, s, userName+"/dir/Access", accessFile)
+	de2, err := putAccessOrGroupFile(t, s, userCtx, userName+"/dir/Access", accessFile)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -320,8 +323,8 @@ func TestWhichAccess(t *testing.T) {
 
 func TestHasRight(t *testing.T) {
 	const accessFile = "l,d: " + userName
-	s := newDirServerForTesting(t, userName)
-	_, err := putAccessFile(t, s, userName+"/Access", accessFile)
+	s, userCtx := newDirServerForTesting(t, userName)
+	_, err := putAccessOrGroupFile(t, s, userCtx, userName+"/Access", accessFile)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -358,7 +361,7 @@ func TestHasRight(t *testing.T) {
 
 // Check regression: This was a bug in the Tree.
 func TestGlobDoesNotRemoveRoot(t *testing.T) {
-	s := newDirServerForTesting(t, userName)
+	s, _ := newDirServerForTesting(t, userName)
 	// Forces a flush on the user tree.
 	ents1, err := s.Glob(userName + "/*")
 	if err != nil {
@@ -389,7 +392,7 @@ func TestGlobMultiSlashPattern(t *testing.T) {
 		oneSlashPattern = dirName + "*"
 		twoSlashPattern = dirName + "/*"
 	)
-	s := newDirServerForTesting(t, otherUser)
+	s, _ := newDirServerForTesting(t, otherUser)
 	entry := &upspin.DirEntry{
 		Name:       dirName,
 		SignedName: dirName,
@@ -430,16 +433,16 @@ func TestGlobMultiSlashPattern(t *testing.T) {
 }
 
 func TestGlob(t *testing.T) {
-	sOwner := newDirServerForTesting(t, userName)
+	sOwner, ownerCtx := newDirServerForTesting(t, userName)
 
 	// Put an Access file that has List permissions for newUser.
-	_, err := putAccessFile(t, sOwner, userName+"/Access", "*:"+userName+"\nl:"+otherUser)
+	_, err := putAccessOrGroupFile(t, sOwner, ownerCtx, userName+"/Access", "*:"+userName+"\nl:"+otherUser)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Get a server for otherUser.
-	s := newDirServerForTesting(t, otherUser)
+	s, _ := newDirServerForTesting(t, otherUser)
 
 	//
 	// First subtest: list someone else's root without Read rights.
@@ -498,7 +501,7 @@ func TestGlob(t *testing.T) {
 	//
 
 	// Put an Access file where globber has Read permissions.
-	_, err = putAccessFile(t, sOwner, userName+"/dir/Access", "*:"+userName+"\nl,r:"+otherUser)
+	_, err = putAccessOrGroupFile(t, sOwner, ownerCtx, userName+"/dir/Access", "*:"+userName+"\nl,r:"+otherUser)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -652,7 +655,7 @@ func TestGlob(t *testing.T) {
 	//
 
 	// Put an Access file where globber does not have permissions in /dir.
-	_, err = putAccessFile(t, sOwner, userName+"/dir/Access", "*:"+userName)
+	_, err = putAccessOrGroupFile(t, sOwner, ownerCtx, userName+"/dir/Access", "*:"+userName)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -686,7 +689,7 @@ func TestGlob(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	s := newDirServerForTesting(t, userName)
+	s, _ := newDirServerForTesting(t, userName)
 
 	// Directory not empty (there are entries there).
 	_, err := s.Delete(userName + "/dir")
@@ -728,13 +731,13 @@ func TestForgetsRemoteGroupFiles(t *testing.T) {
 		accessContents = "r: " + familyGroupName
 	)
 
-	s := newDirServerForTesting(t, userName)
-	_, err := putAccessFile(t, s, accessFile, accessContents)
+	s, userCtx := newDirServerForTesting(t, userName)
+	_, err := putAccessOrGroupFile(t, s, userCtx, accessFile, accessContents)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	sReader := newDirServerForTesting(t, otherUser)
+	sReader, _ := newDirServerForTesting(t, otherUser)
 	_, err = sReader.Lookup(accessFile)
 	if !errors.Match(errPrivate, err) {
 		t.Errorf("err = %s\nwant = %q", err, errPrivate)
@@ -767,7 +770,7 @@ func TestForgetsRemoteGroupFiles(t *testing.T) {
 }
 
 func TestClose(t *testing.T) {
-	s := newDirServerForTesting(t, userName)
+	s, _ := newDirServerForTesting(t, userName)
 	s.Close()
 	// TODO: check error code when we have one.
 }
@@ -777,7 +780,7 @@ func TestClose(t *testing.T) {
 // Ensures no one can figure out which users exist by looking them up and
 // differentiating a non-existing root from a permission-denied root.
 func TestCantProbeForExistence(t *testing.T) {
-	s := newDirServerForTesting(t, userName)
+	s, _ := newDirServerForTesting(t, userName)
 
 	_, err := s.Lookup("barney@rubble.org/")
 	if !errors.Match(errNotExist, err) {
@@ -786,9 +789,9 @@ func TestCantProbeForExistence(t *testing.T) {
 }
 
 func TestPermissionDenied(t *testing.T) {
-	s := newDirServerForTesting(t, userName)
+	s, userCtx := newDirServerForTesting(t, userName)
 	// Access file permits only List rights.
-	_, err := putAccessFile(t, s, userName+"/Access", "l:"+userName)
+	_, err := putAccessOrGroupFile(t, s, userCtx, userName+"/Access", "l:"+userName)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -809,7 +812,7 @@ func TestPermissionDenied(t *testing.T) {
 	}
 
 	// Now Access file permits Create right too.
-	_, err = putAccessFile(t, s, userName+"/Access", "l,c:"+userName)
+	_, err = putAccessOrGroupFile(t, s, userCtx, userName+"/Access", "l,c:"+userName)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -828,8 +831,8 @@ func TestPermissionDenied(t *testing.T) {
 }
 
 func TestOverwriteFileWithWrongSequence(t *testing.T) {
-	s := newDirServerForTesting(t, userName)
-	_, err := putAccessFile(t, s, userName+"/Access", "*:"+userName)
+	s, userCtx := newDirServerForTesting(t, userName)
+	_, err := putAccessOrGroupFile(t, s, userCtx, userName+"/Access", "*:"+userName)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -849,35 +852,20 @@ func TestOverwriteFileWithWrongSequence(t *testing.T) {
 }
 
 func TestPutBadAccess(t *testing.T) {
-	s := newDirServerForTesting(t, userName)
+	s, userCtx := newDirServerForTesting(t, userName)
 
 	const accessFileContents = "Merge: batman@gotham.city"
 
-	loc := writeToStore(t, s.serverContext, []byte(accessFileContents))
-
-	de := &upspin.DirEntry{
-		Name:       userName + "/Access",
-		SignedName: userName + "/Access",
-		Attr:       upspin.AttrNone,
-		Writer:     userName,
-		Packing:    upspin.PlainPack,
-		Blocks: []upspin.DirBlock{
-			{
-				Location: loc,
-				Offset:   0,
-				Size:     int64(len(accessFileContents)),
-			},
-		},
-	}
-	_, err := s.Put(de)
-	expectedErr := errors.E(errors.Invalid, errors.E(de.Name))
+	accessName := upspin.PathName(userName + "/Access")
+	_, err := putAccessOrGroupFile(t, s, userCtx, accessName, accessFileContents)
+	expectedErr := errors.E(errors.Invalid, errors.E(accessName))
 	if !errors.Match(expectedErr, err) {
 		t.Fatalf("err = %v, want = %v", err, expectedErr)
 	}
 }
 
 func TestPutBadGroup(t *testing.T) {
-	s := newDirServerForTesting(t, userName)
+	s, userCtx := newDirServerForTesting(t, userName)
 	_, err := makeDirectory(s, userName+"/Group")
 	if err != nil {
 		t.Fatal(err)
@@ -885,24 +873,9 @@ func TestPutBadGroup(t *testing.T) {
 
 	const groupFileContents = "yo@bar" // bad username.
 
-	loc := writeToStore(t, s.serverContext, []byte(groupFileContents))
-
-	de := &upspin.DirEntry{
-		Name:       userName + "/Group/badgroup",
-		SignedName: userName + "/Group/badgroup",
-		Attr:       upspin.AttrNone,
-		Writer:     userName,
-		Packing:    upspin.PlainPack,
-		Blocks: []upspin.DirBlock{
-			{
-				Location: loc,
-				Offset:   0,
-				Size:     int64(len(groupFileContents)),
-			},
-		},
-	}
-	_, err = s.Put(de)
-	expectedErr := errors.E(errors.Invalid, errors.E(de.Name))
+	groupName := upspin.PathName(userName + "/Group/badgroup")
+	_, err = putAccessOrGroupFile(t, s, userCtx, groupName, groupFileContents)
+	expectedErr := errors.E(errors.Invalid, errors.E(groupName))
 	if !errors.Match(expectedErr, err) {
 		t.Fatalf("err = %v, want = %v", err, expectedErr)
 	}
@@ -938,26 +911,41 @@ func makeDirectory(s *server, name upspin.PathName) (*upspin.DirEntry, error) {
 	return s.Put(entry)
 }
 
-func putAccessFile(t *testing.T, s *server, name upspin.PathName, contents string) (*upspin.DirEntry, error) {
-	if !access.IsAccessFile(name) { // For internal consistency only.
+func putAccessOrGroupFile(t *testing.T, s *server, userCtx upspin.Context, name upspin.PathName, contents string) (*upspin.DirEntry, error) {
+	if !access.IsAccessFile(name) && !access.IsGroupFile(name) {
 		t.Fatalf("%s not an access file", name)
 	}
-	loc := writeToStore(t, s.serverContext, []byte(contents))
+	packer := pack.Lookup(upspin.EEIntegrityPack)
 	de := &upspin.DirEntry{
 		Name:       name,
 		SignedName: name,
+		Link:       "",
+		Time:       upspin.Now(),
+		Sequence:   upspin.SeqIgnore,
 		Attr:       upspin.AttrNone,
 		Writer:     userName,
-		Packing:    upspin.PlainPack,
-		Blocks: []upspin.DirBlock{
-			{
-				Location: loc,
-				Offset:   0,
-				Size:     int64(len(contents)),
-			},
-		},
+		Packing:    upspin.EEIntegrityPack,
 	}
-	_, err := s.Put(de)
+	bp, err := packer.Pack(userCtx, de)
+	if err != nil {
+		t.Fatal(err)
+	}
+	cipher, err := bp.Pack([]byte(contents))
+	if err != nil {
+		t.Fatal(err)
+	}
+	loc := writeToStore(t, userCtx, cipher)
+	bp.SetLocation(
+		upspin.Location{
+			Endpoint:  loc.Endpoint,
+			Reference: loc.Reference,
+		},
+	)
+	err = bp.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = s.Put(de)
 	return de, err
 }
 
@@ -1011,8 +999,9 @@ func (m *mockClock) addSecond(n int) {
 
 var generatorInstance upspin.DirServer
 
-func newDirServerForTesting(t *testing.T, userName upspin.UserName) *server {
-	factotum, err := factotum.NewFromDir(repo("key/testdata/upspin-test"))
+// newDirServerForTesting returns a new server and a user context.
+func newDirServerForTesting(t *testing.T, userName upspin.UserName) (*server, upspin.Context) {
+	f, err := factotum.NewFromDir(repo("key/testdata/upspin-test"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1023,7 +1012,7 @@ func newDirServerForTesting(t *testing.T, userName upspin.UserName) *server {
 	ctx := context.New()
 	ctx = context.SetUserName(ctx, serverName)
 	ctx = context.SetPacking(ctx, upspin.EEPack)
-	ctx = context.SetFactotum(ctx, factotum)
+	ctx = context.SetFactotum(ctx, f)
 	ctx = context.SetKeyEndpoint(ctx, endpointInProcess)
 	ctx = context.SetStoreEndpoint(ctx, endpointInProcess)
 	ctx = context.SetDirEndpoint(ctx, endpointInProcess)
@@ -1038,7 +1027,7 @@ func newDirServerForTesting(t *testing.T, userName upspin.UserName) *server {
 		Name:      serverName,
 		Dirs:      []upspin.Endpoint{ctx.DirEndpoint()},
 		Stores:    []upspin.Endpoint{ctx.StoreEndpoint()},
-		PublicKey: factotum.PublicKey(),
+		PublicKey: f.PublicKey(),
 	}
 	err = key.Put(user)
 	if err != nil {
@@ -1050,11 +1039,17 @@ func newDirServerForTesting(t *testing.T, userName upspin.UserName) *server {
 	userCtx := context.New()
 	userCtx = context.SetUserName(userCtx, userName)
 	userCtx = context.SetDirEndpoint(userCtx, ctx.DirEndpoint())
+	userCtx = context.SetStoreEndpoint(userCtx, endpointInProcess)
+	f, err = factotum.NewFromDir(repo("key/testdata/bob"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	userCtx = context.SetFactotum(userCtx, f)
 	user = &upspin.User{
 		Name:      userName,
 		Dirs:      []upspin.Endpoint{userCtx.DirEndpoint()},
-		Stores:    []upspin.Endpoint{ctx.StoreEndpoint()},
-		PublicKey: factotum.PublicKey(), // doesn't matter
+		Stores:    []upspin.Endpoint{userCtx.StoreEndpoint()},
+		PublicKey: f.PublicKey(), // doesn't matter
 	}
 	err = key.Put(user)
 	if err != nil {
@@ -1074,7 +1069,7 @@ func newDirServerForTesting(t *testing.T, userName upspin.UserName) *server {
 	if err != nil {
 		t.Fatal(err)
 	}
-	return svr.(*server)
+	return svr.(*server), userCtx
 }
 
 func writeToStore(t *testing.T, ctx upspin.Context, data []byte) upspin.Location {

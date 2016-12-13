@@ -32,8 +32,8 @@ var defaultEnt = upspin.DirEntry{
 }
 
 func TestSnapshot(t *testing.T) {
-	s := newDirServerForTesting(t, canonicalUser)
-	snap := newDirServerForTesting(t, snapshotUser)
+	s, _ := newDirServerForTesting(t, canonicalUser)
+	snap, _ := newDirServerForTesting(t, snapshotUser)
 
 	create(t, s, canonicalUser+"/", isDir)
 	create(t, s, canonicalUser+"/dir", isDir)
@@ -108,7 +108,7 @@ func TestSnapshot(t *testing.T) {
 }
 
 func TestForceSnapshotVersioning(t *testing.T) {
-	s := newDirServerForTesting(t, snapshotUser)
+	s, _ := newDirServerForTesting(t, snapshotUser)
 	ents, err := s.Glob(snapshotUser + "/*/*/*")
 	if err != nil {
 		t.Fatal(err)
@@ -174,7 +174,7 @@ func TestForceSnapshotVersioning(t *testing.T) {
 }
 
 func TestForceSnapshot(t *testing.T) {
-	s := newDirServerForTesting(t, snapshotUser)
+	s, _ := newDirServerForTesting(t, snapshotUser)
 
 	ents, err := s.Glob(snapshotUser + "/*/*/*")
 	if err != nil {
@@ -202,7 +202,7 @@ func TestForceSnapshot(t *testing.T) {
 }
 
 func TestTriggerSnapshotWithPut(t *testing.T) {
-	s := newDirServerForTesting(t, snapshotUser)
+	s, _ := newDirServerForTesting(t, snapshotUser)
 
 	ents, err := s.Glob(snapshotUser + "/*/*/*")
 	if err != nil {
@@ -285,21 +285,21 @@ func TestTriggerSnapshotWithPut(t *testing.T) {
 
 func TestOnlyOwnerCanLookup(t *testing.T) {
 	// snapshotUser can Lookup.
-	s := newDirServerForTesting(t, snapshotUser)
+	s, _ := newDirServerForTesting(t, snapshotUser)
 	_, err := s.Lookup(snapshotUser + "/")
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// owner of snapshot can Lookup.
-	s = newDirServerForTesting(t, canonicalUser)
+	s, _ = newDirServerForTesting(t, canonicalUser)
 	_, err = s.Lookup(snapshotUser + "/")
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// no one else can.
-	s = newDirServerForTesting(t, "spy@nsa.gov")
+	s, _ = newDirServerForTesting(t, "spy@nsa.gov")
 	_, err = s.Lookup(snapshotUser + "/")
 	expectedErr := errors.E(upspin.PathName(snapshotUser+"/"), errPrivate)
 	if !errors.Match(expectedErr, err) {
@@ -309,21 +309,21 @@ func TestOnlyOwnerCanLookup(t *testing.T) {
 
 func TestOnlyOwnerCanGlob(t *testing.T) {
 	// snapshotUser can Glob.
-	s := newDirServerForTesting(t, snapshotUser)
+	s, _ := newDirServerForTesting(t, snapshotUser)
 	_, err := s.Glob(snapshotUser + "/*")
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// owner of snapshot can Glob.
-	s = newDirServerForTesting(t, canonicalUser)
+	s, _ = newDirServerForTesting(t, canonicalUser)
 	_, err = s.Glob(snapshotUser + "/*")
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// no one else can.
-	s = newDirServerForTesting(t, "spy@nsa.gov")
+	s, _ = newDirServerForTesting(t, "spy@nsa.gov")
 	_, err = s.Glob(snapshotUser + "/*")
 	expectedErr := errors.E(errNotExist, errors.E(upspin.PathName(snapshotUser+"/")))
 	if !errors.Match(expectedErr, err) {
@@ -340,7 +340,7 @@ func TestSnapshotIsReadOnly(t *testing.T) {
 		{canonicalUser, errReadOnly},
 		{"spy@kgb.ru", errPrivate},
 	} {
-		s := newDirServerForTesting(t, c.user)
+		s, _ := newDirServerForTesting(t, c.user)
 
 		// Ensures no user can:
 
@@ -372,7 +372,7 @@ func TestSnapshotIsReadOnly(t *testing.T) {
 }
 
 func TestSnapshotUserCanCreateSnapshotRoot(t *testing.T) {
-	s := newDirServerForTesting(t, "user+snapshot@example.com")
+	s, _ := newDirServerForTesting(t, "user+snapshot@example.com")
 	create(t, s, "user+snapshot@example.com/", isDir)
 }
 

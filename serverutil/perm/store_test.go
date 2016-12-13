@@ -9,6 +9,7 @@ import (
 
 	"upspin.io/access"
 	"upspin.io/errors"
+	"upspin.io/log"
 	"upspin.io/test/testenv"
 	"upspin.io/upspin"
 )
@@ -111,9 +112,11 @@ func TestStoreIncludeRemoteGroups(t *testing.T) {
 
 	r.As(owner)
 	r.MakeDirectory(groupDir)
-	r.Put(writersGroup, ownersContents)
 	r.Put(otherGroupFile, otherGroupContents)
-
+	r.Put(writersGroup, ownersContents)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
 	err = wait(store.perm, saved)
 	if err != nil {
 		t.Fatal(err)
