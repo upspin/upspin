@@ -42,9 +42,7 @@ See the description for rotate for information about updating keys.
 		fs.Usage()
 	}
 	switch *curveName {
-	case "p256":
-	case "p384":
-	case "p521":
+	case "p256", "p384", "p521":
 		// ok
 	default:
 		log.Printf("no such curve %q", *curveName)

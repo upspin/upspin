@@ -425,6 +425,16 @@ func (s *State) mkdirAllLocal(path string) {
 	}
 }
 
+func (s *State) shouldNotExist(path string) {
+	_, err := os.Stat(path)
+	if err == nil {
+		s.exitf("%s already exists", path)
+	}
+	if !os.IsNotExist(err) {
+		s.exit(err)
+	}
+}
+
 // intFlag returns the value of the named integer flag in the flag set.
 func intFlag(fs *flag.FlagSet, name string) int {
 	return fs.Lookup(name).Value.(flag.Getter).Get().(int)
