@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fae08f14_0c121778",
+        "filename": "metric/gcpsaver_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-14T23:10:59Z",
+      "side": 1,
+      "message": "Saying \"this is not flaky\" doesn\u0027t mean that it isn\u0027t flaky.\nThere\u0027s no reason why the other goroutine must have caught up by the time we reach line 108, so this test is by definition flaky.\n\nTo make it not flaky you need to put some hooks in to stub out the timer, as we did in that other change.",
+      "revId": "274cff7a62ef985e81adb790b12e48bea02185fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
