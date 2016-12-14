@@ -91,6 +91,7 @@ signup@key.upspin.io to complete the signup process.
 		Dir:       dirEndpoint,
 		Store:     storeEndpoint,
 		SecretDir: *where,
+		Packing:   "ee",
 	})
 	if err != nil {
 		s.exit(err)
@@ -144,6 +145,7 @@ type rcData struct {
 	UserName   upspin.UserName
 	Store, Dir *upspin.Endpoint
 	SecretDir  string
+	Packing    string
 }
 
 var rcTemplate = template.Must(template.New("rc").Parse(`
@@ -151,7 +153,7 @@ username: {{.UserName}}
 secrets: {{.SecretDir}}
 storeserver: {{.Store}}
 dirserver: {{.Dir}}
-packing: ee
+packing: {{.Packing}}
 `))
 
 type mailData struct {
