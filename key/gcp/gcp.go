@@ -157,7 +157,7 @@ func (s *server) canPut(op string, target upspin.UserName, isTargetNew bool) err
 	// owns the domain (and is thus allowed to create new users).
 	if !isTargetNew {
 		// Even domain admins cannot update their users.
-		return errors.E(op, errors.Permission, s.user)
+		return errors.E(op, errors.Exist, s.user)
 	}
 	err = s.verifyOwns(s.user, entry.User.PublicKey, domain)
 	if err == nil {
