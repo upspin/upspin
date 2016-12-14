@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa6def43_d370fef5",
+        "filename": "cmd/upspin/setupdomain.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-12-14T05:37:59Z",
+      "side": 1,
+      "message": "Most (all?) other commands don\u0027t leave a blank line here.",
+      "revId": "f35ab5a48320f2bc5fffe64d9af62aacabfb0689",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa6def43_339f92f0",
+        "filename": "cmd/upspin/setupdomain.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-12-14T05:37:59Z",
+      "side": 1,
+      "message": "the domain?",
+      "revId": "f35ab5a48320f2bc5fffe64d9af62aacabfb0689",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa6def43_53940ed0",
+        "filename": "cmd/upspin/setupdomain.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-12-14T05:37:59Z",
+      "side": 1,
+      "message": "s/be//",
+      "revId": "f35ab5a48320f2bc5fffe64d9af62aacabfb0689",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa6def43_73990a07",
+        "filename": "cmd/upspin/setupdomain.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-12-14T05:37:59Z",
+      "side": 1,
+      "message": "Then you probably want to update the style of keygen.go as well.",
+      "revId": "f35ab5a48320f2bc5fffe64d9af62aacabfb0689",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa6def43_b38aa2aa",
+        "filename": "cmd/upspin/setupdomain.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-12-14T05:37:59Z",
+      "side": 1,
+      "message": "Channelling my inner Rob (even though I can see the sarcasm in the message): present tense is now.",
+      "revId": "f35ab5a48320f2bc5fffe64d9af62aacabfb0689",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
