@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa6def43_30693d69",
+        "filename": "context/user.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-12-14T23:32:01Z",
+      "side": 1,
+      "message": "This is already in initcontext.go.",
+      "revId": "6c4a10d7d5e9e83b22c12c11aa4b87dcb2994e66",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
