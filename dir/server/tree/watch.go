@@ -34,8 +34,9 @@ const (
 )
 
 var (
-	errTimeout = errors.E(errors.IO, errors.Str("channel operation timed out"))
-	errClosed  = errors.E(errors.IO, errors.Str("channel closed"))
+	errTimeout  = errors.E(errors.IO, errors.Str("channel operation timed out"))
+	errClosed   = errors.E(errors.IO, errors.Str("channel closed"))
+	errNotExist = errors.E(errors.NotExist)
 )
 
 // watcher holds together the done channel and the event channel for a given
@@ -134,9 +135,13 @@ func (t *Tree) Watch(p path.Parsed, order int64, done <-chan struct{}) (<-chan *
 // t.mu must be held.
 func (t *Tree) addWatcher(p path.Parsed, w *watcher) error {
 	n, _, err := t.loadPath(p)
-	if err != nil {
+	if err != nil && !errors.Match(errNotExist, err) {
 		return err
 	}
+	if err != nil && n == nil {
+		return err
+	}
+	// Add watcher to node, or to an ancestor.
 	n.watchers = append(n.watchers, w)
 	return nil
 }
@@ -149,37 +154,40 @@ func (w *watcher) sendCurrentAndWatch(clone, orig *Tree, p path.Parsed, offset i
 	const op = "dir/server/tree.sendCurrentAndWatch"
 
 	n, _, err := clone.loadPath(p)
-	if err != nil {
-		log.Error.Printf("%s: %s", op, err)
+	if err != nil && !errors.Match(errNotExist, err) {
+		log.Error.Printf("%s: error loading path: %s", op, err)
 		w.sendError(err)
 		w.close()
 		return
 	}
-	fn := func(n *node, level int) error {
-		logEntry := &LogEntry{
-			Op:    Put,
-			Entry: n.entry,
+	// If p exists, traverse the sub-tree and send its current state on the
+	// events channel.
+	if err == nil {
+		fn := func(n *node, level int) error {
+			logEntry := &LogEntry{
+				Op:    Put,
+				Entry: n.entry,
+			}
+			err = w.sendEvent(logEntry, offset)
+			if err != nil {
+				return err
+			}
+			return nil
 		}
-		err = w.sendEvent(logEntry, offset)
+		err = clone.traverse(n, 0, fn)
 		if err != nil {
-			return err
+			log.Error.Printf("%s: error traversing tree: %s", op, err)
+			w.sendError(err)
+			w.close()
+			return
 		}
-		return nil
 	}
-	err = clone.traverse(n, 0, fn)
-	if err != nil {
-		log.Error.Printf("%s: %s", op, err)
-		w.sendError(err)
-		w.close()
-		return
-	}
-
 	// Set up the notification hook on the original tree. We must lock it.
 	orig.mu.Lock()
 	err = orig.addWatcher(p, w)
 	orig.mu.Unlock()
 	if err != nil {
-		log.Error.Printf("%s: %s", op, err)
+		log.Error.Printf("%s: error adding watcher: %s", op, err)
 		w.sendError(err)
 		w.close()
 		return
@@ -343,6 +351,30 @@ func removeDeadWatchers(n *node) {
 		curr++
 	}
 	n.watchers = n.watchers[:curr]
+}
+
+// moveDownWatchers moves watchers from the parent to the node if and only if
+// the parent watcher is watching node.
+func moveDownWatchers(node, parent *node) {
+	curr := 0
+	p, _ := path.Parse(node.entry.Name) // err can't happen.
+	for i := 0; i < len(parent.watchers); i++ {
+		w := parent.watchers[i]
+		if w.path.NElem() < p.NElem() {
+			curr++
+			continue
+		}
+		if w.path.First(p.NElem()).Path() == p.Path() {
+			// Move this watcher from the parent to the node.
+			node.watchers = append(node.watchers, w)
+			if i > curr {
+				parent.watchers[curr] = parent.watchers[i]
+			}
+			continue
+		}
+		curr++
+	}
+	parent.watchers = parent.watchers[:curr]
 }
 
 // notifyWatchers tells all watchers there are new entries in the log to be
