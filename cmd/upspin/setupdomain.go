@@ -5,6 +5,7 @@
 package main
 
 import (
+	"bytes"
 	"crypto/rand"
 	"flag"
 	"fmt"
@@ -125,14 +126,38 @@ set access controls.
 	}
 
 	// Generate rc files for those users.
-	err = ioutil.WriteFile(storeRC,
-		[]byte(fmt.Sprintf(rcFormat, "upspin-store", domain, domain, domain, "plain", storeServerPath)), 0600)
-	if err != nil {
+	dirEndpoint := upspin.Endpoint{
+		Transport: upspin.Remote,
+		NetAddr:   upspin.NetAddr("dir." + domain + ":443"),
+	}
+	storeEndpoint := upspin.Endpoint{
+		Transport: upspin.Remote,
+		NetAddr:   upspin.NetAddr("store." + domain + ":443"),
+	}
+	var dirBody bytes.Buffer
+	if err := rcTemplate.Execute(&dirBody, rcData{
+		UserName:  upspin.UserName("upspin-dir@" + domain),
+		Store:     &storeEndpoint,
+		Dir:       &dirEndpoint,
+		SecretDir: dirServerPath,
+		Packing:   "symm",
+	}); err != nil {
 		s.exit(err)
 	}
-	err = ioutil.WriteFile(dirRC,
-		[]byte(fmt.Sprintf(rcFormat, "upspin-dir", domain, domain, domain, "symm", dirServerPath)), 0600)
-	if err != nil {
+	if err := ioutil.WriteFile(dirRC, dirBody.Bytes(), 0644); err != nil {
+		s.exit(err)
+	}
+	var storeBody bytes.Buffer
+	if err := rcTemplate.Execute(&storeBody, rcData{
+		UserName:  upspin.UserName("upspin-store@" + domain),
+		Store:     &storeEndpoint,
+		Dir:       &dirEndpoint,
+		SecretDir: storeServerPath,
+		Packing:   "plain",
+	}); err != nil {
+		s.exit(err)
+	}
+	if err := ioutil.WriteFile(storeRC, storeBody.Bytes(), 0644); err != nil {
 		s.exit(err)
 	}
 
@@ -155,15 +180,6 @@ set access controls.
 		s.exit(err)
 	}
 }
-
-const (
-	rcFormat = `username: %s@%s
-dirserver: remote,dir.%s
-storeserver: remote,store.%s
-packing: %s
-secrets: %s
-`
-)
 
 type setupDomainData struct {
 	Dir, Where string
@@ -191,6 +207,7 @@ that {{.UserName}} is authorized to register users under {{.Domain}}.
 To register the users listed above, run this command:
 
 	$ upspin -project={{.Project}} setupdomain -where={{.Where}} -put-users {{.Domain}}
+
 `))
 
 // writeUserFile reads the specified rc file and writes a YAML-encoded
