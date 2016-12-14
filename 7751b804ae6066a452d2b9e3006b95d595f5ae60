@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fae08f14_cc308f1b",
+        "filename": "client/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-12-14T20:30:44Z",
+      "side": 1,
+      "message": "the accessEntry argument is unused now. delete it.",
+      "revId": "7751b804ae6066a452d2b9e3006b95d595f5ae60",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
