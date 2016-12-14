@@ -35,8 +35,6 @@ const (
 	isDir      = true
 )
 
-var errNotExist = errors.E(errors.NotExist)
-
 // This test checks the tree for log consistency by exercising the life-cycle of a tree,
 // from creating a new tree from scratch, adding new nodes, flushing it to Store then
 // adding more nodes to a new tree and having to load it from the Store.
