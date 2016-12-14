@@ -211,6 +211,9 @@ func (t *Tree) put(p path.Parsed, de *upspin.DirEntry) (*node, []*watcher, error
 	node := &node{
 		entry: *de,
 	}
+	// If any parent watchers were watching this node, move them to this
+	// node.
+	moveDownWatchers(node, parent)
 	err = t.addKid(node, p, parent, parentPath)
 	if err != nil {
 		return nil, watchers, err
@@ -342,9 +345,10 @@ func (t *Tree) setNodeDirtyAt(level int, n *node) {
 // loadPath ensures the tree contains all nodes up to p and returns p's node.
 // If any node is not already in memory, it is loaded from the store server.
 // If while loading the path a link is discovered, the link is returned and if
-// it's not the last element of the path, ErrFollowLink is returned. Along with
-// node, loadPath also returns all watchers on p's node and in all of p's node's
-// ancestors.
+// it's not the last element of the path, ErrFollowLink is returned. If the node
+// does not exist, loadPath returns a NotExist error and the closest existing
+// ancestor of p, if any. Along with node, loadPath also returns all watchers on
+// p's node and in all of p's node's ancestors.
 // t.mu must be held.
 func (t *Tree) loadPath(p path.Parsed) (*node, []*watcher, error) {
 	err := t.loadRoot()
@@ -356,7 +360,11 @@ func (t *Tree) loadPath(p path.Parsed) (*node, []*watcher, error) {
 	removeDeadWatchers(node)
 	watchers := append([]*watcher(nil), node.watchers...)
 	for i := 0; i < p.NElem(); i++ {
-		node, err = t.loadNode(node, p.Elem(i))
+		child, err := t.loadNode(node, p.Elem(i))
+		if errors.Match(errors.E(errors.NotExist), err) {
+			return node, watchers, err
+		}
+		node = child
 		if err != nil {
 			return node, watchers, err // err could be upspin.ErrFollowLink.
 		}
@@ -364,7 +372,7 @@ func (t *Tree) loadPath(p path.Parsed) (*node, []*watcher, error) {
 		watchers = append(watchers, node.watchers...)
 	}
 	if node.entry.Name != p.Path() {
-		return nil, watchers, errors.E(errors.NotExist, p.Path())
+		return node, watchers, errors.E(errors.NotExist, p.Path())
 	}
 	return node, watchers, nil
 }
@@ -588,6 +596,9 @@ func (t *Tree) delete(p path.Parsed) (*node, []*watcher, error) {
 
 	// If node was dirty, there's no need to flush it to Store ever.
 	t.removeFromDirtyList(p, node)
+
+	// If there were watchers on this node, move them to the parent.
+	parent.watchers = append(parent.watchers, node.watchers...)
 
 	// Update parent: mark it dirty and log its new version.
 	err = t.markDirty(parentPath)
