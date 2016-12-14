@@ -211,6 +211,9 @@ func (t *Tree) put(p path.Parsed, de *upspin.DirEntry) (*node, []*watcher, error
 	node := &node{
 		entry: *de,
 	}
+	// If any parent watchers were watching this node, move them to this
+	// node.
+	moveDownWatchers(node, parent)
 	err = t.addKid(node, p, parent, parentPath)
 	if err != nil {
 		return nil, watchers, err
@@ -342,9 +345,10 @@ func (t *Tree) setNodeDirtyAt(level int, n *node) {
 // loadPath ensures the tree contains all nodes up to p and returns p's node.
 // If any node is not already in memory, it is loaded from the store server.
 // If while loading the path a link is discovered, the link is returned and if
-// it's not the last element of the path, ErrFollowLink is returned. Along with
-// node, loadPath also returns all watchers on p's node and in all of p's node's
-// ancestors.
+// it's not the last element of the path, ErrFollowLink is returned. If the node
+// does not exist, loadPath returns a NotExist error and the lowest existing
+// ancestor of p, if any. Along with node, loadPath also returns all watchers on
+// p's node and in all of p's node's ancestors.
 // t.mu must be held.
 func (t *Tree) loadPath(p path.Parsed) (*node, []*watcher, error) {
 	err := t.loadRoot()
@@ -364,7 +368,7 @@ func (t *Tree) loadPath(p path.Parsed) (*node, []*watcher, error) {
 		watchers = append(watchers, node.watchers...)
 	}
 	if node.entry.Name != p.Path() {
-		return nil, watchers, errors.E(errors.NotExist, p.Path())
+		return node, watchers, errors.E(errors.NotExist, p.Path())
 	}
 	return node, watchers, nil
 }
@@ -385,25 +389,27 @@ func (t *Tree) loadDir(dir *node) error {
 
 // loadNode loads a child node of parent with the given path-wise element name,
 // loading it from storage if is not already loaded. If the parent node is a
-// link, ErrFollowLink is returned, along with the parent node itself.
+// link, ErrFollowLink is returned, along with the parent node itself. If the
+// element node does not exist, loadNode returns a NotExist error and the parent
+// node.
 // t.mu must be held.
 func (t *Tree) loadNode(parent *node, elem string) (*node, error) {
 	if parent.entry.IsLink() {
 		return parent, upspin.ErrFollowLink
 	}
 	if !parent.entry.IsDir() {
-		return nil, errors.E(errors.NotExist, path.Join(parent.entry.Name, elem))
+		return parent, errors.E(errors.NotExist, path.Join(parent.entry.Name, elem))
 	}
 	err := t.loadDir(parent)
 	if err != nil {
-		return nil, err
+		return parent, err
 	}
 	for dirName, node := range parent.kids {
 		if elem == dirName {
 			return node, nil
 		}
 	}
-	return nil, errors.E(errors.NotExist, path.Join(parent.entry.Name, elem))
+	return parent, errors.E(errors.NotExist, path.Join(parent.entry.Name, elem))
 }
 
 // loadKids loads all kids of a parent node from the Store.
@@ -582,12 +588,16 @@ func (t *Tree) delete(p path.Parsed) (*node, []*watcher, error) {
 		// Node is a non-empty directory.
 		return nil, watchers, errors.E(errors.NotEmpty, p.Path())
 	}
+
 	// Remove this elem from the parent's kids map.
 	// No need to check if it was there -- it wouldn't have loaded if it weren't.
 	delete(parent.kids, elem)
 
 	// If node was dirty, there's no need to flush it to Store ever.
 	t.removeFromDirtyList(p, node)
+
+	// If there were watchers on this node, move them to the parent.
+	parent.watchers = append(parent.watchers, node.watchers...)
 
 	// Update parent: mark it dirty and log its new version.
 	err = t.markDirty(parentPath)

@@ -8,6 +8,7 @@ import (
 	"testing"
 	"time"
 
+	"fmt"
 	"upspin.io/errors"
 	"upspin.io/upspin"
 )
@@ -224,6 +225,85 @@ func TestWatchFromCurrent(t *testing.T) {
 		t.Errorf("Expected no event, got %v", event)
 	case <-time.After(10 * time.Millisecond):
 		// Ok. Nothing should ever show up.
+	}
+}
+
+func TestWatchNonExistingNode(t *testing.T) {
+	context, log, logIndex := newConfigForTesting(t, userName)
+	tree, err := New(context, log, logIndex)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// A root must exist for a watcher.
+	_, err = tree.Put(newDirEntry("/", isDir, context))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Get a watcher for the current subtree, rooted at orig/sub1.
+	done := make(chan struct{})
+	ch, err := tree.Watch(mkpath(t, userName+"/orig/sub1"), -1, done)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a tree.
+
+	// Does not generate an event.
+	_, err = tree.Put(newDirEntry("/orig", isDir, context))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Does not generate an event.
+	_, err = tree.Put(newDirEntry("/orig/sub11", isDir, context))
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = tree.Put(newDirEntry("/orig/sub1", isDir, context))
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = tree.Put(newDirEntry("/orig/sub1/somefile.txt", !isDir, context))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Delete sub1 and re-create it. All generate an event except where
+	// marked.
+	_, err = tree.Delete(mkpath(t, userName+"/orig/sub1/somefile.txt"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = tree.Delete(mkpath(t, userName+"/orig/sub1"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Does not generate an event.
+	_, err = tree.Put(newDirEntry("/orig/somecrap", !isDir, context))
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = tree.Put(newDirEntry("/orig/sub1", isDir, context))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// We get notified of all deletions and the creation of sub1 again, but
+	// not the creation of a file not being watched.
+	for i, exp := range []struct {
+		name      upspin.PathName
+		isDelete  bool
+		hasBlocks bool
+	}{
+		{"/orig/sub1", !isDelete, !hasBlocks},
+		{"/orig/sub1/somefile.txt", !isDelete, hasBlocks},
+		{"/orig/sub1/somefile.txt", isDelete, hasBlocks},
+		{"/orig/sub1", isDelete, !hasBlocks},
+		{"/orig/sub1", !isDelete, !hasBlocks},
+	} {
+		event := <-ch
+		err = checkEvent(event, userName+exp.name, exp.isDelete, exp.hasBlocks)
+		if err != nil {
+			t.Errorf("%d: %s", i, err)
+		}
 	}
 }
 
