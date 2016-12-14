@@ -13,6 +13,9 @@ import (
 	"os"
 	"path/filepath"
 
+	yaml "gopkg.in/yaml.v2"
+
+	"upspin.io/context"
 	"upspin.io/flags"
 	"upspin.io/upspin"
 )
@@ -62,15 +65,27 @@ set access controls.
 		s.exitf("no such curve %q", *curveName)
 	}
 
-	dstDir := *where
-	dstDir = filepath.Join(dstDir, flags.Project)
-
-	dirServerPath := filepath.Join(dstDir, "dirserver")
-	storeServerPath := filepath.Join(dstDir, "storeserver")
+	var (
+		dirServerPath   = filepath.Join(*where, flags.Project, "dirserver")
+		storeServerPath = filepath.Join(*where, flags.Project, "storeserver")
+		dirRC           = filepath.Join(dirServerPath, "rc")
+		storeRC         = filepath.Join(storeServerPath, "rc")
+	)
 
 	if *putUsers {
-		s.exitf("at the present moment in time this is not now currently implemented, yet")
-		// However it may be, one day.
+		dirFile, dirUser, err := writeUserFile(dirRC)
+		if err != nil {
+			s.exit(err)
+		}
+		storeFile, storeUser, err := writeUserFile(storeRC)
+		if err != nil {
+			s.exit(err)
+		}
+		s.user("-put", "-in", dirFile)
+		os.Remove(dirFile)
+		s.user("-put", "-in", storeFile)
+		os.Remove(storeFile)
+		fmt.Printf("Successfully put %q and %q to the key server.\n", dirUser, storeUser)
 		return
 	}
 
@@ -110,12 +125,12 @@ set access controls.
 	}
 
 	// Generate rc files for those users.
-	err = ioutil.WriteFile(filepath.Join(storeServerPath, "rc"),
+	err = ioutil.WriteFile(storeRC,
 		[]byte(fmt.Sprintf(rcFormat, "upspin-store", domain, domain, domain, "plain", storeServerPath)), 0600)
 	if err != nil {
 		s.exit(err)
 	}
-	err = ioutil.WriteFile(filepath.Join(dirServerPath, "rc"),
+	err = ioutil.WriteFile(dirRC,
 		[]byte(fmt.Sprintf(rcFormat, "upspin-dir", domain, domain, domain, "symm", dirServerPath)), 0600)
 	if err != nil {
 		s.exit(err)
@@ -129,7 +144,7 @@ set access controls.
 	}
 
 	err = setupDomainTemplate.Execute(os.Stdout, setupDomainData{
-		Dir:       dstDir,
+		Dir:       filepath.Join(*where, flags.Project),
 		Where:     *where,
 		Domain:    domain,
 		Project:   flags.Project,
@@ -177,3 +192,27 @@ To register the users listed above, run this command:
 
 	$ upspin -project={{.Project}} setupdomain -where={{.Where}} -put-users {{.Domain}}
 `))
+
+func writeUserFile(rcFile string) (tmpFile string, u upspin.UserName, err error) {
+	ctx, err := context.FromFile(rcFile)
+	if err != nil {
+		return "", "", err
+	}
+	b, err := yaml.Marshal(context.User(ctx))
+	if err != nil {
+		return "", "", err
+	}
+	f, err := ioutil.TempFile("", "setupdomain-user")
+	if err != nil {
+		return "", "", err
+	}
+	if _, err := f.Write(b); err != nil {
+		os.Remove(f.Name())
+		return "", "", err
+	}
+	if err := f.Close(); err != nil {
+		os.Remove(f.Name())
+		return "", "", err
+	}
+	return f.Name(), ctx.UserName(), nil
+}
