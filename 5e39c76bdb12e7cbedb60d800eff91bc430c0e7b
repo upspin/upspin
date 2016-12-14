@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa6def43_704f35b0",
+        "filename": "cmd/upspin/setupdomain.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-12-14T23:53:21Z",
+      "side": 1,
+      "message": "s/1h/15m/ ?",
+      "revId": "5e39c76bdb12e7cbedb60d800eff91bc430c0e7b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
