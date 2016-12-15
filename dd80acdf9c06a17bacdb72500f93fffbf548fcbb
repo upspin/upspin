@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa6def43_4b6b67d1",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-12-15T21:59:42Z",
+      "side": 1,
+      "message": "Clarify comment to indicate this shuts down the entire cacheserver.",
+      "revId": "dd80acdf9c06a17bacdb72500f93fffbf548fcbb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa6def43_2b7d4b84",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-12-15T21:59:42Z",
+      "side": 1,
+      "message": "comment on meaning of order",
+      "revId": "dd80acdf9c06a17bacdb72500f93fffbf548fcbb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
