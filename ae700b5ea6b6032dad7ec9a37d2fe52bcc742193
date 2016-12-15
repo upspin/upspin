@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fae08f14_2ce4b320",
+        "filename": "metric/gcpsaver.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-15T05:16:05Z",
+      "side": 1,
+      "message": "Don\u0027t add this all to the package when it\u0027s not under test.\n\nJust do something like this\n\nvar onFlush \u003d func() {} // test hook\n\nand then override that in the test with something like this\n\nflushed :\u003d make(chan bool)\nonFlush \u003d func() { flushed \u003c- true }\ndefer func() { onFlush \u003d func() {} }\n\nand then when you want to wait for a flush\n\n\u003c-flushed",
+      "revId": "ae700b5ea6b6032dad7ec9a37d2fe52bcc742193",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fae08f14_0ce1f710",
+        "filename": "metric/gcpsaver_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-15T05:16:05Z",
+      "side": 1,
+      "message": "why would a flush occur more than twice if you only push two metrics in?\n100 seems unnecessarily large here",
+      "revId": "ae700b5ea6b6032dad7ec9a37d2fe52bcc742193",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
