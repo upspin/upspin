@@ -27,6 +27,10 @@ import (
 
 	// We need the directory transports to fetch write permissions.
 	_ "upspin.io/transports"
+
+	// Load packers for reading Access and Group files.
+	_ "upspin.io/pack/eeintegrity"
+	_ "upspin.io/pack/plain"
 )
 
 const serverName = "storeserver"
