@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "fa6def43_6acca17c",
+        "filename": "metric/gcpsaver.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-12-15T19:05:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fae08f14_2ce4b320",
+      "revId": "ae700b5ea6b6032dad7ec9a37d2fe52bcc742193",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "fae08f14_0ce1f710",
         "filename": "metric/gcpsaver_test.go",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2016-12-15T05:16:05Z",
       "side": 1,
       "message": "why would a flush occur more than twice if you only push two metrics in?\n100 seems unnecessarily large here",
+      "revId": "ae700b5ea6b6032dad7ec9a37d2fe52bcc742193",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa6def43_aad69905",
+        "filename": "metric/gcpsaver_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-12-15T19:05:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fae08f14_0ce1f710",
       "revId": "ae700b5ea6b6032dad7ec9a37d2fe52bcc742193",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
