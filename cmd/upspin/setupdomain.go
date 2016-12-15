@@ -200,7 +200,7 @@ To prove that {{.UserName}} is the owner of {{.Domain}},
 add the following record to {{.Domain}}'s DNS zone:
 
 	NAME	TYPE	TTL	DATA
-	@	TXT	1h	upspin:{{.Signature}}
+	@	TXT	15m	upspin:{{.Signature}}
 
 Once the DNS change propagates the key server will use the TXT record to verify
 that {{.UserName}} is authorized to register users under {{.Domain}}.
