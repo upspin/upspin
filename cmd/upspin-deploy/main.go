@@ -65,7 +65,7 @@ var (
 	prefix = flag.String("prefix", "", "A `string` that begins all resource names")
 	domain = flag.String("domain", "", "The base domain `name` for the Upspin services")
 
-	machineType = flag.String("machinetype", "n1-standard-1", "GCP machine type for servers")
+	machineType = flag.String("machinetype", "g1-small", "GCP machine type for servers")
 
 	keyserver = flag.String("keyserver", defaultKeyServer, "Key server `host:port` (empty means use this cluster's KeyServer)")
 
