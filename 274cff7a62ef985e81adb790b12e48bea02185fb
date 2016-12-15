@@ -16,6 +16,24 @@
       "revId": "274cff7a62ef985e81adb790b12e48bea02185fb",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa6def43_b6ca863c",
+        "filename": "metric/gcpsaver_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-12-15T00:48:54Z",
+      "side": 1,
+      "message": "Done (if you\u0027re interested,  I can prove to you it\u0027s not flaky even if you run on a 2Hz calculator. But the discussion is moot now)",
+      "parentUuid": "fae08f14_0c121778",
+      "revId": "274cff7a62ef985e81adb790b12e48bea02185fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
