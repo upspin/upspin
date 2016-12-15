@@ -33,7 +33,6 @@ import (
 	cloudtrace "google.golang.org/api/cloudtrace/v1"
 	compute "google.golang.org/api/compute/v1"
 	container "google.golang.org/api/container/v1"
-	dns "google.golang.org/api/dns/v1"
 	"google.golang.org/api/googleapi"
 	"google.golang.org/api/iterator"
 	"google.golang.org/api/option"
@@ -148,6 +147,9 @@ func main() {
 			log.Fatal(err)
 		}
 	}
+	if *create {
+		cfg.PrintDNSAdvisory()
+	}
 }
 
 func mustProvideFlag(f *string, name string) {
@@ -247,11 +249,7 @@ func (c *Config) Create() error {
 
 	count++
 	go func() {
-		if err := wrap("addresses", c.createAddresses()); err != nil {
-			errc <- err
-			return
-		}
-		errc <- wrap("zone", c.createZone())
+		errc <- wrap("addresses", c.createAddresses())
 	}()
 
 	count++
@@ -288,11 +286,6 @@ func (c *Config) Delete() error {
 	count++
 	go func() {
 		errc <- wrap("addresses", c.deleteAddresses())
-	}()
-
-	count++
-	go func() {
-		errc <- wrap("zone", c.deleteZone())
 	}()
 
 	// Wait for the above concurrent tasks to complete.
@@ -964,116 +957,6 @@ func (c *Config) deleteAddresses() error {
 	return nil
 }
 
-func (c *Config) zoneName() string {
-	return c.Prefix + "zone"
-}
-
-func (c *Config) createZone() error {
-	name := c.zoneName()
-	log.Printf("Creating zone %q", name)
-
-	svc, err := dnsService()
-	if err != nil {
-		return err
-	}
-
-	zone := &dns.ManagedZone{
-		DnsName:     c.Domain + ".",
-		Name:        name,
-		Description: "upspin cluster",
-	}
-	zone, err = svc.ManagedZones.Create(c.Project, zone).Do()
-	err = okReason("alreadyExists", err)
-	if err != nil {
-		return err
-	}
-
-	addrs := map[string]string{} // [host]ip
-	var records []*dns.ResourceRecordSet
-	for _, s := range c.servers() {
-		ip, err := c.ipAddress(s)
-		if err != nil {
-			return err
-		}
-		host := c.hostName(s)
-		records = append(records, &dns.ResourceRecordSet{
-			Name:    host + ".",
-			Type:    "A",
-			Rrdatas: []string{ip},
-		})
-		addrs[host] = ip
-	}
-
-	change := &dns.Change{Additions: records}
-	change, err = svc.Changes.Create(c.Project, name, change).Do()
-	for err == nil && change.Status == "pending" {
-		time.Sleep(1 * time.Second)
-		change, err = svc.Changes.Get(c.Project, name, change.Id).Do()
-	}
-	if err := okReason("alreadyExists", err); err != nil {
-		return err
-	}
-
-	if zone != nil {
-		fmt.Print("\n==== User action required ===\n\n")
-		fmt.Println("Please configure your registrar to delegate the domain")
-		fmt.Printf("\t%s\n", c.Domain)
-		fmt.Println("to these name servers:")
-		for _, s := range zone.NameServers {
-			fmt.Printf("\t%s\n", s)
-		}
-		fmt.Println()
-		fmt.Println("Alternatively, if you want to use your own name servers,")
-		fmt.Println("add A records for these hosts and IP addresses:")
-		for host, ip := range addrs {
-			fmt.Printf("\t%s\t%s\n", ip, host)
-		}
-		fmt.Println()
-	}
-
-	return nil
-}
-
-func (c *Config) deleteZone() error {
-	name := c.zoneName()
-	log.Printf("Deleting zone %q", name)
-
-	svc, err := dnsService()
-	if err != nil {
-		return err
-	}
-
-	// List and delete records first.
-	var records []*dns.ResourceRecordSet
-	ctx := context.Background()
-	err = svc.ResourceRecordSets.List(c.Project, name).Pages(ctx, func(resp *dns.ResourceRecordSetsListResponse) error {
-		for _, r := range resp.Rrsets {
-			if r.Type != "A" {
-				continue
-			}
-			records = append(records, r)
-		}
-		return nil
-	})
-	err = okReason("notFound", err)
-	if err != nil {
-		return err
-	}
-	if len(records) > 0 {
-		change := &dns.Change{Deletions: records}
-		change, err = svc.Changes.Create(c.Project, name, change).Do()
-		for err == nil && change.Status == "pending" {
-			time.Sleep(1 * time.Second)
-			change, err = svc.Changes.Get(c.Project, name, change.Id).Do()
-		}
-		if err = okReason("notFound", err); err != nil {
-			return err
-		}
-	}
-
-	return okReason("notFound", svc.ManagedZones.Delete(c.Project, name).Do())
-}
-
 func (c *Config) diskName(suffix string) string {
 	return c.Prefix + suffix
 }
@@ -1109,6 +992,26 @@ func (c *Config) deleteDisks() error {
 	return okReason("notFound", c.waitOp(svc, op, err))
 }
 
+func (c *Config) PrintDNSAdvisory() error {
+	addrs := make(map[string]string) // [host]ip
+	for _, s := range c.servers() {
+		host := c.hostName(s)
+		ip, err := c.ipAddress(s)
+		if err != nil {
+			return err
+		}
+		addrs[host] = ip
+	}
+	fmt.Print("\n==== User action required ===\n\n")
+	fmt.Println("You must configure your domain name servers to describe the")
+	fmt.Println("new servers by adding A records for these hosts and IP addresses:")
+	for host, ip := range addrs {
+		fmt.Printf("\t%s\t%s\n", ip, host)
+	}
+	fmt.Println()
+	return nil
+}
+
 func containerService() (*container.Service, error) {
 	client, err := google.DefaultClient(context.Background(), container.CloudPlatformScope)
 	if err != nil {
@@ -1123,14 +1026,6 @@ func computeService() (*compute.Service, error) {
 		return nil, err
 	}
 	return compute.New(client)
-}
-
-func dnsService() (*dns.Service, error) {
-	client, err := google.DefaultClient(context.Background(), compute.ComputeScope)
-	if err != nil {
-		return nil, err
-	}
-	return dns.New(client)
 }
 
 func (c *Config) waitOp(svc *compute.Service, op *compute.Operation, err error) error {
