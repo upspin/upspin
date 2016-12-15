@@ -23,22 +23,22 @@ const (
 	writersGroup = groupDir + "/" + WritersGroupFile
 )
 
-func TestCantFindFileDenyAll(t *testing.T) {
+func TestCantFindFileAllowsAll(t *testing.T) {
 	ownerEnv := setupEnv(t)
 	perm, err := New(ownerEnv.Context, owner, ownerEnv.DirServer.Lookup, ownerEnv.DirServer.Watch)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	// Everyone is denied, since we can't read the owner file.
+	// Everyone is allowed, since we can't read the owner file.
 	for _, user := range []upspin.UserName{
 		owner,
 		writer,
 		"foo@bar.com",
 		"nobody@nobody.org",
 	} {
-		if perm.IsWriter(user) {
-			t.Errorf("user %q is allowed; expected not allowed", user)
+		if !perm.IsWriter(user) {
+			t.Errorf("IsWriter(%q)=false, want true", user)
 		}
 	}
 
