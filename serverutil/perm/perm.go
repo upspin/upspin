@@ -75,9 +75,7 @@ func New(ctx upspin.Context, target upspin.UserName, lookup LookupFunc, watch Wa
 		targetFile: upspin.PathName(target) + "/Group/" + WritersGroupFile,
 		lookup:     lookup,
 		watch:      watch,
-		// Until we can prove the targetFile does not exist, we prohibit
-		// writes. An empty map means no one is allowed.
-		writers: make(map[upspin.UserName]bool),
+		writers:    nil, // Start open.
 	}
 
 	p.eventCond = sync.NewCond(&p.mu)
