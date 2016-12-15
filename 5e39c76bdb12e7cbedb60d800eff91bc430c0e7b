@@ -34,6 +34,23 @@
       "revId": "5e39c76bdb12e7cbedb60d800eff91bc430c0e7b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "fa6def43_f037a59a",
+        "filename": "cmd/upspin/signup.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-12-15T00:20:49Z",
+      "side": 1,
+      "message": "I was planning to change the existing behavior so that we don\u0027t emit rc lines that have the default value.   (Keyserver was already taken care of, but \"secrets:\" recently crept in.)",
+      "revId": "5e39c76bdb12e7cbedb60d800eff91bc430c0e7b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
