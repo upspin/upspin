@@ -14,6 +14,7 @@ import (
 
 	"upspin.io/context"
 	"upspin.io/errors"
+	"upspin.io/log"
 	"upspin.io/upspin"
 )
 
@@ -131,6 +132,7 @@ var names = []string{
 }
 
 func TestLogFile(t *testing.T) {
+	log.SetLevel("debug")
 	dir, err := ioutil.TempDir("/tmp", "dircacheserverlog")
 	if err != nil {
 		t.Fatal("creating test directory")
@@ -189,11 +191,11 @@ func TestLogFile(t *testing.T) {
 		_, _, ok := l.lookup(good.name)
 		if i == 0 {
 			if !ok {
-				t.Errorf("%s: expected but not found", &good)
+				t.Errorf("%s: expected but not found", good)
 			}
 		} else {
 			if ok {
-				t.Errorf("%s: not expected but found", &good)
+				t.Errorf("%s: not expected but found", good)
 			}
 		}
 	}
@@ -209,11 +211,11 @@ func TestLogFile(t *testing.T) {
 		_, _, ok := l.lookup(good.name)
 		if i == 0 {
 			if !ok {
-				t.Errorf("%s: expected but not found", &good)
+				t.Errorf("%s: expected but not found", good)
 			}
 		} else {
 			if ok {
-				t.Errorf("%s: not expected but found", &good)
+				t.Errorf("%s: not expected but found", good)
 			}
 		}
 	}

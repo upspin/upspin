@@ -28,8 +28,8 @@ type server struct {
 	ctx  upspin.Context
 	clog *clog
 
-	// userToDirServerMapping is a mapping of users to directory server endpoints
-	userToDirServerMapping *userToDirServerMapping
+	// userToDirServer is a mapping of users to directory server endpoints
+	userToDirServer *userToDirServer
 
 	// For session handling and the Ping GRPC method.
 	auth.Server
@@ -41,16 +41,16 @@ func New(ctx upspin.Context) (proto.DirServer, error) {
 	if len(homeDir) == 0 {
 		return nil, errors.Str("$HOME not defined")
 	}
-	userToDirServerMapping := newUserToDirServerMapping()
-	clog, err := openLog(ctx, ospath.Join(homeDir, "upspin/dircache"), 20*1024*1024, userToDirServerMapping)
+	userToDirServer := newUserToDirServer()
+	clog, err := openLog(ctx, ospath.Join(homeDir, "upspin/dircache"), 20*1024*1024, userToDirServer)
 	if err != nil {
 		return nil, err
 	}
 	return &server{
-		ctx:  ctx,
-		clog: clog,
-		userToDirServerMapping: userToDirServerMapping,
-		Server:                 auth.NewServer(ctx, nil),
+		ctx:             ctx,
+		clog:            clog,
+		userToDirServer: userToDirServer,
+		Server:          auth.NewServer(ctx, nil),
 	}, nil
 }
 
@@ -67,7 +67,7 @@ func (s *server) dirFor(ctx gContext.Context, path upspin.PathName) (upspin.DirS
 	}
 	dir, err := bind.DirServer(s.ctx, ep)
 	if err == nil {
-		s.userToDirServerMapping.Set(path, &ep)
+		s.userToDirServer.Set(path, &ep)
 	}
 	return dir, err
 }
@@ -264,17 +264,17 @@ func globError(err error) *proto.EntriesError {
 	return &proto.EntriesError{Error: errors.MarshalError(err)}
 }
 
-// userToDirServerMapping is a cache from user name to the endpoing of its directory server.
-type userToDirServerMapping struct {
+// userToDirServer is a cache from user name to the endpoint of its directory server.
+type userToDirServer struct {
 	sync.Mutex
 	m map[upspin.UserName]*upspin.Endpoint
 }
 
-func newUserToDirServerMapping() *userToDirServerMapping {
-	return &userToDirServerMapping{m: make(map[upspin.UserName]*upspin.Endpoint)}
+func newUserToDirServer() *userToDirServer {
+	return &userToDirServer{m: make(map[upspin.UserName]*upspin.Endpoint)}
 }
 
-func (c *userToDirServerMapping) Set(p upspin.PathName, ep *upspin.Endpoint) {
+func (c *userToDirServer) Set(p upspin.PathName, ep *upspin.Endpoint) {
 	c.Lock()
 	if parsed, err := path.Parse(p); err == nil {
 		c.m[parsed.User()] = ep
@@ -284,7 +284,7 @@ func (c *userToDirServerMapping) Set(p upspin.PathName, ep *upspin.Endpoint) {
 	c.Unlock()
 }
 
-func (c *userToDirServerMapping) Get(p upspin.PathName) *upspin.Endpoint {
+func (c *userToDirServer) Get(p upspin.PathName) *upspin.Endpoint {
 	c.Lock()
 	defer c.Unlock()
 	if parsed, err := path.Parse(p); err == nil {
