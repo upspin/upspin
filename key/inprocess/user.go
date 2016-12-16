@@ -83,8 +83,8 @@ func (s *server) Put(u *upspin.User) error {
 		return errors.E(op, errors.Invalid, u.Name, errors.Str("user has wildcard '*' in name"))
 	}
 
-	s.db.mu.RLock()
-	defer s.db.mu.RUnlock()
+	s.db.mu.Lock()
+	defer s.db.mu.Unlock()
 	s.db.users[u.Name] = dup(u)
 	return nil
 }
