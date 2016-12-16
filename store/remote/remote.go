@@ -136,7 +136,7 @@ func (r *remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service
 
 	// First try a cache
 	if svc := dialCache(op, context, e); svc != nil {
-		return r, nil
+		return svc, nil
 	}
 
 	// Call the server directly.
