@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "5a56fbee_f244a6ba",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 349,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-12-16T03:56:13Z",
+      "side": 1,
+      "message": "Sorry, I think of a tree in terms of the branches \"going down\". The \"lowest\" is the closest to the node indeed.\nDone.",
+      "parentUuid": "5a56fbee_72b6f6b8",
+      "revId": "c6cf654cb041d3806f866e3005694939881e9056",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da93cbd8_9bbaaba2",
         "filename": "dir/server/tree/tree.go",
         "patchSetId": 2
@@ -48,6 +66,24 @@
       "writtenOn": "2016-12-16T03:15:39Z",
       "side": 1,
       "message": "Why this change?\nIf you only care about this behavior in that one place in loadPath, then that code can be written as\n\nchild, err :\u003d t.loadNode(node, p.Elem(i))\nif errors.Match(errors.E(errors.NotExist), err) {\n  return node, watchers, err\n}\nif err !\u003d nil {\n  return child, watchers, err  \n}\nnode \u003d child",
+      "revId": "c6cf654cb041d3806f866e3005694939881e9056",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a56fbee_328b8eb2",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 393,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-12-16T03:56:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da93cbd8_9bbaaba2",
       "revId": "c6cf654cb041d3806f866e3005694939881e9056",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -71,6 +107,24 @@
     },
     {
       "key": {
+        "uuid": "5a56fbee_d29322e7",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 363,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-12-16T03:56:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da93cbd8_bbbf6791",
+      "revId": "c6cf654cb041d3806f866e3005694939881e9056",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da93cbd8_dbc43334",
         "filename": "dir/server/tree/watch.go",
         "patchSetId": 2
@@ -82,6 +136,24 @@
       "writtenOn": "2016-12-16T03:15:39Z",
       "side": 1,
       "message": "I don\u0027t understand the logic here. It needs some comments.",
+      "revId": "c6cf654cb041d3806f866e3005694939881e9056",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5a56fbee_128e8ac1",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2016-12-16T03:56:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da93cbd8_dbc43334",
       "revId": "c6cf654cb041d3806f866e3005694939881e9056",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
