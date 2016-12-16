@@ -130,18 +130,14 @@ func getBuildID(op *cloudbuild.Operation) (string, error) {
 	if op.Metadata == nil {
 		return "", errors.New("missing Metadata in operation")
 	}
-	if m, ok := op.Metadata.(map[string]interface{}); ok {
-		b, err := json.Marshal(m["build"])
-		if err != nil {
-			return "", err
-		}
-		build := &cloudbuild.Build{}
-		if err := json.Unmarshal(b, &build); err != nil {
-			return "", err
-		}
-		return build.Id, nil
+	var buildMeta cloudbuild.BuildOperationMetadata
+	if err := json.Unmarshal([]byte(op.Metadata), &buildMeta); err != nil {
+		return "", err
 	}
-	return "", errors.New("unknown type for op")
+	if buildMeta.Build == nil {
+		return "", errors.New("missing Build in operation metadata")
+	}
+	return buildMeta.Build.Id, nil
 }
 
 func uploadTar(ctx context.Context, root string, hc *http.Client, bucket string, objectName string) error {
