@@ -28,8 +28,8 @@ type server struct {
 	ctx  upspin.Context
 	clog *clog
 
-	// epMap is a map of users to endpoints
-	epMap *epMap
+	// userToDirServerMapping is a mapping of users to directory server endpoints
+	userToDirServerMapping *userToDirServerMapping
 
 	// For session handling and the Ping GRPC method.
 	grpcauth.Server
@@ -41,16 +41,16 @@ func New(ctx upspin.Context, authServer grpcauth.Server) (proto.DirServer, error
 	if len(homeDir) == 0 {
 		return nil, errors.Str("$HOME not defined")
 	}
-	epMap := newEpMap()
-	clog, err := openLog(ctx, ospath.Join(homeDir, "upspin/dircache"), 20*1024*1024, epMap)
+	userToDirServerMapping := newUserToDirServerMapping()
+	clog, err := openLog(ctx, ospath.Join(homeDir, "upspin/dircache"), 20*1024*1024, userToDirServerMapping)
 	if err != nil {
 		return nil, err
 	}
 	return &server{
-		ctx:    ctx,
-		clog:   clog,
-		epMap:  epMap,
-		Server: authServer,
+		ctx:  ctx,
+		clog: clog,
+		userToDirServerMapping: userToDirServerMapping,
+		Server:                 authServer,
 	}, nil
 }
 
@@ -67,7 +67,7 @@ func (s *server) dirFor(ctx gContext.Context, path upspin.PathName) (upspin.DirS
 	}
 	dir, err := bind.DirServer(s.ctx, ep)
 	if err == nil {
-		s.epMap.Set(path, &ep)
+		s.userToDirServerMapping.Set(path, &ep)
 	}
 	return dir, err
 }
@@ -98,10 +98,8 @@ func (s *server) Lookup(ctx gContext.Context, req *proto.DirLookupRequest) (*pro
 		return entryError(nil, err)
 	}
 
-	lock := s.clog.lock(name)
-	defer s.clog.unlock(lock)
-	if e := s.clog.lookup(name); e != nil {
-		return entryError(e.de, e.error)
+	if de, err, ok := s.clog.lookup(name); ok {
+		return entryError(de, err)
 	}
 
 	de, err := dir.Lookup(name)
@@ -121,10 +119,8 @@ func (s *server) Glob(ctx gContext.Context, req *proto.DirGlobRequest) (*proto.E
 		return entriesError(nil, err)
 	}
 
-	lock := s.clog.lock(name)
-	defer s.clog.unlock(lock)
-	if e, entries := s.clog.lookupGlob(name); e != nil {
-		return entriesError(entries, e.error)
+	if entries, err, ok := s.clog.lookupGlob(name); ok {
+		return entriesError(entries, err)
 	}
 
 	entries, globReqErr := dir.Glob(string(name))
@@ -149,8 +145,6 @@ func (s *server) Put(ctx gContext.Context, req *proto.DirPutRequest) (*proto.Ent
 		return entryError(nil, err)
 	}
 
-	lock := s.clog.lock(entry.Name)
-	defer s.clog.unlock(lock)
 	de, err := dir.Put(entry)
 	s.clog.logRequest(putReq, entry.Name, err, de)
 
@@ -168,8 +162,6 @@ func (s *server) Delete(ctx gContext.Context, req *proto.DirDeleteRequest) (*pro
 		return entryError(nil, err)
 	}
 
-	lock := s.clog.lock(name)
-	defer s.clog.unlock(lock)
 	de, err := dir.Delete(name)
 	s.clog.logRequest(deleteReq, name, err, de)
 
@@ -187,8 +179,6 @@ func (s *server) WhichAccess(ctx gContext.Context, req *proto.DirWhichAccessRequ
 		return entryError(nil, err)
 	}
 
-	lock := s.clog.lock(name)
-	defer s.clog.unlock(lock)
 	if de, ok := s.clog.whichAccess(name); ok {
 		return entryError(de, nil)
 	}
@@ -274,30 +264,32 @@ func globError(err error) *proto.EntriesError {
 	return &proto.EntriesError{Error: errors.MarshalError(err)}
 }
 
-// epMap is a cache from user name to the endpoing of its directory server.
-type epMap struct {
+// userToDirServerMapping is a cache from user name to the endpoing of its directory server.
+type userToDirServerMapping struct {
 	sync.Mutex
 	m map[upspin.UserName]*upspin.Endpoint
 }
 
-func newEpMap() *epMap {
-	return &epMap{m: make(map[upspin.UserName]*upspin.Endpoint)}
+func newUserToDirServerMapping() *userToDirServerMapping {
+	return &userToDirServerMapping{m: make(map[upspin.UserName]*upspin.Endpoint)}
 }
 
-func (c *epMap) Set(p upspin.PathName, ep *upspin.Endpoint) {
+func (c *userToDirServerMapping) Set(p upspin.PathName, ep *upspin.Endpoint) {
 	c.Lock()
-	if parsed, err := path.Parse(p); err != nil {
+	if parsed, err := path.Parse(p); err == nil {
 		c.m[parsed.User()] = ep
+	} else {
+		log.Info.Printf("parse error on a cleaned name: %s", p)
 	}
 	c.Unlock()
 }
 
-func (c *epMap) Get(p upspin.PathName) *upspin.Endpoint {
+func (c *userToDirServerMapping) Get(p upspin.PathName) *upspin.Endpoint {
 	c.Lock()
 	defer c.Unlock()
 	if parsed, err := path.Parse(p); err == nil {
-		return nil
-	} else {
 		return c.m[parsed.User()]
 	}
+	log.Info.Printf("parse error on a cleaned name: %s", p)
+	return nil
 }
