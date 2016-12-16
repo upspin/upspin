@@ -39,7 +39,7 @@ var _ upspin.DirServer = (*remote)(nil)
 
 // Glob implements upspin.DirServer.Glob.
 func (r *remote) Glob(pattern string) ([]*upspin.DirEntry, error) {
-	op := opf("Glob", "%q", pattern)
+	op := r.opf("Glob", "%q", pattern)
 
 	gCtx, callOpt, finishAuth, err := r.NewAuthContext()
 	if err != nil {
@@ -75,7 +75,7 @@ func entryName(entry *upspin.DirEntry) string {
 
 // Put implements upspin.DirServer.Put.
 func (r *remote) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
-	op := opf("Put", "%s", entryName(entry))
+	op := r.opf("Put", "%s", entryName(entry))
 
 	gCtx, callOpt, finishAuth, err := r.NewAuthContext()
 	if err != nil {
@@ -96,7 +96,7 @@ func (r *remote) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 
 // WhichAccess implements upspin.DirServer.WhichAccess.
 func (r *remote) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, error) {
-	op := opf("WhichAccess", "%q", pathName)
+	op := r.opf("WhichAccess", "%q", pathName)
 
 	gCtx, callOpt, finishAuth, err := r.NewAuthContext()
 	if err != nil {
@@ -113,7 +113,7 @@ func (r *remote) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, error)
 
 // Delete implements upspin.DirServer.Delete.
 func (r *remote) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
-	op := opf("Delete", "%q", pathName)
+	op := r.opf("Delete", "%q", pathName)
 
 	gCtx, callOpt, finishAuth, err := r.NewAuthContext()
 	if err != nil {
@@ -130,7 +130,7 @@ func (r *remote) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
 
 // Lookup implements upspin.DirServer.Lookup.
 func (r *remote) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
-	op := opf("Lookup", "%q", pathName)
+	op := r.opf("Lookup", "%q", pathName)
 
 	gCtx, callOpt, finishAuth, err := r.NewAuthContext()
 	if err != nil {
@@ -147,7 +147,7 @@ func (r *remote) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 
 // Watch implements upspin.DirServer.
 func (r *remote) Watch(name upspin.PathName, order int64, done <-chan struct{}) (<-chan upspin.Event, error) {
-	op := opf("Watch", "%q %d", name, order)
+	op := r.opf("Watch", "%q %d", name, order)
 
 	gCtx, callOpt, finishAuth, err := r.NewAuthContext()
 	if err != nil {
@@ -275,16 +275,15 @@ func dialCache(op *operation, context upspin.Context, proxyFor upspin.Endpoint) 
 }
 
 // Dial implements upspin.Service.
-func (*remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
-	op := opf("Dial", "%q, %q", context.UserName(), e)
+func (r *remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+	op := r.opf("Dial", "%q, %q", context.UserName(), e)
 
 	if e.Transport != upspin.Remote {
 		return nil, op.error(errors.Invalid, errors.Str("unrecognized transport"))
 	}
 
 	// First try a cache
-	r := dialCache(op, context, e)
-	if r != nil {
+	if svc := dialCache(op, context, e); svc != nil {
 		return r, nil
 	}
 
@@ -326,8 +325,10 @@ func unmarshalError(b []byte) error {
 	return err
 }
 
-func opf(method string, format string, args ...interface{}) *operation {
-	op := &operation{"dir/remote." + method, fmt.Sprintf(format, args...)}
+func (r *remote) opf(method string, format string, args ...interface{}) *operation {
+	ep := r.ctx.endpoint.String()
+	s := fmt.Sprintf("dir/remote.%s(%q)", method, ep)
+	op := &operation{s, fmt.Sprintf(format, args...)}
 	log.Debug.Print(op)
 	return op
 }

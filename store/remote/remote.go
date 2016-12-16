@@ -34,7 +34,7 @@ var _ upspin.StoreServer = (*remote)(nil)
 
 // Get implements upspin.StoreServer.Get.
 func (r *remote) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Location, error) {
-	op := opf("Get", "%q", ref)
+	op := r.opf("Get", "%q", ref)
 
 	gCtx, callOpt, finishAuth, err := r.NewAuthContext()
 	if err != nil {
@@ -56,7 +56,7 @@ func (r *remote) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Lo
 
 // Put implements upspin.StoreServer.Put.
 func (r *remote) Put(data []byte) (*upspin.Refdata, error) {
-	op := opf("Put", "%v bytes", len(data))
+	op := r.opf("Put", "%v bytes", len(data))
 
 	gCtx, callOpt, finishAuth, err := r.NewAuthContext()
 	if err != nil {
@@ -75,7 +75,7 @@ func (r *remote) Put(data []byte) (*upspin.Refdata, error) {
 
 // Delete implements upspin.StoreServer.Delete.
 func (r *remote) Delete(ref upspin.Reference) error {
-	op := opf("Delete", "%q", ref)
+	op := r.opf("Delete", "%q", ref)
 
 	gCtx, callOpt, finishAuth, err := r.NewAuthContext()
 	if err != nil {
@@ -127,16 +127,15 @@ func dialCache(op *operation, context upspin.Context, proxyFor upspin.Endpoint) 
 }
 
 // Dial implements upspin.Service.
-func (*remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
-	op := opf("Dial", "%q, %q", context.UserName(), e)
+func (r *remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+	op := r.opf("Dial", "%q, %q", context.UserName(), e)
 
 	if e.Transport != upspin.Remote {
 		return nil, op.error(errors.Invalid, errors.Str("unrecognized transport"))
 	}
 
 	// First try a cache
-	r := dialCache(op, context, e)
-	if r != nil {
+	if svc := dialCache(op, context, e); svc != nil {
 		return r, nil
 	}
 
@@ -167,8 +166,10 @@ func init() {
 	bind.RegisterStoreServer(transport, r)
 }
 
-func opf(method string, format string, args ...interface{}) *operation {
-	op := &operation{"store/remote." + method, fmt.Sprintf(format, args...)}
+func (r *remote) opf(method string, format string, args ...interface{}) *operation {
+	ep := r.ctx.endpoint.String()
+	s := fmt.Sprintf("store/remote.%s(%q)", method, ep)
+	op := &operation{s, fmt.Sprintf(format, args...)}
 	log.Debug.Print(op)
 	return op
 }
