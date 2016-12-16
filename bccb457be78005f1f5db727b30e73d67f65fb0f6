@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a56fbee_b51128cb",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2016-12-16T05:01:16Z",
+      "side": 1,
+      "message": "Perhaps add a TODO here to enable configuring a starting writer, namely the dirserver.",
+      "revId": "bccb457be78005f1f5db727b30e73d67f65fb0f6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
