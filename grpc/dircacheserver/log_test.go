@@ -76,6 +76,11 @@ func compare(l, le *clogEntry) error {
 	return nil
 }
 
+func compareReply(l *clogEntry, de *upspin.DirEntry, err error) error {
+	le := &clogEntry{request: l.request, name: l.name, complete: l.complete, error: err, de: de}
+	return compare(l, le)
+}
+
 var (
 	ep1 = &upspin.Endpoint{Transport: upspin.InProcess, NetAddr: upspin.NetAddr("hoohaa")}
 )
@@ -144,9 +149,12 @@ func TestLogFile(t *testing.T) {
 	}
 	for _, name := range names {
 		good := mkClogEntry(putReq, name)
-		e := l.lookup(good.name)
-		if err := compare(good, e); err != nil {
-			t.Error(err)
+		de, err, ok := l.lookup(good.name)
+		if !ok {
+			t.Errorf("%s not found", good.name)
+		}
+		if cerr := compareReply(good, de, err); err != nil {
+			t.Error(cerr)
 		}
 	}
 	l.close()
@@ -159,9 +167,12 @@ func TestLogFile(t *testing.T) {
 	}
 	for _, name := range names {
 		good := mkClogEntry(putReq, name)
-		e := l.lookup(good.name)
-		if err := compare(good, e); err != nil {
-			t.Error(err)
+		de, err, ok := l.lookup(good.name)
+		if !ok {
+			t.Errorf("%s not found", good.name)
+		}
+		if cerr := compareReply(good, de, err); err != nil {
+			t.Error(cerr)
 		}
 	}
 
@@ -175,14 +186,14 @@ func TestLogFile(t *testing.T) {
 	}
 	for i, name := range names {
 		good := mkClogEntry(putReq, name)
-		e := l.lookup(good.name)
+		_, _, ok := l.lookup(good.name)
 		if i == 0 {
-			if e == nil {
-				t.Errorf("%s: expected but not found", &good)
+			if !ok {
+				t.Errorf("%s: expected but not found", good)
 			}
 		} else {
-			if e != nil {
-				t.Errorf("%s: not expected but found", &good)
+			if ok {
+				t.Errorf("%s: not expected but found", good)
 			}
 		}
 	}
@@ -195,14 +206,14 @@ func TestLogFile(t *testing.T) {
 	}
 	for i, name := range names {
 		good := mkClogEntry(putReq, name)
-		e := l.lookup(good.name)
+		_, _, ok := l.lookup(good.name)
 		if i == 0 {
-			if e == nil {
-				t.Errorf("%s: expected but not found", &good)
+			if !ok {
+				t.Errorf("%s: expected but not found", good)
 			}
 		} else {
-			if e != nil && e.error == nil {
-				t.Errorf("%s: not expected but found", e)
+			if ok {
+				t.Errorf("%s: not expected but found", good)
 			}
 		}
 	}
@@ -231,12 +242,9 @@ func TestLogGlob(t *testing.T) {
 	l.logGlobRequest("u@foo.com/a/b/c/*", nil, entries)
 
 	// Check for individual entries.
-	e, nentries := l.lookupGlob("u@foo.com/a/b/c/*")
-	if e == nil {
-		t.Fatalf("lookupGlob returned nil")
-	}
-	if !e.complete {
-		t.Fatalf("lookupGlob returned inclompete entry")
+	nentries, err, ok := l.lookupGlob("u@foo.com/a/b/c/*")
+	if !ok {
+		t.Fatalf("lookupGlob not found")
 	}
 	if len(nentries) != len(entries) {
 		t.Fatalf("lookupGlob missing entries: %d instead of %d", len(nentries), len(entries))
@@ -258,12 +266,9 @@ l:
 	if err != nil {
 		t.Fatal("creating test log")
 	}
-	e, nentries = l.lookupGlob("u@foo.com/a/b/c/*")
-	if e == nil {
-		t.Fatalf("lookupGlob returned nil")
-	}
-	if !e.complete {
-		t.Fatalf("lookupGlob returned inclompete entry")
+	nentries, err, ok = l.lookupGlob("u@foo.com/a/b/c/*")
+	if !ok {
+		t.Fatalf("lookupGlob not found")
 	}
 	if len(nentries) != len(entries) {
 		t.Fatalf("lookupGlob (after reopen) missing entries: %d instead of %d", len(nentries), len(entries))
