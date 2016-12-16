@@ -37,7 +37,7 @@ var _ upspin.KeyServer = (*remote)(nil)
 
 // Lookup implements upspin.Key.Lookup.
 func (r *remote) Lookup(name upspin.UserName) (*upspin.User, error) {
-	op := opf("Lookup", "%q", name)
+	op := r.opf("Lookup", "%q", name)
 
 	req := &proto.KeyLookupRequest{
 		UserName: string(name),
@@ -61,7 +61,7 @@ func userName(user *upspin.User) string {
 
 // Put implements upspin.Key.Put.
 func (r *remote) Put(user *upspin.User) error {
-	op := opf("Put", "%v", userName(user))
+	op := r.opf("Put", "%v", userName(user))
 
 	gCtx, callOpt, finishAuth, err := r.NewAuthContext()
 	if err != nil {
@@ -87,8 +87,8 @@ func (r *remote) Endpoint() upspin.Endpoint {
 }
 
 // Dial implements upspin.Service.
-func (*remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
-	op := opf("Dial", "%q, %q", context.UserName(), e)
+func (r *remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+	op := r.opf("Dial", "%q, %q", context.UserName(), e)
 
 	if e.Transport != upspin.Remote {
 		return nil, op.error(errors.Invalid, errors.Str("unrecognized transport"))
@@ -102,16 +102,15 @@ func (*remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, 
 	// The connection is closed when this service is released (see Bind.Release)
 	keyClient := proto.NewKeyClient(authClient.GRPCConn())
 	authClient.SetService(keyClient)
-	r := &remote{
+
+	return &remote{
 		AuthClientService: authClient,
 		ctx: dialContext{
 			endpoint: e,
 			userName: context.UserName(),
 		},
 		keyClient: keyClient,
-	}
-
-	return r, nil
+	}, nil
 }
 
 const transport = upspin.Remote
@@ -121,8 +120,10 @@ func init() {
 	bind.RegisterKeyServer(transport, usercache.Global(r))
 }
 
-func opf(method string, format string, args ...interface{}) *operation {
-	op := &operation{"key/remote." + method, fmt.Sprintf(format, args...)}
+func (r *remote) opf(method string, format string, args ...interface{}) *operation {
+	ep := r.ctx.endpoint.String()
+	s := fmt.Sprintf("key/remote.%s(%q)", method, ep)
+	op := &operation{s, fmt.Sprintf(format, args...)}
 	log.Debug.Print(op)
 	return op
 }
