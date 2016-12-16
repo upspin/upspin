@@ -35,11 +35,11 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"runtime"
 	"runtime/pprof"
 	"sort"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -105,7 +105,7 @@ type clog struct {
 	maxDisk       int64         // most bytes taken by on disk logs
 	lru           *cache.LRU    // [lruKey]*clogEntry
 
-	userToDirServerMapping *userToDirServerMapping // map from user name to DirServer endpoint
+	userToDirServer *userToDirServer // map from user name to DirServer endpoint
 
 	exit            chan bool // closing signals child routines to exit
 	refresherExited chan bool // closing confirms the refresher is exiting
@@ -117,11 +117,12 @@ type clog struct {
 	globalLock sync.RWMutex
 
 	// logFileLock provides exclusive access to the log file.
-	logFileLock sync.Mutex
-	file        *os.File
-	wr          *bufio.Writer
-	logSize     int64
-	order       int64
+	logFileLock    sync.Mutex
+	file           *os.File
+	wr             *bufio.Writer
+	logSize        int64 // current log file size in bytes
+	order          int64 // highest order received before a bad log record
+	highestLogFile int   // highest numbered logfile
 
 	pathLocks hashLockArena
 	globLocks hashLockArena
@@ -142,70 +143,54 @@ type lruKey struct {
 // LRUMax is the maximum number of entries in the LRU.
 const LRUMax = 10000
 
-// oldestFirst and newestFirst are used to sort a directory.
-type oldestFirst []os.FileInfo
-
-func (a oldestFirst) Len() int           { return len(a) }
-func (a oldestFirst) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a oldestFirst) Less(i, j int) bool { return a[i].ModTime().Before(a[j].ModTime()) }
-
-type newestFirst []os.FileInfo
-
-func (a newestFirst) Len() int           { return len(a) }
-func (a newestFirst) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-func (a newestFirst) Less(i, j int) bool { return a[j].ModTime().Before(a[i].ModTime()) }
-
 // openLog reads the current log.
 // - dir is the directory for log files.
 // - maxDisk is an approximate limit on disk space for log files
-// - userToDirServerMapping is a map from user names to directory endpoints, maintained by the server
-func openLog(ctx upspin.Context, dir string, maxDisk int64, userToDirServerMapping *userToDirServerMapping) (*clog, error) {
+// - userToDirServer is a map from user names to directory endpoints, maintained by the server
+func openLog(ctx upspin.Context, dir string, maxDisk int64, userToDirServer *userToDirServer) (*clog, error) {
 	const op = "grpc/dircacheserver.openLog"
-	log.Debug.Printf(op)
 	if err := os.MkdirAll(dir, 0700); err != nil {
 		return nil, err
 	}
 
-	if userToDirServerMapping == nil {
-		userToDirServerMapping = newUserToDirServerMapping()
+	if userToDirServer == nil {
+		userToDirServer = newUserToDirServer()
 	}
 	l := &clog{
-		ctx:                    ctx,
-		dir:                    dir,
-		lru:                    cache.NewLRU(LRUMax),
-		refreshPeriod:          30 * time.Second,
-		maxDisk:                maxDisk,
-		exit:                   make(chan bool),
-		refresherExited:        make(chan bool),
-		rotate:                 make(chan bool),
-		rotaterExited:          make(chan bool),
-		userToDirServerMapping: userToDirServerMapping,
+		ctx:             ctx,
+		dir:             dir,
+		lru:             cache.NewLRU(LRUMax),
+		refreshPeriod:   30 * time.Second,
+		maxDisk:         maxDisk,
+		exit:            make(chan bool),
+		refresherExited: make(chan bool),
+		rotate:          make(chan bool),
+		rotaterExited:   make(chan bool),
+		userToDirServer: userToDirServer,
 	}
 
 	// updateLRU expect these to be held.
 	l.globalLock.RLock()
 	defer l.globalLock.RUnlock()
 
-	// Read the log files, oldest first. Remember highest Order encountered
-	// before an error.
-	f, err := os.Open(dir)
+	files, highestLogFile, err := listSorted(dir, true)
 	if err != nil {
 		return nil, err
 	}
-	infos, err := f.Readdir(0)
-	f.Close()
-	if err != nil {
-		return nil, err
-	}
-	sort.Sort(oldestFirst(infos))
-	highest := int64(-1)
-	for i := range infos {
-		err := l.readLogFile(l.dir + "/" + infos[i].Name())
-		if err != nil && highest == -1 {
-			highest = l.order
+	l.highestLogFile = highestLogFile
+
+	// The highest Order we can trust is the last we saw before
+	// an error reading the log.
+	highestOrder := int64(-1)
+	for _, lfi := range files {
+		err := l.readLogFile(lfi.Name(l.dir))
+		if err != nil && highestOrder == -1 {
+			highestOrder = l.order
 		}
 	}
-	l.order = highest
+	if highestOrder != -1 {
+		l.order = highestOrder
+	}
 
 	// Start a new log.
 	l.rotateLog()
@@ -227,32 +212,31 @@ func (l *clog) rotateLog() {
 	l.logFileLock.Unlock()
 
 	// Trim the logs.
-	f, err := os.Open(l.dir)
+	files, _, err := listSorted(l.dir, false)
 	if err != nil {
-		log.Info.Printf("%s: %", op, err)
 		return
 	}
-	infos, err := f.Readdir(0)
-	f.Close()
-	if err != nil {
-		log.Info.Printf("%s: %", op, err)
-		return
-	}
-	sort.Sort(newestFirst(infos))
 	var len int64
-	for i := range infos {
-		len += infos[i].Size()
+	for _, lfi := range files {
+		len += lfi.Size()
 		if len > 3*l.maxDisk/4 {
-			os.Remove(l.dir + "/" + infos[i].Name())
+			fn := lfi.Name(l.dir)
+			log.Debug.Printf("%s: remove log file %s", op, fn)
+			if err := os.Remove(fn); err != nil {
+				log.Info.Printf("%s: %s", op, err)
+			}
 		}
 	}
 
 	// Create a new log file and make it current.
-	f, err = ioutil.TempFile(l.dir, "clog")
+	l.highestLogFile++
+	lfi := &logFileInfo{number: l.highestLogFile}
+	f, err := os.OpenFile(lfi.Name(l.dir), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0700)
 	if err != nil {
 		log.Info.Printf("%s: %", op, err)
 		return
 	}
+	log.Debug.Printf("%s: new log file %s", op, f.Name())
 	l.logFileLock.Lock()
 	if l.file != nil {
 		l.wr.Flush()
@@ -264,6 +248,76 @@ func (l *clog) rotateLog() {
 	l.logFileLock.Unlock()
 
 	l.appendToLogFile(&clogEntry{request: versionReq, name: version})
+}
+
+type logFileInfo struct {
+	number int
+	size   int64
+}
+type ascendingOrder []*logFileInfo
+
+func (a ascendingOrder) Len() int           { return len(a) }
+func (a ascendingOrder) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a ascendingOrder) Less(i, j int) bool { return a[i].number < a[j].number }
+
+type descendingOrder []*logFileInfo
+
+func (a descendingOrder) Len() int           { return len(a) }
+func (a descendingOrder) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a descendingOrder) Less(i, j int) bool { return a[j].number < a[i].number }
+
+func (lfi logFileInfo) Size() int64            { return lfi.size }
+func (lfi logFileInfo) Name(dir string) string { return fmt.Sprintf("%s/clog.%d", dir, lfi.number) }
+
+// listSorted returns a list of log files in ascending or descending order. Also
+// return the number of the highest found, or zero if none found. Files not
+// matching the log name pattern are removed.
+func listSorted(dir string, ascending bool) ([]*logFileInfo, int, error) {
+	f, err := os.Open(dir)
+	if err != nil {
+		return nil, 0, err
+	}
+	infos, err := f.Readdir(0)
+	f.Close()
+	if err != nil {
+		return nil, 0, err
+	}
+	var lfis []*logFileInfo
+	highest := 0
+	for i := range infos {
+		fi := parseLogName(infos[i])
+		if fi == nil {
+			// If it doesn't parse, remove it.
+			if err := os.Remove(infos[i].Name()); err != nil {
+				log.Info.Printf("grps/dircacheserver.listSorted%s: %s", err)
+			}
+		}
+		lfis = append(lfis, fi)
+		if fi.number > highest {
+			highest = fi.number
+		}
+	}
+	if lfis == nil {
+		return nil, 0, nil
+	}
+	if ascending {
+		sort.Sort(ascendingOrder(lfis))
+	} else {
+		sort.Sort(descendingOrder(lfis))
+	}
+	return lfis, highest, nil
+}
+
+func parseLogName(fi os.FileInfo) *logFileInfo {
+	parts := strings.Split(fi.Name(), ".")
+	if len(parts) != 2 || parts[0] != "clog" {
+		return nil
+	}
+	n, err := strconv.Atoi(parts[1])
+	if err != nil {
+		return nil
+	}
+	return &logFileInfo{size: fi.Size(), number: n}
 }
 
 // rotater is a goroutine that is woken whenever we need to trim the
@@ -283,6 +337,8 @@ func (l *clog) rotater() {
 // readLogFile reads a single log file. The log file must begin and end with a version record.
 func (l *clog) readLogFile(fn string) error {
 	const op = "grpc/dircacheserver.readLogFile"
+
+	log.Debug.Printf("%s: %s", op, fn)
 
 	// Open the log file.  If one didn't exist, just rename the new log file and return.
 	f, err := os.Open(fn)
@@ -354,17 +410,18 @@ func (l *clog) myDirServer(pathName upspin.PathName) bool {
 }
 
 func (l *clog) close() error {
-	// Write out partials.
-	if l.wr != nil {
-		l.wr.Flush()
-	}
-
 	// Stop go routines.
 	close(l.exit)
 	<-l.refresherExited
 	<-l.rotaterExited
 
-	return l.file.Close()
+	// Write out partials.
+	var err error
+	if l.wr != nil {
+		l.wr.Flush()
+		err = l.file.Close()
+	}
+	return err
 }
 
 func (l *clog) lookup(name upspin.PathName) (*upspin.DirEntry, error, bool) {
@@ -692,6 +749,7 @@ func (l *clog) addToLRU(e *clogEntry) (changes int) {
 	} else {
 		lock = l.pathLocks.lock(e.name)
 	}
+	defer lock.Unlock()
 	if v, ok := l.lru.Get(k); ok {
 		oe := v.(*clogEntry)
 		if match(e, oe) {
@@ -702,7 +760,6 @@ func (l *clog) addToLRU(e *clogEntry) (changes int) {
 		}
 	}
 	l.lru.Add(k, e)
-	lock.Unlock()
 	return changes
 }
 
@@ -1165,7 +1222,7 @@ func (l *clog) refreshLoop(iter *cache.Iterator, failed map[upspin.Endpoint]bool
 		e := v.(*clogEntry)
 
 		// Avoid any destinations we couldn't reach this round.
-		ep := l.userToDirServerMapping.Get(e.name)
+		ep := l.userToDirServer.Get(e.name)
 		if ep == nil || failed[*ep] {
 			continue
 		}
