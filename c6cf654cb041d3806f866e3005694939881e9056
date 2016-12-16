@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5a56fbee_72b6f6b8",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 349,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-12-16T03:30:33Z",
+      "side": 1,
+      "message": "nearest or closest would work for me.  I too found lowest unusual.",
+      "parentUuid": "da93cbd8_7b9b1f4d",
+      "revId": "c6cf654cb041d3806f866e3005694939881e9056",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da93cbd8_9bbaaba2",
         "filename": "dir/server/tree/tree.go",
         "patchSetId": 2
