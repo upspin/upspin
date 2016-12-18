@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da93cbd8_bb7767f0",
+        "filename": "auth/grpcauth/grpctracing.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-12-18T06:42:06Z",
+      "side": 1,
+      "message": "// It causes excessive heap growth if enabled.",
+      "revId": "d623805433e40ec015683e2b6f1159092fa82fbd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da93cbd8_5b7103f7",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 344,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-12-18T06:42:06Z",
+      "side": 1,
+      "message": "assumes path is clean",
+      "revId": "d623805433e40ec015683e2b6f1159092fa82fbd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da93cbd8_3b64373a",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 1256,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-12-18T06:42:06Z",
+      "side": 1,
+      "message": "this assumes a clean path. can you make that assumption?",
+      "revId": "d623805433e40ec015683e2b6f1159092fa82fbd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da93cbd8_db7c33d7",
+        "filename": "grpc/dircacheserver/server.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-12-18T06:42:06Z",
+      "side": 1,
+      "message": "s/endpoing/endpoint/\n\nalso i don\u0027t like types in variables. the characters spent writing \u0027map\u0027 could be used to say something informative. plus it\u0027s a struct, not a map. plus it\u0027s a cache. plus it might change completely one day.\n\nendpointCache or epCache or even dirCache (it\u0027s really dirs that matter) seem much better names to me.",
+      "revId": "d623805433e40ec015683e2b6f1159092fa82fbd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da93cbd8_fb81ef99",
+        "filename": "grpc/dircacheserver/server.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-12-18T06:42:06Z",
+      "side": 1,
+      "message": "shouldn\u0027t you bitch if you get a bad path name?",
+      "revId": "d623805433e40ec015683e2b6f1159092fa82fbd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "da93cbd8_1b677b41",
+        "filename": "grpc/dircacheserver/server.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-12-18T06:42:06Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "d623805433e40ec015683e2b6f1159092fa82fbd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
