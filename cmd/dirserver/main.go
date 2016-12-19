@@ -9,6 +9,8 @@ package main
 import (
 	"net/http"
 
+	"google.golang.org/grpc"
+
 	"upspin.io/auth"
 	"upspin.io/auth/grpcauth"
 	"upspin.io/cloud/https"
@@ -84,15 +86,16 @@ func main() {
 		log.Printf("Warning: no Writers Group file protection -- all access permitted")
 	}
 
+	grpcServer := grpc.NewServer()
 	config := auth.Config{Lookup: auth.PublicUserKeyService(ctx)}
-	grpcSecureServer, err := grpcauth.NewSecureServer(config)
+	grpcSecureServer, err := grpcauth.NewSecureServer(grpcServer, config)
 	if err != nil {
 		log.Fatal(err)
 	}
 	s := dirserver.New(ctx, dir, grpcSecureServer, upspin.NetAddr(flags.NetAddr))
-	proto.RegisterDirServer(grpcSecureServer.GRPCServer(), s)
+	proto.RegisterDirServer(grpcServer, s)
 
-	http.Handle("/", grpcSecureServer.GRPCServer())
+	http.Handle("/", grpcServer)
 	https.ListenAndServe(serverName, flags.HTTPSAddr, &https.Options{
 		CertFile: flags.TLSCertFile,
 		KeyFile:  flags.TLSKeyFile,

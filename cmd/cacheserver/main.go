@@ -8,6 +8,8 @@ package main
 import (
 	"net"
 
+	"google.golang.org/grpc"
+
 	"upspin.io/auth"
 	"upspin.io/auth/grpcauth"
 	"upspin.io/context"
@@ -57,7 +59,8 @@ func main() {
 	ctx = context.SetCacheEndpoint(ctx, upspin.Endpoint{})
 
 	authConfig := auth.Config{Lookup: auth.PublicUserKeyService(ctx), Context: ctx}
-	grpcSecureServer, err := grpcauth.NewSecureServer(authConfig)
+	grpcServer := grpc.NewServer()
+	grpcSecureServer, err := grpcauth.NewSecureServer(grpcServer, authConfig)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -65,16 +68,17 @@ func main() {
 	if err != nil {
 		log.Fatalf("opening cache: %s", err)
 	}
-	proto.RegisterStoreServer(grpcSecureServer.GRPCServer(), ss)
+	proto.RegisterStoreServer(grpcServer, ss)
 	ds, err := dircacheserver.New(ctx, grpcSecureServer)
 	if err != nil {
 		log.Fatalf("opening cache: %s", err)
 	}
-	proto.RegisterDirServer(grpcSecureServer.GRPCServer(), ds)
+	proto.RegisterDirServer(grpcServer, ds)
 
 	ln, err := net.Listen("tcp", addr)
 	if err != nil {
 		log.Fatalf("listen: %s", err)
 	}
-	grpcSecureServer.GRPCServer().Serve(ln)
+	err = grpcServer.Serve(ln)
+	log.Fatalf("serve: %v", err)
 }

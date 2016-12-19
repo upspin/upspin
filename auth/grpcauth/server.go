@@ -100,9 +100,9 @@ type SecureServer interface {
 }
 
 // NewSecureServer returns a new SecureServer that serves GRPC.
-func NewSecureServer(config auth.Config) (SecureServer, error) {
+func NewSecureServer(server *grpc.Server, config auth.Config) (SecureServer, error) {
 	return &secureServerImpl{
-		grpcServer: grpc.NewServer(),
+		grpcServer: server,
 		config:     config,
 	}, nil
 }
