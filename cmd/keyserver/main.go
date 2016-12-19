@@ -103,7 +103,7 @@ func main() {
 
 	const metadataKey = "keyserver"
 
-	https.ListenAndServe(metadataKey, flags.HTTPSAddr, &https.Options{
+	https.ListenAndServe(nil, metadataKey, flags.HTTPSAddr, &https.Options{
 		CertFile: flags.TLSCertFile,
 		KeyFile:  flags.TLSKeyFile,
 	})
