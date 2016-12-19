@@ -14,6 +14,8 @@ import (
 	"testing"
 	"time"
 
+	"google.golang.org/grpc"
+
 	gContext "golang.org/x/net/context"
 
 	"upspin.io/auth"
@@ -61,22 +63,20 @@ func pickPort() (port string) {
 }
 
 func startServer() (port string) {
-	config := auth.Config{
-		Lookup: lookup,
-	}
-	var err error
-	grpcServer, err = NewSecureServer(config)
+	config := auth.Config{Lookup: lookup}
+	grpcServer := grpc.NewServer()
+	ss, err := NewSecureServer(grpcServer, config)
 	if err != nil {
 		log.Fatal(err)
 	}
-	srv = &server{
-		SecureServer: grpcServer,
-	}
+
+	srv = &server{SecureServer: ss}
 	port = pickPort()
-	prototest.RegisterTestServiceServer(grpcServer.GRPCServer(), srv)
+
+	prototest.RegisterTestServiceServer(grpcServer, srv)
 	log.Printf("Starting e2e server on port %s", port)
-	http.Handle("/", grpcServer.GRPCServer())
-	go https.ListenAndServe("test", fmt.Sprintf("localhost:%s", port), nil)
+	http.Handle("/", grpcServer)
+	go https.ListenAndServe(nil, "test", fmt.Sprintf("localhost:%s", port), nil)
 	return port
 }
 
