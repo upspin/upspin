@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a56fbee_4e8b06b1",
+        "filename": "cmd/cacheserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-12-19T04:18:52Z",
+      "side": 1,
+      "message": "Why not change this also?",
+      "range": {
+        "startLine": 82,
+        "startChar": 0,
+        "endLine": 82,
+        "endChar": 40
+      },
+      "revId": "a2549ab2129d3e01b970900f1160d22e2a20a3dd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
