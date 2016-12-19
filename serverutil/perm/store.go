@@ -33,15 +33,16 @@ type Store struct {
 }
 
 // WrapStore wraps the given StoreServer with a StoreServer that checks access
-// permissions.
-func WrapStore(ctx upspin.Context, store upspin.StoreServer) (*Store, error) {
+// permissions. It will only start polling the store permissions after the
+// ready channel is closed.
+func WrapStore(ctx upspin.Context, ready <-chan struct{}, store upspin.StoreServer) (*Store, error) {
 	s := &Store{
 		StoreServer: store,
 		serverCtx:   ctx,
 		user:        ctx.UserName(),
 	}
 	var err error
-	s.perm, err = New(ctx, ctx.UserName(), s.lookup, s.watch)
+	s.perm, err = New(ctx, ready, ctx.UserName(), s.lookup, s.watch)
 	if err != nil {
 		return nil, err
 	}

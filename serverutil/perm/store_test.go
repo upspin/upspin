@@ -13,8 +13,23 @@ import (
 	"upspin.io/upspin"
 )
 
+func setupStoreEnv(t *testing.T) (store *Store, ownerEnv *testenv.Env, wait, cleanup func()) {
+	ownerEnv, wait, cleanup = setupEnv(t)
+
+	var err error
+	store, err = WrapStore(ownerEnv.Context, readyNow, ownerEnv.StoreServer)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return
+}
+
 func TestStoreNoGroupFileAllowsAll(t *testing.T) {
-	store, ownerEnv := setup(t)
+	store, _, wait, cleanup := setupStoreEnv(t)
+	defer cleanup()
+
+	wait()
 
 	// Everyone is allowed.
 	for _, user := range []upspin.UserName{
@@ -27,16 +42,14 @@ func TestStoreNoGroupFileAllowsAll(t *testing.T) {
 			t.Errorf("user %q is not allowed; expected allowed", user)
 		}
 	}
-
-	ownerEnv.Exit()
 }
 
 func TestStoreAllowsOnlyOwner(t *testing.T) {
-	store, ownerEnv := setup(t)
+	store, ownerEnv, wait, cleanup := setupStoreEnv(t)
+	defer cleanup()
+
 	r := testenv.NewRunner()
 	r.AddUser(ownerEnv.Context)
-
-	saved := save(store.perm)
 
 	r.As(owner)
 	r.MakeDirectory(groupDir)
@@ -45,10 +58,8 @@ func TestStoreAllowsOnlyOwner(t *testing.T) {
 		t.Fatal(r.Diag())
 	}
 
-	err := wait(store.perm, saved)
-	if err != nil {
-		t.Fatal(err)
-	}
+	wait() // Update call
+	wait() // Watch event
 
 	// Owner is allowed.
 	if !store.perm.IsWriter(owner) {
@@ -65,12 +76,12 @@ func TestStoreAllowsOnlyOwner(t *testing.T) {
 			t.Errorf("user %q is allowed; expected not allowed", user)
 		}
 	}
-
-	ownerEnv.Exit()
 }
 
 func TestStoreIncludeRemoteGroups(t *testing.T) {
-	store, ownerEnv := setup(t)
+	store, ownerEnv, wait, cleanup := setupStoreEnv(t)
+	defer cleanup()
+
 	writerEnv, err := testenv.New(&testenv.Setup{
 		OwnerName: writer,
 		Packing:   upspin.PlainPack,
@@ -107,8 +118,6 @@ func TestStoreIncludeRemoteGroups(t *testing.T) {
 		t.Fatal(r.Diag())
 	}
 
-	saved := save(store.perm)
-
 	r.As(owner)
 	r.MakeDirectory(groupDir)
 	r.Put(otherGroupFile, otherGroupContents)
@@ -116,10 +125,9 @@ func TestStoreIncludeRemoteGroups(t *testing.T) {
 	if r.Failed() {
 		t.Fatal(r.Diag())
 	}
-	err = wait(store.perm, saved)
-	if err != nil {
-		t.Fatal(err)
-	}
+
+	wait() // Update call
+	wait() // Watch event
 
 	// owner, writer and randomDude are allowed.
 	for _, user := range []upspin.UserName{
@@ -145,11 +153,12 @@ func TestStoreIncludeRemoteGroups(t *testing.T) {
 	}
 
 	writerEnv.Exit()
-	ownerEnv.Exit()
 }
 
 func TestStoreLifeCycle(t *testing.T) {
-	store, ownerEnv := setup(t)
+	store, ownerEnv, wait, cleanup := setupStoreEnv(t)
+	defer cleanup()
+
 	writerEnv, err := testenv.New(&testenv.Setup{
 		OwnerName: writer,
 		Packing:   upspin.PlainPack,
@@ -163,6 +172,8 @@ func TestStoreLifeCycle(t *testing.T) {
 	r.AddUser(ownerEnv.Context)
 	r.AddUser(writerEnv.Context)
 
+	wait()
+
 	// Everyone is allowed at first.
 	for _, user := range []upspin.UserName{
 		owner,
@@ -175,8 +186,6 @@ func TestStoreLifeCycle(t *testing.T) {
 		}
 	}
 
-	saved := save(store.perm)
-
 	r.As(owner)
 	r.MakeDirectory(groupDir)
 	r.Put(writersGroup, "*@example.com") // Anyone at example.com is allowed.
@@ -184,11 +193,7 @@ func TestStoreLifeCycle(t *testing.T) {
 		t.Fatal(r.Diag())
 	}
 
-	// Wait for a re-computation of the permissions.
-	err = wait(store.perm, saved)
-	if err != nil {
-		t.Fatal(err)
-	}
+	wait()
 
 	// Owner continues to be allowed, as well as others in the domain.
 	for _, user := range []upspin.UserName{
@@ -213,11 +218,12 @@ func TestStoreLifeCycle(t *testing.T) {
 	}
 
 	writerEnv.Exit()
-	ownerEnv.Exit()
 }
 
 func TestStoreIntegration(t *testing.T) {
-	ownerStore, ownerEnv := setup(t)
+	ownerStore, ownerEnv, wait, cleanup := setupStoreEnv(t)
+	defer cleanup()
+
 	writerEnv, err := testenv.New(&testenv.Setup{
 		OwnerName: writer,
 		Packing:   upspin.PlainPack,
@@ -230,6 +236,8 @@ func TestStoreIntegration(t *testing.T) {
 	r := testenv.NewRunner()
 	r.AddUser(ownerEnv.Context)
 	r.AddUser(writerEnv.Context)
+
+	wait()
 
 	// Dial the server for writer.
 	srv, err := ownerStore.Dial(writerEnv.Context, writerEnv.Context.StoreEndpoint())
@@ -261,11 +269,7 @@ func TestStoreIntegration(t *testing.T) {
 		t.Fatal(r.Diag())
 	}
 
-	// Force re-reading permissions file.
-	err = ownerStore.perm.Update()
-	if err != nil {
-		t.Fatal(err)
-	}
+	wait()
 
 	// Writing as owner succeeds.
 	ref1, err := ownerStore.Put([]byte("123"))
@@ -291,20 +295,4 @@ func TestStoreIntegration(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-}
-
-func setup(t *testing.T) (*Store, *testenv.Env) {
-	ownerEnv, err := testenv.New(&testenv.Setup{
-		OwnerName: owner,
-		Packing:   upspin.PlainPack,
-		Kind:      "server",
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	store, err := WrapStore(ownerEnv.Context, ownerEnv.StoreServer)
-	if err != nil {
-		t.Fatal(err)
-	}
-	return store, ownerEnv
 }

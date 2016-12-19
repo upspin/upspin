@@ -28,6 +28,9 @@ const (
 	retryTimeout = 30 * time.Second
 )
 
+// onUpdate is a testing stub that is called after each user list update occurs.
+var onUpdate = func() {}
+
 // Perm tracks the set of users with write access to a server, as specified by
 // the Writers Group file. These might be users who can write blocks to a
 // StoreServer or create a root on a DirServer.
@@ -40,13 +43,10 @@ type Perm struct {
 	lookup LookupFunc
 	watch  WatchFunc
 
-	mu           sync.Mutex // protects the fields below.
-	eventCounter int64      // counts events on channel; mostly for testing.
-	eventCond    *sync.Cond // informs when eventCounter is updated.
-
 	// writers is the set of users allowed to write. If it's nil, all users
 	// are allowed. An empty map means no one is allowed.
 	writers map[upspin.UserName]bool
+	mu      sync.RWMutex // guards writers
 }
 
 // LookupFunc looks up name, as defined by upspin.DirServer.
@@ -67,7 +67,7 @@ var (
 // the provided Lookup function for lookups and the Watch function to watch
 // changes on the writers file. The target user is typically the user name of a
 // server, such as a StoreServer or a DirServer.
-func New(ctx upspin.Context, target upspin.UserName, lookup LookupFunc, watch WatchFunc) (*Perm, error) {
+func New(ctx upspin.Context, ready <-chan struct{}, target upspin.UserName, lookup LookupFunc, watch WatchFunc) (*Perm, error) {
 	const op = "serverutil/perm.New"
 	p := &Perm{
 		ctx:        ctx,
@@ -78,21 +78,15 @@ func New(ctx upspin.Context, target upspin.UserName, lookup LookupFunc, watch Wa
 		writers:    nil, // Start open.
 	}
 
-	p.eventCond = sync.NewCond(&p.mu)
-	err := p.Update()
-	if err != nil {
-		switch {
-		case errors.Match(errPrivate, err),
-			errors.Match(errPermission, err),
-			errors.Match(errNotExist, err):
-			// OK, keep watching.
-		case errors.Match(errIO, err):
-			// Ok. Maybe the servers are booting up.
-		default:
-			return nil, errors.E(op, err)
+	go func() {
+		<-ready
+		err := p.Update()
+		if err != nil {
+			log.Error.Printf("%s: %v", op, err)
+			onUpdate() // Even if we failed, unblock tests.
 		}
-	}
-	go p.updateLoop()
+		go p.updateLoop()
+	}()
 	return p, nil
 }
 
@@ -133,15 +127,12 @@ func (p *Perm) updateLoop() {
 		}
 		if e.Delete {
 			p.deleteUsers()
+			continue
 		}
 		err = p.updateUsers(e.Entry)
 		if err != nil {
 			log.Error.Printf("%s: updateUsers: %s", op, err)
 		}
-		p.mu.Lock()
-		p.eventCounter++
-		p.eventCond.Signal()
-		p.mu.Unlock()
 	}
 }
 
@@ -169,6 +160,7 @@ func (p *Perm) updateUsers(entry *upspin.DirEntry) error {
 	}
 	log.Printf("serverutil/perm: Setting writers to: %v", users)
 	p.set(users)
+	onUpdate()
 	return nil
 }
 
@@ -199,8 +191,8 @@ func (p *Perm) load(name upspin.PathName) ([]byte, error) {
 
 // IsWriter reports whether the user has write privileges on this Perm.
 func (p *Perm) IsWriter(u upspin.UserName) bool {
-	p.mu.Lock()
-	defer p.mu.Unlock()
+	p.mu.RLock()
+	defer p.mu.RUnlock()
 	// Everyone is allowed if there is no Writers Group file.
 	if p.writers == nil {
 		return true
@@ -237,4 +229,5 @@ func (p *Perm) deleteUsers() {
 	p.mu.Lock()
 	p.writers = nil
 	p.mu.Unlock()
+	onUpdate()
 }
