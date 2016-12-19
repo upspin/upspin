@@ -14,7 +14,8 @@ import (
 )
 
 func TestDirIntegration(t *testing.T) {
-	ownerEnv := setupEnv(t)
+	ownerEnv, wait, cleanup := setupEnv(t)
+	defer cleanup()
 
 	r := testenv.NewRunner()
 	r.AddUser(ownerEnv.Context)
@@ -37,10 +38,12 @@ func TestDirIntegration(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Wrap the writer's DirServer, pointing Perm to the owner's group file.
-	dir, err := WrapDir(writerCtx, owner, dirServer)
+	dir, err := WrapDir(writerCtx, readyNow, owner, dirServer)
 	if err != nil {
 		t.Fatal(err)
 	}
+	wait()
+	wait()
 
 	// At first, only owner can create a root, so it fails.
 	entry := &upspin.DirEntry{
@@ -51,23 +54,15 @@ func TestDirIntegration(t *testing.T) {
 	_, err = dir.Put(entry)
 	expectedErr := errors.E(errors.Permission, upspin.UserName(writer))
 	if !errors.Match(expectedErr, err) {
-		t.Errorf("err = %s, want = %s", err, expectedErr)
+		t.Fatalf("err = %v, want = %v", err, expectedErr)
 	}
-
-	saved := save(dir.perm)
 
 	// Allow writer to create a root now.
 	r.Put(writersGroup, owner+" "+writer)
-
-	err = wait(dir.perm, saved)
-	if err != nil {
-		t.Fatal(err)
-	}
+	wait()
 
 	_, err = dir.Put(entry)
 	if err != nil {
 		t.Fatalf("Expected root creation to succeed; instead err = %s", err)
 	}
-
-	ownerEnv.Exit()
 }

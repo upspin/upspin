@@ -62,7 +62,10 @@ func (opt *Options) applyDefaults() {
 //
 // If the server is running outside GCE, instead an HTTPS server is started on
 // the address specified by addr using the certificate details specified by opt.
-func ListenAndServe(metaSuffix, addr string, opt *Options) {
+//
+// The given channel, if any, is closed when the TCP listener has succeeded.
+// It may be used to signal that the server is ready to start serving requests.
+func ListenAndServe(ready chan<- struct{}, metaSuffix, addr string, opt *Options) {
 	if opt == nil {
 		opt = defaultOptions
 	} else {
@@ -75,6 +78,9 @@ func ListenAndServe(metaSuffix, addr string, opt *Options) {
 		bucket, err := metadata.InstanceAttributeValue(key)
 		if err != nil {
 			log.Fatalf("https: couldn't read %q metadata value: %v", key, err)
+		}
+		if ready != nil {
+			close(ready) // TODO(adg): listen manually and do this after listen
 		}
 		if err := letsencryptCache(&m, bucket, metaSuffix); err != nil {
 			log.Fatalf("https: couldn't set up letsencrypt cache: %v", err)
@@ -107,6 +113,9 @@ func ListenAndServe(metaSuffix, addr string, opt *Options) {
 	ln, err := net.Listen("tcp", addr)
 	if err != nil {
 		log.Fatalf("https: %v", err)
+	}
+	if ready != nil {
+		close(ready)
 	}
 	err = http.Serve(tls.NewListener(ln, config), nil)
 	log.Fatalf("https: %v", err)

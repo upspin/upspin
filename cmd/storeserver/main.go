@@ -73,13 +73,14 @@ func main() {
 		log.Fatalf("Setting up StoreServer: %v", err)
 	}
 
+	ready := make(chan struct{})
 	grpcServer := grpc.NewServer()
 	authConfig := auth.Config{Lookup: auth.PublicUserKeyService(ctx)}
 	grpcSecureServer, err := grpcauth.NewSecureServer(grpcServer, authConfig)
 	if err != nil {
 		log.Fatal(err)
 	}
-	store, err = perm.WrapStore(ctx, store)
+	store, err = perm.WrapStore(ctx, ready, store)
 	if err != nil {
 		log.Fatalf("Error wrapping store: %s", err)
 	}
@@ -87,7 +88,7 @@ func main() {
 	proto.RegisterStoreServer(grpcServer, s)
 
 	http.Handle("/", grpcServer)
-	https.ListenAndServe(serverName, flags.HTTPSAddr, &https.Options{
+	https.ListenAndServe(ready, serverName, flags.HTTPSAddr, &https.Options{
 		CertFile: flags.TLSCertFile,
 		KeyFile:  flags.TLSKeyFile,
 	})
