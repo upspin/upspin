@@ -43,11 +43,13 @@ const (
 	// grants access to everyone who can authenticate to the Upspin system.
 	// This constant can be used in Access files, but will always be expanded
 	// to the the full name ("all@upspin.io") when returned from Access.Users
-	// and such.
+	// and such. All is not allowed to be present in Group files.
 	All = "all" // Case is ignored, so "All", "ALL", etc. also work.
 
 	// AllUsers is a reserved Upspin user name. Its appearance in a user list
 	// grants access to everyone who can authenticate to the Upspin system.
+	// It is the user name that is substituted for the shorthand "all" in a user
+	// list. AllUsers is not allowed to be present in Group files.
 	AllUsers upspin.UserName = "all@upspin.io"
 )
 
@@ -205,6 +207,7 @@ func Parse(pathName upspin.PathName, data []byte) (*Access, error) {
 	}
 	a.allUsers = make([]path.Parsed, 0, numUsers)
 	// Sort the lists, then repack them into the "all" users list.
+	// It does not remove duplicates.
 	for i, r := range a.list {
 		sort.Sort(sliceOfParsed(r))
 		a.list[i] = a.allUsers[len(a.allUsers) : len(a.allUsers)+len(r)]
@@ -292,11 +295,23 @@ func clean(line []byte) []byte {
 	return bytes.TrimSpace(line)
 }
 
+// isAll is a case-insensitive check for "all" or "all@upspin.io"
+func isAll(user []byte) bool {
+	// Check for length to be fast. Safe because "all" and "all@upspin.io" are ASCII.
+	if len(user) == len(allBytes) && bytes.EqualFold(user, allBytes) {
+		return true
+	}
+	if len(user) == len(allUsersBytes) && bytes.EqualFold(user, allUsersBytes) {
+		return true
+	}
+	return false
+}
+
 // parsedAppend parses the users (as path.Parse values) and appends them to the list.
 func parsedAppend(list []path.Parsed, owner upspin.UserName, users ...[]byte) ([]path.Parsed, error) {
 	for _, user := range users {
-		// Case-insensitive check for the "all" shorthand, which we promote to "all@upspin.io".
-		if len(user) == 3 && bytes.EqualFold(user, allBytes) {
+		// Case-insensitive check for the "all" or "all@upspin.io", which we canonicalize to "all@upspin.io".
+		if isAll(user) {
 			user = allUsersBytes
 		}
 		p, err := path.Parse(upspin.PathName(user) + "/")
@@ -472,7 +487,13 @@ func ParseGroup(parsed path.Parsed, contents []byte) (group []path.Parsed, err e
 		users = splitList(users[:0], line)
 		if users == nil {
 			return nil, errors.E(op, parsed.Path(), errors.Invalid,
-				errors.Errorf("syntax error in group file on line %d: %s", lineNum, line))
+				errors.Errorf("syntax error in group file on line %d", lineNum))
+		}
+		for _, user := range users {
+			if isAll(user) {
+				return nil, errors.E(op, parsed.Path(), errors.Invalid,
+					errors.Errorf("cannot use %q in group file on line %d", user, lineNum))
+			}
 		}
 		if group == nil {
 			group = make([]path.Parsed, 0, preallocSize(len(users)))
@@ -480,7 +501,7 @@ func ParseGroup(parsed path.Parsed, contents []byte) (group []path.Parsed, err e
 		group, err = parsedAppend(group, parsed.User(), users...)
 		if err != nil {
 			return nil, errors.E(op, parsed.Path(), errors.Invalid,
-				errors.Errorf("bad group users list on line %d: %q: %v", lineNum, line, err))
+				errors.Errorf("bad group users list on line %d: %v", lineNum, err))
 		}
 	}
 	if s.Err() != nil {

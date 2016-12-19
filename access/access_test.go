@@ -7,6 +7,7 @@ package access
 import (
 	"reflect"
 	"sort"
+	"strings"
 	"testing"
 
 	"upspin.io/errors"
@@ -32,7 +33,8 @@ Read : reader@reader.org
 WRITE: anotherwriter@a.bc
   create,DeLeTe  :admin@c.com`)
 
-	allUsersAccessText = []byte(`r : foo@bob.com, all`)
+	// Duplicated "all" will exist but be canonicalized when parsed.
+	allUsersAccessText = []byte(`r : foo@bob.com, All, ALL@UPSPIN.IO`)
 
 	groupText = []byte("#This is my family\nfred@me.com, ann@me.com\njoe@me.com\n")
 )
@@ -98,7 +100,8 @@ func TestParseAllUsers(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	match(t, a.list[Read], []string{"foo@bob.com", string(AllUsers)})
+	// AllUsers appears twice here as it's also twice in the input; that's OK.
+	match(t, a.list[Read], []string{"foo@bob.com", string(AllUsers), string(AllUsers)})
 	match(t, a.list[Write], nil)
 	match(t, a.list[List], nil)
 	match(t, a.list[Create], nil)
@@ -439,6 +442,32 @@ func TestAccessAllUsers(t *testing.T) {
 	check("someone@obscure.com", Write, "me@here.com/foo/bar", false)
 }
 
+func TestGroupDisallowsAll(t *testing.T) {
+	parsed, err := path.Parse("me@here.com/Group/meAndAllElse")
+	if err != nil {
+		t.Fatal(err)
+	}
+	tests := []string{
+		"all",
+		"ALL",
+		"all@upspin.io",
+		"all@UPSPIN.io",
+		"me@here.com all",
+		"all@upspin.io\nme@here.com",
+	}
+	for _, test := range tests {
+		_, err = ParseGroup(parsed, []byte(test))
+		if err == nil {
+			t.Errorf(`group parse accepted "all" in: %s`, test)
+			continue
+		}
+		expectedErr := errors.E(parsed.Path(), errors.Invalid)
+		if !errors.Match(expectedErr, err) || !strings.Contains(err.Error(), "in group file") {
+			t.Errorf(`unexpected error %v in: %s`, err, test)
+		}
+	}
+}
+
 func TestParseEmptyFile(t *testing.T) {
 	accessText := []byte("\n # Just a comment.\n\r\t # Nothing to see here \n \n \n\t\n")
 	a, err := Parse(testFile, accessText)
@@ -580,7 +609,7 @@ func TestParseBadGroupFile(t *testing.T) {
 
 func TestParseBadGroupMember(t *testing.T) {
 	expectedErr := errors.E(upspin.PathName(testGroupFile), errors.Invalid,
-		errors.Str(`bad group users list on line 1: "joe@me.com, fred@": user fred@: user.Parse: invalid operation: missing domain name`))
+		errors.Str(`bad group users list on line 1: user fred@: user.Parse: invalid operation: missing domain name`))
 
 	parsed, err := path.Parse(testGroupFile)
 	if err != nil {
