@@ -77,8 +77,10 @@ func main() {
 	if err != nil {
 		log.Fatalf("Setting up DirServer: %v", err)
 	}
+	var ready chan struct{}
 	if flags.StoreServerUser != "" {
-		dir, err = perm.WrapDir(ctx, upspin.UserName(flags.StoreServerUser), dir)
+		ready := make(chan struct{})
+		dir, err = perm.WrapDir(ctx, ready, upspin.UserName(flags.StoreServerUser), dir)
 		if err != nil {
 			log.Fatalf("Can't wrap DirServer monitoring %s: %s", flags.StoreServerUser, err)
 		}
@@ -96,7 +98,7 @@ func main() {
 	proto.RegisterDirServer(grpcServer, s)
 
 	http.Handle("/", grpcServer)
-	https.ListenAndServe(serverName, flags.HTTPSAddr, &https.Options{
+	https.ListenAndServe(ready, serverName, flags.HTTPSAddr, &https.Options{
 		CertFile: flags.TLSCertFile,
 		KeyFile:  flags.TLSKeyFile,
 	})
