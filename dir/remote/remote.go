@@ -156,6 +156,7 @@ func (r *remote) Watch(name upspin.PathName, order int64, done <-chan struct{}) 
 	srvStream, err := r.dirClient.Watch(gCtx, callOpt)
 	err = finishAuth(err)
 	if err != nil {
+		r.checkGrpc(err)
 		return nil, op.error(err)
 	}
 	req := &proto.DirWatchRequest{
