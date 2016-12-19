@@ -34,7 +34,11 @@ WRITE: anotherwriter@a.bc
   create,DeLeTe  :admin@c.com`)
 
 	// Duplicated "all" will exist but be canonicalized when parsed.
-	allUsersAccessText = []byte(`r : foo@bob.com, All, ALL@UPSPIN.IO`)
+	// Note we must put easch "all" entry on its own line.
+	allUsersAccessText = []byte("r : foo@bob.com\nr: All\nr:ALL@UPSPIN.IO")
+
+	// Here we put them all on one line, and should see an error.
+	allUsersAccessTextBad = []byte("r : foo@bob.com All ALL@UPSPIN.IO")
 
 	groupText = []byte("#This is my family\nfred@me.com, ann@me.com\njoe@me.com\n")
 )
@@ -106,6 +110,14 @@ func TestParseAllUsers(t *testing.T) {
 	match(t, a.list[List], nil)
 	match(t, a.list[Create], nil)
 	match(t, a.list[Delete], nil)
+}
+
+func TestParseAllUsersNotAloneOnLine(t *testing.T) {
+	_, err := Parse(testFile, allUsersAccessTextBad)
+	expectedErr := errors.E(errors.Invalid, errors.Str(`"All" must be the only user listed on the line`))
+	if !errors.Match(expectedErr, err) {
+		t.Fatalf(`unexpected error for "all" not alone: %v`, err)
+	}
 }
 
 type accessEqualTest struct {

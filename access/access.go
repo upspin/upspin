@@ -309,9 +309,13 @@ func isAll(user []byte) bool {
 
 // parsedAppend parses the users (as path.Parse values) and appends them to the list.
 func parsedAppend(list []path.Parsed, owner upspin.UserName, users ...[]byte) ([]path.Parsed, error) {
-	for _, user := range users {
+	for i, user := range users {
 		// Case-insensitive check for the "all" or "all@upspin.io", which we canonicalize to "all@upspin.io".
+		// We require it to be the only item on the line.
 		if isAll(user) {
+			if i != 0 || len(users) > 1 {
+				return nil, errors.Errorf("%q must be the only user listed on the line", user)
+			}
 			user = allUsersBytes
 		}
 		p, err := path.Parse(upspin.PathName(user) + "/")
