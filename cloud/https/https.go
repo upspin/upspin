@@ -29,6 +29,12 @@ import (
 // outside GCE. The default is the self-signed certificate in
 // upspin.io/auth/grpcauth/testdata.
 type Options struct {
+	// LetsEncryptCache specifies the cache file for Let's Encrypt.
+	// If set, enables Let's Encrypt certificates for this server.
+	LetsEncryptCache string
+
+	// CertFile and KeyFile specifies the TLS certificates to use.
+	// It has no effect if LetsEncryptCache is set.
 	CertFile string
 	KeyFile  string
 }
@@ -55,8 +61,7 @@ func (opt *Options) applyDefaults() {
 // (See the upspin.io/cloud/letscloud package for more information.)
 //
 // If the server is running outside GCE, instead an HTTPS server is started on
-// the address specified by addr the certificate and key files specified by
-// opt.
+// the address specified by addr using the certificate details specified by opt.
 func ListenAndServe(metaSuffix, addr string, opt *Options) {
 	if opt == nil {
 		opt = defaultOptions
@@ -77,13 +82,26 @@ func ListenAndServe(metaSuffix, addr string, opt *Options) {
 		log.Fatalf("https: %v", m.Serve())
 	}
 
-	log.Info.Printf("https: not on GCE; serving HTTPS on %q", addr)
-	if opt.CertFile == defaultOptions.CertFile || opt.KeyFile == defaultOptions.KeyFile {
-		log.Error.Print("https: WARNING: using self-signed test certificates.")
-	}
-	config, err := auth.NewDefaultTLSConfig(opt.CertFile, opt.KeyFile)
-	if err != nil {
-		log.Fatalf("https: setting up TLS config: %v", err)
+	var config *tls.Config
+	if file := opt.LetsEncryptCache; file != "" {
+		log.Info.Printf("https: serving HTTPS on %q using Let's Encrypt certificates", addr)
+		var m letsencrypt.Manager
+		if err := m.CacheFile(file); err != nil {
+			log.Fatalf("https: couldn't set up letsencrypt cache: %v", err)
+		}
+		config = &tls.Config{
+			GetCertificate: m.GetCertificate,
+		}
+	} else {
+		log.Info.Printf("https: not on GCE; serving HTTPS on %q using provided certificates", addr)
+		if opt.CertFile == defaultOptions.CertFile || opt.KeyFile == defaultOptions.KeyFile {
+			log.Error.Print("https: WARNING: using self-signed test certificates.")
+		}
+		var err error
+		config, err = auth.NewDefaultTLSConfig(opt.CertFile, opt.KeyFile)
+		if err != nil {
+			log.Fatalf("https: setting up TLS config: %v", err)
+		}
 	}
 	config.NextProtos = []string{"h2"} // Enable HTTP/2 support
 	ln, err := net.Listen("tcp", addr)
