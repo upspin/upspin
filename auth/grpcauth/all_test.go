@@ -76,7 +76,7 @@ func startServer() (port string) {
 	prototest.RegisterTestServiceServer(grpcServer, srv)
 	log.Printf("Starting e2e server on port %s", port)
 	http.Handle("/", grpcServer)
-	go https.ListenAndServe("test", fmt.Sprintf("localhost:%s", port), nil)
+	go https.ListenAndServe(nil, "test", fmt.Sprintf("localhost:%s", port), nil)
 	return port
 }
 

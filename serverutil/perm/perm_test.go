@@ -6,8 +6,8 @@ package perm
 
 import (
 	"testing"
+	"time"
 
-	"upspin.io/errors"
 	"upspin.io/test/testenv"
 	"upspin.io/upspin"
 )
@@ -23,12 +23,58 @@ const (
 	writersGroup = groupDir + "/" + WritersGroupFile
 )
 
-func TestCantFindFileAllowsAll(t *testing.T) {
-	ownerEnv := setupEnv(t)
-	perm, err := New(ownerEnv.Context, owner, ownerEnv.DirServer.Lookup, ownerEnv.DirServer.Watch)
+// setupEnv sets up a test environment, used by the tests in this package.
+// The wait func, when called, blocks until onUpdate fires or a timeout occurs.
+// The cleanup func should be called when the test function exits.
+func setupEnv(t *testing.T) (ownerEnv *testenv.Env, wait, cleanup func()) {
+	var err error
+	ownerEnv, err = testenv.New(&testenv.Setup{
+		OwnerName: owner,
+		Packing:   upspin.PlainPack,
+		Kind:      "server", // Must implement Watch API.
+	})
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	updated := make(chan bool)
+	onUpdate = func() { <-updated }
+	wait = func() {
+		const timeout = 2 * time.Second
+		select {
+		case <-time.After(timeout):
+			t.Fatal("timed out waiting for update")
+		case updated <- true:
+			// OK.
+		}
+	}
+	cleanup = func() {
+		ownerEnv.Exit()
+		close(updated) // Unblock the update loop, if blocked.
+		onUpdate = func() {}
+	}
+
+	return
+}
+
+// readyNow is closed at init time and should be passed no New, WrapStore, or
+// WrapDir to indicate that it should poll immediately.
+var readyNow chan struct{}
+
+func init() {
+	readyNow = make(chan struct{})
+	close(readyNow)
+}
+
+func TestCantFindFileAllowsAll(t *testing.T) {
+	ownerEnv, wait, cleanup := setupEnv(t)
+	defer cleanup()
+
+	perm, err := New(ownerEnv.Context, readyNow, owner, ownerEnv.DirServer.Lookup, ownerEnv.DirServer.Watch)
+	if err != nil {
+		t.Fatal(err)
+	}
+	wait()
 
 	// Everyone is allowed, since we can't read the owner file.
 	for _, user := range []upspin.UserName{
@@ -41,12 +87,11 @@ func TestCantFindFileAllowsAll(t *testing.T) {
 			t.Errorf("IsWriter(%q)=false, want true", user)
 		}
 	}
-
-	ownerEnv.Exit()
 }
 
 func TestNoFileAllowsAll(t *testing.T) {
-	ownerEnv := setupEnv(t)
+	ownerEnv, wait, cleanup := setupEnv(t)
+	defer cleanup()
 
 	// Put a permissive Access file, now server knows the file is not there.
 	r := testenv.NewRunner()
@@ -57,10 +102,11 @@ func TestNoFileAllowsAll(t *testing.T) {
 		t.Fatal(r.Diag())
 	}
 
-	perm, err := New(ownerEnv.Context, owner, ownerEnv.DirServer.Lookup, ownerEnv.DirServer.Watch)
+	perm, err := New(ownerEnv.Context, readyNow, owner, ownerEnv.DirServer.Lookup, ownerEnv.DirServer.Watch)
 	if err != nil {
 		t.Fatal(err)
 	}
+	wait()
 
 	// Everyone is allowed.
 	for _, user := range []upspin.UserName{
@@ -73,12 +119,12 @@ func TestNoFileAllowsAll(t *testing.T) {
 			t.Errorf("user %q is not allowed; expected allowed", user)
 		}
 	}
-
-	ownerEnv.Exit()
 }
 
 func TestAllowsOnlyOwner(t *testing.T) {
-	ownerEnv := setupEnv(t)
+	ownerEnv, wait, cleanup := setupEnv(t)
+	defer cleanup()
+
 	r := testenv.NewRunner()
 	r.AddUser(ownerEnv.Context)
 
@@ -90,10 +136,11 @@ func TestAllowsOnlyOwner(t *testing.T) {
 		t.Fatal(r.Diag())
 	}
 
-	perm, err := New(ownerEnv.Context, owner, ownerEnv.DirServer.Lookup, ownerEnv.DirServer.Watch)
+	perm, err := New(ownerEnv.Context, readyNow, owner, ownerEnv.DirServer.Lookup, ownerEnv.DirServer.Watch)
 	if err != nil {
 		t.Fatal(err)
 	}
+	wait()
 
 	// Owner is allowed.
 	if !perm.IsWriter(owner) {
@@ -110,12 +157,12 @@ func TestAllowsOnlyOwner(t *testing.T) {
 			t.Errorf("user %q is allowed; expected not allowed", user)
 		}
 	}
-
-	ownerEnv.Exit()
 }
 
 func TestAllowsOthersAndWildcard(t *testing.T) {
-	ownerEnv := setupEnv(t)
+	ownerEnv, wait, cleanup := setupEnv(t)
+	defer cleanup()
+
 	r := testenv.NewRunner()
 	r.AddUser(ownerEnv.Context)
 
@@ -127,10 +174,12 @@ func TestAllowsOthersAndWildcard(t *testing.T) {
 		t.Fatal(r.Diag())
 	}
 
-	perm, err := New(ownerEnv.Context, owner, ownerEnv.DirServer.Lookup, ownerEnv.DirServer.Watch)
+	perm, err := New(ownerEnv.Context, readyNow, owner, ownerEnv.DirServer.Lookup, ownerEnv.DirServer.Watch)
 	if err != nil {
 		t.Fatal(err)
 	}
+	wait() // Update call
+	wait() // Watch event
 
 	// Owner, writer and a wildcard user are allowed.
 	for _, user := range []upspin.UserName{
@@ -153,17 +202,14 @@ func TestAllowsOthersAndWildcard(t *testing.T) {
 		}
 	}
 
-	saved := save(perm)
-
-	// Remove everyone but owner. Update should be very fast, through the
-	// Watch API.
+	// Remove everyone but owner.
+	// Update should happen quickly through the Watch API.
 	r.Put(writersGroup, owner)
-
-	// Allow time for events to be delivered.
-	err = wait(perm, saved)
-	if err != nil {
-		t.Fatal(err)
+	if r.Failed() {
+		t.Fatal(r.Diag())
 	}
+	wait()
+
 	for _, user := range []upspin.UserName{
 		writer,
 		"master@superusers.com",
@@ -174,40 +220,4 @@ func TestAllowsOthersAndWildcard(t *testing.T) {
 			t.Errorf("%s is allowed; expected not allowed", user)
 		}
 	}
-
-	ownerEnv.Exit()
-}
-
-// save returns the current state of Perm's event counter.
-func save(perm *Perm) int64 {
-	perm.mu.Lock()
-	defer perm.mu.Unlock()
-	return perm.eventCounter
-}
-
-// wait waits until the event counter has moved beyond the mark value.
-func wait(perm *Perm, mark int64) error {
-	counter := mark
-	for retries := 0; counter <= mark; retries++ {
-		if retries > 10 {
-			return errors.Str("waited too long for event that never happened")
-		}
-		perm.mu.Lock()
-		perm.eventCond.Wait()
-		counter = perm.eventCounter
-		perm.mu.Unlock()
-	}
-	return nil
-}
-
-func setupEnv(t *testing.T) *testenv.Env {
-	ownerEnv, err := testenv.New(&testenv.Setup{
-		OwnerName: owner,
-		Packing:   upspin.PlainPack,
-		Kind:      "server", // Must implement Watch API.
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	return ownerEnv
 }
