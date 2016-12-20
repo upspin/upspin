@@ -98,7 +98,22 @@ signup@key.upspin.io to complete the signup process.
 	}
 	err = ioutil.WriteFile(*rcFile, rcContents.Bytes(), 0640)
 	if err != nil {
-		s.exit(err)
+		// Directory doesn't exist, perhaps.
+		if !os.IsNotExist(err) {
+			s.exitf("cannot create %s: %v", *rcFile, err)
+		}
+		dir := filepath.Dir(*rcFile)
+		if _, statErr := os.Stat(dir); !os.IsNotExist(statErr) {
+			// Looks like the directory exists, so stop now and report original error.
+			s.exitf("cannot create %s: %v", *rcFile, err)
+		}
+		if mkdirErr := os.Mkdir(dir, 0700); mkdirErr != nil {
+			s.exitf("cannot make directory %s: %v", dir, mkdirErr)
+		}
+		err = ioutil.WriteFile(*rcFile, rcContents.Bytes(), 0640)
+		if err != nil {
+			s.exit(err)
+		}
 	}
 	fmt.Println("Configuration file written to:")
 	fmt.Printf("\t%s\n\n", *rcFile)
