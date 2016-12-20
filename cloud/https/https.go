@@ -30,11 +30,11 @@ import (
 // upspin.io/auth/grpcauth/testdata.
 type Options struct {
 	// LetsEncryptCache specifies the cache file for Let's Encrypt.
-	// If set, enables Let's Encrypt certificates for this server.
+	// If non-empty, enables Let's Encrypt certificates for this server.
 	LetsEncryptCache string
 
 	// CertFile and KeyFile specifies the TLS certificates to use.
-	// It has no effect if LetsEncryptCache is set.
+	// It has no effect if LetsEncryptCache is non-empty.
 	CertFile string
 	KeyFile  string
 }
