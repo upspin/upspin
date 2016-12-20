@@ -73,10 +73,11 @@ See the description for rotate for information about updating keys.
 		fmt.Println("If you lose the keys you can re-create them by running this command:")
 		fmt.Printf("\tupspin keygen -secretseed %s\n", proquintStr)
 		fmt.Println("Write this command down and store it in a secure, private place.")
-		fmt.Println("Do not share your private key or this command with anyone.\n")
+		fmt.Println("Do not share your private key or this command with anyone.")
 	} else {
-		fmt.Println("Do not share your private key with anyone.\n")
+		fmt.Println("Do not share your private key with anyone.")
 	}
+	fmt.Println()
 }
 
 func createKeys(curveName, secret string) (public string, private, proquintStr string, err error) {
