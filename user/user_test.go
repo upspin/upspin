@@ -33,7 +33,8 @@ func TestParse(t *testing.T) {
 	var tests = []cases{
 		{upspin.UserName("me@here.com"), "me", S, "here.com", ""},
 		{upspin.UserName("me+you@here.com"), "me+you", "you", "here.com", ""},
-		{upspin.UserName("me@HERE.com"), "me", S, "here.com", ""},                // Lower-case the domain.
+		{upspin.UserName("me@HERE.com"), "me", S, "here.com", ""}, // Lower-case the domain.
+		{upspin.UserName("me.and.my.shadow@here.com"), "me.and.my.shadow", S, "here.com", ""},
 		{upspin.UserName(hugeOKName + "@foo.com"), hugeOKName, S, "foo.com", ""}, // Maximum accepted length, 254.
 		{upspin.UserName(hugeBadName + "@foo.com"), U, S, D, "name too long"},
 		{upspin.UserName("@"), U, S, D, "invalid operation: missing user name"},

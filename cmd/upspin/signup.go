@@ -66,7 +66,7 @@ signup@key.upspin.io to complete the signup process.
 	// Parse user name.
 	uname, _, domain, err := user.Parse(upspin.UserName(fs.Arg(0)))
 	if err != nil {
-		s.exit(err)
+		s.exitf("invalid user name %q: %v", fs.Arg(0), err)
 	}
 	userName := upspin.UserName(uname + "@" + domain)
 

@@ -190,13 +190,13 @@ func simpleUserNameChar(r rune) bool {
 // illegalASCIIPunctuation reports whether the rune is an ASCII punctuation
 // character that is allowed by PRECIS but not by us.
 func illegalASCIIPunctuation(r rune) bool {
-	return strings.ContainsRune(" \"(),:;<>.[\\]`", r)
+	return strings.ContainsRune(" \"(),:;<>[\\]`", r)
 }
 
 // legalASCIIPunctuation reports whether the rune is an ASCII punctuation
 // character that is allowed by us.
 func legalASCIIPunctuation(r rune) bool {
-	return strings.ContainsRune("!#$%&'*+-/=?^_{|}~", r)
+	return strings.ContainsRune("!#.$%&'*+-/=?^_{|}~", r)
 }
 
 // See the comments for UserAndDomain.
