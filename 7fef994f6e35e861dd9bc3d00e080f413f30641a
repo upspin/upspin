@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "17961e08_1def3394",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-12-20T04:09:47Z",
+      "side": 1,
+      "message": "user list?",
+      "revId": "7fef994f6e35e861dd9bc3d00e080f413f30641a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
