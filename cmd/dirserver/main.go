@@ -77,6 +77,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("Setting up DirServer: %v", err)
 	}
+
+	// Wrap with permissions checks, if requested.
 	var ready chan struct{}
 	if flags.StoreServerUser != "" {
 		ready := make(chan struct{})
@@ -89,8 +91,8 @@ func main() {
 	}
 
 	config := auth.Config{Lookup: auth.PublicUserKeyService(ctx)}
-	grpcSecureServer := grpcauth.NewSecureServer(config)
-	s := dirserver.New(ctx, dir, grpcSecureServer, upspin.NetAddr(flags.NetAddr))
+	authServer := grpcauth.NewServer(config)
+	s := dirserver.New(ctx, dir, authServer, upspin.NetAddr(flags.NetAddr))
 
 	grpcServer := grpc.NewServer()
 	proto.RegisterDirServer(grpcServer, s)

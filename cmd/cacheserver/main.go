@@ -59,14 +59,14 @@ func main() {
 	ctx = context.SetCacheEndpoint(ctx, upspin.Endpoint{})
 
 	authConfig := auth.Config{Lookup: auth.PublicUserKeyService(ctx), Context: ctx}
-	grpcSecureServer := grpcauth.NewSecureServer(authConfig)
+	authServer := grpcauth.NewServer(authConfig)
 
-	ss, err := storecacheserver.New(ctx, grpcSecureServer)
+	ss, err := storecacheserver.New(ctx, authServer)
 	if err != nil {
 		log.Fatalf("opening cache: %s", err)
 	}
 
-	ds, err := dircacheserver.New(ctx, grpcSecureServer)
+	ds, err := dircacheserver.New(ctx, authServer)
 	if err != nil {
 		log.Fatalf("opening cache: %s", err)
 	}

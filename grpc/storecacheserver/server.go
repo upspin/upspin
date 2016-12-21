@@ -30,15 +30,15 @@ const (
 type server struct {
 	ctx upspin.Context
 
-	// Automatically handles authentication by implementing the Authenticate server method.
-	grpcauth.SecureServer
-
 	// The on disk cache.
 	cache *storeCache
+
+	// For session handling and the Ping GRPC method.
+	grpcauth.Server
 }
 
 // New creates a new StoreServer instance.
-func New(ctx upspin.Context, ss grpcauth.SecureServer) (proto.StoreServer, error) {
+func New(ctx upspin.Context, authServer grpcauth.Server) (proto.StoreServer, error) {
 	homeDir := os.Getenv("HOME")
 	if len(homeDir) == 0 {
 		homeDir = "/etc"
@@ -48,16 +48,16 @@ func New(ctx upspin.Context, ss grpcauth.SecureServer) (proto.StoreServer, error
 		return nil, err
 	}
 	return &server{
-		ctx:          ctx,
-		SecureServer: ss,
-		cache:        c,
+		ctx:    ctx,
+		Server: authServer,
+		cache:  c,
 	}, nil
 }
 
 // storeFor returns a StoreServer instance bound to the user and endpoint specified in the session.
 func (s *server) storeFor(ctx gContext.Context) (upspin.StoreServer, error) {
 	// Validate that we have a session. If not, it's an auth error.
-	session, err := s.GetSessionFromContext(ctx)
+	session, err := s.SessionFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +72,7 @@ func (s *server) storeFor(ctx gContext.Context) (upspin.StoreServer, error) {
 func (s *server) endpointFor(ctx gContext.Context) (upspin.Endpoint, error) {
 	var e upspin.Endpoint
 	// Validate that we have a session. If not, it's an auth error.
-	session, err := s.GetSessionFromContext(ctx)
+	session, err := s.SessionFromContext(ctx)
 	if err != nil {
 		return e, err
 	}

@@ -73,14 +73,16 @@ func main() {
 		log.Fatalf("Setting up StoreServer: %v", err)
 	}
 
+	// Wrap with permissions checks.
 	ready := make(chan struct{})
-	authConfig := auth.Config{Lookup: auth.PublicUserKeyService(ctx)}
-	grpcSecureServer := grpcauth.NewSecureServer(authConfig)
 	store, err = perm.WrapStore(ctx, ready, store)
 	if err != nil {
 		log.Fatalf("Error wrapping store: %s", err)
 	}
-	s := storeserver.New(ctx, store, grpcSecureServer, upspin.NetAddr(flags.NetAddr))
+
+	authConfig := auth.Config{Lookup: auth.PublicUserKeyService(ctx)}
+	authServer := grpcauth.NewServer(authConfig)
+	s := storeserver.New(ctx, store, authServer, upspin.NetAddr(flags.NetAddr))
 
 	grpcServer := grpc.NewServer()
 	proto.RegisterStoreServer(grpcServer, s)

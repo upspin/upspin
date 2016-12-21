@@ -30,26 +30,26 @@ type server struct {
 	// The underlying keyserver implementation.
 	key upspin.KeyServer
 
-	// Automatically handles authentication by implementing the Authenticate server method.
-	grpcauth.SecureServer
+	// For session handling and the Ping GRPC method.
+	grpcauth.Server
 }
 
-func New(ctx upspin.Context, key upspin.KeyServer, ss grpcauth.SecureServer, addr upspin.NetAddr) proto.KeyServer {
+func New(ctx upspin.Context, key upspin.KeyServer, authServer grpcauth.Server, addr upspin.NetAddr) proto.KeyServer {
 	return &server{
 		context: ctx,
 		endpoint: upspin.Endpoint{
 			Transport: upspin.Remote,
 			NetAddr:   addr,
 		},
-		key:          key,
-		SecureServer: ss,
+		key:    key,
+		Server: authServer,
 	}
 }
 
 // keyFor returns a KeyServer bound to the user specified in the context.
 func (s *server) keyFor(ctx gContext.Context) (upspin.KeyServer, error) {
 	// Validate that we have a session. If not, it's an auth error.
-	session, err := s.GetSessionFromContext(ctx)
+	session, err := s.SessionFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
