@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package grpcauth handles authenticating users using GRPC.
-package grpcauth
+// Package auth handles authenticating users using GRPC.
+package auth
 
 import (
 	"crypto/rand"
@@ -115,7 +115,7 @@ func generateRandomToken() (string, error) {
 // given context, finds or creates a session for that token or request,
 // and returns that session.
 func (s *serverImpl) SessionFromContext(ctx gContext.Context) (session auth.Session, err error) {
-	const op = "auth/grpcauth.SessionFromContext"
+	const op = "grpc/auth.SessionFromContext"
 	defer func() {
 		if err == nil {
 			return

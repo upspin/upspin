@@ -11,9 +11,9 @@ import (
 
 	gContext "golang.org/x/net/context"
 
-	"upspin.io/auth/grpcauth"
 	"upspin.io/context"
 	"upspin.io/errors"
+	"upspin.io/grpc/auth"
 	"upspin.io/log"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
@@ -31,10 +31,10 @@ type server struct {
 	store upspin.StoreServer
 
 	// For session handling and the Ping GRPC method.
-	grpcauth.Server
+	auth.Server
 }
 
-func New(ctx upspin.Context, store upspin.StoreServer, authServer grpcauth.Server, addr upspin.NetAddr) proto.StoreServer {
+func New(ctx upspin.Context, store upspin.StoreServer, addr upspin.NetAddr) proto.StoreServer {
 	return &server{
 		context: ctx,
 		endpoint: upspin.Endpoint{
@@ -42,7 +42,7 @@ func New(ctx upspin.Context, store upspin.StoreServer, authServer grpcauth.Serve
 			NetAddr:   addr,
 		},
 		store:  store,
-		Server: authServer,
+		Server: auth.NewServer(ctx, nil),
 	}
 }
 

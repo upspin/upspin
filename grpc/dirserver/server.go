@@ -10,9 +10,9 @@ import (
 	"fmt"
 	"io"
 
-	"upspin.io/auth/grpcauth"
 	"upspin.io/context"
 	"upspin.io/errors"
+	"upspin.io/grpc/auth"
 	"upspin.io/log"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
@@ -32,10 +32,10 @@ type server struct {
 	dir upspin.DirServer
 
 	// For session handling and the Ping GRPC method.
-	grpcauth.Server
+	auth.Server
 }
 
-func New(ctx upspin.Context, dir upspin.DirServer, authServer grpcauth.Server, addr upspin.NetAddr) proto.DirServer {
+func New(ctx upspin.Context, dir upspin.DirServer, addr upspin.NetAddr) proto.DirServer {
 	return &server{
 		context: ctx,
 		endpoint: upspin.Endpoint{
@@ -43,7 +43,7 @@ func New(ctx upspin.Context, dir upspin.DirServer, authServer grpcauth.Server, a
 			NetAddr:   addr,
 		},
 		dir:    dir,
-		Server: authServer,
+		Server: auth.NewServer(ctx, nil),
 	}
 }
 

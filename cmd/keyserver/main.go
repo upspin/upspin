@@ -13,7 +13,6 @@ import (
 
 	"google.golang.org/grpc"
 
-	"upspin.io/auth/grpcauth"
 	"upspin.io/cloud/https"
 	"upspin.io/context"
 	"upspin.io/errors"
@@ -76,20 +75,9 @@ func main() {
 	// Special hack for bootstrapping the inprocess key server.
 	setupTestUser(key)
 
-	authConfig := grpcauth.ServerConfig{
-		Lookup: func(userName upspin.UserName) (upspin.PublicKey, error) {
-			user, err := key.Lookup(userName)
-			if err != nil {
-				return "", err
-			}
-			return user.PublicKey, nil
-		},
-	}
-	authServer := grpcauth.NewServer(ctx, &authConfig)
-	s := keyserver.New(ctx, key, authServer, upspin.NetAddr(flags.NetAddr))
-
 	grpcServer := grpc.NewServer()
-	proto.RegisterKeyServer(grpcServer, s)
+	grpcKey := keyserver.New(ctx, key, upspin.NetAddr(flags.NetAddr))
+	proto.RegisterKeyServer(grpcServer, grpcKey)
 	http.Handle("/", grpcServer)
 
 	if *mailConfigFile != "" {

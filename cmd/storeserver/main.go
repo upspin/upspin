@@ -11,7 +11,6 @@ import (
 
 	"google.golang.org/grpc"
 
-	"upspin.io/auth/grpcauth"
 	"upspin.io/cloud/https"
 	"upspin.io/context"
 	"upspin.io/errors"
@@ -79,11 +78,9 @@ func main() {
 		log.Fatalf("Error wrapping store: %s", err)
 	}
 
-	authServer := grpcauth.NewServer(ctx, nil)
-	s := storeserver.New(ctx, store, authServer, upspin.NetAddr(flags.NetAddr))
-
 	grpcServer := grpc.NewServer()
-	proto.RegisterStoreServer(grpcServer, s)
+	grpcStore := storeserver.New(ctx, store, upspin.NetAddr(flags.NetAddr))
+	proto.RegisterStoreServer(grpcServer, grpcStore)
 	http.Handle("/", grpcServer)
 
 	https.ListenAndServe(ready, serverName, flags.HTTPSAddr, &https.Options{
