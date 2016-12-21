@@ -33,7 +33,6 @@ import (
 	"crypto/rand"
 	"fmt"
 	"math/big"
-	"net"
 	"time"
 
 	gContext "golang.org/x/net/context"
@@ -88,28 +87,15 @@ type SecureServer interface {
 
 	// GetSessionFromContext returns a session from the context if there is one.
 	GetSessionFromContext(ctx gContext.Context) (auth.Session, error)
-
-	// Serve blocks and serves request until the server is stopped.
-	Serve(listener net.Listener) error
-
-	// Stop stops serving requests immediately, closing all open connections.
-	Stop()
-
-	// GRPCServer returns the underlying GRPC server.
-	GRPCServer() *grpc.Server
 }
 
 // NewSecureServer returns a new SecureServer that serves GRPC.
-func NewSecureServer(server *grpc.Server, config auth.Config) (SecureServer, error) {
-	return &secureServerImpl{
-		grpcServer: server,
-		config:     config,
-	}, nil
+func NewSecureServer(config auth.Config) SecureServer {
+	return &secureServerImpl{config: config}
 }
 
 type secureServerImpl struct {
-	grpcServer *grpc.Server
-	config     auth.Config
+	config auth.Config
 }
 
 var _ SecureServer = (*secureServerImpl)(nil)
@@ -255,21 +241,6 @@ func (s *secureServerImpl) handleSessionRequest(ctx gContext.Context, authReques
 		return nil, err
 	}
 	return session, nil
-}
-
-// Serve implements SecureServer.
-func (s *secureServerImpl) Serve(listener net.Listener) error {
-	return s.grpcServer.Serve(listener)
-}
-
-// Stop implements SecureServer.
-func (s *secureServerImpl) Stop() {
-	s.grpcServer.Stop()
-}
-
-// GRPCServer implements SecureServer.
-func (s *secureServerImpl) GRPCServer() *grpc.Server {
-	return s.grpcServer
 }
 
 // verifyUser verifies a GRPC context header authenticating the remote user.

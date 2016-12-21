@@ -77,7 +77,6 @@ func main() {
 	// Special hack for bootstrapping the inprocess key server.
 	setupTestUser(key)
 
-	grpcServer := grpc.NewServer()
 	authConfig := auth.Config{Lookup: func(userName upspin.UserName) (upspin.PublicKey, error) {
 		user, err := key.Lookup(userName)
 		if err != nil {
@@ -85,14 +84,13 @@ func main() {
 		}
 		return user.PublicKey, nil
 	}}
-	grpcSecureServer, err := grpcauth.NewSecureServer(grpcServer, authConfig)
-	if err != nil {
-		log.Fatal(err)
-	}
+	grpcSecureServer := grpcauth.NewSecureServer(authConfig)
 	s := keyserver.New(ctx, key, grpcSecureServer, upspin.NetAddr(flags.NetAddr))
-	proto.RegisterKeyServer(grpcServer, s)
 
+	grpcServer := grpc.NewServer()
+	proto.RegisterKeyServer(grpcServer, s)
 	http.Handle("/", grpcServer)
+
 	if *mailConfigFile != "" {
 		mailHandler, err := newMailHandler(key, *mailConfigFile)
 		if err != nil {
@@ -102,7 +100,6 @@ func main() {
 	}
 
 	const metadataKey = "keyserver"
-
 	https.ListenAndServe(nil, metadataKey, flags.HTTPSAddr, &https.Options{
 		CertFile: flags.TLSCertFile,
 		KeyFile:  flags.TLSKeyFile,

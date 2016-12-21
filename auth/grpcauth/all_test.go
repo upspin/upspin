@@ -31,7 +31,7 @@ import (
 var (
 	joePublic  = upspin.PublicKey("p256\n104278369061367353805983276707664349405797936579880352274235000127123465616334\n26941412685198548642075210264642864401950753555952207894712845271039438170192\n")
 	user       = upspin.UserName("joe@blow.com")
-	grpcServer SecureServer
+	grpcServer *grpc.Server
 	srv        *server
 	cli        *client
 )
@@ -64,15 +64,10 @@ func pickPort() (port string) {
 
 func startServer() (port string) {
 	config := auth.Config{Lookup: lookup}
-	grpcServer := grpc.NewServer()
-	ss, err := NewSecureServer(grpcServer, config)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	srv = &server{SecureServer: ss}
+	srv = &server{SecureServer: NewSecureServer(config)}
 	port = pickPort()
 
+	grpcServer = grpc.NewServer()
 	prototest.RegisterTestServiceServer(grpcServer, srv)
 	log.Printf("Starting e2e server on port %s", port)
 	http.Handle("/", grpcServer)
@@ -210,7 +205,7 @@ func TestMain(m *testing.M) {
 	// Terminate cleanly.
 	log.Printf("Finishing...")
 	cli.Close()
-	srv.Stop()
+	grpcServer.Stop()
 
 	// Report test results.
 	log.Printf("Finishing e2e tests: %d", code)
