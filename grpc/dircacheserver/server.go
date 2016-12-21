@@ -31,12 +31,12 @@ type server struct {
 	// epMap is a map of users to endpoints
 	epMap *epMap
 
-	// Automatically handles authentication by implementing the Authenticate server method.
-	grpcauth.SecureServer
+	// For session handling and the Ping GRPC method.
+	grpcauth.Server
 }
 
 // New creates a new DirServer cache reading in the log and writing out a new compacted log.
-func New(ctx upspin.Context, ss grpcauth.SecureServer) (proto.DirServer, error) {
+func New(ctx upspin.Context, authServer grpcauth.Server) (proto.DirServer, error) {
 	homeDir := os.Getenv("HOME")
 	if len(homeDir) == 0 {
 		return nil, errors.Str("$HOME not defined")
@@ -47,17 +47,17 @@ func New(ctx upspin.Context, ss grpcauth.SecureServer) (proto.DirServer, error) 
 		return nil, err
 	}
 	return &server{
-		ctx:          ctx,
-		clog:         clog,
-		epMap:        epMap,
-		SecureServer: ss,
+		ctx:    ctx,
+		clog:   clog,
+		epMap:  epMap,
+		Server: authServer,
 	}, nil
 }
 
 // dirFor returns a DirServer instance bound to the user specified in the context.
 func (s *server) dirFor(ctx gContext.Context, path upspin.PathName) (upspin.DirServer, error) {
 	// Validate that we have a session. If not, it's an auth error.
-	session, err := s.GetSessionFromContext(ctx)
+	session, err := s.SessionFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +76,7 @@ func (s *server) dirFor(ctx gContext.Context, path upspin.PathName) (upspin.DirS
 func (s *server) endpointFor(ctx gContext.Context) (*upspin.Endpoint, error) {
 	var ep upspin.Endpoint
 	// Validate that we have a session. If not, it's an auth error.
-	session, err := s.GetSessionFromContext(ctx)
+	session, err := s.SessionFromContext(ctx)
 	if err != nil {
 		return &ep, err
 	}

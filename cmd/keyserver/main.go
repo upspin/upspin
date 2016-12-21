@@ -84,8 +84,8 @@ func main() {
 		}
 		return user.PublicKey, nil
 	}}
-	grpcSecureServer := grpcauth.NewSecureServer(authConfig)
-	s := keyserver.New(ctx, key, grpcSecureServer, upspin.NetAddr(flags.NetAddr))
+	authServer := grpcauth.NewServer(authConfig)
+	s := keyserver.New(ctx, key, authServer, upspin.NetAddr(flags.NetAddr))
 
 	grpcServer := grpc.NewServer()
 	proto.RegisterKeyServer(grpcServer, s)

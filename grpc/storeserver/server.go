@@ -30,26 +30,26 @@ type server struct {
 	// The underlying storage implementation.
 	store upspin.StoreServer
 
-	// Automatically handles authentication by implementing the Authenticate server method.
-	grpcauth.SecureServer
+	// For session handling and the Ping GRPC method.
+	grpcauth.Server
 }
 
-func New(ctx upspin.Context, store upspin.StoreServer, ss grpcauth.SecureServer, addr upspin.NetAddr) proto.StoreServer {
+func New(ctx upspin.Context, store upspin.StoreServer, authServer grpcauth.Server, addr upspin.NetAddr) proto.StoreServer {
 	return &server{
 		context: ctx,
 		endpoint: upspin.Endpoint{
 			Transport: upspin.Remote,
 			NetAddr:   addr,
 		},
-		store:        store,
-		SecureServer: ss,
+		store:  store,
+		Server: authServer,
 	}
 }
 
 // storeFor returns a StoreServer instance bound to the user specified in the context.
 func (s *server) storeFor(ctx gContext.Context) (upspin.StoreServer, error) {
 	// Validate that we have a session. If not, it's an auth error.
-	session, err := s.GetSessionFromContext(ctx)
+	session, err := s.SessionFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}
