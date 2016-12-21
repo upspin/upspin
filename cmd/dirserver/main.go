@@ -88,16 +88,14 @@ func main() {
 		log.Printf("Warning: no Writers Group file protection -- all access permitted")
 	}
 
-	grpcServer := grpc.NewServer()
 	config := auth.Config{Lookup: auth.PublicUserKeyService(ctx)}
-	grpcSecureServer, err := grpcauth.NewSecureServer(grpcServer, config)
-	if err != nil {
-		log.Fatal(err)
-	}
+	grpcSecureServer := grpcauth.NewSecureServer(config)
 	s := dirserver.New(ctx, dir, grpcSecureServer, upspin.NetAddr(flags.NetAddr))
-	proto.RegisterDirServer(grpcServer, s)
 
+	grpcServer := grpc.NewServer()
+	proto.RegisterDirServer(grpcServer, s)
 	http.Handle("/", grpcServer)
+
 	https.ListenAndServe(ready, serverName, flags.HTTPSAddr, &https.Options{
 		CertFile: flags.TLSCertFile,
 		KeyFile:  flags.TLSKeyFile,
