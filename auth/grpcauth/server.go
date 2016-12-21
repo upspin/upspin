@@ -3,30 +3,6 @@
 // license that can be found in the LICENSE file.
 
 // Package grpcauth handles authenticating users using GRPC.
-//
-// To use a grpcauth on the server side:
-//
-// ss, err := NewSecureServer(&auth.Config{Lookup: auth.PublicUserKeyService()}, "path/to/certfile", "path/to/certkeyfile")
-// listener, err := net.Listen("tcp", fmt.Sprintf(":%d", port))
-// ss.Serve(listener)
-//
-// where myServer's exported methods do the following:
-//
-// func (m *myServer) DoSomething(ctx context.Context, req *proto.Request) (*proto.Response, error) {
-//     session, err := m.GetSessionFromContext(ctx)
-//     if err != nil {
-//          return err
-//     }
-//     user := session.User()
-//     ... do something for user now ...
-// }
-//
-// Therefore, define myServer as follows:
-//
-// type myServer struct {
-//      grpcauth.SecureServer
-//      ...
-// }
 package grpcauth
 
 import (
@@ -80,34 +56,29 @@ const (
 	serverAuthMagic = " AuthenticateServer "
 )
 
-// A SecureServer is a GRPC server that implements the Authenticate method as defined by the upspin proto.
-type SecureServer interface {
-	// Ping responds with the same.
-	Ping(ctx gContext.Context, req *proto.PingRequest) (*proto.PingResponse, error)
+// Server provides a mechanism for GRPC severs to manage sessions
+// and implements the GRPC Ping method shared by all Upspin servers.
+// It should be embedded in any Upspin GRPC server implementations.
+type Server interface {
+	// SessionFromContext looks for an authentication request or token in
+	// the context's GRPC headers, and returns a new or existing session
+	// (if available).
+	SessionFromContext(ctx gContext.Context) (auth.Session, error)
 
-	// GetSessionFromContext returns a session from the context if there is one.
-	GetSessionFromContext(ctx gContext.Context) (auth.Session, error)
+	// Ping is the GRPC Ping method shared by all Upspin GRPC servers.
+	Ping(gContext gContext.Context, req *proto.PingRequest) (*proto.PingResponse, error)
 }
 
-// NewSecureServer returns a new SecureServer that serves GRPC.
-func NewSecureServer(config auth.Config) SecureServer {
-	return &secureServerImpl{config: config}
+// NewServer returns a new Server that uses the given config.
+func NewServer(config auth.Config) Server {
+	return &serverImpl{config: config}
 }
 
-type secureServerImpl struct {
+type serverImpl struct {
 	config auth.Config
 }
 
-var _ SecureServer = (*secureServerImpl)(nil)
-
-// Ping responds with the same.
-func (s *secureServerImpl) Ping(ctx gContext.Context, req *proto.PingRequest) (*proto.PingResponse, error) {
-	log.Print("Ping")
-	resp := &proto.PingResponse{
-		PingSequence: req.PingSequence,
-	}
-	return resp, nil
-}
+var _ Server = (*serverImpl)(nil)
 
 func generateRandomToken() (string, error) {
 	var buf [authTokenEntropyLen]byte
@@ -121,11 +92,11 @@ func generateRandomToken() (string, error) {
 	return fmt.Sprintf("%X", buf), nil
 }
 
-// GetSessionFromContext looks for an authentication token or request in the
+// SessionFromContext looks for an authentication token or request in the
 // given context, finds or creates a session for that token or request,
 // and returns that session.
-func (s *secureServerImpl) GetSessionFromContext(ctx gContext.Context) (session auth.Session, err error) {
-	const op = "auth/grpcauth.GetSessionFromContext"
+func (s *serverImpl) SessionFromContext(ctx gContext.Context) (session auth.Session, err error) {
+	const op = "auth/grpcauth.SessionFromContext"
 	defer func() {
 		if err == nil {
 			return
@@ -161,7 +132,12 @@ func (s *secureServerImpl) GetSessionFromContext(ctx gContext.Context) (session 
 	return s.handleSessionRequest(ctx, authRequest, proxyRequest)
 }
 
-func (s *secureServerImpl) validateToken(ctx gContext.Context, authToken string) (auth.Session, error) {
+// Ping implements Pinger.
+func (s *serverImpl) Ping(gContext gContext.Context, req *proto.PingRequest) (*proto.PingResponse, error) {
+	return &proto.PingResponse{PingSequence: req.PingSequence}, nil
+}
+
+func (s *serverImpl) validateToken(ctx gContext.Context, authToken string) (auth.Session, error) {
 	if len(authToken) < authTokenEntropyLen {
 		return nil, errors.E(errors.Invalid, errors.Str("invalid auth token"))
 	}
@@ -188,7 +164,7 @@ func (s *secureServerImpl) validateToken(ctx gContext.Context, authToken string)
 	return session, nil
 }
 
-func (s *secureServerImpl) handleSessionRequest(ctx gContext.Context, authRequest []string, proxyRequest []string) (auth.Session, error) {
+func (s *serverImpl) handleSessionRequest(ctx gContext.Context, authRequest []string, proxyRequest []string) (auth.Session, error) {
 	// Validate the username.
 	user := upspin.UserName(authRequest[0])
 	if err := valid.UserName(user); err != nil {
