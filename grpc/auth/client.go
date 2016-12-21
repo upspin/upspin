@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package grpcauth
+package auth
 
 import (
 	"crypto/tls"
@@ -77,7 +77,7 @@ var tokenFreshnessDuration = authTokenDuration - time.Hour
 // The security level specifies the expected security guarantees of the connection.
 // If proxyFor is an assigned endpoint, it indicates that this connection is being used to proxy request to that endpoint.
 func NewClient(context upspin.Context, netAddr upspin.NetAddr, keepAliveInterval time.Duration, security SecurityLevel, proxyFor upspin.Endpoint) (*Client, error) {
-	const op = "auth/grpcauth.NewGRPCClient"
+	const op = "grpc/auth.NewClient"
 	if keepAliveInterval != 0 && keepAliveInterval < time.Minute {
 		log.Info.Printf("Keep-alive interval too short. You may overload the server and be throttled")
 	}
@@ -163,7 +163,7 @@ func (ac *Client) keepAlive() {
 			}
 			sleepFor = ac.keepAliveInterval
 			if !ac.Ping() {
-				log.Error.Printf("grpcauth: keepAlive: ping failed")
+				log.Error.Printf("grpc/auth: keepAlive: ping failed")
 			}
 			ac.setLastActivity()
 		case <-ac.closeKeepAlive:
@@ -261,7 +261,7 @@ func (ac *Client) isProxy() bool {
 // 	err = finishAuth(err)
 // 	// handle err
 func (ac *Client) NewAuthContext() (ctx gContext.Context, opt grpc.CallOption, finishAuth func(error) error, err error) {
-	const op = "auth/grpcauth.Client"
+	const op = "grpc/auth.NewAuthContext"
 
 	ctx = gContext.Background()
 

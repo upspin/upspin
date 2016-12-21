@@ -14,9 +14,9 @@ import (
 
 	gContext "golang.org/x/net/context"
 
-	"upspin.io/auth/grpcauth"
 	"upspin.io/bind"
 	"upspin.io/errors"
+	"upspin.io/grpc/auth"
 	"upspin.io/log"
 	"upspin.io/path"
 	"upspin.io/upspin"
@@ -32,11 +32,11 @@ type server struct {
 	userToDirServerMapping *userToDirServerMapping
 
 	// For session handling and the Ping GRPC method.
-	grpcauth.Server
+	auth.Server
 }
 
 // New creates a new DirServer cache reading in the log and writing out a new compacted log.
-func New(ctx upspin.Context, authServer grpcauth.Server) (proto.DirServer, error) {
+func New(ctx upspin.Context) (proto.DirServer, error) {
 	homeDir := os.Getenv("HOME")
 	if len(homeDir) == 0 {
 		return nil, errors.Str("$HOME not defined")
@@ -50,7 +50,7 @@ func New(ctx upspin.Context, authServer grpcauth.Server) (proto.DirServer, error
 		ctx:  ctx,
 		clog: clog,
 		userToDirServerMapping: userToDirServerMapping,
-		Server:                 authServer,
+		Server:                 auth.NewServer(ctx, nil),
 	}, nil
 }
 
