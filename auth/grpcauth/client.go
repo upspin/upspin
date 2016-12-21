@@ -24,18 +24,19 @@ import (
 	"upspin.io/upspin/proto"
 )
 
-// GRPCCommon is an interface that all GRPC services implement for authentication and ping as part of upspin.Service.
-type GRPCCommon interface {
-	// Ping is the GRPC call for Ping.
+// Pinger describes part of a GRPC client for an upspin.Service
+type Pinger interface {
 	Ping(ctx gContext.Context, in *proto.PingRequest, opts ...grpc.CallOption) (*proto.PingResponse, error)
 }
 
-// AuthClientService is a partial Service that uses GRPC as transport and implements Authentication.
-type AuthClientService struct {
-	grpcCommon GRPCCommon
-	grpcConn   *grpc.ClientConn
-	context    upspin.Context
-	proxyFor   upspin.Endpoint // the server is a proxy for this endpoint.
+// Client is a partial upspin.Service that uses GRPC as transport and
+// implements authentication using out-of-band GRPC headers.
+// It should be embedded in any Upspin GRPC client implementation.
+type Client struct {
+	pinger   Pinger
+	grpcConn *grpc.ClientConn
+	context  upspin.Context
+	proxyFor upspin.Endpoint // the server is a proxy for this endpoint.
 
 	keepAliveInterval time.Duration // interval of keep-alive packets.
 	closeKeepAlive    chan bool     // channel used to tell the keep-alive routine to exit.
@@ -67,7 +68,7 @@ const (
 // To be safe, we refresh the token 1 hour ahead of time.
 var tokenFreshnessDuration = authTokenDuration - time.Hour
 
-// NewGRPCClient returns new GRPC client connected to a GRPC server at a net address.
+// NewClient returns new GRPC client connected to a GRPC server at a net address.
 // The address is expected to be a raw network address with port number, as in domain.com:5580. However, for convenience,
 // it is optionally accepted for the time being to use one of the following prefixes:
 // https://, http://, grpc://. This may change in the future.
@@ -75,7 +76,7 @@ var tokenFreshnessDuration = authTokenDuration - time.Hour
 // keep-alive packets.
 // The security level specifies the expected security guarantees of the connection.
 // If proxyFor is an assigned endpoint, it indicates that this connection is being used to proxy request to that endpoint.
-func NewGRPCClient(context upspin.Context, netAddr upspin.NetAddr, keepAliveInterval time.Duration, security SecurityLevel, proxyFor upspin.Endpoint) (*AuthClientService, error) {
+func NewClient(context upspin.Context, netAddr upspin.NetAddr, keepAliveInterval time.Duration, security SecurityLevel, proxyFor upspin.Endpoint) (*Client, error) {
 	const op = "auth/grpcauth.NewGRPCClient"
 	if keepAliveInterval != 0 && keepAliveInterval < time.Minute {
 		log.Info.Printf("Keep-alive interval too short. You may overload the server and be throttled")
@@ -91,7 +92,7 @@ func NewGRPCClient(context upspin.Context, netAddr upspin.NetAddr, keepAliveInte
 	case isHTTPS:
 		skip = 8
 	}
-	ac := &AuthClientService{
+	ac := &Client{
 		context:           context,
 		keepAliveInterval: keepAliveInterval,
 		closeKeepAlive:    make(chan bool, 1),
@@ -150,7 +151,7 @@ func isLocal(addr string) bool {
 
 // keepAlive loops forever pinging the server every keepAliveInterval. It skips pings if there has been network
 // activity more recently than the keep alive interval. It must run on a separate go routine.
-func (ac *AuthClientService) keepAlive() {
+func (ac *Client) keepAlive() {
 	sleepFor := ac.keepAliveInterval
 	for {
 		select {
@@ -172,7 +173,7 @@ func (ac *AuthClientService) keepAlive() {
 }
 
 // lastActivity reports the time of the last known network activity.
-func (ac *AuthClientService) lastActivity() time.Time {
+func (ac *Client) lastActivity() time.Time {
 	ac.mu.Lock()
 	defer ac.mu.Unlock()
 	return ac.lastNetActivity
@@ -180,24 +181,25 @@ func (ac *AuthClientService) lastActivity() time.Time {
 
 // setLastActivity sets the current time as the last known network acitivity. This is useful
 // when using application pings, to prevent unnecessarily frequent pings.
-func (ac *AuthClientService) setLastActivity() {
+func (ac *Client) setLastActivity() {
 	ac.mu.Lock()
 	ac.lastNetActivity = time.Now()
 	ac.mu.Unlock()
 }
 
-// SetService sets the underlying RPC service which was obtained with proto.NewSERVICENAMEClient, where SERVICENAME is
-// the RPC service definition from the proto file.
-func (ac *AuthClientService) SetService(common GRPCCommon) {
-	ac.grpcCommon = common
+// SetService sets the underlying RPC service which was obtained with
+// proto.NewSERVICENAMEClient, where SERVICENAME is the RPC service definition
+// from the proto file.
+func (ac *Client) SetService(p Pinger) {
+	ac.pinger = p
 }
 
 // GRPCConn returns the GRPC client connection used to dial the server.
-func (ac *AuthClientService) GRPCConn() *grpc.ClientConn {
+func (ac *Client) GRPCConn() *grpc.ClientConn {
 	return ac.grpcConn
 }
 
-func (ac *AuthClientService) dialWithKeepAlive(target string, timeout time.Duration) (net.Conn, error) {
+func (ac *Client) dialWithKeepAlive(target string, timeout time.Duration) (net.Conn, error) {
 	// Invalidate auth token and mark proxy as not configured.
 	ac.mu.Lock()
 	ac.authToken = ""
@@ -219,14 +221,14 @@ func (ac *AuthClientService) dialWithKeepAlive(target string, timeout time.Durat
 }
 
 // Ping implements upspin.Service.
-func (ac *AuthClientService) Ping() bool {
+func (ac *Client) Ping() bool {
 	seq := rand.Int31()
 	req := &proto.PingRequest{
 		PingSequence: seq,
 	}
 	gctx, cancel := gContext.WithTimeout(gContext.Background(), 3*time.Second)
 	defer cancel()
-	resp, err := ac.grpcCommon.Ping(gctx, req)
+	resp, err := ac.pinger.Ping(gctx, req)
 	if err != nil {
 		log.Printf("Ping error: %s", err)
 	}
@@ -234,13 +236,13 @@ func (ac *AuthClientService) Ping() bool {
 	return err == nil && resp.PingSequence == seq
 }
 
-func (ac *AuthClientService) isAuthTokenExpired() bool {
+func (ac *Client) isAuthTokenExpired() bool {
 	ac.mu.Lock()
 	defer ac.mu.Unlock()
 	return ac.authToken == "" || ac.lastTokenRefresh.Add(tokenFreshnessDuration).Before(time.Now())
 }
 
-func (ac *AuthClientService) isProxy() bool {
+func (ac *Client) isProxy() bool {
 	return ac.proxyFor.Transport != upspin.Unassigned
 }
 
@@ -258,8 +260,8 @@ func (ac *AuthClientService) isProxy() bool {
 // 	resp, err := c.grpcClient.Echo(ctx, req, callOpt)
 // 	err = finishAuth(err)
 // 	// handle err
-func (ac *AuthClientService) NewAuthContext() (ctx gContext.Context, opt grpc.CallOption, finishAuth func(error) error, err error) {
-	const op = "auth/grpcauth.AuthClientService"
+func (ac *Client) NewAuthContext() (ctx gContext.Context, opt grpc.CallOption, finishAuth func(error) error, err error) {
+	const op = "auth/grpcauth.Client"
 
 	ctx = gContext.Background()
 
@@ -328,7 +330,7 @@ func (ac *AuthClientService) NewAuthContext() (ctx gContext.Context, opt grpc.Ca
 
 // verifyServerUser ensures server is running as the same user. It assumes that msg[0] is
 // the user name.
-func (ac *AuthClientService) verifyServerUser(msg []string) error {
+func (ac *Client) verifyServerUser(msg []string) error {
 	u := upspin.UserName(msg[0])
 	if ac.context.UserName() != u {
 		return errors.Errorf("client %s does not match server %s", ac.context.UserName(), u)
@@ -354,7 +356,7 @@ func (ac *AuthClientService) verifyServerUser(msg []string) error {
 }
 
 // Close implements upspin.Service.
-func (ac *AuthClientService) Close() {
+func (ac *Client) Close() {
 	select { // prevents blocking if Close is called more than once.
 	case ac.closeKeepAlive <- true:
 		close(ac.closeKeepAlive)

@@ -31,26 +31,26 @@ type server struct {
 	// The underlying dirserver implementation.
 	dir upspin.DirServer
 
-	// Automatically handles authentication by implementing the Authenticate server method.
-	grpcauth.SecureServer
+	// For session handling and the Ping GRPC method.
+	grpcauth.Server
 }
 
-func New(ctx upspin.Context, dir upspin.DirServer, ss grpcauth.SecureServer, addr upspin.NetAddr) proto.DirServer {
+func New(ctx upspin.Context, dir upspin.DirServer, authServer grpcauth.Server, addr upspin.NetAddr) proto.DirServer {
 	return &server{
 		context: ctx,
 		endpoint: upspin.Endpoint{
 			Transport: upspin.Remote,
 			NetAddr:   addr,
 		},
-		dir:          dir,
-		SecureServer: ss,
+		dir:    dir,
+		Server: authServer,
 	}
 }
 
 // dirFor returns a DirServer instance bound to the user specified in the context.
 func (s *server) dirFor(ctx gContext.Context) (upspin.DirServer, error) {
 	// Validate that we have a session. If not, it's an auth error.
-	session, err := s.GetSessionFromContext(ctx)
+	session, err := s.SessionFromContext(ctx)
 	if err != nil {
 		return nil, err
 	}

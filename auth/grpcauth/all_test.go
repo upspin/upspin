@@ -37,7 +37,7 @@ var (
 )
 
 type server struct {
-	SecureServer
+	Server
 	t         *testing.T
 	iteration int
 }
@@ -64,20 +64,20 @@ func pickPort() (port string) {
 
 func startServer() (port string) {
 	config := auth.Config{Lookup: lookup}
-	srv = &server{SecureServer: NewSecureServer(config)}
+	srv = &server{Server: NewServer(config)}
 	port = pickPort()
 
 	grpcServer = grpc.NewServer()
 	prototest.RegisterTestServiceServer(grpcServer, srv)
-	log.Printf("Starting e2e server on port %s", port)
 	http.Handle("/", grpcServer)
+
 	go https.ListenAndServe(nil, "test", fmt.Sprintf("localhost:%s", port), nil)
 	return port
 }
 
 func (s *server) Echo(ctx gContext.Context, req *prototest.EchoRequest) (*prototest.EchoResponse, error) {
 	// Validate that we have a session. If not, it's an auth error.
-	session, err := s.GetSessionFromContext(ctx)
+	session, err := s.SessionFromContext(ctx)
 	if err != nil {
 		s.t.Fatal(err)
 	}
@@ -97,9 +97,9 @@ func (s *server) Echo(ctx gContext.Context, req *prototest.EchoRequest) (*protot
 }
 
 type client struct {
-	*AuthClientService // For handling Ping and Close.
-	grpcClient         prototest.TestServiceClient
-	reqCount           int
+	*Client    // For sessions, Ping, and Close.
+	grpcClient prototest.TestServiceClient
+	reqCount   int
 }
 
 func (c *client) Echo(t *testing.T, payload string) (response string) {
@@ -140,9 +140,9 @@ func startClient(port string) {
 	ctx = context.SetCertPool(ctx, pool)
 
 	// Try a few times because the server may not be up yet.
-	var authClient *AuthClientService
+	var authClient *Client
 	for i := 0; i < 10; i++ {
-		authClient, err = NewGRPCClient(ctx, upspin.NetAddr("localhost:"+port), KeepAliveInterval, Secure, upspin.Endpoint{})
+		authClient, err = NewClient(ctx, upspin.NetAddr("localhost:"+port), KeepAliveInterval, Secure, upspin.Endpoint{})
 		if err == nil {
 			break
 		}
@@ -154,8 +154,8 @@ func startClient(port string) {
 	grpcClient := prototest.NewTestServiceClient(authClient.GRPCConn())
 	authClient.SetService(grpcClient)
 	cli = &client{
-		AuthClientService: authClient,
-		grpcClient:        grpcClient,
+		Client:     authClient,
+		grpcClient: grpcClient,
 	}
 }
 

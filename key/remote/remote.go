@@ -28,9 +28,9 @@ type dialContext struct {
 
 // remote implements upspin.KeyServer.
 type remote struct {
-	*grpcauth.AuthClientService // For handling Authenticate, Ping and Close.
-	ctx                         dialContext
-	keyClient                   proto.KeyClient
+	*grpcauth.Client // For sessions, Ping, and Close.
+	ctx              dialContext
+	keyClient        proto.KeyClient
 }
 
 var _ upspin.KeyServer = (*remote)(nil)
@@ -94,7 +94,7 @@ func (r *remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service
 		return nil, op.error(errors.Invalid, errors.Str("unrecognized transport"))
 	}
 
-	authClient, err := grpcauth.NewGRPCClient(context, e.NetAddr, grpcauth.KeepAliveInterval, grpcauth.Secure, upspin.Endpoint{})
+	authClient, err := grpcauth.NewClient(context, e.NetAddr, grpcauth.KeepAliveInterval, grpcauth.Secure, upspin.Endpoint{})
 	if err != nil {
 		return nil, op.error(errors.IO, err)
 	}
@@ -104,7 +104,7 @@ func (r *remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service
 	authClient.SetService(keyClient)
 
 	return &remote{
-		AuthClientService: authClient,
+		Client: authClient,
 		ctx: dialContext{
 			endpoint: e,
 			userName: context.UserName(),
