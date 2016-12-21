@@ -21,7 +21,8 @@ import (
 	"cloud.google.com/go/storage"
 	"rsc.io/letsencrypt"
 
-	"upspin.io/auth"
+	"upspin.io/access"
+	"upspin.io/errors"
 	"upspin.io/log"
 )
 
@@ -104,7 +105,7 @@ func ListenAndServe(ready chan<- struct{}, metaSuffix, addr string, opt *Options
 			log.Error.Print("https: WARNING: using self-signed test certificates.")
 		}
 		var err error
-		config, err = auth.NewDefaultTLSConfig(opt.CertFile, opt.KeyFile)
+		config, err = newDefaultTLSConfig(opt.CertFile, opt.KeyFile)
 		if err != nil {
 			log.Fatalf("https: setting up TLS config: %v", err)
 		}
@@ -161,4 +162,67 @@ func letsencryptCache(m *letsencrypt.Manager, bucket, suffix string) error {
 	}()
 
 	return nil
+}
+
+// newDefaultTLSConfig creates a new TLS config based on the certificate files given.
+func newDefaultTLSConfig(certFile string, certKeyFile string) (*tls.Config, error) {
+	const op = "cloud/https.newDefaultTLSConfig"
+	certReadable, err := isReadableFile(certFile)
+	if err != nil {
+		return nil, errors.E(op, errors.Invalid, errors.Errorf("SSL certificate in %q: %q", certFile, err))
+	}
+	if !certReadable {
+		return nil, errors.E(op, errors.Invalid, errors.Errorf("certificate file %q not readable", certFile))
+	}
+	keyReadable, err := isReadableFile(certKeyFile)
+	if err != nil {
+		return nil, errors.E(op, errors.Invalid, errors.Errorf("SSL key in %q: %v", certKeyFile, err))
+	}
+	if !keyReadable {
+		return nil, errors.E(op, errors.Invalid, errors.Errorf("certificate key file %q not readable", certKeyFile))
+	}
+
+	cert, err := tls.LoadX509KeyPair(certFile, certKeyFile)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+
+	tlsConfig := &tls.Config{
+		CipherSuites: []uint16{
+			tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
+			tls.TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256,
+			tls.TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,
+			tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+		},
+		MinVersion:               tls.VersionTLS12,
+		PreferServerCipherSuites: true, // Use our choice, not the client's choice
+		CurvePreferences:         []tls.CurveID{tls.CurveP521, tls.CurveP384, tls.CurveP256},
+		Certificates:             []tls.Certificate{cert},
+	}
+	tlsConfig.BuildNameToCertificate()
+	return tlsConfig, nil
+}
+
+// isReadableFile reports whether the file exists and is readable.
+// If the error is non-nil, it means there might be a file or directory
+// with that name but we cannot read it.
+func isReadableFile(path string) (bool, error) {
+	// Is it stattable and is it a plain file?
+	info, err := os.Stat(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return false, nil // Item does not exist.
+		}
+		return false, err // Item is problematic.
+	}
+	if info.IsDir() {
+		return false, errors.Str("is directory")
+	}
+	// Is it readable?
+	fd, err := os.Open(path)
+	if err != nil {
+		return false, access.ErrPermissionDenied
+	}
+	fd.Close()
+	return true, nil // Item exists and is readable.
 }
