@@ -402,6 +402,8 @@ func (p Packing) String() string {
 		return "debug"
 	case EEPack:
 		return "ee"
+	case EEIntegrityPack:
+		return "eeintegrity"
 	default:
 		return fmt.Sprintf("packing(%d)", int(p))
 	}
