@@ -13,7 +13,7 @@ import (
 // PublicUserKeyService returns a Lookup function that looks up user's public keys.
 // The lookup function returned is bound to a well-known public Upspin user service.
 func PublicUserKeyService(ctx upspin.Context) func(userName upspin.UserName) (upspin.PublicKey, error) {
-	const op = "auth.PublicUserKeyService"
+	const op = "grpc/auth.PublicUserKeyService"
 	return func(userName upspin.UserName) (upspin.PublicKey, error) {
 		key, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
 		if err != nil {
