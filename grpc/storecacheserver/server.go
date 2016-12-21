@@ -13,9 +13,9 @@ import (
 
 	gContext "golang.org/x/net/context"
 
-	"upspin.io/auth/grpcauth"
 	"upspin.io/bind"
 	"upspin.io/errors"
+	"upspin.io/grpc/auth"
 	"upspin.io/log"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
@@ -34,11 +34,11 @@ type server struct {
 	cache *storeCache
 
 	// For session handling and the Ping GRPC method.
-	grpcauth.Server
+	auth.Server
 }
 
 // New creates a new StoreServer instance.
-func New(ctx upspin.Context, authServer grpcauth.Server) (proto.StoreServer, error) {
+func New(ctx upspin.Context) (proto.StoreServer, error) {
 	homeDir := os.Getenv("HOME")
 	if len(homeDir) == 0 {
 		homeDir = "/etc"
@@ -49,7 +49,7 @@ func New(ctx upspin.Context, authServer grpcauth.Server) (proto.StoreServer, err
 	}
 	return &server{
 		ctx:    ctx,
-		Server: authServer,
+		Server: auth.NewServer(ctx, nil),
 		cache:  c,
 	}, nil
 }
