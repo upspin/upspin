@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "17961e08_3dcb0fb3",
+        "filename": "auth/grpcauth/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-12-21T03:32:17Z",
+      "side": 1,
+      "message": "s/s.$/./",
+      "revId": "cd1b99912663ab586100ced8b345c2efc8228f1c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "17961e08_9dd90386",
+        "filename": "cmd/dirserver/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-12-21T03:32:17Z",
+      "side": 1,
+      "message": "s/permissions/permission/",
+      "revId": "cd1b99912663ab586100ced8b345c2efc8228f1c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "17961e08_fdccc7c8",
+        "filename": "cmd/storeserver/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-12-21T03:32:17Z",
+      "side": 1,
+      "message": "s/permissions/permission/",
+      "revId": "cd1b99912663ab586100ced8b345c2efc8228f1c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
