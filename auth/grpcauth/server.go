@@ -69,16 +69,35 @@ type Server interface {
 	Ping(gContext gContext.Context, req *proto.PingRequest) (*proto.PingResponse, error)
 }
 
+// ServerConfig holds the configuration for instantiating a Server.
+type ServerConfig struct {
+	// Lookup looks up user keys.
+	// If nil, auth.PublicUserKeyService will be used.
+	Lookup func(userName upspin.UserName) (upspin.PublicKey, error)
+}
+
 // NewServer returns a new Server that uses the given config.
-func NewServer(config auth.Config) Server {
-	return &serverImpl{config: config}
+// If a nil config is provided the defaults are used.
+func NewServer(ctx upspin.Context, cfg *ServerConfig) Server {
+	return &serverImpl{
+		context: ctx,
+		config:  cfg,
+	}
 }
 
 type serverImpl struct {
-	config auth.Config
+	context upspin.Context
+	config  *ServerConfig
 }
 
 var _ Server = (*serverImpl)(nil)
+
+func (s *serverImpl) lookup(u upspin.UserName) (upspin.PublicKey, error) {
+	if s.config == nil || s.config.Lookup == nil {
+		return auth.PublicUserKeyService(s.context)(u)
+	}
+	return s.config.Lookup(u)
+}
 
 func generateRandomToken() (string, error) {
 	var buf [authTokenEntropyLen]byte
@@ -152,11 +171,7 @@ func (s *serverImpl) validateToken(ctx gContext.Context, authToken string) (auth
 	}
 
 	// If session has expired, forcibly remove it from the cache and return an error.
-	timeFunc := time.Now
-	if s.config.TimeFunc != nil {
-		timeFunc = s.config.TimeFunc
-	}
-	if session.Expires().Before(timeFunc()) {
+	if session.Expires().Before(time.Now()) {
 		auth.ClearSession(authToken)
 		return nil, errors.E(errors.Permission, errExpired)
 	}
@@ -171,18 +186,13 @@ func (s *serverImpl) handleSessionRequest(ctx gContext.Context, authRequest []st
 		return nil, errors.E(user, err)
 	}
 
-	var now time.Time
-	if s.config.TimeFunc == nil {
-		now = time.Now()
-	} else {
-		now = s.config.TimeFunc()
-	}
-
 	// Get user's public key.
-	key, err := s.config.Lookup(user)
+	key, err := s.lookup(user)
 	if err != nil {
 		return nil, errors.E(user, err)
 	}
+
+	now := time.Now()
 
 	// Validate signature.
 	if err := verifyUser(key, authRequest, clientAuthMagic, now); err != nil {
@@ -205,7 +215,7 @@ func (s *serverImpl) handleSessionRequest(ctx gContext.Context, authRequest []st
 			return nil, errors.E(errors.Invalid, errors.Errorf("invalid proxy endpoint: %v", err))
 		}
 		// Authenticate the server to the user.
-		authMsg, err := signUser(s.config.Context, serverAuthMagic)
+		authMsg, err := signUser(s.context, serverAuthMagic)
 		if err != nil {
 			return nil, errors.E(errors.Permission, err)
 		}
