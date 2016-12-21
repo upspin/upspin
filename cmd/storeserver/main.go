@@ -11,7 +11,6 @@ import (
 
 	"google.golang.org/grpc"
 
-	"upspin.io/auth"
 	"upspin.io/auth/grpcauth"
 	"upspin.io/cloud/https"
 	"upspin.io/context"
@@ -80,8 +79,7 @@ func main() {
 		log.Fatalf("Error wrapping store: %s", err)
 	}
 
-	authConfig := auth.Config{Lookup: auth.PublicUserKeyService(ctx)}
-	authServer := grpcauth.NewServer(authConfig)
+	authServer := grpcauth.NewServer(ctx, nil)
 	s := storeserver.New(ctx, store, authServer, upspin.NetAddr(flags.NetAddr))
 
 	grpcServer := grpc.NewServer()

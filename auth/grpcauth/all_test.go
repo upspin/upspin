@@ -18,7 +18,6 @@ import (
 
 	gContext "golang.org/x/net/context"
 
-	"upspin.io/auth"
 	prototest "upspin.io/auth/grpcauth/testdata"
 	"upspin.io/cloud/https"
 	"upspin.io/context"
@@ -63,8 +62,7 @@ func pickPort() (port string) {
 }
 
 func startServer() (port string) {
-	config := auth.Config{Lookup: lookup}
-	srv = &server{Server: NewServer(config)}
+	srv = &server{Server: NewServer(nil, &ServerConfig{Lookup: lookup})}
 	port = pickPort()
 
 	grpcServer = grpc.NewServer()
