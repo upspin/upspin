@@ -9,9 +9,9 @@ package remote
 import (
 	"fmt"
 
-	"upspin.io/auth/grpcauth"
 	"upspin.io/bind"
 	"upspin.io/errors"
+	"upspin.io/grpc/auth"
 	"upspin.io/log"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
@@ -25,9 +25,9 @@ type dialContext struct {
 
 // remote implements upspin.StoreServer.
 type remote struct {
-	*grpcauth.Client // For sessions, Ping, and Close.
-	ctx              dialContext
-	storeClient      proto.StoreClient
+	*auth.Client // For sessions, Ping, and Close.
+	ctx          dialContext
+	storeClient  proto.StoreClient
 }
 
 var _ upspin.StoreServer = (*remote)(nil)
@@ -105,7 +105,7 @@ func dialCache(op *operation, context upspin.Context, proxyFor upspin.Endpoint) 
 	}
 
 	// Call the cache. The cache is local so don't bother with TLS.
-	authClient, err := grpcauth.NewClient(context, ce.NetAddr, grpcauth.KeepAliveInterval, grpcauth.NoSecurity, proxyFor)
+	authClient, err := auth.NewClient(context, ce.NetAddr, auth.KeepAliveInterval, auth.NoSecurity, proxyFor)
 	if err != nil {
 		// On error dial direct.
 		op.error(errors.IO, err)
@@ -140,7 +140,7 @@ func (r *remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service
 	}
 
 	// Call the server directly.
-	authClient, err := grpcauth.NewClient(context, e.NetAddr, grpcauth.KeepAliveInterval, grpcauth.Secure, upspin.Endpoint{})
+	authClient, err := auth.NewClient(context, e.NetAddr, auth.KeepAliveInterval, auth.Secure, upspin.Endpoint{})
 	if err != nil {
 		return nil, op.error(errors.IO, err)
 	}

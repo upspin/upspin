@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package grpcauth
+package auth
 
 import (
 	"fmt"
@@ -18,11 +18,11 @@ import (
 
 	gContext "golang.org/x/net/context"
 
-	prototest "upspin.io/auth/grpcauth/testdata"
 	"upspin.io/cloud/https"
 	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/factotum"
+	prototest "upspin.io/grpc/auth/testdata"
 	"upspin.io/log"
 	"upspin.io/upspin"
 )

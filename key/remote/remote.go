@@ -11,9 +11,9 @@ import (
 
 	gContext "golang.org/x/net/context"
 
-	"upspin.io/auth/grpcauth"
 	"upspin.io/bind"
 	"upspin.io/errors"
+	"upspin.io/grpc/auth"
 	"upspin.io/key/usercache"
 	"upspin.io/log"
 	"upspin.io/upspin"
@@ -28,9 +28,9 @@ type dialContext struct {
 
 // remote implements upspin.KeyServer.
 type remote struct {
-	*grpcauth.Client // For sessions, Ping, and Close.
-	ctx              dialContext
-	keyClient        proto.KeyClient
+	*auth.Client // For sessions, Ping, and Close.
+	ctx          dialContext
+	keyClient    proto.KeyClient
 }
 
 var _ upspin.KeyServer = (*remote)(nil)
@@ -94,7 +94,7 @@ func (r *remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service
 		return nil, op.error(errors.Invalid, errors.Str("unrecognized transport"))
 	}
 
-	authClient, err := grpcauth.NewClient(context, e.NetAddr, grpcauth.KeepAliveInterval, grpcauth.Secure, upspin.Endpoint{})
+	authClient, err := auth.NewClient(context, e.NetAddr, auth.KeepAliveInterval, auth.Secure, upspin.Endpoint{})
 	if err != nil {
 		return nil, op.error(errors.IO, err)
 	}

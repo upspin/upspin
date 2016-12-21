@@ -10,7 +10,6 @@ import (
 
 	"google.golang.org/grpc"
 
-	"upspin.io/auth/grpcauth"
 	"upspin.io/context"
 	"upspin.io/flags"
 	"upspin.io/grpc/dircacheserver"
@@ -57,14 +56,12 @@ func main() {
 	// Stop the cache server recursing.
 	ctx = context.SetCacheEndpoint(ctx, upspin.Endpoint{})
 
-	authServer := grpcauth.NewServer(ctx, nil)
-
-	ss, err := storecacheserver.New(ctx, authServer)
+	ss, err := storecacheserver.New(ctx)
 	if err != nil {
 		log.Fatalf("opening cache: %s", err)
 	}
 
-	ds, err := dircacheserver.New(ctx, authServer)
+	ds, err := dircacheserver.New(ctx)
 	if err != nil {
 		log.Fatalf("opening cache: %s", err)
 	}
