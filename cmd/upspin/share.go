@@ -13,6 +13,7 @@ import (
 	"io/ioutil"
 	"os"
 	"sort"
+	"strings"
 
 	"upspin.io/access"
 	"upspin.io/errors"
@@ -423,6 +424,7 @@ func (s *Sharer) fixShare(name upspin.PathName, users []upspin.UserName) {
 	// Could do this more efficiently, calling Share collectively, but the Puts are sequential anyway.
 	keys := make([]upspin.PublicKey, 0, len(users))
 	for _, user := range users {
+		// Erroneous or wildcard users will have empty keys here, and be ignored.
 		if k := s.lookupKey(user); len(k) > 0 {
 			// TODO: Make this general. This works now only because we are always using ee.
 			keys = append(keys, k)
@@ -448,6 +450,8 @@ func (s *Sharer) fixShare(name upspin.PathName, users []upspin.UserName) {
 }
 
 // lookupKey returns the public key for the user.
+// If the user does not exist, is the "all" user, or is a wildcard
+// (*@example.com), it returns the empty string.
 func (s *Sharer) lookupKey(user upspin.UserName) upspin.PublicKey {
 	key, ok := s.userKeys[user] // We use an empty (zero-valued) key to cache failed lookups.
 	if ok {
@@ -455,6 +459,10 @@ func (s *Sharer) lookupKey(user upspin.UserName) upspin.PublicKey {
 	}
 	if user == access.AllUsers {
 		s.userKeys[user] = "<all>"
+		return ""
+	}
+	if isWildcardUser(user) {
+		s.userKeys[user] = ""
 		return ""
 	}
 	u, err := s.state.KeyServer().Lookup(user)
@@ -476,4 +484,8 @@ func (s *Sharer) lookupKey(user upspin.UserName) upspin.PublicKey {
 	s.userKeys[user] = key
 	s.userByHash[sha256.Sum256([]byte(key))] = user
 	return key
+}
+
+func isWildcardUser(user upspin.UserName) bool {
+	return strings.HasPrefix(string(user), "*@")
 }

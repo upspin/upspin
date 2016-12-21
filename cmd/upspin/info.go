@@ -329,6 +329,10 @@ func (s *State) userExists(user upspin.UserName, userSeen map[upspin.UserName]bo
 	if userSeen[user] || user == access.AllUsers { // all@upspin.io is baked in.
 		return true // Previous answer will do.
 	}
+	// Ignore wildcards.
+	if isWildcardUser(user) {
+		return true
+	}
 	userSeen[user] = true
 	_, err := s.KeyServer().Lookup(user)
 	return err == nil
