@@ -15,7 +15,6 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 
-	"upspin.io/auth"
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/log"
@@ -63,7 +62,7 @@ type Server interface {
 	// SessionFromContext looks for an authentication request or token in
 	// the context's GRPC headers, and returns a new or existing session
 	// (if available).
-	SessionFromContext(ctx gContext.Context) (auth.Session, error)
+	SessionFromContext(ctx gContext.Context) (Session, error)
 
 	// Ping is the GRPC Ping method shared by all Upspin GRPC servers.
 	Ping(gContext gContext.Context, req *proto.PingRequest) (*proto.PingResponse, error)
@@ -72,7 +71,7 @@ type Server interface {
 // ServerConfig holds the configuration for instantiating a Server.
 type ServerConfig struct {
 	// Lookup looks up user keys.
-	// If nil, auth.PublicUserKeyService will be used.
+	// If nil, PublicUserKeyService will be used.
 	Lookup func(userName upspin.UserName) (upspin.PublicKey, error)
 }
 
@@ -94,7 +93,7 @@ var _ Server = (*serverImpl)(nil)
 
 func (s *serverImpl) lookup(u upspin.UserName) (upspin.PublicKey, error) {
 	if s.config == nil || s.config.Lookup == nil {
-		return auth.PublicUserKeyService(s.context)(u)
+		return PublicUserKeyService(s.context)(u)
 	}
 	return s.config.Lookup(u)
 }
@@ -114,7 +113,7 @@ func generateRandomToken() (string, error) {
 // SessionFromContext looks for an authentication token or request in the
 // given context, finds or creates a session for that token or request,
 // and returns that session.
-func (s *serverImpl) SessionFromContext(ctx gContext.Context) (session auth.Session, err error) {
+func (s *serverImpl) SessionFromContext(ctx gContext.Context) (session Session, err error) {
 	const op = "grpc/auth.SessionFromContext"
 	defer func() {
 		if err == nil {
@@ -156,13 +155,13 @@ func (s *serverImpl) Ping(gContext gContext.Context, req *proto.PingRequest) (*p
 	return &proto.PingResponse{PingSequence: req.PingSequence}, nil
 }
 
-func (s *serverImpl) validateToken(ctx gContext.Context, authToken string) (auth.Session, error) {
+func (s *serverImpl) validateToken(ctx gContext.Context, authToken string) (Session, error) {
 	if len(authToken) < authTokenEntropyLen {
 		return nil, errors.E(errors.Invalid, errors.Str("invalid auth token"))
 	}
 
 	// Get the session for this authToken
-	session := auth.GetSession(authToken)
+	session := GetSession(authToken)
 	if session == nil {
 		// We don't know this client or have forgotten about it. We must authenticate.
 		// Log it so we can track how often this happens. Maybe we need to increase the session cache size.
@@ -172,14 +171,14 @@ func (s *serverImpl) validateToken(ctx gContext.Context, authToken string) (auth
 
 	// If session has expired, forcibly remove it from the cache and return an error.
 	if session.Expires().Before(time.Now()) {
-		auth.ClearSession(authToken)
+		ClearSession(authToken)
 		return nil, errors.E(errors.Permission, errExpired)
 	}
 
 	return session, nil
 }
 
-func (s *serverImpl) handleSessionRequest(ctx gContext.Context, authRequest []string, proxyRequest []string) (auth.Session, error) {
+func (s *serverImpl) handleSessionRequest(ctx gContext.Context, authRequest []string, proxyRequest []string) (Session, error) {
 	// Validate the username.
 	user := upspin.UserName(authRequest[0])
 	if err := valid.UserName(user); err != nil {
@@ -222,7 +221,7 @@ func (s *serverImpl) handleSessionRequest(ctx gContext.Context, authRequest []st
 		header[authRequestKey] = authMsg
 	}
 
-	session := auth.NewSession(user, expiration, authToken, ep, nil)
+	session := NewSession(user, expiration, authToken, ep, nil)
 	if err := grpc.SendHeader(ctx, header); err != nil {
 		return nil, err
 	}
