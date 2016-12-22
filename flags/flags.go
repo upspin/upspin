@@ -152,7 +152,14 @@ func (f configFlag) String() string {
 
 // Set implements flag.Value.
 func (f configFlag) Set(s string) error {
-	*f.s = strings.Split(strings.TrimSpace(s), ",")
+	ss := strings.Split(strings.TrimSpace(s), ",")
+	// Drop empty elements.
+	for i := 0; i < len(ss); i++ {
+		if ss[i] == "" {
+			ss = append(ss[:i], ss[i+1:]...)
+		}
+	}
+	*f.s = ss
 	return nil
 }
 
