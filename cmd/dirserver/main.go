@@ -93,8 +93,5 @@ func main() {
 	proto.RegisterDirServer(grpcServer, grpcDir)
 	http.Handle("/", grpcServer)
 
-	https.ListenAndServe(ready, serverName, flags.HTTPSAddr, &https.Options{
-		CertFile: flags.TLSCertFile,
-		KeyFile:  flags.TLSKeyFile,
-	})
+	https.ListenAndServeFromFlags(ready, serverName)
 }
