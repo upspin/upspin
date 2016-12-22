@@ -122,6 +122,24 @@
       "revId": "e351fcdfc809a00fbfc3466cb1a1f2b405738c53",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "17961e08_20c3e4f4",
+        "filename": "cmd/upspinserver/main.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2016-12-22T02:35:29Z",
+      "side": 1,
+      "message": "Done here and in https://upspin-review.googlesource.com/6854",
+      "parentUuid": "17961e08_e0b3bc99",
+      "revId": "e351fcdfc809a00fbfc3466cb1a1f2b405738c53",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
