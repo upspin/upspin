@@ -23,6 +23,7 @@ import (
 
 	"upspin.io/access"
 	"upspin.io/errors"
+	"upspin.io/flags"
 	"upspin.io/log"
 )
 
@@ -120,6 +121,16 @@ func ListenAndServe(ready chan<- struct{}, metaSuffix, addr string, opt *Options
 	}
 	err = http.Serve(tls.NewListener(ln, config), nil)
 	log.Fatalf("https: %v", err)
+}
+
+// ListenAndServeFromFlags is the same as ListenAndServe, but it determines the
+// listen address and Options from command-line flags in the flags package.
+func ListenAndServeFromFlags(ready chan<- struct{}, metaSuffix string) {
+	ListenAndServe(ready, metaSuffix, flags.HTTPSAddr, &Options{
+		LetsEncryptCache: flags.LetsEncryptCache,
+		CertFile:         flags.TLSCertFile,
+		KeyFile:          flags.TLSKeyFile,
+	})
 }
 
 func letsencryptCache(m *letsencrypt.Manager, bucket, suffix string) error {
