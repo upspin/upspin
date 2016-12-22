@@ -29,6 +29,11 @@ var (
 	// HTTPSAddr is the network address on which to listen for incoming network connections.
 	HTTPSAddr = "localhost:443"
 
+	// LetsEncryptCache is the location of a file in which the Let's
+	// Encrypt certificates are stored. The containing directory should
+	// user-accessible only (chmod 0700).
+	LetsEncryptCache string
+
 	// Log sets the level of logging (implements flag.Value).
 	Log logFlag
 
@@ -62,6 +67,9 @@ var flags = map[string]func(){
 	},
 	"https": func() {
 		flag.StringVar(&HTTPSAddr, "https", HTTPSAddr, "`address` for incoming network connections")
+	},
+	"letsencrypt_cache": func() {
+		flag.StringVar(&LetsEncryptCache, "letscache", "", "Let's Encrypt cache `file`")
 	},
 	"log": func() {
 		Log.Set("info")

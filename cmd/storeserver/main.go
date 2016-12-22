@@ -36,7 +36,7 @@ import (
 const serverName = "storeserver"
 
 func main() {
-	flags.Parse("addr", "config", "context", "https", "kind", "log", "project", "tls")
+	flags.Parse("addr", "config", "context", "https", "kind", "letsencrypt_cache", "log", "project", "tls")
 
 	if flags.Project != "" {
 		log.Connect(flags.Project, serverName)

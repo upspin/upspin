@@ -41,7 +41,7 @@ import (
 const serverName = "dirserver"
 
 func main() {
-	flags.Parse("addr", "config", "context", "https", "kind", "storeservername", "log", "project", "tls")
+	flags.Parse("addr", "config", "context", "https", "kind", "storeservername", "letsencrypt_cache", "log", "project", "tls")
 
 	if flags.Project != "" {
 		log.Connect(flags.Project, serverName)
