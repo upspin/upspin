@@ -417,7 +417,6 @@ func (t *Tree) loadNode(parent *node, elem string) (*node, error) {
 // loadKids loads all kids of a parent node from the Store.
 // t.mu must be held.
 func (t *Tree) loadKids(parent *node) error {
-	log.Debug.Printf("Loading kids from Store for %q", parent.entry.Name)
 	data, err := clientutil.ReadAll(t.context, &parent.entry)
 	if err != nil {
 		return err
@@ -746,7 +745,8 @@ func (t *Tree) recoverFromLog() error {
 	}
 	if lastOffset == lastProcessed {
 		// All caught up.
-		log.Debug.Printf("Tree is all caught up for user %s", t.user)
+		// Uncomment for debugging.
+		//log.Debug.Printf("Tree is all caught up for user %s", t.user)
 		return nil
 	}
 	err = t.loadRoot()
@@ -760,7 +760,8 @@ func (t *Tree) recoverFromLog() error {
 	recovered := 0
 	next := lastProcessed
 	for {
-		log.Debug.Printf("Recovering from log...")
+		// Uncomment for debugging.
+		//log.Debug.Printf("Recovering from log...")
 		var replay []LogEntry
 		replay, next, err = t.log.ReadAt(batchSize, next)
 		if err != nil {
@@ -779,18 +780,19 @@ func (t *Tree) recoverFromLog() error {
 
 			switch logEntry.Op {
 			case Put:
-				log.Debug.Printf("Putting dirEntry: %q", de.Name)
+				// Uncomment for debugging.
+				//log.Debug.Printf("Putting dirEntry: %q", de.Name)
 				_, _, err = t.put(p, &de)
 			case Delete:
-				log.Debug.Printf("Deleting path: %q", p.Path())
+				// Uncomment for debugging.
+				//log.Debug.Printf("Deleting path: %q", p.Path())
 				_, _, err = t.delete(p)
 			default:
 				return errors.E(op, errors.Internal, errors.Errorf("no such log operation: %v", logEntry.Op))
 			}
 			if err != nil {
 				// Now we're in serious trouble. We can't recover.
-				log.Error.Printf("Can't recover from logs for user %s: %s", t.user, err)
-				return errors.E(op, err)
+				return errors.E(op, t.user, errors.Errorf("can't recover log: %v", err))
 			}
 		}
 		recovered += len(replay)
@@ -798,8 +800,9 @@ func (t *Tree) recoverFromLog() error {
 			break
 		}
 	}
-	log.Printf("%s: %d entries recovered. Tree is current.", op, recovered)
-	log.Debug.Printf("%s: Tree:\n%s\n", op, t)
+	// Uncomment for debugging.
+	//log.Debug.Printf("%s: %d entries recovered. Tree is current.", op, recovered)
+	//log.Debug.Printf("%s: Tree:\n%s\n", op, t)
 	return nil
 }
 
