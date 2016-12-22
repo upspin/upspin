@@ -805,10 +805,12 @@ func (t *Tree) recoverFromLog() error {
 
 // OnEviction implements cache.EvictionNotifier.
 func (t *Tree) OnEviction(key interface{}) {
-	log.Debug.Printf("Tree being evicted: %s", t.log.User())
+	const op = "dir/server/tree.OnEviction"
+	// Uncomment for debugging sessions.
+	//log.Debug.Printf("%s: tree being evicted: %s", t.log.User())
 	err := t.Flush()
 	if err != nil {
-		log.Error.Printf("OnEviction: Flush: %v", err)
+		log.Error.Printf("%s: flush: %v", op, err)
 	}
 }
 

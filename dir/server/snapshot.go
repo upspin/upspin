@@ -59,7 +59,7 @@ func (s *server) getSnapshotConfig(userName upspin.UserName) (*snapshotConfig, e
 
 func (s *server) startSnapshotLoop() {
 	if s.snapshotControl != nil {
-		log.Error.Printf("dir/server: Attempting to restart snapshot worker")
+		log.Error.Printf("dir/server.startSnapshotLoop: attempting to restart snapshot worker")
 		return
 	}
 	s.snapshotControl = make(chan upspin.UserName)
@@ -308,7 +308,7 @@ func (s *server) mkDirIfNotExist(name path.Parsed) error {
 func isSnapshotUser(userName upspin.UserName) bool {
 	_, suffix, _, err := user.Parse(userName)
 	if err != nil {
-		log.Error.Printf("isSnapshotUser: error parsing user name %q: %s", userName, err)
+		log.Error.Printf("dir/server.isSnapshotUser: error parsing user name %q: %s", userName, err)
 		return false
 	}
 	return suffix == snapshotSuffix
@@ -320,7 +320,7 @@ func isSnapshotOwner(userName upspin.UserName, snapshotUser upspin.UserName) boo
 	u, suffix, domain, err := user.Parse(userName)
 	if err != nil {
 		// This should not happen. Log the error.
-		log.Error.Printf("isSnapshotOwner: error parsing %q: %s", userName, err)
+		log.Error.Printf("dir/server.isSnapshotOwner: error parsing %q: %s", userName, err)
 		return false
 	}
 	if suffix != "" && suffix != snapshotSuffix {

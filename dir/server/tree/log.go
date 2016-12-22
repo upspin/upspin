@@ -16,7 +16,6 @@ import (
 	"strings"
 
 	"upspin.io/errors"
-	"upspin.io/log"
 	"upspin.io/upspin"
 )
 
@@ -186,7 +185,8 @@ func (l *Log) ReadAt(n int, offset int64) (dst []LogEntry, next int64, err error
 		// End of file.
 		return dst, fileOffset, nil
 	}
-	log.Debug.Printf("%s: seeking to offset %d, reading %d log entries", op, offset, n)
+	// Uncomment for debugging sessions.
+	//log.Debug.Printf("%s: seeking to offset %d, reading %d log entries", op, offset, n)
 	_, err = l.file.Seek(offset, io.SeekStart)
 	if err != nil {
 		return nil, 0, errors.E(op, errors.IO, err)

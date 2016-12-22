@@ -161,7 +161,7 @@ func New(ctxt upspin.Context, options ...string) (upspin.DirServer, error) {
 		if err != nil {
 			return nil, errors.E(op, errors.IO, err)
 		}
-		log.Error.Printf("Warning: writing important logs to a temporary directory (%q). A server restart will lose data.", dir)
+		log.Error.Printf("%s: warning: writing important logs to a temporary directory (%q). A server restart will lose data.", op, dir)
 		logDir = dir
 	}
 

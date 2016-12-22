@@ -9,7 +9,6 @@ package tree
 import (
 	"upspin.io/bind"
 	"upspin.io/errors"
-	"upspin.io/log"
 	"upspin.io/path"
 	"upspin.io/upspin"
 )
@@ -32,7 +31,6 @@ func (t *Tree) store(n *node) error {
 	// Can't pack a non-dir entry. Something went bad if we got here.
 	if !n.entry.IsDir() {
 		err := errors.E(errors.Internal, errors.Str("can't pack non-dir entry"))
-		log.Error.Print(err)
 		return err
 	}
 
@@ -61,7 +59,8 @@ func (t *Tree) store(n *node) error {
 		if err != nil {
 			return errors.E(err)
 		}
-		log.Debug.Printf("Tree.store: %s: Saving child: %s. Size: %d", n.entry.Name, kid.entry.Name, len(block))
+		// Uncomment for debugging sessions.
+		//log.Debug.Printf("dir/server/tree.Tree.store: %s: Saving child: %s. Size: %d", n.entry.Name, kid.entry.Name, len(block))
 
 		// Don't let blocks grow too much (but we never split a large DirEntry in the middle).
 		if len(data) > 0 && len(data)+len(block) > blockSize {
@@ -96,7 +95,6 @@ func storeBlock(store upspin.StoreServer, bp upspin.BlockPacker, data []byte) er
 	}
 	refdata, err := store.Put(cipher)
 	if err != nil {
-		log.Error.Printf("Error writing block to store: %s", err)
 		return err
 	}
 	loc := upspin.Location{
@@ -115,7 +113,6 @@ func (t *Tree) loadKidsFromBlock(n *node, block []byte) error {
 	if n.dirty {
 		err := errors.E(errors.Internal, n.entry.Name,
 			errors.Str("trying to load a block from storage when the node is dirty"))
-		log.Error.Print(err)
 		return err
 	}
 	nodePath, err := path.Parse(n.entry.Name)
@@ -127,12 +124,10 @@ func (t *Tree) loadKidsFromBlock(n *node, block []byte) error {
 		// a directory that has content already. To allow it, we would
 		// need to check for name collisions. Disallow for now.
 		err := errors.E(errors.Invalid, nodePath.Path(), errors.Str("cannot hide existing contents of path with new block"))
-		log.Error.Printf("loadKidsFromBlock: %s", err)
 		return err
 	}
 	if n.entry.Name == "" {
 		err := errors.E(errors.Internal, errors.Str("empty entry name"))
-		log.Error.Print(err)
 		return err
 	}
 	// Load children for this node.
@@ -170,7 +165,6 @@ func (t *Tree) loadKidsFromBlock(n *node, block []byte) error {
 			// Trying to re-add an existing child. Something is amiss.
 			err := errors.E(errors.Internal, n.entry.Name,
 				errors.Str("re-adding an existing element in the Tree"))
-			log.Error.Print(err)
 			return err
 		}
 		n.kids[elem] = &node{

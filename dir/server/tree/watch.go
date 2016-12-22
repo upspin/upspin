@@ -240,10 +240,9 @@ func (w *watcher) sendError(err error) {
 	case w.events <- e:
 		// Error event was sent.
 	case <-time.After(3 * watcherTimeout):
-		// TODO: time.After leaks. Use NewTimer.
 		// Can't send another error since we timed out again. Log an
 		// error and close the watcher.
-		log.Error.Printf("dir/server/tree.sendNotifications: %s", errTimeout)
+		log.Error.Printf("dir/server/tree.sendError: %s", errTimeout)
 	}
 }
 
@@ -294,7 +293,6 @@ func (w *watcher) watch(offset int64) {
 		var err error
 		offset, err = w.sendEventFromLog(offset)
 		if err != nil {
-			log.Error.Printf("dir/server/tree.watch: %s", err)
 			if err != errTimeout && err != errClosed {
 				w.sendError(err)
 			}
