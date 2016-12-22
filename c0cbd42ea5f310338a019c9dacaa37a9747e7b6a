@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "17961e08_a0bdb465",
+        "filename": "grpc/dircacheserver/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-12-22T02:15:10Z",
+      "side": 1,
+      "message": "s/endpoing/endpoint/\n\ni appreciate the improvement from epMap but as i said last time, you usually don\u0027t need the type in a variable\u0027s or type\u0027s name.\nthis would be just as clear if called userToDirServer",
+      "revId": "c0cbd42ea5f310338a019c9dacaa37a9747e7b6a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
