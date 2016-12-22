@@ -417,7 +417,6 @@ func (t *Tree) loadNode(parent *node, elem string) (*node, error) {
 // loadKids loads all kids of a parent node from the Store.
 // t.mu must be held.
 func (t *Tree) loadKids(parent *node) error {
-	log.Debug.Printf("Loading kids from Store for %q", parent.entry.Name)
 	data, err := clientutil.ReadAll(t.context, &parent.entry)
 	if err != nil {
 		return err

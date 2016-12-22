@@ -93,7 +93,6 @@ func (gcs *gcsImpl) Get(ref string) (link string, error error) {
 		}
 		return "", err
 	}
-	log.Debug.Printf("The media download link for %v/%v is %v.", gcs.bucketName, res.Name, res.MediaLink)
 	return res.MediaLink, nil
 }
 
@@ -121,10 +120,7 @@ func (gcs *gcsImpl) Put(ref string, contents []byte) (refLink string, error erro
 	acl := string(gcs.defaultWriteACL)
 	object := &gcsBE.Object{Name: ref}
 	res, err := gcs.service.Objects.Insert(gcs.bucketName, object).Media(buf).PredefinedAcl(acl).Do()
-	if err == nil {
-		log.Debug.Printf("Created object %v at location %v", res.Name, res.SelfLink)
-	} else {
-		log.Error.Printf("Objects.Insert failed: %v", err)
+	if err != nil {
 		return "", err
 	}
 	return res.MediaLink, err
@@ -145,7 +141,7 @@ func (gcs *gcsImpl) ListPrefix(prefix string, depth int) ([]string, error) {
 			objDepth := strings.Count(o.Name, "/")
 			netDepth := objDepth - prefixDepth
 			if netDepth < 0 {
-				log.Error.Printf("WARN: Negative depth should never happen.")
+				log.Error.Printf("cloud/storage/gcs: WARNING: negative depth should never happen.")
 				continue
 			}
 			if netDepth <= depth {
