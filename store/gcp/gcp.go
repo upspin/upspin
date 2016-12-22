@@ -69,7 +69,6 @@ func New(options ...string) (upspin.StoreServer, error) {
 	if c == nil {
 		return nil, errors.E(op, errors.Str("filecache failed to create temp directory"))
 	}
-	log.Debug.Printf("Configured GCP store: %v", options)
 
 	return &server{
 		storage: s,
@@ -162,7 +161,6 @@ func (s *server) innerGet(ref upspin.Reference, span *metric.Span) (file *os.Fil
 	s1.End()
 	if err == nil {
 		// Ref is in the local cache. Send the file and be done.
-		log.Debug.Printf("ref %s is in local cache. Returning it as file: %s", ref, file.Name())
 		return
 	}
 
@@ -178,14 +176,12 @@ func (s *server) innerGet(ref upspin.Reference, span *metric.Span) (file *os.Fil
 	// GCP should return an http link
 	if !strings.HasPrefix(link, "http") {
 		err = errors.E(op, errors.Errorf("invalid link returned from GCP: %s", link))
-		log.Error.Println(err)
 		return
 	}
 
 	url, err := url.Parse(link)
 	if err != nil {
 		err = errors.E(op, errors.Errorf("can't parse url: %s: %s", link, err))
-		log.Error.Print(err)
 		return
 	}
 	location.Reference = upspin.Reference(link)
@@ -193,7 +189,6 @@ func (s *server) innerGet(ref upspin.Reference, span *metric.Span) (file *os.Fil
 	// HTTPS transport client efficiently.
 	location.Endpoint.Transport = upspin.HTTPS
 	location.Endpoint.NetAddr = upspin.NetAddr(fmt.Sprintf("%s://%s", url.Scheme, url.Host))
-	log.Debug.Printf("Ref %s returned as link: %s", ref, link)
 	return
 }
 
@@ -232,7 +227,7 @@ func (s *server) Close() {
 	defer s.mu.Unlock()
 
 	if s.refCount == 0 {
-		log.Error.Printf("Closing non-dialed gcp store")
+		log.Error.Printf("store/gcp: closing store that was not dialed")
 		return
 	}
 	s.refCount--
