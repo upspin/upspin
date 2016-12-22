@@ -41,7 +41,7 @@ var (
 )
 
 func main() {
-	flags.Parse("addr", "config", "context", "https", "kind", "letsencrypt_cache", "log", "project", "tls")
+	flags.Parse("addr", "config", "context", "https", "kind", "letscache", "log", "project", "tls")
 
 	if flags.Project != "" {
 		log.Connect(flags.Project, serverName)
@@ -88,11 +88,7 @@ func main() {
 		http.Handle("/mail", mailHandler)
 	}
 
-	const metadataKey = "keyserver"
-	https.ListenAndServe(nil, metadataKey, flags.HTTPSAddr, &https.Options{
-		CertFile: flags.TLSCertFile,
-		KeyFile:  flags.TLSKeyFile,
-	})
+	https.ListenAndServeFromFlags(nil, "keyserver")
 }
 
 // isLocal returns true if the name only resolves to loopback addresses.
