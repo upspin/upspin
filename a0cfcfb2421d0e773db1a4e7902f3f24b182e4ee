@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "17ad3e6a_c288dab3",
+        "filename": "cmd/cacheserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-12-22T00:06:32Z",
+      "side": 1,
+      "message": "This isn\u0027t something to be addressed, just curious.  What exactly changes?  I assume nothing since all this does is create two SessionImpl\u0027s where before there was one.  However, since they contain the same config and  session cache is process global, the semantics remain the same. Looking at the code, there is never a place were we actually make use of multiple different contents serverImpl\u0027s but I guess it would be possible if one were listening on multiple ports.",
+      "range": {
+        "startLine": 64,
+        "startChar": 34,
+        "endLine": 64,
+        "endChar": 35
+      },
+      "revId": "a0cfcfb2421d0e773db1a4e7902f3f24b182e4ee",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
