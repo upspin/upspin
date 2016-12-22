@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "17961e08_600c8cb4",
+        "filename": "flags/flags.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-12-22T00:49:52Z",
+      "side": 1,
+      "message": "0700 is not user-readable only.\nmaybe user-accessible only",
+      "revId": "f425559c302749d96d444d67353affc26f6856e6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "17961e08_801198cb",
+        "filename": "flags/flags.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-12-22T00:49:52Z",
+      "side": 1,
+      "message": "s2/letsencrypt/Let\u0027s Encrypt/\n\ncan the flag name be shorter?",
+      "revId": "f425559c302749d96d444d67353affc26f6856e6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
