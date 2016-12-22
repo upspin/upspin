@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "17961e08_609b2c03",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 705,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-12-22T03:44:18Z",
+      "side": 1,
+      "message": "i\u0027d defer lock.Unlock after line 694, as protection for future changes.",
+      "revId": "a975957cd1ebb4b84b8c4e15e01721143d80df62",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
