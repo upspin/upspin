@@ -36,7 +36,7 @@ import (
 const serverName = "storeserver"
 
 func main() {
-	flags.Parse("addr", "config", "context", "https", "kind", "letsencrypt_cache", "log", "project", "tls")
+	flags.Parse("addr", "config", "context", "https", "kind", "letscache", "log", "project", "tls")
 
 	if flags.Project != "" {
 		log.Connect(flags.Project, serverName)
@@ -83,8 +83,5 @@ func main() {
 	proto.RegisterStoreServer(grpcServer, grpcStore)
 	http.Handle("/", grpcServer)
 
-	https.ListenAndServe(ready, serverName, flags.HTTPSAddr, &https.Options{
-		CertFile: flags.TLSCertFile,
-		KeyFile:  flags.TLSKeyFile,
-	})
+	https.ListenAndServeFromFlags(ready, serverName)
 }
