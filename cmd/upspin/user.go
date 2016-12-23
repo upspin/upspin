@@ -102,7 +102,7 @@ same YAML format printed by the command without the -put flag.
 		// Remote stores need not be defined (yet).
 		if len(keyU.Stores) > 0 && !equalEndpoints(keyU.Stores, u.Stores) {
 			fmt.Fprintf(&buf, "stores in context: %s", u.Stores)
-			fmt.Fprintf(&buf, "stores in key server: %s", u.Stores)
+			fmt.Fprintf(&buf, "stores in key server: %s", keyU.Stores)
 		}
 		if buf.Len() > 0 {
 			s.exitf("local context differs from public record in key server:\n%s", &buf)
