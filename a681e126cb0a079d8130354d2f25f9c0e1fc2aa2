@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "b7ff126b_4ca573ec",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-12-25T03:51:13Z",
+      "side": 1,
+      "message": "Removed it and used your reversal suggestion below.",
+      "parentUuid": "17961e08_003ca87f",
+      "revId": "a681e126cb0a079d8130354d2f25f9c0e1fc2aa2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "17961e08_a038548c",
         "filename": "grpc/dircacheserver/log.go",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2016-12-24T21:41:10Z",
       "side": 1,
       "message": "s/Also return/It also returns/",
+      "revId": "a681e126cb0a079d8130354d2f25f9c0e1fc2aa2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b7ff126b_ecd6e753",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-12-25T03:51:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "17961e08_a038548c",
       "revId": "a681e126cb0a079d8130354d2f25f9c0e1fc2aa2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "b7ff126b_2caaafbb",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 292,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-12-25T03:51:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "17961e08_c0356095",
+      "revId": "a681e126cb0a079d8130354d2f25f9c0e1fc2aa2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "17961e08_60f48caf",
         "filename": "grpc/dircacheserver/log.go",
         "patchSetId": 4
@@ -64,6 +118,24 @@
       "writtenOn": "2016-12-24T21:41:10Z",
       "side": 1,
       "message": "you could also avoid the descending type like this, if you want:\n\nsort.Sort(ascendingOrder(lfis))\nif !ascending{\n  for i, j :\u003d 0, len(lfis)-1; i \u003c j; i, j \u003d i+1, j-1 {\n     lfis[i], lfis[j] \u003d lfis[j], lfis[i]\n  }\n}",
+      "revId": "a681e126cb0a079d8130354d2f25f9c0e1fc2aa2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b7ff126b_8c9f5b9c",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2016-12-25T03:51:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "17961e08_60f48caf",
       "revId": "a681e126cb0a079d8130354d2f25f9c0e1fc2aa2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
