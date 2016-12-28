@@ -318,6 +318,9 @@ var dropPathTests = []pathTestWithCount{
 	// Multiple slashes are OK.
 	{"a@b.co/a/b///", 1, "a@b.co/a"},
 	{"a@b.co///a//////b///c/////", 2, "a@b.co/a"},
+	// No slash, but return with one.
+	{"a@b.co", 1, "a@b.co/"},
+	{"a@b.co", 100, "a@b.co/"},
 }
 
 func TestDropPath(t *testing.T) {
@@ -340,6 +343,9 @@ var firstPathTests = []pathTestWithCount{
 	// Multiple slashes are OK.
 	{"a@b.co/a/b///", 1, "a@b.co/a"},
 	{"a@b.co///a//////b///c/////", 2, "a@b.co/a/b"},
+	// No slash, but return with one.
+	{"a@b.co", 1, "a@b.co/"},
+	{"a@b.co", 100, "a@b.co/"},
 }
 
 func TestFirstPath(t *testing.T) {
