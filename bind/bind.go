@@ -10,8 +10,8 @@ import (
 	"time"
 
 	"upspin.io/errors"
-	"upspin.io/path"
 	"upspin.io/upspin"
+	"upspin.io/user"
 )
 
 // dialKey is the key to the LRU caches that store dialed services.
@@ -181,10 +181,12 @@ func DirServer(cc upspin.Context, e upspin.Endpoint) (upspin.DirServer, error) {
 	return x.(upspin.DirServer), nil
 }
 
-// DirServer returns a DirServer interface bound to the endpoint that serves the given name.
-func DirServerFor(cc upspin.Context, name upspin.PathName) (upspin.DirServer, error) {
+// DirServer returns a DirServer interface bound to the endpoint that serves
+// the given user. If the name is empty, it returns the directory endpoint
+// in the context.
+func DirServerFor(cc upspin.Context, userName upspin.UserName) (upspin.DirServer, error) {
 	const op = "bind.DirServerFor"
-	if len(name) == 0 {
+	if userName == "" {
 		// If name is empty just return the directory at ctx.DirEndpoint().
 		d, err := DirServer(cc, cc.DirEndpoint())
 		if err != nil {
@@ -192,19 +194,20 @@ func DirServerFor(cc upspin.Context, name upspin.PathName) (upspin.DirServer, er
 		}
 		return d, nil
 	}
-	parsed, err := path.Parse(name)
+	// Just a safety check; shouldn't be necessary.
+	userName, err := user.Clean(userName)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
 	var endpoints []upspin.Endpoint
-	if parsed.User() == cc.UserName() {
+	if userName == cc.UserName() {
 		endpoints = append(endpoints, cc.DirEndpoint())
 	}
 	key, err := KeyServer(cc, cc.KeyEndpoint())
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
-	u, err := key.Lookup(parsed.User())
+	u, err := key.Lookup(userName)
 	if err == nil {
 		endpoints = append(endpoints, u.Dirs...)
 	}
@@ -221,7 +224,7 @@ func DirServerFor(cc upspin.Context, name upspin.PathName) (upspin.DirServer, er
 	if firstErr != nil {
 		return nil, errors.E(op, firstErr)
 	}
-	return nil, errors.E(op, name, errors.Str("no directory endpoints found"))
+	return nil, errors.E(op, userName, errors.Str("no directory endpoints found"))
 
 }
 

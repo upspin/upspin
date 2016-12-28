@@ -20,6 +20,7 @@ package perm
 import (
 	"upspin.io/bind"
 	"upspin.io/errors"
+	"upspin.io/path"
 	"upspin.io/upspin"
 )
 
@@ -83,7 +84,11 @@ func (s *Store) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service,
 }
 
 func (s *Store) lookup(name upspin.PathName) (*upspin.DirEntry, error) {
-	dir, err := bind.DirServerFor(s.serverCtx, name)
+	parsed, err := path.Parse(name)
+	if err != nil {
+		return nil, err
+	}
+	dir, err := bind.DirServerFor(s.serverCtx, parsed.User())
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +96,11 @@ func (s *Store) lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 }
 
 func (s *Store) watch(name upspin.PathName, order int64, done <-chan struct{}) (<-chan upspin.Event, error) {
-	dir, err := bind.DirServerFor(s.serverCtx, name)
+	parsed, err := path.Parse(name)
+	if err != nil {
+		return nil, err
+	}
+	dir, err := bind.DirServerFor(s.serverCtx, parsed.User())
 	if err != nil {
 		return nil, err
 	}
