@@ -33,7 +33,7 @@ func TestDirIntegration(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	dirServer, err := bind.DirServerFor(writerCtx, upspin.PathName(writer+"/"))
+	dirServer, err := bind.DirServerFor(writerCtx, writer)
 	if err != nil {
 		t.Fatal(err)
 	}
