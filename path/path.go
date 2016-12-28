@@ -117,21 +117,24 @@ func Parse(pathName upspin.PathName) (Parsed, error) {
 }
 
 // First returns a parsed name with only the first n elements after the user name.
+// See the comment on FirstPath for more information.
 func (p Parsed) First(n int) Parsed {
 	p.path = FirstPath(p.path, n)
 	return p
 }
 
 // Drop returns a parsed name with the last n elements dropped.
+// See the comment on DropPath for more information.
 func (p Parsed) Drop(n int) Parsed {
 	p.path = DropPath(p.path, n)
 	return p
 }
 
 // DropPath returns the path name with the last n elements dropped.
-// It assumes the path is reasonably well-formed (there must be a
-// user name; multiple slashes are OK) but it does not handle .. (dot-dot).
-// The result has been "cleaned" by the Clean function.
+// It "cleans" the argument first, using the Clean function, which means
+// that if the path is malformed or contains dot-dot (..) elements the
+// result may be unexpected.
+// The result has also been "cleaned" by the Clean function.
 func DropPath(pathName upspin.PathName, n int) upspin.PathName {
 	str := string(Clean(pathName))
 	firstSlash := strings.IndexByte(str, '/')
@@ -148,9 +151,10 @@ func DropPath(pathName upspin.PathName, n int) upspin.PathName {
 }
 
 // FirstPath returns the path name with the first n elements dropped.
-// It assumes the path is reasonably well-formed (there must be a
-// user name; multiple slashes are OK) but it does not handle .. (dot-dot).
-// The result has been "cleaned" by the Clean function.
+// It "cleans" the argument first, using the Clean function, which means
+// that if the path is malformed or contains dot-dot (..) elements the
+// result may be unexpected.
+// The result has also been "cleaned" by the Clean function.
 func FirstPath(pathName upspin.PathName, n int) upspin.PathName {
 	str := string(Clean(pathName))
 	slash := strings.IndexByte(str, '/')
