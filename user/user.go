@@ -145,8 +145,9 @@ func errUserName(user upspin.UserName, msg string) (u, s, d string, err error) {
 }
 
 func canonicalize(user string) (string, error) {
-	// The PRECIS operation is expensive but applies to few strings.
-	// Take care of the easy stuff up front.
+	// PRECIS allows any ASCII character, but we are more restrictive.
+	// That's OK because the ASCII check is cheap and almost always
+	// sufficient. Plus ther is an important special case:
 	if user == "*" {
 		return user, nil
 	}
