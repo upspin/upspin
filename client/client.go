@@ -608,7 +608,11 @@ func (c *Client) Open(name upspin.PathName) (upspin.File, error) {
 // DirServer implements upspin.Client.
 func (c *Client) DirServer(name upspin.PathName) (upspin.DirServer, error) {
 	const op = "Client.DirServer"
-	dir, err := bind.DirServerFor(c.context, name)
+	parsed, err := path.Parse(name)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+	dir, err := bind.DirServerFor(c.context, parsed.User())
 	if err != nil {
 		return nil, errors.E(op, err)
 	}

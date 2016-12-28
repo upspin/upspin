@@ -178,7 +178,7 @@ func (f *upspinFS) allocNode(parent *node, name string, mode os.FileMode, size u
 
 // dirLookup returns a bound directory for user 'name'.
 func (f *upspinFS) dirLookup(name upspin.UserName) (upspin.DirServer, error) {
-	return bind.DirServerFor(f.context, upspin.PathName(name))
+	return bind.DirServerFor(f.context, name)
 }
 
 var handleID int
