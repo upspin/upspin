@@ -9,6 +9,7 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"testing"
@@ -99,8 +100,14 @@ func TestShell(t *testing.T) {
 		t.Fatal(err.Error())
 	}
 
+	// A directory for cache files.
+	cacheDir, err := ioutil.TempDir("/tmp", "upspincache")
+	if err != nil {
+		t.Fatal(err.Error())
+	}
+
 	// Mount the file system. It will be served in a separate go routine.
-	do(ctx, mountpoint)
+	do(ctx, mountpoint, cacheDir)
 
 	// Run the tests.
 	cmd := exec.Command("./test.sh", mountpoint, "tester@google.com")
@@ -111,6 +118,7 @@ func TestShell(t *testing.T) {
 	// Unmount.
 	umountHelper(mountpoint)
 	os.RemoveAll(mountpoint)
+	os.RemoveAll(cacheDir)
 
 	// Report error.
 	if err != nil {
