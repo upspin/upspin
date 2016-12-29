@@ -100,7 +100,7 @@ func TestShell(t *testing.T) {
 	}
 
 	// Mount the file system. It will be served in a separate go routine.
-	do(ctx, mountpoint)
+	do(ctx, mountpoint, "")
 
 	// Run the tests.
 	cmd := exec.Command("./test.sh", mountpoint, "tester@google.com")
