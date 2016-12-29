@@ -183,7 +183,7 @@ func (s *State) printInfo(entry *upspin.DirEntry) {
 func attrFormat(attr upspin.Attribute) string {
 	a := attr
 	tail := ""
-	if a|upspin.AttrIncomplete > 0 {
+	if a&upspin.AttrIncomplete > 0 {
 		tail = " (incomplete)"
 		a ^= upspin.AttrIncomplete
 	}
