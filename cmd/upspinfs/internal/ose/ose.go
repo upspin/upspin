@@ -115,6 +115,7 @@ func Rename(from, to string) error {
 	}
 	delete(state.mapping, from)
 	state.mapping[to] = file
+	file.name = to
 	return nil
 }
 
