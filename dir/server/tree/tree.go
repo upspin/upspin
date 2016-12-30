@@ -759,13 +759,19 @@ func (t *Tree) recoverFromLog() error {
 	// how long we want to process the log without checkpointing our state).
 	recovered := 0
 	next := lastProcessed
+	hadError := false
 	for {
 		// Uncomment for debugging.
 		//log.Debug.Printf("Recovering from log...")
 		var replay []LogEntry
 		replay, next, err = t.log.ReadAt(batchSize, next)
 		if err != nil {
-			return errors.E(op, err)
+			log.Error.Printf("%s: Error in log recovery, possible data loss at offset %d: %s", op, next, err)
+			err = t.logIndex.SaveOffset(lastProcessed)
+			if err != nil {
+				return errors.E(op, err)
+			}
+			hadError = true
 		}
 		for _, logEntry := range replay {
 			de := logEntry.Entry
@@ -797,6 +803,9 @@ func (t *Tree) recoverFromLog() error {
 		}
 		recovered += len(replay)
 		if len(replay) < batchSize {
+			break
+		}
+		if hadError {
 			break
 		}
 	}
