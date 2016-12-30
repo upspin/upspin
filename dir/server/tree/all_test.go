@@ -913,6 +913,76 @@ func TestFlushNewTree(t *testing.T) {
 	}
 }
 
+func TestCorruptTreeAndRecover(t *testing.T) {
+	context, log, logIndex := newConfigForTesting(t, userName)
+	tree, err := New(context, log, logIndex)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create some directories first.
+	for _, e := range []struct {
+		name upspin.PathName
+	}{
+		{"/"},
+		{"/dir1"},
+		{"/dir2"},
+	} {
+		_, err = tree.Put(newDirEntry(e.name, isDir, context))
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	// Write some garbage to the log.
+	data := "Some garbage"
+	_, err = log.file.Write([]byte(data))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Put a new directory.
+	_, err = tree.Put(newDirEntry("/dir3", isDir, context))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Crash and recover the tree.
+	tree2, err := New(context, log, logIndex)
+	if err != nil {
+		t.Fatal(err)
+	}
+	entries, _, err := tree2.List(mkpath(t, userName+"/"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	want := map[upspin.PathName]upspin.PathName{
+		userName + "/dir1": userName + "/dir1",
+		userName + "/dir2": userName + "/dir2",
+		// dir3 is lost given the log corruption.
+	}
+	err = checkDirList(entries, want)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Now we can put dir3 normally.
+	_, err = tree2.Put(newDirEntry("/dir3", isDir, context))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Check again.
+	entries, _, err = tree2.List(mkpath(t, userName+"/"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	want[userName+"/dir3"] = userName + "/dir3"
+	err = checkDirList(entries, want)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 var topDir string // where we write our test data.
 
 func TestMain(m *testing.M) {

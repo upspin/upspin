@@ -175,7 +175,8 @@ func (l *Log) Append(e *LogEntry) error {
 }
 
 // ReadAt reads at most n entries from the log starting at offset. It
-// returns the next offset.
+// returns the next offset. In case of errors, if dst is not nil it means the
+// error occurred after reading some entries (<n).
 func (l *Log) ReadAt(n int, offset int64) (dst []LogEntry, next int64, err error) {
 	const op = "dir/server/tree.Log.Read"
 
@@ -201,7 +202,7 @@ func (l *Log) ReadAt(n int, offset int64) (dst []LogEntry, next int64, err error
 		var le LogEntry
 		err := le.unmarshal(cbr)
 		if err != nil {
-			return nil, 0, err
+			return dst, next, err
 		}
 		dst = append(dst, le)
 		next = next + int64(cbr.count)
@@ -461,6 +462,9 @@ func (le *LogEntry) unmarshal(r *checker) error {
 	entrySize, err := binary.ReadVarint(r)
 	if err != nil {
 		return errors.E(op, errors.IO, errors.Errorf("reading entry size: %s", err))
+	}
+	if entrySize <= 0 {
+		return errors.E(op, errors.IO, errors.Errorf("invalid entry size: %d", entrySize))
 	}
 	data := make([]byte, entrySize)
 	_, err = r.Read(data)
