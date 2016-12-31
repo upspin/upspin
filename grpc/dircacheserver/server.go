@@ -8,7 +8,6 @@ package dircacheserver
 
 import (
 	"fmt"
-	"os"
 	ospath "path"
 	"sync"
 
@@ -36,13 +35,9 @@ type server struct {
 }
 
 // New creates a new DirServer cache reading in the log and writing out a new compacted log.
-func New(ctx upspin.Context) (proto.DirServer, error) {
-	homeDir := os.Getenv("HOME")
-	if len(homeDir) == 0 {
-		return nil, errors.Str("$HOME not defined")
-	}
+func New(ctx upspin.Context, cacheDir string, maxLogBytes int64) (proto.DirServer, error) {
 	userToDirServer := newUserToDirServer()
-	clog, err := openLog(ctx, ospath.Join(homeDir, "upspin/dircache"), 20*1024*1024, userToDirServer)
+	clog, err := openLog(ctx, ospath.Join(cacheDir, "dircache"), maxLogBytes, userToDirServer)
 	if err != nil {
 		return nil, err
 	}
