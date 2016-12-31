@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "17961e08_c3832a25",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-12-31T23:24:00Z",
+      "side": 1,
+      "message": "s/errors/error/",
+      "revId": "6c20a3796c1c2e363cb3d8d93be99c9cf24c242f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
