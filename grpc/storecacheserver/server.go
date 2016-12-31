@@ -8,7 +8,6 @@ package storecacheserver
 
 import (
 	"fmt"
-	"os"
 	"path"
 
 	gContext "golang.org/x/net/context"
@@ -19,11 +18,6 @@ import (
 	"upspin.io/log"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
-)
-
-const (
-	byteLimit = 10 * 1000 * 1000 * 1000 // This is an approximate limit of the total bytes in the cache.
-	refLimit  = 10 * 1000 * 1000        // Maximum refs in the LRU.
 )
 
 // server implements upspin.Storeserver.
@@ -38,12 +32,8 @@ type server struct {
 }
 
 // New creates a new StoreServer instance.
-func New(ctx upspin.Context) (proto.StoreServer, error) {
-	homeDir := os.Getenv("HOME")
-	if len(homeDir) == 0 {
-		homeDir = "/etc"
-	}
-	c, err := newCache(path.Join(homeDir, "upspin/storecache"), byteLimit, refLimit)
+func New(ctx upspin.Context, cacheDir string, maxBytes int64) (proto.StoreServer, error) {
+	c, err := newCache(path.Join(cacheDir, "storecache"), maxBytes)
 	if err != nil {
 		return nil, err
 	}
