@@ -6,7 +6,9 @@
 package main
 
 import (
+	"flag"
 	"net"
+	"os"
 
 	"google.golang.org/grpc"
 
@@ -32,6 +34,11 @@ import (
 
 const serverName = "cacheserver"
 
+var (
+	cacheFlag     = flag.String("cache", defaultCacheDir(), "`directory` for cache")
+	cacheSizeFlag = flag.Int64("cachesize", 5e9, "max disk `bytes` for cache")
+)
+
 func main() {
 	flags.Parse()
 
@@ -56,12 +63,16 @@ func main() {
 	// Stop the cache server recursing.
 	ctx = context.SetCacheEndpoint(ctx, upspin.Endpoint{})
 
-	ss, err := storecacheserver.New(ctx)
+	// Calculate limits.
+	maxRefBytes := (9 * (*cacheSizeFlag)) / 10
+	maxLogBytes := maxRefBytes / 9
+
+	ss, err := storecacheserver.New(ctx, *cacheFlag, maxRefBytes)
 	if err != nil {
 		log.Fatalf("opening cache: %s", err)
 	}
 
-	ds, err := dircacheserver.New(ctx)
+	ds, err := dircacheserver.New(ctx, *cacheFlag, maxLogBytes)
 	if err != nil {
 		log.Fatalf("opening cache: %s", err)
 	}
@@ -76,4 +87,12 @@ func main() {
 	proto.RegisterDirServer(grpcServer, ds)
 	err = grpcServer.Serve(ln)
 	log.Fatalf("serve: %v", err)
+}
+
+func defaultCacheDir() string {
+	homeDir := os.Getenv("HOME")
+	if len(homeDir) == 0 {
+		homeDir = "/etc"
+	}
+	return homeDir + "/upspin"
 }
