@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "17961e08_038a723b",
+        "filename": "cmd/cacheserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2016-12-31T23:21:44Z",
+      "side": 1,
+      "message": "i think just \n\nmax disk `bytes` for cache\n\nnot sure it\u0027ll look right with a space, and \"bytes\" will do.\n\nwe don\u0027t camelCase flag names, so it should be bytelimit or byte-limit, but i think both names are poor. instead, why not cachesize?\n\ncacheSizeFlag \u003d flag.Int64(\"cachesize\", 1e10 (really? that\u0027s my whole disk times 4), \"maximum disk cache size in `bytes`\")",
+      "revId": "0e189be03a25e425db12dd6ddc8a8d77e710185a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
