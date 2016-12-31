@@ -204,12 +204,8 @@ func openLog(ctx upspin.Context, dir string, maxDisk int64, userToDirServer *use
 // the l.maxDisk limit.
 func (l *clog) rotateLog() {
 	const op = "grpc/dircacheserver.rotateLog"
-	// Flush current file.
-	l.logFileLock.Lock()
-	if l.wr != nil {
-		l.wr.Flush()
-	}
-	l.logFileLock.Unlock()
+
+	l.flush()
 
 	// Trim the logs.
 	files, _, err := listSorted(l.dir, false)
@@ -248,6 +244,15 @@ func (l *clog) rotateLog() {
 	l.logFileLock.Unlock()
 
 	l.appendToLogFile(&clogEntry{request: versionReq, name: version})
+}
+
+func (l *clog) flush() {
+	// Flush current file.
+	l.logFileLock.Lock()
+	if l.wr != nil {
+		l.wr.Flush()
+	}
+	l.logFileLock.Unlock()
 }
 
 type logFileInfo struct {
@@ -1182,6 +1187,9 @@ func (l *clog) refresher() {
 	iter := l.lru.NewIterator()
 	gIter := l.lru.NewIterator()
 	for {
+		// Periodically flush the log to disk.
+		l.flush()
+
 		// Each round we keep track of what connections failed so that we
 		// we don't waste time retrying them.
 		failed := make(map[upspin.Endpoint]bool)

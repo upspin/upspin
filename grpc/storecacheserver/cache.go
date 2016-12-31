@@ -56,9 +56,13 @@ type storeCache struct {
 
 // newCache returns the cache rooted at dir. It will walk the cache to put all files
 // into the LRU.
-func newCache(dir string, maxBytes int64, maxRefs int) (*storeCache, error) {
+func newCache(dir string, maxBytes int64) (*storeCache, error) {
 	if err := os.MkdirAll(dir, 0700); err != nil {
 		return nil, err
+	}
+	maxRefs := int(maxBytes / 128)
+	if maxRefs > 100000 {
+		maxRefs = 100000
 	}
 	c := &storeCache{dir: dir, limit: maxBytes, lru: cache.NewLRU(maxRefs)}
 	c.walk(dir)
