@@ -42,6 +42,7 @@ var errs = []struct {
 }
 
 var errnoToKind = map[syscall.Errno]errors.Kind{
+	syscall.EPERM:     errors.CannotDecrypt,
 	syscall.EACCES:    errors.Permission,
 	syscall.EEXIST:    errors.Exist,
 	syscall.ENOENT:    errors.NotExist,
