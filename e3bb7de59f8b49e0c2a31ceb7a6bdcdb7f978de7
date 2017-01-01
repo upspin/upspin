@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "17961e08_232c4e5d",
+        "filename": "cmd/cacheserver/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-01T04:51:03Z",
+      "side": 1,
+      "message": "5e9 is much easier to read (and legal)",
+      "revId": "e3bb7de59f8b49e0c2a31ceb7a6bdcdb7f978de7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
