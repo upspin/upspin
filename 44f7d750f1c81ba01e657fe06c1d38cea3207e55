@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "17961e08_26c45c32",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-03T19:49:16Z",
+      "side": 1,
+      "message": "cmd/upspinfs: update to use errors.Private",
+      "revId": "44f7d750f1c81ba01e657fe06c1d38cea3207e55",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
