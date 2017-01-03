@@ -37,7 +37,7 @@ See the description for rotate for information about updating keys.
 	curveName := fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
 	secret := fs.String("secretseed", "", "128 bit secret `seed` in proquint format")
 	where := fs.String("where", filepath.Join(os.Getenv("HOME"), ".ssh"), "`directory` to store keys")
-	s.parseFlags(fs, args, help, "keygen [-curve=256] [-secret=seed] [-where=$HOME/.ssh]")
+	s.parseFlags(fs, args, help, "keygen [-curve=256] [-secretseed=seed] [-where=$HOME/.ssh]")
 	if fs.NArg() != 0 {
 		fs.Usage()
 	}
