@@ -596,15 +596,15 @@ func (l *clog) logGlobRequest(pattern upspin.PathName, err error, entries []*ups
 		return
 	}
 
-	l.globalLock.RLock()
-	defer l.globalLock.RUnlock()
-
 	// Log each entry.
 	children := make(map[string]bool)
 	for _, de := range entries {
 		children[lastElem(de.Name)] = true
 		l.logRequest(lookupReq, de.Name, err, de)
 	}
+
+	l.globalLock.RLock()
+	defer l.globalLock.RUnlock()
 
 	// If any files have disappeared from a preexisting glob, remove them.
 	glock := l.globLocks.lock(dirName)
@@ -836,8 +836,14 @@ func (l *clog) addAccess(e *clogEntry) (changes int) {
 	if !access.IsAccessFile(e.name) {
 		return
 	}
+
+	// Lock everyone else out while we run the LRU.
 	l.globalLock.RUnlock()
 	l.globalLock.Lock()
+	defer func() {
+		l.globalLock.Unlock()
+		l.globalLock.RLock()
+	}()
 
 	// Add the access reference to its immediate directory.
 	dirName := path.DropPath(e.name, 1)
@@ -872,8 +878,6 @@ func (l *clog) addAccess(e *clogEntry) (changes int) {
 			}
 		}
 	}
-	l.globalLock.Unlock()
-	l.globalLock.RLock()
 	return
 }
 
@@ -887,8 +891,14 @@ func (l *clog) removeAccess(e *clogEntry) (changes int) {
 	if !access.IsAccessFile(e.name) {
 		return
 	}
+
+	// Lock everyone else out while we run the LRU.
 	l.globalLock.RUnlock()
 	l.globalLock.Lock()
+	defer func() {
+		l.globalLock.Unlock()
+		l.globalLock.RLock()
+	}()
 
 	// Remove this access reference from its immediate directory.
 	dirName := path.DropPath(e.name, 1)
@@ -917,8 +927,6 @@ func (l *clog) removeAccess(e *clogEntry) (changes int) {
 			ne.access = ""
 		}
 	}
-	l.globalLock.Unlock()
-	l.globalLock.RLock()
 	return
 }
 
