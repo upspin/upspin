@@ -111,16 +111,13 @@ func createKeys(curveName, secret string) (public string, private, proquintStr s
 }
 
 func writeKeys(where, publicKey, privateKey string) error {
+	const create = os.O_RDWR | os.O_CREATE | os.O_TRUNC
 	// Save the keys to files.
-	fdPrivate, err := os.Create(filepath.Join(where, "secret.upspinkey"))
+	fdPrivate, err := os.OpenFile(filepath.Join(where, "secret.upspinkey"), create, 0400)
 	if err != nil {
 		return err
 	}
-	err = fdPrivate.Chmod(0600)
-	if err != nil {
-		return err
-	}
-	fdPublic, err := os.Create(filepath.Join(where, "public.upspinkey"))
+	fdPublic, err := os.OpenFile(filepath.Join(where, "public.upspinkey"), create, 0400)
 	if err != nil {
 		return err
 	}
