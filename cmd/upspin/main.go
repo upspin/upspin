@@ -202,8 +202,9 @@ func newState(op string) *State {
 	s := &State{
 		op: op,
 	}
-	if op == "signup" {
+	if op == "signup" || op == "keygen" {
 		// signup is special since there is no user yet.
+		// keygen simply does not require a context or anything else.
 		return s
 	}
 	ctx, err := context.FromFile(flags.Context)
