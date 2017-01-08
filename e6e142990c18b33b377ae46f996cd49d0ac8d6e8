@@ -89,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "97bbeed0_b5f52465",
+        "filename": "cmd/upspinfs/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-01-08T23:51:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "37040298_e64a3e28",
+      "revId": "e6e142990c18b33b377ae46f996cd49d0ac8d6e8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "37040298_4613521f",
         "filename": "cmd/upspinfs/main.go",
         "patchSetId": 1
@@ -136,6 +154,24 @@
       "side": 1,
       "message": "Actually is more than 300 ms because it looks like grpc tries and tries and tries.  I can take the Sleep out and it won\u0027t affect anything.\n\nI\u0027ll can add an error message saying the cache was unreachabl, going direct.\n\nRight now, if anything (upspin, upspinfs) can\u0027t get to the configured cache after a number of tries, it gives up and goes directly, i.e., everything works, just not as fast.  Not sure if this is the right semantics or not.  I think yes but I can be convinced otherwise in which case, I would turn this into a failure.\n\nIt is annoying that grpc is very noisy about not reaching the cache printing out:\n\n2017/01/08 14:47:52 grpc: addrConn.resetTransport failed to create client transport: connection error: desc \u003d \"transport: dial tcp [::1]:9999: getsockopt: connection refused\"; Reconnecting to {localhost:9999 \u003cnil\u003e}\n2017/01/08 14:47:53 grpc: addrConn.resetTransport failed to create client transport: connection error: desc \u003d \"transport: dial tcp [::1]:9999: getsockopt: connection refused\"; Reconnecting to {localhost:9999 \u003cnil\u003e}\n2017/01/08 14:47:55 grpc: addrConn.resetTransport failed to create client transport: connection error: desc \u003d \"transport: dial tcp [::1]:9999: getsockopt: connection refused\"; Reconnecting to {localhost:9999 \u003cnil\u003e}\n\nIt will confuse the user, I believe.",
       "parentUuid": "37040298_4613521f",
+      "revId": "e6e142990c18b33b377ae46f996cd49d0ac8d6e8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "97bbeed0_35203410",
+        "filename": "cmd/upspinfs/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-01-08T23:51:49Z",
+      "side": 1,
+      "message": "It has the same problem, i.e., at some point I have to give up and run without it.",
+      "parentUuid": "37040298_061d5a26",
       "revId": "e6e142990c18b33b377ae46f996cd49d0ac8d6e8",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
