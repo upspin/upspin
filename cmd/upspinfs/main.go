@@ -11,11 +11,15 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"time"
 
 	"upspin.io/context"
 	"upspin.io/flags"
+	"upspin.io/grpc/auth"
 	"upspin.io/log"
+	"upspin.io/upspin"
 
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
@@ -48,6 +52,9 @@ func main() {
 	}
 	transports.Init(ctx)
 
+	// Start the cache if needed.
+	startCache(ctx)
+
 	// Mount the file system and start serving.
 	mountpoint, err := filepath.Abs(flag.Arg(0))
 	if err != nil {
@@ -63,4 +70,34 @@ func defaultCacheDir() string {
 		homeDir = "/etc"
 	}
 	return homeDir + "/upspin"
+}
+
+func startCache(ctx upspin.Context) {
+	ce := ctx.CacheEndpoint()
+	if ce.Transport == upspin.Unassigned {
+		return // not using a cache server
+	}
+
+	// Dial the cache server.
+	_, err := auth.NewClient(ctx, ce.NetAddr, auth.KeepAliveInterval, auth.NoSecurity, ce)
+	if err == nil {
+		return // cache server running
+	}
+
+	// Start a cache server.
+	go func() {
+		cmd := exec.Command("cacheserver", "-cache="+*cacheFlag, "-log="+log.Level())
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		cmd.Run()
+	}()
+
+	// Wait for it.
+	for tries := 0; tries < 3; tries++ {
+		_, err := auth.NewClient(ctx, ce.NetAddr, auth.KeepAliveInterval, auth.NoSecurity, ce)
+		if err == nil {
+			return // cache server running
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
 }

@@ -4,7 +4,7 @@
 # license that can be found in the LICENSE file.
 
 # mp is the mount point for the upspin root.
-mp=/Volumes/upspin
+mp=$HOME/ufs
 
 # Unmount any previous mount.
 umount $mp 2>/dev/null
@@ -12,8 +12,5 @@ umount $mp 2>/dev/null
 # Creat the mount point if it doesn't already exist.
 mkdir $mp 2>/dev/null
 
-# Uncomment the following line if you want to start every run with a clean cache.
-#rm -fr $HOME/upspin/cache
-
-# Start the service.
-upspinfs $mp
+# Start the service. Use any flags passed to us.
+upspinfs $@ $mp
