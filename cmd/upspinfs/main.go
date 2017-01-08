@@ -4,18 +4,21 @@
 
 // +build !windows
 
-// A FUSE driver for Upspin.
 package main
 
 import (
 	"flag"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"time"
 
 	"upspin.io/context"
 	"upspin.io/flags"
+	"upspin.io/grpc/auth"
 	"upspin.io/log"
+	"upspin.io/upspin"
 
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
@@ -48,6 +51,9 @@ func main() {
 	}
 	transports.Init(ctx)
 
+	// Start the cache if needed.
+	startCache(ctx)
+
 	// Mount the file system and start serving.
 	mountpoint, err := filepath.Abs(flag.Arg(0))
 	if err != nil {
@@ -63,4 +69,47 @@ func defaultCacheDir() string {
 		homeDir = "/etc"
 	}
 	return homeDir + "/upspin"
+}
+
+func startCache(ctx upspin.Context) {
+	ce := ctx.CacheEndpoint()
+	if ce.Transport == upspin.Unassigned {
+		return // not using a cache server
+	}
+
+	// Dial the cache server.
+	_, err := auth.NewClient(ctx, ce.NetAddr, auth.KeepAliveInterval, auth.NoSecurity, ce)
+	if err == nil {
+		return // cache server running
+	}
+
+	// Start a cache server.
+	cacheErrorChan := make(chan bool)
+	go func() {
+		cmd := exec.Command("cacheserver", "-cache="+*cacheFlag, "-log="+log.Level())
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+		if err = cmd.Run(); err != nil {
+			log.Info.Printf("upspinfs: starting cacheserver: %s", err)
+			fmt.Fprintf(os.Stderr, "Failed to start cacheserver, continuing without.\n")
+			close(cacheErrorChan)
+		}
+	}()
+
+	// Wait for it. Give up and continue sithout if it doesn't start in a timely fashion.
+	for tries := 0; tries < 3; tries++ {
+		time.Sleep(100 * time.Millisecond)
+		select {
+		case <-cacheErrorChan:
+			return
+		default:
+		}
+		_, err := auth.NewClient(ctx, ce.NetAddr, auth.KeepAliveInterval, auth.NoSecurity, ce)
+		if err == nil {
+			fmt.Printf("upspinfs: started a cacheserver\n")
+			return
+		}
+	}
+
+	fmt.Fprintf(os.Stderr, "upspinfs: cacheserver may not have started.\n")
 }
