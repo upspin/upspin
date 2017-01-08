@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "97bbeed0_b5aa8520",
+        "filename": "cmd/upspinfs/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-01-08T00:36:39Z",
+      "side": 1,
+      "message": "I\u0027m unclear if Unassigned really means the user did not set cache: in rc, as opposed to some network failure meaning there is no Transport available.  If the latter, we should probably log an error or otherwise tell the user they didn\u0027t get what they expected.  The expert user will probably be able to deduce there is no cacheserver, but maybe not a newcomer.",
+      "revId": "e6e142990c18b33b377ae46f996cd49d0ac8d6e8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "37040298_4613521f",
         "filename": "cmd/upspinfs/main.go",
         "patchSetId": 1
