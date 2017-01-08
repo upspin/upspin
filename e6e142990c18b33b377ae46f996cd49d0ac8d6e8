@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "97bbeed0_959ca044",
+        "filename": "cmd/upspinfs/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-01-08T23:20:21Z",
+      "side": 1,
+      "message": "I\u0027ll fix it in this one...",
+      "parentUuid": "37040298_66164e11",
+      "revId": "e6e142990c18b33b377ae46f996cd49d0ac8d6e8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "97bbeed0_b5aa8520",
         "filename": "cmd/upspinfs/main.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2017-01-08T00:36:39Z",
       "side": 1,
       "message": "I\u0027m unclear if Unassigned really means the user did not set cache: in rc, as opposed to some network failure meaning there is no Transport available.  If the latter, we should probably log an error or otherwise tell the user they didn\u0027t get what they expected.  The expert user will probably be able to deduce there is no cacheserver, but maybe not a newcomer.",
+      "revId": "e6e142990c18b33b377ae46f996cd49d0ac8d6e8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "97bbeed0_b5ba84a0",
+        "filename": "cmd/upspinfs/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-01-08T23:20:21Z",
+      "side": 1,
+      "message": "It means that you didn\u0027t set up an endpoint for the cache.",
+      "parentUuid": "97bbeed0_b5aa8520",
       "revId": "e6e142990c18b33b377ae46f996cd49d0ac8d6e8",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -81,6 +117,24 @@
       "writtenOn": "2017-01-08T23:11:49Z",
       "side": 1,
       "message": "Another way to wait for the server to start is to have the cacheserver print a specific string when it\u0027s ready, and have this server read stdout and wait for that message to appear.",
+      "parentUuid": "37040298_4613521f",
+      "revId": "e6e142990c18b33b377ae46f996cd49d0ac8d6e8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "97bbeed0_f5c4fc34",
+        "filename": "cmd/upspinfs/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-01-08T23:20:21Z",
+      "side": 1,
+      "message": "Actually is more than 300 ms because it looks like grpc tries and tries and tries.  I can take the Sleep out and it won\u0027t affect anything.\n\nI\u0027ll can add an error message saying the cache was unreachabl, going direct.\n\nRight now, if anything (upspin, upspinfs) can\u0027t get to the configured cache after a number of tries, it gives up and goes directly, i.e., everything works, just not as fast.  Not sure if this is the right semantics or not.  I think yes but I can be convinced otherwise in which case, I would turn this into a failure.\n\nIt is annoying that grpc is very noisy about not reaching the cache printing out:\n\n2017/01/08 14:47:52 grpc: addrConn.resetTransport failed to create client transport: connection error: desc \u003d \"transport: dial tcp [::1]:9999: getsockopt: connection refused\"; Reconnecting to {localhost:9999 \u003cnil\u003e}\n2017/01/08 14:47:53 grpc: addrConn.resetTransport failed to create client transport: connection error: desc \u003d \"transport: dial tcp [::1]:9999: getsockopt: connection refused\"; Reconnecting to {localhost:9999 \u003cnil\u003e}\n2017/01/08 14:47:55 grpc: addrConn.resetTransport failed to create client transport: connection error: desc \u003d \"transport: dial tcp [::1]:9999: getsockopt: connection refused\"; Reconnecting to {localhost:9999 \u003cnil\u003e}\n\nIt will confuse the user, I believe.",
       "parentUuid": "37040298_4613521f",
       "revId": "e6e142990c18b33b377ae46f996cd49d0ac8d6e8",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
