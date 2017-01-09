@@ -6,20 +6,19 @@
 package https
 
 import (
-	"context"
 	"crypto/tls"
-	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
 	"os"
 	"path/filepath"
 
+	"golang.org/x/crypto/acme/autocert"
+	gContext "golang.org/x/net/context"
 	"google.golang.org/api/option"
 
 	"cloud.google.com/go/compute/metadata"
 	"cloud.google.com/go/storage"
-	"rsc.io/letsencrypt"
 
 	"upspin.io/access"
 	"upspin.io/errors"
@@ -57,47 +56,43 @@ func (opt *Options) applyDefaults() {
 
 // ListenAndServe serves the http.DefaultServeMux by HTTPS (and HTTP,
 // redirecting to HTTPS), storing SSL credentials in the Google Cloud Storage
-// buckets nominated by the Google Compute Engine project metadata variables
-// "letscloud-get-url-metaSuffix" and "letscloud-put-url-metaSuffix", where
-// metaSuffix is the supplied argument.
-// (See the upspin.io/cloud/letscloud package for more information.)
+// buckets letsencrypt*.
 //
 // If the server is running outside GCE, instead an HTTPS server is started on
 // the address specified by addr using the certificate details specified by opt.
 //
 // The given channel, if any, is closed when the TCP listener has succeeded.
 // It may be used to signal that the server is ready to start serving requests.
-func ListenAndServe(ready chan<- struct{}, metaSuffix, addr string, opt *Options) {
+func ListenAndServe(ready chan<- struct{}, serverName, addr string, opt *Options) {
 	if opt == nil {
 		opt = defaultOptions
 	} else {
 		opt.applyDefaults()
 	}
 	var config *tls.Config
+	var m autocert.Manager
+	m.Prompt = autocert.AcceptTOS
+	// TODO(ehg) How do I capture the --domain flags from deploy?
+	// m.HostPolicy = autocert.HostWhitelist("dir.upspin.io")
+
 	if metadata.OnGCE() {
-		log.Info.Println("https: on GCE; serving HTTPS on port 443 using Let's Encrypt")
-		var m letsencrypt.Manager
+		addr = ":443"
+		log.Info.Printf("https: serving HTTPS on GCE %q using Let's Encrypt certificates", addr)
 		const key = "letsencrypt-bucket"
 		bucket, err := metadata.InstanceAttributeValue(key)
 		if err != nil {
 			log.Fatalf("https: couldn't read %q metadata value: %v", key, err)
 		}
-		if err := letsencryptCache(&m, bucket, metaSuffix); err != nil {
+		cache, err := newAutocertCache(bucket, serverName)
+		if err != nil {
 			log.Fatalf("https: couldn't set up letsencrypt cache: %v", err)
 		}
-		addr = ":443"
-		config = &tls.Config{
-			GetCertificate: m.GetCertificate,
-		}
+		m.Cache = cache
+		config = &tls.Config{GetCertificate: m.GetCertificate}
 	} else if file := opt.LetsEncryptCache; file != "" {
 		log.Info.Printf("https: serving HTTPS on %q using Let's Encrypt certificates", addr)
-		var m letsencrypt.Manager
-		if err := m.CacheFile(file); err != nil {
-			log.Fatalf("https: couldn't set up letsencrypt cache: %v", err)
-		}
-		config = &tls.Config{
-			GetCertificate: m.GetCertificate,
-		}
+		m.Cache = autocert.DirCache(file)
+		config = &tls.Config{GetCertificate: m.GetCertificate}
 	} else {
 		log.Info.Printf("https: not on GCE; serving HTTPS on %q using provided certificates", addr)
 		if opt.CertFile == defaultOptions.CertFile || opt.KeyFile == defaultOptions.KeyFile {
@@ -110,6 +105,9 @@ func ListenAndServe(ready chan<- struct{}, metaSuffix, addr string, opt *Options
 		}
 	}
 	server := &http.Server{
+		// ReadTimeout:  15 * time.Second,
+		// WriteTimeout: 15 * time.Second,
+		// IdleTimeout:  60 * time.Second,
 		TLSConfig: config,
 	}
 	// TODO(adg): enable HTTP/2 once it's fast enough
@@ -131,54 +129,12 @@ func ListenAndServe(ready chan<- struct{}, metaSuffix, addr string, opt *Options
 
 // ListenAndServeFromFlags is the same as ListenAndServe, but it determines the
 // listen address and Options from command-line flags in the flags package.
-func ListenAndServeFromFlags(ready chan<- struct{}, metaSuffix string) {
-	ListenAndServe(ready, metaSuffix, flags.HTTPSAddr, &Options{
+func ListenAndServeFromFlags(ready chan<- struct{}, serverName string) {
+	ListenAndServe(ready, serverName, flags.HTTPSAddr, &Options{
 		LetsEncryptCache: flags.LetsEncryptCache,
 		CertFile:         flags.TLSCertFile,
 		KeyFile:          flags.TLSKeyFile,
 	})
-}
-
-func letsencryptCache(m *letsencrypt.Manager, bucket, suffix string) error {
-	ctx := context.Background()
-	client, err := storage.NewClient(ctx, option.WithScopes(storage.ScopeFullControl))
-	if err != nil {
-		return err
-	}
-	obj := client.Bucket(bucket).Object("letsencrypt-" + suffix)
-
-	// Try to read the existing cache value, if present.
-	r, err := obj.NewReader(ctx)
-	if err != storage.ErrObjectNotExist {
-		if err != nil {
-			return err
-		}
-		data, err := ioutil.ReadAll(r)
-		r.Close()
-		if err != nil {
-			return err
-		}
-		if err := m.Unmarshal(string(data)); err != nil {
-			return err
-		}
-	}
-
-	go func() {
-		// Watch the letsencrypt manager for changes and cache them.
-		for range m.Watch() {
-			w := obj.NewWriter(ctx)
-			_, err := io.WriteString(w, m.Marshal())
-			if err != nil {
-				log.Printf("https: writing letsencrypt cache: %v", err)
-				continue
-			}
-			if err := w.Close(); err != nil {
-				log.Printf("https: writing letsencrypt cache: %v", err)
-			}
-		}
-	}()
-
-	return nil
 }
 
 // newDefaultTLSConfig creates a new TLS config based on the certificate files given.
@@ -242,4 +198,50 @@ func isReadableFile(path string) (bool, error) {
 	}
 	fd.Close()
 	return true, nil // Item exists and is readable.
+}
+
+// autocertCache implements autocert.Cache.
+type autocertCache struct {
+	b      *storage.BucketHandle
+	server string
+}
+
+func newAutocertCache(bucket, prefix string) (cache autocertCache, err error) {
+	ctx := gContext.Background()
+	client, err := storage.NewClient(ctx, option.WithScopes(storage.ScopeFullControl))
+	if err != nil {
+		return
+	}
+	cache.b = client.Bucket(bucket)
+	cache.server = prefix + "-"
+	return
+}
+
+func (cache autocertCache) Get(ctx gContext.Context, name string) ([]byte, error) {
+	r, err := cache.b.Object(cache.server + name).NewReader(ctx)
+	if err == storage.ErrObjectNotExist {
+		return nil, autocert.ErrCacheMiss
+	}
+	if err != nil {
+		return nil, err
+	}
+	defer r.Close()
+	return ioutil.ReadAll(r)
+}
+
+func (cache autocertCache) Put(ctx gContext.Context, name string, data []byte) error {
+	// TODO(ehg) Do we need to add contentType="text/plain; charset=utf-8"?
+	w := cache.b.Object(cache.server + name).NewWriter(ctx)
+	_, err := w.Write(data)
+	if err != nil {
+		log.Printf("https: writing letsencrypt cache: %s %v", name, err)
+	}
+	if err := w.Close(); err != nil {
+		log.Printf("https: writing letsencrypt cache: %s %v", name, err)
+	}
+	return err
+}
+
+func (cache autocertCache) Delete(ctx gContext.Context, name string) error {
+	return cache.b.Object(cache.server + name).Delete(ctx)
 }
