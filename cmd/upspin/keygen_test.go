@@ -33,7 +33,7 @@ const (
 
 	private2Key = "47513031334211958720530809945101319621000940818220052385943490959145831252616\n"
 
-	archive2Key = `# EE 
+	archive2Key = `# EE
 p256
 20475414006091125411730282854763965332579614918776190347990649355528840360162
 41618798560597642013440926161855187887081385971895806061707694318148863738083
@@ -124,6 +124,6 @@ func TestSaveKeygen(t *testing.T) {
 		t.Fatal(err)
 	}
 	if string(data) != archive2Key {
-		t.Fatalf("reading archive key: got %q; want %q", data, archive2Key)
+		t.Fatalf("reading archive key: got\n%s\n\twant\n%s", data, archive2Key)
 	}
 }
