@@ -137,38 +137,42 @@ func writeKeys(where, publicKey, privateKey string) error {
 }
 
 func saveKeys(where string) error {
-	private, err := os.Open(filepath.Join(where, "secret.upspinkey"))
+	var (
+		publicFile  = filepath.Join(where, "public.upspinkey")
+		privateFile = filepath.Join(where, "secret.upspinkey")
+		archiveFile = filepath.Join(where, "secret2.upspinkey")
+	)
+
+	// Read existing key pair.
+	private, err := ioutil.ReadFile(privateFile)
 	if os.IsNotExist(err) {
 		return nil // There is nothing we need to save.
 	}
-	priv, err := ioutil.ReadAll(private)
 	if err != nil {
 		return err
 	}
-	public, err := os.Open(filepath.Join(where, "public.upspinkey"))
+	public, err := ioutil.ReadFile(publicFile)
 	if err != nil {
 		return err // Halt. Existing files are corrupted and need manual attention.
 	}
-	pub, err := ioutil.ReadAll(public)
-	if err != nil {
-		return err
-	}
-	archive, err := os.OpenFile(filepath.Join(where, "secret2.upspinkey"),
-		os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0600)
+
+	// Write old key pair to archive file.
+	archive, err := os.OpenFile(archiveFile, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0600)
 	if err != nil {
 		return err // We don't have permission to archive old keys?
 	}
-	_, err = archive.Write([]byte("# EE \n")) // TODO(ehg) add file date
+	// TODO(ehg) add file date
+	_, err = fmt.Fprintf(archive, "# EE\n%s%s", public, private)
 	if err != nil {
 		return err
 	}
-	_, err = archive.Write(pub)
-	if err != nil {
+	if err := archive.Close(); err != nil {
 		return err
 	}
-	_, err = archive.Write(priv)
-	if err != nil {
+
+	// Remove the old key files.
+	if err := os.Remove(privateFile); err != nil {
 		return err
 	}
-	return nil
+	return os.Remove(publicFile)
 }

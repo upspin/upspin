@@ -124,6 +124,6 @@ func TestSaveKeygen(t *testing.T) {
 		t.Fatal(err)
 	}
 	if string(data) != archive2Key {
-		t.Fatalf("reading archive key: got %q; want %q", data, archive2Key)
+		t.Fatalf("reading archive key: got\n%s\n\twant\n%s", data, archive2Key)
 	}
 }
