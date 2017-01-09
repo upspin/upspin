@@ -364,7 +364,7 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 		return nil, errors.E(op, name, errors.IsDir)
 	}
 	ss := s.StartSpan("ReadAll")
-	data, err := clientutil.ReadAll(c.context, entry)
+	data, err := clientutil.ReadAllWithSpan(c.context, entry, s)
 	ss.End()
 	if err != nil {
 		return nil, errors.E(op, name, err)
