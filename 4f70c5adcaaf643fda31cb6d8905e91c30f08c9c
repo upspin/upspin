@@ -16,6 +16,24 @@
       "revId": "4f70c5adcaaf643fda31cb6d8905e91c30f08c9c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "97bbeed0_0aff8389",
+        "filename": "cloud/https/https.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-01-09T23:22:39Z",
+      "side": 1,
+      "message": "serverName, formerly called metaSuffix, seems to hold a string like \"dirserver\".   I\u0027m looking for \"dir.upspin.io\".   I\u0027m pretty sure we don\u0027t want the user to have to pass it via a flag, I\u0027m just not sure where in the existing contexgt to pull from.",
+      "parentUuid": "37cc02f9_86950a20",
+      "revId": "4f70c5adcaaf643fda31cb6d8905e91c30f08c9c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
