@@ -9,6 +9,7 @@ package clientutil
 import (
 	"upspin.io/bind"
 	"upspin.io/errors"
+	"upspin.io/metric"
 	"upspin.io/pack"
 	"upspin.io/upspin"
 )
@@ -17,7 +18,16 @@ import (
 // the necessary keys loaded in the context to unpack the cipher if the entry
 // is encrypted.
 func ReadAll(ctx upspin.Context, entry *upspin.DirEntry) ([]byte, error) {
+	return ReadAllWithSpan(ctx, entry, nil)
+}
+
+func ReadAllWithSpan(ctx upspin.Context, entry *upspin.DirEntry, span *metric.Span) ([]byte, error) {
 	const op = "client/clientutil.ReadAll"
+
+	if span != nil {
+		span = span.StartSpan(op)
+		defer span.End()
+	}
 
 	if entry.IsLink() {
 		return nil, errors.E(op, entry.Name, errors.Invalid, errors.Str("can't read a link entry"))
@@ -42,7 +52,7 @@ func ReadAll(ctx upspin.Context, entry *upspin.DirEntry) ([]byte, error) {
 		}
 		// block is known valid as per valid.DirEntry above.
 
-		cipher, err := ReadLocation(ctx, block.Location)
+		cipher, err := ReadLocationWithSpan(ctx, block.Location, span)
 		if err != nil {
 			return nil, errors.E(op, err)
 		}
@@ -58,7 +68,16 @@ func ReadAll(ctx upspin.Context, entry *upspin.DirEntry) ([]byte, error) {
 // ReadLocation uses the provided Context to fetch the contents of the given
 // Location, following any StoreServer.Get redirects.
 func ReadLocation(ctx upspin.Context, loc upspin.Location) ([]byte, error) {
+	return ReadLocationWithSpan(ctx, loc, nil)
+}
+
+func ReadLocationWithSpan(ctx upspin.Context, loc upspin.Location, span *metric.Span) ([]byte, error) {
 	const op = "client/clientutil.ReadLocation"
+
+	if span != nil {
+		span = span.StartSpan(op)
+		defer span.End()
+	}
 
 	// firstError remembers the first error we saw.
 	// If we fail completely we return it.
@@ -82,11 +101,15 @@ func ReadLocation(ctx upspin.Context, loc upspin.Location) ([]byte, error) {
 	where := []upspin.Location{loc}
 	for i := 0; i < len(where); i++ { // Not range loop - where changes as we run.
 		loc := where[i]
+		sp := span.StartSpan("bind.StoreServer")
 		store, err := bind.StoreServer(ctx, loc.Endpoint)
+		sp.End()
 		if isError(err) {
 			continue
 		}
+		sp = span.StartSpan("store.Get")
 		data, _, locs, err := store.Get(loc.Reference)
+		sp.End()
 		if isError(err) {
 			continue // locs guaranteed to be nil.
 		}
