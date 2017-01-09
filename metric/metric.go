@@ -6,6 +6,7 @@
 package metric
 
 import (
+	"bytes"
 	"fmt"
 	"sync"
 	"sync/atomic"
@@ -20,6 +21,22 @@ type Metric struct {
 	name  string
 	mu    sync.Mutex // protects all fields below
 	spans []*Span
+}
+
+func (m *Metric) String() string {
+	buf := new(bytes.Buffer)
+	fmt.Fprintf(buf, "metric %s:\n", m.name)
+	//m.mu.Lock()
+	//defer m.mu.Lock()
+	for _, span := range m.spans {
+		parent := span.parentSpan
+		for parent != nil {
+			fmt.Fprint(buf, "\t")
+			parent = parent.parentSpan
+		}
+		fmt.Fprintf(buf, "\tspan %s (%v)\n", span.name, span.endTime.Sub(span.startTime))
+	}
+	return buf.String()
 }
 
 // A Span measures time from the beginning of an event (for example, an RPC request) until its completion.

@@ -247,6 +247,9 @@ func (s *State) maybeEnableMetrics() {
 	} else if strings.Contains(gcloudProject, "upspin-prod") {
 		gcloudProject = "upspin-prod"
 	} else {
+		// Enable debug log metrics.
+		s.metricsSaver = metric.NewLogSaver()
+		metric.RegisterSaver(s.metricsSaver)
 		return
 	}
 	var err error
