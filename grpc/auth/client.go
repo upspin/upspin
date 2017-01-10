@@ -49,10 +49,7 @@ type grpcClient struct {
 	keepAliveInterval time.Duration // interval of keep-alive packets.
 	closeKeepAlive    chan bool     // channel used to tell the keep-alive routine to exit.
 
-	mu               sync.Mutex // protects the field below.
-	authToken        string
-	lastTokenRefresh time.Time
-	lastNetActivity  time.Time // last known time of some network activity.
+	clientAuth
 }
 
 // SecurityLevel defines the security required of a GRPC connection.
@@ -180,21 +177,6 @@ func (ac *grpcClient) keepAlive() {
 	}
 }
 
-// lastActivity reports the time of the last known network activity.
-func (ac *grpcClient) lastActivity() time.Time {
-	ac.mu.Lock()
-	defer ac.mu.Unlock()
-	return ac.lastNetActivity
-}
-
-// setLastActivity sets the current time as the last known network acitivity. This is useful
-// when using application pings, to prevent unnecessarily frequent pings.
-func (ac *grpcClient) setLastActivity() {
-	ac.mu.Lock()
-	ac.lastNetActivity = time.Now()
-	ac.mu.Unlock()
-}
-
 // SetService sets the underlying RPC service which was obtained with
 // proto.NewSERVICENAMEClient, where SERVICENAME is the RPC service definition
 // from the proto file.
@@ -209,9 +191,7 @@ func (ac *grpcClient) GRPCConn() *grpc.ClientConn {
 
 func (ac *grpcClient) dialWithKeepAlive(target string, timeout time.Duration) (net.Conn, error) {
 	// Invalidate auth token and mark proxy as not configured.
-	ac.mu.Lock()
-	ac.authToken = ""
-	ac.mu.Unlock()
+	ac.invalidateSession()
 
 	c, err := net.DialTimeout("tcp", target, timeout)
 	if err != nil {
@@ -244,12 +224,6 @@ func (ac *grpcClient) Ping() bool {
 	return err == nil && resp.PingSequence == seq
 }
 
-func (ac *grpcClient) isAuthTokenExpired() bool {
-	ac.mu.Lock()
-	defer ac.mu.Unlock()
-	return ac.authToken == "" || ac.lastTokenRefresh.Add(tokenFreshnessDuration).Before(time.Now())
-}
-
 func (ac *grpcClient) isProxy() bool {
 	return ac.proxyFor.Transport != upspin.Unassigned
 }
@@ -276,10 +250,7 @@ func (ac *grpcClient) NewAuthContext() (ctx gContext.Context, opt grpc.CallOptio
 	var header metadata.MD
 	opt = grpc.Header(&header)
 
-	if !ac.isAuthTokenExpired() {
-		ac.mu.Lock()
-		token := ac.authToken
-		ac.mu.Unlock()
+	if token, ok := ac.authToken(); ok {
 		ctx = metadata.NewContext(ctx, metadata.Pairs(authTokenKey, token))
 		finishAuth = func(err error) error {
 			ac.setLastActivity()
@@ -313,7 +284,6 @@ func (ac *grpcClient) NewAuthContext() (ctx gContext.Context, opt grpc.CallOptio
 			}
 			return errors.E(op, errors.Permission, errors.Str(authErr[0]))
 		}
-		now := time.Now()
 
 		// If talking to a proxy, make sure it is running as the same user.
 		if ac.isProxy() {
@@ -327,10 +297,7 @@ func (ac *grpcClient) NewAuthContext() (ctx gContext.Context, opt grpc.CallOptio
 			}
 		}
 
-		ac.mu.Lock()
-		defer ac.mu.Unlock()
-		ac.authToken = token[0]
-		ac.lastTokenRefresh = now
+		ac.setAuthToken(token[0])
 		return nil
 	}
 	return
@@ -372,4 +339,53 @@ func (ac *grpcClient) Close() {
 	}
 	// The only error returned is ErrClientConnClosing, meaning something else has already caused it to close.
 	_ = ac.grpcConn.Close() // explicitly ignore the error as there's nothing we can do.
+}
+
+// clientAuth tracks the auth token and its freshness.
+type clientAuth struct {
+	mu              sync.Mutex // protects the field below.
+	token           string
+	lastRefresh     time.Time
+	lastNetActivity time.Time // last known time of some network activity.
+}
+
+// lastActivity reports the time of the last known network activity.
+func (ca *clientAuth) lastActivity() time.Time {
+	ca.mu.Lock()
+	defer ca.mu.Unlock()
+	return ca.lastNetActivity
+}
+
+// setLastActivity sets the current time as the last known network acitivity. This is useful
+// when using application pings, to prevent unnecessarily frequent pings.
+func (ca *clientAuth) setLastActivity() {
+	ca.mu.Lock()
+	ca.lastNetActivity = time.Now()
+	ca.mu.Unlock()
+}
+
+// invalidateSession forgets the authentication token.
+func (ca *clientAuth) invalidateSession() {
+	ca.mu.Lock()
+	ca.token = ""
+	ca.mu.Unlock()
+}
+
+// authToken returns the current authentication token and true,
+// or—if no valid token is held—an empty string and false.
+func (ca *clientAuth) authToken() (token string, ok bool) {
+	ca.mu.Lock()
+	defer ca.mu.Unlock()
+	if ca.token == "" || ca.lastRefresh.Add(tokenFreshnessDuration).Before(time.Now()) {
+		return "", false
+	}
+	return ca.token, true
+}
+
+// setAuthToken sets the authentication token to the given value.
+func (ca *clientAuth) setAuthToken(token string) {
+	ca.mu.Lock()
+	defer ca.mu.Unlock()
+	ca.token = token
+	ca.lastRefresh = time.Now()
 }
