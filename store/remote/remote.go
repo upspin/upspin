@@ -36,17 +36,12 @@ var _ upspin.StoreServer = (*remote)(nil)
 func (r *remote) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Location, error) {
 	op := r.opf("Get", "%q", ref)
 
-	gCtx, callOpt, finishAuth, err := r.NewAuthContext()
-	if err != nil {
-		return nil, nil, nil, op.error(err)
-	}
 	req := &proto.StoreGetRequest{
 		Reference: string(ref),
 	}
-	resp, err := r.storeClient.Get(gCtx, req, callOpt)
-	err = finishAuth(err)
-	if err != nil {
-		return nil, nil, nil, op.error(errors.IO, err)
+	resp := new(proto.StoreGetResponse)
+	if err := r.Invoke("StoreServer/Get", req, resp); err != nil {
+		return nil, nil, nil, op.error(err)
 	}
 	if len(resp.Error) != 0 {
 		return nil, nil, nil, errors.UnmarshalError(resp.Error)
@@ -58,17 +53,12 @@ func (r *remote) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Lo
 func (r *remote) Put(data []byte) (*upspin.Refdata, error) {
 	op := r.opf("Put", "%v bytes", len(data))
 
-	gCtx, callOpt, finishAuth, err := r.NewAuthContext()
-	if err != nil {
-		return nil, op.error(err)
-	}
 	req := &proto.StorePutRequest{
 		Data: data,
 	}
-	resp, err := r.storeClient.Put(gCtx, req, callOpt)
-	err = finishAuth(err)
-	if err != nil {
-		return nil, op.error(errors.IO, err)
+	resp := new(proto.StorePutResponse)
+	if err := r.Invoke("StoreServer/Put", req, resp); err != nil {
+		return nil, op.error(err)
 	}
 	return proto.UpspinRefdata(resp.Refdata), op.error(errors.UnmarshalError(resp.Error))
 }
@@ -77,17 +67,12 @@ func (r *remote) Put(data []byte) (*upspin.Refdata, error) {
 func (r *remote) Delete(ref upspin.Reference) error {
 	op := r.opf("Delete", "%q", ref)
 
-	gCtx, callOpt, finishAuth, err := r.NewAuthContext()
-	if err != nil {
-		return op.error(err)
-	}
 	req := &proto.StoreDeleteRequest{
 		Reference: string(ref),
 	}
-	resp, err := r.storeClient.Delete(gCtx, req, callOpt)
-	err = finishAuth(err)
-	if err != nil {
-		return op.error(errors.IO, err)
+	resp := new(proto.StoreDeleteResponse)
+	if err := r.Invoke("StoreServer/Delete", req, resp); err != nil {
+		return op.error(err)
 	}
 	return op.error(errors.UnmarshalError(resp.Error))
 }
@@ -105,16 +90,12 @@ func dialCache(op *operation, context upspin.Context, proxyFor upspin.Endpoint) 
 	}
 
 	// Call the cache. The cache is local so don't bother with TLS.
-	authClient, err := auth.NewClient(context, ce.NetAddr, auth.KeepAliveInterval, auth.NoSecurity, proxyFor)
+	authClient, err := auth.NewHTTPClient(context, ce.NetAddr, auth.NoSecurity, proxyFor)
 	if err != nil {
 		// On error dial direct.
 		op.error(errors.IO, err)
 		return nil
 	}
-
-	// The connection is closed when this service is released (see Bind.Release).
-	storeClient := proto.NewStoreClient(authClient.GRPCConn())
-	authClient.SetService(storeClient)
 
 	return &remote{
 		Client: authClient,
@@ -122,7 +103,6 @@ func dialCache(op *operation, context upspin.Context, proxyFor upspin.Endpoint) 
 			endpoint: proxyFor,
 			userName: context.UserName(),
 		},
-		storeClient: storeClient,
 	}
 }
 
@@ -135,19 +115,16 @@ func (r *remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service
 	}
 
 	// First try a cache
-	if svc := dialCache(op, context, e); svc != nil {
-		return svc, nil
-	}
+	// TODO(adg): enable this once we have the cache use HTTP
+	//if svc := dialCache(op, context, e); svc != nil {
+	//	return svc, nil
+	//}
 
 	// Call the server directly.
-	authClient, err := auth.NewClient(context, e.NetAddr, auth.KeepAliveInterval, auth.Secure, upspin.Endpoint{})
+	authClient, err := auth.NewHTTPClient(context, e.NetAddr, auth.Secure, upspin.Endpoint{})
 	if err != nil {
 		return nil, op.error(errors.IO, err)
 	}
-
-	// The connection is closed when this service is released (see Bind.Release)
-	storeClient := proto.NewStoreClient(authClient.GRPCConn())
-	authClient.SetService(storeClient)
 
 	return &remote{
 		Client: authClient,
@@ -155,7 +132,6 @@ func (r *remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service
 			endpoint: e,
 			userName: context.UserName(),
 		},
-		storeClient: storeClient,
 	}, nil
 }
 
