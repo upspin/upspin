@@ -33,6 +33,29 @@
       "revId": "a074a3c020961007723248e7b399b001f7217d72",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "97bbeed0_a905bbc5",
+        "filename": "grpc/auth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-01-10T23:46:35Z",
+      "side": 1,
+      "message": "Aren\u0027t you going to want this somewhere more generic?  I assume this is here only temporarily.",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 21
+      },
+      "revId": "a074a3c020961007723248e7b399b001f7217d72",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
