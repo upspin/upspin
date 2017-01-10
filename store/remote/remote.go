@@ -25,9 +25,9 @@ type dialContext struct {
 
 // remote implements upspin.StoreServer.
 type remote struct {
-	*auth.Client // For sessions, Ping, and Close.
-	ctx          dialContext
-	storeClient  proto.StoreClient
+	auth.Client // For sessions, Ping, and Close.
+	ctx         dialContext
+	storeClient proto.StoreClient
 }
 
 var _ upspin.StoreServer = (*remote)(nil)
