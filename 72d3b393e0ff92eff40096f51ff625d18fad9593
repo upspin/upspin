@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "37cc02f9_e63afed7",
+        "filename": "grpc/auth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 346,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-10T23:49:39Z",
+      "side": 1,
+      "message": "move this past the guys it does not protect",
+      "revId": "72d3b393e0ff92eff40096f51ff625d18fad9593",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "37cc02f9_c63f02c6",
+        "filename": "grpc/auth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 359,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-10T23:49:39Z",
+      "side": 1,
+      "message": "// setLastActivity records the current time as that of the last known network activity.\n// It is used to prevent unnecessarily frequent pings.",
+      "revId": "72d3b393e0ff92eff40096f51ff625d18fad9593",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "37cc02f9_26553613",
+        "filename": "grpc/auth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 375,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-10T23:49:39Z",
+      "side": 1,
+      "message": "em dashes don\u0027t look good in CW text. maybe - for now - do this?",
+      "revId": "72d3b393e0ff92eff40096f51ff625d18fad9593",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
