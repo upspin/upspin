@@ -27,18 +27,28 @@ stores the private key locally, and prepares to store the private key with the
 public upspin key server. It writes an "rc" file into $HOME/upspin/rc, holding
 the username and the location of the directory and store servers.
 
+By default, signup creates new keys with the p256 cryptographic curve set.
+The -curve and -secretseed flags allow the user to control the curve or to
+recreate or reuse prior keys.
+
 As the final step, it writes the contents of a mail message to standard output.
 This message contains the information to be registered with the key server.
 After running signup, the new user must mail this message to
 signup@key.upspin.io to complete the signup process.
 `
 	fs := flag.NewFlagSet("signup", flag.ExitOnError)
-	force := fs.Bool("force", false, "create a new user even if keys and rc file exist")
-	rcFile := fs.String("rc", "upspin/rc", "location of the rc file")
-	where := fs.String("where", filepath.Join(os.Getenv("HOME"), ".ssh"), "`directory` to store keys")
-	dirServer := fs.String("dir", "", "DirServer `address`")
-	storeServer := fs.String("store", "", "StoreServer `address`")
-	s.parseFlags(fs, args, help, "signup <-dir=address> <-store=address> <email>")
+	var (
+		force       = fs.Bool("force", false, "create a new user even if keys and rc file exist")
+		rcFile      = fs.String("rc", "upspin/rc", "location of the rc file")
+		where       = fs.String("where", filepath.Join(os.Getenv("HOME"), ".ssh"), "`directory` to store keys")
+		dirServer   = fs.String("dir", "", "DirServer `address`")
+		storeServer = fs.String("store", "", "StoreServer `address`")
+	)
+	// Used only in keygen.
+	fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
+	fs.String("secretseed", "", "128 bit secret `seed` in proquint format")
+
+	s.parseFlags(fs, args, help, "signup [-dir=address] [-store=address] [-secretseed=seed] [-curve=p256] [email]")
 	if fs.NArg() != 1 {
 		fs.Usage()
 	}
@@ -47,7 +57,7 @@ signup@key.upspin.io to complete the signup process.
 		fs.Usage()
 	}
 
-	// User must have a home dir in their native OS.
+	// User must have a home dir in the local OS.
 	homedir, err := context.Homedir()
 	if err != nil {
 		s.exit(err)
@@ -119,7 +129,7 @@ signup@key.upspin.io to complete the signup process.
 	fmt.Printf("\t%s\n\n", *rcFile)
 
 	// Generate a new key.
-	s.keygen("-where", *where)
+	s.keygenCommand(fs)
 
 	// Now load the context. This time it should succeed.
 	ctx, err := context.FromFile(*rcFile)
