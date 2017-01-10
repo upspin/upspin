@@ -34,6 +34,92 @@
       "revId": "4f70c5adcaaf643fda31cb6d8905e91c30f08c9c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "37cc02f9_26209610",
+        "filename": "cloud/https/https.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-10T02:20:46Z",
+      "side": 1,
+      "message": "Right now we don\u0027t actually restrict the acme certs to a specific domain, which is arguably a bad thing. I think the right call here would be to add a -domain flag to each of the cmd/*server binaries and pass it through to as an https.Options field. It may even be useful to accept a list of acceptable hostnames.",
+      "parentUuid": "97bbeed0_0aff8389",
+      "revId": "4f70c5adcaaf643fda31cb6d8905e91c30f08c9c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "37cc02f9_662a8ef0",
+        "filename": "cloud/https/https.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-10T02:20:46Z",
+      "side": 1,
+      "message": "newAutocertCache",
+      "revId": "4f70c5adcaaf643fda31cb6d8905e91c30f08c9c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "37cc02f9_86106ac7",
+        "filename": "cloud/https/https.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-10T02:20:46Z",
+      "side": 1,
+      "message": "isn\u0027t the suffix actually a prefix?",
+      "revId": "4f70c5adcaaf643fda31cb6d8905e91c30f08c9c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "37cc02f9_e615deb5",
+        "filename": "cloud/https/https.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-10T02:20:46Z",
+      "side": 1,
+      "message": "it probably only matters on put, if it matters at all",
+      "revId": "4f70c5adcaaf643fda31cb6d8905e91c30f08c9c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "37cc02f9_061d9ad8",
+        "filename": "cloud/https/https.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-10T02:20:46Z",
+      "side": 1,
+      "message": "I don\u0027t think we do, as the bucket operation is atomic and it doesn\u0027t really matter who wins. I doubt the acme manager would make multiple simultaneous calls, though.",
+      "revId": "4f70c5adcaaf643fda31cb6d8905e91c30f08c9c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
