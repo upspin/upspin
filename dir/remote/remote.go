@@ -30,9 +30,9 @@ type dialContext struct {
 
 // remote implements upspin.DirServer.
 type remote struct {
-	*auth.Client // For sessions, Ping, and Close.
-	ctx          dialContext
-	dirClient    proto.DirClient
+	auth.Client // For sessions, Ping, and Close.
+	ctx         dialContext
+	dirClient   proto.DirClient
 }
 
 var _ upspin.DirServer = (*remote)(nil)
