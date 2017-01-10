@@ -164,7 +164,8 @@ func (s *State) printInfo(entry *upspin.DirEntry) {
 	if err != nil {
 		s.exitf("executing info template: %v", err)
 	}
-	if writer.Flush() != nil {
+	err = writer.Flush()
+	if err != nil {
 		s.exitf("flushing template output: %v", err)
 	}
 	if !entry.IsLink() {
