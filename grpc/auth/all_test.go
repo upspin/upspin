@@ -95,7 +95,7 @@ func (s *server) Echo(ctx gContext.Context, req *prototest.EchoRequest) (*protot
 }
 
 type client struct {
-	*Client    // For sessions, Ping, and Close.
+	Client     // For sessions, Ping, and Close.
 	grpcClient prototest.TestServiceClient
 	reqCount   int
 }
@@ -138,7 +138,7 @@ func startClient(port string) {
 	ctx = context.SetCertPool(ctx, pool)
 
 	// Try a few times because the server may not be up yet.
-	var authClient *Client
+	var authClient Client
 	for i := 0; i < 10; i++ {
 		authClient, err = NewClient(ctx, upspin.NetAddr("localhost:"+port), KeepAliveInterval, Secure, upspin.Endpoint{})
 		if err == nil {
@@ -177,10 +177,6 @@ func TestAll(t *testing.T) {
 	}
 	if cli.reqCount != srv.iteration {
 		t.Errorf("Expected client to be on iteration %d, was on %d", srv.iteration, cli.reqCount)
-	}
-
-	if cli.lastActivity().IsZero() {
-		t.Errorf("Expected keep alive go routine to be alive.")
 	}
 }
 

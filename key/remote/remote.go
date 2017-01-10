@@ -28,9 +28,9 @@ type dialContext struct {
 
 // remote implements upspin.KeyServer.
 type remote struct {
-	*auth.Client // For sessions, Ping, and Close.
-	ctx          dialContext
-	keyClient    proto.KeyClient
+	auth.Client // For sessions, Ping, and Close.
+	ctx         dialContext
+	keyClient   proto.KeyClient
 }
 
 var _ upspin.KeyServer = (*remote)(nil)
