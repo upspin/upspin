@@ -2,14 +2,12 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Storeserver is a wrapper for a store implementation that presents it as a
-// GRPC interface.
+// Storeserver is a wrapper for a store implementation that presents it as an
+// HTTP interface.
 package main
 
 import (
 	"net/http"
-
-	"google.golang.org/grpc"
 
 	"upspin.io/cloud/https"
 	"upspin.io/context"
@@ -23,7 +21,6 @@ import (
 	"upspin.io/store/gcp"
 	"upspin.io/store/inprocess"
 	"upspin.io/upspin"
-	"upspin.io/upspin/proto"
 
 	// We need the directory transports to fetch write permissions.
 	_ "upspin.io/transports"
@@ -78,10 +75,7 @@ func main() {
 		log.Fatalf("Error wrapping store: %s", err)
 	}
 
-	grpcServer := grpc.NewServer()
-	grpcStore := storeserver.New(ctx, store, upspin.NetAddr(flags.NetAddr))
-	proto.RegisterStoreServer(grpcServer, grpcStore)
-	http.Handle("/", grpcServer)
-
+	httpStore := storeserver.New(ctx, store, upspin.NetAddr(flags.NetAddr))
+	http.Handle("/", httpStore)
 	https.ListenAndServeFromFlags(ready, serverName)
 }

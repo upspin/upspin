@@ -8,18 +8,24 @@ package auth
 import (
 	"crypto/rand"
 	"fmt"
+	"io/ioutil"
 	"math/big"
+	"net/http"
+	"strings"
 	"time"
 
+	pb "github.com/golang/protobuf/proto"
 	gContext "golang.org/x/net/context"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 
+	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/log"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
+	"upspin.io/user"
 	"upspin.io/valid"
 )
 
@@ -34,16 +40,20 @@ var (
 
 const (
 	// authTokenKey is the key in the context's metadata for the auth token.
-	authTokenKey = "upspinauthtoken" // must be all lower case.
+	authTokenKey    = "upspinauthtoken" // must be all lower case.
+	authTokenHeader = "Upspin-Auth-Token"
 
 	// authRequestKey is the key for inline user authentication.
-	authRequestKey = "upspinauthrequest"
+	authRequestKey    = "upspinauthrequest"
+	authRequestHeader = "Upspin-Auth-Request"
 
 	// authErrorKey is the key for inline user authentication errors.
-	authErrorKey = "upspinautherror"
+	authErrorKey    = "upspinautherror"
+	authErrorHeader = "Upspin-Auth-Error"
 
 	// proxyRequestKey key is for inline proxy configuration requests.
-	proxyRequestKey = "upspinproxyrequest"
+	proxyRequestKey    = "upspinproxyrequest"
+	proxyRequestHeader = "Upspin-Proxy-Request"
 
 	// authTokenEntropyLen is the size of random bytes in an auth token.
 	authTokenEntropyLen = 16
@@ -66,13 +76,39 @@ type Server interface {
 
 	// Ping is the GRPC Ping method shared by all Upspin GRPC servers.
 	Ping(gContext gContext.Context, req *proto.PingRequest) (*proto.PingResponse, error)
+
+	// If a Server is configured with a Service then it will implement
+	// an HTTP handler that services that service by HTTP.
+	http.Handler
 }
+
+// Service describes an RPC service.
+type Service struct {
+	// The name of the service, which forms the first path component of any
+	// HTTP request.
+	Name string
+
+	// The upspin Dialer and Service that will yield a Service to handle
+	// these requests.
+	Dialer interface {
+		upspin.Dialer
+		upspin.Service
+	}
+
+	// The RPC methods to serve.
+	Methods Methods
+}
+
+// Methods describes a set of RPC methods by name.
+type Methods map[string]func(upspin.Service, []byte) (pb.Message, error)
 
 // ServerConfig holds the configuration for instantiating a Server.
 type ServerConfig struct {
 	// Lookup looks up user keys.
 	// If nil, PublicUserKeyService will be used.
 	Lookup func(userName upspin.UserName) (upspin.PublicKey, error)
+
+	Service Service
 }
 
 // NewServer returns a new Server that uses the given config.
@@ -98,6 +134,13 @@ func (s *serverImpl) lookup(u upspin.UserName) (upspin.PublicKey, error) {
 	return s.config.Lookup(u)
 }
 
+func (s *serverImpl) service() *Service {
+	if s.config == nil {
+		return nil
+	}
+	return &s.config.Service
+}
+
 func generateRandomToken() (string, error) {
 	var buf [authTokenEntropyLen]byte
 	n, err := rand.Read(buf[:])
@@ -108,6 +151,64 @@ func generateRandomToken() (string, error) {
 		return "", errors.Str("random bytes too short")
 	}
 	return fmt.Sprintf("%X", buf), nil
+}
+
+func (s *serverImpl) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	d := s.service()
+	if d == nil {
+		http.NotFound(w, r)
+		return
+	}
+
+	prefix := "/" + d.Name + "/"
+	if !strings.HasPrefix(r.URL.Path, prefix) {
+		http.NotFound(w, r)
+		return
+	}
+	method := strings.TrimPrefix(r.URL.Path, prefix)
+
+	m := d.Methods[method]
+	if m == nil {
+		http.NotFound(w, r)
+		return
+	}
+	body, err := ioutil.ReadAll(r.Body)
+	r.Body.Close()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	session, err := s.SessionForRequest(w, r)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
+	}
+	userName, err := user.Clean(session.User())
+	if err != nil {
+		// This shouldn't really happen, but report it anyway.
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	svc, err := d.Dialer.Dial(context.SetUserName(s.context, userName), d.Dialer.Endpoint())
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	resp, err := m(svc, body)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	payload, err := pb.Marshal(resp)
+	if err != nil {
+		log.Error.Printf("error encoding response: %v", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Write(payload)
 }
 
 // SessionFromContext looks for an authentication token or request in the
@@ -134,7 +235,7 @@ func (s *serverImpl) SessionFromContext(ctx gContext.Context) (session Session, 
 		return nil, errors.E(errors.Invalid, errors.Str("invalid request metadata"))
 	}
 	if tok, ok := md[authTokenKey]; ok && len(tok) == 1 {
-		return s.validateToken(ctx, tok[0])
+		return s.validateToken(tok[0])
 	}
 	proxyRequest, ok := md[proxyRequestKey]
 	if ok && len(proxyRequest) != 1 {
@@ -150,12 +251,43 @@ func (s *serverImpl) SessionFromContext(ctx gContext.Context) (session Session, 
 	return s.handleSessionRequest(ctx, authRequest, proxyRequest)
 }
 
+func (s *serverImpl) SessionForRequest(w http.ResponseWriter, r *http.Request) (session Session, err error) {
+	const op = "grpc/auth.SessionForRequest"
+	defer func() {
+		if err == nil {
+			return
+		}
+		// Capture session setup errors and
+		// send them to the client in the HTTP response Header.
+		w.Header().Set(authErrorHeader, err.Error())
+		// Attach the op to the error here, because the client doesn't
+		// care that this error originated in this function.
+		err = errors.E(op, err)
+	}()
+	if tok, ok := r.Header[authTokenHeader]; ok && len(tok) == 1 {
+		return s.validateToken(tok[0])
+	}
+	proxyRequest, ok := r.Header[proxyRequestHeader]
+	if ok && len(proxyRequest) != 1 {
+		return nil, errors.E(errors.Invalid, errors.Str("invalid proxy request in header"))
+	}
+	authRequest, ok := r.Header[authRequestHeader]
+	if ok && len(authRequest) != 4 {
+		return nil, errors.E(errors.Invalid, errors.Str("invalid auth request in header"))
+	}
+	if authRequest == nil {
+		log.Printf("%#v", r.Header)
+		return nil, errors.E(errors.Invalid, errors.Str("no auth token or request in header"))
+	}
+	return s.handleSessionRequestHTTP(w, authRequest, proxyRequest)
+}
+
 // Ping implements Pinger.
 func (s *serverImpl) Ping(gContext gContext.Context, req *proto.PingRequest) (*proto.PingResponse, error) {
 	return &proto.PingResponse{PingSequence: req.PingSequence}, nil
 }
 
-func (s *serverImpl) validateToken(ctx gContext.Context, authToken string) (Session, error) {
+func (s *serverImpl) validateToken(authToken string) (Session, error) {
 	if len(authToken) < authTokenEntropyLen {
 		return nil, errors.E(errors.Invalid, errors.Str("invalid auth token"))
 	}
@@ -226,6 +358,54 @@ func (s *serverImpl) handleSessionRequest(ctx gContext.Context, authRequest []st
 		return nil, err
 	}
 	return session, nil
+}
+
+// handleSessionRequestHTTP is a copy of handleSessionRequest but it writes
+// auth tokens to an HTTP response. TODO(adg): delete handleSessionRequest
+func (s *serverImpl) handleSessionRequestHTTP(w http.ResponseWriter, authRequest []string, proxyRequest []string) (Session, error) {
+	// Validate the username.
+	user := upspin.UserName(authRequest[0])
+	if err := valid.UserName(user); err != nil {
+		return nil, errors.E(user, err)
+	}
+
+	// Get user's public key.
+	key, err := s.lookup(user)
+	if err != nil {
+		return nil, errors.E(user, err)
+	}
+
+	now := time.Now()
+
+	// Validate signature.
+	if err := verifyUser(key, authRequest, clientAuthMagic, now); err != nil {
+		return nil, errors.E(errors.Permission, user, errors.Errorf("invalid signature: %v", err))
+	}
+
+	// Generate an auth token and bind it to a session for the client.
+	expiration := now.Add(authTokenDuration)
+	authToken, err := generateRandomToken()
+	if err != nil {
+		return nil, err
+	}
+	w.Header().Set(authTokenHeader, authToken)
+
+	// If there is a proxy request, remember the proxy's endpoint and authenticate server to client.
+	ep := &upspin.Endpoint{}
+	if len(proxyRequest) == 1 {
+		ep, err = upspin.ParseEndpoint(proxyRequest[0])
+		if err != nil {
+			return nil, errors.E(errors.Invalid, errors.Errorf("invalid proxy endpoint: %v", err))
+		}
+		// Authenticate the server to the user.
+		authMsg, err := signUser(s.context, serverAuthMagic)
+		if err != nil {
+			return nil, errors.E(errors.Permission, err)
+		}
+		w.Header()[authRequestHeader] = authMsg
+	}
+
+	return NewSession(user, expiration, authToken, ep, nil), nil
 }
 
 // verifyUser verifies a GRPC context header authenticating the remote user.
