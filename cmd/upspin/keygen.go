@@ -34,40 +34,46 @@ first key. Keygen can be used to create new keys.
 See the description for rotate for information about updating keys.
 `
 	fs := flag.NewFlagSet("keygen", flag.ExitOnError)
-	curveName := fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
-	secret := fs.String("secretseed", "", "128 bit secret `seed` in proquint format")
-	where := fs.String("where", filepath.Join(os.Getenv("HOME"), ".ssh"), "`directory` to store keys")
+	fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
+	fs.String("secretseed", "", "128 bit secret `seed` in proquint format")
+	fs.String("where", filepath.Join(os.Getenv("HOME"), ".ssh"), "`directory` to store keys")
 	s.parseFlags(fs, args, help, "keygen [-curve=256] [-secretseed=seed] [-where=$HOME/.ssh]")
 	if fs.NArg() != 0 {
 		fs.Usage()
 	}
-	switch *curveName {
+	s.keygenCommand(fs)
+}
+
+func (s *State) keygenCommand(fs *flag.FlagSet) {
+	curve := stringFlag(fs, "curve")
+	switch curve {
 	case "p256", "p384", "p521":
 		// ok
 	default:
-		log.Printf("no such curve %q", *curveName)
+		log.Printf("no such curve %q", curve)
 		fs.Usage()
 	}
 
-	public, private, proquintStr, err := createKeys(*curveName, *secret)
+	public, private, proquintStr, err := createKeys(curve, stringFlag(fs, "secretseed"))
 	if err != nil {
 		s.exitf("creating keys: %v", err)
 	}
 
-	if *where == "" {
+	where := stringFlag(fs, "where")
+	if where == "" {
 		s.exitf("-where must not be empty")
 	}
-	err = saveKeys(*where)
+	err = saveKeys(where)
 	if err != nil {
 		s.exitf("saving previous keys failed(%v); keys not generated", err)
 	}
-	err = writeKeys(*where, public, private)
+	err = writeKeys(where, public, private)
 	if err != nil {
 		s.exitf("writing keys: %v", err)
 	}
 	fmt.Println("Upspin private/public key pair written to:")
-	fmt.Printf("\t%s\n", filepath.Join(*where, "public.upspinkey"))
-	fmt.Printf("\t%s\n", filepath.Join(*where, "secret.upspinkey"))
+	fmt.Printf("\t%s\n", filepath.Join(where, "public.upspinkey"))
+	fmt.Printf("\t%s\n", filepath.Join(where, "secret.upspinkey"))
 	fmt.Println("This key pair provides access to your Upspin identity and data.")
 	if proquintStr != "" {
 		fmt.Println("If you lose the keys you can re-create them by running this command:")
