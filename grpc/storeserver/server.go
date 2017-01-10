@@ -8,8 +8,9 @@ package storeserver
 
 import (
 	"fmt"
+	"net/http"
 
-	gContext "golang.org/x/net/context"
+	pb "github.com/golang/protobuf/proto"
 
 	"upspin.io/context"
 	"upspin.io/errors"
@@ -17,7 +18,6 @@ import (
 	"upspin.io/log"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
-	"upspin.io/user"
 )
 
 // server is a SecureServer that talks to a Store interface and serves GRPC requests.
@@ -34,45 +34,55 @@ type server struct {
 	auth.Server
 }
 
-func New(ctx upspin.Context, store upspin.StoreServer, addr upspin.NetAddr) proto.StoreServer {
-	return &server{
+func New(ctx upspin.Context, store upspin.StoreServer, addr upspin.NetAddr) http.Handler {
+	s := &server{
 		context: ctx,
 		endpoint: upspin.Endpoint{
 			Transport: upspin.Remote,
 			NetAddr:   addr,
 		},
-		store:  store,
-		Server: auth.NewServer(ctx, nil),
+		store: store,
 	}
+
+	return auth.NewServer(ctx, &auth.ServerConfig{Service: s})
 }
 
-// storeFor returns a StoreServer instance bound to the user specified in the context.
-func (s *server) storeFor(ctx gContext.Context) (upspin.StoreServer, error) {
-	// Validate that we have a session. If not, it's an auth error.
-	session, err := s.SessionFromContext(ctx)
-	if err != nil {
-		return nil, err
+func (s *server) Service() string {
+	return "StoreServer"
+}
+
+func (s *server) RequestMessage(method string) pb.Message {
+	switch method {
+	case "Get":
+		return new(proto.StoreGetRequest)
+	case "Put":
+		return new(proto.StorePutRequest)
+	case "Delete":
+		return new(proto.StoreDeleteRequest)
 	}
-	userName, err := user.Clean(session.User())
-	if err != nil {
-		return nil, err
-	}
+	return nil
+}
+
+func (s *server) Dispatch(userName upspin.UserName, method string, in pb.Message) (pb.Message, error) {
 	svc, err := s.store.Dial(context.SetUserName(s.context, userName), s.store.Endpoint())
 	if err != nil {
 		return nil, err
 	}
-	return svc.(upspin.StoreServer), nil
+	store := svc.(upspin.StoreServer)
+	switch method {
+	case "Get":
+		return s.Get(store, in.(*proto.StoreGetRequest))
+	case "Put":
+		return s.Put(store, in.(*proto.StorePutRequest))
+	case "Delete":
+		return s.Delete(store, in.(*proto.StoreDeleteRequest))
+	}
+	return nil, errors.Str("invalid method")
 }
 
 // Get implements proto.StoreServer.
-func (s *server) Get(ctx gContext.Context, req *proto.StoreGetRequest) (*proto.StoreGetResponse, error) {
+func (s *server) Get(store upspin.StoreServer, req *proto.StoreGetRequest) (*proto.StoreGetResponse, error) {
 	op := logf("Get %q", req.Reference)
-
-	store, err := s.storeFor(ctx)
-	if err != nil {
-		op.log(err)
-		return &proto.StoreGetResponse{Error: errors.MarshalError(err)}, nil
-	}
 
 	data, refdata, locs, err := store.Get(upspin.Reference(req.Reference))
 	if err != nil {
@@ -88,14 +98,8 @@ func (s *server) Get(ctx gContext.Context, req *proto.StoreGetRequest) (*proto.S
 }
 
 // Put implements proto.StoreServer.
-func (s *server) Put(ctx gContext.Context, req *proto.StorePutRequest) (*proto.StorePutResponse, error) {
+func (s *server) Put(store upspin.StoreServer, req *proto.StorePutRequest) (*proto.StorePutResponse, error) {
 	op := logf("Put %.30x...", req.Data)
-
-	store, err := s.storeFor(ctx)
-	if err != nil {
-		op.log(err)
-		return &proto.StorePutResponse{Error: errors.MarshalError(err)}, nil
-	}
 
 	refdata, err := store.Put(req.Data)
 	if err != nil {
@@ -112,31 +116,15 @@ func (s *server) Put(ctx gContext.Context, req *proto.StorePutRequest) (*proto.S
 var deleteResponse proto.StoreDeleteResponse
 
 // Delete implements proto.StoreServer.
-func (s *server) Delete(ctx gContext.Context, req *proto.StoreDeleteRequest) (*proto.StoreDeleteResponse, error) {
+func (s *server) Delete(store upspin.StoreServer, req *proto.StoreDeleteRequest) (*proto.StoreDeleteResponse, error) {
 	op := logf("Delete %q", req.Reference)
 
-	store, err := s.storeFor(ctx)
-	if err != nil {
-		op.log(err)
-		return &proto.StoreDeleteResponse{Error: errors.MarshalError(err)}, nil
-	}
-
-	err = store.Delete(upspin.Reference(req.Reference))
+	err := store.Delete(upspin.Reference(req.Reference))
 	if err != nil {
 		op.log(err)
 		return &proto.StoreDeleteResponse{Error: errors.MarshalError(err)}, nil
 	}
 	return &deleteResponse, nil
-}
-
-// Endpoint implements proto.StoreServer.
-func (s *server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*proto.EndpointResponse, error) {
-	return &proto.EndpointResponse{
-		Endpoint: &proto.Endpoint{
-			Transport: int32(s.endpoint.Transport),
-			NetAddr:   string(s.endpoint.NetAddr),
-		},
-	}, nil
 }
 
 func logf(format string, args ...interface{}) operation {
