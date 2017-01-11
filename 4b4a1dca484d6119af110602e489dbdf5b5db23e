@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "37cc02f9_c9aef534",
+        "filename": "cmd/upspin/setupdomain.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-11T22:56:29Z",
+      "side": 1,
+      "message": "this change is wrong, it is for the pair of users (plural) dir and store",
+      "revId": "4b4a1dca484d6119af110602e489dbdf5b5db23e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
