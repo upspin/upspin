@@ -243,7 +243,7 @@ func (s *Sharer) readers(entry *upspin.DirEntry) ([]upspin.UserName, string, boo
 				// We have a key but no user with that key is known to us.
 				// This means an access change has removed permissions for some user
 				// but if that user still has the reference, the user could read the file.
-				// Someone should run upspin share -fix soon to repair the packing.
+				// Someone should run "upspin share -fix" soon to repair the packing.
 				unknownUser = true
 				fmt.Fprintf(os.Stderr, "%q: cannot find user for key(s); rerun with -fix\n", entry.Name)
 				s.state.exitCode = 1

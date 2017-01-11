@@ -15,7 +15,7 @@ import (
 func (s *State) shell(args ...string) {
 	const promptPlaceholder = "<username>"
 	const help = `
-Shell runs an interactive session for upspin subcommands.
+Shell runs an interactive session for Upspin subcommands.
 When running the shell, the leading "upspin" is assumed on each command.
 `
 	fs := flag.NewFlagSet("shell", flag.ExitOnError)
