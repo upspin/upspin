@@ -26,7 +26,7 @@ import (
 func (s *State) setupdomain(args ...string) {
 	const (
 		help = `
-Setupdomain generates keys and rc files for the Upspin users upspin-dir@domain
+Setupdomain generates keys and rc files for the Upspin user's upspin-dir@domain
 and upspin-store@domain, and generates a signature to be added as a DNS TXT
 record to prove that the calling Upspin user has control over domain.
 
