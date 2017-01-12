@@ -8,9 +8,10 @@ package storecacheserver
 
 import (
 	"fmt"
+	"net/http"
 	"path"
 
-	gContext "golang.org/x/net/context"
+	pb "github.com/golang/protobuf/proto"
 
 	"upspin.io/bind"
 	"upspin.io/errors"
@@ -26,31 +27,33 @@ type server struct {
 
 	// The on disk cache.
 	cache *storeCache
-
-	// For session handling and the Ping GRPC method.
-	auth.Server
 }
 
 // New creates a new StoreServer instance.
-func New(ctx upspin.Context, cacheDir string, maxBytes int64) (proto.StoreServer, error) {
+func New(ctx upspin.Context, cacheDir string, maxBytes int64) (http.Handler, error) {
 	c, err := newCache(path.Join(cacheDir, "storecache"), maxBytes)
 	if err != nil {
 		return nil, err
 	}
-	return &server{
-		ctx:    ctx,
-		Server: auth.NewServer(ctx, nil),
-		cache:  c,
-	}, nil
+	s := &server{
+		ctx:   ctx,
+		cache: c,
+	}
+	return auth.NewServer(ctx, &auth.ServerConfig{
+		Service: auth.Service{
+			Name: "Store",
+			Methods: auth.Methods{
+				"Get":      s.Get,
+				"Put":      s.Put,
+				"Delete":   s.Delete,
+				"Endpoint": s.Endpoint,
+			},
+		},
+	}), nil
 }
 
 // storeFor returns a StoreServer instance bound to the user and endpoint specified in the session.
-func (s *server) storeFor(ctx gContext.Context) (upspin.StoreServer, error) {
-	// Validate that we have a session. If not, it's an auth error.
-	session, err := s.SessionFromContext(ctx)
-	if err != nil {
-		return nil, err
-	}
+func (s *server) storeFor(session auth.Session) (upspin.StoreServer, error) {
 	e := session.ProxiedEndpoint()
 	if e.Transport == upspin.Unassigned {
 		return nil, errors.Str("not yet configured")
@@ -59,14 +62,8 @@ func (s *server) storeFor(ctx gContext.Context) (upspin.StoreServer, error) {
 }
 
 // endpointFor returns a StoreServer endpoint for the context.
-func (s *server) endpointFor(ctx gContext.Context) (upspin.Endpoint, error) {
-	var e upspin.Endpoint
-	// Validate that we have a session. If not, it's an auth error.
-	session, err := s.SessionFromContext(ctx)
-	if err != nil {
-		return e, err
-	}
-	e = session.ProxiedEndpoint()
+func (s *server) endpointFor(session auth.Session) (upspin.Endpoint, error) {
+	e := session.ProxiedEndpoint()
 	if e.Transport == upspin.Unassigned {
 		return e, errors.Str("not yet configured")
 	}
@@ -74,10 +71,14 @@ func (s *server) endpointFor(ctx gContext.Context) (upspin.Endpoint, error) {
 }
 
 // Get implements proto.StoreServer.
-func (s *server) Get(ctx gContext.Context, req *proto.StoreGetRequest) (*proto.StoreGetResponse, error) {
+func (s *server) Get(session auth.Session, reqBytes []byte) (pb.Message, error) {
+	var req proto.StoreGetRequest
+	if err := pb.Unmarshal(reqBytes, &req); err != nil {
+		return nil, err
+	}
 	op := logf("Get %q", req.Reference)
 
-	e, err := s.endpointFor(ctx)
+	e, err := s.endpointFor(session)
 	if err != nil {
 		op.log(err)
 		return &proto.StoreGetResponse{Error: errors.MarshalError(err)}, nil
@@ -102,10 +103,14 @@ func (s *server) Get(ctx gContext.Context, req *proto.StoreGetRequest) (*proto.S
 }
 
 // Put implements proto.StoreServer.
-func (s *server) Put(ctx gContext.Context, req *proto.StorePutRequest) (*proto.StorePutResponse, error) {
+func (s *server) Put(session auth.Session, reqBytes []byte) (pb.Message, error) {
+	var req proto.StorePutRequest
+	if err := pb.Unmarshal(reqBytes, &req); err != nil {
+		return nil, err
+	}
 	op := logf("Put %.30x...", req.Data)
 
-	store, err := s.storeFor(ctx)
+	store, err := s.storeFor(session)
 	if err != nil {
 		op.log(err)
 		return &proto.StorePutResponse{Error: errors.MarshalError(err)}, nil
@@ -131,10 +136,14 @@ func (s *server) Put(ctx gContext.Context, req *proto.StorePutRequest) (*proto.S
 var deleteResponse proto.StoreDeleteResponse
 
 // Delete implements proto.StoreServer.
-func (s *server) Delete(ctx gContext.Context, req *proto.StoreDeleteRequest) (*proto.StoreDeleteResponse, error) {
+func (s *server) Delete(session auth.Session, reqBytes []byte) (pb.Message, error) {
+	var req proto.StoreDeleteRequest
+	if err := pb.Unmarshal(reqBytes, &req); err != nil {
+		return nil, err
+	}
 	op := logf("Delete %q", req.Reference)
 
-	store, err := s.storeFor(ctx)
+	store, err := s.storeFor(session)
 	if err != nil {
 		op.log(err)
 		return &proto.StoreDeleteResponse{Error: errors.MarshalError(err)}, nil
@@ -150,10 +159,17 @@ func (s *server) Delete(ctx gContext.Context, req *proto.StoreDeleteRequest) (*p
 }
 
 // Endpoint implements proto.StoreServer. It returns the endpoint of the remote server and not of the cache.
-func (s *server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*proto.EndpointResponse, error) {
+func (s *server) Endpoint(session auth.Session, reqBytes []byte) (pb.Message, error) {
+	// TODO(adg): is this actually called by anyone? The store/remote's
+	// Endpoint method does not actually go across the network, so maybe
+	// this code is unnecessary.
+	var req proto.EndpointRequest
+	if err := pb.Unmarshal(reqBytes, &req); err != nil {
+		return nil, err
+	}
 	op := logf("Endpoint")
 
-	e, err := s.endpointFor(ctx)
+	e, err := s.endpointFor(session)
 	if err != nil {
 		op.log(err)
 		return &proto.EndpointResponse{}, err
