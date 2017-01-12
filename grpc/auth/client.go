@@ -17,7 +17,6 @@ import (
 	"time"
 
 	gContext "golang.org/x/net/context"
-	"golang.org/x/net/http2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/metadata"
@@ -372,9 +371,10 @@ func NewHTTPClient(context upspin.Context, netAddr upspin.NetAddr, security Secu
 	t := &http.Transport{
 		TLSClientConfig: tlsConfig,
 	}
-	if err := http2.ConfigureTransport(t); err != nil {
-		return nil, errors.E(op, err)
-	}
+	// TOOD(adg): Re-enable HTTP/2 once it's fast enough to be usable.
+	//if err := http2.ConfigureTransport(t); err != nil {
+	//	return nil, errors.E(op, err)
+	//}
 	c.client = &http.Client{Transport: t}
 
 	return c, nil
