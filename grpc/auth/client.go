@@ -386,6 +386,7 @@ func (c *httpClient) Invoke(method string, req, resp pb.Message) error {
 	header := make(http.Header)
 
 	token, haveToken := c.authToken()
+retryAuth:
 	if haveToken {
 		// If we have a token already, supply it.
 		header.Set(authTokenHeader, token)
@@ -427,6 +428,15 @@ func (c *httpClient) Invoke(method string, req, resp pb.Message) error {
 		return errors.E(op, errors.IO, err)
 	}
 	if httpResp.StatusCode != http.StatusOK {
+		if haveToken && bytes.Contains(body, []byte(errUnauthenticated.Error())) {
+			// If the server restarted it will have forgotten about
+			// our session, and so our auth token becomes invalid.
+			// Invalidate the session and retry this request,
+			c.invalidateSession()
+			haveToken = false // Retry exactly once.
+			goto retryAuth
+			// TODO(adg): refactor to get rid of the goto
+		}
 		return errors.E(op, errors.IO, errors.Errorf("%s: %s", httpResp.Status, body))
 	}
 
