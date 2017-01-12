@@ -21,13 +21,11 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/metadata"
 
-	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/log"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
-	"upspin.io/user"
 	"upspin.io/valid"
 )
 
@@ -90,19 +88,12 @@ type Service struct {
 	// HTTP request.
 	Name string
 
-	// The upspin Dialer and Service that will yield a Service to handle
-	// these requests.
-	Dialer interface {
-		upspin.Dialer
-		upspin.Service
-	}
-
 	// The RPC methods to serve.
 	Methods Methods
 }
 
 // Methods describes a set of RPC methods by name.
-type Methods map[string]func(upspin.Service, []byte) (pb.Message, error)
+type Methods map[string]func(Session, []byte) (pb.Message, error)
 
 // ServerConfig holds the configuration for instantiating a Server.
 type ServerConfig struct {
@@ -183,32 +174,13 @@ func (s *serverImpl) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var svc upspin.Service
 	session, err := s.SessionForRequest(w, r)
 	if err != nil {
-		if d.Name == "Key" && method == "Lookup" {
-			// No auth required for Key.Lookup.
-			svc = d.Dialer
-		} else {
-			http.Error(w, err.Error(), http.StatusUnauthorized)
-			return
-		}
-	}
-	if session != nil {
-		userName, err := user.Clean(session.User())
-		if err != nil {
-			// This shouldn't really happen, but report it anyway.
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		svc, err = d.Dialer.Dial(context.SetUserName(s.context, userName), d.Dialer.Endpoint())
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
+		http.Error(w, err.Error(), http.StatusUnauthorized)
+		return
 	}
 
-	resp, err := m(svc, body)
+	resp, err := m(session, body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
