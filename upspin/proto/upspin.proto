@@ -27,11 +27,6 @@ message Refdata {
 
 // The Service interface.
 
-message Signature {
-    string r = 1;
-    string s = 2;
-}
-
 message EndpointRequest {
 }
 
