@@ -15,8 +15,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"golang.org/x/net/http2"
-
 	"google.golang.org/api/option"
 
 	"cloud.google.com/go/compute/metadata"
@@ -114,10 +112,11 @@ func ListenAndServe(ready chan<- struct{}, metaSuffix, addr string, opt *Options
 	server := &http.Server{
 		TLSConfig: config,
 	}
-	err := http2.ConfigureServer(server, nil)
-	if err != nil {
-		log.Fatalf("https: %v", err)
-	}
+	// TODO(adg): enable HTTP/2 once it's fast enough
+	//err := http2.ConfigureServer(server, nil)
+	//if err != nil {
+	//	log.Fatalf("https: %v", err)
+	//}
 
 	ln, err := net.Listen("tcp", addr)
 	if err != nil {
