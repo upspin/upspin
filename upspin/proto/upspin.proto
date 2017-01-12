@@ -6,6 +6,40 @@ syntax = "proto3";
 
 package proto;
 
+// These protocol buffers are used in the networking API to talk to Upspin servers.
+// The protocol for a particular method is to send an HTTP request with the appropriate
+// request message to an "api" URL with the method name; the response will then be
+// returned. Both request and response are sent as binary protocol buffers.
+// 
+// For example, to call the Put method of the Store server running at store.example.com,
+// send to the URL
+// 	https://store.example.com/api/Store.Put
+// a POST request with, as payload, an encoded StorePutRequest. The response will be
+// a StorePutResponse. There is such a pair of protocol buffer messages for each
+// method.
+// 
+// The common Service interface is implemented by Key, Store, and Directory servers
+// but the protocol is the same: send to
+// 	https://store.example.com/api/Store.Endpoint
+// not
+// 	https://store.example.com/api/Service.Endpoint
+// For these common methods (only), the request and response message types omit the
+// server name (EndpointRequest not StoreEndpointRequest.)
+// 
+// Unlike in some other systems, the protocol buffer types themselves are not used
+// within the rest of the Upspin implementation. Instead, native Go types are used
+// internally and they are converted to the protocol buffer types across the boundary.
+// Helper routines in this package assist in the translation.
+// 
+// Within the protocol buffers, some of the types are stored as unintepreted bytes
+// that are transcoded with custom code.  For instance, the upspin.io/errors.Error
+// type is transmitted as a byte slice that is marshaled and unmarshaled using the
+// MarshalError and UnmarshalError routines in the errors package. This technique
+// preserves the properties of the Go type across the network.
+//
+// TODO: Explain the streaming Watch API.
+// TODO: Delete the Service example when the code goes.
+
 // Endpoint mirrors upspin.Endpoint.
 message Endpoint {
     int32 transport = 1;
