@@ -9,8 +9,6 @@ package main
 import (
 	"net/http"
 
-	"google.golang.org/grpc"
-
 	"upspin.io/cloud/https"
 	"upspin.io/context"
 	"upspin.io/dir/filesystem"
@@ -23,7 +21,6 @@ import (
 	"upspin.io/metric"
 	"upspin.io/serverutil/perm"
 	"upspin.io/upspin"
-	"upspin.io/upspin/proto"
 
 	// TODO: Which of these are actually needed?
 
@@ -88,10 +85,8 @@ func main() {
 		log.Printf("Warning: no Writers Group file protection -- all access permitted")
 	}
 
-	grpcServer := grpc.NewServer()
-	grpcDir := dirserver.New(ctx, dir, upspin.NetAddr(flags.NetAddr))
-	proto.RegisterDirServer(grpcServer, grpcDir)
-	http.Handle("/", grpcServer)
+	httpDir := dirserver.New(ctx, dir, upspin.NetAddr(flags.NetAddr))
+	http.Handle("/api/", httpDir)
 
 	https.ListenAndServeFromFlags(ready, serverName)
 }

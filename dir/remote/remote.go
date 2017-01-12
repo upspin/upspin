@@ -8,8 +8,8 @@ package remote
 
 import (
 	"fmt"
-	"io"
-	"strings"
+
+	pb "github.com/golang/protobuf/proto"
 
 	"upspin.io/bind"
 	"upspin.io/errors"
@@ -32,7 +32,6 @@ type dialContext struct {
 type remote struct {
 	auth.Client // For sessions, Ping, and Close.
 	ctx         dialContext
-	dirClient   proto.DirClient
 }
 
 var _ upspin.DirServer = (*remote)(nil)
@@ -41,21 +40,14 @@ var _ upspin.DirServer = (*remote)(nil)
 func (r *remote) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	op := r.opf("Glob", "%q", pattern)
 
-	gCtx, callOpt, finishAuth, err := r.NewAuthContext()
-	if err != nil {
-		return nil, op.error(err)
-	}
 	req := &proto.DirGlobRequest{
 		Pattern: pattern,
 	}
-	resp, err := r.dirClient.Glob(gCtx, req, callOpt)
-	err = finishAuth(err)
-	if err != nil {
-		r.checkGrpc(err)
+	resp := new(proto.EntriesError)
+	if err := r.Invoke("Dir.Glob", req, resp); err != nil {
 		return nil, op.error(errors.IO, err)
 	}
-
-	err = unmarshalError(resp.Error)
+	err := unmarshalError(resp.Error)
 	if err != nil && err != upspin.ErrFollowLink {
 		return nil, op.error(err)
 	}
@@ -77,168 +69,145 @@ func entryName(entry *upspin.DirEntry) string {
 func (r *remote) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	op := r.opf("Put", "%s", entryName(entry))
 
-	gCtx, callOpt, finishAuth, err := r.NewAuthContext()
-	if err != nil {
-		return nil, op.error(err)
-	}
 	b, err := entry.Marshal()
 	if err != nil {
 		return nil, op.error(err)
 	}
-	req := &proto.DirPutRequest{
+	return r.invoke(op, "Dir.Put", &proto.DirPutRequest{
 		Entry: b,
-	}
-	resp, err := r.dirClient.Put(gCtx, req, callOpt)
-	err = finishAuth(err)
-	r.checkGrpc(err)
-	return op.entryError(resp, err)
+	})
 }
 
 // WhichAccess implements upspin.DirServer.WhichAccess.
 func (r *remote) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	op := r.opf("WhichAccess", "%q", pathName)
 
-	gCtx, callOpt, finishAuth, err := r.NewAuthContext()
-	if err != nil {
-		return nil, op.error(err)
-	}
-	req := &proto.DirWhichAccessRequest{
+	return r.invoke(op, "Dir.WhichAccess", &proto.DirWhichAccessRequest{
 		Name: string(pathName),
-	}
-	resp, err := r.dirClient.WhichAccess(gCtx, req, callOpt)
-	err = finishAuth(err)
-	r.checkGrpc(err)
-	return op.entryError(resp, err)
+	})
 }
 
 // Delete implements upspin.DirServer.Delete.
 func (r *remote) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	op := r.opf("Delete", "%q", pathName)
 
-	gCtx, callOpt, finishAuth, err := r.NewAuthContext()
-	if err != nil {
-		return nil, op.error(err)
-	}
-	req := &proto.DirDeleteRequest{
+	return r.invoke(op, "Dir.Delete", &proto.DirDeleteRequest{
 		Name: string(pathName),
-	}
-	resp, err := r.dirClient.Delete(gCtx, req, callOpt)
-	err = finishAuth(err)
-	r.checkGrpc(err)
-	return op.entryError(resp, err)
+	})
 }
 
 // Lookup implements upspin.DirServer.Lookup.
 func (r *remote) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	op := r.opf("Lookup", "%q", pathName)
 
-	gCtx, callOpt, finishAuth, err := r.NewAuthContext()
-	if err != nil {
-		return nil, op.error(err)
-	}
-	req := &proto.DirLookupRequest{
+	return r.invoke(op, "Dir.Lookup", &proto.DirLookupRequest{
 		Name: string(pathName),
-	}
-	resp, err := r.dirClient.Lookup(gCtx, req, callOpt)
-	err = finishAuth(err)
-	r.checkGrpc(err)
+	})
+}
+
+func (r *remote) invoke(op *operation, method string, req pb.Message) (*upspin.DirEntry, error) {
+	resp := new(proto.EntryError)
+	err := r.Invoke(method, req, resp)
 	return op.entryError(resp, err)
 }
 
 // Watch implements upspin.DirServer.
 func (r *remote) Watch(name upspin.PathName, order int64, done <-chan struct{}) (<-chan upspin.Event, error) {
-	op := r.opf("Watch", "%q %d", name, order)
+	return nil, errors.Str("not implemented")
 
-	gCtx, callOpt, finishAuth, err := r.NewAuthContext()
-	if err != nil {
-		return nil, op.error(err)
-	}
-	srvStream, err := r.dirClient.Watch(gCtx, callOpt)
-	err = finishAuth(err)
-	if err != nil {
-		r.checkGrpc(err)
-		return nil, op.error(err)
-	}
-	req := &proto.DirWatchRequest{
-		Name:  string(name),
-		Order: order,
-	}
-	err = srvStream.Send(req)
-	if err != nil {
-		return nil, op.error(err)
-	}
+	/*
+			op := r.opf("Watch", "%q %d", name, order)
 
-	// First event back determines if Watch call was successful.
-	protoEvent, err := srvStream.Recv()
-	if err != nil {
-		return nil, op.error(err)
-	}
-	event, err := proto.UpspinEvent(protoEvent)
-	if err != nil {
-		return nil, op.error(err)
-	}
-	if event.Error != nil {
-		return nil, event.Error
-	}
-	// Assert event.Entry is nil, since this is a synthetic event, which
-	// serves to confirm whether Watch succeeded or not.
-	if event.Entry != nil {
-		return nil, op.error(errors.Internal, errors.Str("first event must have nil entry"))
-	}
-	// No error on Watch. Establish output channel.
-	events := make(chan upspin.Event, 1)
-	serverDone := make(chan struct{})
-	go r.watchDone(op, srvStream, events, done, serverDone)
-	go r.watch(op, srvStream, events, serverDone)
-	return events, nil
-}
+			gCtx, callOpt, finishAuth, err := r.NewAuthContext()
+			if err != nil {
+				return nil, op.error(err)
+			}
+			srvStream, err := r.dirClient.Watch(gCtx, callOpt)
+			err = finishAuth(err)
+			if err != nil {
+				return nil, op.error(err)
+			}
+			req := &proto.DirWatchRequest{
+				Name:  string(name),
+				Order: order,
+			}
+			err = srvStream.Send(req)
+			if err != nil {
+				return nil, op.error(err)
+			}
 
-// watchDone, which runs in a goroutine, waits for either the client to close
-// its done channel or the server to close its Events channel. When either one
-// happens it closes the send-side GRPC stream, which in turn signals the server
-// to finish up on its side.
-func (r *remote) watchDone(op *operation, srvStream proto.Dir_WatchClient, events chan upspin.Event, done, serverDone <-chan struct{}) {
-	select {
-	case <-done:
-		op.logf("Client closed done channel")
-	case <-serverDone:
-		op.logf("Server closed events channel")
-	}
-	srvStream.CloseSend()
-}
-
-// watch, which runs in a goroutine, receives events from the server and relays
-// them to the client onto the events channel. When the server terminates the
-// stream (sends the error io.EOF), we close the events channel and notify the
-// other goroutine that we've terminated.
-//
-// Note: there's no need for the sending of events to time out since this is
-// the client side. It can hang forever. But it probably won't because all other
-// layers have timeouts.
-func (r *remote) watch(op *operation, srvStream proto.Dir_WatchClient, events chan upspin.Event, serverDone chan struct{}) {
-	defer close(events)
-	defer close(serverDone) // tell the other goroutine the server is done.
-
-	for {
-		protoEvent, err := srvStream.Recv()
-		if err == io.EOF {
-			// Server closed the channel. Nothing else to do but to
-			// close ours too.
-			return
+			// First event back determines if Watch call was successful.
+			protoEvent, err := srvStream.Recv()
+			if err != nil {
+				return nil, op.error(err)
+			}
+			event, err := proto.UpspinEvent(protoEvent)
+			if err != nil {
+				return nil, op.error(err)
+			}
+			if event.Error != nil {
+				return nil, event.Error
+			}
+			// Assert event.Entry is nil, since this is a synthetic event, which
+			// serves to confirm whether Watch succeeded or not.
+			if event.Entry != nil {
+				return nil, op.error(errors.Internal, errors.Str("first event must have nil entry"))
+			}
+			// No error on Watch. Establish output channel.
+			events := make(chan upspin.Event, 1)
+			serverDone := make(chan struct{})
+			go r.watchDone(op, srvStream, events, done, serverDone)
+			go r.watch(op, srvStream, events, serverDone)
+			return events, nil
 		}
-		if err != nil {
-			op.logErr(err)
-			events <- upspin.Event{Error: err}
-			return
+
+		// watchDone, which runs in a goroutine, waits for either the client to close
+		// its done channel or the server to close its Events channel. When either one
+		// happens it closes the send-side GRPC stream, which in turn signals the server
+		// to finish up on its side.
+		func (r *remote) watchDone(op *operation, srvStream proto.Dir_WatchClient, events chan upspin.Event, done, serverDone <-chan struct{}) {
+			select {
+			case <-done:
+				op.logf("Client closed done channel")
+			case <-serverDone:
+				op.logf("Server closed events channel")
+			}
+			srvStream.CloseSend()
 		}
-		event, err := proto.UpspinEvent(protoEvent)
-		if err != nil {
-			op.logErr(err)
-			events <- upspin.Event{Error: err}
-			return
-		}
-		events <- *event
-	}
+
+		// watch, which runs in a goroutine, receives events from the server and relays
+		// them to the client onto the events channel. When the server terminates the
+		// stream (sends the error io.EOF), we close the events channel and notify the
+		// other goroutine that we've terminated.
+		//
+		// Note: there's no need for the sending of events to time out since this is
+		// the client side. It can hang forever. But it probably won't because all other
+		// layers have timeouts.
+		func (r *remote) watch(op *operation, srvStream proto.Dir_WatchClient, events chan upspin.Event, serverDone chan struct{}) {
+			defer close(events)
+			defer close(serverDone) // tell the other goroutine the server is done.
+
+			for {
+				protoEvent, err := srvStream.Recv()
+				if err == io.EOF {
+					// Server closed the channel. Nothing else to do but to
+					// close ours too.
+					return
+				}
+				if err != nil {
+					op.logErr(err)
+					events <- upspin.Event{Error: err}
+					return
+				}
+				event, err := proto.UpspinEvent(protoEvent)
+				if err != nil {
+					op.logErr(err)
+					events <- upspin.Event{Error: err}
+					return
+				}
+				events <- *event
+			}
+	*/
 }
 
 // Endpoint implements upspin.StoreServer.Endpoint.
@@ -254,16 +223,12 @@ func dialCache(op *operation, context upspin.Context, proxyFor upspin.Endpoint) 
 	}
 
 	// Call the cache. The cache is local so don't bother with TLS.
-	authClient, err := auth.NewClient(context, ce.NetAddr, auth.KeepAliveInterval, auth.NoSecurity, proxyFor)
+	authClient, err := auth.NewHTTPClient(context, ce.NetAddr, auth.NoSecurity, proxyFor)
 	if err != nil {
 		// On error dial direct.
 		op.error(errors.IO, err)
 		return nil
 	}
-
-	// The connection is closed when this service is released (see Bind.Release).
-	dirClient := proto.NewDirClient(authClient.GRPCConn())
-	authClient.SetService(dirClient)
 
 	return &remote{
 		Client: authClient,
@@ -271,7 +236,6 @@ func dialCache(op *operation, context upspin.Context, proxyFor upspin.Endpoint) 
 			endpoint: proxyFor,
 			userName: context.UserName(),
 		},
-		dirClient: dirClient,
 	}
 }
 
@@ -288,21 +252,18 @@ func (r *remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service
 		return svc, nil
 	}
 
-	authClient, err := auth.NewClient(context, e.NetAddr, auth.KeepAliveInterval, auth.Secure, upspin.Endpoint{})
+	authClient, err := auth.NewHTTPClient(context, e.NetAddr, auth.Secure, upspin.Endpoint{})
 	if err != nil {
 		return nil, op.error(errors.IO, err)
 	}
 
 	// The connection is closed when this service is released (see Bind.Release)
-	dirClient := proto.NewDirClient(authClient.GRPCConn())
-	authClient.SetService(dirClient)
 	r = &remote{
 		Client: authClient,
 		ctx: dialContext{
 			endpoint: e,
 			userName: context.UserName(),
 		},
-		dirClient: dirClient,
 	}
 
 	return r, nil
@@ -382,20 +343,4 @@ func (op *operation) entryError(p *proto.EntryError, err error) (*upspin.DirEntr
 		return nil, op.error(unmarshalErr)
 	}
 	return entry, op.error(err)
-}
-
-// GRPC will call back a server if HTTP2 signals that the underlying connection has
-// been terminated. However, shiould the server be unreachable, GRPC will poison
-// the connection and no longer retry the connection returning a transport error on
-// all subsequent RPCs. As a result we will not survive server bounces.
-//
-// To remedy this, we must recognize this condition and remove the service
-// from bind's cache and close the GRPC connection. While grpc has an internal
-// ConnectivityState called Shutdown that indicates this condition we have no
-// access to it. Instead we must examine the error return from GRPC RPCs.
-func (r *remote) checkGrpc(err error) {
-	if err == nil || !strings.Contains(err.Error(), "transport: dial") {
-		return
-	}
-	bind.Release(r)
 }
