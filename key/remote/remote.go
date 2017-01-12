@@ -40,7 +40,7 @@ func (r *remote) Lookup(name upspin.UserName) (*upspin.User, error) {
 		UserName: string(name),
 	}
 	resp := new(proto.KeyLookupResponse)
-	if err := r.Invoke("Key.Lookup", req, resp); err != nil {
+	if err := r.Invoke("Key/Lookup", req, resp); err != nil {
 		return nil, op.error(err)
 	}
 	if len(resp.Error) != 0 {
@@ -64,7 +64,7 @@ func (r *remote) Put(user *upspin.User) error {
 		User: proto.UserProto(user),
 	}
 	resp := new(proto.KeyPutResponse)
-	if err := r.Invoke("Key.Put", req, resp); err != nil {
+	if err := r.Invoke("Key/Put", req, resp); err != nil {
 		return op.error(err)
 	}
 	if len(resp.Error) != 0 {
