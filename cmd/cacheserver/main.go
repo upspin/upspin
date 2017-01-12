@@ -8,9 +8,8 @@ package main
 import (
 	"flag"
 	"net"
+	"net/http"
 	"os"
-
-	"google.golang.org/grpc"
 
 	"upspin.io/context"
 	"upspin.io/flags"
@@ -18,7 +17,6 @@ import (
 	"upspin.io/grpc/storecacheserver"
 	"upspin.io/log"
 	"upspin.io/upspin"
-	"upspin.io/upspin/proto"
 
 	// Load required transports
 	_ "upspin.io/transports"
@@ -82,10 +80,9 @@ func main() {
 		log.Fatalf("listen: %s", err)
 	}
 
-	grpcServer := grpc.NewServer()
-	proto.RegisterStoreServer(grpcServer, ss)
-	proto.RegisterDirServer(grpcServer, ds)
-	err = grpcServer.Serve(ln)
+	http.Handle("/api/Store/", ss)
+	http.Handle("/api/Dir/", ds)
+	err = http.Serve(ln, nil)
 	log.Fatalf("serve: %v", err)
 }
 
