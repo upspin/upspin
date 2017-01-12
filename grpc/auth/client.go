@@ -385,6 +385,7 @@ func (c *httpClient) Invoke(method string, req, resp pb.Message) error {
 
 	header := make(http.Header)
 
+retryAuth:
 	token, haveToken := c.authToken()
 	if haveToken {
 		// If we have a token already, supply it.
@@ -427,6 +428,12 @@ func (c *httpClient) Invoke(method string, req, resp pb.Message) error {
 		return errors.E(op, errors.IO, err)
 	}
 	if httpResp.StatusCode != http.StatusOK {
+		if haveToken && bytes.Contains(body, []byte(errUnauthenticated.Error())) {
+			// The server doesn't know about our session,
+			// so invalidated it and try again.
+			c.invalidateSession()
+			goto retryAuth
+		}
 		return errors.E(op, errors.IO, errors.Errorf("%s: %s", httpResp.Status, body))
 	}
 
