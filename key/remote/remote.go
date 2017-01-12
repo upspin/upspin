@@ -9,8 +9,6 @@ package remote
 import (
 	"fmt"
 
-	gContext "golang.org/x/net/context"
-
 	"upspin.io/bind"
 	"upspin.io/errors"
 	"upspin.io/grpc/auth"
@@ -30,7 +28,6 @@ type dialContext struct {
 type remote struct {
 	auth.Client // For sessions, Ping, and Close.
 	ctx         dialContext
-	keyClient   proto.KeyClient
 }
 
 var _ upspin.KeyServer = (*remote)(nil)
@@ -42,9 +39,9 @@ func (r *remote) Lookup(name upspin.UserName) (*upspin.User, error) {
 	req := &proto.KeyLookupRequest{
 		UserName: string(name),
 	}
-	resp, err := r.keyClient.Lookup(gContext.Background(), req)
-	if err != nil {
-		return nil, op.error(errors.IO, err)
+	resp := new(proto.KeyLookupResponse)
+	if err := r.Invoke("Key.Lookup", req, resp); err != nil {
+		return nil, op.error(err)
 	}
 	if len(resp.Error) != 0 {
 		return nil, op.error(errors.UnmarshalError(resp.Error))
@@ -63,17 +60,12 @@ func userName(user *upspin.User) string {
 func (r *remote) Put(user *upspin.User) error {
 	op := r.opf("Put", "%v", userName(user))
 
-	gCtx, callOpt, finishAuth, err := r.NewAuthContext()
-	if err != nil {
-		return op.error(err)
-	}
 	req := &proto.KeyPutRequest{
 		User: proto.UserProto(user),
 	}
-	resp, err := r.keyClient.Put(gCtx, req, callOpt)
-	err = finishAuth(err)
-	if err != nil {
-		return op.error(errors.IO, err)
+	resp := new(proto.KeyPutResponse)
+	if err := r.Invoke("Key.Put", req, resp); err != nil {
+		return op.error(err)
 	}
 	if len(resp.Error) != 0 {
 		return op.error(errors.UnmarshalError(resp.Error))
@@ -94,14 +86,10 @@ func (r *remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service
 		return nil, op.error(errors.Invalid, errors.Str("unrecognized transport"))
 	}
 
-	authClient, err := auth.NewClient(context, e.NetAddr, auth.KeepAliveInterval, auth.Secure, upspin.Endpoint{})
+	authClient, err := auth.NewHTTPClient(context, e.NetAddr, auth.Secure, upspin.Endpoint{})
 	if err != nil {
 		return nil, op.error(errors.IO, err)
 	}
-
-	// The connection is closed when this service is released (see Bind.Release)
-	keyClient := proto.NewKeyClient(authClient.GRPCConn())
-	authClient.SetService(keyClient)
 
 	return &remote{
 		Client: authClient,
@@ -109,7 +97,6 @@ func (r *remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service
 			endpoint: e,
 			userName: context.UserName(),
 		},
-		keyClient: keyClient,
 	}, nil
 }
 
