@@ -11,8 +11,6 @@ import (
 	"net"
 	"net/http"
 
-	"google.golang.org/grpc"
-
 	"upspin.io/cloud/https"
 	"upspin.io/context"
 	"upspin.io/errors"
@@ -24,7 +22,6 @@ import (
 	"upspin.io/log"
 	"upspin.io/metric"
 	"upspin.io/upspin"
-	"upspin.io/upspin/proto"
 
 	// Load required transports
 	_ "upspin.io/key/transports"
@@ -75,10 +72,8 @@ func main() {
 	// Special hack for bootstrapping the inprocess key server.
 	setupTestUser(key)
 
-	grpcServer := grpc.NewServer()
-	grpcKey := keyserver.New(ctx, key, upspin.NetAddr(flags.NetAddr))
-	proto.RegisterKeyServer(grpcServer, grpcKey)
-	http.Handle("/", grpcServer)
+	httpStore := keyserver.New(ctx, key, upspin.NetAddr(flags.NetAddr))
+	http.Handle("/api/", httpStore)
 
 	if *mailConfigFile != "" {
 		mailHandler, err := newMailHandler(key, *mailConfigFile)

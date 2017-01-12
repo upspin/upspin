@@ -8,16 +8,15 @@ package keyserver
 
 import (
 	"fmt"
+	"net/http"
 
-	gContext "golang.org/x/net/context"
+	pb "github.com/golang/protobuf/proto"
 
-	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/grpc/auth"
 	"upspin.io/log"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
-	"upspin.io/user"
 )
 
 // server is a SecureServer that talks to a KeyServer interface and serves GRPC requests.
@@ -29,13 +28,18 @@ type server struct {
 
 	// The underlying keyserver implementation.
 	key upspin.KeyServer
-
-	// For session handling and the Ping GRPC method.
-	auth.Server
 }
 
-func New(ctx upspin.Context, key upspin.KeyServer, addr upspin.NetAddr) proto.KeyServer {
-	authConfig := auth.ServerConfig{
+func New(ctx upspin.Context, key upspin.KeyServer, addr upspin.NetAddr) http.Handler {
+	s := &server{
+		context: ctx,
+		endpoint: upspin.Endpoint{
+			Transport: upspin.Remote,
+			NetAddr:   addr,
+		},
+		key: key,
+	}
+	return auth.NewServer(ctx, &auth.ServerConfig{
 		Lookup: func(userName upspin.UserName) (upspin.PublicKey, error) {
 			user, err := key.Lookup(userName)
 			if err != nil {
@@ -43,41 +47,29 @@ func New(ctx upspin.Context, key upspin.KeyServer, addr upspin.NetAddr) proto.Ke
 			}
 			return user.PublicKey, nil
 		},
-	}
-	return &server{
-		context: ctx,
-		endpoint: upspin.Endpoint{
-			Transport: upspin.Remote,
-			NetAddr:   addr,
+		Service: auth.Service{
+			Name:   "Key",
+			Dialer: key,
+			Methods: auth.Methods{
+				"Lookup": s.Lookup,
+				"Put":    s.Put,
+			},
 		},
-		key:    key,
-		Server: auth.NewServer(ctx, &authConfig),
-	}
-}
-
-// keyFor returns a KeyServer bound to the user specified in the context.
-func (s *server) keyFor(ctx gContext.Context) (upspin.KeyServer, error) {
-	// Validate that we have a session. If not, it's an auth error.
-	session, err := s.SessionFromContext(ctx)
-	if err != nil {
-		return nil, err
-	}
-	userName, err := user.Clean(session.User())
-	if err != nil {
-		return nil, err
-	}
-	svc, err := s.key.Dial(context.SetUserName(s.context, userName), s.key.Endpoint())
-	if err != nil {
-		return nil, err
-	}
-	return svc.(upspin.KeyServer), nil
+	})
 }
 
 // Lookup implements proto.KeyServer, and does not do any authentication.
-func (s *server) Lookup(ctx gContext.Context, req *proto.KeyLookupRequest) (*proto.KeyLookupResponse, error) {
+func (s *server) Lookup(svc upspin.Service, reqBytes []byte) (pb.Message, error) {
+	// TODO(adg): Lookup should be accessible even to unauthenticated users.
+
+	var req proto.KeyLookupRequest
+	key, err := unmarshal(svc, reqBytes, &req)
+	if err != nil {
+		return nil, err
+	}
 	op := logf("Lookup %q", req.UserName)
 
-	user, err := s.key.Lookup(upspin.UserName(req.UserName))
+	user, err := key.Lookup(upspin.UserName(req.UserName))
 	if err != nil {
 		op.log(err)
 		return &proto.KeyLookupResponse{Error: errors.MarshalError(err)}, nil
@@ -86,14 +78,13 @@ func (s *server) Lookup(ctx gContext.Context, req *proto.KeyLookupRequest) (*pro
 }
 
 // Put implements proto.KeyServer.
-func (s *server) Put(ctx gContext.Context, req *proto.KeyPutRequest) (*proto.KeyPutResponse, error) {
-	op := logf("Put %v", req)
-
-	key, err := s.keyFor(ctx)
+func (s *server) Put(svc upspin.Service, reqBytes []byte) (pb.Message, error) {
+	var req proto.KeyPutRequest
+	key, err := unmarshal(svc, reqBytes, &req)
 	if err != nil {
-		op.log(err)
-		return putError(err), nil
+		return nil, err
 	}
+	op := logf("Put %v", req)
 
 	user := proto.UpspinUser(req.User)
 	err = key.Put(user)
@@ -108,14 +99,12 @@ func putError(err error) *proto.KeyPutResponse {
 	return &proto.KeyPutResponse{Error: errors.MarshalError(err)}
 }
 
-// Endpoint implements proto.KeyServer.
-func (s *server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*proto.EndpointResponse, error) {
-	return &proto.EndpointResponse{
-		Endpoint: &proto.Endpoint{
-			Transport: int32(s.endpoint.Transport),
-			NetAddr:   string(s.endpoint.NetAddr),
-		},
-	}, nil
+// unmarshal is a helper to reduce repetition in each of the RPC methods.
+func unmarshal(svc upspin.Service, reqBytes []byte, req pb.Message) (upspin.KeyServer, error) {
+	if err := pb.Unmarshal(reqBytes, req); err != nil {
+		return nil, err
+	}
+	return svc.(upspin.KeyServer), nil
 }
 
 func logf(format string, args ...interface{}) operation {
