@@ -183,21 +183,29 @@ func (s *serverImpl) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var svc upspin.Service
 	session, err := s.SessionForRequest(w, r)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
-		return
+		if d.Name == "Key" && method == "Lookup" {
+			// No auth required for Key.Lookup.
+			svc = d.Dialer
+		} else {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
 	}
-	userName, err := user.Clean(session.User())
-	if err != nil {
-		// This shouldn't really happen, but report it anyway.
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	svc, err := d.Dialer.Dial(context.SetUserName(s.context, userName), d.Dialer.Endpoint())
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	if session != nil {
+		userName, err := user.Clean(session.User())
+		if err != nil {
+			// This shouldn't really happen, but report it anyway.
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		svc, err = d.Dialer.Dial(context.SetUserName(s.context, userName), d.Dialer.Endpoint())
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 	}
 
 	resp, err := m(svc, body)
