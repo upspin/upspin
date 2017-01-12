@@ -12,6 +12,7 @@ import (
 
 	pb "github.com/golang/protobuf/proto"
 
+	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/grpc/auth"
 	"upspin.io/log"
@@ -48,8 +49,7 @@ func New(ctx upspin.Context, key upspin.KeyServer, addr upspin.NetAddr) http.Han
 			return user.PublicKey, nil
 		},
 		Service: auth.Service{
-			Name:   "Key",
-			Dialer: key,
+			Name: "Key",
 			Methods: auth.Methods{
 				"Lookup": s.Lookup,
 				"Put":    s.Put,
@@ -58,12 +58,23 @@ func New(ctx upspin.Context, key upspin.KeyServer, addr upspin.NetAddr) http.Han
 	})
 }
 
+func (s *server) serverFor(session auth.Session, reqBytes []byte, req pb.Message) (upspin.KeyServer, error) {
+	if err := pb.Unmarshal(reqBytes, req); err != nil {
+		return nil, err
+	}
+	svc, err := s.key.Dial(context.SetUserName(s.context, session.User()), s.key.Endpoint())
+	if err != nil {
+		return nil, err
+	}
+	return svc.(upspin.KeyServer), nil
+}
+
 // Lookup implements proto.KeyServer, and does not do any authentication.
-func (s *server) Lookup(svc upspin.Service, reqBytes []byte) (pb.Message, error) {
+func (s *server) Lookup(session auth.Session, reqBytes []byte) (pb.Message, error) {
 	// TODO(adg): Lookup should be accessible even to unauthenticated users.
 
 	var req proto.KeyLookupRequest
-	key, err := unmarshal(svc, reqBytes, &req)
+	key, err := s.serverFor(session, reqBytes, &req)
 	if err != nil {
 		return nil, err
 	}
@@ -78,9 +89,9 @@ func (s *server) Lookup(svc upspin.Service, reqBytes []byte) (pb.Message, error)
 }
 
 // Put implements proto.KeyServer.
-func (s *server) Put(svc upspin.Service, reqBytes []byte) (pb.Message, error) {
+func (s *server) Put(session auth.Session, reqBytes []byte) (pb.Message, error) {
 	var req proto.KeyPutRequest
-	key, err := unmarshal(svc, reqBytes, &req)
+	key, err := s.serverFor(session, reqBytes, &req)
 	if err != nil {
 		return nil, err
 	}
@@ -97,14 +108,6 @@ func (s *server) Put(svc upspin.Service, reqBytes []byte) (pb.Message, error) {
 
 func putError(err error) *proto.KeyPutResponse {
 	return &proto.KeyPutResponse{Error: errors.MarshalError(err)}
-}
-
-// unmarshal is a helper to reduce repetition in each of the RPC methods.
-func unmarshal(svc upspin.Service, reqBytes []byte, req pb.Message) (upspin.KeyServer, error) {
-	if err := pb.Unmarshal(reqBytes, req); err != nil {
-		return nil, err
-	}
-	return svc.(upspin.KeyServer), nil
 }
 
 func logf(format string, args ...interface{}) operation {
