@@ -8,17 +8,15 @@ package dirserver
 
 import (
 	"fmt"
-	"io"
+	"net/http"
 
-	"upspin.io/context"
+	pb "github.com/golang/protobuf/proto"
+
 	"upspin.io/errors"
 	"upspin.io/grpc/auth"
 	"upspin.io/log"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
-	"upspin.io/user"
-
-	gContext "golang.org/x/net/context"
 )
 
 // server is a SecureServer that talks to a DirServer interface and serves GRPC requests.
@@ -30,78 +28,71 @@ type server struct {
 
 	// The underlying dirserver implementation.
 	dir upspin.DirServer
-
-	// For session handling and the Ping GRPC method.
-	auth.Server
 }
 
-func New(ctx upspin.Context, dir upspin.DirServer, addr upspin.NetAddr) proto.DirServer {
-	return &server{
+func New(ctx upspin.Context, dir upspin.DirServer, addr upspin.NetAddr) http.Handler {
+	s := &server{
 		context: ctx,
 		endpoint: upspin.Endpoint{
 			Transport: upspin.Remote,
 			NetAddr:   addr,
 		},
-		dir:    dir,
-		Server: auth.NewServer(ctx, nil),
+		dir: dir,
 	}
-}
 
-// dirFor returns a DirServer instance bound to the user specified in the context.
-func (s *server) dirFor(ctx gContext.Context) (upspin.DirServer, error) {
-	// Validate that we have a session. If not, it's an auth error.
-	session, err := s.SessionFromContext(ctx)
-	if err != nil {
-		return nil, err
-	}
-	userName, err := user.Clean(session.User())
-	if err != nil {
-		return nil, err
-	}
-	svc, err := s.dir.Dial(context.SetUserName(s.context, userName), s.dir.Endpoint())
-	if err != nil {
-		return nil, err
-	}
-	return svc.(upspin.DirServer), nil
+	return auth.NewServer(ctx, &auth.ServerConfig{
+		Service: auth.Service{
+			Name:   "Dir",
+			Dialer: dir,
+			Methods: auth.Methods{
+				"Delete": s.Delete,
+				"Glob":   s.Glob,
+				"Lookup": s.Lookup,
+				"Put":    s.Put,
+				//"Watch":       s.Watch,
+				"WhichAccess": s.WhichAccess,
+			},
+		},
+	})
+
 }
 
 // Lookup implements proto.DirServer.
-func (s *server) Lookup(ctx gContext.Context, req *proto.DirLookupRequest) (*proto.EntryError, error) {
-	op := logf("Lookup %q", req.Name)
-
-	dir, err := s.dirFor(ctx)
+func (s *server) Lookup(svc upspin.Service, reqBytes []byte) (pb.Message, error) {
+	var req proto.DirLookupRequest
+	dir, err := unmarshal(svc, reqBytes, &req)
 	if err != nil {
-		return op.entryError(nil, err)
+		return nil, err
 	}
+	op := logf("Lookup %q", req.Name)
 
 	return op.entryError(dir.Lookup(upspin.PathName(req.Name)))
 }
 
 // Put implements proto.DirServer.
-func (s *server) Put(ctx gContext.Context, req *proto.DirPutRequest) (*proto.EntryError, error) {
+func (s *server) Put(svc upspin.Service, reqBytes []byte) (pb.Message, error) {
+	var req proto.DirPutRequest
+	dir, err := unmarshal(svc, reqBytes, &req)
+	if err != nil {
+		return nil, err
+	}
 	entry, err := proto.UpspinDirEntry(req.Entry)
 	if err != nil {
 		return &proto.EntryError{Error: errors.MarshalError(err)}, nil
 	}
 	op := logf("Put %q", entry.Name)
 
-	dir, err := s.dirFor(ctx)
-	if err != nil {
-		return op.entryError(nil, err)
-	}
-
 	return op.entryError(dir.Put(entry))
 }
 
 // Glob implements proto.DirServer.
-func (s *server) Glob(ctx gContext.Context, req *proto.DirGlobRequest) (*proto.EntriesError, error) {
-	op := logf("Glob %q", req.Pattern)
-
-	dir, err := s.dirFor(ctx)
+func (s *server) Glob(svc upspin.Service, reqBytes []byte) (pb.Message, error) {
+	var req proto.DirGlobRequest
+	dir, err := unmarshal(svc, reqBytes, &req)
 	if err != nil {
-		op.log(err)
-		return globError(err), nil
+		return nil, err
 	}
+	op := logf("Glob %q", req.Pattern)
 
 	entries, globErr := dir.Glob(req.Pattern)
 	if globErr != nil && globErr != upspin.ErrFollowLink {
@@ -126,26 +117,16 @@ func globError(err error) *proto.EntriesError {
 }
 
 // Watch implements proto.Watch.
-func (s *server) Watch(stream proto.Dir_WatchServer) error {
-	req, err := stream.Recv()
-	if err != nil {
-		return err
-	}
+func (s *server) Watch(svc upspin.Service, reqBytes []byte) (pb.Message, error) {
+	return nil, errors.Str("not implemented")
 
+	var req proto.DirWatchRequest
+	dir, err := unmarshal(svc, reqBytes, &req)
+	if err != nil {
+		return nil, err
+	}
 	op := logf("Watch %q %d", req.Name, req.Order)
-
-	dir, err := s.dirFor(stream.Context())
-	if err != nil {
-		// Report error back to client.
-		protoEvent := &proto.Event{
-			Error: errors.MarshalError(err),
-		}
-		err = stream.Send(protoEvent)
-		if err != nil {
-			return err
-		}
-		return nil
-	}
+	_ = op
 
 	done := make(chan struct{})
 	events, watchErr := dir.Watch(upspin.PathName(req.Name), req.Order, done)
@@ -155,13 +136,14 @@ func (s *server) Watch(stream proto.Dir_WatchServer) error {
 	protoEvent := &proto.Event{
 		Error: errors.MarshalError(watchErr),
 	}
-	err = stream.Send(protoEvent)
-	if err != nil {
-		return err
-	}
+	_ = protoEvent
+	//err = stream.Send(protoEvent)
+	//if err != nil {
+	//	return err
+	//}
 	if watchErr != nil {
 		// We reported the error successfully and now this RPC is done.
-		return nil
+		return nil, watchErr
 	}
 
 	// The watcher was set up properly. We now watch events on the events
@@ -173,10 +155,10 @@ func (s *server) Watch(stream proto.Dir_WatchServer) error {
 		// Block until the client closes the GRPC channel or until
 		// we close our stream below (which may be caused by a timeout
 		// or DirServer errors).
-		_, err := stream.Recv()
-		if err != nil && err != io.EOF {
-			op.logf("error receiving from client: %s", err)
-		}
+		//_, err := stream.Recv()
+		//if err != nil && err != io.EOF {
+		//	op.logf("error receiving from client: %s", err)
+		//}
 		// By closing the done channel we tell both dir.Watch and the
 		// goroutine below that the client is done.
 		close(done)
@@ -188,9 +170,10 @@ func (s *server) Watch(stream proto.Dir_WatchServer) error {
 			if !ok {
 				// DirServer closed its event channel. Close
 				// ours too.
-				return nil
+				return nil, nil
 			}
 			protoEvent, err := proto.EventProto(&e)
+			_ = protoEvent
 			if err != nil {
 				// Conversion failed. Make a protoEvent error by
 				// hand and send it.
@@ -198,50 +181,48 @@ func (s *server) Watch(stream proto.Dir_WatchServer) error {
 					Error: errors.MarshalError(err),
 				}
 			}
-			err = stream.Send(protoEvent)
-			if err != nil {
-				// Send failed. Log error and fail.
-				op.log(err)
-				return err
-			}
+			//err = stream.Send(protoEvent)
+			//if err != nil {
+			//	// Send failed. Log error and fail.
+			//	op.log(err)
+			//	return err
+			//}
 		case <-done:
-			return nil
+			return nil, nil
 		}
 	}
 }
 
 // Delete implements proto.DirServer.
-func (s *server) Delete(ctx gContext.Context, req *proto.DirDeleteRequest) (*proto.EntryError, error) {
-	op := logf("Delete %q", req.Name)
-
-	dir, err := s.dirFor(ctx)
+func (s *server) Delete(svc upspin.Service, reqBytes []byte) (pb.Message, error) {
+	var req proto.DirDeleteRequest
+	dir, err := unmarshal(svc, reqBytes, &req)
 	if err != nil {
-		return op.entryError(nil, err)
+		return nil, err
 	}
+	op := logf("Delete %q", req.Name)
 
 	return op.entryError(dir.Delete(upspin.PathName(req.Name)))
 }
 
 // WhichAccess implements proto.DirServer.
-func (s *server) WhichAccess(ctx gContext.Context, req *proto.DirWhichAccessRequest) (*proto.EntryError, error) {
-	op := logf("WhichAccess %q", req.Name)
-
-	dir, err := s.dirFor(ctx)
+func (s *server) WhichAccess(svc upspin.Service, reqBytes []byte) (pb.Message, error) {
+	var req proto.DirWhichAccessRequest
+	dir, err := unmarshal(svc, reqBytes, &req)
 	if err != nil {
-		return op.entryError(nil, err)
+		return nil, err
 	}
+	op := logf("WhichAccess %q", req.Name)
 
 	return op.entryError(dir.WhichAccess(upspin.PathName(req.Name)))
 }
 
-// Endpoint implements proto.DirServer.
-func (s *server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*proto.EndpointResponse, error) {
-	return &proto.EndpointResponse{
-		Endpoint: &proto.Endpoint{
-			Transport: int32(s.endpoint.Transport),
-			NetAddr:   string(s.endpoint.NetAddr),
-		},
-	}, nil
+// unmarshal is a helper to reduce repetition in each of the RPC methods.
+func unmarshal(svc upspin.Service, reqBytes []byte, req pb.Message) (upspin.DirServer, error) {
+	if err := pb.Unmarshal(reqBytes, req); err != nil {
+		return nil, err
+	}
+	return svc.(upspin.DirServer), nil
 }
 
 func logf(format string, args ...interface{}) operation {
