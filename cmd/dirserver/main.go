@@ -86,7 +86,7 @@ func main() {
 	}
 
 	httpDir := dirserver.New(ctx, dir, upspin.NetAddr(flags.NetAddr))
-	http.Handle("/api/", httpDir)
+	http.Handle("/api/Dir/", httpDir)
 
 	https.ListenAndServeFromFlags(ready, serverName)
 }

@@ -44,7 +44,7 @@ func (r *remote) Glob(pattern string) ([]*upspin.DirEntry, error) {
 		Pattern: pattern,
 	}
 	resp := new(proto.EntriesError)
-	if err := r.Invoke("Dir.Glob", req, resp); err != nil {
+	if err := r.Invoke("Dir/Glob", req, resp); err != nil {
 		return nil, op.error(errors.IO, err)
 	}
 	err := unmarshalError(resp.Error)
@@ -73,7 +73,7 @@ func (r *remote) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	if err != nil {
 		return nil, op.error(err)
 	}
-	return r.invoke(op, "Dir.Put", &proto.DirPutRequest{
+	return r.invoke(op, "Dir/Put", &proto.DirPutRequest{
 		Entry: b,
 	})
 }
@@ -82,7 +82,7 @@ func (r *remote) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 func (r *remote) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	op := r.opf("WhichAccess", "%q", pathName)
 
-	return r.invoke(op, "Dir.WhichAccess", &proto.DirWhichAccessRequest{
+	return r.invoke(op, "Dir/WhichAccess", &proto.DirWhichAccessRequest{
 		Name: string(pathName),
 	})
 }
@@ -91,7 +91,7 @@ func (r *remote) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, error)
 func (r *remote) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	op := r.opf("Delete", "%q", pathName)
 
-	return r.invoke(op, "Dir.Delete", &proto.DirDeleteRequest{
+	return r.invoke(op, "Dir/Delete", &proto.DirDeleteRequest{
 		Name: string(pathName),
 	})
 }
@@ -100,7 +100,7 @@ func (r *remote) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
 func (r *remote) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	op := r.opf("Lookup", "%q", pathName)
 
-	return r.invoke(op, "Dir.Lookup", &proto.DirLookupRequest{
+	return r.invoke(op, "Dir/Lookup", &proto.DirLookupRequest{
 		Name: string(pathName),
 	})
 }

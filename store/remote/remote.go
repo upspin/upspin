@@ -39,7 +39,7 @@ func (r *remote) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Lo
 		Reference: string(ref),
 	}
 	resp := new(proto.StoreGetResponse)
-	if err := r.Invoke("Store.Get", req, resp); err != nil {
+	if err := r.Invoke("Store/Get", req, resp); err != nil {
 		return nil, nil, nil, op.error(err)
 	}
 	if len(resp.Error) != 0 {
@@ -56,7 +56,7 @@ func (r *remote) Put(data []byte) (*upspin.Refdata, error) {
 		Data: data,
 	}
 	resp := new(proto.StorePutResponse)
-	if err := r.Invoke("Store.Put", req, resp); err != nil {
+	if err := r.Invoke("Store/Put", req, resp); err != nil {
 		return nil, op.error(err)
 	}
 	return proto.UpspinRefdata(resp.Refdata), op.error(errors.UnmarshalError(resp.Error))
@@ -70,7 +70,7 @@ func (r *remote) Delete(ref upspin.Reference) error {
 		Reference: string(ref),
 	}
 	resp := new(proto.StoreDeleteResponse)
-	if err := r.Invoke("Store.Delete", req, resp); err != nil {
+	if err := r.Invoke("Store/Delete", req, resp); err != nil {
 		return op.error(err)
 	}
 	return op.error(errors.UnmarshalError(resp.Error))

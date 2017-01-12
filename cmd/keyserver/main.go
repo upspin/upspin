@@ -73,7 +73,7 @@ func main() {
 	setupTestUser(key)
 
 	httpStore := keyserver.New(ctx, key, upspin.NetAddr(flags.NetAddr))
-	http.Handle("/api/", httpStore)
+	http.Handle("/api/Key/", httpStore)
 
 	if *mailConfigFile != "" {
 		mailHandler, err := newMailHandler(key, *mailConfigFile)

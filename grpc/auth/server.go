@@ -155,7 +155,7 @@ func (s *serverImpl) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	prefix := "/api/" + d.Name + "."
+	prefix := "/api/" + d.Name + "/"
 	if !strings.HasPrefix(r.URL.Path, prefix) {
 		http.NotFound(w, r)
 		return
