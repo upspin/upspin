@@ -8,10 +8,11 @@ package dircacheserver
 
 import (
 	"fmt"
+	"net/http"
 	ospath "path"
 	"sync"
 
-	gContext "golang.org/x/net/context"
+	pb "github.com/golang/protobuf/proto"
 
 	"upspin.io/bind"
 	"upspin.io/errors"
@@ -29,33 +30,38 @@ type server struct {
 
 	// userToDirServer is a mapping of users to directory server endpoints
 	userToDirServer *userToDirServer
-
-	// For session handling and the Ping GRPC method.
-	auth.Server
 }
 
 // New creates a new DirServer cache reading in the log and writing out a new compacted log.
-func New(ctx upspin.Context, cacheDir string, maxLogBytes int64) (proto.DirServer, error) {
+func New(ctx upspin.Context, cacheDir string, maxLogBytes int64) (http.Handler, error) {
 	userToDirServer := newUserToDirServer()
 	clog, err := openLog(ctx, ospath.Join(cacheDir, "dircache"), maxLogBytes, userToDirServer)
 	if err != nil {
 		return nil, err
 	}
-	return &server{
+	s := &server{
 		ctx:             ctx,
 		clog:            clog,
 		userToDirServer: userToDirServer,
-		Server:          auth.NewServer(ctx, nil),
-	}, nil
+	}
+
+	return auth.NewServer(ctx, &auth.ServerConfig{
+		Service: auth.Service{
+			Name: "Dir",
+			Methods: auth.Methods{
+				"Delete": s.Delete,
+				"Glob":   s.Glob,
+				"Lookup": s.Lookup,
+				"Put":    s.Put,
+				//"Watch":       s.Watch,
+				"WhichAccess": s.WhichAccess,
+			},
+		},
+	}), nil
 }
 
 // dirFor returns a DirServer instance bound to the user specified in the context.
-func (s *server) dirFor(ctx gContext.Context, path upspin.PathName) (upspin.DirServer, error) {
-	// Validate that we have a session. If not, it's an auth error.
-	session, err := s.SessionFromContext(ctx)
-	if err != nil {
-		return nil, err
-	}
+func (s *server) dirFor(session auth.Session, path upspin.PathName) (upspin.DirServer, error) {
 	ep := session.ProxiedEndpoint()
 	if ep.Transport == upspin.Unassigned {
 		return nil, errors.Str("not yet configured")
@@ -68,14 +74,8 @@ func (s *server) dirFor(ctx gContext.Context, path upspin.PathName) (upspin.DirS
 }
 
 // endpointFor returns a DirServer endpoint for the context.
-func (s *server) endpointFor(ctx gContext.Context) (*upspin.Endpoint, error) {
-	var ep upspin.Endpoint
-	// Validate that we have a session. If not, it's an auth error.
-	session, err := s.SessionFromContext(ctx)
-	if err != nil {
-		return &ep, err
-	}
-	ep = session.ProxiedEndpoint()
+func (s *server) endpointFor(session auth.Session) (*upspin.Endpoint, error) {
+	ep := session.ProxiedEndpoint()
 	if ep.Transport == upspin.Unassigned {
 		return &ep, errors.Str("not yet configured")
 	}
@@ -83,11 +83,15 @@ func (s *server) endpointFor(ctx gContext.Context) (*upspin.Endpoint, error) {
 }
 
 // Lookup implements proto.DirServer.
-func (s *server) Lookup(ctx gContext.Context, req *proto.DirLookupRequest) (*proto.EntryError, error) {
+func (s *server) Lookup(session auth.Session, reqBytes []byte) (pb.Message, error) {
+	var req proto.DirLookupRequest
+	if err := pb.Unmarshal(reqBytes, &req); err != nil {
+		return nil, err
+	}
 	op := logf("Lookup %q", req.Name)
 
 	name := path.Clean(upspin.PathName(req.Name))
-	dir, err := s.dirFor(ctx, name)
+	dir, err := s.dirFor(session, name)
 	if err != nil {
 		op.log(err)
 		return entryError(nil, err)
@@ -104,11 +108,15 @@ func (s *server) Lookup(ctx gContext.Context, req *proto.DirLookupRequest) (*pro
 }
 
 // Glob implements proto.DirServer.
-func (s *server) Glob(ctx gContext.Context, req *proto.DirGlobRequest) (*proto.EntriesError, error) {
+func (s *server) Glob(session auth.Session, reqBytes []byte) (pb.Message, error) {
+	var req proto.DirGlobRequest
+	if err := pb.Unmarshal(reqBytes, &req); err != nil {
+		return nil, err
+	}
 	op := logf("Glob %q", req.Pattern)
 
 	name := path.Clean(upspin.PathName(req.Pattern))
-	dir, err := s.dirFor(ctx, name)
+	dir, err := s.dirFor(session, name)
 	if err != nil {
 		op.log(err)
 		return entriesError(nil, err)
@@ -126,7 +134,11 @@ func (s *server) Glob(ctx gContext.Context, req *proto.DirGlobRequest) (*proto.E
 
 // Put implements proto.DirServer.
 // TODO(p): Remember access errors to avoid even trying?
-func (s *server) Put(ctx gContext.Context, req *proto.DirPutRequest) (*proto.EntryError, error) {
+func (s *server) Put(session auth.Session, reqBytes []byte) (pb.Message, error) {
+	var req proto.DirPutRequest
+	if err := pb.Unmarshal(reqBytes, &req); err != nil {
+		return nil, err
+	}
 	entry, err := proto.UpspinDirEntry(req.Entry)
 	entry.Name = path.Clean(entry.Name)
 	if err != nil {
@@ -134,7 +146,7 @@ func (s *server) Put(ctx gContext.Context, req *proto.DirPutRequest) (*proto.Ent
 	}
 	op := logf("Put %q", entry.Name)
 
-	dir, err := s.dirFor(ctx, entry.Name)
+	dir, err := s.dirFor(session, entry.Name)
 	if err != nil {
 		op.log(err)
 		return entryError(nil, err)
@@ -147,11 +159,15 @@ func (s *server) Put(ctx gContext.Context, req *proto.DirPutRequest) (*proto.Ent
 }
 
 // Delete implements proto.DirServer.
-func (s *server) Delete(ctx gContext.Context, req *proto.DirDeleteRequest) (*proto.EntryError, error) {
+func (s *server) Delete(session auth.Session, reqBytes []byte) (pb.Message, error) {
+	var req proto.DirDeleteRequest
+	if err := pb.Unmarshal(reqBytes, &req); err != nil {
+		return nil, err
+	}
 	op := logf("Delete %q", req.Name)
 
 	name := path.Clean(upspin.PathName(req.Name))
-	dir, err := s.dirFor(ctx, name)
+	dir, err := s.dirFor(session, name)
 	if err != nil {
 		op.log(err)
 		return entryError(nil, err)
@@ -164,11 +180,15 @@ func (s *server) Delete(ctx gContext.Context, req *proto.DirDeleteRequest) (*pro
 }
 
 // WhichAccess implements proto.DirServer.
-func (s *server) WhichAccess(ctx gContext.Context, req *proto.DirWhichAccessRequest) (*proto.EntryError, error) {
+func (s *server) WhichAccess(session auth.Session, reqBytes []byte) (pb.Message, error) {
+	var req proto.DirWhichAccessRequest
+	if err := pb.Unmarshal(reqBytes, &req); err != nil {
+		return nil, err
+	}
 	op := logf("WhichAccess %q", req.Name)
 
 	name := path.Clean(upspin.PathName(req.Name))
-	dir, err := s.dirFor(ctx, name)
+	dir, err := s.dirFor(session, name)
 	if err != nil {
 		op.log(err)
 		return entryError(nil, err)
@@ -184,18 +204,19 @@ func (s *server) WhichAccess(ctx gContext.Context, req *proto.DirWhichAccessRequ
 }
 
 // Watch implements proto.Watch.
-func (s *server) Watch(stream proto.Dir_WatchServer) error {
-	return stream.Send(&proto.Event{
-		Error: errors.MarshalError(upspin.ErrNotSupported),
-	})
+func (s *server) Watch(session auth.Session, reqBytes []byte) (pb.Message, error) {
+	return nil, upspin.ErrNotSupported
 }
 
 // Endpoint implements proto.DirServer.
-func (s *server) Endpoint(ctx gContext.Context, req *proto.EndpointRequest) (*proto.EndpointResponse, error) {
-
+func (s *server) Endpoint(session auth.Session, reqBytes []byte) (pb.Message, error) {
+	var req proto.EndpointRequest
+	if err := pb.Unmarshal(reqBytes, &req); err != nil {
+		return nil, err
+	}
 	op := logf("Endpoint")
 
-	ep, err := s.endpointFor(ctx)
+	ep, err := s.endpointFor(session)
 	if err != nil {
 		op.log(err)
 		return &proto.EndpointResponse{}, err
