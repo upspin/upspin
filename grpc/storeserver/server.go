@@ -12,6 +12,7 @@ import (
 
 	pb "github.com/golang/protobuf/proto"
 
+	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/grpc/auth"
 	"upspin.io/log"
@@ -42,8 +43,7 @@ func New(ctx upspin.Context, store upspin.StoreServer, addr upspin.NetAddr) http
 
 	return auth.NewServer(ctx, &auth.ServerConfig{
 		Service: auth.Service{
-			Name:   "Store",
-			Dialer: store,
+			Name: "Store",
 			Methods: auth.Methods{
 				"Get":    s.Get,
 				"Put":    s.Put,
@@ -53,10 +53,21 @@ func New(ctx upspin.Context, store upspin.StoreServer, addr upspin.NetAddr) http
 	})
 }
 
+func (s *server) serverFor(session auth.Session, reqBytes []byte, req pb.Message) (upspin.StoreServer, error) {
+	if err := pb.Unmarshal(reqBytes, req); err != nil {
+		return nil, err
+	}
+	svc, err := s.store.Dial(context.SetUserName(s.context, session.User()), s.store.Endpoint())
+	if err != nil {
+		return nil, err
+	}
+	return svc.(upspin.StoreServer), nil
+}
+
 // Get implements proto.StoreServer.
-func (s *server) Get(svc upspin.Service, reqBytes []byte) (pb.Message, error) {
+func (s *server) Get(session auth.Session, reqBytes []byte) (pb.Message, error) {
 	var req proto.StoreGetRequest
-	store, err := unmarshal(svc, reqBytes, &req)
+	store, err := s.serverFor(session, reqBytes, &req)
 	if err != nil {
 		return nil, err
 	}
@@ -76,9 +87,9 @@ func (s *server) Get(svc upspin.Service, reqBytes []byte) (pb.Message, error) {
 }
 
 // Put implements proto.StoreServer.
-func (s *server) Put(svc upspin.Service, reqBytes []byte) (pb.Message, error) {
+func (s *server) Put(session auth.Session, reqBytes []byte) (pb.Message, error) {
 	var req proto.StorePutRequest
-	store, err := unmarshal(svc, reqBytes, &req)
+	store, err := s.serverFor(session, reqBytes, &req)
 	if err != nil {
 		return nil, err
 	}
@@ -99,9 +110,9 @@ func (s *server) Put(svc upspin.Service, reqBytes []byte) (pb.Message, error) {
 var deleteResponse proto.StoreDeleteResponse
 
 // Delete implements proto.StoreServer.
-func (s *server) Delete(svc upspin.Service, reqBytes []byte) (pb.Message, error) {
+func (s *server) Delete(session auth.Session, reqBytes []byte) (pb.Message, error) {
 	var req proto.StoreGetRequest
-	store, err := unmarshal(svc, reqBytes, &req)
+	store, err := s.serverFor(session, reqBytes, &req)
 	if err != nil {
 		return nil, err
 	}
@@ -113,14 +124,6 @@ func (s *server) Delete(svc upspin.Service, reqBytes []byte) (pb.Message, error)
 		return &proto.StoreDeleteResponse{Error: errors.MarshalError(err)}, nil
 	}
 	return &deleteResponse, nil
-}
-
-// unmarshal is a helper to reduce repetition in each of the RPC methods.
-func unmarshal(svc upspin.Service, reqBytes []byte, req pb.Message) (upspin.StoreServer, error) {
-	if err := pb.Unmarshal(reqBytes, req); err != nil {
-		return nil, err
-	}
-	return svc.(upspin.StoreServer), nil
 }
 
 func logf(format string, args ...interface{}) operation {

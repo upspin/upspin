@@ -12,6 +12,7 @@ import (
 
 	pb "github.com/golang/protobuf/proto"
 
+	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/grpc/auth"
 	"upspin.io/log"
@@ -42,8 +43,7 @@ func New(ctx upspin.Context, dir upspin.DirServer, addr upspin.NetAddr) http.Han
 
 	return auth.NewServer(ctx, &auth.ServerConfig{
 		Service: auth.Service{
-			Name:   "Dir",
-			Dialer: dir,
+			Name: "Dir",
 			Methods: auth.Methods{
 				"Delete": s.Delete,
 				"Glob":   s.Glob,
@@ -57,10 +57,21 @@ func New(ctx upspin.Context, dir upspin.DirServer, addr upspin.NetAddr) http.Han
 
 }
 
+func (s *server) serverFor(session auth.Session, reqBytes []byte, req pb.Message) (upspin.DirServer, error) {
+	if err := pb.Unmarshal(reqBytes, req); err != nil {
+		return nil, err
+	}
+	svc, err := s.dir.Dial(context.SetUserName(s.context, session.User()), s.dir.Endpoint())
+	if err != nil {
+		return nil, err
+	}
+	return svc.(upspin.DirServer), nil
+}
+
 // Lookup implements proto.DirServer.
-func (s *server) Lookup(svc upspin.Service, reqBytes []byte) (pb.Message, error) {
+func (s *server) Lookup(session auth.Session, reqBytes []byte) (pb.Message, error) {
 	var req proto.DirLookupRequest
-	dir, err := unmarshal(svc, reqBytes, &req)
+	dir, err := s.serverFor(session, reqBytes, &req)
 	if err != nil {
 		return nil, err
 	}
@@ -70,9 +81,9 @@ func (s *server) Lookup(svc upspin.Service, reqBytes []byte) (pb.Message, error)
 }
 
 // Put implements proto.DirServer.
-func (s *server) Put(svc upspin.Service, reqBytes []byte) (pb.Message, error) {
+func (s *server) Put(session auth.Session, reqBytes []byte) (pb.Message, error) {
 	var req proto.DirPutRequest
-	dir, err := unmarshal(svc, reqBytes, &req)
+	dir, err := s.serverFor(session, reqBytes, &req)
 	if err != nil {
 		return nil, err
 	}
@@ -86,9 +97,9 @@ func (s *server) Put(svc upspin.Service, reqBytes []byte) (pb.Message, error) {
 }
 
 // Glob implements proto.DirServer.
-func (s *server) Glob(svc upspin.Service, reqBytes []byte) (pb.Message, error) {
+func (s *server) Glob(session auth.Session, reqBytes []byte) (pb.Message, error) {
 	var req proto.DirGlobRequest
-	dir, err := unmarshal(svc, reqBytes, &req)
+	dir, err := s.serverFor(session, reqBytes, &req)
 	if err != nil {
 		return nil, err
 	}
@@ -117,11 +128,11 @@ func globError(err error) *proto.EntriesError {
 }
 
 // Watch implements proto.Watch.
-func (s *server) Watch(svc upspin.Service, reqBytes []byte) (pb.Message, error) {
+func (s *server) Watch(session auth.Session, reqBytes []byte) (pb.Message, error) {
 	return nil, errors.Str("not implemented")
 
 	var req proto.DirWatchRequest
-	dir, err := unmarshal(svc, reqBytes, &req)
+	dir, err := s.serverFor(session, reqBytes, &req)
 	if err != nil {
 		return nil, err
 	}
@@ -194,9 +205,9 @@ func (s *server) Watch(svc upspin.Service, reqBytes []byte) (pb.Message, error) 
 }
 
 // Delete implements proto.DirServer.
-func (s *server) Delete(svc upspin.Service, reqBytes []byte) (pb.Message, error) {
+func (s *server) Delete(session auth.Session, reqBytes []byte) (pb.Message, error) {
 	var req proto.DirDeleteRequest
-	dir, err := unmarshal(svc, reqBytes, &req)
+	dir, err := s.serverFor(session, reqBytes, &req)
 	if err != nil {
 		return nil, err
 	}
@@ -206,23 +217,15 @@ func (s *server) Delete(svc upspin.Service, reqBytes []byte) (pb.Message, error)
 }
 
 // WhichAccess implements proto.DirServer.
-func (s *server) WhichAccess(svc upspin.Service, reqBytes []byte) (pb.Message, error) {
+func (s *server) WhichAccess(session auth.Session, reqBytes []byte) (pb.Message, error) {
 	var req proto.DirWhichAccessRequest
-	dir, err := unmarshal(svc, reqBytes, &req)
+	dir, err := s.serverFor(session, reqBytes, &req)
 	if err != nil {
 		return nil, err
 	}
 	op := logf("WhichAccess %q", req.Name)
 
 	return op.entryError(dir.WhichAccess(upspin.PathName(req.Name)))
-}
-
-// unmarshal is a helper to reduce repetition in each of the RPC methods.
-func unmarshal(svc upspin.Service, reqBytes []byte, req pb.Message) (upspin.DirServer, error) {
-	if err := pb.Unmarshal(reqBytes, req); err != nil {
-		return nil, err
-	}
-	return svc.(upspin.DirServer), nil
 }
 
 func logf(format string, args ...interface{}) operation {
