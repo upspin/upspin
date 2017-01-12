@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "37cc02f9_e973f1c3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-12T05:12:25Z",
+      "side": 1,
+      "message": "The change from GRPC to HTTPS made all methods authenticate,\nbut we shouldn\u0027t require authentication for Key.Lookup, so disable\nit with this hack.\n\nTODO: Come up with a better solution.",
+      "revId": "300ed26d48f003321005d4063f01b69fe79b096e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
