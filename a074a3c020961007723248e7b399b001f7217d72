@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "37cc02f9_09dacdd1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-12T02:28:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "37cc02f9_66360efb",
+      "revId": "a074a3c020961007723248e7b399b001f7217d72",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "37cc02f9_46331209",
         "filename": "grpc/auth/client.go",
         "patchSetId": 1
@@ -53,6 +71,24 @@
         "endLine": 32,
         "endChar": 21
       },
+      "revId": "a074a3c020961007723248e7b399b001f7217d72",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "37cc02f9_69d701aa",
+        "filename": "grpc/auth/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-12T02:28:33Z",
+      "side": 1,
+      "message": "This will all move out of a \u0027grpc\u0027 tree once we\u0027re done with GRPC.",
+      "parentUuid": "97bbeed0_a905bbc5",
       "revId": "a074a3c020961007723248e7b399b001f7217d72",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
