@@ -76,6 +76,6 @@ func main() {
 	}
 
 	httpStore := storeserver.New(ctx, store, upspin.NetAddr(flags.NetAddr))
-	http.Handle("/api/", httpStore)
+	http.Handle("/api/Store/", httpStore)
 	https.ListenAndServeFromFlags(ready, serverName)
 }
