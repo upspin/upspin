@@ -15,6 +15,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"golang.org/x/net/http2"
+
 	"google.golang.org/api/option"
 
 	"cloud.google.com/go/compute/metadata"
@@ -73,6 +75,7 @@ func ListenAndServe(ready chan<- struct{}, metaSuffix, addr string, opt *Options
 	} else {
 		opt.applyDefaults()
 	}
+	var config *tls.Config
 	if metadata.OnGCE() {
 		log.Info.Println("https: on GCE; serving HTTPS on port 443 using Let's Encrypt")
 		var m letsencrypt.Manager
@@ -81,17 +84,14 @@ func ListenAndServe(ready chan<- struct{}, metaSuffix, addr string, opt *Options
 		if err != nil {
 			log.Fatalf("https: couldn't read %q metadata value: %v", key, err)
 		}
-		if ready != nil {
-			close(ready) // TODO(adg): listen manually and do this after listen
-		}
 		if err := letsencryptCache(&m, bucket, metaSuffix); err != nil {
 			log.Fatalf("https: couldn't set up letsencrypt cache: %v", err)
 		}
-		log.Fatalf("https: %v", m.Serve())
-	}
-
-	var config *tls.Config
-	if file := opt.LetsEncryptCache; file != "" {
+		addr = ":443"
+		config = &tls.Config{
+			GetCertificate: m.GetCertificate,
+		}
+	} else if file := opt.LetsEncryptCache; file != "" {
 		log.Info.Printf("https: serving HTTPS on %q using Let's Encrypt certificates", addr)
 		var m letsencrypt.Manager
 		if err := m.CacheFile(file); err != nil {
@@ -111,7 +111,14 @@ func ListenAndServe(ready chan<- struct{}, metaSuffix, addr string, opt *Options
 			log.Fatalf("https: setting up TLS config: %v", err)
 		}
 	}
-	config.NextProtos = []string{"h2"} // Enable HTTP/2 support
+	server := &http.Server{
+		TLSConfig: config,
+	}
+	err := http2.ConfigureServer(server, nil)
+	if err != nil {
+		log.Fatalf("https: %v", err)
+	}
+
 	ln, err := net.Listen("tcp", addr)
 	if err != nil {
 		log.Fatalf("https: %v", err)
@@ -119,7 +126,7 @@ func ListenAndServe(ready chan<- struct{}, metaSuffix, addr string, opt *Options
 	if ready != nil {
 		close(ready)
 	}
-	err = http.Serve(tls.NewListener(ln, config), nil)
+	err = server.Serve(tls.NewListener(ln, config))
 	log.Fatalf("https: %v", err)
 }
 
