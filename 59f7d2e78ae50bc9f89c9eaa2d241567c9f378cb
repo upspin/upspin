@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e3d38de9_a632902e",
+        "filename": "cmd/storeserver/main.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-01-12T21:53:07Z",
+      "side": 1,
+      "message": "If I had a second service (e.g. httpDirectory) here, it too would hang off of /api/?  I see that the calls go to /api/Store.Put for example.  Where that piece of multiplexing get done? Does the http package just go through the description of each server until if finds one with a path that matches?",
+      "range": {
+        "startLine": 79,
+        "startChar": 1,
+        "endLine": 79,
+        "endChar": 32
+      },
+      "revId": "59f7d2e78ae50bc9f89c9eaa2d241567c9f378cb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
