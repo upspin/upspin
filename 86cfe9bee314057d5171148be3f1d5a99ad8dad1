@@ -22,6 +22,24 @@
       "revId": "86cfe9bee314057d5171148be3f1d5a99ad8dad1",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "37cc02f9_af43b98c",
+        "filename": "grpc/storecacheserver/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-13T00:02:28Z",
+      "side": 1,
+      "message": "The great tidying up is coming soon.",
+      "parentUuid": "e3d38de9_49a17793",
+      "revId": "86cfe9bee314057d5171148be3f1d5a99ad8dad1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
