@@ -62,7 +62,7 @@ func startServer() (port string) {
 		Lookup: lookup,
 		Service: Service{
 			Name: "Server",
-			Methods: Methods{
+			Methods: map[string]Method{
 				"Echo": srv.Echo,
 			},
 		},
@@ -110,7 +110,7 @@ func (c *client) Echo(t *testing.T, payload string) (response string) {
 	}
 	resp := new(prototest.EchoResponse)
 	log.Printf("Client: Echo request: %q", req.Payload)
-	if err := c.Invoke("Server/Echo", req, resp); err != nil {
+	if err := c.Invoke("Server/Echo", req, resp, nil, nil); err != nil {
 		t.Fatal(err)
 	}
 	c.reqCount++

@@ -7,6 +7,7 @@ package auth
 
 import (
 	"crypto/rand"
+	"encoding/binary"
 	"fmt"
 	"io/ioutil"
 	"math/big"
@@ -64,11 +65,18 @@ type Service struct {
 	Name string
 
 	// The RPC methods to serve.
-	Methods Methods
+	Methods map[string]Method
+
+	// The streaming RPC methods to serve.
+	Streams map[string]Stream
 }
 
-// Methods describes a set of RPC methods by name.
-type Methods map[string]func(Session, []byte) (pb.Message, error)
+// Method describes an RPC method.
+type Method func(Session, []byte) (pb.Message, error)
+
+// Stream describes a streaming RPC method.
+// TODO: document
+type Stream func(Session, []byte, <-chan struct{}) (<-chan pb.Message, error)
 
 // ServerConfig holds the configuration for instantiating a Server.
 type ServerConfig struct {
@@ -133,17 +141,12 @@ func (s *serverImpl) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	method := strings.TrimPrefix(r.URL.Path, prefix)
+	name := strings.TrimPrefix(r.URL.Path, prefix)
 
-	m := d.Methods[method]
-	if m == nil {
+	method := d.Methods[name]
+	stream := d.Streams[name]
+	if method == nil && stream == nil {
 		http.NotFound(w, r)
-		return
-	}
-	body, err := ioutil.ReadAll(r.Body)
-	r.Body.Close()
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -153,7 +156,22 @@ func (s *serverImpl) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp, err := m(session, body)
+	body, err := ioutil.ReadAll(r.Body)
+	r.Body.Close()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if method != nil {
+		serveMethod(method, session, w, body)
+		return
+	}
+	serveStream(stream, session, w, body)
+}
+
+func serveMethod(m Method, sess Session, w http.ResponseWriter, body []byte) {
+	resp, err := m(sess, body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -166,6 +184,51 @@ func (s *serverImpl) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	w.Write(payload)
+}
+
+func serveStream(s Stream, sess Session, w http.ResponseWriter, body []byte) {
+	done := make(chan struct{})
+	msgs, err := s(sess, body, done)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	go func() {
+		<-w.(http.CloseNotifier).CloseNotify()
+		close(done)
+	}()
+
+	var lenBytes [4]byte // stores a uint32, the length of each output message
+	for {
+		select {
+		case msg, ok := <-msgs:
+			if !ok {
+				return
+			}
+			if done == nil {
+				// Drop this message as there's nobody to deliver to.
+				continue
+			}
+
+			b, err := pb.Marshal(msg)
+			if err != nil {
+				log.Error.Printf("transport/auth: error encoding proto in stream: %v", err)
+				return
+			}
+
+			binary.BigEndian.PutUint32(lenBytes[:], uint32(len(b)))
+			if _, err := w.Write(lenBytes[:]); err != nil {
+				return
+			}
+			if _, err := w.Write(b); err != nil {
+				return
+			}
+			w.(http.Flusher).Flush()
+
+		case <-done:
+			done = nil
+		}
+	}
 }
 
 func (s *serverImpl) SessionForRequest(w http.ResponseWriter, r *http.Request) (session Session, err error) {

@@ -43,13 +43,15 @@ func New(ctx upspin.Context, dir upspin.DirServer, addr upspin.NetAddr) http.Han
 	return auth.NewServer(ctx, &auth.ServerConfig{
 		Service: auth.Service{
 			Name: "Dir",
-			Methods: auth.Methods{
+			Methods: map[string]auth.Method{
 				"Delete":      s.Delete,
 				"Glob":        s.Glob,
 				"Lookup":      s.Lookup,
 				"Put":         s.Put,
-				"Watch":       s.Watch,
 				"WhichAccess": s.WhichAccess,
+			},
+			Streams: map[string]auth.Stream{
+				"Watch": s.Watch,
 			},
 		},
 	})
@@ -127,8 +129,32 @@ func globError(err error) *proto.EntriesError {
 }
 
 // Watch implements proto.Watch.
-func (s *server) Watch(session auth.Session, reqBytes []byte) (pb.Message, error) {
-	return nil, upspin.ErrNotSupported
+func (s *server) Watch(session auth.Session, reqBytes []byte, done <-chan struct{}) (<-chan pb.Message, error) {
+	var req proto.DirWatchRequest
+	dir, err := s.serverFor(session, reqBytes, &req)
+	if err != nil {
+		return nil, err
+	}
+	op := logf("Watch %q order %d", req.Name, req.Order)
+
+	events, err := dir.Watch(upspin.PathName(req.Name), req.Order, done)
+	if err != nil {
+		return nil, err
+	}
+
+	out := make(chan pb.Message)
+	go func() {
+		defer close(out)
+		for e := range events {
+			ep, err := proto.EventProto(&e)
+			if err != nil {
+				op.logf("error converting event to proto: %v", err)
+				return
+			}
+			out <- ep
+		}
+	}()
+	return out, nil
 }
 
 // Delete implements proto.DirServer.
