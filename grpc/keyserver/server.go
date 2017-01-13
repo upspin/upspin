@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // Package keyserver is a wrapper for an upspin.KeyServer implementation
-// that presents it as an authenticated GRPC service.
+// that presents it as an authenticated service.
 package keyserver
 
 import (
@@ -20,7 +20,6 @@ import (
 	"upspin.io/upspin/proto"
 )
 
-// server is a SecureServer that talks to a KeyServer interface and serves GRPC requests.
 type server struct {
 	context upspin.Context
 

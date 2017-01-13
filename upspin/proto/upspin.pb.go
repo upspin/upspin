@@ -43,11 +43,6 @@ import proto1 "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
 
-import (
-	context "golang.org/x/net/context"
-	grpc "google.golang.org/grpc"
-)
-
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto1.Marshal
 var _ = fmt.Errorf
@@ -70,20 +65,6 @@ func (m *Endpoint) String() string            { return proto1.CompactTextString(
 func (*Endpoint) ProtoMessage()               {}
 func (*Endpoint) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
-func (m *Endpoint) GetTransport() int32 {
-	if m != nil {
-		return m.Transport
-	}
-	return 0
-}
-
-func (m *Endpoint) GetNetAddr() string {
-	if m != nil {
-		return m.NetAddr
-	}
-	return ""
-}
-
 // Location mirrors upspin.Location.
 type Location struct {
 	Endpoint  *Endpoint `protobuf:"bytes,1,opt,name=endpoint" json:"endpoint,omitempty"`
@@ -102,13 +83,6 @@ func (m *Location) GetEndpoint() *Endpoint {
 	return nil
 }
 
-func (m *Location) GetReference() string {
-	if m != nil {
-		return m.Reference
-	}
-	return ""
-}
-
 // Refdata mirrors upspin.Refdata.
 type Refdata struct {
 	Reference string `protobuf:"bytes,1,opt,name=reference" json:"reference,omitempty"`
@@ -120,27 +94,6 @@ func (m *Refdata) Reset()                    { *m = Refdata{} }
 func (m *Refdata) String() string            { return proto1.CompactTextString(m) }
 func (*Refdata) ProtoMessage()               {}
 func (*Refdata) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
-
-func (m *Refdata) GetReference() string {
-	if m != nil {
-		return m.Reference
-	}
-	return ""
-}
-
-func (m *Refdata) GetVolatile() bool {
-	if m != nil {
-		return m.Volatile
-	}
-	return false
-}
-
-func (m *Refdata) GetDuration() int64 {
-	if m != nil {
-		return m.Duration
-	}
-	return 0
-}
 
 type EndpointRequest struct {
 }
@@ -175,13 +128,6 @@ func (m *PingRequest) String() string            { return proto1.CompactTextStri
 func (*PingRequest) ProtoMessage()               {}
 func (*PingRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{5} }
 
-func (m *PingRequest) GetPingSequence() int32 {
-	if m != nil {
-		return m.PingSequence
-	}
-	return 0
-}
-
 type PingResponse struct {
 	PingSequence int32 `protobuf:"varint,1,opt,name=ping_sequence,json=pingSequence" json:"ping_sequence,omitempty"`
 }
@@ -191,13 +137,6 @@ func (m *PingResponse) String() string            { return proto1.CompactTextStr
 func (*PingResponse) ProtoMessage()               {}
 func (*PingResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{6} }
 
-func (m *PingResponse) GetPingSequence() int32 {
-	if m != nil {
-		return m.PingSequence
-	}
-	return 0
-}
-
 type StoreGetRequest struct {
 	Reference string `protobuf:"bytes,1,opt,name=reference" json:"reference,omitempty"`
 }
@@ -206,13 +145,6 @@ func (m *StoreGetRequest) Reset()                    { *m = StoreGetRequest{} }
 func (m *StoreGetRequest) String() string            { return proto1.CompactTextString(m) }
 func (*StoreGetRequest) ProtoMessage()               {}
 func (*StoreGetRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{7} }
-
-func (m *StoreGetRequest) GetReference() string {
-	if m != nil {
-		return m.Reference
-	}
-	return ""
-}
 
 type StoreGetResponse struct {
 	Data      []byte      `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
@@ -225,13 +157,6 @@ func (m *StoreGetResponse) Reset()                    { *m = StoreGetResponse{} 
 func (m *StoreGetResponse) String() string            { return proto1.CompactTextString(m) }
 func (*StoreGetResponse) ProtoMessage()               {}
 func (*StoreGetResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{8} }
-
-func (m *StoreGetResponse) GetData() []byte {
-	if m != nil {
-		return m.Data
-	}
-	return nil
-}
 
 func (m *StoreGetResponse) GetRefdata() *Refdata {
 	if m != nil {
@@ -247,13 +172,6 @@ func (m *StoreGetResponse) GetLocations() []*Location {
 	return nil
 }
 
-func (m *StoreGetResponse) GetError() []byte {
-	if m != nil {
-		return m.Error
-	}
-	return nil
-}
-
 type StorePutRequest struct {
 	Data []byte `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
 }
@@ -262,13 +180,6 @@ func (m *StorePutRequest) Reset()                    { *m = StorePutRequest{} }
 func (m *StorePutRequest) String() string            { return proto1.CompactTextString(m) }
 func (*StorePutRequest) ProtoMessage()               {}
 func (*StorePutRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{9} }
-
-func (m *StorePutRequest) GetData() []byte {
-	if m != nil {
-		return m.Data
-	}
-	return nil
-}
 
 type StorePutResponse struct {
 	Refdata *Refdata `protobuf:"bytes,1,opt,name=refdata" json:"refdata,omitempty"`
@@ -287,13 +198,6 @@ func (m *StorePutResponse) GetRefdata() *Refdata {
 	return nil
 }
 
-func (m *StorePutResponse) GetError() []byte {
-	if m != nil {
-		return m.Error
-	}
-	return nil
-}
-
 type StoreDeleteRequest struct {
 	Reference string `protobuf:"bytes,1,opt,name=reference" json:"reference,omitempty"`
 }
@@ -303,13 +207,6 @@ func (m *StoreDeleteRequest) String() string            { return proto1.CompactT
 func (*StoreDeleteRequest) ProtoMessage()               {}
 func (*StoreDeleteRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{11} }
 
-func (m *StoreDeleteRequest) GetReference() string {
-	if m != nil {
-		return m.Reference
-	}
-	return ""
-}
-
 type StoreDeleteResponse struct {
 	Error []byte `protobuf:"bytes,1,opt,name=error,proto3" json:"error,omitempty"`
 }
@@ -318,13 +215,6 @@ func (m *StoreDeleteResponse) Reset()                    { *m = StoreDeleteRespo
 func (m *StoreDeleteResponse) String() string            { return proto1.CompactTextString(m) }
 func (*StoreDeleteResponse) ProtoMessage()               {}
 func (*StoreDeleteResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{12} }
-
-func (m *StoreDeleteResponse) GetError() []byte {
-	if m != nil {
-		return m.Error
-	}
-	return nil
-}
 
 type User struct {
 	Name      string      `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
@@ -337,13 +227,6 @@ func (m *User) Reset()                    { *m = User{} }
 func (m *User) String() string            { return proto1.CompactTextString(m) }
 func (*User) ProtoMessage()               {}
 func (*User) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{13} }
-
-func (m *User) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
 
 func (m *User) GetDirs() []*Endpoint {
 	if m != nil {
@@ -359,13 +242,6 @@ func (m *User) GetStores() []*Endpoint {
 	return nil
 }
 
-func (m *User) GetPublicKey() string {
-	if m != nil {
-		return m.PublicKey
-	}
-	return ""
-}
-
 type KeyLookupRequest struct {
 	UserName string `protobuf:"bytes,1,opt,name=user_name,json=userName" json:"user_name,omitempty"`
 }
@@ -374,13 +250,6 @@ func (m *KeyLookupRequest) Reset()                    { *m = KeyLookupRequest{} 
 func (m *KeyLookupRequest) String() string            { return proto1.CompactTextString(m) }
 func (*KeyLookupRequest) ProtoMessage()               {}
 func (*KeyLookupRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{14} }
-
-func (m *KeyLookupRequest) GetUserName() string {
-	if m != nil {
-		return m.UserName
-	}
-	return ""
-}
 
 type KeyLookupResponse struct {
 	User  *User  `protobuf:"bytes,1,opt,name=user" json:"user,omitempty"`
@@ -395,13 +264,6 @@ func (*KeyLookupResponse) Descriptor() ([]byte, []int) { return fileDescriptor0,
 func (m *KeyLookupResponse) GetUser() *User {
 	if m != nil {
 		return m.User
-	}
-	return nil
-}
-
-func (m *KeyLookupResponse) GetError() []byte {
-	if m != nil {
-		return m.Error
 	}
 	return nil
 }
@@ -431,13 +293,6 @@ func (m *KeyPutResponse) String() string            { return proto1.CompactTextS
 func (*KeyPutResponse) ProtoMessage()               {}
 func (*KeyPutResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{17} }
 
-func (m *KeyPutResponse) GetError() []byte {
-	if m != nil {
-		return m.Error
-	}
-	return nil
-}
-
 type EntryError struct {
 	Entry []byte `protobuf:"bytes,1,opt,name=entry,proto3" json:"entry,omitempty"`
 	Error []byte `protobuf:"bytes,2,opt,name=error,proto3" json:"error,omitempty"`
@@ -447,20 +302,6 @@ func (m *EntryError) Reset()                    { *m = EntryError{} }
 func (m *EntryError) String() string            { return proto1.CompactTextString(m) }
 func (*EntryError) ProtoMessage()               {}
 func (*EntryError) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{18} }
-
-func (m *EntryError) GetEntry() []byte {
-	if m != nil {
-		return m.Entry
-	}
-	return nil
-}
-
-func (m *EntryError) GetError() []byte {
-	if m != nil {
-		return m.Error
-	}
-	return nil
-}
 
 type EntriesError struct {
 	Entries [][]byte `protobuf:"bytes,1,rep,name=entries,proto3" json:"entries,omitempty"`
@@ -472,20 +313,6 @@ func (m *EntriesError) String() string            { return proto1.CompactTextStr
 func (*EntriesError) ProtoMessage()               {}
 func (*EntriesError) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{19} }
 
-func (m *EntriesError) GetEntries() [][]byte {
-	if m != nil {
-		return m.Entries
-	}
-	return nil
-}
-
-func (m *EntriesError) GetError() []byte {
-	if m != nil {
-		return m.Error
-	}
-	return nil
-}
-
 type DirLookupRequest struct {
 	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
 }
@@ -494,13 +321,6 @@ func (m *DirLookupRequest) Reset()                    { *m = DirLookupRequest{} 
 func (m *DirLookupRequest) String() string            { return proto1.CompactTextString(m) }
 func (*DirLookupRequest) ProtoMessage()               {}
 func (*DirLookupRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{20} }
-
-func (m *DirLookupRequest) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
 
 type DirPutRequest struct {
 	Entry []byte `protobuf:"bytes,1,opt,name=entry,proto3" json:"entry,omitempty"`
@@ -511,13 +331,6 @@ func (m *DirPutRequest) String() string            { return proto1.CompactTextSt
 func (*DirPutRequest) ProtoMessage()               {}
 func (*DirPutRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{21} }
 
-func (m *DirPutRequest) GetEntry() []byte {
-	if m != nil {
-		return m.Entry
-	}
-	return nil
-}
-
 type DirGlobRequest struct {
 	Pattern string `protobuf:"bytes,1,opt,name=pattern" json:"pattern,omitempty"`
 }
@@ -526,13 +339,6 @@ func (m *DirGlobRequest) Reset()                    { *m = DirGlobRequest{} }
 func (m *DirGlobRequest) String() string            { return proto1.CompactTextString(m) }
 func (*DirGlobRequest) ProtoMessage()               {}
 func (*DirGlobRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{22} }
-
-func (m *DirGlobRequest) GetPattern() string {
-	if m != nil {
-		return m.Pattern
-	}
-	return ""
-}
 
 type DirDeleteRequest struct {
 	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
@@ -543,13 +349,6 @@ func (m *DirDeleteRequest) String() string            { return proto1.CompactTex
 func (*DirDeleteRequest) ProtoMessage()               {}
 func (*DirDeleteRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{23} }
 
-func (m *DirDeleteRequest) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
-
 type DirWhichAccessRequest struct {
 	Name string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
 }
@@ -558,13 +357,6 @@ func (m *DirWhichAccessRequest) Reset()                    { *m = DirWhichAccess
 func (m *DirWhichAccessRequest) String() string            { return proto1.CompactTextString(m) }
 func (*DirWhichAccessRequest) ProtoMessage()               {}
 func (*DirWhichAccessRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{24} }
-
-func (m *DirWhichAccessRequest) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
 
 type DirWatchRequest struct {
 	Name  string `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
@@ -575,20 +367,6 @@ func (m *DirWatchRequest) Reset()                    { *m = DirWatchRequest{} }
 func (m *DirWatchRequest) String() string            { return proto1.CompactTextString(m) }
 func (*DirWatchRequest) ProtoMessage()               {}
 func (*DirWatchRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{25} }
-
-func (m *DirWatchRequest) GetName() string {
-	if m != nil {
-		return m.Name
-	}
-	return ""
-}
-
-func (m *DirWatchRequest) GetOrder() int64 {
-	if m != nil {
-		return m.Order
-	}
-	return 0
-}
 
 // The first response in the stream is whether dir.Watch succeeded. If it
 // didn't, the error field contains the error and no streaming happens. If it
@@ -605,34 +383,6 @@ func (m *Event) Reset()                    { *m = Event{} }
 func (m *Event) String() string            { return proto1.CompactTextString(m) }
 func (*Event) ProtoMessage()               {}
 func (*Event) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{26} }
-
-func (m *Event) GetEntry() []byte {
-	if m != nil {
-		return m.Entry
-	}
-	return nil
-}
-
-func (m *Event) GetOrder() int64 {
-	if m != nil {
-		return m.Order
-	}
-	return 0
-}
-
-func (m *Event) GetDelete() bool {
-	if m != nil {
-		return m.Delete
-	}
-	return false
-}
-
-func (m *Event) GetError() []byte {
-	if m != nil {
-		return m.Error
-	}
-	return nil
-}
 
 func init() {
 	proto1.RegisterType((*Endpoint)(nil), "proto.Endpoint")
@@ -662,713 +412,6 @@ func init() {
 	proto1.RegisterType((*DirWhichAccessRequest)(nil), "proto.DirWhichAccessRequest")
 	proto1.RegisterType((*DirWatchRequest)(nil), "proto.DirWatchRequest")
 	proto1.RegisterType((*Event)(nil), "proto.Event")
-}
-
-// Reference imports to suppress errors if they are not otherwise used.
-var _ context.Context
-var _ grpc.ClientConn
-
-// This is a compile-time assertion to ensure that this generated file
-// is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion4
-
-// Client API for Store service
-
-type StoreClient interface {
-	// Service methods:
-	Endpoint(ctx context.Context, in *EndpointRequest, opts ...grpc.CallOption) (*EndpointResponse, error)
-	Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error)
-	Get(ctx context.Context, in *StoreGetRequest, opts ...grpc.CallOption) (*StoreGetResponse, error)
-	Put(ctx context.Context, in *StorePutRequest, opts ...grpc.CallOption) (*StorePutResponse, error)
-	Delete(ctx context.Context, in *StoreDeleteRequest, opts ...grpc.CallOption) (*StoreDeleteResponse, error)
-}
-
-type storeClient struct {
-	cc *grpc.ClientConn
-}
-
-func NewStoreClient(cc *grpc.ClientConn) StoreClient {
-	return &storeClient{cc}
-}
-
-func (c *storeClient) Endpoint(ctx context.Context, in *EndpointRequest, opts ...grpc.CallOption) (*EndpointResponse, error) {
-	out := new(EndpointResponse)
-	err := grpc.Invoke(ctx, "/proto.Store/Endpoint", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *storeClient) Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error) {
-	out := new(PingResponse)
-	err := grpc.Invoke(ctx, "/proto.Store/Ping", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *storeClient) Get(ctx context.Context, in *StoreGetRequest, opts ...grpc.CallOption) (*StoreGetResponse, error) {
-	out := new(StoreGetResponse)
-	err := grpc.Invoke(ctx, "/proto.Store/Get", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *storeClient) Put(ctx context.Context, in *StorePutRequest, opts ...grpc.CallOption) (*StorePutResponse, error) {
-	out := new(StorePutResponse)
-	err := grpc.Invoke(ctx, "/proto.Store/Put", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *storeClient) Delete(ctx context.Context, in *StoreDeleteRequest, opts ...grpc.CallOption) (*StoreDeleteResponse, error) {
-	out := new(StoreDeleteResponse)
-	err := grpc.Invoke(ctx, "/proto.Store/Delete", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// Server API for Store service
-
-type StoreServer interface {
-	// Service methods:
-	Endpoint(context.Context, *EndpointRequest) (*EndpointResponse, error)
-	Ping(context.Context, *PingRequest) (*PingResponse, error)
-	Get(context.Context, *StoreGetRequest) (*StoreGetResponse, error)
-	Put(context.Context, *StorePutRequest) (*StorePutResponse, error)
-	Delete(context.Context, *StoreDeleteRequest) (*StoreDeleteResponse, error)
-}
-
-func RegisterStoreServer(s *grpc.Server, srv StoreServer) {
-	s.RegisterService(&_Store_serviceDesc, srv)
-}
-
-func _Store_Endpoint_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(EndpointRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(StoreServer).Endpoint(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/proto.Store/Endpoint",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StoreServer).Endpoint(ctx, req.(*EndpointRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Store_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PingRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(StoreServer).Ping(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/proto.Store/Ping",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StoreServer).Ping(ctx, req.(*PingRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Store_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(StoreGetRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(StoreServer).Get(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/proto.Store/Get",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StoreServer).Get(ctx, req.(*StoreGetRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Store_Put_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(StorePutRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(StoreServer).Put(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/proto.Store/Put",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StoreServer).Put(ctx, req.(*StorePutRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Store_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(StoreDeleteRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(StoreServer).Delete(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/proto.Store/Delete",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(StoreServer).Delete(ctx, req.(*StoreDeleteRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-var _Store_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "proto.Store",
-	HandlerType: (*StoreServer)(nil),
-	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "Endpoint",
-			Handler:    _Store_Endpoint_Handler,
-		},
-		{
-			MethodName: "Ping",
-			Handler:    _Store_Ping_Handler,
-		},
-		{
-			MethodName: "Get",
-			Handler:    _Store_Get_Handler,
-		},
-		{
-			MethodName: "Put",
-			Handler:    _Store_Put_Handler,
-		},
-		{
-			MethodName: "Delete",
-			Handler:    _Store_Delete_Handler,
-		},
-	},
-	Streams:  []grpc.StreamDesc{},
-	Metadata: "upspin.proto",
-}
-
-// Client API for Key service
-
-type KeyClient interface {
-	// Service methods:
-	Endpoint(ctx context.Context, in *EndpointRequest, opts ...grpc.CallOption) (*EndpointResponse, error)
-	Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error)
-	Lookup(ctx context.Context, in *KeyLookupRequest, opts ...grpc.CallOption) (*KeyLookupResponse, error)
-	Put(ctx context.Context, in *KeyPutRequest, opts ...grpc.CallOption) (*KeyPutResponse, error)
-}
-
-type keyClient struct {
-	cc *grpc.ClientConn
-}
-
-func NewKeyClient(cc *grpc.ClientConn) KeyClient {
-	return &keyClient{cc}
-}
-
-func (c *keyClient) Endpoint(ctx context.Context, in *EndpointRequest, opts ...grpc.CallOption) (*EndpointResponse, error) {
-	out := new(EndpointResponse)
-	err := grpc.Invoke(ctx, "/proto.Key/Endpoint", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *keyClient) Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error) {
-	out := new(PingResponse)
-	err := grpc.Invoke(ctx, "/proto.Key/Ping", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *keyClient) Lookup(ctx context.Context, in *KeyLookupRequest, opts ...grpc.CallOption) (*KeyLookupResponse, error) {
-	out := new(KeyLookupResponse)
-	err := grpc.Invoke(ctx, "/proto.Key/Lookup", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *keyClient) Put(ctx context.Context, in *KeyPutRequest, opts ...grpc.CallOption) (*KeyPutResponse, error) {
-	out := new(KeyPutResponse)
-	err := grpc.Invoke(ctx, "/proto.Key/Put", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// Server API for Key service
-
-type KeyServer interface {
-	// Service methods:
-	Endpoint(context.Context, *EndpointRequest) (*EndpointResponse, error)
-	Ping(context.Context, *PingRequest) (*PingResponse, error)
-	Lookup(context.Context, *KeyLookupRequest) (*KeyLookupResponse, error)
-	Put(context.Context, *KeyPutRequest) (*KeyPutResponse, error)
-}
-
-func RegisterKeyServer(s *grpc.Server, srv KeyServer) {
-	s.RegisterService(&_Key_serviceDesc, srv)
-}
-
-func _Key_Endpoint_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(EndpointRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(KeyServer).Endpoint(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/proto.Key/Endpoint",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KeyServer).Endpoint(ctx, req.(*EndpointRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Key_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PingRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(KeyServer).Ping(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/proto.Key/Ping",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KeyServer).Ping(ctx, req.(*PingRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Key_Lookup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(KeyLookupRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(KeyServer).Lookup(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/proto.Key/Lookup",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KeyServer).Lookup(ctx, req.(*KeyLookupRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Key_Put_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(KeyPutRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(KeyServer).Put(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/proto.Key/Put",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KeyServer).Put(ctx, req.(*KeyPutRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-var _Key_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "proto.Key",
-	HandlerType: (*KeyServer)(nil),
-	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "Endpoint",
-			Handler:    _Key_Endpoint_Handler,
-		},
-		{
-			MethodName: "Ping",
-			Handler:    _Key_Ping_Handler,
-		},
-		{
-			MethodName: "Lookup",
-			Handler:    _Key_Lookup_Handler,
-		},
-		{
-			MethodName: "Put",
-			Handler:    _Key_Put_Handler,
-		},
-	},
-	Streams:  []grpc.StreamDesc{},
-	Metadata: "upspin.proto",
-}
-
-// Client API for Dir service
-
-type DirClient interface {
-	// Service methods:
-	Endpoint(ctx context.Context, in *EndpointRequest, opts ...grpc.CallOption) (*EndpointResponse, error)
-	Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error)
-	Lookup(ctx context.Context, in *DirLookupRequest, opts ...grpc.CallOption) (*EntryError, error)
-	Put(ctx context.Context, in *DirPutRequest, opts ...grpc.CallOption) (*EntryError, error)
-	Glob(ctx context.Context, in *DirGlobRequest, opts ...grpc.CallOption) (*EntriesError, error)
-	Delete(ctx context.Context, in *DirDeleteRequest, opts ...grpc.CallOption) (*EntryError, error)
-	WhichAccess(ctx context.Context, in *DirWhichAccessRequest, opts ...grpc.CallOption) (*EntryError, error)
-	// DirWatchRequest is only sent once, but it is a stream so that closing the
-	// send-side indicates to the server that the client is done receiving
-	// events.
-	Watch(ctx context.Context, opts ...grpc.CallOption) (Dir_WatchClient, error)
-}
-
-type dirClient struct {
-	cc *grpc.ClientConn
-}
-
-func NewDirClient(cc *grpc.ClientConn) DirClient {
-	return &dirClient{cc}
-}
-
-func (c *dirClient) Endpoint(ctx context.Context, in *EndpointRequest, opts ...grpc.CallOption) (*EndpointResponse, error) {
-	out := new(EndpointResponse)
-	err := grpc.Invoke(ctx, "/proto.Dir/Endpoint", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *dirClient) Ping(ctx context.Context, in *PingRequest, opts ...grpc.CallOption) (*PingResponse, error) {
-	out := new(PingResponse)
-	err := grpc.Invoke(ctx, "/proto.Dir/Ping", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *dirClient) Lookup(ctx context.Context, in *DirLookupRequest, opts ...grpc.CallOption) (*EntryError, error) {
-	out := new(EntryError)
-	err := grpc.Invoke(ctx, "/proto.Dir/Lookup", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *dirClient) Put(ctx context.Context, in *DirPutRequest, opts ...grpc.CallOption) (*EntryError, error) {
-	out := new(EntryError)
-	err := grpc.Invoke(ctx, "/proto.Dir/Put", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *dirClient) Glob(ctx context.Context, in *DirGlobRequest, opts ...grpc.CallOption) (*EntriesError, error) {
-	out := new(EntriesError)
-	err := grpc.Invoke(ctx, "/proto.Dir/Glob", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *dirClient) Delete(ctx context.Context, in *DirDeleteRequest, opts ...grpc.CallOption) (*EntryError, error) {
-	out := new(EntryError)
-	err := grpc.Invoke(ctx, "/proto.Dir/Delete", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *dirClient) WhichAccess(ctx context.Context, in *DirWhichAccessRequest, opts ...grpc.CallOption) (*EntryError, error) {
-	out := new(EntryError)
-	err := grpc.Invoke(ctx, "/proto.Dir/WhichAccess", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *dirClient) Watch(ctx context.Context, opts ...grpc.CallOption) (Dir_WatchClient, error) {
-	stream, err := grpc.NewClientStream(ctx, &_Dir_serviceDesc.Streams[0], c.cc, "/proto.Dir/Watch", opts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &dirWatchClient{stream}
-	return x, nil
-}
-
-type Dir_WatchClient interface {
-	Send(*DirWatchRequest) error
-	Recv() (*Event, error)
-	grpc.ClientStream
-}
-
-type dirWatchClient struct {
-	grpc.ClientStream
-}
-
-func (x *dirWatchClient) Send(m *DirWatchRequest) error {
-	return x.ClientStream.SendMsg(m)
-}
-
-func (x *dirWatchClient) Recv() (*Event, error) {
-	m := new(Event)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-// Server API for Dir service
-
-type DirServer interface {
-	// Service methods:
-	Endpoint(context.Context, *EndpointRequest) (*EndpointResponse, error)
-	Ping(context.Context, *PingRequest) (*PingResponse, error)
-	Lookup(context.Context, *DirLookupRequest) (*EntryError, error)
-	Put(context.Context, *DirPutRequest) (*EntryError, error)
-	Glob(context.Context, *DirGlobRequest) (*EntriesError, error)
-	Delete(context.Context, *DirDeleteRequest) (*EntryError, error)
-	WhichAccess(context.Context, *DirWhichAccessRequest) (*EntryError, error)
-	// DirWatchRequest is only sent once, but it is a stream so that closing the
-	// send-side indicates to the server that the client is done receiving
-	// events.
-	Watch(Dir_WatchServer) error
-}
-
-func RegisterDirServer(s *grpc.Server, srv DirServer) {
-	s.RegisterService(&_Dir_serviceDesc, srv)
-}
-
-func _Dir_Endpoint_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(EndpointRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(DirServer).Endpoint(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/proto.Dir/Endpoint",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DirServer).Endpoint(ctx, req.(*EndpointRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Dir_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PingRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(DirServer).Ping(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/proto.Dir/Ping",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DirServer).Ping(ctx, req.(*PingRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Dir_Lookup_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DirLookupRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(DirServer).Lookup(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/proto.Dir/Lookup",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DirServer).Lookup(ctx, req.(*DirLookupRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Dir_Put_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DirPutRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(DirServer).Put(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/proto.Dir/Put",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DirServer).Put(ctx, req.(*DirPutRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Dir_Glob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DirGlobRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(DirServer).Glob(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/proto.Dir/Glob",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DirServer).Glob(ctx, req.(*DirGlobRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Dir_Delete_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DirDeleteRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(DirServer).Delete(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/proto.Dir/Delete",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DirServer).Delete(ctx, req.(*DirDeleteRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Dir_WhichAccess_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DirWhichAccessRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(DirServer).WhichAccess(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/proto.Dir/WhichAccess",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DirServer).WhichAccess(ctx, req.(*DirWhichAccessRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _Dir_Watch_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(DirServer).Watch(&dirWatchServer{stream})
-}
-
-type Dir_WatchServer interface {
-	Send(*Event) error
-	Recv() (*DirWatchRequest, error)
-	grpc.ServerStream
-}
-
-type dirWatchServer struct {
-	grpc.ServerStream
-}
-
-func (x *dirWatchServer) Send(m *Event) error {
-	return x.ServerStream.SendMsg(m)
-}
-
-func (x *dirWatchServer) Recv() (*DirWatchRequest, error) {
-	m := new(DirWatchRequest)
-	if err := x.ServerStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-var _Dir_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "proto.Dir",
-	HandlerType: (*DirServer)(nil),
-	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "Endpoint",
-			Handler:    _Dir_Endpoint_Handler,
-		},
-		{
-			MethodName: "Ping",
-			Handler:    _Dir_Ping_Handler,
-		},
-		{
-			MethodName: "Lookup",
-			Handler:    _Dir_Lookup_Handler,
-		},
-		{
-			MethodName: "Put",
-			Handler:    _Dir_Put_Handler,
-		},
-		{
-			MethodName: "Glob",
-			Handler:    _Dir_Glob_Handler,
-		},
-		{
-			MethodName: "Delete",
-			Handler:    _Dir_Delete_Handler,
-		},
-		{
-			MethodName: "WhichAccess",
-			Handler:    _Dir_WhichAccess_Handler,
-		},
-	},
-	Streams: []grpc.StreamDesc{
-		{
-			StreamName:    "Watch",
-			Handler:       _Dir_Watch_Handler,
-			ServerStreams: true,
-			ClientStreams: true,
-		},
-	},
-	Metadata: "upspin.proto",
 }
 
 func init() { proto1.RegisterFile("upspin.proto", fileDescriptor0) }

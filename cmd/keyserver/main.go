@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Keyserver is a wrapper for a key implementation that presents it as a GRPC
+// Keyserver is a wrapper for a key implementation that presents it as an HTTP
 // interface.
 package main
 

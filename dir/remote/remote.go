@@ -114,100 +114,6 @@ func (r *remote) invoke(op *operation, method string, req pb.Message) (*upspin.D
 // Watch implements upspin.DirServer.
 func (r *remote) Watch(name upspin.PathName, order int64, done <-chan struct{}) (<-chan upspin.Event, error) {
 	return nil, upspin.ErrNotSupported
-
-	/*
-			op := r.opf("Watch", "%q %d", name, order)
-
-			gCtx, callOpt, finishAuth, err := r.NewAuthContext()
-			if err != nil {
-				return nil, op.error(err)
-			}
-			srvStream, err := r.dirClient.Watch(gCtx, callOpt)
-			err = finishAuth(err)
-			if err != nil {
-				return nil, op.error(err)
-			}
-			req := &proto.DirWatchRequest{
-				Name:  string(name),
-				Order: order,
-			}
-			err = srvStream.Send(req)
-			if err != nil {
-				return nil, op.error(err)
-			}
-
-			// First event back determines if Watch call was successful.
-			protoEvent, err := srvStream.Recv()
-			if err != nil {
-				return nil, op.error(err)
-			}
-			event, err := proto.UpspinEvent(protoEvent)
-			if err != nil {
-				return nil, op.error(err)
-			}
-			if event.Error != nil {
-				return nil, event.Error
-			}
-			// Assert event.Entry is nil, since this is a synthetic event, which
-			// serves to confirm whether Watch succeeded or not.
-			if event.Entry != nil {
-				return nil, op.error(errors.Internal, errors.Str("first event must have nil entry"))
-			}
-			// No error on Watch. Establish output channel.
-			events := make(chan upspin.Event, 1)
-			serverDone := make(chan struct{})
-			go r.watchDone(op, srvStream, events, done, serverDone)
-			go r.watch(op, srvStream, events, serverDone)
-			return events, nil
-		}
-
-		// watchDone, which runs in a goroutine, waits for either the client to close
-		// its done channel or the server to close its Events channel. When either one
-		// happens it closes the send-side GRPC stream, which in turn signals the server
-		// to finish up on its side.
-		func (r *remote) watchDone(op *operation, srvStream proto.Dir_WatchClient, events chan upspin.Event, done, serverDone <-chan struct{}) {
-			select {
-			case <-done:
-				op.logf("Client closed done channel")
-			case <-serverDone:
-				op.logf("Server closed events channel")
-			}
-			srvStream.CloseSend()
-		}
-
-		// watch, which runs in a goroutine, receives events from the server and relays
-		// them to the client onto the events channel. When the server terminates the
-		// stream (sends the error io.EOF), we close the events channel and notify the
-		// other goroutine that we've terminated.
-		//
-		// Note: there's no need for the sending of events to time out since this is
-		// the client side. It can hang forever. But it probably won't because all other
-		// layers have timeouts.
-		func (r *remote) watch(op *operation, srvStream proto.Dir_WatchClient, events chan upspin.Event, serverDone chan struct{}) {
-			defer close(events)
-			defer close(serverDone) // tell the other goroutine the server is done.
-
-			for {
-				protoEvent, err := srvStream.Recv()
-				if err == io.EOF {
-					// Server closed the channel. Nothing else to do but to
-					// close ours too.
-					return
-				}
-				if err != nil {
-					op.logErr(err)
-					events <- upspin.Event{Error: err}
-					return
-				}
-				event, err := proto.UpspinEvent(protoEvent)
-				if err != nil {
-					op.logErr(err)
-					events <- upspin.Event{Error: err}
-					return
-				}
-				events <- *event
-			}
-	*/
 }
 
 // Endpoint implements upspin.StoreServer.Endpoint.
@@ -223,7 +129,7 @@ func dialCache(op *operation, context upspin.Context, proxyFor upspin.Endpoint) 
 	}
 
 	// Call the cache. The cache is local so don't bother with TLS.
-	authClient, err := auth.NewHTTPClient(context, ce.NetAddr, auth.NoSecurity, proxyFor)
+	authClient, err := auth.NewClient(context, ce.NetAddr, auth.NoSecurity, proxyFor)
 	if err != nil {
 		// On error dial direct.
 		op.error(errors.IO, err)
@@ -252,7 +158,7 @@ func (r *remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service
 		return svc, nil
 	}
 
-	authClient, err := auth.NewHTTPClient(context, e.NetAddr, auth.Secure, upspin.Endpoint{})
+	authClient, err := auth.NewClient(context, e.NetAddr, auth.Secure, upspin.Endpoint{})
 	if err != nil {
 		return nil, op.error(errors.IO, err)
 	}
