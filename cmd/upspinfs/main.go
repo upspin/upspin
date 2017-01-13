@@ -78,7 +78,7 @@ func startCache(ctx upspin.Context) {
 	}
 
 	// Dial the cache server.
-	ac, err := auth.NewClient(ctx, ce.NetAddr, 0, auth.NoSecurity, ce)
+	ac, err := auth.NewClient(ctx, ce.NetAddr, auth.NoSecurity, ce)
 	if err == nil {
 		ac.Close()
 		return // cache server running
@@ -105,7 +105,7 @@ func startCache(ctx upspin.Context) {
 			return
 		default:
 		}
-		ac, err := auth.NewClient(ctx, ce.NetAddr, 0, auth.NoSecurity, ce)
+		ac, err := auth.NewClient(ctx, ce.NetAddr, auth.NoSecurity, ce)
 		if err == nil {
 			fmt.Printf("Upspinfs started a cacheserver\n")
 			ac.Close()

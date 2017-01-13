@@ -2,10 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package auth handles authenticating users using GRPC.
+// Package auth handles authenticating users using HTTP.
 package auth
-
-// TODO(adg): remove the GRPC stuff
 
 import (
 	"crypto/rand"
@@ -18,8 +16,6 @@ import (
 
 	pb "github.com/golang/protobuf/proto"
 	gContext "golang.org/x/net/context"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/metadata"
 
 	"upspin.io/errors"
 	"upspin.io/factotum"
@@ -39,20 +35,16 @@ var (
 )
 
 const (
-	// authTokenKey is the key in the context's metadata for the auth token.
-	authTokenKey    = "upspinauthtoken" // must be all lower case.
+	// authTokenHeader is the key in the context's metadata for the auth token.
 	authTokenHeader = "Upspin-Auth-Token"
 
-	// authRequestKey is the key for inline user authentication.
-	authRequestKey    = "upspinauthrequest"
+	// authRequestHeader is the key for inline user authentication.
 	authRequestHeader = "Upspin-Auth-Request"
 
-	// authErrorKey is the key for inline user authentication errors.
-	authErrorKey    = "upspinautherror"
+	// authErrorHeader is the key for inline user authentication errors.
 	authErrorHeader = "Upspin-Auth-Error"
 
-	// proxyRequestKey key is for inline proxy configuration requests.
-	proxyRequestKey    = "upspinproxyrequest"
+	// proxyRequestHeader key is for inline proxy configuration requests.
 	proxyRequestHeader = "Upspin-Proxy-Request"
 
 	// authTokenEntropyLen is the size of random bytes in an auth token.
@@ -64,23 +56,6 @@ const (
 	// serverAuthMagic is a string used in validating the server's user name.
 	serverAuthMagic = " AuthenticateServer "
 )
-
-// Server provides a mechanism for GRPC servers to manage sessions
-// and implements the GRPC Ping method shared by all Upspin servers.
-// It should be embedded in any Upspin GRPC server implementations.
-type Server interface {
-	// SessionFromContext looks for an authentication request or token in
-	// the context's GRPC headers, and returns a new or existing session
-	// (if available).
-	SessionFromContext(ctx gContext.Context) (Session, error)
-
-	// Ping is the GRPC Ping method shared by all Upspin GRPC servers.
-	Ping(gContext gContext.Context, req *proto.PingRequest) (*proto.PingResponse, error)
-
-	// If a Server is configured with a Service then it will implement
-	// an HTTP handler that services that service by HTTP.
-	http.Handler
-}
 
 // Service describes an RPC service.
 type Service struct {
@@ -107,7 +82,7 @@ type ServerConfig struct {
 
 // NewServer returns a new Server that uses the given config.
 // If a nil config is provided the defaults are used.
-func NewServer(ctx upspin.Context, cfg *ServerConfig) Server {
+func NewServer(ctx upspin.Context, cfg *ServerConfig) http.Handler {
 	return &serverImpl{
 		context: ctx,
 		config:  cfg,
@@ -118,8 +93,6 @@ type serverImpl struct {
 	context upspin.Context
 	config  *ServerConfig
 }
-
-var _ Server = (*serverImpl)(nil)
 
 func (s *serverImpl) lookup(u upspin.UserName) (upspin.PublicKey, error) {
 	if s.config == nil || s.config.Lookup == nil {
@@ -195,46 +168,6 @@ func (s *serverImpl) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Write(payload)
 }
 
-// SessionFromContext looks for an authentication token or request in the
-// given context, finds or creates a session for that token or request,
-// and returns that session.
-func (s *serverImpl) SessionFromContext(ctx gContext.Context) (session Session, err error) {
-	const op = "grpc/auth.SessionFromContext"
-	defer func() {
-		if err == nil {
-			return
-		}
-		// Capture session setup errors and
-		// send them to the client in a GRPC header.
-		header := metadata.MD{authErrorKey: []string{err.Error()}}
-		if err := grpc.SendHeader(ctx, header); err != nil {
-			log.Error.Printf("%v: failed to send GRPC header: %v", op, err)
-		}
-		// Attach the op to the error here, because the client doesn't
-		// care that this error originated in this function.
-		err = errors.E(op, err)
-	}()
-	md, ok := metadata.FromContext(ctx)
-	if !ok {
-		return nil, errors.E(errors.Invalid, errors.Str("invalid request metadata"))
-	}
-	if tok, ok := md[authTokenKey]; ok && len(tok) == 1 {
-		return s.validateToken(tok[0])
-	}
-	proxyRequest, ok := md[proxyRequestKey]
-	if ok && len(proxyRequest) != 1 {
-		return nil, errors.E(errors.Invalid, errors.Str("invalid proxy request in metadata"))
-	}
-	authRequest, ok := md[authRequestKey]
-	if ok && len(authRequest) != 4 {
-		return nil, errors.E(errors.Invalid, errors.Str("invalid auth request in metadata"))
-	}
-	if authRequest == nil {
-		return nil, errors.E(errors.Invalid, errors.Str("no auth token or request in metadata"))
-	}
-	return s.handleSessionRequest(ctx, authRequest, proxyRequest)
-}
-
 func (s *serverImpl) SessionForRequest(w http.ResponseWriter, r *http.Request) (session Session, err error) {
 	const op = "grpc/auth.SessionForRequest"
 	defer func() {
@@ -263,7 +196,7 @@ func (s *serverImpl) SessionForRequest(w http.ResponseWriter, r *http.Request) (
 		log.Printf("%#v", r.Header)
 		return nil, errors.E(errors.Invalid, errors.Str("no auth token or request in header"))
 	}
-	return s.handleSessionRequestHTTP(w, authRequest, proxyRequest)
+	return s.handleSessionRequest(w, authRequest, proxyRequest)
 }
 
 // Ping implements Pinger.
@@ -294,59 +227,7 @@ func (s *serverImpl) validateToken(authToken string) (Session, error) {
 	return session, nil
 }
 
-func (s *serverImpl) handleSessionRequest(ctx gContext.Context, authRequest []string, proxyRequest []string) (Session, error) {
-	// Validate the username.
-	user := upspin.UserName(authRequest[0])
-	if err := valid.UserName(user); err != nil {
-		return nil, errors.E(user, err)
-	}
-
-	// Get user's public key.
-	key, err := s.lookup(user)
-	if err != nil {
-		return nil, errors.E(user, err)
-	}
-
-	now := time.Now()
-
-	// Validate signature.
-	if err := verifyUser(key, authRequest, clientAuthMagic, now); err != nil {
-		return nil, errors.E(errors.Permission, user, errors.Errorf("invalid signature: %v", err))
-	}
-
-	// Generate an auth token and bind it to a session for the client.
-	expiration := now.Add(authTokenDuration)
-	authToken, err := generateRandomToken()
-	if err != nil {
-		return nil, err
-	}
-	header := metadata.MD{authTokenKey: []string{authToken}}
-
-	// If there is a proxy request, remember the proxy's endpoint and authenticate server to client.
-	ep := &upspin.Endpoint{}
-	if len(proxyRequest) == 1 {
-		ep, err = upspin.ParseEndpoint(proxyRequest[0])
-		if err != nil {
-			return nil, errors.E(errors.Invalid, errors.Errorf("invalid proxy endpoint: %v", err))
-		}
-		// Authenticate the server to the user.
-		authMsg, err := signUser(s.context, serverAuthMagic)
-		if err != nil {
-			return nil, errors.E(errors.Permission, err)
-		}
-		header[authRequestKey] = authMsg
-	}
-
-	session := NewSession(user, expiration, authToken, ep, nil)
-	if err := grpc.SendHeader(ctx, header); err != nil {
-		return nil, err
-	}
-	return session, nil
-}
-
-// handleSessionRequestHTTP is a copy of handleSessionRequest but it writes
-// auth tokens to an HTTP response. TODO(adg): delete handleSessionRequest
-func (s *serverImpl) handleSessionRequestHTTP(w http.ResponseWriter, authRequest []string, proxyRequest []string) (Session, error) {
+func (s *serverImpl) handleSessionRequest(w http.ResponseWriter, authRequest []string, proxyRequest []string) (Session, error) {
 	// Validate the username.
 	user := upspin.UserName(authRequest[0])
 	if err := valid.UserName(user); err != nil {
@@ -392,12 +273,12 @@ func (s *serverImpl) handleSessionRequestHTTP(w http.ResponseWriter, authRequest
 	return NewSession(user, expiration, authToken, ep, nil), nil
 }
 
-// verifyUser verifies a GRPC context header authenticating the remote user.
+// verifyUser authenticates the remote user.
 //
 // The message is a slice of strings of the form: user, time, sig.R, sig.S
 func verifyUser(key upspin.PublicKey, msg []string, magic string, now time.Time) error {
 	if len(msg) != 4 {
-		return errors.Str("bad GRPC header")
+		return errors.Str("bad header")
 	}
 
 	// Make sure the challenge time is sane.
@@ -429,7 +310,7 @@ func verifyUser(key upspin.PublicKey, msg []string, magic string, now time.Time)
 	return nil
 }
 
-// signUser creates a GRPC context header authenticating the local user.
+// signUser creates a header authenticating the local user.
 func signUser(ctx upspin.Context, magic string) ([]string, error) {
 	if ctx == nil {
 		return nil, errors.Str("nil context")

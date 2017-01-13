@@ -23,7 +23,7 @@ import (
 	"upspin.io/upspin/proto"
 )
 
-// server is a SecureServer that talks to a DirServer interface and serves GRPC requests.
+// server is a SecureServer that talks to a DirServer interface and serves requests.
 type server struct {
 	ctx  upspin.Context
 	clog *clog
@@ -49,11 +49,11 @@ func New(ctx upspin.Context, cacheDir string, maxLogBytes int64) (http.Handler, 
 		Service: auth.Service{
 			Name: "Dir",
 			Methods: auth.Methods{
-				"Delete": s.Delete,
-				"Glob":   s.Glob,
-				"Lookup": s.Lookup,
-				"Put":    s.Put,
-				//"Watch":       s.Watch,
+				"Delete":      s.Delete,
+				"Glob":        s.Glob,
+				"Lookup":      s.Lookup,
+				"Put":         s.Put,
+				"Watch":       s.Watch,
 				"WhichAccess": s.WhichAccess,
 			},
 		},
