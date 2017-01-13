@@ -229,7 +229,7 @@ func (l *clog) rotateLog() {
 	lfi := &logFileInfo{number: l.highestLogFile}
 	f, err := os.OpenFile(lfi.Name(l.dir), os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0700)
 	if err != nil {
-		log.Info.Printf("%s: %", op, err)
+		log.Info.Printf("%s: %s", op, err)
 		return
 	}
 	log.Debug.Printf("%s: new log file %s", op, f.Name())
@@ -288,8 +288,9 @@ func listSorted(dir string, ascending bool) ([]*logFileInfo, int, error) {
 		if fi == nil {
 			// If it doesn't parse, remove it.
 			if err := os.Remove(infos[i].Name()); err != nil {
-				log.Info.Printf("transport/dircacheserver.listSorted%s: %s", err)
+				log.Info.Printf("transport/dircacheserver.listSorted: %s", err)
 			}
+			continue
 		}
 		lfis = append(lfis, fi)
 		if fi.number > highest {
