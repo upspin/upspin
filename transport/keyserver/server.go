@@ -49,7 +49,7 @@ func New(ctx upspin.Context, key upspin.KeyServer, addr upspin.NetAddr) http.Han
 		},
 		Service: auth.Service{
 			Name: "Key",
-			Methods: auth.Methods{
+			Methods: map[string]auth.Method{
 				"Lookup": s.Lookup,
 				"Put":    s.Put,
 			},

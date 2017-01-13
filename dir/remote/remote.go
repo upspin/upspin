@@ -44,7 +44,7 @@ func (r *remote) Glob(pattern string) ([]*upspin.DirEntry, error) {
 		Pattern: pattern,
 	}
 	resp := new(proto.EntriesError)
-	if err := r.Invoke("Dir/Glob", req, resp); err != nil {
+	if err := r.Invoke("Dir/Glob", req, resp, nil, nil); err != nil {
 		return nil, op.error(errors.IO, err)
 	}
 	err := unmarshalError(resp.Error)
@@ -107,13 +107,64 @@ func (r *remote) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 
 func (r *remote) invoke(op *operation, method string, req pb.Message) (*upspin.DirEntry, error) {
 	resp := new(proto.EntryError)
-	err := r.Invoke(method, req, resp)
+	err := r.Invoke(method, req, resp, nil, nil)
 	return op.entryError(resp, err)
 }
 
 // Watch implements upspin.DirServer.
 func (r *remote) Watch(name upspin.PathName, order int64, done <-chan struct{}) (<-chan upspin.Event, error) {
-	return nil, upspin.ErrNotSupported
+	op := r.opf("Watch", "%q order %s", name, order)
+	req := &proto.DirWatchRequest{
+		Name:  string(name),
+		Order: order,
+	}
+
+	stream := make(eventStream)
+	events := make(chan upspin.Event)
+	go func() {
+		defer close(events)
+		for {
+			select {
+			case ep, ok := <-stream:
+				if !ok {
+					return
+				}
+				e, err := proto.UpspinEvent(&ep)
+				if err != nil {
+					op.logErr(err)
+					return
+				}
+				events <- *e
+			case <-done:
+			}
+		}
+	}()
+
+	if err := r.Invoke("Dir/Watch", req, nil, stream, done); err != nil {
+		close(stream)
+		return nil, op.error(err)
+	}
+	return events, nil
+}
+
+type eventStream chan proto.Event
+
+func (s eventStream) Send(b []byte, done <-chan struct{}) error {
+	var e proto.Event
+	if err := pb.Unmarshal(b, &e); err != nil {
+		return err
+	}
+	select {
+	case s <- e:
+	case <-done:
+	}
+	return nil
+}
+
+func (s eventStream) Close() { close(s) }
+
+func (s eventStream) Error(err error) {
+	s <- proto.Event{Error: errors.MarshalError(err)}
 }
 
 // Endpoint implements upspin.StoreServer.Endpoint.

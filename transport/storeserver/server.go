@@ -37,7 +37,7 @@ func New(ctx upspin.Context, store upspin.StoreServer, _ upspin.NetAddr) http.Ha
 	return auth.NewServer(ctx, &auth.ServerConfig{
 		Service: auth.Service{
 			Name: "Store",
-			Methods: auth.Methods{
+			Methods: map[string]auth.Method{
 				"Get":    s.Get,
 				"Put":    s.Put,
 				"Delete": s.Delete,

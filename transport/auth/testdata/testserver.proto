@@ -12,7 +12,17 @@ message EchoResponse {
     string payload = 1;
 }
 
+message CountRequest {
+    int32 start = 1;
+    int32 count = 2;
+}
+
+message CountResponse {
+    int32 number = 1;
+}
+
 service TestService {
-	rpc Ping (proto.PingRequest) returns (proto.PingResponse) {}
-	rpc Echo (EchoRequest) returns (EchoResponse) {}
+    rpc Ping (proto.PingRequest) returns (proto.PingResponse) {}
+    rpc Echo (EchoRequest) returns (EchoResponse) {}
+    rpc Count (CountRequest) returns (stream CountResponse) {}
 }
