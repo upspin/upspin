@@ -16,7 +16,7 @@ import (
 // To regenerate the protocol buffer output for this package, run
 //	go generate
 
-//go:generate protoc upspin.proto --go_out=plugins=grpc:.
+//go:generate protoc upspin.proto --go_out=.
 
 // All these converters are an unfortunate side-effect of not letting protobufs rule our types.
 

@@ -17,12 +17,7 @@ package prototest
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
 import math "math"
-import proto1 "upspin.io/upspin/proto"
-
-import (
-	context "golang.org/x/net/context"
-	grpc "google.golang.org/grpc"
-)
+import _ "upspin.io/upspin/proto"
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ = proto.Marshal
@@ -56,111 +51,6 @@ func (*EchoResponse) Descriptor() ([]byte, []int) { return fileDescriptor0, []in
 func init() {
 	proto.RegisterType((*EchoRequest)(nil), "prototest.EchoRequest")
 	proto.RegisterType((*EchoResponse)(nil), "prototest.EchoResponse")
-}
-
-// Reference imports to suppress errors if they are not otherwise used.
-var _ context.Context
-var _ grpc.ClientConn
-
-// This is a compile-time assertion to ensure that this generated file
-// is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion4
-
-// Client API for TestService service
-
-type TestServiceClient interface {
-	Ping(ctx context.Context, in *proto1.PingRequest, opts ...grpc.CallOption) (*proto1.PingResponse, error)
-	Echo(ctx context.Context, in *EchoRequest, opts ...grpc.CallOption) (*EchoResponse, error)
-}
-
-type testServiceClient struct {
-	cc *grpc.ClientConn
-}
-
-func NewTestServiceClient(cc *grpc.ClientConn) TestServiceClient {
-	return &testServiceClient{cc}
-}
-
-func (c *testServiceClient) Ping(ctx context.Context, in *proto1.PingRequest, opts ...grpc.CallOption) (*proto1.PingResponse, error) {
-	out := new(proto1.PingResponse)
-	err := grpc.Invoke(ctx, "/prototest.TestService/Ping", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *testServiceClient) Echo(ctx context.Context, in *EchoRequest, opts ...grpc.CallOption) (*EchoResponse, error) {
-	out := new(EchoResponse)
-	err := grpc.Invoke(ctx, "/prototest.TestService/Echo", in, out, c.cc, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// Server API for TestService service
-
-type TestServiceServer interface {
-	Ping(context.Context, *proto1.PingRequest) (*proto1.PingResponse, error)
-	Echo(context.Context, *EchoRequest) (*EchoResponse, error)
-}
-
-func RegisterTestServiceServer(s *grpc.Server, srv TestServiceServer) {
-	s.RegisterService(&_TestService_serviceDesc, srv)
-}
-
-func _TestService_Ping_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(proto1.PingRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(TestServiceServer).Ping(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/prototest.TestService/Ping",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TestServiceServer).Ping(ctx, req.(*proto1.PingRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _TestService_Echo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(EchoRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(TestServiceServer).Echo(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/prototest.TestService/Echo",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TestServiceServer).Echo(ctx, req.(*EchoRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-var _TestService_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "prototest.TestService",
-	HandlerType: (*TestServiceServer)(nil),
-	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "Ping",
-			Handler:    _TestService_Ping_Handler,
-		},
-		{
-			MethodName: "Echo",
-			Handler:    _TestService_Echo_Handler,
-		},
-	},
-	Streams:  []grpc.StreamDesc{},
-	Metadata: "testserver.proto",
 }
 
 func init() { proto.RegisterFile("testserver.proto", fileDescriptor0) }
