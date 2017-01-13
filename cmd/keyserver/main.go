@@ -16,11 +16,11 @@ import (
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/flags"
-	"upspin.io/grpc/keyserver"
 	"upspin.io/key/gcp"
 	"upspin.io/key/inprocess"
 	"upspin.io/log"
 	"upspin.io/metric"
+	"upspin.io/transport/keyserver"
 	"upspin.io/upspin"
 
 	// Load required transports

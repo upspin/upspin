@@ -15,8 +15,8 @@ import (
 
 	"upspin.io/bind"
 	"upspin.io/errors"
-	"upspin.io/grpc/auth"
 	"upspin.io/log"
+	"upspin.io/transport/auth"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
 )
@@ -184,7 +184,7 @@ func (s *server) Endpoint(session auth.Session, reqBytes []byte) (pb.Message, er
 
 func logf(format string, args ...interface{}) operation {
 	s := fmt.Sprintf(format, args...)
-	log.Debug.Print("grpc/storecacheserver: " + s)
+	log.Debug.Print("transport/storecacheserver: " + s)
 	return operation(s)
 }
 

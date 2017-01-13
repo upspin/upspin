@@ -16,8 +16,8 @@ import (
 
 	"upspin.io/context"
 	"upspin.io/flags"
-	"upspin.io/grpc/auth"
 	"upspin.io/log"
+	"upspin.io/transport/auth"
 	"upspin.io/upspin"
 
 	_ "upspin.io/pack/ee"

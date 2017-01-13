@@ -29,7 +29,7 @@ import (
 
 // Options permits the configuration of TLS certificates for servers running
 // outside GCE. The default is the self-signed certificate in
-// upspin.io/grpc/auth/testdata.
+// upspin.io/transport/auth/testdata.
 type Options struct {
 	// LetsEncryptCache specifies the cache file for Let's Encrypt.
 	// If non-empty, enables Let's Encrypt certificates for this server.
@@ -42,8 +42,8 @@ type Options struct {
 }
 
 var defaultOptions = &Options{
-	CertFile: filepath.Join(os.Getenv("GOPATH"), "/src/upspin.io/grpc/auth/testdata/cert.pem"),
-	KeyFile:  filepath.Join(os.Getenv("GOPATH"), "/src/upspin.io/grpc/auth/testdata/key.pem"),
+	CertFile: filepath.Join(os.Getenv("GOPATH"), "/src/upspin.io/transport/auth/testdata/cert.pem"),
+	KeyFile:  filepath.Join(os.Getenv("GOPATH"), "/src/upspin.io/transport/auth/testdata/key.pem"),
 }
 
 func (opt *Options) applyDefaults() {
