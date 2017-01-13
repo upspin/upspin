@@ -216,8 +216,5 @@ service Dir{
     rpc Glob (DirGlobRequest) returns (EntriesError) {}
     rpc Delete (DirDeleteRequest) returns (EntryError) {}
     rpc WhichAccess (DirWhichAccessRequest) returns (EntryError) {}
-    // DirWatchRequest is only sent once, but it is a stream so that closing the
-    // send-side indicates to the server that the client is done receiving
-    // events.
-    rpc Watch (stream DirWatchRequest) returns (stream Event) {}
+    rpc Watch (DirWatchRequest) returns (stream Event) {}
 }
