@@ -37,7 +37,7 @@ func New(cfg upspin.Config, store upspin.StoreServer, _ upspin.NetAddr) http.Han
 	return auth.NewServer(cfg, &auth.ServerConfig{
 		Service: auth.Service{
 			Name: "Store",
-			Methods: auth.Methods{
+			Methods: map[string]auth.Method{
 				"Get":    s.Get,
 				"Put":    s.Put,
 				"Delete": s.Delete,
