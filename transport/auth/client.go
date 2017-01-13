@@ -7,7 +7,9 @@ package auth
 import (
 	"bytes"
 	"crypto/tls"
+	"encoding/binary"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -28,10 +30,16 @@ type Client interface {
 	Ping() bool
 	Close()
 
-	// Invoke calls the given RPC method ("Server.Method") with the
-	// given request message and decodes the response in to the given
+	// Invoke calls the given RPC method ("Server/Method") with the
+	// given request message and decodes the response into the given
 	// response message.
-	Invoke(method string, req, resp pb.Message) error
+	// TODO: docs
+	Invoke(method string, req, resp pb.Message, stream ResponseChan, done <-chan struct{}) error
+}
+
+type ResponseChan interface {
+	Send(b []byte) error
+	Close()
 }
 
 // SecurityLevel defines the security required of a connection.
@@ -100,8 +108,12 @@ func NewClient(context upspin.Context, netAddr upspin.NetAddr, security Security
 	return c, nil
 }
 
-func (c *httpClient) Invoke(method string, req, resp pb.Message) error {
+func (c *httpClient) Invoke(method string, req, resp pb.Message, stream ResponseChan, done <-chan struct{}) error {
 	const op = "transport/auth.Invoke"
+
+	if (resp == nil) == (stream == nil) {
+		return errors.E(op, errors.Str("exactly one of resp and stream must be nil"))
+	}
 
 	header := make(http.Header)
 
@@ -142,12 +154,12 @@ retryAuth:
 	if err != nil {
 		return errors.E(op, errors.IO, err)
 	}
-	body, err := ioutil.ReadAll(httpResp.Body)
-	httpResp.Body.Close()
-	if err != nil {
-		return errors.E(op, errors.IO, err)
-	}
+	defer httpResp.Body.Close()
+	c.setLastActivity()
+
 	if httpResp.StatusCode != http.StatusOK {
+		body, _ := ioutil.ReadAll(httpResp.Body)
+		httpResp.Body.Close()
 		if haveToken && bytes.Contains(body, []byte(errUnauthenticated.Error())) {
 			// If the server restarted it will have forgotten about
 			// our session, and so our auth token becomes invalid.
@@ -160,14 +172,22 @@ retryAuth:
 		return errors.E(op, errors.IO, errors.Errorf("%s: %s", httpResp.Status, body))
 	}
 
-	// Decode the response.
-	if err := pb.Unmarshal(body, resp); err != nil {
-		return errors.E(op, errors.Invalid, err)
+	if resp != nil {
+		// One-shot method, decode the response.
+		body, _ := ioutil.ReadAll(httpResp.Body)
+		if err != nil {
+			return errors.E(op, errors.IO, err)
+		}
+		if err := pb.Unmarshal(body, resp); err != nil {
+			return errors.E(op, errors.Invalid, err)
+		}
 	}
-	c.setLastActivity()
 
 	if haveToken {
 		// If we already had a token, we're done.
+		if stream != nil {
+			return decodeStream(stream, httpResp.Body, done)
+		}
 		return nil
 	}
 	// Otherwise, process the authentication response.
@@ -195,7 +215,40 @@ retryAuth:
 	}
 
 	c.setAuthToken(token)
+
+	if stream != nil {
+		return decodeStream(stream, httpResp.Body, done)
+	}
 	return nil
+}
+
+func decodeStream(stream ResponseChan, r io.Reader, done <-chan struct{}) error {
+	defer stream.Close()
+
+	var msgLen [4]byte
+	var buf []byte
+	for {
+		// TODO(adg): do something with the done channel here
+		if _, err := io.ReadFull(r, msgLen[:]); err == io.EOF {
+			return nil
+		} else if err != nil {
+			return errors.E(errors.IO, err)
+		}
+		l := binary.BigEndian.Uint32(msgLen[:])
+
+		if cap(buf) < int(l) {
+			buf = make([]byte, l)
+		} else {
+			buf = buf[:l]
+		}
+		if _, err := io.ReadFull(r, buf); err != nil {
+			return errors.E(errors.IO, err)
+		}
+
+		if err := stream.Send(buf); err != nil {
+			return errors.E(errors.IO, err)
+		}
+	}
 }
 
 func isLocal(addr string) bool {
