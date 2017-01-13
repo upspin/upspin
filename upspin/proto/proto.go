@@ -2,8 +2,25 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package proto contains the protocol buffer definitions shared between RPC servers and clients,
-// mirroring the interfaces and types in the upspin package itself.
+// Package proto contains the protocol buffer definitions shared between RPC
+// servers and clients, mirroring the interfaces and types in the upspin
+// package itself.
+//
+// These protocol buffers are used in the networking API to talk to Upspin
+// servers. The wire protocol is described by package upspin.io/transport/auth.
+//
+// Unlike in some other systems, the protocol buffer types themselves are not
+// used within the rest of the Upspin implementation. Instead, native Go types
+// are used internally and they are converted to the protocol buffer types
+// across the boundary. Helper routines in this package assist in the
+// translation.
+//
+// Within the protocol buffers, some of the types are stored as uninterpreted
+// bytes that are transcoded with custom code. For instance, the
+// upspin.io/errors.Error type is transmitted as a byte slice that is marshaled
+// and unmarshaled using the MarshalError and UnmarshalError routines in the
+// errors package. This technique preserves the properties of the Go type across
+// the network.
 package proto
 
 import (
