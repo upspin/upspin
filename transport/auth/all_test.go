@@ -20,8 +20,8 @@ import (
 	"upspin.io/context"
 	"upspin.io/errors"
 	"upspin.io/factotum"
-	prototest "upspin.io/grpc/auth/testdata"
 	"upspin.io/log"
+	prototest "upspin.io/transport/auth/testdata"
 	"upspin.io/upspin"
 )
 

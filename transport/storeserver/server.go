@@ -14,8 +14,8 @@ import (
 
 	"upspin.io/context"
 	"upspin.io/errors"
-	"upspin.io/grpc/auth"
 	"upspin.io/log"
+	"upspin.io/transport/auth"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
 )
@@ -127,7 +127,7 @@ func (s *server) Delete(session auth.Session, reqBytes []byte) (pb.Message, erro
 
 func logf(format string, args ...interface{}) operation {
 	s := fmt.Sprintf(format, args...)
-	log.Info.Print("grpc/storeserver: " + s)
+	log.Info.Print("transport/storeserver: " + s)
 	return operation(s)
 }
 
