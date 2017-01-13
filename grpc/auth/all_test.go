@@ -14,10 +14,9 @@ import (
 	"testing"
 	"time"
 
-	"google.golang.org/grpc"
+	pb "github.com/golang/protobuf/proto"
 
-	gContext "golang.org/x/net/context"
-
+	"upspin.io/bind"
 	"upspin.io/cloud/https"
 	"upspin.io/context"
 	"upspin.io/errors"
@@ -25,21 +24,16 @@ import (
 	prototest "upspin.io/grpc/auth/testdata"
 	"upspin.io/log"
 	"upspin.io/upspin"
+
+	keyServer "upspin.io/key/inprocess"
 )
 
 var (
-	joePublic  = upspin.PublicKey("p256\n104278369061367353805983276707664349405797936579880352274235000127123465616334\n26941412685198548642075210264642864401950753555952207894712845271039438170192\n")
-	user       = upspin.UserName("joe@blow.com")
-	grpcServer *grpc.Server
-	srv        *server
-	cli        *client
+	joePublic = upspin.PublicKey("p256\n104278369061367353805983276707664349405797936579880352274235000127123465616334\n26941412685198548642075210264642864401950753555952207894712845271039438170192\n")
+	user      = upspin.UserName("joe@blow.com")
+	srv       *server
+	cli       *client
 )
-
-type server struct {
-	Server
-	t         *testing.T
-	iteration int
-}
 
 func lookup(userName upspin.UserName) (upspin.PublicKey, error) {
 	if userName == user {
@@ -65,19 +59,39 @@ func startServer() (port string) {
 	srv = &server{Server: NewServer(nil, &ServerConfig{Lookup: lookup})}
 	port = pickPort()
 
-	grpcServer = grpc.NewServer()
-	prototest.RegisterTestServiceServer(grpcServer, srv)
-	http.Handle("/", grpcServer)
+	key := keyServer.New()
+	key.Put(&upspin.User{
+		Name: user,
+	})
+	bind.RegisterKeyServer(upspin.InProcess, key)
 
-	go https.ListenAndServe(nil, "test", fmt.Sprintf("localhost:%s", port), nil)
+	ctx := context.SetUserName(context.New(), user)
+	ctx = context.SetKeyEndpoint(ctx, upspin.Endpoint{Transport: upspin.InProcess})
+	http.Handle("/api/Server/", NewServer(ctx, &ServerConfig{
+		Service: Service{
+			Name: "Server",
+			Methods: Methods{
+				"Echo": srv.Echo,
+			},
+		},
+	}))
+
+	ready := make(chan struct{})
+	go https.ListenAndServe(ready, "test", fmt.Sprintf("localhost:%s", port), nil)
+	<-ready
 	return port
 }
 
-func (s *server) Echo(ctx gContext.Context, req *prototest.EchoRequest) (*prototest.EchoResponse, error) {
-	// Validate that we have a session. If not, it's an auth error.
-	session, err := s.SessionFromContext(ctx)
-	if err != nil {
-		s.t.Fatal(err)
+type server struct {
+	Server
+	t         *testing.T
+	iteration int
+}
+
+func (s *server) Echo(session Session, reqBytes []byte) (pb.Message, error) {
+	var req prototest.EchoRequest
+	if err := pb.Unmarshal(reqBytes, &req); err != nil {
+		return nil, err
 	}
 	if session.User() != user {
 		s.t.Fatalf("Expected user %q, got %q", user, session.User())
@@ -95,23 +109,17 @@ func (s *server) Echo(ctx gContext.Context, req *prototest.EchoRequest) (*protot
 }
 
 type client struct {
-	Client     // For sessions, Ping, and Close.
-	grpcClient prototest.TestServiceClient
-	reqCount   int
+	Client   // For sessions, Ping, and Close.
+	reqCount int
 }
 
 func (c *client) Echo(t *testing.T, payload string) (response string) {
-	gCtx, callOpt, finishAuth, err := c.NewAuthContext()
-	if err != nil {
-		t.Fatal(err)
-	}
 	req := &prototest.EchoRequest{
 		Payload: payload,
 	}
+	resp := new(prototest.EchoResponse)
 	log.Printf("Client: Echo request: %q", req.Payload)
-	resp, err := c.grpcClient.Echo(gCtx, req, callOpt)
-	err = finishAuth(err)
-	if err != nil {
+	if err := c.Invoke("Server/Echo", req, resp); err != nil {
 		t.Fatal(err)
 	}
 	c.reqCount++
@@ -140,7 +148,7 @@ func startClient(port string) {
 	// Try a few times because the server may not be up yet.
 	var authClient Client
 	for i := 0; i < 10; i++ {
-		authClient, err = NewClient(ctx, upspin.NetAddr("localhost:"+port), KeepAliveInterval, Secure, upspin.Endpoint{})
+		authClient, err = NewHTTPClient(ctx, upspin.NetAddr("localhost:"+port), Secure, upspin.Endpoint{})
 		if err == nil {
 			break
 		}
@@ -149,11 +157,8 @@ func startClient(port string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	grpcClient := prototest.NewTestServiceClient(authClient.GRPCConn())
-	authClient.SetService(grpcClient)
 	cli = &client{
-		Client:     authClient,
-		grpcClient: grpcClient,
+		Client: authClient,
 	}
 }
 
@@ -199,7 +204,6 @@ func TestMain(m *testing.M) {
 	// Terminate cleanly.
 	log.Printf("Finishing...")
 	cli.Close()
-	grpcServer.Stop()
 
 	// Report test results.
 	log.Printf("Finishing e2e tests: %d", code)
