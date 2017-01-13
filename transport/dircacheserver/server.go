@@ -48,7 +48,7 @@ func New(cfg upspin.Config, cacheDir string, maxLogBytes int64) (http.Handler, e
 	return auth.NewServer(cfg, &auth.ServerConfig{
 		Service: auth.Service{
 			Name: "Dir",
-			Methods: auth.Methods{
+			Methods: map[string]auth.Method{
 				"Delete":      s.Delete,
 				"Glob":        s.Glob,
 				"Lookup":      s.Lookup,
