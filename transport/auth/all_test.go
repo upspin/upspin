@@ -62,8 +62,11 @@ func startServer() (port string) {
 		Lookup: lookup,
 		Service: Service{
 			Name: "Server",
-			Methods: Methods{
+			Methods: map[string]Method{
 				"Echo": srv.Echo,
+			},
+			Streams: map[string]Stream{
+				"Count": srv.Count,
 			},
 		},
 	}))
@@ -99,6 +102,30 @@ func (s *server) Echo(session Session, reqBytes []byte) (pb.Message, error) {
 	return nil, nil // not reached
 }
 
+func (s *server) Count(session Session, reqBytes []byte, done <-chan struct{}) (<-chan pb.Message, error) {
+	var req prototest.CountRequest
+	if err := pb.Unmarshal(reqBytes, &req); err != nil {
+		return nil, err
+	}
+	log.Printf("Server: Count request: %d", req.Start)
+
+	out := make(chan pb.Message)
+	go func() {
+		defer close(out)
+		for i := req.Start; i < req.Start+req.Count; i++ {
+			resp := &prototest.CountResponse{
+				Number: i,
+			}
+			select {
+			case out <- resp:
+			case <-done:
+				return
+			}
+		}
+	}()
+	return out, nil
+}
+
 type client struct {
 	Client   // For sessions, Ping, and Close.
 	reqCount int
@@ -110,11 +137,60 @@ func (c *client) Echo(t *testing.T, payload string) (response string) {
 	}
 	resp := new(prototest.EchoResponse)
 	log.Printf("Client: Echo request: %q", req.Payload)
-	if err := c.Invoke("Server/Echo", req, resp); err != nil {
+	if err := c.Invoke("Server/Echo", req, resp, nil, nil); err != nil {
 		t.Fatal(err)
 	}
 	c.reqCount++
 	return resp.Payload
+}
+
+func (c *client) Count(t *testing.T, start, count int32) {
+	req := &prototest.CountRequest{
+		Start: start,
+		Count: count,
+	}
+	stream := make(countStream)
+	done := make(chan struct{})
+	go func() {
+		defer close(done)
+		for i := int32(0); ; i++ {
+			resp, ok := <-stream
+			if !ok {
+				if i == count {
+					break
+				}
+				t.Fatalf("stream closed after receiving %v items, want %v", i, count)
+			}
+			log.Printf("Client: Count response: %d", resp.Number)
+			if got, want := resp.Number, start+int32(i); got != want {
+				t.Fatalf("stream message out of order, got %v want %v", got, want)
+			}
+		}
+	}()
+	if err := c.Invoke("Server/Count", req, nil, stream, done); err != nil {
+		t.Fatal("Count:", err)
+	}
+}
+
+type countStream chan prototest.CountResponse
+
+func (s countStream) Send(b []byte, done <-chan struct{}) error {
+	var e prototest.CountResponse
+	if err := pb.Unmarshal(b, &e); err != nil {
+		return err
+	}
+	select {
+	case s <- e:
+	case <-done:
+	}
+	return nil
+}
+
+func (s countStream) Close() {
+	close(s)
+}
+
+func (s countStream) Error(err error) {
 }
 
 func startClient(port string) {
@@ -174,6 +250,8 @@ func TestAll(t *testing.T) {
 	if cli.reqCount != srv.iteration {
 		t.Errorf("Expected client to be on iteration %d, was on %d", srv.iteration, cli.reqCount)
 	}
+
+	cli.Count(t, 0, 5)
 }
 
 var (

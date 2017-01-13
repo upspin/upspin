@@ -49,7 +49,7 @@ func New(cfg upspin.Config, key upspin.KeyServer, addr upspin.NetAddr) http.Hand
 		},
 		Service: auth.Service{
 			Name: "Key",
-			Methods: auth.Methods{
+			Methods: map[string]auth.Method{
 				"Lookup": s.Lookup,
 				"Put":    s.Put,
 			},
