@@ -52,7 +52,7 @@ var tokenFreshnessDuration = authTokenDuration - time.Hour
 
 type httpClient struct {
 	client   *http.Client
-	netAddr  upspin.NetAddr
+	baseURL  string
 	proxyFor upspin.Endpoint // the server is a proxy for this endpoint.
 
 	clientAuth
@@ -68,7 +68,6 @@ func NewClient(context upspin.Context, netAddr upspin.NetAddr, security Security
 	const op = "transport/auth.NewClient"
 
 	c := &httpClient{
-		netAddr:  netAddr,
 		proxyFor: proxyFor,
 	}
 	c.clientAuth.context = context
@@ -80,9 +79,10 @@ func NewClient(context upspin.Context, netAddr upspin.NetAddr, security Security
 		if !isLocal(string(netAddr)) {
 			return nil, errors.E(op, netAddr, errors.IO, errors.Str("insecure dial to non-loopback destination"))
 		}
-		tlsConfig = &tls.Config{InsecureSkipVerify: true}
+		c.baseURL = "http://" + string(netAddr)
 	case Secure:
 		tlsConfig = &tls.Config{RootCAs: context.CertPool()}
+		c.baseURL = "https://" + string(netAddr)
 	default:
 		return nil, errors.E(op, errors.Invalid, errors.Errorf("invalid security level to NewClient: %v", security))
 	}
@@ -132,7 +132,7 @@ retryAuth:
 	header.Set("Content-Type", "application/octet-stream")
 
 	// Make the HTTP request.
-	url := fmt.Sprintf("https://%s/api/%s", c.netAddr, method)
+	url := fmt.Sprintf("%s/api/%s", c.baseURL, method)
 	httpReq, err := http.NewRequest("POST", url, bytes.NewReader(payload))
 	if err != nil {
 		return errors.E(op, errors.Invalid, err)
