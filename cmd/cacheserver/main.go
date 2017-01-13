@@ -13,9 +13,9 @@ import (
 
 	"upspin.io/context"
 	"upspin.io/flags"
-	"upspin.io/grpc/dircacheserver"
-	"upspin.io/grpc/storecacheserver"
 	"upspin.io/log"
+	"upspin.io/transport/dircacheserver"
+	"upspin.io/transport/storecacheserver"
 	"upspin.io/upspin"
 
 	// Load required transports

@@ -148,7 +148,7 @@ const LRUMax = 10000
 // - maxDisk is an approximate limit on disk space for log files
 // - userToDirServer is a map from user names to directory endpoints, maintained by the server
 func openLog(ctx upspin.Context, dir string, maxDisk int64, userToDirServer *userToDirServer) (*clog, error) {
-	const op = "grpc/dircacheserver.openLog"
+	const op = "transport/dircacheserver.openLog"
 	if err := os.MkdirAll(dir, 0700); err != nil {
 		return nil, err
 	}
@@ -203,7 +203,7 @@ func openLog(ctx upspin.Context, dir string, maxDisk int64, userToDirServer *use
 // rotateLog creates a new log file and removes enough old ones to stay under
 // the l.maxDisk limit.
 func (l *clog) rotateLog() {
-	const op = "grpc/dircacheserver.rotateLog"
+	const op = "transport/dircacheserver.rotateLog"
 
 	l.flush()
 
@@ -288,7 +288,7 @@ func listSorted(dir string, ascending bool) ([]*logFileInfo, int, error) {
 		if fi == nil {
 			// If it doesn't parse, remove it.
 			if err := os.Remove(infos[i].Name()); err != nil {
-				log.Info.Printf("grpc/dircacheserver.listSorted%s: %s", err)
+				log.Info.Printf("transport/dircacheserver.listSorted%s: %s", err)
 			}
 		}
 		lfis = append(lfis, fi)
@@ -337,7 +337,7 @@ func (l *clog) rotater() {
 
 // readLogFile reads a single log file. The log file must begin and end with a version record.
 func (l *clog) readLogFile(fn string) error {
-	const op = "grpc/dircacheserver.readLogFile"
+	const op = "transport/dircacheserver.readLogFile"
 
 	log.Debug.Printf("%s: %s", op, fn)
 
@@ -641,7 +641,7 @@ func (l *clog) logGlobRequest(pattern upspin.PathName, err error, entries []*ups
 
 // append appends a clogEntry to the end of the clog and replaces existing in the LRU.
 func (l *clog) append(e *clogEntry) error {
-	const op = "grpc/dircacheserver.append"
+	const op = "transport/dircacheserver.append"
 
 	l.updateLRU(e)
 	l.appendToLogFile(e)

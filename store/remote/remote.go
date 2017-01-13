@@ -11,8 +11,8 @@ import (
 
 	"upspin.io/bind"
 	"upspin.io/errors"
-	"upspin.io/grpc/auth"
 	"upspin.io/log"
+	"upspin.io/transport/auth"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
 )

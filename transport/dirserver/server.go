@@ -14,8 +14,8 @@ import (
 
 	"upspin.io/context"
 	"upspin.io/errors"
-	"upspin.io/grpc/auth"
 	"upspin.io/log"
+	"upspin.io/transport/auth"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
 )
@@ -158,7 +158,7 @@ func (s *server) WhichAccess(session auth.Session, reqBytes []byte) (pb.Message,
 
 func logf(format string, args ...interface{}) operation {
 	s := fmt.Sprintf(format, args...)
-	log.Info.Print("grpc/dirserver: " + s)
+	log.Info.Print("transport/dirserver: " + s)
 	return operation(s)
 }
 

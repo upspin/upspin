@@ -171,7 +171,7 @@ func (s *serverImpl) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *serverImpl) SessionForRequest(w http.ResponseWriter, r *http.Request) (session Session, err error) {
-	const op = "grpc/auth.SessionForRequest"
+	const op = "transport/auth.SessionForRequest"
 	defer func() {
 		if err == nil {
 			return

@@ -67,7 +67,7 @@ type httpClient struct {
 // it indicates that this connection is being used to proxy request to that
 // endpoint.
 func NewClient(context upspin.Context, netAddr upspin.NetAddr, security SecurityLevel, proxyFor upspin.Endpoint) (Client, error) {
-	const op = "grpc/auth.NewClient"
+	const op = "transport/auth.NewClient"
 
 	c := &httpClient{
 		netAddr:  netAddr,
@@ -103,7 +103,7 @@ func NewClient(context upspin.Context, netAddr upspin.NetAddr, security Security
 }
 
 func (c *httpClient) Invoke(method string, req, resp pb.Message) error {
-	const op = "grpc/auth.Invoke"
+	const op = "transport/auth.Invoke"
 
 	header := make(http.Header)
 
