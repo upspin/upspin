@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"net/http"
 	ospath "path"
-	"sync"
 
 	pb "github.com/golang/protobuf/proto"
 
@@ -27,22 +26,17 @@ import (
 type server struct {
 	ctx  upspin.Context
 	clog *clog
-
-	// userToDirServer is a mapping of users to directory server endpoints
-	userToDirServer *userToDirServer
 }
 
 // New creates a new DirServer cache reading in the log and writing out a new compacted log.
 func New(ctx upspin.Context, cacheDir string, maxLogBytes int64) (http.Handler, error) {
-	userToDirServer := newUserToDirServer()
-	clog, err := openLog(ctx, ospath.Join(cacheDir, "dircache"), maxLogBytes, userToDirServer)
+	clog, err := openLog(ctx, ospath.Join(cacheDir, "dircache"), maxLogBytes)
 	if err != nil {
 		return nil, err
 	}
 	s := &server{
-		ctx:             ctx,
-		clog:            clog,
-		userToDirServer: userToDirServer,
+		ctx:  ctx,
+		clog: clog,
 	}
 
 	return auth.NewServer(ctx, &auth.ServerConfig{
@@ -68,7 +62,7 @@ func (s *server) dirFor(session auth.Session, path upspin.PathName) (upspin.DirS
 	}
 	dir, err := bind.DirServer(s.ctx, ep)
 	if err == nil {
-		s.userToDirServer.Set(path, &ep)
+		s.clog.proxyFor(path, &ep)
 	}
 	return dir, err
 }
@@ -278,34 +272,4 @@ func entriesError(entries []*upspin.DirEntry, err error) (*proto.EntriesError, e
 
 func globError(err error) *proto.EntriesError {
 	return &proto.EntriesError{Error: errors.MarshalError(err)}
-}
-
-// userToDirServer is a cache from user name to the endpoint of its directory server.
-type userToDirServer struct {
-	sync.Mutex
-	m map[upspin.UserName]*upspin.Endpoint
-}
-
-func newUserToDirServer() *userToDirServer {
-	return &userToDirServer{m: make(map[upspin.UserName]*upspin.Endpoint)}
-}
-
-func (c *userToDirServer) Set(p upspin.PathName, ep *upspin.Endpoint) {
-	c.Lock()
-	if parsed, err := path.Parse(p); err == nil {
-		c.m[parsed.User()] = ep
-	} else {
-		log.Info.Printf("parse error on a cleaned name: %s", p)
-	}
-	c.Unlock()
-}
-
-func (c *userToDirServer) Get(p upspin.PathName) *upspin.Endpoint {
-	c.Lock()
-	defer c.Unlock()
-	if parsed, err := path.Parse(p); err == nil {
-		return c.m[parsed.User()]
-	}
-	log.Info.Printf("parse error on a cleaned name: %s", p)
-	return nil
 }
