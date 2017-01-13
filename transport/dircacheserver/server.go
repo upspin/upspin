@@ -48,7 +48,7 @@ func New(ctx upspin.Context, cacheDir string, maxLogBytes int64) (http.Handler, 
 	return auth.NewServer(ctx, &auth.ServerConfig{
 		Service: auth.Service{
 			Name: "Dir",
-			Methods: auth.Methods{
+			Methods: map[string]auth.Method{
 				"Delete":      s.Delete,
 				"Glob":        s.Glob,
 				"Lookup":      s.Lookup,
