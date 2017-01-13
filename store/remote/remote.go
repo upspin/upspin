@@ -89,7 +89,7 @@ func dialCache(op *operation, context upspin.Context, proxyFor upspin.Endpoint) 
 	}
 
 	// Call the cache. The cache is local so don't bother with TLS.
-	authClient, err := auth.NewHTTPClient(context, ce.NetAddr, auth.NoSecurity, proxyFor)
+	authClient, err := auth.NewClient(context, ce.NetAddr, auth.NoSecurity, proxyFor)
 	if err != nil {
 		// On error dial direct.
 		op.error(errors.IO, err)
@@ -114,13 +114,12 @@ func (r *remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service
 	}
 
 	// First try a cache
-	// TODO(adg): enable this once we have the cache use HTTP
-	//if svc := dialCache(op, context, e); svc != nil {
-	//	return svc, nil
-	//}
+	if svc := dialCache(op, context, e); svc != nil {
+		return svc, nil
+	}
 
 	// Call the server directly.
-	authClient, err := auth.NewHTTPClient(context, e.NetAddr, auth.Secure, upspin.Endpoint{})
+	authClient, err := auth.NewClient(context, e.NetAddr, auth.Secure, upspin.Endpoint{})
 	if err != nil {
 		return nil, op.error(errors.IO, err)
 	}

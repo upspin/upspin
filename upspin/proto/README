@@ -16,7 +16,7 @@ Then, run 'go generate' from this directory to re-generate the package:
 	$ go generate
 
 If you encounter unexpected diffs, such as changes to the
-"ProtoPackageIsVersion3" or "SupportPackageIsVersion4" constants,
-then you may be using the wrong versions of protoc or protoc-gen-go.
-To debug, run  'which protoc' and 'which protoc-gen-go' and check that the
+"ProtoPackageIsVersion3" constants, then you may be using the wrong versions of
+protoc or protoc-gen-go.
+To debug, run 'which protoc' and 'which protoc-gen-go' and check that the
 commands in your path are the ones you just installed.

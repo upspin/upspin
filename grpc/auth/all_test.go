@@ -16,7 +16,6 @@ import (
 
 	pb "github.com/golang/protobuf/proto"
 
-	"upspin.io/bind"
 	"upspin.io/cloud/https"
 	"upspin.io/context"
 	"upspin.io/errors"
@@ -24,8 +23,6 @@ import (
 	prototest "upspin.io/grpc/auth/testdata"
 	"upspin.io/log"
 	"upspin.io/upspin"
-
-	keyServer "upspin.io/key/inprocess"
 )
 
 var (
@@ -56,18 +53,13 @@ func pickPort() (port string) {
 }
 
 func startServer() (port string) {
-	srv = &server{Server: NewServer(nil, &ServerConfig{Lookup: lookup})}
+	srv = &server{}
 	port = pickPort()
-
-	key := keyServer.New()
-	key.Put(&upspin.User{
-		Name: user,
-	})
-	bind.RegisterKeyServer(upspin.InProcess, key)
 
 	ctx := context.SetUserName(context.New(), user)
 	ctx = context.SetKeyEndpoint(ctx, upspin.Endpoint{Transport: upspin.InProcess})
 	http.Handle("/api/Server/", NewServer(ctx, &ServerConfig{
+		Lookup: lookup,
 		Service: Service{
 			Name: "Server",
 			Methods: Methods{
@@ -83,7 +75,6 @@ func startServer() (port string) {
 }
 
 type server struct {
-	Server
 	t         *testing.T
 	iteration int
 }
@@ -148,7 +139,7 @@ func startClient(port string) {
 	// Try a few times because the server may not be up yet.
 	var authClient Client
 	for i := 0; i < 10; i++ {
-		authClient, err = NewHTTPClient(ctx, upspin.NetAddr("localhost:"+port), Secure, upspin.Endpoint{})
+		authClient, err = NewClient(ctx, upspin.NetAddr("localhost:"+port), Secure, upspin.Endpoint{})
 		if err == nil {
 			break
 		}
