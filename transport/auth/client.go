@@ -7,7 +7,9 @@ package auth
 import (
 	"bytes"
 	"crypto/tls"
+	"encoding/binary"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net"
 	"net/http"
@@ -28,10 +30,28 @@ type Client interface {
 	Ping() bool
 	Close()
 
-	// Invoke calls the given RPC method ("Server.Method") with the
-	// given request message and decodes the response in to the given
+	// Invoke calls the given RPC method ("Server/Method") with the
+	// given request message and decodes the response into the given
 	// response message.
-	Invoke(method string, req, resp pb.Message) error
+	// For regular one-shot methods, the stream and done channels must be nil.
+	// For streaming RPC methods, the caller should provide a nil response
+	// and non-nil stream and done channels.
+	Invoke(method string, req, resp pb.Message, stream ResponseChan, done <-chan struct{}) error
+}
+
+// ResponseChan describes a mechanism to report streamed messages to a client
+// (the caller of Client.Invoke). Typically this interface should wrap a
+// channel that carries decoded protocol buffers.
+type ResponseChan interface {
+	// Send sends a proto-encoded message to the client.
+	// If done is closed, the send should abort.
+	Send(b []byte, done <-chan struct{}) error
+
+	// Error sends an error condition to the client.
+	Error(error)
+
+	// Close closes the response channel.
+	Close()
 }
 
 // SecurityLevel defines the security required of a connection.
@@ -100,8 +120,12 @@ func NewClient(cfg upspin.Config, netAddr upspin.NetAddr, security SecurityLevel
 	return c, nil
 }
 
-func (c *httpClient) Invoke(method string, req, resp pb.Message) error {
+func (c *httpClient) Invoke(method string, req, resp pb.Message, stream ResponseChan, done <-chan struct{}) error {
 	const op = "transport/auth.Invoke"
+
+	if (resp == nil) == (stream == nil) {
+		return errors.E(op, errors.Str("exactly one of resp and stream must be nil"))
+	}
 
 	header := make(http.Header)
 
@@ -142,13 +166,13 @@ retryAuth:
 	if err != nil {
 		return errors.E(op, errors.IO, err)
 	}
-	body, err := ioutil.ReadAll(httpResp.Body)
-	httpResp.Body.Close()
-	if err != nil {
-		return errors.E(op, errors.IO, err)
-	}
+	c.setLastActivity()
+	body := httpResp.Body
+
 	if httpResp.StatusCode != http.StatusOK {
-		if haveToken && bytes.Contains(body, []byte(errUnauthenticated.Error())) {
+		msg, _ := ioutil.ReadAll(body)
+		body.Close()
+		if haveToken && bytes.Contains(msg, []byte(errUnauthenticated.Error())) {
 			// If the server restarted it will have forgotten about
 			// our session, and so our auth token becomes invalid.
 			// Invalidate the session and retry this request,
@@ -157,17 +181,26 @@ retryAuth:
 			goto retryAuth
 			// TODO(adg): refactor to get rid of the goto
 		}
-		return errors.E(op, errors.IO, errors.Errorf("%s: %s", httpResp.Status, body))
+		return errors.E(op, errors.IO, errors.Errorf("%s: %s", httpResp.Status, msg))
 	}
 
-	// Decode the response.
-	if err := pb.Unmarshal(body, resp); err != nil {
-		return errors.E(op, errors.Invalid, err)
+	if resp != nil {
+		// One-shot method, decode the response.
+		respBytes, _ := ioutil.ReadAll(body)
+		body.Close()
+		if err != nil {
+			return errors.E(op, errors.IO, err)
+		}
+		if err := pb.Unmarshal(respBytes, resp); err != nil {
+			return errors.E(op, errors.Invalid, err)
+		}
 	}
-	c.setLastActivity()
 
 	if haveToken {
 		// If we already had a token, we're done.
+		if stream != nil {
+			go decodeStream(stream, body, done)
+		}
 		return nil
 	}
 	// Otherwise, process the authentication response.
@@ -177,8 +210,10 @@ retryAuth:
 	if len(token) == 0 {
 		authErr := httpResp.Header.Get(authErrorHeader)
 		if len(authErr) == 0 {
+			body.Close()
 			return errors.E(op, errors.Invalid, errors.Str("server did not respond to our authentication request"))
 		}
+		body.Close()
 		return errors.E(op, errors.Permission, errors.Str(authErr))
 	}
 
@@ -186,16 +221,93 @@ retryAuth:
 	if c.isProxy() {
 		msg, ok := httpResp.Header[authRequestHeader]
 		if !ok {
+			body.Close()
 			return errors.E(op, errors.Permission, errors.Str("proxy server must authenticate"))
 		}
 		if err := c.verifyServerUser(msg); err != nil {
-			log.Error.Printf("%s: client can't verify server user: %s", op, err)
+			body.Close()
 			return errors.E(op, errors.Permission, err)
 		}
 	}
 
 	c.setAuthToken(token)
+
+	if stream != nil {
+		go decodeStream(stream, body, done)
+	}
 	return nil
+}
+
+// decodeStream reads a stream of protobuf-encoded messages from r and sends
+// them (without decoding them) to the given stream. If the done channel is
+// closed then the stream and reader are closed and decodeStream returns.
+func decodeStream(stream ResponseChan, r io.ReadCloser, done <-chan struct{}) {
+	defer stream.Close()
+	defer r.Close()
+
+	// A stream begins with the bytes "OK".
+	var ok [2]byte
+	if _, err := readFull(r, ok[:], done); err != nil {
+		stream.Error(errors.E(errors.IO, err))
+		return
+	}
+	if ok[0] != 'O' || ok[1] != 'K' {
+		stream.Error(errors.E(errors.IO, errors.Str("unexpected stream preamble")))
+	}
+
+	var msgLen [4]byte
+	var buf []byte
+	for {
+		// Messages are of the form
+		// [length, 4 byte, big-endian-encoded int32]
+		// [length bytes of encoded protobuf message]
+		if _, err := readFull(r, msgLen[:], done); err == io.EOF {
+			return
+		} else if err != nil {
+			stream.Error(errors.E(errors.IO, err))
+			return
+		}
+
+		l := binary.BigEndian.Uint32(msgLen[:])
+
+		if cap(buf) < int(l) {
+			buf = make([]byte, l)
+		} else {
+			buf = buf[:l]
+		}
+		if _, err := readFull(r, buf, done); err != nil {
+			stream.Error(errors.E(errors.IO, err))
+			return
+		}
+
+		if err := stream.Send(buf, done); err != nil {
+			stream.Error(errors.E(errors.IO, err))
+			return
+		}
+	}
+}
+
+// readFull is like io.ReadFull but it will return io.EOF if the provided
+// channel is closed.
+func readFull(r io.Reader, b []byte, done <-chan struct{}) (int, error) {
+	type result struct {
+		n   int
+		err error
+	}
+	ch := make(chan result, 1)
+	go func() {
+		// TODO(adg): this may leak goroutines if the requisite reads
+		// never complete, but will that actually happen? It would be
+		// great to have something like this hooked into the runtime.
+		n, err := io.ReadFull(r, b)
+		ch <- result{n, err}
+	}()
+	select {
+	case r := <-ch:
+		return r.n, r.err
+	case <-done:
+		return 0, io.EOF
+	}
 }
 
 func isLocal(addr string) bool {
