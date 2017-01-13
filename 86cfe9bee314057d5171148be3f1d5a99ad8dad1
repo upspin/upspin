@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e3d38de9_49a17793",
+        "filename": "grpc/storecacheserver/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-01-13T00:01:23Z",
+      "side": 1,
+      "message": "No idea.  If so, we should remove this method in all of the servers?",
+      "range": {
+        "startLine": 163,
+        "startChar": 4,
+        "endLine": 163,
+        "endChar": 49
+      },
+      "revId": "86cfe9bee314057d5171148be3f1d5a99ad8dad1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
