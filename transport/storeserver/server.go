@@ -23,21 +23,15 @@ import (
 type server struct {
 	context upspin.Context
 
-	// What this server reports itself as through its Endpoint method.
-	endpoint upspin.Endpoint
-
 	// The underlying storage implementation.
 	store upspin.StoreServer
 }
 
-func New(ctx upspin.Context, store upspin.StoreServer, addr upspin.NetAddr) http.Handler {
+func New(ctx upspin.Context, store upspin.StoreServer, _ upspin.NetAddr) http.Handler {
+	// TODO(adg): remove addr argument
 	s := &server{
 		context: ctx,
-		endpoint: upspin.Endpoint{
-			Transport: upspin.Remote,
-			NetAddr:   addr,
-		},
-		store: store,
+		store:   store,
 	}
 
 	return auth.NewServer(ctx, &auth.ServerConfig{
@@ -56,7 +50,11 @@ func (s *server) serverFor(session auth.Session, reqBytes []byte, req pb.Message
 	if err := pb.Unmarshal(reqBytes, req); err != nil {
 		return nil, err
 	}
-	svc, err := s.store.Dial(context.SetUserName(s.context, session.User()), s.store.Endpoint())
+	e := s.store.Endpoint()
+	if ep := session.ProxiedEndpoint(); ep.Transport != upspin.Unassigned {
+		e = ep
+	}
+	svc, err := s.store.Dial(context.SetUserName(s.context, session.User()), e)
 	if err != nil {
 		return nil, err
 	}
