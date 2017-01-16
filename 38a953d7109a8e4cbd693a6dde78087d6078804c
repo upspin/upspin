@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c3892940_69c4c523",
+        "filename": "cloud/https/https.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-16T00:12:29Z",
+      "side": 1,
+      "message": "uncomment?",
+      "revId": "38a953d7109a8e4cbd693a6dde78087d6078804c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
