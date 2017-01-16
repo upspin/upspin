@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package storecacheserver
+package storecache
 
 import (
 	"errors"
@@ -245,17 +245,21 @@ func (c *storeCache) get(ctx upspin.Context, ref upspin.Reference, e upspin.Endp
 }
 
 // put saves a reference in the cache. put has the same invariants as get.
-func (c *storeCache) put(data []byte, store upspin.StoreServer) (upspin.Reference, error) {
+func (c *storeCache) put(ctx upspin.Context, data []byte, e upspin.Endpoint) (upspin.Reference, error) {
 	// If we can't put it to the store, don't cache.
 	// TODO(p): This will change with a write through cache.
 	// TODO(p): Use refdata information.
+	store, err := bind.StoreServer(ctx, e)
+	if err != nil {
+		return "", err
+	}
 	refdata, err := store.Put(data)
 	if err != nil {
-		return upspin.Reference("???"), err
+		return "", err
 	}
 	ref := refdata.Reference
 
-	file := c.cachePath(ref, store.Endpoint())
+	file := c.cachePath(ref, e)
 	c.enforceByteLimitByRemovingLeastRecentlyUsedFile()
 
 	c.Lock()
@@ -291,12 +295,15 @@ func (c *storeCache) put(data []byte, store upspin.StoreServer) (upspin.Referenc
 // delete removes a reference from the cache.
 // - No locks are held on entry or exit.
 // - If the cache file is busy, don't remove it.
-func (c *storeCache) delete(ref upspin.Reference, store upspin.StoreServer) error {
-	err := store.Delete(ref)
+func (c *storeCache) delete(ctx upspin.Context, ref upspin.Reference, e upspin.Endpoint) error {
+	store, err := bind.StoreServer(ctx, e)
 	if err != nil {
 		return err
 	}
-	file := c.cachePath(ref, store.Endpoint())
+	if err := store.Delete(ref); err != nil {
+		return err
+	}
+	file := c.cachePath(ref, e)
 	c.Lock()
 	defer c.Unlock()
 	value, ok := c.lru.Get(file)
