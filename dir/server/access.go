@@ -168,6 +168,15 @@ func (s *server) hasRight(right access.Right, p path.Parsed, opts ...options) (b
 	if entry != nil {
 		// We have the Access file entry. Get the contents.
 		acc, err = s.getAccess(entry, o)
+		if err != nil {
+			// There was an error acquiring or parsing this Access file.
+			// That means an Access file is recorded here but is invalid,
+			// at least temporarily. Instead of refusing all rights by
+			// returning an error, we log the error and restore default
+			// (owner-only) rights.
+			log.Error.Printf("dir/server: bad Access file %q: %v; using default rights", entry.Name, err)
+			acc, err = s.getDefaultAccess(p.User())
+		}
 	} else {
 		// No Access file exists anywhere. Use an implicit one.
 		// Get the implicit one from the defaultAccess cache.
