@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c3892940_49d621d8",
+        "filename": "store/cache/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-16T01:05:01Z",
+      "side": 1,
+      "message": "this package name should be storecache. the fact that you rename in it its single import is a clue.\nthe name is just too generic when there are so many caches floating around",
+      "revId": "ba2be84100cdca24be5325ee73f38ac32343bbed",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
