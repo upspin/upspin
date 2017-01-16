@@ -16,6 +16,24 @@
       "revId": "38a953d7109a8e4cbd693a6dde78087d6078804c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "03bd01ca_75555b31",
+        "filename": "cloud/https/https.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-01-16T01:04:17Z",
+      "side": 1,
+      "message": "Yes, after I sort out how to get Go 1.8 in GKE.   Timeouts are confusing enough without the version skew between my workstation and the server.",
+      "parentUuid": "c3892940_69c4c523",
+      "revId": "38a953d7109a8e4cbd693a6dde78087d6078804c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
