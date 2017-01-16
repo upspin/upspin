@@ -53,8 +53,7 @@ var requiredAPIs = []string{
 	"container",
 	"dns.googleapis.com",
 	"logging.googleapis.com",
-	"storage-api-json.googleapis.com",
-	"storage-component-json.googleapis.com",
+	"storage_api",
 }
 
 var (
