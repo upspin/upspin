@@ -15,8 +15,10 @@ import (
 	"upspin.io/context"
 	"upspin.io/flags"
 	"upspin.io/log"
+	storeCache "upspin.io/store/cache"
 	"upspin.io/transport/dircacheserver"
-	"upspin.io/transport/storecacheserver"
+	"upspin.io/transport/storeserver"
+
 	"upspin.io/upspin"
 
 	// Load required transports
@@ -66,10 +68,11 @@ func main() {
 	maxRefBytes := (9 * (*cacheSizeFlag)) / 10
 	maxLogBytes := maxRefBytes / 9
 
-	ss, err := storecacheserver.New(ctx, *cacheFlag, maxRefBytes)
+	sc, err := storeCache.New(ctx, *cacheFlag, maxRefBytes)
 	if err != nil {
 		log.Fatalf("opening cache: %s", err)
 	}
+	ss := storeserver.New(ctx, sc, "")
 
 	ds, err := dircacheserver.New(ctx, *cacheFlag, maxLogBytes)
 	if err != nil {
