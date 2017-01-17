@@ -32,31 +32,31 @@ func umountHelper(mountpoint string) error {
 	return cmd.Run()
 }
 
-// testSetup creates a temporary user context with inprocess services.
-func testSetup(name string) (ctx upspin.Config, err error) {
+// testSetup creates a temporary user config with inprocess services.
+func testSetup(name string) (cfg upspin.Config, err error) {
 	endpoint := upspin.Endpoint{
 		Transport: upspin.InProcess,
 		NetAddr:   "", // ignored
 	}
-	ctx = config.New()
-	ctx = config.SetUserName(ctx, upspin.UserName(name))
-	ctx = config.SetPacking(ctx, upspin.DebugPack)
-	ctx = config.SetKeyEndpoint(ctx, endpoint)
-	ctx = config.SetStoreEndpoint(ctx, endpoint)
-	ctx = config.SetDirEndpoint(ctx, endpoint)
+	cfg = config.New()
+	cfg = config.SetUserName(cfg, upspin.UserName(name))
+	cfg = config.SetPacking(cfg, upspin.DebugPack)
+	cfg = config.SetKeyEndpoint(cfg, endpoint)
+	cfg = config.SetStoreEndpoint(cfg, endpoint)
+	cfg = config.SetDirEndpoint(cfg, endpoint)
 
 	bind.RegisterKeyServer(upspin.InProcess, keyserver.New())
 	bind.RegisterStoreServer(upspin.InProcess, storeserver.New())
-	bind.RegisterDirServer(upspin.InProcess, dirserver.New(ctx))
+	bind.RegisterDirServer(upspin.InProcess, dirserver.New(cfg))
 
 	publicKey := upspin.PublicKey(fmt.Sprintf("key for %s", name))
 	user := &upspin.User{
 		Name:      upspin.UserName(name),
-		Dirs:      []upspin.Endpoint{ctx.DirEndpoint()},
-		Stores:    []upspin.Endpoint{ctx.StoreEndpoint()},
+		Dirs:      []upspin.Endpoint{cfg.DirEndpoint()},
+		Stores:    []upspin.Endpoint{cfg.StoreEndpoint()},
 		PublicKey: publicKey,
 	}
-	key, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
+	key, err := bind.KeyServer(cfg, cfg.KeyEndpoint())
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +95,7 @@ func TestShell(t *testing.T) {
 	fmt.Printf("mountpoint is %s\n", mountpoint)
 
 	// Set up a user config.
-	ctx, err := testSetup("tester@google.com")
+	cfg, err := testSetup("tester@google.com")
 	if err != nil {
 		t.Fatal(err.Error())
 	}
@@ -107,7 +107,7 @@ func TestShell(t *testing.T) {
 	}
 
 	// Mount the file system. It will be served in a separate go routine.
-	do(ctx, mountpoint, cacheDir)
+	do(cfg, mountpoint, cacheDir)
 
 	// Run the tests.
 	cmd := exec.Command("./test.sh", mountpoint, "tester@google.com")

@@ -51,7 +51,7 @@ func main() {
 	}
 
 	// Load configuration and keys for this server. It needs a real upspin username and keys.
-	ctx, err := config.FromFile(flags.Config)
+	cfg, err := config.FromFile(flags.Config)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -61,11 +61,11 @@ func main() {
 	err = nil
 	switch flags.ServerKind {
 	case "inprocess":
-		dir = inprocess.New(ctx)
+		dir = inprocess.New(cfg)
 	case "filesystem":
-		dir, err = filesystem.New(ctx, flags.ServerConfig...)
+		dir, err = filesystem.New(cfg, flags.ServerConfig...)
 	case "server":
-		dir, err = server.New(ctx, flags.ServerConfig...)
+		dir, err = server.New(cfg, flags.ServerConfig...)
 	default:
 		err = errors.Errorf("bad -kind %q", flags.ServerKind)
 	}
@@ -77,7 +77,7 @@ func main() {
 	var ready chan struct{}
 	if flags.StoreServerUser != "" {
 		ready := make(chan struct{})
-		dir, err = perm.WrapDir(ctx, ready, upspin.UserName(flags.StoreServerUser), dir)
+		dir, err = perm.WrapDir(cfg, ready, upspin.UserName(flags.StoreServerUser), dir)
 		if err != nil {
 			log.Fatalf("Can't wrap DirServer monitoring %s: %s", flags.StoreServerUser, err)
 		}
@@ -85,7 +85,7 @@ func main() {
 		log.Printf("Warning: no Writers Group file protection -- all access permitted")
 	}
 
-	httpDir := dirserver.New(ctx, dir, upspin.NetAddr(flags.NetAddr))
+	httpDir := dirserver.New(cfg, dir, upspin.NetAddr(flags.NetAddr))
 	http.Handle("/api/Dir/", httpDir)
 
 	https.ListenAndServeFromFlags(ready, serverName)

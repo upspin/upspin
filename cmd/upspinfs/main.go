@@ -38,28 +38,28 @@ func usage() {
 
 func main() {
 	flag.Usage = usage
-	flags.Parse("context", "log")
+	flags.Parse("config", "log")
 
 	if flag.NArg() != 1 {
 		usage()
 	}
 
 	// Normal setup, get configuration from file and push user cache onto config.
-	ctx, err := config.FromFile(flags.Config)
+	cfg, err := config.FromFile(flags.Config)
 	if err != nil {
 		log.Debug.Fatal(err)
 	}
-	transports.Init(ctx)
+	transports.Init(cfg)
 
 	// Start the cache if needed.
-	startCache(ctx)
+	startCache(cfg)
 
 	// Mount the file system and start serving.
 	mountpoint, err := filepath.Abs(flag.Arg(0))
 	if err != nil {
 		log.Fatalf("can't determine absolute path to mount point %s: %s", flag.Arg(0), err)
 	}
-	done := do(ctx, mountpoint, *cacheFlag)
+	done := do(cfg, mountpoint, *cacheFlag)
 	<-done
 }
 
@@ -71,14 +71,14 @@ func defaultCacheDir() string {
 	return homeDir + "/upspin"
 }
 
-func startCache(ctx upspin.Config) {
-	ce := ctx.CacheEndpoint()
+func startCache(cfg upspin.Config) {
+	ce := cfg.CacheEndpoint()
 	if ce.Transport == upspin.Unassigned {
 		return // not using a cache server
 	}
 
 	// Dial the cache server.
-	ac, err := auth.NewClient(ctx, ce.NetAddr, auth.NoSecurity, ce)
+	ac, err := auth.NewClient(cfg, ce.NetAddr, auth.NoSecurity, ce)
 	if err == nil {
 		ac.Close()
 		return // cache server running
@@ -105,7 +105,7 @@ func startCache(ctx upspin.Config) {
 			return
 		default:
 		}
-		ac, err := auth.NewClient(ctx, ce.NetAddr, auth.NoSecurity, ce)
+		ac, err := auth.NewClient(cfg, ce.NetAddr, auth.NoSecurity, ce)
 		if err == nil {
 			fmt.Printf("Upspinfs started a cacheserver\n")
 			ac.Close()

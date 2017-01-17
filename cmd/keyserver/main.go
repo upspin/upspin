@@ -50,8 +50,8 @@ func main() {
 		}
 	}
 
-	// All we need in the context is some user name. It does not need to be registered as a "real" user.
-	ctx := config.SetUserName(config.New(), serverName)
+	// All we need in the config is some user name. It does not need to be registered as a "real" user.
+	cfg := config.SetUserName(config.New(), serverName)
 
 	// Create a new key implementation.
 	var key upspin.KeyServer
@@ -72,7 +72,7 @@ func main() {
 	// Special hack for bootstrapping the inprocess key server.
 	setupTestUser(key)
 
-	httpStore := keyserver.New(ctx, key, upspin.NetAddr(flags.NetAddr))
+	httpStore := keyserver.New(cfg, key, upspin.NetAddr(flags.NetAddr))
 	http.Handle("/api/Key/", httpStore)
 
 	if *mailConfigFile != "" {

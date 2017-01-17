@@ -170,7 +170,7 @@ func (cfg *Config) Run() error {
 		if err := os.MkdirAll(dir, 0700); err != nil {
 			return err
 		}
-		keygen := exec.Command("upspin", "-context="+rcKeygen, "keygen", "-where="+dir)
+		keygen := exec.Command("upspin", "-config="+rcKeygen, "keygen", "-where="+dir)
 		keygen.Stdout = prefix("keygen: ", os.Stdout)
 		keygen.Stderr = prefix("keygen: ", os.Stderr)
 		if err := keygen.Run(); err != nil {
@@ -221,7 +221,7 @@ func (cfg *Config) Run() error {
 		}
 
 		args := []string{
-			"-context=" + rcFile,
+			"-config=" + rcFile,
 			"-log=" + *logLevel,
 			"-tls_cert=" + filepath.Join(tmpDir, "cert.pem"),
 			"-tls_key=" + filepath.Join(tmpDir, "key.pem"),
@@ -279,7 +279,7 @@ func (cfg *Config) Run() error {
 			return err
 		}
 		cmd := exec.Command("upspin",
-			"-context="+rcFile,
+			"-config="+rcFile,
 			"-log="+*logLevel,
 			"user", "-put",
 		)
@@ -297,7 +297,7 @@ func (cfg *Config) Run() error {
 		return err
 	}
 	shell := exec.Command("upspin",
-		"-context="+rcFile,
+		"-config="+rcFile,
 		"-log="+*logLevel,
 		"shell",
 	)
