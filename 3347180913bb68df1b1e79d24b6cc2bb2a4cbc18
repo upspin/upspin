@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "03bd01ca_0b9ec853",
+        "filename": "client/gobind/gobind.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-01-17T02:54:09Z",
+      "side": 1,
+      "message": "configures",
+      "revId": "3347180913bb68df1b1e79d24b6cc2bb2a4cbc18",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "03bd01ca_2b9b8463",
+        "filename": "client/gobind/gobind.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-01-17T02:54:09Z",
+      "side": 1,
+      "message": "configuration",
+      "revId": "3347180913bb68df1b1e79d24b6cc2bb2a4cbc18",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
