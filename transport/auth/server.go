@@ -82,7 +82,7 @@ type ServerConfig struct {
 
 // NewServer returns a new Server that uses the given config.
 // If a nil config is provided the defaults are used.
-func NewServer(ctx upspin.Context, cfg *ServerConfig) http.Handler {
+func NewServer(ctx upspin.Config, cfg *ServerConfig) http.Handler {
 	return &serverImpl{
 		context: ctx,
 		config:  cfg,
@@ -90,7 +90,7 @@ func NewServer(ctx upspin.Context, cfg *ServerConfig) http.Handler {
 }
 
 type serverImpl struct {
-	context upspin.Context
+	context upspin.Config
 	config  *ServerConfig
 }
 
@@ -311,7 +311,7 @@ func verifyUser(key upspin.PublicKey, msg []string, magic string, now time.Time)
 }
 
 // signUser creates a header authenticating the local user.
-func signUser(ctx upspin.Context, magic string) ([]string, error) {
+func signUser(ctx upspin.Config, magic string) ([]string, error) {
 	if ctx == nil {
 		return nil, errors.Str("nil context")
 	}

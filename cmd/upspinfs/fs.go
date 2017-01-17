@@ -36,7 +36,7 @@ const (
 type upspinFS struct {
 	sync.Mutex                               // Protects concurrent access to the rest of this struct.
 	mountpoint string                        // Absolute Unix path to mountpoint.
-	context    upspin.Context                // Upspin context used for all requests.
+	context    upspin.Config                 // Upspin context used for all requests.
 	client     upspin.Client                 // A client to use for client methods.
 	root       *node                         // The root of the upspin file system.
 	uid        int                           // OS user id of this process' owner.
@@ -91,7 +91,7 @@ func (h *handle) String() string {
 }
 
 // newUpspinFS creates a new upspin file system.
-func newUpspinFS(context upspin.Context, mountpoint string, cacheDir string) *upspinFS {
+func newUpspinFS(context upspin.Config, mountpoint string, cacheDir string) *upspinFS {
 	if !strings.HasSuffix(mountpoint, "/") {
 		mountpoint = mountpoint + "/"
 	}
@@ -862,7 +862,7 @@ func debug(msg interface{}) {
 
 // do is called both by main and testing to mount a FUSE file system. It exits on failure
 // and returns when the file system has been mounted and is ready for requests.
-func do(ctx upspin.Context, mountpoint string, cacheDir string) chan bool {
+func do(ctx upspin.Config, mountpoint string, cacheDir string) chan bool {
 	if log.Level() == "debug" {
 		fuse.Debug = debug
 	}

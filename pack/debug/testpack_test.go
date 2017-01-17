@@ -40,7 +40,7 @@ const (
 
 var (
 	inProcess     = upspin.Endpoint{Transport: upspin.InProcess}
-	globalContext upspin.Context
+	globalContext upspin.Config
 )
 
 func init() {

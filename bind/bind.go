@@ -134,7 +134,7 @@ func RegisterStoreServer(transport upspin.Transport, store upspin.StoreServer) e
 }
 
 // KeyServer returns a KeyServer interface bound to the endpoint.
-func KeyServer(cc upspin.Context, e upspin.Endpoint) (upspin.KeyServer, error) {
+func KeyServer(cc upspin.Config, e upspin.Endpoint) (upspin.KeyServer, error) {
 	const op = "bind.KeyServer"
 	mu.Lock()
 	u, ok := keyMap[e.Transport]
@@ -150,7 +150,7 @@ func KeyServer(cc upspin.Context, e upspin.Endpoint) (upspin.KeyServer, error) {
 }
 
 // StoreServer returns a StoreServer interface bound to the endpoint.
-func StoreServer(cc upspin.Context, e upspin.Endpoint) (upspin.StoreServer, error) {
+func StoreServer(cc upspin.Config, e upspin.Endpoint) (upspin.StoreServer, error) {
 	const op = "bind.StoreServer"
 	mu.Lock()
 	s, ok := storeMap[e.Transport]
@@ -166,7 +166,7 @@ func StoreServer(cc upspin.Context, e upspin.Endpoint) (upspin.StoreServer, erro
 }
 
 // DirServer returns a DirServer interface bound to the endpoint.
-func DirServer(cc upspin.Context, e upspin.Endpoint) (upspin.DirServer, error) {
+func DirServer(cc upspin.Config, e upspin.Endpoint) (upspin.DirServer, error) {
 	const op = "bind.DirServer"
 	mu.Lock()
 	d, ok := directoryMap[e.Transport]
@@ -184,7 +184,7 @@ func DirServer(cc upspin.Context, e upspin.Endpoint) (upspin.DirServer, error) {
 // DirServer returns a DirServer interface bound to the endpoint that serves
 // the given user. If the name is empty, it returns the directory endpoint
 // in the context.
-func DirServerFor(cc upspin.Context, userName upspin.UserName) (upspin.DirServer, error) {
+func DirServerFor(cc upspin.Config, userName upspin.UserName) (upspin.DirServer, error) {
 	const op = "bind.DirServerFor"
 	if userName == "" {
 		// If name is empty just return the directory at ctx.DirEndpoint().
@@ -254,7 +254,7 @@ func Release(service upspin.Service) error {
 }
 
 // reachableService finds a bound and reachable service in the cache or dials a fresh one and saves it in the cache.
-func reachableService(cc upspin.Context, op string, e upspin.Endpoint, cache dialCache, dialer upspin.Dialer) (upspin.Service, error) {
+func reachableService(cc upspin.Config, op string, e upspin.Endpoint, cache dialCache, dialer upspin.Dialer) (upspin.Service, error) {
 	key := dialKey{
 		user:     cc.UserName(),
 		endpoint: e,

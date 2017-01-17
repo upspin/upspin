@@ -21,7 +21,7 @@ import (
 )
 
 type server struct {
-	context upspin.Context
+	context upspin.Config
 
 	// What this server reports itself as through its Endpoint method.
 	endpoint upspin.Endpoint
@@ -30,7 +30,7 @@ type server struct {
 	dir upspin.DirServer
 }
 
-func New(ctx upspin.Context, dir upspin.DirServer, addr upspin.NetAddr) http.Handler {
+func New(ctx upspin.Config, dir upspin.DirServer, addr upspin.NetAddr) http.Handler {
 	s := &server{
 		context: ctx,
 		endpoint: upspin.Endpoint{

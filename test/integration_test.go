@@ -43,7 +43,7 @@ var (
 		OwnerName: ownerName,
 		Cleanup:   cleanup,
 	}
-	readerContext upspin.Context
+	readerContext upspin.Config
 )
 
 func makeIntegrationTestTree(t *testing.T, r *testenv.Runner) {

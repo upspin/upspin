@@ -26,7 +26,7 @@ type service struct {
 	dials   int
 	entries map[string]*upspin.User
 
-	context  upspin.Context
+	context  upspin.Config
 	endpoint upspin.Endpoint
 }
 
@@ -277,7 +277,7 @@ func (s *service) Put(user *upspin.User) error {
 	return nil
 }
 
-func (s *service) Dial(ctx upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (s *service) Dial(ctx upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
 	s.dials++
 	s.context = ctx
 	s.endpoint = e

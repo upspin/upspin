@@ -70,7 +70,7 @@ type Env struct {
 	Client upspin.Client
 
 	// Context is the context used when creating the client.
-	Context upspin.Context
+	Context upspin.Config
 
 	// Setup contains the original setup options.
 	Setup *Setup
@@ -250,7 +250,7 @@ func (e *Env) rmTmpDir() error {
 // NewUser creates a new client for a user.  The new user will not
 // have a root created. Callers should use the client to make a root directory if
 // necessary.
-func (e *Env) NewUser(userName upspin.UserName) (upspin.Context, error) {
+func (e *Env) NewUser(userName upspin.UserName) (upspin.Config, error) {
 	const op = "testenv.NewUser"
 	ctx := config.SetUserName(e.Context, userName)
 	ctx = config.SetPacking(ctx, e.Setup.Packing)
@@ -276,7 +276,7 @@ func (e *Env) NewUser(userName upspin.UserName) (upspin.Context, error) {
 }
 
 // registerUserWithKeyServer registers userName's context with the inProcess keyServer.
-func registerUserWithKeyServer(ctx upspin.Context, userName upspin.UserName) error {
+func registerUserWithKeyServer(ctx upspin.Config, userName upspin.UserName) error {
 	key, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
 	if err != nil {
 		return err
@@ -294,7 +294,7 @@ func registerUserWithKeyServer(ctx upspin.Context, userName upspin.UserName) err
 	return nil
 }
 
-func makeRootIfNotExist(ctx upspin.Context) error {
+func makeRootIfNotExist(ctx upspin.Config) error {
 	path := upspin.PathName(ctx.UserName()) + "/"
 	dir, err := bind.DirServer(ctx, ctx.DirEndpoint())
 	if err != nil {

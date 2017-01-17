@@ -911,7 +911,7 @@ func makeDirectory(s *server, name upspin.PathName) (*upspin.DirEntry, error) {
 	return s.Put(entry)
 }
 
-func putAccessOrGroupFile(t *testing.T, s *server, userCtx upspin.Context, name upspin.PathName, contents string) (*upspin.DirEntry, error) {
+func putAccessOrGroupFile(t *testing.T, s *server, userCtx upspin.Config, name upspin.PathName, contents string) (*upspin.DirEntry, error) {
 	if !access.IsAccessFile(name) && !access.IsGroupFile(name) {
 		t.Fatalf("%s not an access file", name)
 	}
@@ -1000,7 +1000,7 @@ func (m *mockClock) addSecond(n int) {
 var generatorInstance upspin.DirServer
 
 // newDirServerForTesting returns a new server and a user config.
-func newDirServerForTesting(t *testing.T, userName upspin.UserName) (*server, upspin.Context) {
+func newDirServerForTesting(t *testing.T, userName upspin.UserName) (*server, upspin.Config) {
 	f, err := factotum.NewFromDir(repo("key/testdata/upspin-test"))
 	if err != nil {
 		t.Fatal(err)
@@ -1072,7 +1072,7 @@ func newDirServerForTesting(t *testing.T, userName upspin.UserName) (*server, up
 	return svr.(*server), userCtx
 }
 
-func writeToStore(t *testing.T, ctx upspin.Context, data []byte) upspin.Location {
+func writeToStore(t *testing.T, ctx upspin.Config, data []byte) upspin.Location {
 	store, err := bind.StoreServer(ctx, ctx.StoreEndpoint())
 	if err != nil {
 		t.Fatal(err)

@@ -39,7 +39,7 @@ func TestRegister(t *testing.T) {
 }
 
 // packBlob packs text according to the parameters and returns the cipher.
-func packBlob(t *testing.T, ctx upspin.Context, packer upspin.Packer, d *upspin.DirEntry, text []byte) []byte {
+func packBlob(t *testing.T, ctx upspin.Config, packer upspin.Packer, d *upspin.DirEntry, text []byte) []byte {
 	d.Packing = packer.Packing()
 	bp, err := packer.Pack(ctx, d)
 	if err != nil {
@@ -57,7 +57,7 @@ func packBlob(t *testing.T, ctx upspin.Context, packer upspin.Packer, d *upspin.
 }
 
 // unpackBlob unpacks cipher according to the parameters and returns the plain text.
-func unpackBlob(t *testing.T, ctx upspin.Context, packer upspin.Packer, d *upspin.DirEntry, cipher []byte) []byte {
+func unpackBlob(t *testing.T, ctx upspin.Config, packer upspin.Packer, d *upspin.DirEntry, cipher []byte) []byte {
 	bp, err := packer.Unpack(ctx, d)
 	if err != nil {
 		t.Fatal("unpackBlob:", err)
@@ -72,7 +72,7 @@ func unpackBlob(t *testing.T, ctx upspin.Context, packer upspin.Packer, d *upspi
 	return text
 }
 
-func testPackAndUnpack(t *testing.T, ctx upspin.Context, packer upspin.Packer, name upspin.PathName, text []byte) {
+func testPackAndUnpack(t *testing.T, ctx upspin.Config, packer upspin.Packer, name upspin.PathName, text []byte) {
 	// First pack.
 	d := &upspin.DirEntry{
 		Name:       name,
@@ -92,7 +92,7 @@ func testPackAndUnpack(t *testing.T, ctx upspin.Context, packer upspin.Packer, n
 	}
 }
 
-func testPackNameAndUnpack(t *testing.T, ctx upspin.Context, packer upspin.Packer, name, newName upspin.PathName, text []byte) {
+func testPackNameAndUnpack(t *testing.T, ctx upspin.Config, packer upspin.Packer, name, newName upspin.PathName, text []byte) {
 	// First pack.
 	d := &upspin.DirEntry{
 		Name:       name,
@@ -244,7 +244,7 @@ func TestSharing(t *testing.T) {
 	}
 }
 
-func setup(name upspin.UserName) (upspin.Context, upspin.Packer) {
+func setup(name upspin.UserName) (upspin.Config, upspin.Packer) {
 	ctx := config.SetUserName(config.New(), name)
 	packer := pack.Lookup(packing)
 	j := strings.IndexByte(string(name), '@')
@@ -284,7 +284,7 @@ func (d *dummyKey) Lookup(userName upspin.UserName) (*upspin.User, error) {
 	}
 	return nil, errors.E(op, userName, errors.NotExist, errors.Str("user not found"))
 }
-func (d *dummyKey) Dial(cc upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (d *dummyKey) Dial(cc upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
 	return d, nil
 }
 
