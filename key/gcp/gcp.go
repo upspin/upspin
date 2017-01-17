@@ -246,13 +246,13 @@ func (s *server) verifyOwns(u upspin.UserName, pubKey upspin.PublicKey, domain s
 }
 
 // Dial implements upspin.Service.
-func (s *server) Dial(ctx upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
+func (s *server) Dial(cfg upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
 	s.refCount.Lock()
 	s.refCount.count++
 	s.refCount.Unlock()
 
 	svc := *s
-	svc.user = ctx.UserName()
+	svc.user = cfg.UserName()
 	return &svc, nil
 }
 

@@ -26,7 +26,7 @@ type service struct {
 	dials   int
 	entries map[string]*upspin.User
 
-	context  upspin.Config
+	config   upspin.Config
 	endpoint upspin.Endpoint
 }
 
@@ -53,13 +53,13 @@ var (
 	testPublicKey     upspin.PublicKey
 )
 
-// setup returns contexts with the KeyServer uncached and cached.
+// setup returns configs with the KeyServer uncached and cached.
 func setup(t *testing.T, user string) (uncached, cached upspin.KeyServer) {
 	c := config.New()
 	c = config.SetUserName(c, upspin.UserName(user))
 	c = config.SetPacking(c, upspin.DebugPack)
 	c = config.SetKeyEndpoint(c, keyService.endpoint)
-	keyService.context = c
+	keyService.config = c
 
 	cache := &userCacheServer{
 		base: keyService,
@@ -89,7 +89,7 @@ func setup(t *testing.T, user string) (uncached, cached upspin.KeyServer) {
 
 // TestDial tests that we don't Dial the underlying
 // service if the Lookup is for the user in the
-// Dialed context, and that we dial just once for
+// Dialed config, and that we dial just once for
 // Lookups of other users.
 func TestDial(t *testing.T) {
 	const name = "upspin-test@google.com"
@@ -127,7 +127,7 @@ func TestDial(t *testing.T) {
 		t.Fatalf("underlying key service dialed %d times, want 1", n)
 	}
 
-	// Asking for the context user again should still return the same data.
+	// Asking for the config user again should still return the same data.
 	got, err = svc.Lookup(name)
 	if err != nil {
 		t.Fatal(err)
@@ -277,9 +277,9 @@ func (s *service) Put(user *upspin.User) error {
 	return nil
 }
 
-func (s *service) Dial(ctx upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
+func (s *service) Dial(cfg upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
 	s.dials++
-	s.context = ctx
+	s.config = cfg
 	s.endpoint = e
 	return s, nil
 }
