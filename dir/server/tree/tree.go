@@ -55,7 +55,7 @@ type Tree struct {
 	mu sync.Mutex
 
 	user     upspin.UserName
-	context  upspin.Context
+	context  upspin.Config
 	packer   upspin.Packer
 	log      *Log
 	logIndex *LogIndex
@@ -82,7 +82,7 @@ func (n *node) String() string {
 // the Log, the Tree's state is recovered from it.
 // TODO: Maybe new is doing too much work. Figure out how to break in two without
 // returning an inconsistent new tree if log is unprocessed.
-func New(context upspin.Context, log *Log, logIndex *LogIndex) (*Tree, error) {
+func New(context upspin.Config, log *Log, logIndex *LogIndex) (*Tree, error) {
 	const op = "dir/server/tree.New"
 	if context == nil {
 		return nil, errors.E(op, errors.Invalid, errors.Str("context is nil"))

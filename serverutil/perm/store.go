@@ -28,7 +28,7 @@ import (
 type Store struct {
 	upspin.StoreServer
 
-	serverCtx upspin.Context
+	serverCtx upspin.Config
 	user      upspin.UserName
 	perm      *Perm
 }
@@ -36,7 +36,7 @@ type Store struct {
 // WrapStore wraps the given StoreServer with a StoreServer that checks access
 // permissions. It will only start polling the store permissions after the
 // ready channel is closed.
-func WrapStore(ctx upspin.Context, ready <-chan struct{}, store upspin.StoreServer) (*Store, error) {
+func WrapStore(ctx upspin.Config, ready <-chan struct{}, store upspin.StoreServer) (*Store, error) {
 	s := &Store{
 		StoreServer: store,
 		serverCtx:   ctx,
@@ -71,7 +71,7 @@ func (s *Store) Delete(ref upspin.Reference) error {
 }
 
 // Dial implements upspin.Service.
-func (s *Store) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (s *Store) Dial(context upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
 	const op = "store/perm.Dial"
 	service, err := s.StoreServer.Dial(context, e)
 	if err != nil {

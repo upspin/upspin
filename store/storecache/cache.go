@@ -131,7 +131,7 @@ func (c *storeCache) newCachedRef(file string) *cachedRef {
 
 // get fetches a reference. If possible, it stores it as a local file.
 // No locks are held on entry or exit.
-func (c *storeCache) get(ctx upspin.Context, ref upspin.Reference, e upspin.Endpoint) ([]byte, []upspin.Location, error) {
+func (c *storeCache) get(ctx upspin.Config, ref upspin.Reference, e upspin.Endpoint) ([]byte, []upspin.Location, error) {
 	file := c.cachePath(ref, e)
 	c.enforceByteLimitByRemovingLeastRecentlyUsedFile()
 
@@ -245,7 +245,7 @@ func (c *storeCache) get(ctx upspin.Context, ref upspin.Reference, e upspin.Endp
 }
 
 // put saves a reference in the cache. put has the same invariants as get.
-func (c *storeCache) put(ctx upspin.Context, data []byte, e upspin.Endpoint) (upspin.Reference, error) {
+func (c *storeCache) put(ctx upspin.Config, data []byte, e upspin.Endpoint) (upspin.Reference, error) {
 	// If we can't put it to the store, don't cache.
 	// TODO(p): This will change with a write through cache.
 	// TODO(p): Use refdata information.
@@ -295,7 +295,7 @@ func (c *storeCache) put(ctx upspin.Context, data []byte, e upspin.Endpoint) (up
 // delete removes a reference from the cache.
 // - No locks are held on entry or exit.
 // - If the cache file is busy, don't remove it.
-func (c *storeCache) delete(ctx upspin.Context, ref upspin.Reference, e upspin.Endpoint) error {
+func (c *storeCache) delete(ctx upspin.Config, ref upspin.Reference, e upspin.Endpoint) error {
 	store, err := bind.StoreServer(ctx, e)
 	if err != nil {
 		return err

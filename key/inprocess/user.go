@@ -99,7 +99,7 @@ func (s *server) Endpoint() upspin.Endpoint {
 
 // Dial always returns the same instance of the service. The Transport must be InProcess
 // but the NetAddr is ignored.
-func (s *server) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (s *server) Dial(context upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
 	const op = "key/inprocess.Dial"
 	if e.Transport != upspin.InProcess {
 		return nil, errors.E(op, errors.Invalid, errors.Str("unrecognized transport"))

@@ -72,7 +72,7 @@ func (r *Runner) setErr(err error) {
 // AddUser adds the user in the given context to the Runner's
 // internal state, and creates a client for use as that user.
 // If a client already exists for that user, it is replaced with a new one.
-func (r *Runner) AddUser(ctx upspin.Context) {
+func (r *Runner) AddUser(ctx upspin.Config) {
 	if r.err != nil {
 		return
 	}

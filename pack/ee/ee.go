@@ -95,14 +95,14 @@ func (ee ee) Packing() upspin.Packing {
 	return upspin.EEPack
 }
 
-func (ee ee) PackLen(ctx upspin.Context, cleartext []byte, d *upspin.DirEntry) int {
+func (ee ee) PackLen(ctx upspin.Config, cleartext []byte, d *upspin.DirEntry) int {
 	if err := pack.CheckPacking(ee, d); err != nil {
 		return -1
 	}
 	return len(cleartext)
 }
 
-func (ee ee) UnpackLen(ctx upspin.Context, ciphertext []byte, d *upspin.DirEntry) int {
+func (ee ee) UnpackLen(ctx upspin.Config, ciphertext []byte, d *upspin.DirEntry) int {
 	if err := pack.CheckPacking(ee, d); err != nil {
 		return -1
 	}
@@ -113,7 +113,7 @@ func (ee ee) String() string {
 	return "ee"
 }
 
-func (ee ee) Pack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockPacker, error) {
+func (ee ee) Pack(ctx upspin.Config, d *upspin.DirEntry) (upspin.BlockPacker, error) {
 	const op = "pack/ee.Pack"
 	if err := pack.CheckPacking(ee, d); err != nil {
 		return nil, errors.E(op, errors.Invalid, d.Name, err)
@@ -160,7 +160,7 @@ func newKeyAndCipher() ([]byte, cipher.Block, error) {
 }
 
 type blockPacker struct {
-	ctx    upspin.Context
+	ctx    upspin.Config
 	entry  *upspin.DirEntry
 	cipher cipher.Block
 	dkey   []byte
@@ -279,7 +279,7 @@ func (bp *blockPacker) Close() error {
 	return pdMarshal(&bp.entry.Packdata, sig, upspin.Signature{}, wrap, sum)
 }
 
-func (ee ee) Unpack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockUnpacker, error) {
+func (ee ee) Unpack(ctx upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker, error) {
 	const op = "pack/ee.Unpack"
 	if err := pack.CheckPacking(ee, d); err != nil {
 		return nil, errors.E(op, errors.Invalid, d.Name, err)
@@ -361,7 +361,7 @@ func (ee ee) Unpack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockUnpacke
 }
 
 type blockUnpacker struct {
-	ctx                   upspin.Context
+	ctx                   upspin.Config
 	entry                 *upspin.DirEntry
 	internal.BlockTracker // provides NextBlock method and Block field
 	cipher                cipher.Block
@@ -407,7 +407,7 @@ func (ee ee) ReaderHashes(packdata []byte) (readers [][]byte, err error) {
 }
 
 // Share extracts the file decryption key from the packdata, wraps it for a revised list of readers, and updates packdata.
-func (ee ee) Share(ctx upspin.Context, readers []upspin.PublicKey, packdata []*[]byte) {
+func (ee ee) Share(ctx upspin.Config, readers []upspin.PublicKey, packdata []*[]byte) {
 
 	// A Packdata holds a cipherSum, a Signature, and a list of wrapped keys.
 	// Share updates the wrapped keys, leaving the other two fields unchanged.
@@ -492,7 +492,7 @@ func (ee ee) Share(ctx upspin.Context, readers []upspin.PublicKey, packdata []*[
 }
 
 // Name implements upspin.Name.
-func (ee ee) Name(ctx upspin.Context, d *upspin.DirEntry, newName upspin.PathName) error {
+func (ee ee) Name(ctx upspin.Config, d *upspin.DirEntry, newName upspin.PathName) error {
 	const op = "pack/ee.Name"
 	if d.IsDir() {
 		return errors.E(op, d.Name, errors.IsDir, "cannot rename directory")
@@ -842,7 +842,7 @@ func packdataLen(nwrap int) int {
 }
 
 // publicKey returns the string representation of a user's public key.
-func publicKey(ctx upspin.Context, user upspin.UserName) (upspin.PublicKey, error) {
+func publicKey(ctx upspin.Config, user upspin.UserName) (upspin.PublicKey, error) {
 
 	// Key pairs have three representations:
 	// 1. string, used for storage and between programs like User.Lookup

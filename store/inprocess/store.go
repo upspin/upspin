@@ -120,7 +120,7 @@ func (s *service) Get(ref upspin.Reference) (ciphertext []byte, refdata *upspin.
 // There is only one data set in the address space.
 // Dial ignores the address within the endpoint but requires that the transport be InProcess.
 // TODO: Authenticate the caller.
-func (s *service) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (s *service) Dial(context upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
 	const op = "store/inprocess.Dial"
 	if e.Transport != upspin.InProcess {
 		return nil, errors.E(op, errors.Invalid, errors.Str("unrecognized transport"))

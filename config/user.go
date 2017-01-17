@@ -7,7 +7,7 @@ package config
 import "upspin.io/upspin"
 
 // User returns an upspin.User record for the user in the given configuration.
-func User(ctx upspin.Context) *upspin.User {
+func User(ctx upspin.Config) *upspin.User {
 	var key upspin.PublicKey
 	if f := ctx.Factotum(); f != nil {
 		key = f.PublicKey()

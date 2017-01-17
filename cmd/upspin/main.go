@@ -68,7 +68,7 @@ var commands = map[string]func(*State, ...string){
 type State struct {
 	op           string // Name of the subcommand we are running.
 	client       upspin.Client
-	context      upspin.Context
+	context      upspin.Config
 	sharer       *Sharer
 	exitCode     int // Exit with non-zero status for minor problems.
 	interactive  bool

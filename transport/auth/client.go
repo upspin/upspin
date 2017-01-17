@@ -64,7 +64,7 @@ type httpClient struct {
 // security guarantees of the connection. If proxyFor is an assigned endpoint,
 // it indicates that this connection is being used to proxy request to that
 // endpoint.
-func NewClient(context upspin.Context, netAddr upspin.NetAddr, security SecurityLevel, proxyFor upspin.Endpoint) (Client, error) {
+func NewClient(context upspin.Config, netAddr upspin.NetAddr, security SecurityLevel, proxyFor upspin.Endpoint) (Client, error) {
 	const op = "transport/auth.NewClient"
 
 	c := &httpClient{
@@ -225,7 +225,7 @@ func (c *httpClient) Close()     {}
 
 // clientAuth tracks the auth token and its freshness.
 type clientAuth struct {
-	context upspin.Context
+	context upspin.Config
 
 	mu              sync.Mutex // protects the fields below.
 	token           string

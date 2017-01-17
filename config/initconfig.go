@@ -53,7 +53,7 @@ func init() {
 }
 
 // New returns a context with all fields set as defaults.
-func New() upspin.Context {
+func New() upspin.Config {
 	return base{}
 }
 
@@ -83,7 +83,7 @@ var ErrNoFactotum = errors.Str("factotum not initialized: no secrets provided")
 // be opened but the name can be found in $HOME/upspin, that file is used.
 // As with InitContext, environment variables may override the
 // values in the context file.
-func FromFile(name string) (upspin.Context, error) {
+func FromFile(name string) (upspin.Config, error) {
 	f, err := os.Open(name)
 	if err != nil && !filepath.IsAbs(name) && os.IsNotExist(err) {
 		// It's a local name, so, try adding $HOME/upspin
@@ -135,7 +135,7 @@ func FromFile(name string) (upspin.Context, error) {
 // Files without the suffix ".pem" are ignored.
 // The default value for tlscerts is the empty string,
 // in which case just the system roots are used.
-func InitContext(r io.Reader) (upspin.Context, error) {
+func InitContext(r io.Reader) (upspin.Config, error) {
 	const op = "config.InitContext"
 	vals := map[string]string{
 		username:    string(defaultUserName),
@@ -338,7 +338,7 @@ func parseEndpoint(op string, vals map[string]string, key string, errorp *error)
 }
 
 type ctxUserName struct {
-	upspin.Context
+	upspin.Config
 	userName upspin.UserName
 }
 
@@ -348,15 +348,15 @@ func (ctx ctxUserName) UserName() upspin.UserName {
 
 // SetUserName returns a context derived from the given context
 // with the given user name.
-func SetUserName(ctx upspin.Context, u upspin.UserName) upspin.Context {
+func SetUserName(ctx upspin.Config, u upspin.UserName) upspin.Config {
 	return ctxUserName{
-		Context:  ctx,
+		Config:   ctx,
 		userName: u,
 	}
 }
 
 type ctxFactotum struct {
-	upspin.Context
+	upspin.Config
 	factotum upspin.Factotum
 }
 
@@ -366,15 +366,15 @@ func (ctx ctxFactotum) Factotum() upspin.Factotum {
 
 // SetFactotum returns a context derived from the given context
 // with the given factotum.
-func SetFactotum(ctx upspin.Context, f upspin.Factotum) upspin.Context {
+func SetFactotum(ctx upspin.Config, f upspin.Factotum) upspin.Config {
 	return ctxFactotum{
-		Context:  ctx,
+		Config:   ctx,
 		factotum: f,
 	}
 }
 
 type ctxPacking struct {
-	upspin.Context
+	upspin.Config
 	packing upspin.Packing
 }
 
@@ -384,15 +384,15 @@ func (ctx ctxPacking) Packing() upspin.Packing {
 
 // SetPacking returns a context derived from the given context
 // with the given packing.
-func SetPacking(ctx upspin.Context, p upspin.Packing) upspin.Context {
+func SetPacking(ctx upspin.Config, p upspin.Packing) upspin.Config {
 	return ctxPacking{
-		Context: ctx,
+		Config:  ctx,
 		packing: p,
 	}
 }
 
 type ctxKeyEndpoint struct {
-	upspin.Context
+	upspin.Config
 	keyEndpoint upspin.Endpoint
 }
 
@@ -402,15 +402,15 @@ func (ctx ctxKeyEndpoint) KeyEndpoint() upspin.Endpoint {
 
 // SetKeyEndpoint returns a context derived from the given context
 // with the given key endpoint.
-func SetKeyEndpoint(ctx upspin.Context, e upspin.Endpoint) upspin.Context {
+func SetKeyEndpoint(ctx upspin.Config, e upspin.Endpoint) upspin.Config {
 	return ctxKeyEndpoint{
-		Context:     ctx,
+		Config:      ctx,
 		keyEndpoint: e,
 	}
 }
 
 type ctxStoreEndpoint struct {
-	upspin.Context
+	upspin.Config
 	storeEndpoint upspin.Endpoint
 }
 
@@ -420,15 +420,15 @@ func (ctx ctxStoreEndpoint) StoreEndpoint() upspin.Endpoint {
 
 // SetStoreEndpoint returns a context derived from the given context
 // with the given store endpoint.
-func SetStoreEndpoint(ctx upspin.Context, e upspin.Endpoint) upspin.Context {
+func SetStoreEndpoint(ctx upspin.Config, e upspin.Endpoint) upspin.Config {
 	return ctxStoreEndpoint{
-		Context:       ctx,
+		Config:        ctx,
 		storeEndpoint: e,
 	}
 }
 
 type ctxCacheEndpoint struct {
-	upspin.Context
+	upspin.Config
 	cacheEndpoint upspin.Endpoint
 }
 
@@ -438,15 +438,15 @@ func (ctx ctxCacheEndpoint) CacheEndpoint() upspin.Endpoint {
 
 // SetCacheEndpoint returns a context derived from the given context
 // with the given cache endpoint.
-func SetCacheEndpoint(ctx upspin.Context, e upspin.Endpoint) upspin.Context {
+func SetCacheEndpoint(ctx upspin.Config, e upspin.Endpoint) upspin.Config {
 	return ctxCacheEndpoint{
-		Context:       ctx,
+		Config:        ctx,
 		cacheEndpoint: e,
 	}
 }
 
 type ctxDirEndpoint struct {
-	upspin.Context
+	upspin.Config
 	dirEndpoint upspin.Endpoint
 }
 
@@ -456,15 +456,15 @@ func (ctx ctxDirEndpoint) DirEndpoint() upspin.Endpoint {
 
 // SetDirEndpoint returns a context derived from the given context
 // with the given dir endpoint.
-func SetDirEndpoint(ctx upspin.Context, e upspin.Endpoint) upspin.Context {
+func SetDirEndpoint(ctx upspin.Config, e upspin.Endpoint) upspin.Config {
 	return ctxDirEndpoint{
-		Context:     ctx,
+		Config:      ctx,
 		dirEndpoint: e,
 	}
 }
 
 type ctxCertPool struct {
-	upspin.Context
+	upspin.Config
 	pool *x509.CertPool
 }
 
@@ -472,10 +472,10 @@ func (ctx ctxCertPool) CertPool() *x509.CertPool {
 	return ctx.pool
 }
 
-func SetCertPool(ctx upspin.Context, pool *x509.CertPool) upspin.Context {
+func SetCertPool(ctx upspin.Config, pool *x509.CertPool) upspin.Config {
 	return ctxCertPool{
-		Context: ctx,
-		pool:    pool,
+		Config: ctx,
+		pool:   pool,
 	}
 }
 

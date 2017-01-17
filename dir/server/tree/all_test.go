@@ -1001,7 +1001,7 @@ func TestMain(m *testing.M) {
 // TODO: Run all tests in loop using Plain and Debug packs as well.
 // TODO: test more error cases.
 
-func mkdir(t *testing.T, tree *Tree, ctx upspin.Context, name upspin.PathName) (path.Parsed, *upspin.DirEntry) {
+func mkdir(t *testing.T, tree *Tree, ctx upspin.Config, name upspin.PathName) (path.Parsed, *upspin.DirEntry) {
 	p, entry := newDirEntry(name, isDir, ctx)
 	entry, err := tree.Put(p, entry)
 	if err != nil {
@@ -1038,7 +1038,7 @@ func mkpath(t *testing.T, pathName upspin.PathName) path.Parsed {
 
 // newDirEntry returns a dir entry for a path name filled with the mandatory
 // arguments. It is used to make tests more concise.
-func newDirEntry(name upspin.PathName, isDir bool, config upspin.Context) (path.Parsed, *upspin.DirEntry) {
+func newDirEntry(name upspin.PathName, isDir bool, config upspin.Config) (path.Parsed, *upspin.DirEntry) {
 	var writer upspin.UserName
 	var attr upspin.Attribute
 	var blocks []upspin.DirBlock
@@ -1073,7 +1073,7 @@ func newDirEntry(name upspin.PathName, isDir bool, config upspin.Context) (path.
 
 // newConfigForTesting creates the necessary items to instantiate a Tree for
 // testing.
-func newConfigForTesting(t *testing.T, userName upspin.UserName) (upspin.Context, *Log, *LogIndex) {
+func newConfigForTesting(t *testing.T, userName upspin.UserName) (upspin.Config, *Log, *LogIndex) {
 	factotum, err := factotum.NewFromDir(repo("key/testdata/upspin-test"))
 	if err != nil {
 		t.Fatal(err)
@@ -1149,7 +1149,7 @@ func entrySize(t *testing.T, entry *upspin.DirEntry) int {
 	return len(buf)
 }
 
-func buildTree(t *testing.T, tree *Tree, context upspin.Context) {
+func buildTree(t *testing.T, tree *Tree, context upspin.Config) {
 	// Create some directories and files.
 	for _, e := range []struct {
 		name upspin.PathName

@@ -82,7 +82,7 @@ func TestReadAll(t *testing.T) {
 	}
 }
 
-func setupTestContext(t *testing.T) upspin.Context {
+func setupTestContext(t *testing.T) upspin.Config {
 	// Create some test locations.
 	for i := 0; i < 10; i++ {
 		loc := upspin.Location{
@@ -150,6 +150,6 @@ func (s *mockStore) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin
 	return nil, nil, nil, errors.E(errors.NotExist)
 }
 
-func (s *mockStore) Dial(upspin.Context, upspin.Endpoint) (upspin.Service, error) {
+func (s *mockStore) Dial(upspin.Config, upspin.Endpoint) (upspin.Service, error) {
 	return s, nil
 }

@@ -23,7 +23,7 @@ const (
 	aeadOverhead = 16
 )
 
-func TestMultiBlockRoundTrip(t *testing.T, ctx upspin.Context, packer upspin.Packer, userName upspin.UserName) {
+func TestMultiBlockRoundTrip(t *testing.T, ctx upspin.Config, packer upspin.Packer, userName upspin.UserName) {
 	var overhead int64
 	if packer.Packing() == upspin.SymmPack {
 		overhead = aeadOverhead
@@ -79,7 +79,7 @@ func TestMultiBlockRoundTrip(t *testing.T, ctx upspin.Context, packer upspin.Pac
 	}
 }
 
-func packEntry(ctx upspin.Context, store fakeStore, packer upspin.Packer, de *upspin.DirEntry, r io.Reader) error {
+func packEntry(ctx upspin.Config, store fakeStore, packer upspin.Packer, de *upspin.DirEntry, r io.Reader) error {
 	bp, err := packer.Pack(ctx, de)
 	if err != nil {
 		return err
@@ -121,7 +121,7 @@ loop:
 	return bp.Close()
 }
 
-func unpackEntry(ctx upspin.Context, store fakeStore, packer upspin.Packer, de *upspin.DirEntry, w io.Writer) error {
+func unpackEntry(ctx upspin.Config, store fakeStore, packer upspin.Packer, de *upspin.DirEntry, w io.Writer) error {
 	bp, err := packer.Unpack(ctx, de)
 	if err != nil {
 		return err
@@ -150,7 +150,7 @@ func unpackEntry(ctx upspin.Context, store fakeStore, packer upspin.Packer, de *
 	}
 }
 
-func unpackEntryRandomly(ctx upspin.Context, store fakeStore, packer upspin.Packer, de *upspin.DirEntry, data []byte, cleartextBlockOffsets []int64) error {
+func unpackEntryRandomly(ctx upspin.Config, store fakeStore, packer upspin.Packer, de *upspin.DirEntry, data []byte, cleartextBlockOffsets []int64) error {
 	bp, err := packer.Unpack(ctx, de)
 	if err != nil {
 		return err

@@ -16,7 +16,7 @@ import (
 // ReadAll reads the entire contents of a DirEntry. The reader must have
 // the necessary keys loaded in the context to unpack the cipher if the entry
 // is encrypted.
-func ReadAll(ctx upspin.Context, entry *upspin.DirEntry) ([]byte, error) {
+func ReadAll(ctx upspin.Config, entry *upspin.DirEntry) ([]byte, error) {
 	const op = "client/clientutil.ReadAll"
 
 	if entry.IsLink() {
@@ -57,7 +57,7 @@ func ReadAll(ctx upspin.Context, entry *upspin.DirEntry) ([]byte, error) {
 
 // ReadLocation uses the provided Context to fetch the contents of the given
 // Location, following any StoreServer.Get redirects.
-func ReadLocation(ctx upspin.Context, loc upspin.Location) ([]byte, error) {
+func ReadLocation(ctx upspin.Config, loc upspin.Location) ([]byte, error) {
 	const op = "client/clientutil.ReadLocation"
 
 	// firstError remembers the first error we saw.
