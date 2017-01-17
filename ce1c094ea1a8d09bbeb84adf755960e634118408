@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "a39fd578_4f3599f8",
+        "filename": "transport/dircacheserver/proxied.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-01-17T23:57:48Z",
+      "side": 1,
+      "message": "May look neater to you but now misses the sleep.  I made a version with less indentation but correct.  I personally hate the first case in an if err to not be the error case but in this case it clearly was not understandable that way.",
+      "parentUuid": "63db1d69_ae8777f7",
+      "revId": "ce1c094ea1a8d09bbeb84adf755960e634118408",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "63db1d69_8e8cbb1c",
         "filename": "transport/dircacheserver/proxied.go",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2017-01-17T23:49:08Z",
       "side": 1,
       "message": "I\u0027m confused here. Why are we dying if watch, ie handleEvent, returns a nil error?",
+      "revId": "ce1c094ea1a8d09bbeb84adf755960e634118408",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e3e70d23_e6cda66a",
+        "filename": "transport/dircacheserver/proxied.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-01-17T23:57:48Z",
+      "side": 1,
+      "message": "Because, as the watch() comment says below, it returns an error if there is an error and a nil if the watcher has been told to die.",
+      "parentUuid": "63db1d69_8e8cbb1c",
       "revId": "ce1c094ea1a8d09bbeb84adf755960e634118408",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
