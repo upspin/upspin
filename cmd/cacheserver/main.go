@@ -12,7 +12,7 @@ import (
 	"net/http"
 	"os"
 
-	"upspin.io/context"
+	"upspin.io/config"
 	"upspin.io/flags"
 	"upspin.io/log"
 	"upspin.io/store/storecache"
@@ -28,7 +28,7 @@ import (
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
 
-	// This is required for context.InitContext to work.
+	// This is required for config.InitContext to work.
 	// TODO(adg): This seems wrong; fix it.
 	_ "upspin.io/pack/plain"
 )
@@ -44,7 +44,7 @@ func main() {
 	flags.Parse()
 
 	// Load context and keys for this server. It needn't have a real username.
-	ctx, err := context.FromFile(flags.Context)
+	ctx, err := config.FromFile(flags.Context)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -62,7 +62,7 @@ func main() {
 	}
 
 	// Stop the cache server recursing.
-	ctx = context.SetCacheEndpoint(ctx, upspin.Endpoint{})
+	ctx = config.SetCacheEndpoint(ctx, upspin.Endpoint{})
 
 	// Calculate limits.
 	maxRefBytes := (9 * (*cacheSizeFlag)) / 10

@@ -12,7 +12,7 @@ import (
 	"testing"
 
 	"upspin.io/bind"
-	"upspin.io/context"
+	"upspin.io/config"
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/path"
@@ -1038,7 +1038,7 @@ func mkpath(t *testing.T, pathName upspin.PathName) path.Parsed {
 
 // newDirEntry returns a dir entry for a path name filled with the mandatory
 // arguments. It is used to make tests more concise.
-func newDirEntry(name upspin.PathName, isDir bool, context upspin.Context) (path.Parsed, *upspin.DirEntry) {
+func newDirEntry(name upspin.PathName, isDir bool, config upspin.Context) (path.Parsed, *upspin.DirEntry) {
 	var writer upspin.UserName
 	var attr upspin.Attribute
 	var blocks []upspin.DirBlock
@@ -1064,7 +1064,7 @@ func newDirEntry(name upspin.PathName, isDir bool, context upspin.Context) (path
 		Name:       p.Path(),
 		SignedName: p.Path(),
 		Attr:       attr,
-		Packing:    context.Packing(),
+		Packing:    config.Packing(),
 		Writer:     writer,
 		Packdata:   []byte("1234"),
 		Blocks:     blocks,
@@ -1082,12 +1082,12 @@ func newConfigForTesting(t *testing.T, userName upspin.UserName) (upspin.Context
 		Transport: upspin.InProcess,
 		NetAddr:   "",
 	}
-	ctx := context.New()
-	ctx = context.SetUserName(ctx, serverName)
-	ctx = context.SetFactotum(ctx, factotum)
-	ctx = context.SetStoreEndpoint(ctx, endpointInProcess)
-	ctx = context.SetKeyEndpoint(ctx, endpointInProcess)
-	ctx = context.SetPacking(ctx, upspin.EEPack)
+	ctx := config.New()
+	ctx = config.SetUserName(ctx, serverName)
+	ctx = config.SetFactotum(ctx, factotum)
+	ctx = config.SetStoreEndpoint(ctx, endpointInProcess)
+	ctx = config.SetKeyEndpoint(ctx, endpointInProcess)
+	ctx = config.SetPacking(ctx, upspin.EEPack)
 	key, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
 	if err != nil {
 		t.Fatal(err)

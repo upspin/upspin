@@ -23,7 +23,7 @@ import (
 	"upspin.io/cloud/mail"
 	"upspin.io/cloud/mail/sendgrid"
 	inbound "upspin.io/cmd/keyserver/internal/mail"
-	"upspin.io/context"
+	"upspin.io/config"
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/log"
@@ -191,9 +191,9 @@ func (m *mailHandler) createUser(msg *inbound.SignupMessage) error {
 func (m *mailHandler) dialForUser(name upspin.UserName) (upspin.KeyServer, error) {
 	// We need to dial this server locally so the new user is authenticated
 	// with it implicitly.
-	ctx := context.New()
-	ctx = context.SetKeyEndpoint(ctx, m.key.Endpoint())
-	ctx = context.SetUserName(ctx, name)
+	ctx := config.New()
+	ctx = config.SetKeyEndpoint(ctx, m.key.Endpoint())
+	ctx = config.SetUserName(ctx, name)
 
 	service, err := m.key.Dial(ctx, m.key.Endpoint())
 	if err != nil {

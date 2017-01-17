@@ -11,7 +11,7 @@ import (
 	"fmt"
 	"os"
 
-	"upspin.io/context"
+	"upspin.io/config"
 	"upspin.io/pack/ee"
 	"upspin.io/upspin"
 )
@@ -54,7 +54,7 @@ func (s *State) countersignCommand(fs *flag.FlagSet) {
 	}
 
 	lastCtx := s.context
-	s.context = context.SetFactotum(s.context, s.context.Factotum().Pop())
+	s.context = config.SetFactotum(s.context, s.context.Factotum().Pop())
 	defer func() { s.context = lastCtx }()
 
 	root := upspin.PathName(string(s.context.UserName()) + "/")

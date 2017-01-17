@@ -13,7 +13,7 @@ import (
 	"strings"
 
 	"upspin.io/client"
-	"upspin.io/context"
+	"upspin.io/config"
 	"upspin.io/flags"
 	"upspin.io/log"
 	"upspin.io/path"
@@ -38,7 +38,7 @@ type server struct {
 }
 
 func newServer() *server {
-	ctx, err := context.InitContext(nil)
+	ctx, err := config.InitContext(nil)
 	if err != nil {
 		log.Fatal(err)
 	}

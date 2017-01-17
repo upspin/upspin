@@ -7,7 +7,7 @@ package main
 import (
 	"flag"
 
-	"upspin.io/context"
+	"upspin.io/config"
 )
 
 func (s *State) rotate(args ...string) {
@@ -43,7 +43,7 @@ TODO: Rotate and countersign are terms of art, not clear to users.
 		s.exitf("no factotum available")
 	}
 	lastCtx := s.context
-	s.context = context.SetFactotum(s.context, f.Pop()) // context now defaults to old key
+	s.context = config.SetFactotum(s.context, f.Pop()) // context now defaults to old key
 	defer func() { s.context = lastCtx }()
 
 	keyServer := s.KeyServer()

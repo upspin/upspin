@@ -17,7 +17,7 @@ import (
 	"testing"
 
 	"upspin.io/bind"
-	"upspin.io/context"
+	"upspin.io/config"
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/pack"
@@ -50,17 +50,17 @@ func newContextAndServices(name upspin.UserName) (ctx upspin.Context, key upspin
 		Transport: upspin.InProcess,
 		NetAddr:   "", // ignored
 	}
-	ctx = context.New()
-	ctx = context.SetUserName(ctx, name)
-	ctx = context.SetPacking(ctx, upspin.DebugPack)
-	ctx = context.SetKeyEndpoint(ctx, endpoint)
-	ctx = context.SetStoreEndpoint(ctx, endpoint)
-	ctx = context.SetDirEndpoint(ctx, endpoint)
+	ctx = config.New()
+	ctx = config.SetUserName(ctx, name)
+	ctx = config.SetPacking(ctx, upspin.DebugPack)
+	ctx = config.SetKeyEndpoint(ctx, endpoint)
+	ctx = config.SetStoreEndpoint(ctx, endpoint)
+	ctx = config.SetDirEndpoint(ctx, endpoint)
 	f, err := factotum.NewFromDir(repo("key/testdata/dir-server"))
 	if err != nil {
 		panic(err)
 	}
-	ctx = context.SetFactotum(ctx, f)
+	ctx = config.SetFactotum(ctx, f)
 
 	key, _ = bind.KeyServer(ctx, ctx.KeyEndpoint())
 	store, _ = bind.StoreServer(ctx, ctx.KeyEndpoint())
@@ -70,12 +70,12 @@ func newContextAndServices(name upspin.UserName) (ctx upspin.Context, key upspin
 
 func setup() (upspin.Context, upspin.DirServer) {
 	userName := nextUser()
-	context, key, dir, _ := newContextAndServices(userName)
+	config, key, dir, _ := newContextAndServices(userName)
 	user := &upspin.User{
 		Name:      upspin.UserName(userName),
-		Dirs:      []upspin.Endpoint{context.DirEndpoint()},
-		Stores:    []upspin.Endpoint{context.StoreEndpoint()},
-		PublicKey: context.Factotum().PublicKey(),
+		Dirs:      []upspin.Endpoint{config.DirEndpoint()},
+		Stores:    []upspin.Endpoint{config.StoreEndpoint()},
+		PublicKey: config.Factotum().PublicKey(),
 	}
 	err := key.Put(user)
 	if err != nil {
@@ -85,22 +85,22 @@ func setup() (upspin.Context, upspin.DirServer) {
 	if err != nil {
 		panic(err)
 	}
-	return context, dir
+	return config, dir
 }
 
-func storeData(t *testing.T, context upspin.Context, data []byte, name upspin.PathName) *upspin.DirEntry {
-	return storeDataHelper(t, context, data, name, context.Packing())
+func storeData(t *testing.T, config upspin.Context, data []byte, name upspin.PathName) *upspin.DirEntry {
+	return storeDataHelper(t, config, data, name, config.Packing())
 }
 
 func storePlainWithIntegrity(t *testing.T, context upspin.Context, data []byte, name upspin.PathName) *upspin.DirEntry {
 	return storeDataHelper(t, context, data, name, upspin.EEIntegrityPack)
 }
 
-func storeDataHelper(t *testing.T, context upspin.Context, data []byte, name upspin.PathName, packing upspin.Packing) *upspin.DirEntry {
+func storeDataHelper(t *testing.T, config upspin.Context, data []byte, name upspin.PathName, packing upspin.Packing) *upspin.DirEntry {
 	if path.Clean(name) != name {
 		t.Fatalf("%q is not a clean path name", name)
 	}
-	entry, err := newDirEntry(context, packing, name, data, upspin.AttrNone, "", upspin.SeqIgnore)
+	entry, err := newDirEntry(config, packing, name, data, upspin.AttrNone, "", upspin.SeqIgnore)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -113,12 +113,12 @@ func storeDataHelper(t *testing.T, context upspin.Context, data []byte, name ups
 }
 
 // readAll retrieves the data for the entry. It is a test-only version of Service.readAll.
-func readAll(context upspin.Context, entry *upspin.DirEntry) ([]byte, error) {
+func readAll(config upspin.Context, entry *upspin.DirEntry) ([]byte, error) {
 	packer := pack.Lookup(entry.Packing)
 	if packer == nil {
 		return nil, errors.Errorf("no packing %#x registered", entry.Packing)
 	}
-	u, err := packer.Unpack(context, entry)
+	u, err := packer.Unpack(config, entry)
 	if err != nil {
 		return nil, err
 	}
@@ -128,7 +128,7 @@ func readAll(context upspin.Context, entry *upspin.DirEntry) ([]byte, error) {
 		if !ok {
 			break
 		}
-		store, err := bind.StoreServer(context, context.StoreEndpoint())
+		store, err := bind.StoreServer(config, config.StoreEndpoint())
 		if err != nil {
 			return nil, err
 		}
@@ -164,13 +164,13 @@ func makeDirectory(dir upspin.DirServer, directoryName upspin.PathName) (*upspin
 }
 
 func TestPutTopLevelFileUsingDirectory(t *testing.T) {
-	context, directory := setup()
-	user := context.UserName()
+	config, directory := setup()
+	user := config.UserName()
 	root := upspin.PathName(user + "/")
 	fileName := root + "file"
 	const text = "hello sailor"
 
-	entry1 := storeData(t, context, []byte(text), fileName)
+	entry1 := storeData(t, config, []byte(text), fileName)
 	if len(entry1.Blocks) != 1 {
 		t.Fatalf("internal error: %v: expected one block, found %d", fileName, len(entry1.Blocks))
 	}
@@ -192,7 +192,7 @@ func TestPutTopLevelFileUsingDirectory(t *testing.T) {
 	}
 
 	// Fetch the data back and inspect it.
-	clear, err := readAll(context, entry1)
+	clear, err := readAll(config, entry1)
 	if err != nil {
 		t.Fatal("unpack:", err)
 	}
@@ -205,14 +205,14 @@ func TestPutTopLevelFileUsingDirectory(t *testing.T) {
 const nFile = 100
 
 func TestPutHundredTopLevelFilesUsingDirectory(t *testing.T) {
-	context, directory := setup()
-	user := context.UserName()
+	config, directory := setup()
+	user := config.UserName()
 	// Create a hundred files.
 	locs := make([]upspin.Location, nFile)
 	for i := 0; i < nFile; i++ {
 		text := "X" + strings.Repeat(fmt.Sprint(i), i) // Need a non-empty file so we have a Location.
 		fileName := upspin.PathName(fmt.Sprintf("%s/file.%d", user, i))
-		entry := storeData(t, context, []byte(text), fileName)
+		entry := storeData(t, config, []byte(text), fileName)
 		_, err := directory.Put(entry)
 		if err != nil {
 			t.Fatal("put file:", err)
@@ -229,7 +229,7 @@ func TestPutHundredTopLevelFilesUsingDirectory(t *testing.T) {
 		if err != nil {
 			t.Fatalf("lookup %s: %s", fileName, err)
 		}
-		clear, err := readAll(context, entry)
+		clear, err := readAll(config, entry)
 		if err != nil {
 			t.Fatal("unpack:", err)
 		}
@@ -241,14 +241,14 @@ func TestPutHundredTopLevelFilesUsingDirectory(t *testing.T) {
 }
 
 func TestGetHundredTopLevelFilesUsingDirectory(t *testing.T) {
-	context, directory := setup()
-	user := context.UserName()
+	config, directory := setup()
+	user := config.UserName()
 	// Create a hundred files.
 	href := make([]upspin.Location, nFile)
 	for i := 0; i < nFile; i++ {
 		text := "Y" + strings.Repeat(fmt.Sprint(i), i) // Need a non-empty file so we have a Location.
 		fileName := upspin.PathName(fmt.Sprintf("%s/file.%d", user, i))
-		entry := storeData(t, context, []byte(text), fileName)
+		entry := storeData(t, config, []byte(text), fileName)
 		_, err := directory.Put(entry)
 		if err != nil {
 			t.Fatal("put file:", err)
@@ -265,7 +265,7 @@ func TestGetHundredTopLevelFilesUsingDirectory(t *testing.T) {
 		if err != nil {
 			t.Fatalf("lookup %s: %s", fileName, err)
 		}
-		clear, err := readAll(context, entry)
+		clear, err := readAll(config, entry)
 		if err != nil {
 			t.Fatalf("%q: unpack file: %v", fileName, err)
 		}
@@ -277,8 +277,8 @@ func TestGetHundredTopLevelFilesUsingDirectory(t *testing.T) {
 }
 
 func TestCreateDirectoriesAndAFile(t *testing.T) {
-	context, directory := setup()
-	user := context.UserName()
+	config, directory := setup()
+	user := config.UserName()
 	dirName := upspin.PathName(fmt.Sprintf("%s/foo", user))
 	entry, err := makeDirectory(directory, dirName)
 	if err != nil {
@@ -301,7 +301,7 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	}
 	fileName := upspin.PathName(fmt.Sprintf("%s/foo/bar/asdf/zot/file", user))
 	text := "hello world"
-	entry = storeData(t, context, []byte(text), fileName)
+	entry = storeData(t, config, []byte(text), fileName)
 	e, err := directory.Put(entry)
 	if err != nil {
 		t.Fatal(err)
@@ -311,7 +311,7 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	}
 	// Read it back.
 	entry, err = directory.Lookup(fileName)
-	data, err := readAll(context, entry)
+	data, err := readAll(config, entry)
 	if err != nil {
 		t.Fatalf("%q: unpack file: %v", fileName, err)
 	}
@@ -321,14 +321,14 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	}
 	// Now overwrite it.
 	text = "goodnight mother"
-	entry = storeData(t, context, []byte(text), fileName)
+	entry = storeData(t, config, []byte(text), fileName)
 	_, err = directory.Put(entry)
 	if err != nil {
 		t.Fatal(err)
 	}
 	// Read it back.
 	entry, err = directory.Lookup(fileName)
-	data, err = readAll(context, entry)
+	data, err = readAll(config, entry)
 	if err != nil {
 		t.Fatalf("%q: second unpack file: %v", fileName, err)
 	}
@@ -371,8 +371,8 @@ var globTests = []globTest{
 }
 
 func TestGlob(t *testing.T) {
-	context, directory := setup()
-	user := context.UserName()
+	config, directory := setup()
+	user := config.UserName()
 	// Build the tree.
 	dirs := []string{
 		"ten",
@@ -395,7 +395,7 @@ func TestGlob(t *testing.T) {
 	}
 	for _, file := range files {
 		name := upspin.PathName(fmt.Sprintf("%s/%s", user, file))
-		entry := storeData(t, context, []byte(name), name)
+		entry := storeData(t, config, []byte(name), name)
 		_, err := directory.Put(entry)
 		if err != nil {
 			t.Fatalf("make file: %s: %v", name, err)
@@ -439,33 +439,33 @@ func TestGlob(t *testing.T) {
 }
 
 func TestGlobSyntaxError(t *testing.T) {
-	context, directory := setup()
+	config, directory := setup()
 	// We need to create a file so the Glob test processes the whole pattern.
-	user := context.UserName()
+	user := config.UserName()
 	root := upspin.PathName(user + "/")
 	fileName := root + "file"
-	entry := storeData(t, context, []byte("hello"), fileName)
+	entry := storeData(t, config, []byte("hello"), fileName)
 	_, err := directory.Put(entry)
 	if err != nil {
 		t.Fatal(err)
 	}
 	expectErr := errors.E("dir/inprocess.Glob", errors.Invalid)
-	_, err = directory.Glob(string(context.UserName()) + "/[]")
+	_, err = directory.Glob(string(config.UserName()) + "/[]")
 	if !errors.Match(expectErr, err) {
 		t.Fatalf("err = %v; expected %v", err, expectErr)
 	}
 }
 
 func TestSequencing(t *testing.T) {
-	context, directory := setup()
-	user := context.UserName()
+	config, directory := setup()
+	user := config.UserName()
 	fileName := upspin.PathName(user + "/file")
 	// Validate sequence increases after write.
 	seq := int64(-1)
 	for i := 0; i < 10; i++ {
 		// Create a file.
 		text := fmt.Sprintln("version", i)
-		entry := storeData(t, context, []byte(text), fileName)
+		entry := storeData(t, config, []byte(text), fileName)
 		_, err := directory.Put(entry)
 		if err != nil {
 			t.Fatalf("put file %d: %v", i, err)
@@ -486,7 +486,7 @@ func TestSequencing(t *testing.T) {
 		t.Fatalf("lookup root: %v", err)
 	}
 	dirSeq := entry.Sequence
-	entry = storeData(t, context, []byte("first seq version"), fileName)
+	entry = storeData(t, config, []byte("first seq version"), fileName)
 	entry.Sequence = seq
 	_, err = directory.Put(entry)
 	if err != nil {
@@ -507,7 +507,7 @@ func TestSequencing(t *testing.T) {
 		t.Fatalf("wrong sequence for directory: expected %d got %d", dirSeq+1, entry.Sequence)
 	}
 	// Now check it fails if we don't.
-	entry = storeData(t, context, []byte("second seq version"), fileName)
+	entry = storeData(t, config, []byte("second seq version"), fileName)
 	entry.Sequence = seq
 	_, err = directory.Put(entry)
 	if err == nil {
@@ -520,15 +520,15 @@ func TestSequencing(t *testing.T) {
 }
 
 func TestRootDirectorySequencing(t *testing.T) {
-	context, directory := setup()
-	user := context.UserName()
+	config, directory := setup()
+	user := config.UserName()
 	fileName := upspin.PathName(user + "/file")
 	// Validate sequence increases after write.
 	seq := int64(-1)
 	for i := 0; i < 10; i++ {
 		// Create a file.
 		text := fmt.Sprintln("version", i)
-		entry := storeData(t, context, []byte(text), fileName)
+		entry := storeData(t, config, []byte(text), fileName)
 		_, err := directory.Put(entry)
 		if err != nil {
 			t.Fatalf("put file %d: %v", i, err)
@@ -545,10 +545,10 @@ func TestRootDirectorySequencing(t *testing.T) {
 }
 
 func TestSeqNotExist(t *testing.T) {
-	context, directory := setup()
-	user := context.UserName()
+	config, directory := setup()
+	user := config.UserName()
 	fileName := upspin.PathName(user + "/file")
-	entry := storeData(t, context, []byte("hello"), fileName)
+	entry := storeData(t, config, []byte("hello"), fileName)
 	// First write with SeqNotExist should succeed.
 	entry.Sequence = upspin.SeqNotExist
 	_, err := directory.Put(entry)
@@ -566,10 +566,10 @@ func TestSeqNotExist(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	context, dir := setup()
-	user := context.UserName()
+	config, dir := setup()
+	user := config.UserName()
 	fileName := upspin.PathName(user + "/file")
-	entry := storeData(t, context, []byte("hello"), fileName)
+	entry := storeData(t, config, []byte("hello"), fileName)
 	_, err := dir.Put(entry)
 	if err != nil {
 		t.Fatal(err)
@@ -598,15 +598,15 @@ func TestDelete(t *testing.T) {
 }
 
 func TestDeleteDirectory(t *testing.T) {
-	context, dir := setup()
-	user := context.UserName()
+	config, dir := setup()
+	user := config.UserName()
 	dirName := upspin.PathName(user + "/dir")
 	fileName := dirName + "/file"
 	_, err := makeDirectory(dir, dirName)
 	if err != nil {
 		t.Fatal(err)
 	}
-	entry := storeData(t, context, []byte("hello"), fileName)
+	entry := storeData(t, config, []byte("hello"), fileName)
 	_, err = dir.Put(entry)
 	if err != nil {
 		t.Fatal(err)
@@ -647,8 +647,8 @@ func TestDeleteDirectory(t *testing.T) {
 }
 
 func TestWhichAccess(t *testing.T) {
-	context, dir := setup()
-	user := context.UserName()
+	config, dir := setup()
+	user := config.UserName()
 	dir1Name := upspin.PathName(user + "/dir1")
 	dir2Name := dir1Name + "/dir2"
 	fileName := dir2Name + "/file"
@@ -661,7 +661,7 @@ func TestWhichAccess(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	entry := storeData(t, context, []byte("hello"), fileName)
+	entry := storeData(t, config, []byte("hello"), fileName)
 	_, err = dir.Put(entry)
 	if err != nil {
 		t.Fatal(err)
@@ -679,7 +679,7 @@ func TestWhichAccess(t *testing.T) {
 		t.Errorf("expected no Access file, got %q", accessEntry.Name)
 	}
 	// Add an Access file to dir1.
-	entry = storePlainWithIntegrity(t, context, []byte("r:*@google.com\n"), accessFileName)
+	entry = storePlainWithIntegrity(t, config, []byte("r:*@google.com\n"), accessFileName)
 	_, err = dir.Put(entry)
 	if err != nil {
 		t.Fatal(err)
@@ -707,8 +707,8 @@ func TestWhichAccess(t *testing.T) {
 }
 
 func TestLinkToFile(t *testing.T) {
-	context, dir := setup()
-	user := context.UserName()
+	config, dir := setup()
+	user := config.UserName()
 	dirName := upspin.PathName(user + "/dir")
 	fileName := dirName + "/file"
 	linkName := upspin.PathName(user + "/link")
@@ -720,7 +720,7 @@ func TestLinkToFile(t *testing.T) {
 	if e != nil {
 		t.Fatal("non-nil entry from makeDirectory")
 	}
-	entry := storeData(t, context, []byte("hello"), fileName)
+	entry := storeData(t, config, []byte("hello"), fileName)
 	e, err = dir.Put(entry)
 	if err != nil {
 		t.Fatal(err)
@@ -733,7 +733,7 @@ func TestLinkToFile(t *testing.T) {
 		t.Fatal(err)
 	}
 	// File exists. Now create a link to it in the root.
-	linkEntry, err := newDirEntry(context, upspin.PlainPack, linkName, nil, upspin.AttrLink, fileName, upspin.SeqIgnore)
+	linkEntry, err := newDirEntry(config, upspin.PlainPack, linkName, nil, upspin.AttrLink, fileName, upspin.SeqIgnore)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -752,7 +752,7 @@ func TestLinkToFile(t *testing.T) {
 	}
 
 	// Put through the link, should get ErrFollow link with the right path.
-	putEntry, err := newDirEntry(context, upspin.PlainPack, linkName, []byte("hello"), upspin.AttrNone, "", upspin.SeqIgnore)
+	putEntry, err := newDirEntry(config, upspin.PlainPack, linkName, []byte("hello"), upspin.AttrNone, "", upspin.SeqIgnore)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -765,7 +765,7 @@ func TestLinkToFile(t *testing.T) {
 	}
 
 	// Make a link to the directory.
-	dirLinkEntry, err := newDirEntry(context, upspin.PlainPack, dirLinkName, nil, upspin.AttrLink, dirName, upspin.SeqIgnore)
+	dirLinkEntry, err := newDirEntry(config, upspin.PlainPack, dirLinkName, nil, upspin.AttrLink, dirName, upspin.SeqIgnore)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -829,8 +829,8 @@ func equalNames(t *testing.T, user upspin.UserName, entries []*upspin.DirEntry, 
 }
 
 func TestWhichAccessLink(t *testing.T) {
-	context, dir := setup()
-	user := context.UserName()
+	config, dir := setup()
+	user := config.UserName()
 	// This is more elaborate than we need, but it's clear.
 	// We construct a tree with a private directory and a public one, with
 	// suitable access controls. (We just one user; it's all we need.)
@@ -850,7 +850,7 @@ func TestWhichAccessLink(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	entry := storeData(t, context, []byte("hello"), privateFileName)
+	entry := storeData(t, config, []byte("hello"), privateFileName)
 	_, err = dir.Put(entry)
 	if err != nil {
 		t.Fatal(err)
@@ -860,7 +860,7 @@ func TestWhichAccessLink(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Private file exists. Now create a link to it in the public directory.
-	linkEntry, err := newDirEntry(context, upspin.PlainPack, publicLinkName, nil, upspin.AttrLink, privateFileName, upspin.SeqIgnore)
+	linkEntry, err := newDirEntry(config, upspin.PlainPack, publicLinkName, nil, upspin.AttrLink, privateFileName, upspin.SeqIgnore)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -878,13 +878,13 @@ func TestWhichAccessLink(t *testing.T) {
 	}
 	// All is well. Now create two access files, a public one and a private one.
 	// The contents don't really matter, since DirServer doesn't evaluate links, but be thorough.
-	entry = storePlainWithIntegrity(t, context, []byte("\n"), privateAccessFileName) // TODO(ehg,r): why is empty a problem with integrity?
+	entry = storePlainWithIntegrity(t, config, []byte("\n"), privateAccessFileName) // TODO(ehg,r): why is empty a problem with integrity?
 	_, err = dir.Put(entry)
 	if err != nil {
 		t.Fatal(err)
 	}
 	allRights := fmt.Sprintf("*:%s\n", user)
-	entry = storePlainWithIntegrity(t, context, []byte(allRights), publicAccessFileName)
+	entry = storePlainWithIntegrity(t, config, []byte(allRights), publicAccessFileName)
 	_, err = dir.Put(entry)
 	if err != nil {
 		t.Fatal(err)

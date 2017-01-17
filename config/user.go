@@ -2,11 +2,11 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package context
+package config
 
 import "upspin.io/upspin"
 
-// User returns an upspin.User record for the user in the given context.
+// User returns an upspin.User record for the user in the given configuration.
 func User(ctx upspin.Context) *upspin.User {
 	var key upspin.PublicKey
 	if f := ctx.Factotum(); f != nil {

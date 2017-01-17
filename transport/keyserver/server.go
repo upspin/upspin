@@ -12,7 +12,7 @@ import (
 
 	pb "github.com/golang/protobuf/proto"
 
-	"upspin.io/context"
+	"upspin.io/config"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/transport/auth"
@@ -61,7 +61,7 @@ func (s *server) serverFor(session auth.Session, reqBytes []byte, req pb.Message
 	if err := pb.Unmarshal(reqBytes, req); err != nil {
 		return nil, err
 	}
-	svc, err := s.key.Dial(context.SetUserName(s.context, session.User()), s.key.Endpoint())
+	svc, err := s.key.Dial(config.SetUserName(s.context, session.User()), s.key.Endpoint())
 	if err != nil {
 		return nil, err
 	}

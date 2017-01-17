@@ -15,7 +15,7 @@ import (
 	"testing"
 
 	"upspin.io/bind"
-	"upspin.io/context"
+	"upspin.io/config"
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/pack"
@@ -221,7 +221,7 @@ func TestSharing(t *testing.T) {
 		keyToReturn: []upspin.PublicKey{joectx.Factotum().PublicKey()},
 	}
 	bind.RegisterKeyServer(upspin.InProcess, mockKey)
-	joectx = context.SetKeyEndpoint(joectx, upspin.Endpoint{Transport: upspin.InProcess})
+	joectx = config.SetKeyEndpoint(joectx, upspin.Endpoint{Transport: upspin.InProcess})
 
 	d := &upspin.DirEntry{
 		Name:       pathName,
@@ -232,7 +232,7 @@ func TestSharing(t *testing.T) {
 
 	// Now load Bob as the current user.
 	bobctx, packer := setup(bobsUserName)
-	bobctx = context.SetKeyEndpoint(bobctx, upspin.Endpoint{Transport: upspin.InProcess})
+	bobctx = config.SetKeyEndpoint(bobctx, upspin.Endpoint{Transport: upspin.InProcess})
 	clear := unpackBlob(t, bobctx, packer, d, cipher)
 	if string(clear) != text {
 		t.Errorf("Expected %s, got %s", text, clear)
@@ -245,7 +245,7 @@ func TestSharing(t *testing.T) {
 }
 
 func setup(name upspin.UserName) (upspin.Context, upspin.Packer) {
-	ctx := context.SetUserName(context.New(), name)
+	ctx := config.SetUserName(config.New(), name)
 	packer := pack.Lookup(packing)
 	j := strings.IndexByte(string(name), '@')
 	if j < 0 {
@@ -255,7 +255,7 @@ func setup(name upspin.UserName) (upspin.Context, upspin.Packer) {
 	if err != nil {
 		log.Fatalf("unable to initialize factotum for %s", string(name[:j]))
 	}
-	ctx = context.SetFactotum(ctx, f)
+	ctx = config.SetFactotum(ctx, f)
 	return ctx, packer
 }
 

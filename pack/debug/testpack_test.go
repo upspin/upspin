@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"upspin.io/bind"
-	"upspin.io/context"
+	"upspin.io/config"
 	"upspin.io/log"
 	"upspin.io/pack"
 	"upspin.io/pack/internal/packtest"
@@ -44,10 +44,10 @@ var (
 )
 
 func init() {
-	c := context.New()
-	c = context.SetUserName(c, userName)
-	c = context.SetPacking(c, upspin.DebugPack)
-	c = context.SetKeyEndpoint(c, inProcess)
+	c := config.New()
+	c = config.SetUserName(c, userName)
+	c = config.SetPacking(c, upspin.DebugPack)
+	c = config.SetKeyEndpoint(c, inProcess)
 	globalContext = c
 }
 

@@ -17,7 +17,7 @@ import (
 	pb "github.com/golang/protobuf/proto"
 
 	"upspin.io/cloud/https"
-	"upspin.io/context"
+	"upspin.io/config"
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/log"
@@ -56,8 +56,8 @@ func startServer() (port string) {
 	srv = &server{}
 	port = pickPort()
 
-	ctx := context.SetUserName(context.New(), user)
-	ctx = context.SetKeyEndpoint(ctx, upspin.Endpoint{Transport: upspin.InProcess})
+	ctx := config.SetUserName(config.New(), user)
+	ctx = config.SetKeyEndpoint(ctx, upspin.Endpoint{Transport: upspin.InProcess})
 	http.Handle("/api/Server/", NewServer(ctx, &ServerConfig{
 		Lookup: lookup,
 		Service: Service{
@@ -118,13 +118,13 @@ func (c *client) Echo(t *testing.T, payload string) (response string) {
 }
 
 func startClient(port string) {
-	ctx := context.SetUserName(context.New(), user)
+	ctx := config.SetUserName(config.New(), user)
 
 	f, err := factotum.NewFromDir(repo("key/testdata/joe"))
 	if err != nil {
 		log.Fatal(err)
 	}
-	ctx = context.SetFactotum(ctx, f)
+	ctx = config.SetFactotum(ctx, f)
 
 	pem, err := ioutil.ReadFile("testdata/cert.pem")
 	if err != nil {
@@ -134,7 +134,7 @@ func startClient(port string) {
 	if ok := pool.AppendCertsFromPEM(pem); !ok {
 		log.Fatal("could not add certificates to pool")
 	}
-	ctx = context.SetCertPool(ctx, pool)
+	ctx = config.SetCertPool(ctx, pool)
 
 	// Try a few times because the server may not be up yet.
 	var authClient Client
