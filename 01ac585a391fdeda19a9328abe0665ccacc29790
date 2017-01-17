@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "43aa999c_91598c3f",
+        "filename": "transport/dircacheserver/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-01-17T23:44:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "63db1d69_6e7bcf2a",
+      "revId": "01ac585a391fdeda19a9328abe0665ccacc29790",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "63db1d69_ee8d7f1b",
         "filename": "transport/dircacheserver/proxied.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2017-01-17T22:49:45Z",
       "side": 1,
       "message": "it might be cleaner if the contents of this for loop were in a separate method\n\nthen you could do things in that function like\n  defer close(done)\n\nand handle all the timeout/retry stuff just once in this loop",
+      "revId": "01ac585a391fdeda19a9328abe0665ccacc29790",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c39e897c_30ce36b1",
+        "filename": "transport/dircacheserver/proxied.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-01-17T23:44:59Z",
+      "side": 1,
+      "message": "You\u0027re right, much netter.",
+      "parentUuid": "63db1d69_ee8d7f1b",
       "revId": "01ac585a391fdeda19a9328abe0665ccacc29790",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "43aa999c_91ae2cd6",
+        "filename": "transport/dircacheserver/proxied.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-01-17T23:44:59Z",
+      "side": 1,
+      "message": "First time which time?  This will be long running and you will presumably move a lap top a few times a day.  Perhaps once an hour?  Still silly but at least it won\u0027t fill your disk up for a long time.",
+      "parentUuid": "63db1d69_4e78132c",
+      "revId": "01ac585a391fdeda19a9328abe0665ccacc29790",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "63db1d69_2e85c7f3",
         "filename": "transport/dircacheserver/proxied.go",
         "patchSetId": 2
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "43aa999c_51d66433",
+        "filename": "transport/dircacheserver/proxied.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-01-17T23:44:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "63db1d69_2e85c7f3",
+      "revId": "01ac585a391fdeda19a9328abe0665ccacc29790",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "63db1d69_0e820bec",
         "filename": "transport/dircacheserver/proxied.go",
         "patchSetId": 2
@@ -81,6 +153,24 @@
       "writtenOn": "2017-01-17T22:49:45Z",
       "side": 1,
       "message": "set done to nil here, otherwise you might try to close it twice (line 181)",
+      "revId": "01ac585a391fdeda19a9328abe0665ccacc29790",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "236e8540_13aff640",
+        "filename": "transport/dircacheserver/proxied.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-01-17T23:44:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "63db1d69_0e820bec",
       "revId": "01ac585a391fdeda19a9328abe0665ccacc29790",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
