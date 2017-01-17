@@ -45,32 +45,32 @@ func nextUser() upspin.UserName {
 	return upspin.UserName(fmt.Sprintf("user%d@google.com", userNumber))
 }
 
-func newContextAndServices(name upspin.UserName) (ctx upspin.Config, key upspin.KeyServer, dir upspin.DirServer, store upspin.StoreServer) {
+func newConfigAndServices(name upspin.UserName) (cfg upspin.Config, key upspin.KeyServer, dir upspin.DirServer, store upspin.StoreServer) {
 	endpoint := upspin.Endpoint{
 		Transport: upspin.InProcess,
 		NetAddr:   "", // ignored
 	}
-	ctx = config.New()
-	ctx = config.SetUserName(ctx, name)
-	ctx = config.SetPacking(ctx, upspin.DebugPack)
-	ctx = config.SetKeyEndpoint(ctx, endpoint)
-	ctx = config.SetStoreEndpoint(ctx, endpoint)
-	ctx = config.SetDirEndpoint(ctx, endpoint)
+	cfg = config.New()
+	cfg = config.SetUserName(cfg, name)
+	cfg = config.SetPacking(cfg, upspin.DebugPack)
+	cfg = config.SetKeyEndpoint(cfg, endpoint)
+	cfg = config.SetStoreEndpoint(cfg, endpoint)
+	cfg = config.SetDirEndpoint(cfg, endpoint)
 	f, err := factotum.NewFromDir(repo("key/testdata/dir-server"))
 	if err != nil {
 		panic(err)
 	}
-	ctx = config.SetFactotum(ctx, f)
+	cfg = config.SetFactotum(cfg, f)
 
-	key, _ = bind.KeyServer(ctx, ctx.KeyEndpoint())
-	store, _ = bind.StoreServer(ctx, ctx.KeyEndpoint())
-	dir = New(ctx)
+	key, _ = bind.KeyServer(cfg, cfg.KeyEndpoint())
+	store, _ = bind.StoreServer(cfg, cfg.KeyEndpoint())
+	dir = New(cfg)
 	return
 }
 
 func setup() (upspin.Config, upspin.DirServer) {
 	userName := nextUser()
-	config, key, dir, _ := newContextAndServices(userName)
+	config, key, dir, _ := newConfigAndServices(userName)
 	user := &upspin.User{
 		Name:      upspin.UserName(userName),
 		Dirs:      []upspin.Endpoint{config.DirEndpoint()},
@@ -92,8 +92,8 @@ func storeData(t *testing.T, config upspin.Config, data []byte, name upspin.Path
 	return storeDataHelper(t, config, data, name, config.Packing())
 }
 
-func storePlainWithIntegrity(t *testing.T, context upspin.Config, data []byte, name upspin.PathName) *upspin.DirEntry {
-	return storeDataHelper(t, context, data, name, upspin.EEIntegrityPack)
+func storePlainWithIntegrity(t *testing.T, config upspin.Config, data []byte, name upspin.PathName) *upspin.DirEntry {
+	return storeDataHelper(t, config, data, name, upspin.EEIntegrityPack)
 }
 
 func storeDataHelper(t *testing.T, config upspin.Config, data []byte, name upspin.PathName, packing upspin.Packing) *upspin.DirEntry {

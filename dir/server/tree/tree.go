@@ -55,7 +55,7 @@ type Tree struct {
 	mu sync.Mutex
 
 	user     upspin.UserName
-	context  upspin.Config
+	config   upspin.Config
 	packer   upspin.Packer
 	log      *Log
 	logIndex *LogIndex
@@ -72,20 +72,20 @@ func (n *node) String() string {
 	return fmt.Sprintf("node: %q, dirty: %v, kids: %d", n.entry.Name, n.dirty, len(n.kids))
 }
 
-// New creates an empty Tree using the server's context, a Log and a
-// LogIndex for a particular user's tree. Context is used for contacting
+// New creates an empty Tree using the server's config, a Log and a
+// LogIndex for a particular user's tree. Config is used for contacting
 // StoreServer, defining the default packing and setting the server name.
-// All fields of the context must be defined. Log manipulates the log on behalf
+// All fields of the config must be defined. Log manipulates the log on behalf
 // of the tree for a user. LogIndex is used by Tree to track the most recent
 // changes stored in the log for the user. The user name in Log and LogIndex
 // must be for the exact same user. If there are unprocessed log entries in
 // the Log, the Tree's state is recovered from it.
 // TODO: Maybe new is doing too much work. Figure out how to break in two without
 // returning an inconsistent new tree if log is unprocessed.
-func New(context upspin.Config, log *Log, logIndex *LogIndex) (*Tree, error) {
+func New(config upspin.Config, log *Log, logIndex *LogIndex) (*Tree, error) {
 	const op = "dir/server/tree.New"
-	if context == nil {
-		return nil, errors.E(op, errors.Invalid, errors.Str("context is nil"))
+	if config == nil {
+		return nil, errors.E(op, errors.Invalid, errors.Str("config is nil"))
 	}
 	if log == nil {
 		return nil, errors.E(op, errors.Invalid, errors.Str("log is nil"))
@@ -93,17 +93,17 @@ func New(context upspin.Config, log *Log, logIndex *LogIndex) (*Tree, error) {
 	if logIndex == nil {
 		return nil, errors.E(op, errors.Invalid, errors.Str("logIndex is nil"))
 	}
-	if context.StoreEndpoint().Transport == upspin.Unassigned {
+	if config.StoreEndpoint().Transport == upspin.Unassigned {
 		return nil, errors.E(op, errors.Invalid, errors.Str("unassigned store endpoint"))
 	}
-	if context.KeyEndpoint().Transport == upspin.Unassigned {
+	if config.KeyEndpoint().Transport == upspin.Unassigned {
 		return nil, errors.E(op, errors.Invalid, errors.Str("unassigned key endpoint"))
 	}
-	if context.Factotum() == nil {
+	if config.Factotum() == nil {
 		return nil, errors.E(op, errors.Invalid, errors.Str("factotum is nil"))
 	}
-	if context.UserName() == "" {
-		return nil, errors.E(op, errors.Invalid, errors.Str("username in tree context is empty"))
+	if config.UserName() == "" {
+		return nil, errors.E(op, errors.Invalid, errors.Str("username in tree config is empty"))
 	}
 	if log.User() == "" {
 		return nil, errors.E(op, errors.Invalid, errors.Str("username in log is empty"))
@@ -114,13 +114,13 @@ func New(context upspin.Config, log *Log, logIndex *LogIndex) (*Tree, error) {
 	if err := valid.UserName(log.User()); err != nil {
 		return nil, errors.E(op, errors.Invalid, err)
 	}
-	packer := pack.Lookup(context.Packing())
+	packer := pack.Lookup(config.Packing())
 	if packer == nil {
-		return nil, errors.E(op, errors.Invalid, errors.Errorf("no packing %s registered", context.Packing()))
+		return nil, errors.E(op, errors.Invalid, errors.Errorf("no packing %s registered", config.Packing()))
 	}
 	t := &Tree{
 		user:     log.User(),
-		context:  context,
+		config:   config,
 		packer:   packer,
 		log:      log,
 		logIndex: logIndex,
@@ -417,7 +417,7 @@ func (t *Tree) loadNode(parent *node, elem string) (*node, error) {
 // loadKids loads all kids of a parent node from the Store.
 // t.mu must be held.
 func (t *Tree) loadKids(parent *node) error {
-	data, err := clientutil.ReadAll(t.context, &parent.entry)
+	data, err := clientutil.ReadAll(t.config, &parent.entry)
 	if err != nil {
 		return err
 	}

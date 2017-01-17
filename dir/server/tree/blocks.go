@@ -20,7 +20,7 @@ const blockSize = 1024 * 1024 // 1MB
 // Children of n, if any, must not be dirty.
 func (t *Tree) store(n *node) error {
 	// Get our store server.
-	storeServer, err := bind.StoreServer(t.context, t.context.StoreEndpoint())
+	storeServer, err := bind.StoreServer(t.config, t.config.StoreEndpoint())
 	if err != nil {
 		return err
 	}
@@ -36,13 +36,13 @@ func (t *Tree) store(n *node) error {
 
 	// Prepare the dirEntry
 	n.entry.Blocks = nil // if any blocks existed, their references are lost as we're packing dirEntry again.
-	n.entry.Packing = t.context.Packing()
+	n.entry.Packing = t.config.Packing()
 	n.entry.Time = upspin.Now()
-	n.entry.Writer = t.context.UserName()
+	n.entry.Writer = t.config.UserName()
 	// Sequence number is already up-to-date (see setNodeDirtyAt).
 
 	// Start packing.
-	bp, err := packer.Pack(t.context, &n.entry)
+	bp, err := packer.Pack(t.config, &n.entry)
 	if err != nil {
 		return errors.E(err)
 	}
