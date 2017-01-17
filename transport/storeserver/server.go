@@ -51,6 +51,7 @@ func (s *server) serverFor(session auth.Session, reqBytes []byte, req pb.Message
 		return nil, err
 	}
 	e := s.store.Endpoint()
+	log.Info.Printf("proxiedEndpoint is %s", session.ProxiedEndpoint())
 	if ep := session.ProxiedEndpoint(); ep.Transport != upspin.Unassigned {
 		e = ep
 	}
