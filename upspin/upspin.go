@@ -171,13 +171,13 @@ type Packer interface {
 	// to store the cleartext after packing.
 	// PackLen might update the entry's Packdata field.
 	// PackLen returns -1 if there is an error.
-	PackLen(context Config, cleartext []byte, entry *DirEntry) int
+	PackLen(config Config, cleartext []byte, entry *DirEntry) int
 
 	// UnpackLen returns an upper bound on the number of bytes
 	// required to store the unpacked cleartext.
 	// UnpackLen might update the entry's Packdata field.
 	// UnpackLen returns -1 if there is an error.
-	UnpackLen(context Config, ciphertext []byte, entry *DirEntry) int
+	UnpackLen(config Config, ciphertext []byte, entry *DirEntry) int
 
 	// ReaderHashes returns SHA-256 hashes of the public keys able to decrypt the
 	// associated ciphertext.
@@ -192,13 +192,13 @@ type Packer interface {
 	// In case of error, Share skips processing for that reader or packdata.
 	// If packdata[i] is nil on return, it was skipped.
 	// Share trusts the caller to check the arguments are not malicious.
-	Share(context Config, readers []PublicKey, packdata []*[]byte)
+	Share(config Config, readers []PublicKey, packdata []*[]byte)
 
 	// Name updates the DirEntry to refer to a new path. If the new
 	// path is in a different directory, the wrapped keys are reduced to
 	// only that of the Upspin user invoking the method. The Packdata
 	// in entry must contain a wrapped key for that user.
-	Name(context Config, entry *DirEntry, path PathName) error
+	Name(config Config, entry *DirEntry, path PathName) error
 }
 
 const (

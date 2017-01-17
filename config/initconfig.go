@@ -30,7 +30,7 @@ import (
 
 var inTest = false // Generate errors instead of logs for certain problems.
 
-// base implements upspin.Context, returning default values for all operations.
+// base implements upspin.Config, returning default values for all operations.
 type base struct{}
 
 func (base) UserName() upspin.UserName      { return defaultUserName }
@@ -52,7 +52,7 @@ func init() {
 	}
 }
 
-// New returns a context with all fields set as defaults.
+// New returns a config with all fields set as defaults.
 func New() upspin.Config {
 	return base{}
 }
@@ -75,14 +75,14 @@ const (
 	tlscerts    = "tlscerts"
 )
 
-// ErrNoFactotum indicates that the returned context contains no Factotum, and
+// ErrNoFactotum indicates that the returned config contains no Factotum, and
 // that the user requested this by setting secrets=none in the configuration.
 var ErrNoFactotum = errors.Str("factotum not initialized: no secrets provided")
 
-// FromFile initializes a context using the given file. If the file cannot
+// FromFile initializes a config using the given file. If the file cannot
 // be opened but the name can be found in $HOME/upspin, that file is used.
-// As with InitContext, environment variables may override the
-// values in the context file.
+// As with InitConfig, environment variables may override the
+// values in the config file.
 func FromFile(name string) (upspin.Config, error) {
 	f, err := os.Open(name)
 	if err != nil && !filepath.IsAbs(name) && os.IsNotExist(err) {
@@ -96,10 +96,10 @@ func FromFile(name string) (upspin.Config, error) {
 		return nil, errors.E("config.FromFile", err)
 	}
 	defer f.Close()
-	return InitContext(f)
+	return InitConfig(f)
 }
 
-// InitContext returns a context generated from a configuration file and/or
+// InitConfig returns a config generated from a configuration file and/or
 // environment variables.
 //
 // A configuration file should be of the format
@@ -115,7 +115,7 @@ func FromFile(name string) (upspin.Config, error) {
 // configuration key, may override configuration values in the config file.
 //
 // Any endpoints (keyserver, dirserver, storeserver) not set in the data for
-// the context will be set to the "unassigned" transport and an empty network
+// the config will be set to the "unassigned" transport and an empty network
 // address, except keyserver which defaults to "remote,key.upspin.io:443".
 // If an endpoint is specified without a transport it is assumed to be
 // the address component of a remote endpoint.
@@ -126,7 +126,7 @@ func FromFile(name string) (upspin.Config, error) {
 //
 // The default value for secrets is "$HOME/.ssh".
 // The special value "none" indicates there are no secrets to load;
-// in this case, the returned context will not include a Factotum
+// in this case, the returned config will not include a Factotum
 // and the returned error is ErrNoFactotum.
 //
 // The tlscerts key specifies a directory containing PEM certificates define
@@ -135,8 +135,8 @@ func FromFile(name string) (upspin.Config, error) {
 // Files without the suffix ".pem" are ignored.
 // The default value for tlscerts is the empty string,
 // in which case just the system roots are used.
-func InitContext(r io.Reader) (upspin.Config, error) {
-	const op = "config.InitContext"
+func InitConfig(r io.Reader) (upspin.Config, error) {
+	const op = "config.InitConfig"
 	vals := map[string]string{
 		username:    string(defaultUserName),
 		packing:     defaultPacking.String(),
@@ -176,21 +176,21 @@ func InitContext(r io.Reader) (upspin.Config, error) {
 		return nil, errors.E(op, err)
 	}
 
-	// Construct a context from vals.
-	ctx := New()
+	// Construct a config from vals.
+	cfg := New()
 
 	// Put the canonical respresentation of the username in the config.
 	username, err := user.Clean(upspin.UserName(vals[username]))
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
-	ctx = SetUserName(ctx, username)
+	cfg = SetUserName(cfg, username)
 
 	packer := pack.LookupByName(vals[packing])
 	if packer == nil {
 		return nil, errors.E(op, errors.Invalid, errors.Errorf("unknown packing %q", vals[packing]))
 	}
-	ctx = SetPacking(ctx, packer.Packing())
+	cfg = SetPacking(cfg, packer.Packing())
 
 	if dir := vals[tlscerts]; dir != "" {
 		pool, err := certPoolFromDir(dir)
@@ -198,9 +198,9 @@ func InitContext(r io.Reader) (upspin.Config, error) {
 			return nil, errors.E(op, err)
 		}
 		if pool != nil {
-			ctx = SetCertPool(ctx, pool)
+			cfg = SetCertPool(cfg, pool)
 		} else {
-			log.Info.Printf("context: no PEM certificates found in %q", dir)
+			log.Info.Printf("config: no PEM certificates found in %q", dir)
 		}
 	}
 
@@ -218,16 +218,16 @@ func InitContext(r io.Reader) (upspin.Config, error) {
 		if err != nil {
 			return nil, errors.E(op, err)
 		}
-		ctx = SetFactotum(ctx, f)
+		cfg = SetFactotum(cfg, f)
 		// This must be done before bind so that keys are ready for authenticating to servers.
 	}
 
-	ctx = SetKeyEndpoint(ctx, parseEndpoint(op, vals, keyserver, &err))
-	ctx = SetStoreEndpoint(ctx, parseEndpoint(op, vals, storeserver, &err))
-	ctx = SetCacheEndpoint(ctx, parseEndpoint(op, vals, cache, &err))
-	ctx = SetDirEndpoint(ctx, parseEndpoint(op, vals, dirserver, &err))
+	cfg = SetKeyEndpoint(cfg, parseEndpoint(op, vals, keyserver, &err))
+	cfg = SetStoreEndpoint(cfg, parseEndpoint(op, vals, storeserver, &err))
+	cfg = SetCacheEndpoint(cfg, parseEndpoint(op, vals, cache, &err))
+	cfg = SetDirEndpoint(cfg, parseEndpoint(op, vals, dirserver, &err))
 
-	return ctx, err
+	return cfg, err
 }
 
 // valsFromYAML parses YAML from the given map and puts the values
@@ -260,7 +260,7 @@ func valsFromEnvironment(vals map[string]string) error {
 		// Variables we care about look like upspinkey=value.
 		kv := strings.SplitN(v, "=", 2)
 		if len(kv) != 2 {
-			log.Info.Printf("context: invalid environment variable %q ignored", v)
+			log.Info.Printf("config: invalid environment variable %q ignored", v)
 			continue
 		}
 		attr := kv[0][len("upspin"):]
@@ -269,7 +269,7 @@ func valsFromEnvironment(vals map[string]string) error {
 			if inTest {
 				return errors.E(errors.Invalid, errors.Errorf("unrecognized environment variable %q", v))
 			} else {
-				log.Printf("context: unrecognized environment variable %q ignored", v)
+				log.Printf("config: unrecognized environment variable %q ignored", v)
 			}
 			continue
 		}
@@ -337,144 +337,144 @@ func parseEndpoint(op string, vals map[string]string, key string, errorp *error)
 	return *ep
 }
 
-type ctxUserName struct {
+type cfgUserName struct {
 	upspin.Config
 	userName upspin.UserName
 }
 
-func (ctx ctxUserName) UserName() upspin.UserName {
-	return ctx.userName
+func (cfg cfgUserName) UserName() upspin.UserName {
+	return cfg.userName
 }
 
-// SetUserName returns a context derived from the given context
+// SetUserName returns a config derived from the given config
 // with the given user name.
-func SetUserName(ctx upspin.Config, u upspin.UserName) upspin.Config {
-	return ctxUserName{
-		Config:   ctx,
+func SetUserName(cfg upspin.Config, u upspin.UserName) upspin.Config {
+	return cfgUserName{
+		Config:   cfg,
 		userName: u,
 	}
 }
 
-type ctxFactotum struct {
+type cfgFactotum struct {
 	upspin.Config
 	factotum upspin.Factotum
 }
 
-func (ctx ctxFactotum) Factotum() upspin.Factotum {
-	return ctx.factotum
+func (cfg cfgFactotum) Factotum() upspin.Factotum {
+	return cfg.factotum
 }
 
-// SetFactotum returns a context derived from the given context
+// SetFactotum returns a config derived from the given config
 // with the given factotum.
-func SetFactotum(ctx upspin.Config, f upspin.Factotum) upspin.Config {
-	return ctxFactotum{
-		Config:   ctx,
+func SetFactotum(cfg upspin.Config, f upspin.Factotum) upspin.Config {
+	return cfgFactotum{
+		Config:   cfg,
 		factotum: f,
 	}
 }
 
-type ctxPacking struct {
+type cfgPacking struct {
 	upspin.Config
 	packing upspin.Packing
 }
 
-func (ctx ctxPacking) Packing() upspin.Packing {
-	return ctx.packing
+func (cfg cfgPacking) Packing() upspin.Packing {
+	return cfg.packing
 }
 
-// SetPacking returns a context derived from the given context
+// SetPacking returns a config derived from the given config
 // with the given packing.
-func SetPacking(ctx upspin.Config, p upspin.Packing) upspin.Config {
-	return ctxPacking{
-		Config:  ctx,
+func SetPacking(cfg upspin.Config, p upspin.Packing) upspin.Config {
+	return cfgPacking{
+		Config:  cfg,
 		packing: p,
 	}
 }
 
-type ctxKeyEndpoint struct {
+type cfgKeyEndpoint struct {
 	upspin.Config
 	keyEndpoint upspin.Endpoint
 }
 
-func (ctx ctxKeyEndpoint) KeyEndpoint() upspin.Endpoint {
-	return ctx.keyEndpoint
+func (cfg cfgKeyEndpoint) KeyEndpoint() upspin.Endpoint {
+	return cfg.keyEndpoint
 }
 
-// SetKeyEndpoint returns a context derived from the given context
+// SetKeyEndpoint returns a config derived from the given config
 // with the given key endpoint.
-func SetKeyEndpoint(ctx upspin.Config, e upspin.Endpoint) upspin.Config {
-	return ctxKeyEndpoint{
-		Config:      ctx,
+func SetKeyEndpoint(cfg upspin.Config, e upspin.Endpoint) upspin.Config {
+	return cfgKeyEndpoint{
+		Config:      cfg,
 		keyEndpoint: e,
 	}
 }
 
-type ctxStoreEndpoint struct {
+type cfgStoreEndpoint struct {
 	upspin.Config
 	storeEndpoint upspin.Endpoint
 }
 
-func (ctx ctxStoreEndpoint) StoreEndpoint() upspin.Endpoint {
-	return ctx.storeEndpoint
+func (cfg cfgStoreEndpoint) StoreEndpoint() upspin.Endpoint {
+	return cfg.storeEndpoint
 }
 
-// SetStoreEndpoint returns a context derived from the given context
+// SetStoreEndpoint returns a config derived from the given config
 // with the given store endpoint.
-func SetStoreEndpoint(ctx upspin.Config, e upspin.Endpoint) upspin.Config {
-	return ctxStoreEndpoint{
-		Config:        ctx,
+func SetStoreEndpoint(cfg upspin.Config, e upspin.Endpoint) upspin.Config {
+	return cfgStoreEndpoint{
+		Config:        cfg,
 		storeEndpoint: e,
 	}
 }
 
-type ctxCacheEndpoint struct {
+type cfgCacheEndpoint struct {
 	upspin.Config
 	cacheEndpoint upspin.Endpoint
 }
 
-func (ctx ctxCacheEndpoint) CacheEndpoint() upspin.Endpoint {
-	return ctx.cacheEndpoint
+func (cfg cfgCacheEndpoint) CacheEndpoint() upspin.Endpoint {
+	return cfg.cacheEndpoint
 }
 
-// SetCacheEndpoint returns a context derived from the given context
+// SetCacheEndpoint returns a config derived from the given config
 // with the given cache endpoint.
-func SetCacheEndpoint(ctx upspin.Config, e upspin.Endpoint) upspin.Config {
-	return ctxCacheEndpoint{
-		Config:        ctx,
+func SetCacheEndpoint(cfg upspin.Config, e upspin.Endpoint) upspin.Config {
+	return cfgCacheEndpoint{
+		Config:        cfg,
 		cacheEndpoint: e,
 	}
 }
 
-type ctxDirEndpoint struct {
+type cfgDirEndpoint struct {
 	upspin.Config
 	dirEndpoint upspin.Endpoint
 }
 
-func (ctx ctxDirEndpoint) DirEndpoint() upspin.Endpoint {
-	return ctx.dirEndpoint
+func (cfg cfgDirEndpoint) DirEndpoint() upspin.Endpoint {
+	return cfg.dirEndpoint
 }
 
-// SetDirEndpoint returns a context derived from the given context
+// SetDirEndpoint returns a config derived from the given config
 // with the given dir endpoint.
-func SetDirEndpoint(ctx upspin.Config, e upspin.Endpoint) upspin.Config {
-	return ctxDirEndpoint{
-		Config:      ctx,
+func SetDirEndpoint(cfg upspin.Config, e upspin.Endpoint) upspin.Config {
+	return cfgDirEndpoint{
+		Config:      cfg,
 		dirEndpoint: e,
 	}
 }
 
-type ctxCertPool struct {
+type cfgCertPool struct {
 	upspin.Config
 	pool *x509.CertPool
 }
 
-func (ctx ctxCertPool) CertPool() *x509.CertPool {
-	return ctx.pool
+func (cfg cfgCertPool) CertPool() *x509.CertPool {
+	return cfg.pool
 }
 
-func SetCertPool(ctx upspin.Config, pool *x509.CertPool) upspin.Config {
-	return ctxCertPool{
-		Config: ctx,
+func SetCertPool(cfg upspin.Config, pool *x509.CertPool) upspin.Config {
+	return cfgCertPool{
+		Config: cfg,
 		pool:   pool,
 	}
 }
