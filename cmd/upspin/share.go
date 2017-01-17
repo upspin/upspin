@@ -102,8 +102,8 @@ func (s *State) shareCommand(fs *flag.FlagSet) {
 	if s.sharer.fix {
 		for _, name := range names {
 			parsed, _ := path.Parse(name)
-			if parsed.User() != s.context.UserName() {
-				s.exitf("%q: %q is not owner", name, s.context.UserName())
+			if parsed.User() != s.config.UserName() {
+				s.exitf("%q: %q is not owner", name, s.config.UserName())
 			}
 		}
 	}
@@ -229,12 +229,12 @@ func (s *Sharer) readers(entry *upspin.DirEntry) ([]upspin.UserName, string, boo
 			thisUser, ok = s.userByHash[h]
 			if !ok {
 				// Check old keys in Factotum.
-				f := s.state.context.Factotum()
+				f := s.state.config.Factotum()
 				if f == nil {
 					s.state.exitf("no factotum available")
 				}
 				if _, err := f.PublicKeyFromHash(hash); err == nil {
-					thisUser = s.state.context.UserName()
+					thisUser = s.state.config.UserName()
 					ok = true
 					self = true
 				}
@@ -435,7 +435,7 @@ func (s *Sharer) fixShare(name upspin.PathName, users []upspin.UserName) {
 		return
 	}
 	packdatas := []*[]byte{&entry.Packdata}
-	packer.Share(s.state.context, keys, packdatas)
+	packer.Share(s.state.config, keys, packdatas)
 	if packdatas[0] == nil {
 		fmt.Fprintf(os.Stderr, "packing skipped for %q\n", entry.Name)
 		s.state.exitCode = 1

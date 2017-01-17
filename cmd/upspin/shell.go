@@ -31,7 +31,7 @@ When running the shell, the leading "upspin" is assumed on each command.
 		}
 	}
 	if *promptFlag == promptPlaceholder {
-		*promptFlag = string(s.context.UserName()) + ">"
+		*promptFlag = string(s.config.UserName()) + ">"
 	}
 	s.interactive = true
 	defer func() { s.interactive = false }()

@@ -132,19 +132,19 @@ signup@key.upspin.io to complete the signup process.
 	s.keygenCommand(fs)
 
 	// Now load the config. This time it should succeed.
-	ctx, err := config.FromFile(*rcFile)
+	cfg, err := config.FromFile(*rcFile)
 	if err != nil {
 		s.exit(err)
 	}
 
-	f := ctx.Factotum()
+	f := cfg.Factotum()
 	if f == nil {
 		s.exitf("no factotum available")
 	}
 	pubKey := strings.TrimSpace(string(f.PublicKey()))
 
 	// Sign the username, key, and dir and store endpoints.
-	sig, err := f.Sign([]byte(string(ctx.UserName()) + pubKey + dirEndpoint.String() + storeEndpoint.String()))
+	sig, err := f.Sign([]byte(string(cfg.UserName()) + pubKey + dirEndpoint.String() + storeEndpoint.String()))
 	if err != nil {
 		s.exit(err)
 	}

@@ -24,7 +24,7 @@ the directory server for the user's root supports them.
 		fs.Usage()
 	}
 
-	u, suffix, domain, err := user.Parse(s.context.UserName())
+	u, suffix, domain, err := user.Parse(s.config.UserName())
 	if err != nil {
 		s.exit(err)
 	}

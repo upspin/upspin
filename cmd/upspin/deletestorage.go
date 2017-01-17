@@ -32,7 +32,7 @@ the user's store.
 
 For -ref, the reference must exactly match the reference's full
 value, such as is presented by the info command. The reference is
-assumed to refer to the store defined in the user's context.
+assumed to refer to the store defined in the user's configuration.
 `
 	fs := flag.NewFlagSet("deletestorage", flag.ExitOnError)
 	byPath := fs.Bool("path", false, "delete all blocks referenced by the path names")
@@ -47,7 +47,7 @@ assumed to refer to the store defined in the user's context.
 
 	if *byRef {
 		// All references refer to this store.
-		store, err := bind.StoreServer(s.context, s.context.StoreEndpoint())
+		store, err := bind.StoreServer(s.config, s.config.StoreEndpoint())
 		if err != nil {
 			s.exit(err)
 		}
@@ -71,7 +71,7 @@ assumed to refer to the store defined in the user's context.
 			if block.Location.Endpoint != prevEndpoint {
 				prevEndpoint = block.Location.Endpoint
 				var err error
-				store, err = bind.StoreServer(s.context, prevEndpoint)
+				store, err = bind.StoreServer(s.config, prevEndpoint)
 				if err != nil {
 					s.exit(err) // Not much to do now.
 				}

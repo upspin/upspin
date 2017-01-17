@@ -27,11 +27,11 @@ the user's default store server. It does not resolve redirections.
 	}
 	ref := fs.Arg(0)
 
-	store, err := bind.StoreServer(s.context, s.context.StoreEndpoint())
+	store, err := bind.StoreServer(s.config, s.config.StoreEndpoint())
 	if err != nil {
 		s.exit(err)
 	}
-	fmt.Fprintf(os.Stderr, "Using store server at %s\n", s.context.StoreEndpoint())
+	fmt.Fprintf(os.Stderr, "Using store server at %s\n", s.config.StoreEndpoint())
 
 	data, _, locs, err := store.Get(upspin.Reference(ref))
 	if err != nil {
