@@ -108,11 +108,11 @@ func FromFile(name string) (upspin.Context, error) {
 // where key may be one of username, keyserver, dirserver, storeserver,
 // packing, secrets, or tlscerts.
 //
-// The default configuration file location is $HOME/upspin/rc.
+// The default configuration file location is $HOME/upspin/config.
 // If passed a non-nil io.Reader, that is used instead of the default file.
 //
 // Environment variables named "upspinkey", where "key" is a recognized
-// configuration key, may override configuration values in the rc file.
+// configuration key, may override configuration values in the config file.
 //
 // Any endpoints (keyserver, dirserver, storeserver) not set in the data for
 // the context will be set to the "unassigned" transport and an empty network
@@ -148,13 +148,13 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 		tlscerts:    "",
 	}
 
-	// If the provided reader is nil, try $HOME/upspin/rc.
+	// If the provided reader is nil, try $HOME/upspin/config.
 	if r == nil {
 		home, err := Homedir()
 		if err != nil {
 			return nil, errors.E(op, err)
 		}
-		f, err := os.Open(filepath.Join(home, "upspin/rc"))
+		f, err := os.Open(filepath.Join(home, "upspin/config"))
 		if err != nil {
 			return nil, errors.E(op, err)
 		}

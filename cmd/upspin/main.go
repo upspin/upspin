@@ -210,7 +210,7 @@ func newState(op string) *State {
 		// keygen simply does not require a context or anything else.
 		return s
 	}
-	ctx, err := config.FromFile(flags.Context)
+	ctx, err := config.FromFile(flags.Config)
 	if err != nil && err != config.ErrNoFactotum {
 		s.exit(err)
 	}

@@ -60,7 +60,7 @@ func main() {
 	case "inprocess":
 		key = inprocess.New()
 	case "gcp":
-		key, err = gcp.New(flags.Config...)
+		key, err = gcp.New(flags.ServerConfig...)
 	default:
 		err = errors.Errorf("bad -kind %q", flags.ServerKind)
 

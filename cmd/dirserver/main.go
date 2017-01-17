@@ -50,8 +50,8 @@ func main() {
 		}
 	}
 
-	// Load context and keys for this server. It needs a real upspin username and keys.
-	ctx, err := config.FromFile(flags.Context)
+	// Load configuration and keys for this server. It needs a real upspin username and keys.
+	ctx, err := config.FromFile(flags.Config)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -63,9 +63,9 @@ func main() {
 	case "inprocess":
 		dir = inprocess.New(ctx)
 	case "filesystem":
-		dir, err = filesystem.New(ctx, flags.Config...)
+		dir, err = filesystem.New(ctx, flags.ServerConfig...)
 	case "server":
-		dir, err = server.New(ctx, flags.Config...)
+		dir, err = server.New(ctx, flags.ServerConfig...)
 	default:
 		err = errors.Errorf("bad -kind %q", flags.ServerKind)
 	}
