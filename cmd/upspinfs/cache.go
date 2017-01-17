@@ -47,8 +47,8 @@ type cachedFile struct {
 	de   []*upspin.DirEntry // If this is a directory, its contents.
 }
 
-func newCache(context upspin.Config, dir string) *cache {
-	c := &cache{dir: dir, client: client.New(context)}
+func newCache(config upspin.Config, dir string) *cache {
+	c := &cache{dir: dir, client: client.New(config)}
 	os.Mkdir(dir, 0700)
 
 	// Clean out all cache files.
@@ -141,7 +141,7 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 	if packer == nil {
 		return errors.E(op, name, errors.Errorf("unrecognized Packing %d", entry.Packing))
 	}
-	bu, err := packer.Unpack(n.f.context, entry)
+	bu, err := packer.Unpack(n.f.config, entry)
 	if err != nil {
 		return errors.E(op, name, err) // Showstopper.
 	}
@@ -190,7 +190,7 @@ Blocks:
 		where := []upspin.Location{block.Location}
 		for i := 0; i < len(where); i++ { // Not range loop - where changes as we run.
 			loc := where[i]
-			store, err := bind.StoreServer(n.f.context, loc.Endpoint)
+			store, err := bind.StoreServer(n.f.config, loc.Endpoint)
 			if isError(err) {
 				continue
 			}

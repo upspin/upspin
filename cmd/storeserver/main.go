@@ -46,7 +46,7 @@ func main() {
 	}
 
 	// Load configuration and keys for this server. It needs a real upspin username and keys.
-	ctx, err := config.FromFile(flags.Config)
+	cfg, err := config.FromFile(flags.Config)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -60,7 +60,7 @@ func main() {
 	case "gcp":
 		store, err = gcp.New(flags.ServerConfig...)
 	case "filesystem":
-		store, err = filesystem.New(ctx, flags.ServerConfig...)
+		store, err = filesystem.New(cfg, flags.ServerConfig...)
 	default:
 		err = errors.Errorf("bad -kind %q", flags.ServerKind)
 	}
@@ -70,12 +70,12 @@ func main() {
 
 	// Wrap with permission checks.
 	ready := make(chan struct{})
-	store, err = perm.WrapStore(ctx, ready, store)
+	store, err = perm.WrapStore(cfg, ready, store)
 	if err != nil {
 		log.Fatalf("Error wrapping store: %s", err)
 	}
 
-	httpStore := storeserver.New(ctx, store, upspin.NetAddr(flags.NetAddr))
+	httpStore := storeserver.New(cfg, store, upspin.NetAddr(flags.NetAddr))
 	http.Handle("/api/Store/", httpStore)
 	https.ListenAndServeFromFlags(ready, serverName)
 }

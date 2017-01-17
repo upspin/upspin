@@ -52,20 +52,20 @@ This command is designed to operate on projects created by setupdomain.
 		s.exitf("specified location is not a directory: %v", cfgDir)
 	}
 
-	storeCtx, err := config.FromFile(filepath.Join(cfgDir, "storeserver/rc"))
+	storeCfg, err := config.FromFile(filepath.Join(cfgDir, "storeserver/rc"))
 	if err != nil {
 		s.exit(err)
 	}
-	dirCtx, err := config.FromFile(filepath.Join(cfgDir, "dirserver/rc"))
+	dirCfg, err := config.FromFile(filepath.Join(cfgDir, "dirserver/rc"))
 	if err != nil {
 		s.exit(err)
 	}
 
-	storeUser := storeCtx.UserName()
-	dirUser := dirCtx.UserName()
+	storeUser := storeCfg.UserName()
+	dirUser := dirCfg.UserName()
 
 	// Act as the store user.
-	c := client.New(storeCtx)
+	c := client.New(storeCfg)
 
 	// Make the store root.
 	_, err = c.MakeDirectory(upspin.PathName(storeUser) + "/")

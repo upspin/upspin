@@ -191,11 +191,11 @@ func (m *mailHandler) createUser(msg *inbound.SignupMessage) error {
 func (m *mailHandler) dialForUser(name upspin.UserName) (upspin.KeyServer, error) {
 	// We need to dial this server locally so the new user is authenticated
 	// with it implicitly.
-	ctx := config.New()
-	ctx = config.SetKeyEndpoint(ctx, m.key.Endpoint())
-	ctx = config.SetUserName(ctx, name)
+	cfg := config.New()
+	cfg = config.SetKeyEndpoint(cfg, m.key.Endpoint())
+	cfg = config.SetUserName(cfg, name)
 
-	service, err := m.key.Dial(ctx, m.key.Endpoint())
+	service, err := m.key.Dial(cfg, m.key.Endpoint())
 	if err != nil {
 		return nil, err
 	}

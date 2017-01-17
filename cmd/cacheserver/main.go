@@ -44,14 +44,14 @@ func main() {
 	flags.Parse()
 
 	// Load configuration and keys for this server. It needn't have a real username.
-	ctx, err := config.FromFile(flags.Config)
+	cfg, err := config.FromFile(flags.Config)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// Serving address comes from config with flag overriding.
 	var addr string
-	if ce := ctx.CacheEndpoint(); ce.Transport == upspin.Remote {
+	if ce := cfg.CacheEndpoint(); ce.Transport == upspin.Remote {
 		addr = string(ce.NetAddr)
 	}
 	if flags.NetAddr != "" {
@@ -62,19 +62,19 @@ func main() {
 	}
 
 	// Stop the cache server recursing.
-	ctx = config.SetCacheEndpoint(ctx, upspin.Endpoint{})
+	cfg = config.SetCacheEndpoint(cfg, upspin.Endpoint{})
 
 	// Calculate limits.
 	maxRefBytes := (9 * (*cacheSizeFlag)) / 10
 	maxLogBytes := maxRefBytes / 9
 
-	sc, err := storecache.New(ctx, *cacheFlag, maxRefBytes)
+	sc, err := storecache.New(cfg, *cacheFlag, maxRefBytes)
 	if err != nil {
 		log.Fatalf("opening cache: %s", err)
 	}
-	ss := storeserver.New(ctx, sc, "")
+	ss := storeserver.New(cfg, sc, "")
 
-	ds, err := dircacheserver.New(ctx, *cacheFlag, maxLogBytes)
+	ds, err := dircacheserver.New(cfg, *cacheFlag, maxLogBytes)
 	if err != nil {
 		log.Fatalf("opening cache: %s", err)
 	}

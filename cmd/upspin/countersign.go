@@ -53,9 +53,9 @@ func (s *State) countersignCommand(fs *flag.FlagSet) {
 		s.exitf("no factotum available")
 	}
 
-	lastCtx := s.config
+	lastCfg := s.config
 	s.config = config.SetFactotum(s.config, s.config.Factotum().Pop())
-	defer func() { s.config = lastCtx }()
+	defer func() { s.config = lastCfg }()
 
 	root := upspin.PathName(string(s.config.UserName()) + "/")
 	entries := c.entriesFromDirectory(root)
