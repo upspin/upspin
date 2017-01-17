@@ -43,8 +43,8 @@ var (
 func main() {
 	flags.Parse()
 
-	// Load context and keys for this server. It needn't have a real username.
-	ctx, err := config.FromFile(flags.Context)
+	// Load configuration and keys for this server. It needn't have a real username.
+	ctx, err := config.FromFile(flags.Config)
 	if err != nil {
 		log.Fatal(err)
 	}

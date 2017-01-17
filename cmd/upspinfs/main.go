@@ -44,8 +44,8 @@ func main() {
 		usage()
 	}
 
-	// Normal setup, get context from file and push user cache onto config.
-	ctx, err := config.FromFile(flags.Context)
+	// Normal setup, get configuration from file and push user cache onto config.
+	ctx, err := config.FromFile(flags.Config)
 	if err != nil {
 		log.Debug.Fatal(err)
 	}

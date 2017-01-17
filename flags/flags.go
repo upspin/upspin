@@ -17,11 +17,11 @@ import (
 )
 
 var (
-	// Config specifies configuration options ("key=value") for servers.
-	Config []string
+	// ServerConfig specifies configuration options ("key=value") for servers.
+	ServerConfig []string
 
-	// Context names the Upspin context file to use.
-	Context = filepath.Join(os.Getenv("HOME"), "/upspin/rc")
+	// Config names the Upspin configuration file to use.
+	Config = filepath.Join(os.Getenv("HOME"), "/upspin/config")
 
 	// NetAddr is the publicly accessible network address of this server.
 	NetAddr string
@@ -56,11 +56,11 @@ var (
 // flags is a map of flag registration functions keyed by flag name,
 // used by Parse to register specific (or all) flags.
 var flags = map[string]func(){
-	"config": func() {
-		flag.Var(configFlag{&Config}, "config", "comma-separated list of configuration options (key=value) for this server")
+	"serverconfig": func() {
+		flag.Var(configFlag{&ServerConfig}, "serverconfig", "comma-separated list of configuration options (key=value) for this server")
 	},
-	"context": func() {
-		flag.StringVar(&Context, "context", Context, "context `file`")
+	"config": func() {
+		flag.StringVar(&Config, "config", Config, "user's configuration `file`")
 	},
 	"addr": func() {
 		flag.StringVar(&NetAddr, "addr", NetAddr, "publicly accessible network address (`host:port`)")
