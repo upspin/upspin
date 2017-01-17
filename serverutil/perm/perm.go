@@ -35,7 +35,7 @@ var onUpdate = func() {}
 // the Writers Group file. These might be users who can write blocks to a
 // StoreServer or create a root on a DirServer.
 type Perm struct {
-	ctx upspin.Config
+	cfg upspin.Config
 
 	targetUser upspin.UserName
 	targetFile upspin.PathName
@@ -67,10 +67,10 @@ var (
 // the provided Lookup function for lookups and the Watch function to watch
 // changes on the writers file. The target user is typically the user name of a
 // server, such as a StoreServer or a DirServer.
-func New(ctx upspin.Config, ready <-chan struct{}, target upspin.UserName, lookup LookupFunc, watch WatchFunc) (*Perm, error) {
+func New(cfg upspin.Config, ready <-chan struct{}, target upspin.UserName, lookup LookupFunc, watch WatchFunc) (*Perm, error) {
 	const op = "serverutil/perm.New"
 	p := &Perm{
-		ctx:        ctx,
+		cfg:        cfg,
 		targetUser: target,
 		targetFile: upspin.PathName(target) + "/Group/" + WritersGroupFile,
 		lookup:     lookup,
@@ -186,7 +186,7 @@ func (p *Perm) load(name upspin.PathName) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return clientutil.ReadAll(p.ctx, entry)
+	return clientutil.ReadAll(p.cfg, entry)
 }
 
 // IsWriter reports whether the user has write privileges on this Perm.

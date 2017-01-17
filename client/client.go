@@ -26,7 +26,7 @@ import (
 
 // Client implements upspin.Client.
 type Client struct {
-	context upspin.Config
+	config upspin.Config
 }
 
 var _ upspin.Client = (*Client)(nil)
@@ -38,10 +38,10 @@ const (
 	doNotFollowFinalLink = false
 )
 
-// New creates a Client that uses the given Context to
+// New creates a Client that uses the given configuration to
 // access the various Upspin servers.
-func New(context upspin.Config) upspin.Client {
-	return &Client{context: context}
+func New(config upspin.Config) upspin.Client {
+	return &Client{config: config}
 }
 
 // PutLink implements upspin.Client.
@@ -74,7 +74,7 @@ func (c *Client) PutLink(oldName, linkName upspin.PathName) (*upspin.DirEntry, e
 		Packing:    upspin.PlainPack, // Unused but be explicit.
 		Time:       upspin.Now(),
 		Sequence:   upspin.SeqIgnore,
-		Writer:     c.context.UserName(),
+		Writer:     c.config.UserName(),
 		Link:       oldName,
 		Attr:       upspin.AttrLink,
 	}
@@ -127,9 +127,9 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 	} else {
 		// Encrypt data according to the preferred packer
 		// TODO: Do a Lookup in the parent directory to find the overriding packer.
-		packer = pack.Lookup(c.context.Packing())
+		packer = pack.Lookup(c.config.Packing())
 		if packer == nil {
-			return nil, errors.E(op, name, errors.Errorf("unrecognized Packing %d", c.context.Packing()))
+			return nil, errors.E(op, name, errors.Errorf("unrecognized Packing %d", c.config.Packing()))
 		}
 	}
 
@@ -154,7 +154,7 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 		Packing:    packer.Packing(),
 		Time:       upspin.Now(),
 		Sequence:   upspin.SeqIgnore,
-		Writer:     c.context.UserName(),
+		Writer:     c.config.UserName(),
 		Link:       "",
 		Attr:       upspin.AttrNone,
 	}
@@ -185,11 +185,11 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 
 func (c *Client) pack(entry *upspin.DirEntry, data []byte, packer upspin.Packer, s *metric.Span) error {
 	// Start the I/O.
-	store, err := bind.StoreServer(c.context, c.context.StoreEndpoint())
+	store, err := bind.StoreServer(c.config, c.config.StoreEndpoint())
 	if err != nil {
 		return err
 	}
-	bp, err := packer.Pack(c.context, entry)
+	bp, err := packer.Pack(c.config, entry)
 	if err != nil {
 		return err
 	}
@@ -213,7 +213,7 @@ func (c *Client) pack(entry *upspin.DirEntry, data []byte, packer upspin.Packer,
 		}
 		bp.SetLocation(
 			upspin.Location{
-				Endpoint:  c.context.StoreEndpoint(),
+				Endpoint:  c.config.StoreEndpoint(),
 				Reference: refdata.Reference,
 			},
 		)
@@ -239,14 +239,14 @@ func (c *Client) addReaders(op string, entry *upspin.DirEntry, packer upspin.Pac
 
 	// Add other readers to Packdata.
 	readersPublicKey := make([]upspin.PublicKey, len(readers)+1)
-	f := c.context.Factotum()
+	f := c.config.Factotum()
 	if f == nil {
 		return errors.E(op, name, errors.Permission, errors.Str("no factotum available"))
 	}
 	readersPublicKey[0] = f.PublicKey()
 	n := 1
 	for _, r := range readers {
-		key, err := bind.KeyServer(c.context, c.context.KeyEndpoint())
+		key, err := bind.KeyServer(c.config, c.config.KeyEndpoint())
 		if err != nil {
 			return errors.E(op, err)
 		}
@@ -264,7 +264,7 @@ func (c *Client) addReaders(op string, entry *upspin.DirEntry, packer upspin.Pac
 	readersPublicKey = readersPublicKey[:n]
 	packdata := make([]*[]byte, 1)
 	packdata[0] = &entry.Packdata
-	packer.Share(c.context, readersPublicKey, packdata)
+	packer.Share(c.config, readersPublicKey, packdata)
 	return nil
 }
 
@@ -288,7 +288,7 @@ func (c *Client) getReaders(op string, name upspin.PathName, accessEntry *upspin
 			return nil, err
 		}
 		owner := parsed.User()
-		if owner == c.context.UserName() {
+		if owner == c.config.UserName() {
 			// We are the owner, but the caller always
 			// adds the us, so return an empty list.
 			return nil, nil
@@ -364,7 +364,7 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 		return nil, errors.E(op, name, errors.IsDir)
 	}
 	ss := s.StartSpan("ReadAll")
-	data, err := clientutil.ReadAll(c.context, entry)
+	data, err := clientutil.ReadAll(c.config, entry)
 	ss.End()
 	if err != nil {
 		return nil, errors.E(op, name, err)
@@ -598,7 +598,7 @@ func (c *Client) Open(name upspin.PathName) (upspin.File, error) {
 	if entry.IsLink() {
 		return nil, errors.E(op, errors.Invalid, name, errors.Str("cannot Open a link"))
 	}
-	f, err := file.Readable(c.context, entry)
+	f, err := file.Readable(c.config, entry)
 	if err != nil {
 		return nil, errors.E(op, name, err)
 	}
@@ -612,7 +612,7 @@ func (c *Client) DirServer(name upspin.PathName) (upspin.DirServer, error) {
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
-	dir, err := bind.DirServerFor(c.context, parsed.User())
+	dir, err := bind.DirServerFor(c.config, parsed.User())
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
@@ -654,7 +654,7 @@ func (c *Client) dupOrRename(op string, oldName, newName upspin.PathName, rename
 
 	packer := pack.Lookup(entry.Packing)
 	if packer == nil {
-		return nil, errors.E(op, oldName, errors.Invalid, errors.Errorf("unrecognized Packing %d", c.context.Packing()))
+		return nil, errors.E(op, oldName, errors.Invalid, errors.Errorf("unrecognized Packing %d", c.config.Packing()))
 	}
 	if access.IsAccessFile(newName) || access.IsGroupFile(newName) {
 		if entry.Packing != upspin.EEIntegrityPack {
@@ -665,7 +665,7 @@ func (c *Client) dupOrRename(op string, oldName, newName upspin.PathName, rename
 	// Update the directory entry with the new name and sequence.
 	// We insist the new file must not exist.
 	entry.Sequence = upspin.SeqNotExist
-	if err := packer.Name(c.context, entry, newName); err != nil {
+	if err := packer.Name(c.config, entry, newName); err != nil {
 		return nil, err
 	}
 

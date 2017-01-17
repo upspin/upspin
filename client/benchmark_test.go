@@ -88,16 +88,16 @@ func setupBench(b *testing.B, userName upspin.UserName, packing upspin.Packing, 
 		b.Fatalf("No such key for packing: %d", packing)
 	}
 
-	ctx := setup(userName, pub)
+	cfg := setup(userName, pub)
 	if packing == upspin.EEPack {
-		ctx = config.SetPacking(ctx, packing)
+		cfg = config.SetPacking(cfg, packing)
 		f, err := factotum.NewFromDir(repo(keyDir))
 		if err != nil {
 			b.Fatal(err)
 		}
-		ctx = config.SetFactotum(ctx, f)
+		cfg = config.SetFactotum(cfg, f)
 	}
-	return New(ctx), block
+	return New(cfg), block
 }
 
 // repo returns the local pathname of a file in the upspin repository.

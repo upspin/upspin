@@ -64,7 +64,7 @@ type inflightDial struct {
 	sync.WaitGroup
 
 	// These are the return values of a reachableService call.
-	// Concurrent calls to reachableService with the same context
+	// Concurrent calls to reachableService with the same config
 	// and endpoint should return the same values.
 	// Either service or err must be non-nil.
 	service upspin.Service
@@ -183,11 +183,11 @@ func DirServer(cc upspin.Config, e upspin.Endpoint) (upspin.DirServer, error) {
 
 // DirServer returns a DirServer interface bound to the endpoint that serves
 // the given user. If the name is empty, it returns the directory endpoint
-// in the context.
+// in the config.
 func DirServerFor(cc upspin.Config, userName upspin.UserName) (upspin.DirServer, error) {
 	const op = "bind.DirServerFor"
 	if userName == "" {
-		// If name is empty just return the directory at ctx.DirEndpoint().
+		// If name is empty just return the directory at cc.DirEndpoint().
 		d, err := DirServer(cc, cc.DirEndpoint())
 		if err != nil {
 			return nil, errors.E(op, err)
