@@ -17,7 +17,7 @@ import (
 
 	"upspin.io/access"
 	"upspin.io/bind"
-	"upspin.io/context"
+	"upspin.io/config"
 	"upspin.io/dir/server/tree"
 	"upspin.io/errors"
 	"upspin.io/factotum"
@@ -999,7 +999,7 @@ func (m *mockClock) addSecond(n int) {
 
 var generatorInstance upspin.DirServer
 
-// newDirServerForTesting returns a new server and a user context.
+// newDirServerForTesting returns a new server and a user config.
 func newDirServerForTesting(t *testing.T, userName upspin.UserName) (*server, upspin.Context) {
 	f, err := factotum.NewFromDir(repo("key/testdata/upspin-test"))
 	if err != nil {
@@ -1009,13 +1009,13 @@ func newDirServerForTesting(t *testing.T, userName upspin.UserName) (*server, up
 		Transport: upspin.InProcess,
 		NetAddr:   "",
 	}
-	ctx := context.New()
-	ctx = context.SetUserName(ctx, serverName)
-	ctx = context.SetPacking(ctx, upspin.EEPack)
-	ctx = context.SetFactotum(ctx, f)
-	ctx = context.SetKeyEndpoint(ctx, endpointInProcess)
-	ctx = context.SetStoreEndpoint(ctx, endpointInProcess)
-	ctx = context.SetDirEndpoint(ctx, endpointInProcess)
+	ctx := config.New()
+	ctx = config.SetUserName(ctx, serverName)
+	ctx = config.SetPacking(ctx, upspin.EEPack)
+	ctx = config.SetFactotum(ctx, f)
+	ctx = config.SetKeyEndpoint(ctx, endpointInProcess)
+	ctx = config.SetStoreEndpoint(ctx, endpointInProcess)
+	ctx = config.SetDirEndpoint(ctx, endpointInProcess)
 
 	key, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
 	if err != nil {
@@ -1036,15 +1036,15 @@ func newDirServerForTesting(t *testing.T, userName upspin.UserName) (*server, up
 
 	// Set the public key for the user, since EE Pack requires the dir owner
 	// to have a wrapped key.
-	userCtx := context.New()
-	userCtx = context.SetUserName(userCtx, userName)
-	userCtx = context.SetDirEndpoint(userCtx, ctx.DirEndpoint())
-	userCtx = context.SetStoreEndpoint(userCtx, endpointInProcess)
+	userCtx := config.New()
+	userCtx = config.SetUserName(userCtx, userName)
+	userCtx = config.SetDirEndpoint(userCtx, ctx.DirEndpoint())
+	userCtx = config.SetStoreEndpoint(userCtx, endpointInProcess)
 	f, err = factotum.NewFromDir(repo("key/testdata/bob"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	userCtx = context.SetFactotum(userCtx, f)
+	userCtx = config.SetFactotum(userCtx, f)
 	user = &upspin.User{
 		Name:      userName,
 		Dirs:      []upspin.Endpoint{userCtx.DirEndpoint()},

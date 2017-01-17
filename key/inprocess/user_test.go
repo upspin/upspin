@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"testing"
 
-	"upspin.io/context"
+	"upspin.io/config"
 	"upspin.io/upspin"
 
 	_ "upspin.io/dir/inprocess"
@@ -28,11 +28,11 @@ var (
 )
 
 func setup(t *testing.T) upspin.KeyServer {
-	c := context.New()
-	c = context.SetUserName(c, testUser.Name)
-	c = context.SetKeyEndpoint(c, inProcessEndpoint)
-	c = context.SetStoreEndpoint(c, inProcessEndpoint)
-	c = context.SetDirEndpoint(c, inProcessEndpoint)
+	c := config.New()
+	c = config.SetUserName(c, testUser.Name)
+	c = config.SetKeyEndpoint(c, inProcessEndpoint)
+	c = config.SetStoreEndpoint(c, inProcessEndpoint)
+	c = config.SetDirEndpoint(c, inProcessEndpoint)
 	return New()
 }
 

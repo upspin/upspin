@@ -2,8 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//Package context creates a client context from various sources.
-package context
+package config
 
 import (
 	"bytes"
@@ -232,28 +231,28 @@ func TestMain(m *testing.M) {
 	os.Exit(code)
 }
 
-func testConfig(t *testing.T, expect *expectations, config string) {
-	context, err := InitContext(strings.NewReader(config))
+func testConfig(t *testing.T, expect *expectations, configuration string) {
+	config, err := InitContext(strings.NewReader(configuration))
 	if err != nil {
-		t.Fatalf("could not parse config %v: %v", config, err)
+		t.Fatalf("could not parse config %v: %v", configuration, err)
 	}
-	if context.UserName() != expect.username {
-		t.Errorf("name: got %v expected %v", context.UserName(), expect.username)
+	if config.UserName() != expect.username {
+		t.Errorf("name: got %v expected %v", config.UserName(), expect.username)
 	}
 	tests := []struct {
 		expected upspin.Endpoint
 		got      upspin.Endpoint
 	}{
-		{expect.keyserver, context.KeyEndpoint()},
-		{expect.dirserver, context.DirEndpoint()},
-		{expect.storeserver, context.StoreEndpoint()},
+		{expect.keyserver, config.KeyEndpoint()},
+		{expect.dirserver, config.DirEndpoint()},
+		{expect.storeserver, config.StoreEndpoint()},
 	}
 	for i, test := range tests {
 		if test.expected != test.got {
 			t.Errorf("%d: got %s expected %v", i, test.got, test.expected)
 		}
 	}
-	if context.Packing() != expect.packing {
-		t.Errorf("got %v expected %v", context.Packing(), expect.packing)
+	if config.Packing() != expect.packing {
+		t.Errorf("got %v expected %v", config.Packing(), expect.packing)
 	}
 }

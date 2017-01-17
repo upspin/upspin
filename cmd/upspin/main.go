@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // Upspin is a simple utility for running the Upspin client with the user's default
-// context. It also provides commands for maintaining the user's state not easily
+// config. It also provides commands for maintaining the user's state not easily
 // done by the client, such as signing up a new user, changing keys, or updating
 // sharing information.
 package main
@@ -25,7 +25,7 @@ import (
 
 	"upspin.io/bind"
 	"upspin.io/client"
-	"upspin.io/context"
+	"upspin.io/config"
 	"upspin.io/flags"
 	"upspin.io/metric"
 	"upspin.io/path"
@@ -210,8 +210,8 @@ func newState(op string) *State {
 		// keygen simply does not require a context or anything else.
 		return s
 	}
-	ctx, err := context.FromFile(flags.Context)
-	if err != nil && err != context.ErrNoFactotum {
+	ctx, err := config.FromFile(flags.Context)
+	if err != nil && err != config.ErrNoFactotum {
 		s.exit(err)
 	}
 	transports.Init(ctx)

@@ -16,7 +16,7 @@ import (
 
 	yaml "gopkg.in/yaml.v2"
 
-	"upspin.io/context"
+	"upspin.io/config"
 	"upspin.io/flags"
 	"upspin.io/upspin"
 )
@@ -213,11 +213,11 @@ To register the users listed above, run this command:
 // writeUserFile reads the specified rc file and writes a YAML-encoded
 // upspin.User to userFile. It also returns the username.
 func writeUserFile(rcFile string) (userFile string, u upspin.UserName, err error) {
-	ctx, err := context.FromFile(rcFile)
+	ctx, err := config.FromFile(rcFile)
 	if err != nil {
 		return "", "", err
 	}
-	b, err := yaml.Marshal(context.User(ctx))
+	b, err := yaml.Marshal(config.User(ctx))
 	if err != nil {
 		return "", "", err
 	}

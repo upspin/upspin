@@ -10,7 +10,7 @@ import (
 	"net/http"
 
 	"upspin.io/cloud/https"
-	"upspin.io/context"
+	"upspin.io/config"
 	"upspin.io/dir/filesystem"
 	"upspin.io/dir/inprocess"
 	"upspin.io/dir/server"
@@ -51,7 +51,7 @@ func main() {
 	}
 
 	// Load context and keys for this server. It needs a real upspin username and keys.
-	ctx, err := context.FromFile(flags.Context)
+	ctx, err := config.FromFile(flags.Context)
 	if err != nil {
 		log.Fatal(err)
 	}

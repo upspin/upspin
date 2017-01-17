@@ -15,7 +15,7 @@ import (
 	"strings"
 	"text/template"
 
-	"upspin.io/context"
+	"upspin.io/config"
 	"upspin.io/upspin"
 	"upspin.io/user"
 )
@@ -58,7 +58,7 @@ signup@key.upspin.io to complete the signup process.
 	}
 
 	// User must have a home dir in the local OS.
-	homedir, err := context.Homedir()
+	homedir, err := config.Homedir()
 	if err != nil {
 		s.exit(err)
 	}
@@ -89,7 +89,7 @@ signup@key.upspin.io to complete the signup process.
 	defer restoreEnvironment(env)
 
 	// Verify if we have an rc file.
-	_, err = context.FromFile(*rcFile)
+	_, err = config.FromFile(*rcFile)
 	if err == nil && !*force {
 		s.exitf("%s already exists", *rcFile)
 	}
@@ -131,8 +131,8 @@ signup@key.upspin.io to complete the signup process.
 	// Generate a new key.
 	s.keygenCommand(fs)
 
-	// Now load the context. This time it should succeed.
-	ctx, err := context.FromFile(*rcFile)
+	// Now load the config. This time it should succeed.
+	ctx, err := config.FromFile(*rcFile)
 	if err != nil {
 		s.exit(err)
 	}

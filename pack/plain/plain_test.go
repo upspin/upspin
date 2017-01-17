@@ -8,14 +8,14 @@ import (
 	"crypto/rand"
 	"testing"
 
-	"upspin.io/context"
+	"upspin.io/config"
 	"upspin.io/pack"
 	"upspin.io/pack/internal/packtest"
 	"upspin.io/upspin"
 )
 
 var (
-	globalContext = context.New()
+	globalContext = config.New()
 )
 
 func TestRegister(t *testing.T) {
