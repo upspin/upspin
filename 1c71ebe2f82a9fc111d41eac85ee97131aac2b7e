@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "c3892940_c9d05150",
+        "filename": "cmd/dirserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-17T03:13:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c3892940_29b80d27",
+      "revId": "1c71ebe2f82a9fc111d41eac85ee97131aac2b7e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c3892940_09b3494d",
         "filename": "cmd/storeserver/main.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2017-01-17T02:56:58Z",
       "side": 1,
       "message": "add serverconfig",
+      "revId": "1c71ebe2f82a9fc111d41eac85ee97131aac2b7e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c3892940_e9cd15b5",
+        "filename": "cmd/storeserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-17T03:13:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c3892940_09b3494d",
       "revId": "1c71ebe2f82a9fc111d41eac85ee97131aac2b7e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "c3892940_49946186",
+        "filename": "flags/flags.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-17T03:13:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c3892940_e976f5a4",
+      "revId": "1c71ebe2f82a9fc111d41eac85ee97131aac2b7e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c3892940_49bd4116",
         "filename": "flags/flags.go",
         "patchSetId": 1
@@ -70,6 +124,24 @@
         "endLine": 63,
         "endChar": 51
       },
+      "revId": "1c71ebe2f82a9fc111d41eac85ee97131aac2b7e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c3892940_299f2da6",
+        "filename": "flags/flags.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-17T03:13:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c3892940_49bd4116",
       "revId": "1c71ebe2f82a9fc111d41eac85ee97131aac2b7e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
