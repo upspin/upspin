@@ -18,13 +18,13 @@ const (
 )
 
 func TestWatchFromBeginning(t *testing.T) {
-	context, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(context, log, logIndex)
+	config, log, logIndex := newConfigForTesting(t, userName)
+	tree, err := New(config, log, logIndex)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	p, _ := mkdir(t, tree, context, "/")
+	p, _ := mkdir(t, tree, config, "/")
 
 	ch, err := tree.Watch(p, 0, make(chan struct{}))
 	if err != nil {
@@ -32,7 +32,7 @@ func TestWatchFromBeginning(t *testing.T) {
 	}
 
 	// Put something under the root and observe a notification.
-	dirPath, dir := mkdir(t, tree, context, "/dir")
+	dirPath, dir := mkdir(t, tree, config, "/dir")
 
 	event := <-ch
 	err = checkEvent(event, dir.SignedName, !isDelete, !hasBlocks)
@@ -41,7 +41,7 @@ func TestWatchFromBeginning(t *testing.T) {
 	}
 
 	// Put something under dir and observe another notification.
-	subdirPath, subdir := mkdir(t, tree, context, "/dir/subdir")
+	subdirPath, subdir := mkdir(t, tree, config, "/dir/subdir")
 
 	event = <-ch
 	err = checkEvent(event, subdir.SignedName, !isDelete, !hasBlocks)
@@ -69,7 +69,7 @@ func TestWatchFromBeginning(t *testing.T) {
 	}
 
 	// Put a file under dir. Watch two updates, one on each channel.
-	p, entry := newDirEntry("/dir/fileA.txt", !isDir, context)
+	p, entry := newDirEntry("/dir/fileA.txt", !isDir, config)
 	_, err = tree.Put(p, entry)
 	if err != nil {
 		t.Fatal(err)
@@ -109,7 +109,7 @@ func TestWatchFromBeginning(t *testing.T) {
 		t.Errorf("Expected channel closed, got event = %v", event)
 	}
 
-	p, entry = newDirEntry("/dir/fileB.txt", !isDir, context)
+	p, entry = newDirEntry("/dir/fileB.txt", !isDir, config)
 	_, err = tree.Put(p, entry)
 	if err != nil {
 		t.Fatal(err)
@@ -124,13 +124,13 @@ func TestWatchFromBeginning(t *testing.T) {
 }
 
 func TestWatchFromMiddle(t *testing.T) {
-	context, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(context, log, logIndex)
+	config, log, logIndex := newConfigForTesting(t, userName)
+	tree, err := New(config, log, logIndex)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	buildTree(t, tree, context)
+	buildTree(t, tree, config)
 
 	// Generate a delete event.
 	_, err = tree.Delete(mkpath(t, userName+"/orig/sub1/file1.txt"))
@@ -173,13 +173,13 @@ func TestWatchFromMiddle(t *testing.T) {
 }
 
 func TestWatchFromCurrent(t *testing.T) {
-	context, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(context, log, logIndex)
+	config, log, logIndex := newConfigForTesting(t, userName)
+	tree, err := New(config, log, logIndex)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	buildTree(t, tree, context)
+	buildTree(t, tree, config)
 
 	// Get a watcher for the current subtree, rooted at orig/sub1.
 	done := make(chan struct{})
@@ -189,7 +189,7 @@ func TestWatchFromCurrent(t *testing.T) {
 	}
 
 	// Make further modifications.
-	_, err = tree.Put(newDirEntry("/orig/sub1/thesis.pdf", !isDir, context))
+	_, err = tree.Put(newDirEntry("/orig/sub1/thesis.pdf", !isDir, config))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -228,13 +228,13 @@ func TestWatchFromCurrent(t *testing.T) {
 }
 
 func TestWatchNonExistingNode(t *testing.T) {
-	context, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(context, log, logIndex)
+	config, log, logIndex := newConfigForTesting(t, userName)
+	tree, err := New(config, log, logIndex)
 	if err != nil {
 		t.Fatal(err)
 	}
 	// A root must exist for a watcher.
-	_, err = tree.Put(newDirEntry("/", isDir, context))
+	_, err = tree.Put(newDirEntry("/", isDir, config))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -249,20 +249,20 @@ func TestWatchNonExistingNode(t *testing.T) {
 	// Create a tree.
 
 	// Does not generate an event.
-	_, err = tree.Put(newDirEntry("/orig", isDir, context))
+	_, err = tree.Put(newDirEntry("/orig", isDir, config))
 	if err != nil {
 		t.Fatal(err)
 	}
 	// Does not generate an event.
-	_, err = tree.Put(newDirEntry("/orig/sub11", isDir, context))
+	_, err = tree.Put(newDirEntry("/orig/sub11", isDir, config))
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = tree.Put(newDirEntry("/orig/sub1", isDir, context))
+	_, err = tree.Put(newDirEntry("/orig/sub1", isDir, config))
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = tree.Put(newDirEntry("/orig/sub1/somefile.txt", !isDir, context))
+	_, err = tree.Put(newDirEntry("/orig/sub1/somefile.txt", !isDir, config))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -277,11 +277,11 @@ func TestWatchNonExistingNode(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Does not generate an event.
-	_, err = tree.Put(newDirEntry("/orig/somecrap", !isDir, context))
+	_, err = tree.Put(newDirEntry("/orig/somecrap", !isDir, config))
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = tree.Put(newDirEntry("/orig/sub1", isDir, context))
+	_, err = tree.Put(newDirEntry("/orig/sub1", isDir, config))
 	if err != nil {
 		t.Fatal(err)
 	}

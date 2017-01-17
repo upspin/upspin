@@ -30,11 +30,11 @@ import (
 	_ "upspin.io/pack/plain"
 )
 
-func New(context upspin.Config) upspin.DirServer {
+func New(config upspin.Config) upspin.DirServer {
 	return &server{
-		context: context,
+		config: config,
 		db: &database{
-			dirContext: context,
+			dirConfig:  config,
 			root:       make(map[upspin.UserName]*upspin.DirEntry),
 			rootAccess: make(map[upspin.UserName]*access.Access),
 			access:     make(map[upspin.PathName]*access.Access),
@@ -52,16 +52,16 @@ var (
 // server implements the upspin.DirServer interface. It is a multiplexed
 // by user onto a database.
 type server struct {
-	// context holds the context that created the call.
-	context upspin.Config
-	db      *database
+	// config holds the config that created the call.
+	config upspin.Config
+	db     *database
 }
 
 var _ upspin.DirServer = (*server)(nil)
 
 // database represents the shared state of the directory forest.
 type database struct {
-	dirContext upspin.Config // For accessing store holding directory entries.
+	dirConfig upspin.Config // For accessing store holding directory entries.
 
 	// mu is used to serialize access to the maps.
 	// It's also used to serialize all access to the store through the
@@ -85,7 +85,7 @@ var _ upspin.DirServer = (*server)(nil)
 
 // newDirEntry returns a new DirEntry holding the provided directory data (cleartext).
 // This is the general form of the method that follows, used in the tests.
-func newDirEntry(context upspin.Config, packing upspin.Packing, name upspin.PathName, cleartext []byte, attr upspin.Attribute, link upspin.PathName, seq int64) (*upspin.DirEntry, error) {
+func newDirEntry(config upspin.Config, packing upspin.Packing, name upspin.PathName, cleartext []byte, attr upspin.Attribute, link upspin.PathName, seq int64) (*upspin.DirEntry, error) {
 	entry := &upspin.DirEntry{
 		Name:       name,
 		SignedName: name, // TODO: snapshots.
@@ -94,7 +94,7 @@ func newDirEntry(context upspin.Config, packing upspin.Packing, name upspin.Path
 		Attr:       attr,
 		Link:       link,
 		Sequence:   seq,
-		Writer:     context.UserName(),
+		Writer:     config.UserName(),
 	}
 	if (link != "") != (attr == upspin.AttrLink) {
 		return nil, errors.Errorf("inconsistent attribute (%v) and link (%q) fields", attr, link)
@@ -107,7 +107,7 @@ func newDirEntry(context upspin.Config, packing upspin.Packing, name upspin.Path
 		// No data to pack.
 		return entry, nil
 	}
-	bp, err := packer.Pack(context, entry)
+	bp, err := packer.Pack(config, entry)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +115,7 @@ func newDirEntry(context upspin.Config, packing upspin.Packing, name upspin.Path
 	if err != nil {
 		return nil, err
 	}
-	store, err := bind.StoreServer(context, context.StoreEndpoint())
+	store, err := bind.StoreServer(config, config.StoreEndpoint())
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +125,7 @@ func newDirEntry(context upspin.Config, packing upspin.Packing, name upspin.Path
 	}
 	bp.SetLocation(
 		upspin.Location{
-			Endpoint:  context.StoreEndpoint(),
+			Endpoint:  config.StoreEndpoint(),
 			Reference: refdata.Reference,
 		},
 	)
@@ -138,14 +138,14 @@ func newDirEntry(context upspin.Config, packing upspin.Packing, name upspin.Path
 // newDirEntry returns a new DirEntry holding the provided directory data (cleartext).
 // It is called for directories only.
 func (s *server) newDirEntry(name upspin.PathName, cleartext []byte, seq int64) (*upspin.DirEntry, error) {
-	return newDirEntry(s.db.dirContext, dirPacking, name, cleartext, upspin.AttrDirectory, "", seq)
+	return newDirEntry(s.db.dirConfig, dirPacking, name, cleartext, upspin.AttrDirectory, "", seq)
 }
 
 // dirBlock constructs an upspin.DirBlock with the appropriate fields.
-func dirBlock(context upspin.Config, ref upspin.Reference, offset int64, blob []byte) upspin.DirBlock {
+func dirBlock(config upspin.Config, ref upspin.Reference, offset int64, blob []byte) upspin.DirBlock {
 	return upspin.DirBlock{
 		Location: upspin.Location{
-			Endpoint:  context.StoreEndpoint(),
+			Endpoint:  config.StoreEndpoint(),
 			Reference: ref,
 		},
 		Offset: offset,
@@ -429,7 +429,7 @@ func (s *server) Watch(upspin.PathName, int64, <-chan struct{}) (<-chan upspin.E
 
 // readAll retrieves the data for the entry.
 func (s *server) readAll(entry *upspin.DirEntry) ([]byte, error) {
-	return clientutil.ReadAll(s.db.dirContext, entry)
+	return clientutil.ReadAll(s.db.dirConfig, entry)
 }
 
 // Delete implements upspin.DirServer.Delete.
@@ -626,7 +626,7 @@ func (s *server) listDir(dirName upspin.PathName) ([]*upspin.DirEntry, error) {
 	return results, nil
 }
 
-// can reports whether the calling user (defined by s.context.UserName()) has the
+// can reports whether the calling user (defined by s.config.UserName()) has the
 // access right for this file or directory.
 // s.db.mu is _not_ held.
 func (s *server) can(right access.Right, parsed path.Parsed) (bool, error) {
@@ -634,7 +634,7 @@ func (s *server) can(right access.Right, parsed path.Parsed) (bool, error) {
 	if accessFile == nil {
 		accessFile = s.rootAccessFile(parsed)
 	}
-	return accessFile.Can(s.context.UserName(), right, parsed.Path(), s.load)
+	return accessFile.Can(s.config.UserName(), right, parsed.Path(), s.load)
 }
 
 // errPerm checks whether the user has any right to the
@@ -823,13 +823,13 @@ func (s *server) installEntry(op string, dirName upspin.PathName, dirEntry *upsp
 // Dial always returns the same instance, so there is only one instance of the service
 // running in the address space. It ignores the address within the endpoint but
 // requires that the transport be InProcess.
-func (s *server) Dial(context upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
+func (s *server) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
 	const op = "dir/inprocess.Dial"
 	if e.Transport != upspin.InProcess {
 		return nil, errors.E(op, errors.Invalid, errors.Str("unrecognized transport"))
 	}
 	this := *s // Make a copy.
-	this.context = context
+	this.config = config
 	return &this, nil
 }
 
