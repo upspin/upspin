@@ -19,16 +19,16 @@ import (
 )
 
 // New creates a new StoreServer instance with the
-// provided server context and configuration options.
+// provided server configuration and  options.
 // The only valid configuration option is "root", which
 // specifies a path to the file system root.
-func New(ctx upspin.Config, options ...string) (upspin.StoreServer, error) {
+func New(cfg upspin.Config, options ...string) (upspin.StoreServer, error) {
 	const op = "store/filesystem.New"
 
-	s := &server{server: ctx}
+	s := &server{server: cfg}
 
 	var err error
-	s.root, s.defaultAccess, err = newRoot(ctx, options)
+	s.root, s.defaultAccess, err = newRoot(cfg, options)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
@@ -81,11 +81,11 @@ func (s *server) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Lo
 	return data, refdata, nil, nil
 }
 
-func (s *server) Dial(ctx upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
+func (s *server) Dial(cfg upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
 	const op = "store/filesystem.Dial"
 
 	dialed := *s
-	dialed.user = ctx
+	dialed.user = cfg
 	return &dialed, nil
 }
 

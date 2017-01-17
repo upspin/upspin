@@ -209,7 +209,7 @@ func (s *server) Delete(ref upspin.Reference) error {
 }
 
 // Dial implements upspin.Service.
-func (s *server) Dial(context upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
+func (s *server) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.refCount++

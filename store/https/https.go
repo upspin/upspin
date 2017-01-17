@@ -62,10 +62,10 @@ func IsServerReachable(serverURL string) bool {
 }
 
 // Dial implements Dialer.
-func (s *Store) Dial(context upspin.Config, endpoint upspin.Endpoint) (upspin.Service, error) {
+func (s *Store) Dial(config upspin.Config, endpoint upspin.Endpoint) (upspin.Service, error) {
 	const op = "store/https.Dial"
-	if context == nil {
-		return nil, newStoreError(op, "nil context", "")
+	if config == nil {
+		return nil, newStoreError(op, "nil config", "")
 	}
 	serverURL, err := url.Parse(string(endpoint.NetAddr))
 	if err != nil {
