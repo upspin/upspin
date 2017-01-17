@@ -18,8 +18,8 @@ import (
 	"upspin.io/upspin/proto"
 )
 
-// dialContext contains the destination and authenticated user of the dial.
-type dialContext struct {
+// dialConfig contains the destination and authenticated user of the dial.
+type dialConfig struct {
 	endpoint upspin.Endpoint
 	userName upspin.UserName
 }
@@ -27,7 +27,7 @@ type dialContext struct {
 // remote implements upspin.KeyServer.
 type remote struct {
 	auth.Client // For sessions, Ping, and Close.
-	ctx         dialContext
+	cfg         dialConfig
 }
 
 var _ upspin.KeyServer = (*remote)(nil)
@@ -75,27 +75,27 @@ func (r *remote) Put(user *upspin.User) error {
 
 // Endpoint implements upspin.StoreServer.Endpoint.
 func (r *remote) Endpoint() upspin.Endpoint {
-	return r.ctx.endpoint
+	return r.cfg.endpoint
 }
 
 // Dial implements upspin.Service.
-func (r *remote) Dial(context upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
-	op := r.opf("Dial", "%q, %q", context.UserName(), e)
+func (r *remote) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
+	op := r.opf("Dial", "%q, %q", config.UserName(), e)
 
 	if e.Transport != upspin.Remote {
 		return nil, op.error(errors.Invalid, errors.Str("unrecognized transport"))
 	}
 
-	authClient, err := auth.NewClient(context, e.NetAddr, auth.Secure, upspin.Endpoint{})
+	authClient, err := auth.NewClient(config, e.NetAddr, auth.Secure, upspin.Endpoint{})
 	if err != nil {
 		return nil, op.error(errors.IO, err)
 	}
 
 	return &remote{
 		Client: authClient,
-		ctx: dialContext{
+		cfg: dialConfig{
 			endpoint: e,
-			userName: context.UserName(),
+			userName: config.UserName(),
 		},
 	}, nil
 }
@@ -108,7 +108,7 @@ func init() {
 }
 
 func (r *remote) opf(method string, format string, args ...interface{}) *operation {
-	ep := r.ctx.endpoint.String()
+	ep := r.cfg.endpoint.String()
 	s := fmt.Sprintf("key/remote.%s(%q)", method, ep)
 	op := &operation{s, fmt.Sprintf(format, args...)}
 	log.Debug.Print(op)
