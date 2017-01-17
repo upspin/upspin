@@ -68,7 +68,7 @@ var commands = map[string]func(*State, ...string){
 type State struct {
 	op           string // Name of the subcommand we are running.
 	client       upspin.Client
-	context      upspin.Config
+	config       upspin.Config
 	sharer       *Sharer
 	exitCode     int // Exit with non-zero status for minor problems.
 	interactive  bool
@@ -207,23 +207,23 @@ func newState(op string) *State {
 	}
 	if op == "signup" || op == "keygen" {
 		// signup is special since there is no user yet.
-		// keygen simply does not require a context or anything else.
+		// keygen simply does not require a config or anything else.
 		return s
 	}
-	ctx, err := config.FromFile(flags.Config)
+	cfg, err := config.FromFile(flags.Config)
 	if err != nil && err != config.ErrNoFactotum {
 		s.exit(err)
 	}
-	transports.Init(ctx)
-	s.client = client.New(ctx)
-	s.context = ctx
+	transports.Init(cfg)
+	s.client = client.New(cfg)
+	s.config = cfg
 	s.sharer = newSharer(s)
 	s.maybeEnableMetrics()
 	return s
 }
 
 func (s *State) DirServer() upspin.DirServer {
-	dir, err := bind.DirServer(s.context, s.context.DirEndpoint())
+	dir, err := bind.DirServer(s.config, s.config.DirEndpoint())
 	if err != nil {
 		s.exit(err)
 	}
@@ -231,7 +231,7 @@ func (s *State) DirServer() upspin.DirServer {
 }
 
 func (s *State) KeyServer() upspin.KeyServer {
-	key, err := bind.KeyServer(s.context, s.context.KeyEndpoint())
+	key, err := bind.KeyServer(s.config, s.config.KeyEndpoint())
 	if err != nil {
 		s.exit(err)
 	}

@@ -40,24 +40,24 @@ type Countersigner struct {
 
 // countersignCommand is the main function for the countersign subcommand.
 func (s *State) countersignCommand(fs *flag.FlagSet) {
-	u, err := s.KeyServer().Lookup(s.context.UserName())
+	u, err := s.KeyServer().Lookup(s.config.UserName())
 	if err != nil || len(u.PublicKey) == 0 {
-		s.exitf("can't find old key for %q: %s\n", s.context.UserName(), err)
+		s.exitf("can't find old key for %q: %s\n", s.config.UserName(), err)
 	}
 	c := &Countersigner{
 		state:  s,
 		oldKey: u.PublicKey,
 	}
-	newF := s.context.Factotum()
+	newF := s.config.Factotum()
 	if newF == nil {
 		s.exitf("no factotum available")
 	}
 
-	lastCtx := s.context
-	s.context = config.SetFactotum(s.context, s.context.Factotum().Pop())
-	defer func() { s.context = lastCtx }()
+	lastCtx := s.config
+	s.config = config.SetFactotum(s.config, s.config.Factotum().Pop())
+	defer func() { s.config = lastCtx }()
 
-	root := upspin.PathName(string(s.context.UserName()) + "/")
+	root := upspin.PathName(string(s.config.UserName()) + "/")
 	entries := c.entriesFromDirectory(root)
 	for _, e := range entries {
 		c.countersign(e, newF)
@@ -90,7 +90,7 @@ func (c *Countersigner) entriesFromDirectory(dir upspin.PathName) []*upspin.DirE
 	for _, e := range thisDir {
 		if !e.IsDir() && !e.IsLink() &&
 			e.Packing == upspin.EEPack &&
-			string(e.Writer) == string(c.state.context.UserName()) {
+			string(e.Writer) == string(c.state.config.UserName()) {
 			entries = append(entries, e)
 		}
 	}

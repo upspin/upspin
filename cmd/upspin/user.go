@@ -51,7 +51,7 @@ same YAML format printed by the command without the -put flag.
 	}
 	var userNames []upspin.UserName
 	if fs.NArg() == 0 {
-		userNames = append(userNames, s.context.UserName())
+		userNames = append(userNames, s.config.UserName())
 	} else {
 		for i := 0; i < fs.NArg(); i++ {
 			userName, err := user.Clean(upspin.UserName(fs.Arg(i)))
@@ -72,14 +72,14 @@ same YAML format printed by the command without the -put flag.
 			s.exit(err)
 		}
 		fmt.Printf("%s\n", blob)
-		if name != s.context.UserName() {
+		if name != s.config.UserName() {
 			continue
 		}
 		// When it's the user asking about herself, the result comes
-		// from the context and may disagree with the value in the
+		// from the configuration and may disagree with the value in the
 		// key store. This is a common source of error so we want to
 		// diagnose it. To do that, we wipe the key cache and go again.
-		// This will wipe the memory of our remembered context and
+		// This will wipe the memory of our remembered configuration and
 		// reload it from the key server.
 		usercache.ResetGlobal()
 		keyU, err := keyServer.Lookup(name)
@@ -88,24 +88,24 @@ same YAML format printed by the command without the -put flag.
 		}
 		var buf bytes.Buffer
 		if keyU.Name != u.Name {
-			fmt.Fprintf(&buf, "user name in context: %s\n", u.Name)
+			fmt.Fprintf(&buf, "user name in configuration: %s\n", u.Name)
 			fmt.Fprintf(&buf, "user name in key server: %s", keyU.Name)
 		}
 		if keyU.PublicKey != u.PublicKey {
-			fmt.Fprintf(&buf, "public key in context does not match key server")
+			fmt.Fprintf(&buf, "public key in configuration does not match key server")
 		}
 		// There must be dir servers defined in both and we expect agreement.
 		if !equalEndpoints(keyU.Dirs, u.Dirs) {
-			fmt.Fprintf(&buf, "dirs in context: %s\n", u.Dirs)
+			fmt.Fprintf(&buf, "dirs in configuration: %s\n", u.Dirs)
 			fmt.Fprintf(&buf, "dirs in key server: %s", keyU.Dirs)
 		}
 		// Remote stores need not be defined (yet).
 		if len(keyU.Stores) > 0 && !equalEndpoints(keyU.Stores, u.Stores) {
-			fmt.Fprintf(&buf, "stores in context: %s", u.Stores)
+			fmt.Fprintf(&buf, "stores in configuration: %s", u.Stores)
 			fmt.Fprintf(&buf, "stores in key server: %s", keyU.Stores)
 		}
 		if buf.Len() > 0 {
-			s.exitf("local context differs from public record in key server:\n%s", &buf)
+			s.exitf("local configuration differs from public record in key server:\n%s", &buf)
 		}
 	}
 }

@@ -38,16 +38,16 @@ TODO: Rotate and countersign are terms of art, not clear to users.
 		fs.Usage()
 	}
 
-	f := s.context.Factotum() // save latest factotum
+	f := s.config.Factotum() // save latest factotum
 	if f == nil {
 		s.exitf("no factotum available")
 	}
-	lastCtx := s.context
-	s.context = config.SetFactotum(s.context, f.Pop()) // context now defaults to old key
-	defer func() { s.context = lastCtx }()
+	lastCfg := s.config
+	s.config = config.SetFactotum(s.config, f.Pop()) // config now defaults to old key
+	defer func() { s.config = lastCfg }()
 
 	keyServer := s.KeyServer()
-	u, err := keyServer.Lookup(s.context.UserName())
+	u, err := keyServer.Lookup(s.config.UserName())
 	if err != nil {
 		s.exit(err)
 	}
