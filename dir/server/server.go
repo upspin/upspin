@@ -43,7 +43,7 @@ type server struct {
 	// serverContext holds this server's Factotum, server name and store
 	// endpoint where to store dir entries. It is set when the server is
 	// first registered and never reset again.
-	serverContext upspin.Context
+	serverContext upspin.Config
 
 	// userName is the name of the user on behalf of whom this
 	// server is serving.
@@ -102,7 +102,7 @@ type options struct {
 }
 
 // New creates a new instance of DirServer with the given options
-func New(ctxt upspin.Context, options ...string) (upspin.DirServer, error) {
+func New(ctxt upspin.Config, options ...string) (upspin.DirServer, error) {
 	const op = "dir/server.New"
 	if ctxt == nil {
 		return nil, errors.E(op, errors.Invalid, errors.Str("nil context"))
@@ -739,7 +739,7 @@ func (s *server) watch(op string, treeEvents <-chan *upspin.Event, outEvents cha
 }
 
 // Dial implements upspin.Dialer.
-func (s *server) Dial(ctx upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (s *server) Dial(ctx upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
 	const op = "dir/server.Dial"
 	if e.Transport == upspin.Unassigned {
 		return nil, errors.E(op, errors.Invalid, errors.Str("transport must not be unassigned"))

@@ -17,7 +17,7 @@ import (
 
 // server implements upspin.Storeserver.
 type server struct {
-	ctx upspin.Context
+	ctx upspin.Config
 
 	// The on disk cache.
 	cache *storeCache
@@ -27,7 +27,7 @@ type server struct {
 }
 
 // New creates a new store cache that implements upspin.StoreServer.
-func New(ctx upspin.Context, cacheDir string, maxBytes int64) (upspin.StoreServer, error) {
+func New(ctx upspin.Config, cacheDir string, maxBytes int64) (upspin.StoreServer, error) {
 	c, err := newCache(path.Join(cacheDir, "storecache"), maxBytes)
 	if err != nil {
 		return nil, err
@@ -38,7 +38,7 @@ func New(ctx upspin.Context, cacheDir string, maxBytes int64) (upspin.StoreServe
 	}, nil
 }
 
-func (s *server) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (s *server) Dial(context upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
 	s2 := *s
 	s.authority = e
 	return &s2, nil

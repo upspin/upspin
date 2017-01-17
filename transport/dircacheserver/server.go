@@ -25,7 +25,7 @@ import (
 
 // server is a SecureServer that talks to a DirServer interface and serves requests.
 type server struct {
-	ctx  upspin.Context
+	ctx  upspin.Config
 	clog *clog
 
 	// userToDirServer is a mapping of users to directory server endpoints
@@ -33,7 +33,7 @@ type server struct {
 }
 
 // New creates a new DirServer cache reading in the log and writing out a new compacted log.
-func New(ctx upspin.Context, cacheDir string, maxLogBytes int64) (http.Handler, error) {
+func New(ctx upspin.Config, cacheDir string, maxLogBytes int64) (http.Handler, error) {
 	userToDirServer := newUserToDirServer()
 	clog, err := openLog(ctx, ospath.Join(cacheDir, "dircache"), maxLogBytes, userToDirServer)
 	if err != nil {

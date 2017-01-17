@@ -26,7 +26,7 @@ import (
 
 // Client implements upspin.Client.
 type Client struct {
-	context upspin.Context
+	context upspin.Config
 }
 
 var _ upspin.Client = (*Client)(nil)
@@ -40,7 +40,7 @@ const (
 
 // New creates a Client that uses the given Context to
 // access the various Upspin servers.
-func New(context upspin.Context) upspin.Client {
+func New(context upspin.Config) upspin.Client {
 	return &Client{context: context}
 }
 

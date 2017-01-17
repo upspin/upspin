@@ -71,7 +71,7 @@ func defaultCacheDir() string {
 	return homeDir + "/upspin"
 }
 
-func startCache(ctx upspin.Context) {
+func startCache(ctx upspin.Config) {
 	ce := ctx.CacheEndpoint()
 	if ce.Transport == upspin.Unassigned {
 		return // not using a cache server

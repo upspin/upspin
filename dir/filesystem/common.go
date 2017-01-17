@@ -23,7 +23,7 @@ import (
 // newRoot parses the given options for the file system "root"
 // and sets up a default access file.
 // It is used by server constructors.
-func newRoot(ctx upspin.Context, opts []string) (root string, defaultAccess *access.Access, err error) {
+func newRoot(ctx upspin.Config, opts []string) (root string, defaultAccess *access.Access, err error) {
 	for _, o := range opts {
 		switch {
 		case strings.HasPrefix(o, "root="):

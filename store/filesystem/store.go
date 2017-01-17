@@ -22,7 +22,7 @@ import (
 // provided server context and configuration options.
 // The only valid configuration option is "root", which
 // specifies a path to the file system root.
-func New(ctx upspin.Context, options ...string) (upspin.StoreServer, error) {
+func New(ctx upspin.Config, options ...string) (upspin.StoreServer, error) {
 	const op = "store/filesystem.New"
 
 	s := &server{server: ctx}
@@ -39,11 +39,11 @@ func New(ctx upspin.Context, options ...string) (upspin.StoreServer, error) {
 type server struct {
 	// Set by New.
 	root          string
-	server        upspin.Context
+	server        upspin.Config
 	defaultAccess *access.Access
 
 	// Set by Dial.
-	user upspin.Context
+	user upspin.Config
 }
 
 var errNotDialed = errors.E(errors.Internal, errors.Str("must Dial before making request"))
@@ -81,7 +81,7 @@ func (s *server) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Lo
 	return data, refdata, nil, nil
 }
 
-func (s *server) Dial(ctx upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (s *server) Dial(ctx upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
 	const op = "store/filesystem.Dial"
 
 	dialed := *s

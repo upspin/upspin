@@ -36,7 +36,7 @@ type userCacheServer struct {
 	// If dialContext is non-nil, then the Dial method has been called.
 	// If dialed is non-nil, then the underlying service has been dialed.
 	mu           sync.Mutex
-	dialContext  upspin.Context
+	dialContext  upspin.Config
 	dialEndpoint upspin.Endpoint
 	dialed       upspin.KeyServer
 }
@@ -142,7 +142,7 @@ func (c *userCacheServer) Ping() bool {
 }
 
 // Authenticate implements upspin.Service.
-func (c *userCacheServer) Authenticate(upspin.Context) error {
+func (c *userCacheServer) Authenticate(upspin.Config) error {
 	return errors.Str("key/usercache.Authenticate: not implemented")
 }
 
@@ -162,7 +162,7 @@ func (c *userCacheServer) Close() {
 }
 
 // Dial implements upspin.Dialer.
-func (c *userCacheServer) Dial(ctx upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (c *userCacheServer) Dial(ctx upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
 	c.cacheContextUser(ctx)
 
 	cc := *c
@@ -176,7 +176,7 @@ func (c *userCacheServer) Dial(ctx upspin.Context, e upspin.Endpoint) (upspin.Se
 // cacheContextUser puts the dialed user in the cache with an extra-long expiry
 // time, so that we don't hit the underlying cache for the current user and
 // instead use the values from their context.
-func (c *userCacheServer) cacheContextUser(ctx upspin.Context) {
+func (c *userCacheServer) cacheContextUser(ctx upspin.Config) {
 	if ctx == nil {
 		return
 	}

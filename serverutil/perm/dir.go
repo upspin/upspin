@@ -22,7 +22,7 @@ type Dir struct {
 // WrapDir wraps the given DirServer with a DirServer that checks root-creation
 // permissions. It will only start polling the store permissions after the
 // ready channel is closed.
-func WrapDir(ctx upspin.Context, ready <-chan struct{}, targetUser upspin.UserName, dir upspin.DirServer) (*Dir, error) {
+func WrapDir(ctx upspin.Config, ready <-chan struct{}, targetUser upspin.UserName, dir upspin.DirServer) (*Dir, error) {
 	const op = "serverutil/perm.WrapDir"
 	p, err := New(ctx, ready, targetUser, dir.Lookup, dir.Watch)
 	if err != nil {
@@ -49,7 +49,7 @@ func (d *Dir) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 }
 
 // Dial implements upspin.Service.
-func (d *Dir) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (d *Dir) Dial(context upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
 	const op = "serverutil/perm.Dial"
 	service, err := d.DirServer.Dial(context, e)
 	if err != nil {

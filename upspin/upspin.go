@@ -161,23 +161,23 @@ type Packer interface {
 
 	// Pack returns a BlockPacker that packs blocks
 	// into the given DirEntry.
-	Pack(Context, *DirEntry) (BlockPacker, error)
+	Pack(Config, *DirEntry) (BlockPacker, error)
 
 	// Unpack returns a BlockUnpacker that unpacks blocks
 	// from the given DirEntry.
-	Unpack(Context, *DirEntry) (BlockUnpacker, error)
+	Unpack(Config, *DirEntry) (BlockUnpacker, error)
 
 	// PackLen returns an upper bound on the number of bytes required
 	// to store the cleartext after packing.
 	// PackLen might update the entry's Packdata field.
 	// PackLen returns -1 if there is an error.
-	PackLen(context Context, cleartext []byte, entry *DirEntry) int
+	PackLen(context Config, cleartext []byte, entry *DirEntry) int
 
 	// UnpackLen returns an upper bound on the number of bytes
 	// required to store the unpacked cleartext.
 	// UnpackLen might update the entry's Packdata field.
 	// UnpackLen returns -1 if there is an error.
-	UnpackLen(context Context, ciphertext []byte, entry *DirEntry) int
+	UnpackLen(context Config, ciphertext []byte, entry *DirEntry) int
 
 	// ReaderHashes returns SHA-256 hashes of the public keys able to decrypt the
 	// associated ciphertext.
@@ -192,13 +192,13 @@ type Packer interface {
 	// In case of error, Share skips processing for that reader or packdata.
 	// If packdata[i] is nil on return, it was skipped.
 	// Share trusts the caller to check the arguments are not malicious.
-	Share(context Context, readers []PublicKey, packdata []*[]byte)
+	Share(context Config, readers []PublicKey, packdata []*[]byte)
 
 	// Name updates the DirEntry to refer to a new path. If the new
 	// path is in a different directory, the wrapped keys are reduced to
 	// only that of the Upspin user invoking the method. The Packdata
 	// in entry must contain a wrapped key for that user.
-	Name(context Context, entry *DirEntry, path PathName) error
+	Name(context Config, entry *DirEntry, path PathName) error
 }
 
 const (
@@ -644,9 +644,9 @@ type File interface {
 	Seek(offset int64, whence int) (ret int64, err error)
 }
 
-// Context contains client information such as the user's keys and
+// Config contains client information such as the user's keys and
 // preferred KeyServer, DirServer, and StoreServer endpoints.
-type Context interface {
+type Config interface {
 	// The name of the user requesting access.
 	UserName() UserName
 
@@ -683,7 +683,7 @@ type Context interface {
 // the Upspin "bind" package to connect to services.
 type Dialer interface {
 	// Dial connects to the service and performs any needed authentication.
-	Dial(Context, Endpoint) (Service, error)
+	Dial(Config, Endpoint) (Service, error)
 }
 
 // Service is the general interface returned by a dialer. It includes

@@ -32,7 +32,7 @@ var bindOnce sync.Once
 // context. This handles the case where a context specifies an inprocess
 // directory server and configures that server to talk to the specified store
 // server.
-func Init(ctx upspin.Context) {
+func Init(ctx upspin.Config) {
 	if ctx == nil {
 		return
 	}

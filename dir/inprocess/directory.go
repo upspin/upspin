@@ -30,7 +30,7 @@ import (
 	_ "upspin.io/pack/plain"
 )
 
-func New(context upspin.Context) upspin.DirServer {
+func New(context upspin.Config) upspin.DirServer {
 	return &server{
 		context: context,
 		db: &database{
@@ -53,7 +53,7 @@ var (
 // by user onto a database.
 type server struct {
 	// context holds the context that created the call.
-	context upspin.Context
+	context upspin.Config
 	db      *database
 }
 
@@ -61,7 +61,7 @@ var _ upspin.DirServer = (*server)(nil)
 
 // database represents the shared state of the directory forest.
 type database struct {
-	dirContext upspin.Context // For accessing store holding directory entries.
+	dirContext upspin.Config // For accessing store holding directory entries.
 
 	// mu is used to serialize access to the maps.
 	// It's also used to serialize all access to the store through the
@@ -85,7 +85,7 @@ var _ upspin.DirServer = (*server)(nil)
 
 // newDirEntry returns a new DirEntry holding the provided directory data (cleartext).
 // This is the general form of the method that follows, used in the tests.
-func newDirEntry(context upspin.Context, packing upspin.Packing, name upspin.PathName, cleartext []byte, attr upspin.Attribute, link upspin.PathName, seq int64) (*upspin.DirEntry, error) {
+func newDirEntry(context upspin.Config, packing upspin.Packing, name upspin.PathName, cleartext []byte, attr upspin.Attribute, link upspin.PathName, seq int64) (*upspin.DirEntry, error) {
 	entry := &upspin.DirEntry{
 		Name:       name,
 		SignedName: name, // TODO: snapshots.
@@ -142,7 +142,7 @@ func (s *server) newDirEntry(name upspin.PathName, cleartext []byte, seq int64) 
 }
 
 // dirBlock constructs an upspin.DirBlock with the appropriate fields.
-func dirBlock(context upspin.Context, ref upspin.Reference, offset int64, blob []byte) upspin.DirBlock {
+func dirBlock(context upspin.Config, ref upspin.Reference, offset int64, blob []byte) upspin.DirBlock {
 	return upspin.DirBlock{
 		Location: upspin.Location{
 			Endpoint:  context.StoreEndpoint(),
@@ -823,7 +823,7 @@ func (s *server) installEntry(op string, dirName upspin.PathName, dirEntry *upsp
 // Dial always returns the same instance, so there is only one instance of the service
 // running in the address space. It ignores the address within the endpoint but
 // requires that the transport be InProcess.
-func (s *server) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (s *server) Dial(context upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
 	const op = "dir/inprocess.Dial"
 	if e.Transport != upspin.InProcess {
 		return nil, errors.E(op, errors.Invalid, errors.Str("unrecognized transport"))

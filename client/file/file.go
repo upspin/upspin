@@ -33,7 +33,7 @@ type File struct {
 	closed   bool            // Whether the file has been closed, preventing further operations.
 
 	// Used only by readers.
-	context upspin.Context
+	context upspin.Config
 	entry   *upspin.DirEntry
 	size    int64
 	bu      upspin.BlockUnpacker
@@ -51,7 +51,7 @@ var _ upspin.File = (*File)(nil)
 
 // Readable creates a new File for the given DirEntry that must be readable
 // using the given Context.
-func Readable(ctx upspin.Context, entry *upspin.DirEntry) (*File, error) {
+func Readable(ctx upspin.Config, entry *upspin.DirEntry) (*File, error) {
 	// TODO(adg): check if this is a dir or link?
 	const op = "client/file.Readable"
 
