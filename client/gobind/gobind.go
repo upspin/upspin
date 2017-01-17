@@ -20,7 +20,7 @@ package gobind
 
 import (
 	"upspin.io/client"
-	"upspin.io/context"
+	"upspin.io/config"
 	"upspin.io/factotum"
 	"upspin.io/log"
 	"upspin.io/upspin"
@@ -122,35 +122,35 @@ func (c *Client) Put(name string, data []byte) (string, error) {
 }
 
 // NewClient returns a new Client for a given user's configuration.
-func NewClient(config *ClientConfig) (*Client, error) {
-	userName, err := user.Clean(upspin.UserName(config.UserName))
+func NewClient(clientConfig *ClientConfig) (*Client, error) {
+	userName, err := user.Clean(upspin.UserName(clientConfig.UserName))
 	if err != nil {
 		return nil, err
 	}
-	ctx := context.New()
-	ctx = context.SetUserName(ctx, userName)
-	ctx = context.SetPacking(ctx, upspin.EEPack)
-	f, err := factotum.NewFromKeys([]byte(config.PublicKey), []byte(config.PrivateKey), nil)
+	ctx := config.New()
+	ctx = config.SetUserName(ctx, userName)
+	ctx = config.SetPacking(ctx, upspin.EEPack)
+	f, err := factotum.NewFromKeys([]byte(clientConfig.PublicKey), []byte(clientConfig.PrivateKey), nil)
 	if err != nil {
 		log.Error.Printf("Error creating factotum: %s", err)
 		return nil, err
 	}
-	ctx = context.SetFactotum(ctx, f)
+	ctx = config.SetFactotum(ctx, f)
 	se := upspin.Endpoint{
 		Transport: upspin.Remote,
-		NetAddr:   upspin.NetAddr(config.StoreNetAddr),
+		NetAddr:   upspin.NetAddr(clientConfig.StoreNetAddr),
 	}
-	ctx = context.SetStoreEndpoint(ctx, se)
+	ctx = config.SetStoreEndpoint(ctx, se)
 	de := upspin.Endpoint{
 		Transport: upspin.Remote,
-		NetAddr:   upspin.NetAddr(config.DirNetAddr),
+		NetAddr:   upspin.NetAddr(clientConfig.DirNetAddr),
 	}
-	ctx = context.SetDirEndpoint(ctx, de)
+	ctx = config.SetDirEndpoint(ctx, de)
 	ue := upspin.Endpoint{
 		Transport: upspin.Remote,
-		NetAddr:   upspin.NetAddr(config.KeyNetAddr),
+		NetAddr:   upspin.NetAddr(clientConfig.KeyNetAddr),
 	}
-	ctx = context.SetKeyEndpoint(ctx, ue)
+	ctx = config.SetKeyEndpoint(ctx, ue)
 	return &Client{
 		c: client.New(ctx),
 	}, nil

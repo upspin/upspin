@@ -12,7 +12,7 @@ import (
 	"testing"
 
 	"upspin.io/bind"
-	"upspin.io/context"
+	"upspin.io/config"
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/log"
@@ -96,13 +96,13 @@ func setupTestContext(t *testing.T) upspin.Context {
 	if err != nil {
 		t.Fatal(err)
 	}
-	ctx := context.New()
-	ctx = context.SetUserName(ctx, userName)
-	ctx = context.SetPacking(ctx, upspin.EEPack)
-	ctx = context.SetFactotum(ctx, f)
-	ctx = context.SetKeyEndpoint(ctx, inProcess)
-	ctx = context.SetStoreEndpoint(ctx, inProcess)
-	ctx = context.SetDirEndpoint(ctx, inProcess)
+	ctx := config.New()
+	ctx = config.SetUserName(ctx, userName)
+	ctx = config.SetPacking(ctx, upspin.EEPack)
+	ctx = config.SetFactotum(ctx, f)
+	ctx = config.SetKeyEndpoint(ctx, inProcess)
+	ctx = config.SetStoreEndpoint(ctx, inProcess)
+	ctx = config.SetDirEndpoint(ctx, inProcess)
 
 	user := &upspin.User{
 		Name:      upspin.UserName(userName),

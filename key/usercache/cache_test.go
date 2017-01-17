@@ -14,7 +14,7 @@ import (
 
 	"upspin.io/bind"
 	"upspin.io/cache"
-	"upspin.io/context"
+	"upspin.io/config"
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/upspin"
@@ -55,10 +55,10 @@ var (
 
 // setup returns contexts with the KeyServer uncached and cached.
 func setup(t *testing.T, user string) (uncached, cached upspin.KeyServer) {
-	c := context.New()
-	c = context.SetUserName(c, upspin.UserName(user))
-	c = context.SetPacking(c, upspin.DebugPack)
-	c = context.SetKeyEndpoint(c, keyService.endpoint)
+	c := config.New()
+	c = config.SetUserName(c, upspin.UserName(user))
+	c = config.SetPacking(c, upspin.DebugPack)
+	c = config.SetKeyEndpoint(c, keyService.endpoint)
 	keyService.context = c
 
 	cache := &userCacheServer{
@@ -70,13 +70,13 @@ func setup(t *testing.T, user string) (uncached, cached upspin.KeyServer) {
 	}
 
 	if user == "upspin-test@google.com" {
-		c = context.SetDirEndpoint(c, testDirEndpoint)
-		c = context.SetStoreEndpoint(c, testStoreEndpoint)
+		c = config.SetDirEndpoint(c, testDirEndpoint)
+		c = config.SetStoreEndpoint(c, testStoreEndpoint)
 		f, err := factotum.NewFromDir(repo("key/testdata/upspin-test"))
 		if err != nil {
 			t.Fatal(err)
 		}
-		c = context.SetFactotum(c, f)
+		c = config.SetFactotum(c, f)
 		testPublicKey = f.PublicKey()
 	}
 
@@ -97,7 +97,7 @@ func TestDial(t *testing.T) {
 
 	keyService.dials = 0
 
-	// Try asking for the user in the dialed context.
+	// Try asking for the user in the dialed config.
 	// We should get it back without doing any actual dials.
 	got, err := svc.Lookup(name)
 	if err != nil {

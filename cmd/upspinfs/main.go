@@ -14,7 +14,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"upspin.io/context"
+	"upspin.io/config"
 	"upspin.io/flags"
 	"upspin.io/log"
 	"upspin.io/transport/auth"
@@ -44,8 +44,8 @@ func main() {
 		usage()
 	}
 
-	// Normal setup, get context from file and push user cache onto context.
-	ctx, err := context.FromFile(flags.Context)
+	// Normal setup, get context from file and push user cache onto config.
+	ctx, err := config.FromFile(flags.Context)
 	if err != nil {
 		log.Debug.Fatal(err)
 	}

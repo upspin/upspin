@@ -15,7 +15,7 @@ import (
 	"testing"
 
 	"upspin.io/bind"
-	"upspin.io/context"
+	"upspin.io/config"
 	"upspin.io/upspin"
 
 	dirserver "upspin.io/dir/inprocess"
@@ -38,12 +38,12 @@ func testSetup(name string) (ctx upspin.Context, err error) {
 		Transport: upspin.InProcess,
 		NetAddr:   "", // ignored
 	}
-	ctx = context.New()
-	ctx = context.SetUserName(ctx, upspin.UserName(name))
-	ctx = context.SetPacking(ctx, upspin.DebugPack)
-	ctx = context.SetKeyEndpoint(ctx, endpoint)
-	ctx = context.SetStoreEndpoint(ctx, endpoint)
-	ctx = context.SetDirEndpoint(ctx, endpoint)
+	ctx = config.New()
+	ctx = config.SetUserName(ctx, upspin.UserName(name))
+	ctx = config.SetPacking(ctx, upspin.DebugPack)
+	ctx = config.SetKeyEndpoint(ctx, endpoint)
+	ctx = config.SetStoreEndpoint(ctx, endpoint)
+	ctx = config.SetDirEndpoint(ctx, endpoint)
 
 	bind.RegisterKeyServer(upspin.InProcess, keyserver.New())
 	bind.RegisterStoreServer(upspin.InProcess, storeserver.New())
@@ -94,7 +94,7 @@ func TestShell(t *testing.T) {
 	}
 	fmt.Printf("mountpoint is %s\n", mountpoint)
 
-	// Set up a user context.
+	// Set up a user config.
 	ctx, err := testSetup("tester@google.com")
 	if err != nil {
 		t.Fatal(err.Error())

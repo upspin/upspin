@@ -12,7 +12,7 @@ import (
 	"strings"
 	"testing"
 
-	"upspin.io/context"
+	"upspin.io/config"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/upspin"
@@ -138,7 +138,7 @@ func TestLogFile(t *testing.T) {
 		t.Fatal("creating test directory")
 	}
 	defer os.RemoveAll(dir)
-	l, err := openLog(context.SetUserName(context.New(), testUser), dir, 1000000, nil)
+	l, err := openLog(config.SetUserName(config.New(), testUser), dir, 1000000, nil)
 	if err != nil {
 		t.Fatal("creating test log")
 	}
@@ -163,7 +163,7 @@ func TestLogFile(t *testing.T) {
 
 	// Reopen and check the LRU contents.
 	t.Logf("TestLogFile test LogFile")
-	l, err = openLog(context.SetUserName(context.New(), testUser), dir, 1000000, nil)
+	l, err = openLog(config.SetUserName(config.New(), testUser), dir, 1000000, nil)
 	if err != nil {
 		t.Fatal("creating test log")
 	}
@@ -202,7 +202,7 @@ func TestLogFile(t *testing.T) {
 	l.close()
 
 	// Reopen and make sure it is still compressed.
-	l, err = openLog(context.SetUserName(context.New(), testUser), dir, 1000000, nil)
+	l, err = openLog(config.SetUserName(config.New(), testUser), dir, 1000000, nil)
 	if err != nil {
 		t.Fatal("creating test log")
 	}
@@ -229,7 +229,7 @@ func TestLogGlob(t *testing.T) {
 		t.Fatal("creating test directory")
 	}
 	defer os.RemoveAll(dir)
-	l, err := openLog(context.SetUserName(context.New(), testUser), dir, 1000000, nil)
+	l, err := openLog(config.SetUserName(config.New(), testUser), dir, 1000000, nil)
 	if err != nil {
 		t.Fatal("creating test log")
 	}
@@ -264,7 +264,7 @@ l:
 	t.Log("reopening log")
 
 	// Reopen, and ensure the glob services.
-	l, err = openLog(context.SetUserName(context.New(), testUser), dir, 1000000, nil)
+	l, err = openLog(config.SetUserName(config.New(), testUser), dir, 1000000, nil)
 	if err != nil {
 		t.Fatal("creating test log")
 	}

@@ -10,7 +10,7 @@ import (
 	"log"
 
 	"upspin.io/client"
-	"upspin.io/context"
+	"upspin.io/config"
 	"upspin.io/pack"
 	"upspin.io/upspin"
 )
@@ -48,7 +48,7 @@ func (s *State) repackCommand(fs *flag.FlagSet) {
 	}
 
 	prevClient := s.client
-	s.client = client.New(context.SetPacking(s.context, packer.Packing()))
+	s.client = client.New(config.SetPacking(s.context, packer.Packing()))
 	defer func() { s.client = prevClient }()
 
 	for _, entry := range s.globAllUpspin(fs.Args()) {

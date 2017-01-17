@@ -14,7 +14,7 @@ import (
 	"strings"
 	"testing"
 
-	"upspin.io/context"
+	"upspin.io/config"
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/pack"
@@ -185,7 +185,7 @@ func BenchmarkPackUnpack_1Mbyte(b *testing.B) {
 }
 
 func setup(name upspin.UserName) (upspin.Context, upspin.Packer) {
-	ctx := context.SetUserName(context.New(), name)
+	ctx := config.SetUserName(config.New(), name)
 	packer := pack.Lookup(packing)
 	j := strings.IndexByte(string(name), '@')
 	if j < 0 {
@@ -195,7 +195,7 @@ func setup(name upspin.UserName) (upspin.Context, upspin.Packer) {
 	if err != nil {
 		log.Fatalf("unable to initialize factotum for %s", string(name[:j]))
 	}
-	ctx = context.SetFactotum(ctx, f)
+	ctx = config.SetFactotum(ctx, f)
 	return ctx, packer
 }
 

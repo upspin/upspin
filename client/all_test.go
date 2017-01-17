@@ -11,7 +11,7 @@ import (
 	"testing"
 
 	"upspin.io/bind"
-	"upspin.io/context"
+	"upspin.io/config"
 	"upspin.io/log"
 	"upspin.io/upspin"
 
@@ -31,11 +31,11 @@ func init() {
 		NetAddr:   "", // ignored
 	}
 
-	baseCtx = context.New()
-	baseCtx = context.SetPacking(baseCtx, upspin.DebugPack)
-	baseCtx = context.SetKeyEndpoint(baseCtx, inProcess)
-	baseCtx = context.SetStoreEndpoint(baseCtx, inProcess)
-	baseCtx = context.SetDirEndpoint(baseCtx, inProcess)
+	baseCtx = config.New()
+	baseCtx = config.SetPacking(baseCtx, upspin.DebugPack)
+	baseCtx = config.SetKeyEndpoint(baseCtx, inProcess)
+	baseCtx = config.SetStoreEndpoint(baseCtx, inProcess)
+	baseCtx = config.SetDirEndpoint(baseCtx, inProcess)
 
 	bind.RegisterKeyServer(upspin.InProcess, keyserver.New())
 	bind.RegisterStoreServer(upspin.InProcess, storeserver.New())
@@ -52,7 +52,7 @@ func checkTransport(s upspin.Service) {
 }
 
 func setup(userName upspin.UserName, publicKey upspin.PublicKey) upspin.Context {
-	ctx := context.SetUserName(baseCtx, userName)
+	ctx := config.SetUserName(baseCtx, userName)
 	key, _ := bind.KeyServer(ctx, ctx.KeyEndpoint())
 	checkTransport(key)
 	dir, _ := bind.DirServer(ctx, ctx.DirEndpoint())

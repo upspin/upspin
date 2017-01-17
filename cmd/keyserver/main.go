@@ -12,7 +12,7 @@ import (
 	"net/http"
 
 	"upspin.io/cloud/https"
-	"upspin.io/context"
+	"upspin.io/config"
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/flags"
@@ -51,7 +51,7 @@ func main() {
 	}
 
 	// All we need in the context is some user name. It does not need to be registered as a "real" user.
-	ctx := context.SetUserName(context.New(), serverName)
+	ctx := config.SetUserName(config.New(), serverName)
 
 	// Create a new key implementation.
 	var key upspin.KeyServer

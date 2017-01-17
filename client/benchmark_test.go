@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"upspin.io/context"
+	"upspin.io/config"
 	"upspin.io/factotum"
 	"upspin.io/log"
 	"upspin.io/upspin"
@@ -90,12 +90,12 @@ func setupBench(b *testing.B, userName upspin.UserName, packing upspin.Packing, 
 
 	ctx := setup(userName, pub)
 	if packing == upspin.EEPack {
-		ctx = context.SetPacking(ctx, packing)
+		ctx = config.SetPacking(ctx, packing)
 		f, err := factotum.NewFromDir(repo(keyDir))
 		if err != nil {
 			b.Fatal(err)
 		}
-		ctx = context.SetFactotum(ctx, f)
+		ctx = config.SetFactotum(ctx, f)
 	}
 	return New(ctx), block
 }

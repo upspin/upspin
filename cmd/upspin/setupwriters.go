@@ -12,7 +12,7 @@ import (
 	"path/filepath"
 
 	"upspin.io/client"
-	"upspin.io/context"
+	"upspin.io/config"
 	"upspin.io/errors"
 	"upspin.io/flags"
 	"upspin.io/upspin"
@@ -52,11 +52,11 @@ This command is designed to operate on projects created by setupdomain.
 		s.exitf("specified location is not a directory: %v", cfgDir)
 	}
 
-	storeCtx, err := context.FromFile(filepath.Join(cfgDir, "storeserver/rc"))
+	storeCtx, err := config.FromFile(filepath.Join(cfgDir, "storeserver/rc"))
 	if err != nil {
 		s.exit(err)
 	}
-	dirCtx, err := context.FromFile(filepath.Join(cfgDir, "dirserver/rc"))
+	dirCtx, err := config.FromFile(filepath.Join(cfgDir, "dirserver/rc"))
 	if err != nil {
 		s.exit(err)
 	}

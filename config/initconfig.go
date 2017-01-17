@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package context creates a client context from various sources.
-package context
+// Package config creates a client configuration from various sources.
+package config
 
 import (
 	"crypto/x509"
@@ -93,7 +93,7 @@ func FromFile(name string) (upspin.Context, error) {
 		}
 	}
 	if err != nil {
-		return nil, errors.E("context.FromFile", err)
+		return nil, errors.E("config.FromFile", err)
 	}
 	defer f.Close()
 	return InitContext(f)
@@ -136,7 +136,7 @@ func FromFile(name string) (upspin.Context, error) {
 // The default value for tlscerts is the empty string,
 // in which case just the system roots are used.
 func InitContext(r io.Reader) (upspin.Context, error) {
-	const op = "context.InitContext"
+	const op = "config.InitContext"
 	vals := map[string]string{
 		username:    string(defaultUserName),
 		packing:     defaultPacking.String(),
@@ -179,7 +179,7 @@ func InitContext(r io.Reader) (upspin.Context, error) {
 	// Construct a context from vals.
 	ctx := New()
 
-	// Put the canonical respresentation of the username in the context.
+	// Put the canonical respresentation of the username in the config.
 	username, err := user.Clean(upspin.UserName(vals[username]))
 	if err != nil {
 		return nil, errors.E(op, err)
