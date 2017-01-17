@@ -38,12 +38,12 @@ type server struct {
 }
 
 func newServer() *server {
-	ctx, err := config.InitConfig(nil)
+	cfg, err := config.InitConfig(nil)
 	if err != nil {
 		log.Fatal(err)
 	}
-	transports.Init(ctx)
-	return &server{cli: client.New(ctx)}
+	transports.Init(cfg)
+	return &server{cli: client.New(cfg)}
 }
 
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {

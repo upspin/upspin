@@ -36,7 +36,7 @@ const (
 type upspinFS struct {
 	sync.Mutex                               // Protects concurrent access to the rest of this struct.
 	mountpoint string                        // Absolute Unix path to mountpoint.
-	context    upspin.Config                 // Upspin context used for all requests.
+	config     upspin.Config                 // Upspin config used for all requests.
 	client     upspin.Client                 // A client to use for client methods.
 	root       *node                         // The root of the upspin file system.
 	uid        int                           // OS user id of this process' owner.
@@ -91,21 +91,21 @@ func (h *handle) String() string {
 }
 
 // newUpspinFS creates a new upspin file system.
-func newUpspinFS(context upspin.Config, mountpoint string, cacheDir string) *upspinFS {
+func newUpspinFS(config upspin.Config, mountpoint string, cacheDir string) *upspinFS {
 	if !strings.HasSuffix(mountpoint, "/") {
 		mountpoint = mountpoint + "/"
 	}
 	f := &upspinFS{
 		mountpoint: mountpoint,
-		context:    context,
-		client:     client.New(context),
+		config:     config,
+		client:     client.New(config),
 		uid:        os.Getuid(),
 		gid:        os.Getgid(),
 		userDirs:   make(map[string]bool),
 		nodeMap:    make(map[upspin.PathName]*node),
 		enoentMap:  make(map[upspin.PathName]time.Time),
 	}
-	f.cache = newCache(context, cacheDir+"/fscache")
+	f.cache = newCache(config, cacheDir+"/fscache")
 	// Preallocate root node.
 	f.root = f.allocNode(nil, "", 0500|os.ModeDir, 0, time.Now())
 	return f
@@ -174,7 +174,7 @@ func (f *upspinFS) allocNode(parent *node, name string, mode os.FileMode, size u
 
 // dirLookup returns a bound directory for user 'name'.
 func (f *upspinFS) dirLookup(name upspin.UserName) (upspin.DirServer, error) {
-	return bind.DirServerFor(f.context, name)
+	return bind.DirServerFor(f.config, name)
 }
 
 var handleID int
@@ -862,19 +862,19 @@ func debug(msg interface{}) {
 
 // do is called both by main and testing to mount a FUSE file system. It exits on failure
 // and returns when the file system has been mounted and is ready for requests.
-func do(ctx upspin.Config, mountpoint string, cacheDir string) chan bool {
+func do(cfg upspin.Config, mountpoint string, cacheDir string) chan bool {
 	if log.Level() == "debug" {
 		fuse.Debug = debug
 	}
 
-	f := newUpspinFS(ctx, mountpoint, cacheDir)
+	f := newUpspinFS(cfg, mountpoint, cacheDir)
 
 	c, err := fuse.Mount(
 		mountpoint,
 		fuse.FSName("upspin"),
 		fuse.Subtype("fs"),
 		fuse.LocalVolume(),
-		fuse.VolumeName(fmt.Sprintf("%s-%s", f.context.DirEndpoint().NetAddr, f.context.UserName())),
+		fuse.VolumeName(fmt.Sprintf("%s-%s", f.config.DirEndpoint().NetAddr, f.config.UserName())),
 		fuse.DaemonTimeout("240"),
 		//fuse.OSXDebugFuseKernel(),
 		//fuse.NoAppleDouble(),
