@@ -39,8 +39,8 @@ const (
 )
 
 var (
-	inProcess     = upspin.Endpoint{Transport: upspin.InProcess}
-	globalContext upspin.Config
+	inProcess    = upspin.Endpoint{Transport: upspin.InProcess}
+	globalConfig upspin.Config
 )
 
 func init() {
@@ -48,7 +48,7 @@ func init() {
 	c = config.SetUserName(c, userName)
 	c = config.SetPacking(c, upspin.DebugPack)
 	c = config.SetKeyEndpoint(c, inProcess)
-	globalContext = c
+	globalConfig = c
 }
 
 // The values returned by PackLen and UnpackLen should be exact,
@@ -63,11 +63,11 @@ func TestPackLen(t *testing.T) {
 		Name:    name,
 		Packing: packer.Packing(),
 	}
-	n := packer.PackLen(globalContext, data, de)
+	n := packer.PackLen(globalConfig, data, de)
 	if n < 0 {
 		t.Fatal("PackLen failed")
 	}
-	bp, err := packer.Pack(globalContext, de)
+	bp, err := packer.Pack(globalConfig, de)
 	if err != nil {
 		t.Fatal("Pack:", err)
 	}
@@ -81,11 +81,11 @@ func TestPackLen(t *testing.T) {
 	}
 
 	// Now unpack.
-	n = packer.UnpackLen(globalContext, cipher, de)
+	n = packer.UnpackLen(globalConfig, cipher, de)
 	if n < 0 {
 		t.Fatal("UnpackLen failed")
 	}
-	bu, err := packer.Unpack(globalContext, de)
+	bu, err := packer.Unpack(globalConfig, de)
 	if err != nil {
 		t.Fatal("Unpack:", err)
 	}
@@ -112,11 +112,11 @@ func TestPack(t *testing.T) {
 		Name:    name,
 		Packing: packer.Packing(),
 	}
-	n := packer.PackLen(globalContext, data, de)
+	n := packer.PackLen(globalConfig, data, de)
 	if n < 0 {
 		t.Fatal("PackLen failed")
 	}
-	bp, err := packer.Pack(globalContext, de)
+	bp, err := packer.Pack(globalConfig, de)
 	if err != nil {
 		t.Fatal("Pack:", err)
 	}
@@ -130,7 +130,7 @@ func TestPack(t *testing.T) {
 	}
 
 	// Now unpack.
-	bu, err := packer.Unpack(globalContext, de)
+	bu, err := packer.Unpack(globalConfig, de)
 	if err != nil {
 		t.Fatal("Unpack:", err)
 	}
@@ -147,7 +147,7 @@ func TestPack(t *testing.T) {
 }
 
 func TestMain(m *testing.M) {
-	key, err := bind.KeyServer(globalContext, globalContext.KeyEndpoint())
+	key, err := bind.KeyServer(globalConfig, globalConfig.KeyEndpoint())
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -207,5 +207,5 @@ func TestMultiBlockRoundTrip(t *testing.T) {
 	if p == nil {
 		t.Fatal("Lookup failed")
 	}
-	packtest.TestMultiBlockRoundTrip(t, globalContext, p, userName)
+	packtest.TestMultiBlockRoundTrip(t, globalConfig, p, userName)
 }

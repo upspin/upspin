@@ -41,9 +41,9 @@ func TestRegister(t *testing.T) {
 }
 
 // packBlob packs text according to the parameters and returns the cipher.
-func packBlob(t *testing.T, ctx upspin.Config, packer upspin.Packer, d *upspin.DirEntry, text []byte) []byte {
+func packBlob(t *testing.T, cfg upspin.Config, packer upspin.Packer, d *upspin.DirEntry, text []byte) []byte {
 	d.Packing = packer.Packing()
-	bp, err := packer.Pack(ctx, d)
+	bp, err := packer.Pack(cfg, d)
 	if err != nil {
 		t.Fatal("packBlob:", err)
 	}
@@ -59,8 +59,8 @@ func packBlob(t *testing.T, ctx upspin.Config, packer upspin.Packer, d *upspin.D
 }
 
 // unpackBlob unpacks cipher according to the parameters and returns the plain text.
-func unpackBlob(t *testing.T, ctx upspin.Config, packer upspin.Packer, d *upspin.DirEntry, cipher []byte) []byte {
-	bp, err := packer.Unpack(ctx, d)
+func unpackBlob(t *testing.T, cfg upspin.Config, packer upspin.Packer, d *upspin.DirEntry, cipher []byte) []byte {
+	bp, err := packer.Unpack(cfg, d)
 	if err != nil {
 		t.Fatal("unpackBlob:", err)
 	}
@@ -74,17 +74,17 @@ func unpackBlob(t *testing.T, ctx upspin.Config, packer upspin.Packer, d *upspin
 	return text
 }
 
-func testPackAndUnpack(t *testing.T, ctx upspin.Config, packer upspin.Packer, name upspin.PathName, text []byte) {
+func testPackAndUnpack(t *testing.T, cfg upspin.Config, packer upspin.Packer, name upspin.PathName, text []byte) {
 	// First pack.
 	d := &upspin.DirEntry{
 		Name:       name,
 		SignedName: name,
-		Writer:     ctx.UserName(),
+		Writer:     cfg.UserName(),
 	}
-	cipher := packBlob(t, ctx, packer, d, text)
+	cipher := packBlob(t, cfg, packer, d, text)
 
 	// Now unpack.
-	clear := unpackBlob(t, ctx, packer, d, cipher)
+	clear := unpackBlob(t, cfg, packer, d, cipher)
 
 	if !bytes.Equal(text, clear) {
 		t.Errorf("text: expected %q; got %q", text, clear)
@@ -94,17 +94,17 @@ func testPackAndUnpack(t *testing.T, ctx upspin.Config, packer upspin.Packer, na
 	}
 }
 
-func testPackNameAndUnpack(t *testing.T, ctx upspin.Config, packer upspin.Packer, name, newName upspin.PathName, text []byte) {
+func testPackNameAndUnpack(t *testing.T, cfg upspin.Config, packer upspin.Packer, name, newName upspin.PathName, text []byte) {
 	// First pack.
 	d := &upspin.DirEntry{
 		Name:       name,
 		SignedName: name,
-		Writer:     ctx.UserName(),
+		Writer:     cfg.UserName(),
 	}
-	cipher := packBlob(t, ctx, packer, d, text)
+	cipher := packBlob(t, cfg, packer, d, text)
 
 	// Name to newName.
-	if err := packer.Name(ctx, d, newName); err != nil {
+	if err := packer.Name(cfg, d, newName); err != nil {
 		t.Errorf("Name failed: %s", err)
 	}
 	if d.Name != newName {
@@ -112,7 +112,7 @@ func testPackNameAndUnpack(t *testing.T, ctx upspin.Config, packer upspin.Packer
 	}
 
 	// Now unpack.
-	clear := unpackBlob(t, ctx, packer, d, cipher)
+	clear := unpackBlob(t, cfg, packer, d, cipher)
 
 	if !bytes.Equal(text, clear) {
 		t.Errorf("text: expected %q; got %q", text, clear)
@@ -125,8 +125,8 @@ func TestPack256(t *testing.T) {
 		name                 = upspin.PathName(user + "/file/of/user.256")
 		text                 = "this is some text 256"
 	)
-	ctx, packer := setup(user)
-	testPackAndUnpack(t, ctx, packer, name, []byte(text))
+	cfg, packer := setup(user)
+	testPackAndUnpack(t, cfg, packer, name, []byte(text))
 }
 
 func TestName256(t *testing.T) {
@@ -136,8 +136,8 @@ func TestName256(t *testing.T) {
 		newName                 = upspin.PathName(user + "/file/of/user.256.2")
 		text                    = "this is some text 256"
 	)
-	ctx, packer := setup(user)
-	testPackNameAndUnpack(t, ctx, packer, name, newName, []byte(text))
+	cfg, packer := setup(user)
+	testPackNameAndUnpack(t, cfg, packer, name, newName, []byte(text))
 }
 
 func benchmarkPack(b *testing.B, curveName string, fileSize int, unpack bool) {
@@ -153,15 +153,15 @@ func benchmarkPack(b *testing.B, curveName string, fileSize int, unpack bool) {
 	}
 	data = data[:n]
 	name := upspin.PathName(fmt.Sprintf("%s/file/of/user.%d", user, packing))
-	ctx, packer := setup(user)
+	cfg, packer := setup(user)
 	for i := 0; i < b.N; i++ {
 		d := &upspin.DirEntry{
 			Name:       name,
 			SignedName: name,
-			Writer:     ctx.UserName(),
+			Writer:     cfg.UserName(),
 			Packing:    packer.Packing(),
 		}
-		bp, err := packer.Pack(ctx, d)
+		bp, err := packer.Pack(cfg, d)
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -176,7 +176,7 @@ func benchmarkPack(b *testing.B, curveName string, fileSize int, unpack bool) {
 		if !unpack {
 			continue
 		}
-		bu, err := packer.Unpack(ctx, d)
+		bu, err := packer.Unpack(cfg, d)
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -206,10 +206,10 @@ func BenchmarkPackUnpack256_1Mbyte(b *testing.B) {
 }
 
 // shareBlob updates the packdata of a blob such that the public keys given are readers of the blob.
-func shareBlob(t *testing.T, ctx upspin.Config, packer upspin.Packer, readers []upspin.PublicKey, packdata *[]byte) {
+func shareBlob(t *testing.T, cfg upspin.Config, packer upspin.Packer, readers []upspin.PublicKey, packdata *[]byte) {
 	pd := make([]*[]byte, 1)
 	pd[0] = packdata
-	packer.Share(ctx, readers, pd)
+	packer.Share(cfg, readers, pd)
 }
 
 func TestSharing(t *testing.T) {
@@ -226,23 +226,23 @@ func TestSharing(t *testing.T) {
 	carlaPublic := upspin.PublicKey("p384\n26172614276096813357206176213406982397222536659671409755310805362042028026922579207014531049688734331134000100158544\n17028658482487767962568267600820350664652897469525797908053707470805274016916949610485516295521856564391853226932191\n")
 
 	// Set up Joe as the creator/owner.
-	joectx, packer := setup(joesUserName)
+	joecfg, packer := setup(joesUserName)
 	// Set up a mock user service that knows about Joe's public keys (for checking signature during unpack).
 	mockKey := &dummyKey{
 		userToMatch: []upspin.UserName{joesUserName},
-		keyToReturn: []upspin.PublicKey{joectx.Factotum().PublicKey()},
+		keyToReturn: []upspin.PublicKey{joecfg.Factotum().PublicKey()},
 	}
 	bind.RegisterKeyServer(upspin.InProcess, mockKey)
-	joectx = config.SetKeyEndpoint(joectx, upspin.Endpoint{Transport: upspin.InProcess})
+	joecfg = config.SetKeyEndpoint(joecfg, upspin.Endpoint{Transport: upspin.InProcess})
 
 	d := &upspin.DirEntry{
 		Name:       pathName,
 		SignedName: pathName,
 	}
-	d.Writer = joectx.UserName()
-	cipher := packBlob(t, joectx, packer, d, []byte(text))
+	d.Writer = joecfg.UserName()
+	cipher := packBlob(t, joecfg, packer, d, []byte(text))
 	// Share with Bob and Carla.
-	shareBlob(t, joectx, packer, []upspin.PublicKey{joePublic, bobPublic, carlaPublic}, &d.Packdata)
+	shareBlob(t, joecfg, packer, []upspin.PublicKey{joePublic, bobPublic, carlaPublic}, &d.Packdata)
 
 	readers, err := packer.ReaderHashes(d.Packdata)
 	if err != nil {
@@ -259,9 +259,9 @@ func TestSharing(t *testing.T) {
 	}
 
 	// Now load Bob as the current user.
-	bobctx, packer := setup(bobsUserName)
-	bobctx = config.SetKeyEndpoint(bobctx, upspin.Endpoint{Transport: upspin.InProcess})
-	clear := unpackBlob(t, bobctx, packer, d, cipher)
+	bobcfg, packer := setup(bobsUserName)
+	bobcfg = config.SetKeyEndpoint(bobcfg, upspin.Endpoint{Transport: upspin.InProcess})
+	clear := unpackBlob(t, bobcfg, packer, d, cipher)
 	if string(clear) != text {
 		t.Errorf("Expected %s, got %s", text, clear)
 	}
@@ -272,9 +272,9 @@ func TestSharing(t *testing.T) {
 	}
 
 	// Load Carla as the current user.
-	carlactx, packer := setup(carlasUserName)
-	carlactx = config.SetKeyEndpoint(carlactx, upspin.Endpoint{Transport: upspin.InProcess})
-	clear = unpackBlob(t, carlactx, packer, d, cipher)
+	carlacfg, packer := setup(carlasUserName)
+	carlacfg = config.SetKeyEndpoint(carlacfg, upspin.Endpoint{Transport: upspin.InProcess})
+	clear = unpackBlob(t, carlacfg, packer, d, cipher)
 	if string(clear) != text {
 		t.Errorf("Expected %s, got %s", text, clear)
 	}
@@ -291,7 +291,7 @@ func TestBadSharing(t *testing.T) {
 	joePublic := upspin.PublicKey("p256\n104278369061367353805983276707664349405797936579880352274235000127123465616334\n26941412685198548642075210264642864401950753555952207894712845271039438170192\n")
 	bobPublic := upspin.PublicKey("p256\n22501350716439586308300487995594907386227865907589820632958610970814693581908\n104071495646780593180743128812641149143422089655848205222288250096821814372528\n")
 
-	ctx, packer := setup(joesUserName)
+	cfg, packer := setup(joesUserName)
 	mockKey := &dummyKey{
 		userToMatch: []upspin.UserName{bobsUserName, joesUserName},
 		keyToReturn: []upspin.PublicKey{bobPublic, joePublic},
@@ -300,29 +300,29 @@ func TestBadSharing(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	ctx = config.SetFactotum(ctx, f)
+	cfg = config.SetFactotum(cfg, f)
 	bind.RegisterKeyServer(upspin.InProcess, mockKey)
-	ctx = config.SetKeyEndpoint(ctx, upspin.Endpoint{Transport: upspin.InProcess})
+	cfg = config.SetKeyEndpoint(cfg, upspin.Endpoint{Transport: upspin.InProcess})
 
 	d := &upspin.DirEntry{
 		Name:       pathName,
 		SignedName: pathName,
 	}
-	d.Writer = ctx.UserName()
-	packBlob(t, ctx, packer, d, []byte(text))
+	d.Writer = cfg.UserName()
+	packBlob(t, cfg, packer, d, []byte(text))
 
 	// Don't share with Bob (do nothing).
 
 	// Now load Bob as the current user.
-	ctx = config.SetUserName(ctx, bobsUserName)
+	cfg = config.SetUserName(cfg, bobsUserName)
 	f, err = factotum.NewFromDir(repo("key", "testdata", "bob"))
 	if err != nil {
 		t.Fatal(err)
 	}
-	ctx = config.SetFactotum(ctx, f)
+	cfg = config.SetFactotum(cfg, f)
 
 	// Bob can't unpack.
-	_, err = packer.Unpack(ctx, d)
+	_, err = packer.Unpack(cfg, d)
 	if err == nil {
 		t.Fatal("Expected error, got none.")
 	}
@@ -332,7 +332,7 @@ func TestBadSharing(t *testing.T) {
 }
 
 func setup(name upspin.UserName) (upspin.Config, upspin.Packer) {
-	ctx := config.SetUserName(config.New(), name)
+	cfg := config.SetUserName(config.New(), name)
 	packer := pack.Lookup(packing)
 	j := strings.IndexByte(string(name), '@')
 	if j < 0 {
@@ -342,8 +342,8 @@ func setup(name upspin.UserName) (upspin.Config, upspin.Packer) {
 	if err != nil {
 		log.Fatalf("unable to initialize factotum for %s", string(name[:j]))
 	}
-	ctx = config.SetFactotum(ctx, f)
-	return ctx, packer
+	cfg = config.SetFactotum(cfg, f)
+	return cfg, packer
 }
 
 // dummyKey is a User service that returns a key for a given user.
@@ -377,8 +377,8 @@ func (d *dummyKey) Dial(cc upspin.Config, e upspin.Endpoint) (upspin.Service, er
 
 func TestMultiBlockRoundTrip(t *testing.T) {
 	const userName = upspin.UserName("aly@upspin.io")
-	ctx, packer := setup(userName)
-	packtest.TestMultiBlockRoundTrip(t, ctx, packer, userName)
+	cfg, packer := setup(userName)
+	packtest.TestMultiBlockRoundTrip(t, cfg, packer, userName)
 }
 
 // repo returns the local pathname of a file in the upspin repository.
@@ -399,11 +399,11 @@ func TestConsistentKeyStream(t *testing.T) {
 		name                 = upspin.PathName(user + "/file/of/user")
 	)
 
-	ctx, packer := setup(user)
+	cfg, packer := setup(user)
 	de := &upspin.DirEntry{
 		Name:       name,
 		SignedName: name,
-		Writer:     ctx.UserName(),
+		Writer:     cfg.UserName(),
 		Packing:    packer.Packing(),
 	}
 
@@ -431,7 +431,7 @@ func TestConsistentKeyStream(t *testing.T) {
 	for _, bs := range blockSizes {
 		t.Logf("encrypt blockSize=%d", bs)
 
-		bp, err := packer.Pack(ctx, de)
+		bp, err := packer.Pack(cfg, de)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -470,7 +470,7 @@ func TestConsistentKeyStream(t *testing.T) {
 		t.Logf("decrypt blockSize=%d", bs)
 
 		de := dirEntries[bs]
-		bu, err := packer.Unpack(ctx, &de)
+		bu, err := packer.Unpack(cfg, &de)
 		if err != nil {
 			t.Fatal(err)
 		}
