@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e3e70d23_5b78cf2b",
+        "filename": "transport/auth/client.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-01-17T23:13:16Z",
+      "side": 1,
+      "message": "As R pointed out, we really could use something describing the protocol here.",
+      "range": {
+        "startLine": 172,
+        "startChar": 0,
+        "endLine": 172,
+        "endChar": 42
+      },
+      "revId": "c89a0e75eb99830806f47a957cd9893e8928238d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "23b3e516_706ef817",
+        "filename": "transport/auth/client.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-01-17T23:13:16Z",
+      "side": 1,
+      "message": "In these error cases, for streams, should we not close stream and/or httpResp.Body as decodeStream does?",
+      "range": {
+        "startLine": 208,
+        "startChar": 1,
+        "endLine": 227,
+        "endChar": 2
+      },
+      "revId": "c89a0e75eb99830806f47a957cd9893e8928238d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e399cd94_367750a3",
+        "filename": "transport/auth/client.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-01-17T23:13:16Z",
+      "side": 1,
+      "message": "a comment like \"// messages are of the form 4 byte lentgh followed by message.\" wouldn\u0027t hurt.",
+      "range": {
+        "startLine": 256,
+        "startChar": 2,
+        "endLine": 256,
+        "endChar": 60
+      },
+      "revId": "c89a0e75eb99830806f47a957cd9893e8928238d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "236e8540_b87c4189",
+        "filename": "transport/auth/client.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-01-17T23:13:16Z",
+      "side": 1,
+      "message": "But it just uses the io.Reader that is httpResp.Body.  Seems like you are too many layers removed to get this right.  Basically you want the lowest level Read to throw an error when done closes. Kind of a pain.",
+      "range": {
+        "startLine": 290,
+        "startChar": 1,
+        "endLine": 296,
+        "endChar": 4
+      },
+      "revId": "c89a0e75eb99830806f47a957cd9893e8928238d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
