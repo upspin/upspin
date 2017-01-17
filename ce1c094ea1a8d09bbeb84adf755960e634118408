@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "63db1d69_ae8777f7",
+        "filename": "transport/dircacheserver/proxied.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-17T23:49:08Z",
+      "side": 1,
+      "message": "I feel like this could be a bit neater:\n\nif err :\u003d d.watch(); err \u003d\u003d upspin.ErrNotSupported {\n  log\n  return\n} else if err !\u003d nil {\n  log\n  nextLogTime...\n  continue\n}\nreturn",
+      "revId": "ce1c094ea1a8d09bbeb84adf755960e634118408",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "63db1d69_8e8cbb1c",
+        "filename": "transport/dircacheserver/proxied.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-17T23:49:08Z",
+      "side": 1,
+      "message": "I\u0027m confused here. Why are we dying if watch, ie handleEvent, returns a nil error?",
+      "revId": "ce1c094ea1a8d09bbeb84adf755960e634118408",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
