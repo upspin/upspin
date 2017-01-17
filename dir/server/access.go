@@ -72,7 +72,7 @@ func (s *server) whichAccess(p path.Parsed, opts ...options) (*upspin.DirEntry, 
 // loadAccess loads and processes an Access file from its DirEntry.
 func (s *server) loadAccess(entry *upspin.DirEntry, opts ...options) (*access.Access, error) {
 	defer span(opts).StartSpan("loadAccess").End()
-	buf, err := clientutil.ReadAll(s.serverContext, entry)
+	buf, err := clientutil.ReadAll(s.serverConfig, entry)
 	if err != nil {
 		return nil, err
 	}
@@ -105,13 +105,13 @@ func (s *server) loadPath(name upspin.PathName) ([]byte, error) {
 		return nil, err
 	}
 	// entry contains a valid value now. Read it.
-	return clientutil.ReadAll(s.serverContext, entry)
+	return clientutil.ReadAll(s.serverConfig, entry)
 }
 
 // remoteLookup performs a lookup on the canonical DirServer for the path,
 // which might be remote.
 func (s *server) remoteLookup(p path.Parsed) (*upspin.DirEntry, error) {
-	key, err := bind.KeyServer(s.serverContext, s.serverContext.KeyEndpoint())
+	key, err := bind.KeyServer(s.serverConfig, s.serverConfig.KeyEndpoint())
 	if err != nil {
 		return nil, err
 	}
@@ -127,12 +127,12 @@ func (s *server) remoteLookup(p path.Parsed) (*upspin.DirEntry, error) {
 		return err
 	}
 	for _, e := range u.Dirs {
-		if e == s.serverContext.DirEndpoint() {
+		if e == s.serverConfig.DirEndpoint() {
 			// It's okay to load the tree for this user, because they
 			// live in this dir server, according to the KeyServer.
 			return s.lookup("remoteLookup", p, entryMustBeClean)
 		}
-		dir, err := bind.DirServer(s.serverContext, e)
+		dir, err := bind.DirServer(s.serverConfig, e)
 		if check(err) != nil {
 			// Skip bad bind.
 			continue
@@ -256,7 +256,7 @@ func (s *server) getDefaultAccess(userName upspin.UserName) (acc *access.Access,
 // loadGroup loads a group file from its entry and parses it, but does not
 // pass it to access.AddGroup
 func (s *server) loadGroup(p path.Parsed, entry *upspin.DirEntry) error {
-	data, err := clientutil.ReadAll(s.serverContext, entry)
+	data, err := clientutil.ReadAll(s.serverConfig, entry)
 	if err != nil {
 		return err
 	}

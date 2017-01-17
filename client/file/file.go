@@ -33,10 +33,10 @@ type File struct {
 	closed   bool            // Whether the file has been closed, preventing further operations.
 
 	// Used only by readers.
-	context upspin.Config
-	entry   *upspin.DirEntry
-	size    int64
-	bu      upspin.BlockUnpacker
+	config upspin.Config
+	entry  *upspin.DirEntry
+	size   int64
+	bu     upspin.BlockUnpacker
 	// Keep the most recently unpacked block around
 	// in case a subsequent readAt starts at the same place.
 	lastBlockIndex int
@@ -50,8 +50,8 @@ type File struct {
 var _ upspin.File = (*File)(nil)
 
 // Readable creates a new File for the given DirEntry that must be readable
-// using the given Context.
-func Readable(ctx upspin.Config, entry *upspin.DirEntry) (*File, error) {
+// using the given Config.
+func Readable(cfg upspin.Config, entry *upspin.DirEntry) (*File, error) {
 	// TODO(adg): check if this is a dir or link?
 	const op = "client/file.Readable"
 
@@ -59,7 +59,7 @@ func Readable(ctx upspin.Config, entry *upspin.DirEntry) (*File, error) {
 	if packer == nil {
 		return nil, errors.E(op, entry.Name, errors.Invalid, errors.Errorf("unrecognized Packing %d", entry.Packing))
 	}
-	bu, err := packer.Unpack(ctx, entry)
+	bu, err := packer.Unpack(cfg, entry)
 	if err != nil {
 		return nil, errors.E(op, entry.Name, err)
 	}
@@ -69,7 +69,7 @@ func Readable(ctx upspin.Config, entry *upspin.DirEntry) (*File, error) {
 	}
 
 	return &File{
-		context:        ctx,
+		config:         cfg,
 		name:           entry.Name,
 		writable:       false,
 		entry:          entry,
@@ -155,7 +155,7 @@ func (f *File) readAt(op string, dst []byte, off int64) (n int, err error) {
 			clear = f.lastBlockBytes
 		} else {
 			// Otherwise, we need to read the block and unpack.
-			cipher, err := clientutil.ReadLocation(f.context, b.Location)
+			cipher, err := clientutil.ReadLocation(f.config, b.Location)
 			if err != nil {
 				return 0, errors.E(op, errors.IO, f.name, err)
 			}

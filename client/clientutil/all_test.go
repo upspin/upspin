@@ -42,7 +42,7 @@ var (
 )
 
 func TestReadAll(t *testing.T) {
-	ctx := setupTestContext(t)
+	cfg := setupTestConfig(t)
 	store := &mockStore{
 		locWithContent: tLocs[9],
 		content:        []byte("found it!"),
@@ -73,7 +73,7 @@ func TestReadAll(t *testing.T) {
 		Sequence: upspin.SeqBase,
 	}
 
-	got, err := ReadAll(ctx, entry)
+	got, err := ReadAll(cfg, entry)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -82,7 +82,7 @@ func TestReadAll(t *testing.T) {
 	}
 }
 
-func setupTestContext(t *testing.T) upspin.Config {
+func setupTestConfig(t *testing.T) upspin.Config {
 	// Create some test locations.
 	for i := 0; i < 10; i++ {
 		loc := upspin.Location{
@@ -96,21 +96,21 @@ func setupTestContext(t *testing.T) upspin.Config {
 	if err != nil {
 		t.Fatal(err)
 	}
-	ctx := config.New()
-	ctx = config.SetUserName(ctx, userName)
-	ctx = config.SetPacking(ctx, upspin.EEPack)
-	ctx = config.SetFactotum(ctx, f)
-	ctx = config.SetKeyEndpoint(ctx, inProcess)
-	ctx = config.SetStoreEndpoint(ctx, inProcess)
-	ctx = config.SetDirEndpoint(ctx, inProcess)
+	cfg := config.New()
+	cfg = config.SetUserName(cfg, userName)
+	cfg = config.SetPacking(cfg, upspin.EEPack)
+	cfg = config.SetFactotum(cfg, f)
+	cfg = config.SetKeyEndpoint(cfg, inProcess)
+	cfg = config.SetStoreEndpoint(cfg, inProcess)
+	cfg = config.SetDirEndpoint(cfg, inProcess)
 
 	user := &upspin.User{
 		Name:      upspin.UserName(userName),
-		Dirs:      []upspin.Endpoint{ctx.DirEndpoint()},
-		Stores:    []upspin.Endpoint{ctx.StoreEndpoint()},
+		Dirs:      []upspin.Endpoint{cfg.DirEndpoint()},
+		Stores:    []upspin.Endpoint{cfg.StoreEndpoint()},
 		PublicKey: f.PublicKey(),
 	}
-	key, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
+	key, err := bind.KeyServer(cfg, cfg.KeyEndpoint())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -118,7 +118,7 @@ func setupTestContext(t *testing.T) upspin.Config {
 	if err != nil {
 		t.Fatal(err)
 	}
-	return ctx
+	return cfg
 }
 
 // repo returns the local pathname of a file in the upspin repository.

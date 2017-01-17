@@ -40,10 +40,10 @@ const (
 
 // server implements upspin.DirServer.
 type server struct {
-	// serverContext holds this server's Factotum, server name and store
+	// serverConfig holds this server's Factotum, server name and store
 	// endpoint where to store dir entries. It is set when the server is
 	// first registered and never reset again.
-	serverContext upspin.Config
+	serverConfig upspin.Config
 
 	// userName is the name of the user on behalf of whom this
 	// server is serving.
@@ -102,24 +102,24 @@ type options struct {
 }
 
 // New creates a new instance of DirServer with the given options
-func New(ctxt upspin.Config, options ...string) (upspin.DirServer, error) {
+func New(cfg upspin.Config, options ...string) (upspin.DirServer, error) {
 	const op = "dir/server.New"
-	if ctxt == nil {
-		return nil, errors.E(op, errors.Invalid, errors.Str("nil context"))
+	if cfg == nil {
+		return nil, errors.E(op, errors.Invalid, errors.Str("nil config"))
 	}
-	if ctxt.DirEndpoint().Transport == upspin.Unassigned {
+	if cfg.DirEndpoint().Transport == upspin.Unassigned {
 		return nil, errors.E(op, errors.Invalid, errors.Str("directory endpoint cannot be unassigned"))
 	}
-	if ctxt.KeyEndpoint().Transport == upspin.Unassigned {
+	if cfg.KeyEndpoint().Transport == upspin.Unassigned {
 		return nil, errors.E(op, errors.Invalid, errors.Str("key endpoint cannot be unassigned"))
 	}
-	if ctxt.StoreEndpoint().Transport == upspin.Unassigned {
+	if cfg.StoreEndpoint().Transport == upspin.Unassigned {
 		return nil, errors.E(op, errors.Invalid, errors.Str("store endpoint cannot be unassigned"))
 	}
-	if ctxt.UserName() == "" {
+	if cfg.UserName() == "" {
 		return nil, errors.E(op, errors.Invalid, errors.Str("empty user name"))
 	}
-	if ctxt.Factotum() == nil {
+	if cfg.Factotum() == nil {
 		return nil, errors.E(op, errors.Invalid, errors.Str("nil factotum"))
 	}
 	// Check which options are present and pick suitable defaults.
@@ -166,8 +166,8 @@ func New(ctxt upspin.Config, options ...string) (upspin.DirServer, error) {
 	}
 
 	s := &server{
-		serverContext: ctxt,
-		userName:      ctxt.UserName(),
+		serverConfig:  cfg,
+		userName:      cfg.UserName(),
 		logDir:        logDir,
 		userTrees:     cache.NewLRU(userCacheSize),
 		access:        cache.NewLRU(accessCacheSize),
@@ -763,7 +763,7 @@ func (s *server) Dial(ctx upspin.Config, e upspin.Endpoint) (upspin.Service, err
 // Endpoint implements upspin.Service.
 func (s *server) Endpoint() upspin.Endpoint {
 	// TODO: to be removed.
-	return s.serverContext.DirEndpoint()
+	return s.serverConfig.DirEndpoint()
 }
 
 // Ping implements upspin.Service.
@@ -849,7 +849,7 @@ func (s *server) loadTreeFor(user upspin.UserName, opts ...options) (*tree.Tree,
 		// Fall through and load a new tree.
 	}
 	// Create a new tree for the user.
-	tree, err := tree.New(s.serverContext, log, logIndex)
+	tree, err := tree.New(s.serverConfig, log, logIndex)
 	if err != nil {
 		return nil, err
 	}
