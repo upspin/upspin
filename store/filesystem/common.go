@@ -23,7 +23,7 @@ import (
 // newRoot parses the given options for the file system "root"
 // and sets up a default access file.
 // It is used by server constructors.
-func newRoot(ctx upspin.Config, opts []string) (root string, defaultAccess *access.Access, err error) {
+func newRoot(cfg upspin.Config, opts []string) (root string, defaultAccess *access.Access, err error) {
 	for _, o := range opts {
 		switch {
 		case strings.HasPrefix(o, "root="):
@@ -48,7 +48,7 @@ func newRoot(ctx upspin.Config, opts []string) (root string, defaultAccess *acce
 		return "", nil, errors.Str("root must be a directory")
 	}
 
-	defaultAccess, err = access.New(upspin.PathName(ctx.UserName()) + "/Access")
+	defaultAccess, err = access.New(upspin.PathName(cfg.UserName()) + "/Access")
 	if err != nil {
 		return "", nil, err
 	}
@@ -56,7 +56,7 @@ func newRoot(ctx upspin.Config, opts []string) (root string, defaultAccess *acce
 	return root, defaultAccess, nil
 }
 
-// can reports whether the user associated with the given context has
+// can reports whether the user associated with the given config has
 // the given right to access the given path.
 func can(root string, defaultAccess *access.Access, user upspin.UserName, right access.Right, parsed path.Parsed) (bool, error) {
 	a := defaultAccess
