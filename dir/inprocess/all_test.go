@@ -45,7 +45,7 @@ func nextUser() upspin.UserName {
 	return upspin.UserName(fmt.Sprintf("user%d@google.com", userNumber))
 }
 
-func newContextAndServices(name upspin.UserName) (ctx upspin.Context, key upspin.KeyServer, dir upspin.DirServer, store upspin.StoreServer) {
+func newContextAndServices(name upspin.UserName) (ctx upspin.Config, key upspin.KeyServer, dir upspin.DirServer, store upspin.StoreServer) {
 	endpoint := upspin.Endpoint{
 		Transport: upspin.InProcess,
 		NetAddr:   "", // ignored
@@ -68,7 +68,7 @@ func newContextAndServices(name upspin.UserName) (ctx upspin.Context, key upspin
 	return
 }
 
-func setup() (upspin.Context, upspin.DirServer) {
+func setup() (upspin.Config, upspin.DirServer) {
 	userName := nextUser()
 	config, key, dir, _ := newContextAndServices(userName)
 	user := &upspin.User{
@@ -88,15 +88,15 @@ func setup() (upspin.Context, upspin.DirServer) {
 	return config, dir
 }
 
-func storeData(t *testing.T, config upspin.Context, data []byte, name upspin.PathName) *upspin.DirEntry {
+func storeData(t *testing.T, config upspin.Config, data []byte, name upspin.PathName) *upspin.DirEntry {
 	return storeDataHelper(t, config, data, name, config.Packing())
 }
 
-func storePlainWithIntegrity(t *testing.T, context upspin.Context, data []byte, name upspin.PathName) *upspin.DirEntry {
+func storePlainWithIntegrity(t *testing.T, context upspin.Config, data []byte, name upspin.PathName) *upspin.DirEntry {
 	return storeDataHelper(t, context, data, name, upspin.EEIntegrityPack)
 }
 
-func storeDataHelper(t *testing.T, config upspin.Context, data []byte, name upspin.PathName, packing upspin.Packing) *upspin.DirEntry {
+func storeDataHelper(t *testing.T, config upspin.Config, data []byte, name upspin.PathName, packing upspin.Packing) *upspin.DirEntry {
 	if path.Clean(name) != name {
 		t.Fatalf("%q is not a clean path name", name)
 	}
@@ -113,7 +113,7 @@ func storeDataHelper(t *testing.T, config upspin.Context, data []byte, name upsp
 }
 
 // readAll retrieves the data for the entry. It is a test-only version of Service.readAll.
-func readAll(config upspin.Context, entry *upspin.DirEntry) ([]byte, error) {
+func readAll(config upspin.Config, entry *upspin.DirEntry) ([]byte, error) {
 	packer := pack.Lookup(entry.Packing)
 	if packer == nil {
 		return nil, errors.Errorf("no packing %#x registered", entry.Packing)

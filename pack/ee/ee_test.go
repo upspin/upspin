@@ -41,7 +41,7 @@ func TestRegister(t *testing.T) {
 }
 
 // packBlob packs text according to the parameters and returns the cipher.
-func packBlob(t *testing.T, ctx upspin.Context, packer upspin.Packer, d *upspin.DirEntry, text []byte) []byte {
+func packBlob(t *testing.T, ctx upspin.Config, packer upspin.Packer, d *upspin.DirEntry, text []byte) []byte {
 	d.Packing = packer.Packing()
 	bp, err := packer.Pack(ctx, d)
 	if err != nil {
@@ -59,7 +59,7 @@ func packBlob(t *testing.T, ctx upspin.Context, packer upspin.Packer, d *upspin.
 }
 
 // unpackBlob unpacks cipher according to the parameters and returns the plain text.
-func unpackBlob(t *testing.T, ctx upspin.Context, packer upspin.Packer, d *upspin.DirEntry, cipher []byte) []byte {
+func unpackBlob(t *testing.T, ctx upspin.Config, packer upspin.Packer, d *upspin.DirEntry, cipher []byte) []byte {
 	bp, err := packer.Unpack(ctx, d)
 	if err != nil {
 		t.Fatal("unpackBlob:", err)
@@ -74,7 +74,7 @@ func unpackBlob(t *testing.T, ctx upspin.Context, packer upspin.Packer, d *upspi
 	return text
 }
 
-func testPackAndUnpack(t *testing.T, ctx upspin.Context, packer upspin.Packer, name upspin.PathName, text []byte) {
+func testPackAndUnpack(t *testing.T, ctx upspin.Config, packer upspin.Packer, name upspin.PathName, text []byte) {
 	// First pack.
 	d := &upspin.DirEntry{
 		Name:       name,
@@ -94,7 +94,7 @@ func testPackAndUnpack(t *testing.T, ctx upspin.Context, packer upspin.Packer, n
 	}
 }
 
-func testPackNameAndUnpack(t *testing.T, ctx upspin.Context, packer upspin.Packer, name, newName upspin.PathName, text []byte) {
+func testPackNameAndUnpack(t *testing.T, ctx upspin.Config, packer upspin.Packer, name, newName upspin.PathName, text []byte) {
 	// First pack.
 	d := &upspin.DirEntry{
 		Name:       name,
@@ -206,7 +206,7 @@ func BenchmarkPackUnpack256_1Mbyte(b *testing.B) {
 }
 
 // shareBlob updates the packdata of a blob such that the public keys given are readers of the blob.
-func shareBlob(t *testing.T, ctx upspin.Context, packer upspin.Packer, readers []upspin.PublicKey, packdata *[]byte) {
+func shareBlob(t *testing.T, ctx upspin.Config, packer upspin.Packer, readers []upspin.PublicKey, packdata *[]byte) {
 	pd := make([]*[]byte, 1)
 	pd[0] = packdata
 	packer.Share(ctx, readers, pd)
@@ -331,7 +331,7 @@ func TestBadSharing(t *testing.T) {
 	}
 }
 
-func setup(name upspin.UserName) (upspin.Context, upspin.Packer) {
+func setup(name upspin.UserName) (upspin.Config, upspin.Packer) {
 	ctx := config.SetUserName(config.New(), name)
 	packer := pack.Lookup(packing)
 	j := strings.IndexByte(string(name), '@')
@@ -371,7 +371,7 @@ func (d *dummyKey) Lookup(userName upspin.UserName) (*upspin.User, error) {
 	}
 	return nil, errors.E(op, userName, errors.NotExist, errors.Str("user not found"))
 }
-func (d *dummyKey) Dial(cc upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (d *dummyKey) Dial(cc upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
 	return d, nil
 }
 

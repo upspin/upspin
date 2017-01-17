@@ -170,7 +170,7 @@ func (d *dummyKey) Close() {
 	d.closeCalled++
 }
 
-func (d *dummyKey) Dial(cc upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (d *dummyKey) Dial(cc upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
 	user := &dummyKey{endpoint: e}
 	d.dialed++
 	return user, nil
@@ -190,12 +190,12 @@ func (d *dummyStoreServer) Endpoint() upspin.Endpoint {
 	return d.endpoint
 }
 
-func (d *dummyStoreServer) Dial(cc upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (d *dummyStoreServer) Dial(cc upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
 	store := &dummyStoreServer{endpoint: e}
 	return store, nil
 }
 
-func (d *dummyDirServer) Dial(cc upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (d *dummyDirServer) Dial(cc upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
 	dir := &dummyDirServer{endpoint: e}
 	return dir, nil
 }

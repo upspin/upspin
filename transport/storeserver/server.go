@@ -21,13 +21,13 @@ import (
 )
 
 type server struct {
-	context upspin.Context
+	context upspin.Config
 
 	// The underlying storage implementation.
 	store upspin.StoreServer
 }
 
-func New(ctx upspin.Context, store upspin.StoreServer, _ upspin.NetAddr) http.Handler {
+func New(ctx upspin.Config, store upspin.StoreServer, _ upspin.NetAddr) http.Handler {
 	// TODO(adg): remove addr argument
 	s := &server{
 		context: ctx,

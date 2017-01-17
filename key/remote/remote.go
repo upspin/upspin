@@ -79,7 +79,7 @@ func (r *remote) Endpoint() upspin.Endpoint {
 }
 
 // Dial implements upspin.Service.
-func (r *remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (r *remote) Dial(context upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
 	op := r.opf("Dial", "%q, %q", context.UserName(), e)
 
 	if e.Transport != upspin.Remote {

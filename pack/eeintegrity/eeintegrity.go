@@ -55,7 +55,7 @@ func (ei ei) Packing() upspin.Packing {
 }
 
 // PackLen implements upspin.Packer.
-func (ei ei) PackLen(ctx upspin.Context, cleartext []byte, d *upspin.DirEntry) int {
+func (ei ei) PackLen(ctx upspin.Config, cleartext []byte, d *upspin.DirEntry) int {
 	if err := pack.CheckPacking(ei, d); err != nil {
 		return -1
 	}
@@ -63,7 +63,7 @@ func (ei ei) PackLen(ctx upspin.Context, cleartext []byte, d *upspin.DirEntry) i
 }
 
 // UnpackLen implements upspin.Packer.
-func (ei ei) UnpackLen(ctx upspin.Context, ciphertext []byte, d *upspin.DirEntry) int {
+func (ei ei) UnpackLen(ctx upspin.Config, ciphertext []byte, d *upspin.DirEntry) int {
 	if err := pack.CheckPacking(ei, d); err != nil {
 		return -1
 	}
@@ -76,7 +76,7 @@ func (ei ei) String() string {
 }
 
 // Pack implements upspin.Packer.
-func (ei ei) Pack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockPacker, error) {
+func (ei ei) Pack(ctx upspin.Config, d *upspin.DirEntry) (upspin.BlockPacker, error) {
 	const op = "pack/ei.Pack"
 	if err := pack.CheckPacking(ei, d); err != nil {
 		return nil, errors.E(op, errors.Invalid, d.Name, err)
@@ -95,7 +95,7 @@ func (ei ei) Pack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockPacker, e
 }
 
 type blockPacker struct {
-	ctx   upspin.Context
+	ctx   upspin.Config
 	entry *upspin.DirEntry
 
 	buf internal.LazyBuffer
@@ -163,7 +163,7 @@ func (bp *blockPacker) Close() error {
 }
 
 // Unpack implements upspin.Packer.
-func (ei ei) Unpack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockUnpacker, error) {
+func (ei ei) Unpack(ctx upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker, error) {
 	const op = "pack/ei.Unpack"
 	if err := pack.CheckPacking(ei, d); err != nil {
 		return nil, errors.E(op, errors.Invalid, d.Name, err)
@@ -215,7 +215,7 @@ func (ei ei) Unpack(ctx upspin.Context, d *upspin.DirEntry) (upspin.BlockUnpacke
 }
 
 type blockUnpacker struct {
-	ctx                   upspin.Context
+	ctx                   upspin.Config
 	entry                 *upspin.DirEntry
 	internal.BlockTracker // provides NextBlock method and Block field
 
@@ -248,11 +248,11 @@ func (ei ei) ReaderHashes(packdata []byte) (readers [][]byte, err error) {
 }
 
 // Share is unused in this packer.
-func (ei ei) Share(ctx upspin.Context, readers []upspin.PublicKey, packdata []*[]byte) {
+func (ei ei) Share(ctx upspin.Config, readers []upspin.PublicKey, packdata []*[]byte) {
 }
 
 // Name implements upspin.Packer.
-func (ei ei) Name(ctx upspin.Context, d *upspin.DirEntry, newName upspin.PathName) error {
+func (ei ei) Name(ctx upspin.Config, d *upspin.DirEntry, newName upspin.PathName) error {
 	const op = "pack/ei.Name"
 	if d.IsDir() {
 		return errors.E(op, d.Name, errors.IsDir, "cannot rename directory")
@@ -387,7 +387,7 @@ func packdataLen(nwrap int) int {
 }
 
 // publicKey returns the string representation of a user's public key.
-func publicKey(ctx upspin.Context, user upspin.UserName) (upspin.PublicKey, error) {
+func publicKey(ctx upspin.Config, user upspin.UserName) (upspin.PublicKey, error) {
 
 	// Key pairs have three representations:
 	// 1. string, used for storage and between programs like User.Lookup

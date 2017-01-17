@@ -81,7 +81,7 @@ func (r *remote) Endpoint() upspin.Endpoint {
 	return r.ctx.endpoint
 }
 
-func dialCache(op *operation, context upspin.Context, proxyFor upspin.Endpoint) upspin.Service {
+func dialCache(op *operation, context upspin.Config, proxyFor upspin.Endpoint) upspin.Service {
 	// Are we using a cache?
 	ce := context.CacheEndpoint()
 	if ce.Transport == upspin.Unassigned {
@@ -106,7 +106,7 @@ func dialCache(op *operation, context upspin.Context, proxyFor upspin.Endpoint) 
 }
 
 // Dial implements upspin.Service.
-func (r *remote) Dial(context upspin.Context, e upspin.Endpoint) (upspin.Service, error) {
+func (r *remote) Dial(context upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
 	op := r.opf("Dial", "%q, %q", context.UserName(), e)
 
 	if e.Transport != upspin.Remote {

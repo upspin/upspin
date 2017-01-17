@@ -23,7 +23,7 @@ import (
 	_ "upspin.io/pack/debug"
 )
 
-var baseCtx upspin.Context
+var baseCtx upspin.Config
 
 func init() {
 	inProcess := upspin.Endpoint{
@@ -51,7 +51,7 @@ func checkTransport(s upspin.Service) {
 	}
 }
 
-func setup(userName upspin.UserName, publicKey upspin.PublicKey) upspin.Context {
+func setup(userName upspin.UserName, publicKey upspin.PublicKey) upspin.Config {
 	ctx := config.SetUserName(baseCtx, userName)
 	key, _ := bind.KeyServer(ctx, ctx.KeyEndpoint())
 	checkTransport(key)

@@ -33,7 +33,7 @@ func umountHelper(mountpoint string) error {
 }
 
 // testSetup creates a temporary user context with inprocess services.
-func testSetup(name string) (ctx upspin.Context, err error) {
+func testSetup(name string) (ctx upspin.Config, err error) {
 	endpoint := upspin.Endpoint{
 		Transport: upspin.InProcess,
 		NetAddr:   "", // ignored

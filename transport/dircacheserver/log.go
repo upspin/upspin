@@ -99,7 +99,7 @@ type clogEntry struct {
 
 // clog represents the replayable log of DirEntry changes.
 type clog struct {
-	ctx           upspin.Context
+	ctx           upspin.Config
 	dir           string        // directory clog lives in
 	refreshPeriod time.Duration // Duration between refreshes
 	maxDisk       int64         // most bytes taken by on disk logs
@@ -147,7 +147,7 @@ const LRUMax = 10000
 // - dir is the directory for log files.
 // - maxDisk is an approximate limit on disk space for log files
 // - userToDirServer is a map from user names to directory endpoints, maintained by the server
-func openLog(ctx upspin.Context, dir string, maxDisk int64, userToDirServer *userToDirServer) (*clog, error) {
+func openLog(ctx upspin.Config, dir string, maxDisk int64, userToDirServer *userToDirServer) (*clog, error) {
 	const op = "transport/dircacheserver.openLog"
 	if err := os.MkdirAll(dir, 0700); err != nil {
 		return nil, err

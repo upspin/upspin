@@ -17,7 +17,7 @@ type simpleContext struct {
 var ep0 upspin.Endpoint // Will have upspin.Unassigned as transport.
 
 // NewSimpleContext returns a context with nothing but a user name.
-func NewSimpleContext(u upspin.UserName) upspin.Context {
+func NewSimpleContext(u upspin.UserName) upspin.Config {
 	return &simpleContext{userName: u}
 }
 
