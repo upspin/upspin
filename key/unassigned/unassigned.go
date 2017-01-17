@@ -47,7 +47,7 @@ func (Server) Ping() bool {
 }
 
 // Dial implements upspin.Service.
-func (Server) Dial(context upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
+func (Server) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
 	const op = "key/Server.Dial"
 	if e.Transport != upspin.Unassigned {
 		return nil, errors.E(op, errors.Invalid, errors.Str("unrecognized transport"))

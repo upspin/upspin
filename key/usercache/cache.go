@@ -5,7 +5,7 @@
 // Package usercache provides a KeyServer implementation that wraps
 // another and caches Lookups.
 // If a Lookup is made for the user that last Dialed the service,
-// data from that user's context will be provided instead of making
+// data from that user's config will be provided instead of making
 // a request to the underlying server.
 // The caching KeyServer will defer Dialing the underlying service
 // until a Lookup or Put request needs to access that service.
@@ -33,10 +33,10 @@ type userCacheServer struct {
 
 	// The following fields are used to defer dialing the underlying
 	// service until a Lookup or Put call requires it.
-	// If dialContext is non-nil, then the Dial method has been called.
+	// If dialConfig is non-nil, then the Dial method has been called.
 	// If dialed is non-nil, then the underlying service has been dialed.
 	mu           sync.Mutex
-	dialContext  upspin.Config
+	dialConfig   upspin.Config
 	dialEndpoint upspin.Endpoint
 	dialed       upspin.KeyServer
 }
@@ -52,10 +52,10 @@ const (
 	// defaultDuration is the default entry expiration time.
 	defaultDuration = 15 * time.Minute
 
-	// contextUserDuration is the expiration time of the dialing user's
+	// configUserDuration is the expiration time of the dialing user's
 	// pre-populated record. This is set to a decade to ensure that we
-	// always use the context's values, unless overridden by a Put.
-	contextUserDuration = 3650 * 24 * time.Hour
+	// always use the config's values, unless overridden by a Put.
+	configUserDuration = 3650 * 24 * time.Hour
 )
 
 var globalCache = userCache{entries: cache.NewLRU(256), duration: defaultDuration}
@@ -162,38 +162,38 @@ func (c *userCacheServer) Close() {
 }
 
 // Dial implements upspin.Dialer.
-func (c *userCacheServer) Dial(ctx upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
-	c.cacheContextUser(ctx)
+func (c *userCacheServer) Dial(cfg upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
+	c.cacheConfigUser(cfg)
 
 	cc := *c
 	cc.mu = sync.Mutex{}
 	cc.dialed = nil
-	cc.dialContext = ctx
+	cc.dialConfig = cfg
 	cc.dialEndpoint = e
 	return &cc, nil
 }
 
-// cacheContextUser puts the dialed user in the cache with an extra-long expiry
+// cacheConfigUser puts the dialed user in the cache with an extra-long expiry
 // time, so that we don't hit the underlying cache for the current user and
-// instead use the values from their context.
-func (c *userCacheServer) cacheContextUser(ctx upspin.Config) {
-	if ctx == nil {
+// instead use the values from their config.
+func (c *userCacheServer) cacheConfigUser(cfg upspin.Config) {
+	if cfg == nil {
 		return
 	}
-	f := ctx.Factotum()
+	f := cfg.Factotum()
 	if f == nil {
 		return
 	}
-	name := ctx.UserName()
+	name := cfg.UserName()
 	c.cache.entries.Add(name, &entry{
-		expires: time.Now().Add(contextUserDuration),
+		expires: time.Now().Add(configUserDuration),
 		user: &upspin.User{
 			Name: name,
 			Dirs: []upspin.Endpoint{
-				ctx.DirEndpoint(),
+				cfg.DirEndpoint(),
 			},
 			Stores: []upspin.Endpoint{
-				ctx.StoreEndpoint(),
+				cfg.StoreEndpoint(),
 			},
 			PublicKey: f.PublicKey(),
 		},
@@ -211,11 +211,11 @@ func (c *userCacheServer) dial() error {
 	if c.dialed != nil {
 		return nil
 	}
-	if c.dialContext == nil {
+	if c.dialConfig == nil {
 		return errors.Str("server not dialed")
 	}
 
-	svc, err := c.base.Dial(c.dialContext, c.dialEndpoint)
+	svc, err := c.base.Dial(c.dialConfig, c.dialEndpoint)
 	if err != nil {
 		return err
 	}
