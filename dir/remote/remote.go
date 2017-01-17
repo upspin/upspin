@@ -22,8 +22,8 @@ import (
 // requireAuthentication specifies whether the connection demands TLS.
 const requireAuthentication = true
 
-// dialContext contains the destination and authenticated user of the dial.
-type dialContext struct {
+// dialConfig contains the destination and authenticated user of the dial.
+type dialConfig struct {
 	endpoint upspin.Endpoint
 	userName upspin.UserName
 }
@@ -31,7 +31,7 @@ type dialContext struct {
 // remote implements upspin.DirServer.
 type remote struct {
 	auth.Client // For sessions, Ping, and Close.
-	ctx         dialContext
+	cfg         dialConfig
 }
 
 var _ upspin.DirServer = (*remote)(nil)
@@ -118,18 +118,18 @@ func (r *remote) Watch(name upspin.PathName, order int64, done <-chan struct{}) 
 
 // Endpoint implements upspin.StoreServer.Endpoint.
 func (r *remote) Endpoint() upspin.Endpoint {
-	return r.ctx.endpoint
+	return r.cfg.endpoint
 }
 
-func dialCache(op *operation, context upspin.Config, proxyFor upspin.Endpoint) upspin.Service {
+func dialCache(op *operation, config upspin.Config, proxyFor upspin.Endpoint) upspin.Service {
 	// Are we using a cache?
-	ce := context.CacheEndpoint()
+	ce := config.CacheEndpoint()
 	if ce.Transport == upspin.Unassigned {
 		return nil
 	}
 
 	// Call the cache. The cache is local so don't bother with TLS.
-	authClient, err := auth.NewClient(context, ce.NetAddr, auth.NoSecurity, proxyFor)
+	authClient, err := auth.NewClient(config, ce.NetAddr, auth.NoSecurity, proxyFor)
 	if err != nil {
 		// On error dial direct.
 		op.error(errors.IO, err)
@@ -138,27 +138,27 @@ func dialCache(op *operation, context upspin.Config, proxyFor upspin.Endpoint) u
 
 	return &remote{
 		Client: authClient,
-		ctx: dialContext{
+		cfg: dialConfig{
 			endpoint: proxyFor,
-			userName: context.UserName(),
+			userName: config.UserName(),
 		},
 	}
 }
 
 // Dial implements upspin.Service.
-func (r *remote) Dial(context upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
-	op := r.opf("Dial", "%q, %q", context.UserName(), e)
+func (r *remote) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
+	op := r.opf("Dial", "%q, %q", config.UserName(), e)
 
 	if e.Transport != upspin.Remote {
 		return nil, op.error(errors.Invalid, errors.Str("unrecognized transport"))
 	}
 
 	// First try a cache
-	if svc := dialCache(op, context, e); svc != nil {
+	if svc := dialCache(op, config, e); svc != nil {
 		return svc, nil
 	}
 
-	authClient, err := auth.NewClient(context, e.NetAddr, auth.Secure, upspin.Endpoint{})
+	authClient, err := auth.NewClient(config, e.NetAddr, auth.Secure, upspin.Endpoint{})
 	if err != nil {
 		return nil, op.error(errors.IO, err)
 	}
@@ -166,9 +166,9 @@ func (r *remote) Dial(context upspin.Config, e upspin.Endpoint) (upspin.Service,
 	// The connection is closed when this service is released (see Bind.Release)
 	r = &remote{
 		Client: authClient,
-		ctx: dialContext{
+		cfg: dialConfig{
 			endpoint: e,
-			userName: context.UserName(),
+			userName: config.UserName(),
 		},
 	}
 
@@ -194,7 +194,7 @@ func unmarshalError(b []byte) error {
 }
 
 func (r *remote) opf(method string, format string, args ...interface{}) *operation {
-	ep := r.ctx.endpoint.String()
+	ep := r.cfg.endpoint.String()
 	s := fmt.Sprintf("dir/remote.%s(%q)", method, ep)
 	op := &operation{s, fmt.Sprintf(format, args...)}
 	log.Debug.Print(op)
