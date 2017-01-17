@@ -275,7 +275,7 @@ func (s *server) mkDirIfNotExist(name path.Parsed) error {
 		SignedName: name.Path(),
 		Attr:       upspin.AttrDirectory,
 		Writer:     name.User(),
-		Packing:    s.serverContext.Packing(),
+		Packing:    s.serverConfig.Packing(),
 		Time:       upspin.Now(),
 		Sequence:   0, // Tree will increment when flushed.
 	}

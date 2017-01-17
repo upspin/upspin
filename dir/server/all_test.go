@@ -904,7 +904,7 @@ func makeDirectory(s *server, name upspin.PathName) (*upspin.DirEntry, error) {
 		Name:       parsed.Path(),
 		SignedName: parsed.Path(),
 		Attr:       upspin.AttrDirectory,
-		Packing:    s.serverContext.Packing(),
+		Packing:    s.serverConfig.Packing(),
 		Writer:     serverName,
 		Sequence:   upspin.SeqIgnore,
 	}

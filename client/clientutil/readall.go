@@ -14,9 +14,9 @@ import (
 )
 
 // ReadAll reads the entire contents of a DirEntry. The reader must have
-// the necessary keys loaded in the context to unpack the cipher if the entry
+// the necessary keys loaded in the config to unpack the cipher if the entry
 // is encrypted.
-func ReadAll(ctx upspin.Config, entry *upspin.DirEntry) ([]byte, error) {
+func ReadAll(cfg upspin.Config, entry *upspin.DirEntry) ([]byte, error) {
 	const op = "client/clientutil.ReadAll"
 
 	if entry.IsLink() {
@@ -31,7 +31,7 @@ func ReadAll(ctx upspin.Config, entry *upspin.DirEntry) ([]byte, error) {
 	if packer == nil {
 		return nil, errors.E(op, entry.Name, errors.Errorf("unrecognized Packing %d", entry.Packing))
 	}
-	bu, err := packer.Unpack(ctx, entry)
+	bu, err := packer.Unpack(cfg, entry)
 	if err != nil {
 		return nil, errors.E(op, entry.Name, err) // Showstopper.
 	}
@@ -42,7 +42,7 @@ func ReadAll(ctx upspin.Config, entry *upspin.DirEntry) ([]byte, error) {
 		}
 		// block is known valid as per valid.DirEntry above.
 
-		cipher, err := ReadLocation(ctx, block.Location)
+		cipher, err := ReadLocation(cfg, block.Location)
 		if err != nil {
 			return nil, errors.E(op, err)
 		}
@@ -55,9 +55,9 @@ func ReadAll(ctx upspin.Config, entry *upspin.DirEntry) ([]byte, error) {
 	return data, nil
 }
 
-// ReadLocation uses the provided Context to fetch the contents of the given
+// ReadLocation uses the provided Config to fetch the contents of the given
 // Location, following any StoreServer.Get redirects.
-func ReadLocation(ctx upspin.Config, loc upspin.Location) ([]byte, error) {
+func ReadLocation(cfg upspin.Config, loc upspin.Location) ([]byte, error) {
 	const op = "client/clientutil.ReadLocation"
 
 	// firstError remembers the first error we saw.
@@ -82,7 +82,7 @@ func ReadLocation(ctx upspin.Config, loc upspin.Location) ([]byte, error) {
 	where := []upspin.Location{loc}
 	for i := 0; i < len(where); i++ { // Not range loop - where changes as we run.
 		loc := where[i]
-		store, err := bind.StoreServer(ctx, loc.Endpoint)
+		store, err := bind.StoreServer(cfg, loc.Endpoint)
 		if isError(err) {
 			continue
 		}

@@ -127,31 +127,31 @@ func NewClient(clientConfig *ClientConfig) (*Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	ctx := config.New()
-	ctx = config.SetUserName(ctx, userName)
-	ctx = config.SetPacking(ctx, upspin.EEPack)
+	cfg := config.New()
+	cfg = config.SetUserName(cfg, userName)
+	cfg = config.SetPacking(cfg, upspin.EEPack)
 	f, err := factotum.NewFromKeys([]byte(clientConfig.PublicKey), []byte(clientConfig.PrivateKey), nil)
 	if err != nil {
 		log.Error.Printf("Error creating factotum: %s", err)
 		return nil, err
 	}
-	ctx = config.SetFactotum(ctx, f)
+	cfg = config.SetFactotum(cfg, f)
 	se := upspin.Endpoint{
 		Transport: upspin.Remote,
 		NetAddr:   upspin.NetAddr(clientConfig.StoreNetAddr),
 	}
-	ctx = config.SetStoreEndpoint(ctx, se)
+	cfg = config.SetStoreEndpoint(cfg, se)
 	de := upspin.Endpoint{
 		Transport: upspin.Remote,
 		NetAddr:   upspin.NetAddr(clientConfig.DirNetAddr),
 	}
-	ctx = config.SetDirEndpoint(ctx, de)
+	cfg = config.SetDirEndpoint(cfg, de)
 	ue := upspin.Endpoint{
 		Transport: upspin.Remote,
 		NetAddr:   upspin.NetAddr(clientConfig.KeyNetAddr),
 	}
-	ctx = config.SetKeyEndpoint(ctx, ue)
+	cfg = config.SetKeyEndpoint(cfg, ue)
 	return &Client{
-		c: client.New(ctx),
+		c: client.New(cfg),
 	}, nil
 }
