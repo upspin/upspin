@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c3892940_69e76524",
+        "filename": "cmd/upspin/rotate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-17T04:05:11Z",
+      "side": 1,
+      "message": "lastCfg",
+      "revId": "3f5830598b4d98c444560dece5e2f4898c9a408b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
