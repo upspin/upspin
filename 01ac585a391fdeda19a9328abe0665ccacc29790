@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "63db1d69_6e7bcf2a",
+        "filename": "transport/dircacheserver/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-17T22:49:45Z",
+      "side": 1,
+      "message": "If this is to be incremented, how about \"20170117\"",
+      "revId": "01ac585a391fdeda19a9328abe0665ccacc29790",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "63db1d69_ee8d7f1b",
+        "filename": "transport/dircacheserver/proxied.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-17T22:49:45Z",
+      "side": 1,
+      "message": "it might be cleaner if the contents of this for loop were in a separate method\n\nthen you could do things in that function like\n  defer close(done)\n\nand handle all the timeout/retry stuff just once in this loop",
+      "revId": "01ac585a391fdeda19a9328abe0665ccacc29790",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "63db1d69_4e78132c",
+        "filename": "transport/dircacheserver/proxied.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-17T22:49:45Z",
+      "side": 1,
+      "message": "You could just log the first time it fails?",
+      "revId": "01ac585a391fdeda19a9328abe0665ccacc29790",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "63db1d69_2e85c7f3",
+        "filename": "transport/dircacheserver/proxied.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-17T22:49:45Z",
+      "side": 1,
+      "message": "\u0027done\u0027 and \u0027events\u0027 are also fine names.",
+      "revId": "01ac585a391fdeda19a9328abe0665ccacc29790",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "63db1d69_0e820bec",
+        "filename": "transport/dircacheserver/proxied.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-17T22:49:45Z",
+      "side": 1,
+      "message": "set done to nil here, otherwise you might try to close it twice (line 181)",
+      "revId": "01ac585a391fdeda19a9328abe0665ccacc29790",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
