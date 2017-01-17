@@ -23,7 +23,7 @@ import (
 	_ "upspin.io/pack/debug"
 )
 
-var baseCtx upspin.Config
+var baseCfg upspin.Config
 
 func init() {
 	inProcess := upspin.Endpoint{
@@ -31,15 +31,15 @@ func init() {
 		NetAddr:   "", // ignored
 	}
 
-	baseCtx = config.New()
-	baseCtx = config.SetPacking(baseCtx, upspin.DebugPack)
-	baseCtx = config.SetKeyEndpoint(baseCtx, inProcess)
-	baseCtx = config.SetStoreEndpoint(baseCtx, inProcess)
-	baseCtx = config.SetDirEndpoint(baseCtx, inProcess)
+	baseCfg = config.New()
+	baseCfg = config.SetPacking(baseCfg, upspin.DebugPack)
+	baseCfg = config.SetKeyEndpoint(baseCfg, inProcess)
+	baseCfg = config.SetStoreEndpoint(baseCfg, inProcess)
+	baseCfg = config.SetDirEndpoint(baseCfg, inProcess)
 
 	bind.RegisterKeyServer(upspin.InProcess, keyserver.New())
 	bind.RegisterStoreServer(upspin.InProcess, storeserver.New())
-	bind.RegisterDirServer(upspin.InProcess, dirserver.New(baseCtx))
+	bind.RegisterDirServer(upspin.InProcess, dirserver.New(baseCfg))
 }
 
 func checkTransport(s upspin.Service) {
@@ -52,18 +52,18 @@ func checkTransport(s upspin.Service) {
 }
 
 func setup(userName upspin.UserName, publicKey upspin.PublicKey) upspin.Config {
-	ctx := config.SetUserName(baseCtx, userName)
-	key, _ := bind.KeyServer(ctx, ctx.KeyEndpoint())
+	cfg := config.SetUserName(baseCfg, userName)
+	key, _ := bind.KeyServer(cfg, cfg.KeyEndpoint())
 	checkTransport(key)
-	dir, _ := bind.DirServer(ctx, ctx.DirEndpoint())
+	dir, _ := bind.DirServer(cfg, cfg.DirEndpoint())
 	checkTransport(dir)
 	if publicKey == "" {
 		publicKey = upspin.PublicKey(fmt.Sprintf("key for %s", userName))
 	}
 	user := &upspin.User{
 		Name:      upspin.UserName(userName),
-		Dirs:      []upspin.Endpoint{ctx.DirEndpoint()},
-		Stores:    []upspin.Endpoint{ctx.StoreEndpoint()},
+		Dirs:      []upspin.Endpoint{cfg.DirEndpoint()},
+		Stores:    []upspin.Endpoint{cfg.StoreEndpoint()},
 		PublicKey: publicKey,
 	}
 	err := key.Put(user)
@@ -80,7 +80,7 @@ func setup(userName upspin.UserName, publicKey upspin.PublicKey) upspin.Config {
 	if err != nil {
 		panic(err)
 	}
-	return ctx
+	return cfg
 }
 
 // TODO: End of copied code.

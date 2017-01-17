@@ -25,20 +25,20 @@ import (
 
 var bindOnce sync.Once
 
-// Init initializes the transports for the given context.
-// It is a no-op if passed a nil context or called more than once.
+// Init initializes the transports for the given configuration.
+// It is a no-op if passed a nil config or called more than once.
 //
 // It should be called only by client programs, directly after parsing a
-// context. This handles the case where a context specifies an inprocess
+// config. This handles the case where a config specifies an inprocess
 // directory server and configures that server to talk to the specified store
 // server.
-func Init(ctx upspin.Config) {
-	if ctx == nil {
+func Init(cfg upspin.Config) {
+	if cfg == nil {
 		return
 	}
-	if ctx.DirEndpoint().Transport == upspin.InProcess {
+	if cfg.DirEndpoint().Transport == upspin.InProcess {
 		bindOnce.Do(func() {
-			bind.RegisterDirServer(upspin.InProcess, inprocess.New(ctx))
+			bind.RegisterDirServer(upspin.InProcess, inprocess.New(cfg))
 		})
 	}
 }

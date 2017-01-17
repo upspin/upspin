@@ -15,7 +15,7 @@ import (
 )
 
 func TestSwitch(t *testing.T) {
-	ctx := testfixtures.NewSimpleConfig("nobody@example.com")
+	cfg := testfixtures.NewSimpleConfig("nobody@example.com")
 
 	// These should succeed.
 	du := &dummyKey{}
@@ -41,24 +41,24 @@ func TestSwitch(t *testing.T) {
 	}
 
 	// These should return different NetAddrs
-	s1, _ := StoreServer(ctx, upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr1"})
-	s2, _ := StoreServer(ctx, upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr2"})
+	s1, _ := StoreServer(cfg, upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr1"})
+	s2, _ := StoreServer(cfg, upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr2"})
 	if s1.Endpoint().NetAddr != "addr1" || s2.Endpoint().NetAddr != "addr2" {
 		t.Errorf("got %s %s, expected addr1 addr2", s1.Endpoint().NetAddr, s2.Endpoint().NetAddr)
 	}
 
 	// This should fail.
-	if _, err := StoreServer(ctx, upspin.Endpoint{Transport: upspin.Transport(99)}); err == nil {
+	if _, err := StoreServer(cfg, upspin.Endpoint{Transport: upspin.Transport(99)}); err == nil {
 		t.Errorf("expected bind.StoreServer of undefined to fail")
 	}
 
 	// Test caching. dummyKey has a dial count.
 	e := upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr1"}
-	u1, err := KeyServer(ctx, e) // Dials once.
+	u1, err := KeyServer(cfg, e) // Dials once.
 	if err != nil {
 		t.Fatal(err)
 	}
-	u2, err := KeyServer(ctx, e) // Does not dial; hits the cache.
+	u2, err := KeyServer(cfg, e) // Does not dial; hits the cache.
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -68,9 +68,9 @@ func TestSwitch(t *testing.T) {
 	if du.dialed != 1 {
 		t.Errorf("Expected only one dial. Got %d", du.dialed)
 	}
-	// But a different context forces a new dial.
-	ctx2 := testfixtures.NewSimpleConfig("bob@foo.com")
-	u3, err := KeyServer(ctx2, e) // Dials again,
+	// But a different config forces a new dial.
+	cfg2 := testfixtures.NewSimpleConfig("bob@foo.com")
+	u3, err := KeyServer(cfg2, e) // Dials again,
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -112,14 +112,14 @@ func TestConcurrency(t *testing.T) {
 	pingFreshnessDuration = 0 // Forces ping to always be invalid
 	defer func() { pingFreshnessDuration = 15 * time.Minute }()
 
-	ctx := testfixtures.NewSimpleConfig("nobody@example.com")
+	cfg := testfixtures.NewSimpleConfig("nobody@example.com")
 	e := upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr17"}
 
 	var wg sync.WaitGroup
 	store := func(release bool) {
 		defer wg.Done()
 		for i := 0; i < nRuns; i++ {
-			s, err := StoreServer(ctx, e)
+			s, err := StoreServer(cfg, e)
 			if err != nil {
 				t.Error("StoreServer:", err)
 				return
