@@ -70,7 +70,7 @@ func TestCantFindFileAllowsAll(t *testing.T) {
 	ownerEnv, wait, cleanup := setupEnv(t)
 	defer cleanup()
 
-	perm, err := New(ownerEnv.Context, readyNow, owner, ownerEnv.DirServer.Lookup, ownerEnv.DirServer.Watch)
+	perm, err := New(ownerEnv.Config, readyNow, owner, ownerEnv.DirServer.Lookup, ownerEnv.DirServer.Watch)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -95,14 +95,14 @@ func TestNoFileAllowsAll(t *testing.T) {
 
 	// Put a permissive Access file, now server knows the file is not there.
 	r := testenv.NewRunner()
-	r.AddUser(ownerEnv.Context)
+	r.AddUser(ownerEnv.Config)
 	r.As(owner)
 	r.Put(accessFile, accessContent) // So server can lookup the file.
 	if r.Failed() {
 		t.Fatal(r.Diag())
 	}
 
-	perm, err := New(ownerEnv.Context, readyNow, owner, ownerEnv.DirServer.Lookup, ownerEnv.DirServer.Watch)
+	perm, err := New(ownerEnv.Config, readyNow, owner, ownerEnv.DirServer.Lookup, ownerEnv.DirServer.Watch)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -126,7 +126,7 @@ func TestAllowsOnlyOwner(t *testing.T) {
 	defer cleanup()
 
 	r := testenv.NewRunner()
-	r.AddUser(ownerEnv.Context)
+	r.AddUser(ownerEnv.Config)
 
 	r.As(owner)
 	r.Put(accessFile, accessContent) // So server can lookup the file.
@@ -136,7 +136,7 @@ func TestAllowsOnlyOwner(t *testing.T) {
 		t.Fatal(r.Diag())
 	}
 
-	perm, err := New(ownerEnv.Context, readyNow, owner, ownerEnv.DirServer.Lookup, ownerEnv.DirServer.Watch)
+	perm, err := New(ownerEnv.Config, readyNow, owner, ownerEnv.DirServer.Lookup, ownerEnv.DirServer.Watch)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -164,7 +164,7 @@ func TestAllowsOthersAndWildcard(t *testing.T) {
 	defer cleanup()
 
 	r := testenv.NewRunner()
-	r.AddUser(ownerEnv.Context)
+	r.AddUser(ownerEnv.Config)
 
 	r.As(owner)
 	r.Put(accessFile, accessContent) // So server can lookup the file.
@@ -174,7 +174,7 @@ func TestAllowsOthersAndWildcard(t *testing.T) {
 		t.Fatal(r.Diag())
 	}
 
-	perm, err := New(ownerEnv.Context, readyNow, owner, ownerEnv.DirServer.Lookup, ownerEnv.DirServer.Watch)
+	perm, err := New(ownerEnv.Config, readyNow, owner, ownerEnv.DirServer.Lookup, ownerEnv.DirServer.Watch)
 	if err != nil {
 		t.Fatal(err)
 	}

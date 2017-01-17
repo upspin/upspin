@@ -79,7 +79,7 @@ func (mux *Mux) Register(ep upspin.Endpoint, d upspin.Dialer) {
 // NetAddr in the given endpoint. It expects to receive an Endpoint with an
 // Inprocess transport. If the given Endpoint's NetAddr does not correspond
 // with a service known to the muxer, it returns an error.
-func (mux *Mux) dial(ctx upspin.Config, ep upspin.Endpoint) (upspin.Service, error) {
+func (mux *Mux) dial(cfg upspin.Config, ep upspin.Endpoint) (upspin.Service, error) {
 	if ep.Transport != upspin.InProcess {
 		return nil, errors.Errorf("Dial with transport %v, want inprocess", ep.Transport)
 	}
@@ -89,7 +89,7 @@ func (mux *Mux) dial(ctx upspin.Config, ep upspin.Endpoint) (upspin.Service, err
 	if svc == nil {
 		return nil, errors.Errorf("Dial did not recognize NetAddr %q", ep.NetAddr)
 	}
-	return svc.Dial(ctx, ep)
+	return svc.Dial(cfg, ep)
 }
 
 type key struct {
@@ -98,8 +98,8 @@ type key struct {
 }
 
 // Dial implements upspin.Dialer.
-func (s key) Dial(ctx upspin.Config, ep upspin.Endpoint) (upspin.Service, error) {
-	return s.mux.dial(ctx, ep)
+func (s key) Dial(cfg upspin.Config, ep upspin.Endpoint) (upspin.Service, error) {
+	return s.mux.dial(cfg, ep)
 }
 
 type store struct {
@@ -108,8 +108,8 @@ type store struct {
 }
 
 // Dial implements upspin.Dialer.
-func (s store) Dial(ctx upspin.Config, ep upspin.Endpoint) (upspin.Service, error) {
-	return s.mux.dial(ctx, ep)
+func (s store) Dial(cfg upspin.Config, ep upspin.Endpoint) (upspin.Service, error) {
+	return s.mux.dial(cfg, ep)
 }
 
 type dir struct {
@@ -118,6 +118,6 @@ type dir struct {
 }
 
 // Dial implements upspin.Dialer.
-func (s dir) Dial(ctx upspin.Config, ep upspin.Endpoint) (upspin.Service, error) {
-	return s.mux.dial(ctx, ep)
+func (s dir) Dial(cfg upspin.Config, ep upspin.Endpoint) (upspin.Service, error) {
+	return s.mux.dial(cfg, ep)
 }
