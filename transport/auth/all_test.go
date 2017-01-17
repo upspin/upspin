@@ -56,9 +56,9 @@ func startServer() (port string) {
 	srv = &server{}
 	port = pickPort()
 
-	ctx := config.SetUserName(config.New(), user)
-	ctx = config.SetKeyEndpoint(ctx, upspin.Endpoint{Transport: upspin.InProcess})
-	http.Handle("/api/Server/", NewServer(ctx, &ServerConfig{
+	cfg := config.SetUserName(config.New(), user)
+	cfg = config.SetKeyEndpoint(cfg, upspin.Endpoint{Transport: upspin.InProcess})
+	http.Handle("/api/Server/", NewServer(cfg, &ServerConfig{
 		Lookup: lookup,
 		Service: Service{
 			Name: "Server",
@@ -118,28 +118,28 @@ func (c *client) Echo(t *testing.T, payload string) (response string) {
 }
 
 func startClient(port string) {
-	ctx := config.SetUserName(config.New(), user)
+	cfg := config.SetUserName(config.New(), user)
 
 	f, err := factotum.NewFromDir(repo("key/testdata/joe"))
 	if err != nil {
 		log.Fatal(err)
 	}
-	ctx = config.SetFactotum(ctx, f)
+	cfg = config.SetFactotum(cfg, f)
 
 	pem, err := ioutil.ReadFile("testdata/cert.pem")
 	if err != nil {
 		log.Fatal(err)
 	}
-	pool := ctx.CertPool()
+	pool := cfg.CertPool()
 	if ok := pool.AppendCertsFromPEM(pem); !ok {
 		log.Fatal("could not add certificates to pool")
 	}
-	ctx = config.SetCertPool(ctx, pool)
+	cfg = config.SetCertPool(cfg, pool)
 
 	// Try a few times because the server may not be up yet.
 	var authClient Client
 	for i := 0; i < 10; i++ {
-		authClient, err = NewClient(ctx, upspin.NetAddr("localhost:"+port), Secure, upspin.Endpoint{})
+		authClient, err = NewClient(cfg, upspin.NetAddr("localhost:"+port), Secure, upspin.Endpoint{})
 		if err == nil {
 			break
 		}

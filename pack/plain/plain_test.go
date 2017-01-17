@@ -15,7 +15,7 @@ import (
 )
 
 var (
-	globalContext = config.New()
+	globalConfig = config.New()
 )
 
 func TestRegister(t *testing.T) {
@@ -48,7 +48,7 @@ func doPack(t testing.TB, name upspin.PathName, data []byte) ([]byte, *upspin.Di
 	de := &upspin.DirEntry{
 		Name: name,
 	}
-	bp, err := packer.Pack(globalContext, de)
+	bp, err := packer.Pack(globalConfig, de)
 	if err != nil {
 		t.Fatal("doPack:", err)
 	}
@@ -66,7 +66,7 @@ func doPack(t testing.TB, name upspin.PathName, data []byte) ([]byte, *upspin.Di
 // doUnpack unpacks cipher for a dir entry and returns the clear text.
 func doUnpack(t testing.TB, cipher []byte, de *upspin.DirEntry) []byte {
 	packer := pack.Lookup(upspin.PlainPack)
-	bp, err := packer.Unpack(globalContext, de)
+	bp, err := packer.Unpack(globalConfig, de)
 	if err != nil {
 		t.Fatal("doUnpack:", err)
 	}
@@ -105,5 +105,5 @@ func TestMultiBlockRoundTrip(t *testing.T) {
 		t.Fatal("Lookup failed")
 	}
 	const userName = upspin.UserName("ken@google.com")
-	packtest.TestMultiBlockRoundTrip(t, globalContext, p, userName)
+	packtest.TestMultiBlockRoundTrip(t, globalConfig, p, userName)
 }

@@ -64,13 +64,13 @@ type httpClient struct {
 // security guarantees of the connection. If proxyFor is an assigned endpoint,
 // it indicates that this connection is being used to proxy request to that
 // endpoint.
-func NewClient(context upspin.Config, netAddr upspin.NetAddr, security SecurityLevel, proxyFor upspin.Endpoint) (Client, error) {
+func NewClient(cfg upspin.Config, netAddr upspin.NetAddr, security SecurityLevel, proxyFor upspin.Endpoint) (Client, error) {
 	const op = "transport/auth.NewClient"
 
 	c := &httpClient{
 		proxyFor: proxyFor,
 	}
-	c.clientAuth.context = context
+	c.clientAuth.config = cfg
 
 	var tlsConfig *tls.Config
 	switch security {
@@ -81,7 +81,7 @@ func NewClient(context upspin.Config, netAddr upspin.NetAddr, security SecurityL
 		}
 		c.baseURL = "http://" + string(netAddr)
 	case Secure:
-		tlsConfig = &tls.Config{RootCAs: context.CertPool()}
+		tlsConfig = &tls.Config{RootCAs: cfg.CertPool()}
 		c.baseURL = "https://" + string(netAddr)
 	default:
 		return nil, errors.E(op, errors.Invalid, errors.Errorf("invalid security level to NewClient: %v", security))
@@ -113,7 +113,7 @@ retryAuth:
 	} else {
 		// Otherwise prepare an auth request.
 		// Authenticate client's user name. reqNow discourages signature replay.
-		authMsg, err := signUser(c.context, clientAuthMagic)
+		authMsg, err := signUser(c.config, clientAuthMagic)
 		if err != nil {
 			log.Error.Printf("%s: signUser: %s", op, err)
 			return errors.E(op, err)
@@ -225,7 +225,7 @@ func (c *httpClient) Close()     {}
 
 // clientAuth tracks the auth token and its freshness.
 type clientAuth struct {
-	context upspin.Config
+	config upspin.Config
 
 	mu              sync.Mutex // protects the fields below.
 	token           string
@@ -278,12 +278,12 @@ func (ca *clientAuth) setAuthToken(token string) {
 // It assumes that msg[0] is the user name.
 func (ca *clientAuth) verifyServerUser(msg []string) error {
 	u := upspin.UserName(msg[0])
-	if ca.context.UserName() != u {
-		return errors.Errorf("client %s does not match server %s", ca.context.UserName(), u)
+	if ca.config.UserName() != u {
+		return errors.Errorf("client %s does not match server %s", ca.config.UserName(), u)
 	}
 
 	// Get user's public key.
-	keyServer, err := bind.KeyServer(ca.context, ca.context.KeyEndpoint())
+	keyServer, err := bind.KeyServer(ca.config, ca.config.KeyEndpoint())
 	if err != nil {
 		return err
 	}

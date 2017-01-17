@@ -74,14 +74,14 @@ func (symm symm) Packing() upspin.Packing {
 	return upspin.SymmPack
 }
 
-func (symm symm) PackLen(ctx upspin.Config, cleartext []byte, d *upspin.DirEntry) int {
+func (symm symm) PackLen(cfg upspin.Config, cleartext []byte, d *upspin.DirEntry) int {
 	if err := pack.CheckPacking(symm, d); err != nil {
 		return -1
 	}
 	return len(cleartext) + aeadOverhead
 }
 
-func (symm symm) UnpackLen(ctx upspin.Config, ciphertext []byte, d *upspin.DirEntry) int {
+func (symm symm) UnpackLen(cfg upspin.Config, ciphertext []byte, d *upspin.DirEntry) int {
 	if err := pack.CheckPacking(symm, d); err != nil {
 		return -1
 	}
@@ -92,7 +92,7 @@ func (symm symm) String() string {
 	return "symm"
 }
 
-func (symm symm) Pack(ctx upspin.Config, d *upspin.DirEntry) (upspin.BlockPacker, error) {
+func (symm symm) Pack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockPacker, error) {
 	const op = "pack/symm.Pack"
 	if err := pack.CheckPacking(symm, d); err != nil {
 		return nil, errors.E(op, errors.Invalid, d.Name, err)
@@ -108,13 +108,13 @@ func (symm symm) Pack(ctx upspin.Config, d *upspin.DirEntry) (upspin.BlockPacker
 	d.Blocks = nil
 
 	return &blockPacker{
-		ctx:   ctx,
+		cfg:   cfg,
 		entry: d,
 	}, nil
 }
 
 type blockPacker struct {
-	ctx   upspin.Config
+	cfg   upspin.Config
 	entry *upspin.DirEntry
 	buf   internal.LazyBuffer
 }
@@ -165,7 +165,7 @@ func (bp *blockPacker) Close() error {
 	return nil
 }
 
-func (symm symm) Unpack(ctx upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker, error) {
+func (symm symm) Unpack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker, error) {
 	const op = "pack/symm.Unpack"
 	// Call Size to check that the block Offsets and Sizes are consistent.
 	if _, err := d.Size(); err != nil {
@@ -179,14 +179,14 @@ func (symm symm) Unpack(ctx upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpa
 	}
 
 	return &blockUnpacker{
-		ctx:          ctx,
+		cfg:          cfg,
 		entry:        d,
 		BlockTracker: internal.NewBlockTracker(d.Blocks),
 	}, nil
 }
 
 type blockUnpacker struct {
-	ctx                   upspin.Config
+	cfg                   upspin.Config
 	entry                 *upspin.DirEntry
 	internal.BlockTracker // provides NextBlock method and Block field
 	buf                   internal.LazyBuffer
@@ -211,7 +211,7 @@ func (bp *blockUnpacker) Close() error {
 
 var errNotImplemented = errors.Str("not implemented")
 
-func (symm symm) Name(ctx upspin.Config, d *upspin.DirEntry, newName upspin.PathName) error {
+func (symm symm) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName) error {
 	const op = "pack/symm.Name"
 	return errors.E(op, errNotImplemented)
 }
@@ -221,5 +221,5 @@ func (symm symm) ReaderHashes(packdata []byte) (readers [][]byte, err error) {
 	return nil, errors.E(op, errNotImplemented)
 }
 
-func (symm symm) Share(ctx upspin.Config, readers []upspin.PublicKey, packdata []*[]byte) {
+func (symm symm) Share(cfg upspin.Config, readers []upspin.PublicKey, packdata []*[]byte) {
 }
