@@ -48,20 +48,20 @@ func TestGroupFileMultiDir(t *testing.T) {
 	}
 
 	// Assert env1, env2 and env3 talk to different DirServers.
-	if ownerEnv.Context.DirEndpoint() == readerEnv.Context.DirEndpoint() {
-		t.Fatalf("ownerEnv and readerEnv endpoints are the same, expected distinct: %v", ownerEnv.Context.DirEndpoint())
+	if ownerEnv.Config.DirEndpoint() == readerEnv.Config.DirEndpoint() {
+		t.Fatalf("ownerEnv and readerEnv endpoints are the same, expected distinct: %v", ownerEnv.Config.DirEndpoint())
 	}
-	if ownerEnv.Context.DirEndpoint() == middleEnv.Context.DirEndpoint() {
-		t.Fatalf("ownerEnv and middleEnv endpoints are the same, expected distinct: %v", ownerEnv.Context.DirEndpoint())
+	if ownerEnv.Config.DirEndpoint() == middleEnv.Config.DirEndpoint() {
+		t.Fatalf("ownerEnv and middleEnv endpoints are the same, expected distinct: %v", ownerEnv.Config.DirEndpoint())
 	}
-	if readerEnv.Context.DirEndpoint() == middleEnv.Context.DirEndpoint() {
-		t.Fatalf("readerEnv and middleEnv endpoints are the same, expected distinct: %v", readerEnv.Context.DirEndpoint())
+	if readerEnv.Config.DirEndpoint() == middleEnv.Config.DirEndpoint() {
+		t.Fatalf("readerEnv and middleEnv endpoints are the same, expected distinct: %v", readerEnv.Config.DirEndpoint())
 	}
 
 	r := testenv.NewRunner()
-	r.AddUser(ownerEnv.Context)
-	r.AddUser(readerEnv.Context)
-	r.AddUser(middleEnv.Context)
+	r.AddUser(ownerEnv.Config)
+	r.AddUser(readerEnv.Config)
+	r.AddUser(middleEnv.Config)
 
 	const (
 		base              = ownerName + "/group-multidir-test"

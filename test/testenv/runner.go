@@ -22,7 +22,7 @@ import (
 // between where an error occurs and where it is checked.
 //
 // 	r := testenv.NewRunner()
-// 	r.AddUser(context)
+// 	r.AddUser(config)
 // 	r.As(username)
 // 	r.Put("user@host/foo", "content")
 // 	r.Get("user@host/foo")
@@ -69,14 +69,14 @@ func (r *Runner) setErr(err error) {
 	_, r.errFile, r.errLine, _ = runtime.Caller(2)
 }
 
-// AddUser adds the user in the given context to the Runner's
+// AddUser adds the user in the given config to the Runner's
 // internal state, and creates a client for use as that user.
 // If a client already exists for that user, it is replaced with a new one.
-func (r *Runner) AddUser(ctx upspin.Config) {
+func (r *Runner) AddUser(cfg upspin.Config) {
 	if r.err != nil {
 		return
 	}
-	r.clients[ctx.UserName()] = client.New(ctx)
+	r.clients[cfg.UserName()] = client.New(cfg)
 }
 
 // As instructs the Runner to perform subsequent actions as the specified user.

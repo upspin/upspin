@@ -43,7 +43,7 @@ var (
 		OwnerName: ownerName,
 		Cleanup:   cleanup,
 	}
-	readerContext upspin.Config
+	readerConfig upspin.Config
 )
 
 func makeIntegrationTestTree(t *testing.T, r *testenv.Runner) {
@@ -145,9 +145,9 @@ func testGlobWithLimitedAccess(t *testing.T, r *testenv.Runner) {
 	dir2Pat := ownerName + "/dir2/*.txt"
 	bothPat := ownerName + "/dir*/*.txt"
 
-	checkDirs := func(context, pat string, want int) {
+	checkDirs := func(config, pat string, want int) {
 		if r.Failed() {
-			t.Fatalf("%v globbing %v: %v", context, pat, r.Diag())
+			t.Fatalf("%v globbing %v: %v", config, pat, r.Diag())
 		}
 		got := len(r.Entries)
 		if got == want {
@@ -156,7 +156,7 @@ func testGlobWithLimitedAccess(t *testing.T, r *testenv.Runner) {
 		for _, d := range r.Entries {
 			t.Log("got:", d.Name)
 		}
-		t.Fatalf("%v globbing %v saw %v dirs, want %v", context, pat, got, want)
+		t.Fatalf("%v globbing %v saw %v dirs, want %v", config, pat, got, want)
 	}
 
 	// Owner sees both files.
@@ -327,14 +327,14 @@ func testSelectedOnePacking(t *testing.T, setup testenv.Setup) {
 		t.Fatal(err)
 	}
 
-	readerContext, err = env.NewUser(readerName)
+	readerConfig, err = env.NewUser(readerName)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	r := testenv.NewRunner()
-	r.AddUser(env.Context)
-	r.AddUser(readerContext)
+	r.AddUser(env.Config)
+	r.AddUser(readerConfig)
 
 	// Build the test tree (for the tests in this file).
 	makeIntegrationTestTree(t, r)
@@ -411,11 +411,11 @@ func locationOf(entry *upspin.DirEntry) upspin.Location {
 }
 
 func cleanup(env *testenv.Env) error {
-	dir, err := bind.DirServer(env.Context, env.Context.DirEndpoint())
+	dir, err := bind.DirServer(env.Config, env.Config.DirEndpoint())
 	if err != nil {
 		return err
 	}
-	return deleteAll(dir, upspin.PathName(env.Context.UserName()+"/"))
+	return deleteAll(dir, upspin.PathName(env.Config.UserName()+"/"))
 }
 
 // deleteAll recursively deletes the directory named by path through the

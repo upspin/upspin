@@ -17,7 +17,7 @@ func setupStoreEnv(t *testing.T) (store *Store, ownerEnv *testenv.Env, wait, cle
 	ownerEnv, wait, cleanup = setupEnv(t)
 
 	var err error
-	store, err = WrapStore(ownerEnv.Context, readyNow, ownerEnv.StoreServer)
+	store, err = WrapStore(ownerEnv.Config, readyNow, ownerEnv.StoreServer)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -49,7 +49,7 @@ func TestStoreAllowsOnlyOwner(t *testing.T) {
 	defer cleanup()
 
 	r := testenv.NewRunner()
-	r.AddUser(ownerEnv.Context)
+	r.AddUser(ownerEnv.Config)
 
 	r.As(owner)
 	r.MakeDirectory(groupDir)
@@ -92,8 +92,8 @@ func TestStoreIncludeRemoteGroups(t *testing.T) {
 	}
 
 	r := testenv.NewRunner()
-	r.AddUser(ownerEnv.Context)
-	r.AddUser(writerEnv.Context)
+	r.AddUser(ownerEnv.Config)
+	r.AddUser(writerEnv.Config)
 
 	const (
 		randomDude = "random@dude.io"
@@ -169,8 +169,8 @@ func TestStoreLifeCycle(t *testing.T) {
 	}
 
 	r := testenv.NewRunner()
-	r.AddUser(ownerEnv.Context)
-	r.AddUser(writerEnv.Context)
+	r.AddUser(ownerEnv.Config)
+	r.AddUser(writerEnv.Config)
 
 	wait()
 
@@ -234,13 +234,13 @@ func TestStoreIntegration(t *testing.T) {
 	}
 
 	r := testenv.NewRunner()
-	r.AddUser(ownerEnv.Context)
-	r.AddUser(writerEnv.Context)
+	r.AddUser(ownerEnv.Config)
+	r.AddUser(writerEnv.Config)
 
 	wait()
 
 	// Dial the server for writer.
-	srv, err := ownerStore.Dial(writerEnv.Context, writerEnv.Context.StoreEndpoint())
+	srv, err := ownerStore.Dial(writerEnv.Config, writerEnv.Config.StoreEndpoint())
 	if err != nil {
 		t.Fatal(err)
 	}

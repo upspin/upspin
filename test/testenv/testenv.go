@@ -69,8 +69,8 @@ type Env struct {
 	// Client is the client tests should use for reaching the newly-created Tree.
 	Client upspin.Client
 
-	// Context is the context used when creating the client.
-	Context upspin.Config
+	// Config is the configuration used when creating the client.
+	Config upspin.Config
 
 	// Setup contains the original setup options.
 	Setup *Setup
@@ -115,11 +115,11 @@ func New(setup *Setup) (*Env, error) {
 	env := &Env{
 		Setup: setup,
 	}
-	ctx := config.New()
+	cfg := config.New()
 
 	// All tests use the same keyserver, so that users of different
 	// DirServers can still interact with each other.
-	ctx = config.SetKeyEndpoint(ctx, upspin.Endpoint{Transport: upspin.InProcess})
+	cfg = config.SetKeyEndpoint(cfg, upspin.Endpoint{Transport: upspin.InProcess})
 
 	switch k := setup.Kind; k {
 	case "inprocess", "server":
@@ -128,9 +128,9 @@ func New(setup *Setup) (*Env, error) {
 
 		// Set endpoints.
 		storeEndpoint := randomEndpoint("store")
-		ctx = config.SetStoreEndpoint(ctx, storeEndpoint)
+		cfg = config.SetStoreEndpoint(cfg, storeEndpoint)
 		dirEndpoint := randomEndpoint("dir")
-		ctx = config.SetDirEndpoint(ctx, dirEndpoint)
+		cfg = config.SetDirEndpoint(cfg, dirEndpoint)
 
 		// Set up a StoreServer instance. Just use the inprocess
 		// version for offline tests; the store/gcp implementation
@@ -141,15 +141,15 @@ func New(setup *Setup) (*Env, error) {
 		// Set up DirServer instance.
 		switch k {
 		case "inprocess":
-			env.DirServer = dirserver_inprocess.New(ctx)
+			env.DirServer = dirserver_inprocess.New(cfg)
 		case "server":
 			// Set up user and factotum.
-			ctx = config.SetUserName(ctx, TestServerName)
+			cfg = config.SetUserName(cfg, TestServerName)
 			f, err := factotum.NewFromDir(repo("key/testdata/" + TestServerName[:strings.Index(TestServerName, "@")]))
 			if err != nil {
 				return nil, errors.E(op, err)
 			}
-			ctx = config.SetFactotum(ctx, f)
+			cfg = config.SetFactotum(cfg, f)
 
 			// Create temporary directory for DirServer storage.
 			logDir, err := ioutil.TempDir("", "testenv-dirserver")
@@ -157,7 +157,7 @@ func New(setup *Setup) (*Env, error) {
 				return nil, errors.E(op, err)
 			}
 			env.tmpDir = logDir
-			env.DirServer, err = dirserver_server.New(ctx, "logDir="+logDir)
+			env.DirServer, err = dirserver_server.New(cfg, "logDir="+logDir)
 			if err != nil {
 				env.rmTmpDir()
 				return nil, errors.E(op, err)
@@ -166,11 +166,11 @@ func New(setup *Setup) (*Env, error) {
 		dirServerMux.Register(dirEndpoint, env.DirServer)
 
 	case "remote":
-		ctx = config.SetStoreEndpoint(ctx, upspin.Endpoint{
+		cfg = config.SetStoreEndpoint(cfg, upspin.Endpoint{
 			Transport: upspin.Remote,
 			NetAddr:   TestStoreServer,
 		})
-		ctx = config.SetDirEndpoint(ctx, upspin.Endpoint{
+		cfg = config.SetDirEndpoint(cfg, upspin.Endpoint{
 			Transport: upspin.Remote,
 			NetAddr:   TestDirServer,
 		})
@@ -179,23 +179,23 @@ func New(setup *Setup) (*Env, error) {
 		return nil, errors.E(op, errors.Errorf("bad kind %q", k))
 	}
 
-	// Set the context to use the endpoints we created above.
-	env.Context = ctx
+	// Set the config to use the endpoints we created above.
+	env.Config = cfg
 
-	// Create a testuser, and set the context to the one for the user.
-	ctx, err := env.NewUser(setup.OwnerName)
+	// Create a testuser, and set the config to the one for the user.
+	cfg, err := env.NewUser(setup.OwnerName)
 	if err != nil {
 		env.rmTmpDir()
 		return nil, errors.E(op, err)
 	}
-	env.Context = ctx
+	env.Config = cfg
 
-	if err := makeRootIfNotExist(ctx); err != nil {
+	if err := makeRootIfNotExist(cfg); err != nil {
 		env.rmTmpDir()
 		return nil, errors.E(op, err)
 	}
 
-	env.Client = client.New(ctx)
+	env.Client = client.New(cfg)
 	return env, nil
 }
 
@@ -252,8 +252,8 @@ func (e *Env) rmTmpDir() error {
 // necessary.
 func (e *Env) NewUser(userName upspin.UserName) (upspin.Config, error) {
 	const op = "testenv.NewUser"
-	ctx := config.SetUserName(e.Context, userName)
-	ctx = config.SetPacking(ctx, e.Setup.Packing)
+	cfg := config.SetUserName(e.Config, userName)
+	cfg = config.SetPacking(cfg, e.Setup.Packing)
 
 	// Set up a factotum for the user.
 	user, _, _, err := user.Parse(userName)
@@ -264,29 +264,29 @@ func (e *Env) NewUser(userName upspin.UserName) (upspin.Config, error) {
 	if err != nil {
 		return nil, errors.E(op, userName, err)
 	}
-	ctx = config.SetFactotum(ctx, f)
+	cfg = config.SetFactotum(cfg, f)
 
 	// Register the user with the key server.
-	err = registerUserWithKeyServer(ctx, ctx.UserName())
+	err = registerUserWithKeyServer(cfg, cfg.UserName())
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
 
-	return ctx, nil
+	return cfg, nil
 }
 
-// registerUserWithKeyServer registers userName's context with the inProcess keyServer.
-func registerUserWithKeyServer(ctx upspin.Config, userName upspin.UserName) error {
-	key, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
+// registerUserWithKeyServer registers userName's config with the inProcess keyServer.
+func registerUserWithKeyServer(cfg upspin.Config, userName upspin.UserName) error {
+	key, err := bind.KeyServer(cfg, cfg.KeyEndpoint())
 	if err != nil {
 		return err
 	}
 	// Install the registered user.
 	user := &upspin.User{
 		Name:      userName,
-		Dirs:      []upspin.Endpoint{ctx.DirEndpoint()},
-		Stores:    []upspin.Endpoint{ctx.StoreEndpoint()},
-		PublicKey: ctx.Factotum().PublicKey(),
+		Dirs:      []upspin.Endpoint{cfg.DirEndpoint()},
+		Stores:    []upspin.Endpoint{cfg.StoreEndpoint()},
+		PublicKey: cfg.Factotum().PublicKey(),
 	}
 	if err := key.Put(user); err != nil {
 		return err
@@ -294,9 +294,9 @@ func registerUserWithKeyServer(ctx upspin.Config, userName upspin.UserName) erro
 	return nil
 }
 
-func makeRootIfNotExist(ctx upspin.Config) error {
-	path := upspin.PathName(ctx.UserName()) + "/"
-	dir, err := bind.DirServer(ctx, ctx.DirEndpoint())
+func makeRootIfNotExist(cfg upspin.Config) error {
+	path := upspin.PathName(cfg.UserName()) + "/"
+	dir, err := bind.DirServer(cfg, cfg.DirEndpoint())
 	if err != nil {
 		return err
 	}
