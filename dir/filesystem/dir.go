@@ -31,16 +31,16 @@ type server struct {
 }
 
 // New creates a new DirServer instance with the
-// provided server context and configuration options.
+// provided server configuration and options.
 // The only valid configuration option is "root", which
 // specifies a path to the file system root.
-func New(ctx upspin.Config, options ...string) (upspin.DirServer, error) {
+func New(cfg upspin.Config, options ...string) (upspin.DirServer, error) {
 	const op = "dir/filesystem.New"
 
-	s := &server{server: ctx}
+	s := &server{server: cfg}
 
 	var err error
-	s.root, s.defaultAccess, err = newRoot(ctx, options)
+	s.root, s.defaultAccess, err = newRoot(cfg, options)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
@@ -229,11 +229,11 @@ func (s *server) Ping() bool {
 func (s *server) Close() {
 }
 
-func (s *server) Dial(ctx upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
+func (s *server) Dial(cfg upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
 	const op = "dir/filesystem.Dial"
 
 	dialed := *s
-	dialed.user = ctx
+	dialed.user = cfg
 	return &dialed, nil
 }
 

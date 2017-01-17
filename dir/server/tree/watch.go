@@ -109,7 +109,7 @@ func (t *Tree) Watch(p path.Parsed, order int64, done <-chan struct{}) (<-chan *
 		offset := t.log.LastOffset()
 		clone := &Tree{
 			user:     t.user,
-			context:  t.context,
+			config:   t.config,
 			packer:   t.packer,
 			log:      cLog,
 			logIndex: cIndex,

@@ -39,21 +39,21 @@ const (
 // from creating a new tree from scratch, adding new nodes, flushing it to Store then
 // adding more nodes to a new tree and having to load it from the Store.
 func TestPutNodes(t *testing.T) {
-	context, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(context, log, logIndex)
+	config, log, logIndex := newConfigForTesting(t, userName)
+	tree, err := New(config, log, logIndex)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	root, err := tree.Put(newDirEntry("/", isDir, context))
+	root, err := tree.Put(newDirEntry("/", isDir, config))
 	if err != nil {
 		t.Fatal(err)
 	}
-	dir2, err := tree.Put(newDirEntry("/dir", isDir, context))
+	dir2, err := tree.Put(newDirEntry("/dir", isDir, config))
 	if err != nil {
 		t.Fatal(err)
 	}
-	dir3, err := tree.Put(newDirEntry("/dir/doc.pdf", !isDir, context))
+	dir3, err := tree.Put(newDirEntry("/dir/doc.pdf", !isDir, config))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -151,13 +151,13 @@ func TestPutNodes(t *testing.T) {
 	}
 
 	// Now start a new tree from scratch and confirm it is loaded from the Store.
-	tree2, err := New(context, log, logIndex)
+	tree2, err := New(config, log, logIndex)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	t.Logf("== Tree:\n%s", tree2.String())
-	dir4, err := tree2.Put(newDirEntry("/dir/img.jpg", !isDir, context))
+	dir4, err := tree2.Put(newDirEntry("/dir/img.jpg", !isDir, config))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -208,18 +208,18 @@ func TestPutNodes(t *testing.T) {
 }
 
 func TestAddKidToEmptyNonDirtyDir(t *testing.T) {
-	context, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(context, log, logIndex)
+	config, log, logIndex := newConfigForTesting(t, userName)
+	tree, err := New(config, log, logIndex)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	p, de := newDirEntry("/", isDir, context)
+	p, de := newDirEntry("/", isDir, config)
 	_, err = tree.Put(p, de)
 	if err != nil {
 		t.Fatal(err)
 	}
-	p, de = newDirEntry("/dir", isDir, context)
+	p, de = newDirEntry("/dir", isDir, config)
 	_, err = tree.Put(p, de)
 	if err != nil {
 		t.Fatal(err)
@@ -234,7 +234,7 @@ func TestAddKidToEmptyNonDirtyDir(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	p, de = newDirEntry("/dir/subdir", isDir, context)
+	p, de = newDirEntry("/dir/subdir", isDir, config)
 	_, err = tree.Put(p, de)
 	if err != nil {
 		t.Fatal(err)
@@ -244,13 +244,13 @@ func TestAddKidToEmptyNonDirtyDir(t *testing.T) {
 // Test that an empty root can be saved and retrieved.
 // Roots are handled differently than other directory entries.
 func TestPutEmptyRoot(t *testing.T) {
-	context, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(context, log, logIndex)
+	config, log, logIndex := newConfigForTesting(t, userName)
+	tree, err := New(config, log, logIndex)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	p, dir1 := newDirEntry("/", isDir, context)
+	p, dir1 := newDirEntry("/", isDir, config)
 	_, err = tree.Put(p, dir1)
 	if err != nil {
 		t.Fatal(err)
@@ -262,19 +262,19 @@ func TestPutEmptyRoot(t *testing.T) {
 	}
 
 	// Now start a new tree from scratch and confirm it is loaded from the Store.
-	tree2, err := New(context, log, logIndex)
+	tree2, err := New(config, log, logIndex)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	p, dir2 := newDirEntry("/dir", isDir, context)
+	p, dir2 := newDirEntry("/dir", isDir, config)
 	_, err = tree2.Put(p, dir2)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Try to put a file under an non-existent dir
-	p, dir3 := newDirEntry("/invaliddir/myfile", !isDir, context)
+	p, dir3 := newDirEntry("/invaliddir/myfile", !isDir, config)
 	_, err = tree2.Put(p, dir3)
 	if err == nil {
 		t.Fatal("Expected error, got none")
@@ -308,14 +308,14 @@ func TestPutEmptyRoot(t *testing.T) {
 	}
 
 	// Can't Put to tree2 anymore.
-	_, err = tree2.Put(newDirEntry("/newdir", isDir, context))
+	_, err = tree2.Put(newDirEntry("/newdir", isDir, config))
 	expectedErr = errors.E(errors.NotExist)
 	if !errors.Match(expectedErr, err) {
 		t.Fatalf("err = %v, want = %v", err, expectedErr)
 	}
 
 	// But we can create the root again.
-	_, err = tree2.Put(newDirEntry("/", isDir, context))
+	_, err = tree2.Put(newDirEntry("/", isDir, config))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -325,8 +325,8 @@ func TestPutEmptyRoot(t *testing.T) {
 // entries that were not flushed to the Store. It tests that the new tree
 // recovers from the log and is fully functional.
 func TestRebuildFromLog(t *testing.T) {
-	context, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(context, log, logIndex)
+	config, log, logIndex := newConfigForTesting(t, userName)
+	tree, err := New(config, log, logIndex)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -341,7 +341,7 @@ func TestRebuildFromLog(t *testing.T) {
 		{"/dir0/file_in_dir.txt", !isDir},
 	}
 	for _, test := range tests {
-		p, de := newDirEntry(test.name, test.isDir, context)
+		p, de := newDirEntry(test.name, test.isDir, config)
 		_, err := tree.Put(p, de)
 		if err != nil {
 			t.Fatalf("Creating %q, isDir %v: %s", test.name, test.isDir, err)
@@ -353,7 +353,7 @@ func TestRebuildFromLog(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Simulate a crash and restart, without ever having flushed the tree.
-	tree, err = New(context, log, logIndex)
+	tree, err = New(config, log, logIndex)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -391,7 +391,7 @@ func TestRebuildFromLog(t *testing.T) {
 		{"/dir1/file_in_dir.txt", !isDir},
 	}
 	for _, test := range tests {
-		p, de := newDirEntry(test.name, test.isDir, context)
+		p, de := newDirEntry(test.name, test.isDir, config)
 		_, err := tree.Put(p, de)
 		if err != nil {
 			t.Fatalf("Creating %q, isDir %v: %s", test.name, test.isDir, err)
@@ -410,7 +410,7 @@ func TestRebuildFromLog(t *testing.T) {
 	// Now we crash and restart.
 	// /file2.txt and /dir1/file_in_dir must exist after recovery and /file1
 	// must not.
-	tree, err = New(context, log, logIndex)
+	tree, err = New(config, log, logIndex)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -443,7 +443,7 @@ func TestRebuildFromLog(t *testing.T) {
 	}
 
 	// Furthermore, we can create entries in an existing directory.
-	p, de := newDirEntry("/dir0/will_not_fail", !isDir, context)
+	p, de := newDirEntry("/dir0/will_not_fail", !isDir, config)
 	_, err = tree.Put(p, de)
 	if err != nil {
 		t.Fatal(err)
@@ -451,24 +451,24 @@ func TestRebuildFromLog(t *testing.T) {
 }
 
 func TestPutLargeNode(t *testing.T) {
-	context, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(context, log, logIndex)
+	config, log, logIndex := newConfigForTesting(t, userName)
+	tree, err := New(config, log, logIndex)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	p, dir1 := newDirEntry("/", isDir, context)
+	p, dir1 := newDirEntry("/", isDir, config)
 	_, err = tree.Put(p, dir1)
 	if err != nil {
 		t.Fatal(err)
 	}
-	p, dir2 := newDirEntry("/largefile", !isDir, context)
+	p, dir2 := newDirEntry("/largefile", !isDir, config)
 	dir2.Packdata = make([]byte, blockSize+1) // force a block split on the next file.
 	_, err = tree.Put(p, dir2)
 	if err != nil {
 		t.Fatal(err)
 	}
-	p, dir3 := newDirEntry("/smallfile", !isDir, context)
+	p, dir3 := newDirEntry("/smallfile", !isDir, config)
 	_, err = tree.Put(p, dir3)
 	if err != nil {
 		t.Fatal(err)
@@ -487,13 +487,13 @@ func TestPutLargeNode(t *testing.T) {
 }
 
 func TestLinks(t *testing.T) {
-	context, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(context, log, logIndex)
+	config, log, logIndex := newConfigForTesting(t, userName)
+	tree, err := New(config, log, logIndex)
 	if err != nil {
 		t.Fatal(err)
 	}
 	// Make root.
-	p, deRoot := newDirEntry("/", isDir, context)
+	p, deRoot := newDirEntry("/", isDir, config)
 	_, err = tree.Put(p, deRoot)
 	if err != nil {
 		t.Fatal(err)
@@ -502,7 +502,7 @@ func TestLinks(t *testing.T) {
 	// down, for a comprehensive check.
 	for _, dir := range []upspin.PathName{"", "/mysubdir", "/mysubdir/deeper"} {
 		if dir != "" {
-			p, deSub := newDirEntry(dir, isDir, context)
+			p, deSub := newDirEntry(dir, isDir, config)
 			_, err = tree.Put(p, deSub)
 			if err != nil {
 				t.Fatal(err)
@@ -510,7 +510,7 @@ func TestLinks(t *testing.T) {
 		}
 
 		// Put a link.
-		p, deLink := newDirEntry(dir+"/link", !isDir, context)
+		p, deLink := newDirEntry(dir+"/link", !isDir, config)
 		deLink.Attr = upspin.AttrLink
 		deLink.Link = "linkerdude@link.lnk/the_target"
 		_, err = tree.Put(p, deLink)
@@ -519,7 +519,7 @@ func TestLinks(t *testing.T) {
 		}
 
 		// Try to put a file inside the link.
-		p, deFile := newDirEntry(dir+"/link/file.txt", !isDir, context)
+		p, deFile := newDirEntry(dir+"/link/file.txt", !isDir, config)
 		got, err := tree.Put(p, deFile)
 		if err != upspin.ErrFollowLink {
 			t.Fatalf("err = %v, want = ErrFollowLink (%v)", err, upspin.ErrFollowLink)
@@ -547,7 +547,7 @@ func TestLinks(t *testing.T) {
 		}
 
 		// Start a new tree to ensure links are recovered from the log.
-		tree, err = New(context, log, logIndex)
+		tree, err = New(config, log, logIndex)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -583,14 +583,14 @@ func TestLinks(t *testing.T) {
 }
 
 func TestList(t *testing.T) {
-	context, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(context, log, logIndex)
+	config, log, logIndex := newConfigForTesting(t, userName)
+	tree, err := New(config, log, logIndex)
 	if err != nil {
 		t.Fatal(err)
 	}
 	// Build a simple tree.
 	for _, dir := range []upspin.PathName{"/", "/dir1", "/dir2", "/dir3", "/dir3/sub1"} {
-		p, de := newDirEntry(dir, isDir, context)
+		p, de := newDirEntry(dir, isDir, config)
 		_, err = tree.Put(p, de)
 		if err != nil {
 			t.Fatal(err)
@@ -659,13 +659,13 @@ func TestList(t *testing.T) {
 }
 
 func TestPutDirSameTreeNonRoot(t *testing.T) {
-	context, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(context, log, logIndex)
+	config, log, logIndex := newConfigForTesting(t, userName)
+	tree, err := New(config, log, logIndex)
 	if err != nil {
 		t.Fatal(err)
 	}
 	// Build a simple tree.
-	buildTree(t, tree, context)
+	buildTree(t, tree, config)
 
 	t.Logf("Tree1:\n%s", tree)
 
@@ -734,7 +734,7 @@ func TestPutDirSameTreeNonRoot(t *testing.T) {
 
 	// Create a new entry in the original place, to ensure it's not
 	// reflected in the snapshot now.
-	_, err = tree.Put(newDirEntry("/orig/file.txt", !isDir, context))
+	_, err = tree.Put(newDirEntry("/orig/file.txt", !isDir, config))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -756,7 +756,7 @@ func TestPutDirSameTreeNonRoot(t *testing.T) {
 	}
 
 	// Create a new tree (simulate a crash).
-	tree, err = New(context, log, logIndex)
+	tree, err = New(config, log, logIndex)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -773,13 +773,13 @@ func TestPutDirSameTreeNonRoot(t *testing.T) {
 }
 
 func TestPutDirSameTreeRoot(t *testing.T) {
-	context, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(context, log, logIndex)
+	config, log, logIndex := newConfigForTesting(t, userName)
+	tree, err := New(config, log, logIndex)
 	if err != nil {
 		t.Fatal(err)
 	}
 	// Build a simple tree.
-	buildTree(t, tree, context)
+	buildTree(t, tree, config)
 
 	t.Logf("Tree1:\n%s", tree)
 
@@ -812,20 +812,20 @@ func TestPutDirSameTreeRoot(t *testing.T) {
 }
 
 func TestPutDirOtherTreeRoot(t *testing.T) {
-	context, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(context, log, logIndex)
+	config, log, logIndex := newConfigForTesting(t, userName)
+	tree, err := New(config, log, logIndex)
 	if err != nil {
 		t.Fatal(err)
 	}
 	// Build a simple tree.
-	buildTree(t, tree, context)
+	buildTree(t, tree, config)
 
 	t.Logf("Tree1:\n%s", tree)
 
 	// Create another tree for another user.
 	const otherUser = "other@another.biz"
-	context2, log2, logIndex2 := newConfigForTesting(t, otherUser)
-	tree2, err := New(context2, log2, logIndex2)
+	config2, log2, logIndex2 := newConfigForTesting(t, otherUser)
+	tree2, err := New(config2, log2, logIndex2)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -838,7 +838,7 @@ func TestPutDirOtherTreeRoot(t *testing.T) {
 		Name:       p.Path(),
 		SignedName: p.Path(),
 		Attr:       upspin.AttrDirectory,
-		Packing:    context2.Packing(),
+		Packing:    config2.Packing(),
 		Writer:     serverName,
 	}
 	_, err = tree2.Put(p, entry)
@@ -886,7 +886,7 @@ func TestPutDirOtherTreeRoot(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Creating a new tree2 (crash and restart) yields the same thing.
-	tree3, err := New(context2, log2, logIndex2)
+	tree3, err := New(config2, log2, logIndex2)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -901,8 +901,8 @@ func TestPutDirOtherTreeRoot(t *testing.T) {
 }
 
 func TestFlushNewTree(t *testing.T) {
-	context, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(context, log, logIndex)
+	config, log, logIndex := newConfigForTesting(t, userName)
+	tree, err := New(config, log, logIndex)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -914,8 +914,8 @@ func TestFlushNewTree(t *testing.T) {
 }
 
 func TestCorruptTreeAndRecover(t *testing.T) {
-	context, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(context, log, logIndex)
+	config, log, logIndex := newConfigForTesting(t, userName)
+	tree, err := New(config, log, logIndex)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -928,7 +928,7 @@ func TestCorruptTreeAndRecover(t *testing.T) {
 		{"/dir1"},
 		{"/dir2"},
 	} {
-		_, err = tree.Put(newDirEntry(e.name, isDir, context))
+		_, err = tree.Put(newDirEntry(e.name, isDir, config))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -942,13 +942,13 @@ func TestCorruptTreeAndRecover(t *testing.T) {
 	}
 
 	// Put a new directory.
-	_, err = tree.Put(newDirEntry("/dir3", isDir, context))
+	_, err = tree.Put(newDirEntry("/dir3", isDir, config))
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Crash and recover the tree.
-	tree2, err := New(context, log, logIndex)
+	tree2, err := New(config, log, logIndex)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -967,7 +967,7 @@ func TestCorruptTreeAndRecover(t *testing.T) {
 	}
 
 	// Now we can put dir3 normally.
-	_, err = tree2.Put(newDirEntry("/dir3", isDir, context))
+	_, err = tree2.Put(newDirEntry("/dir3", isDir, config))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1001,8 +1001,8 @@ func TestMain(m *testing.M) {
 // TODO: Run all tests in loop using Plain and Debug packs as well.
 // TODO: test more error cases.
 
-func mkdir(t *testing.T, tree *Tree, ctx upspin.Config, name upspin.PathName) (path.Parsed, *upspin.DirEntry) {
-	p, entry := newDirEntry(name, isDir, ctx)
+func mkdir(t *testing.T, tree *Tree, cfg upspin.Config, name upspin.PathName) (path.Parsed, *upspin.DirEntry) {
+	p, entry := newDirEntry(name, isDir, cfg)
 	entry, err := tree.Put(p, entry)
 	if err != nil {
 		t.Fatal(err)
@@ -1082,21 +1082,21 @@ func newConfigForTesting(t *testing.T, userName upspin.UserName) (upspin.Config,
 		Transport: upspin.InProcess,
 		NetAddr:   "",
 	}
-	ctx := config.New()
-	ctx = config.SetUserName(ctx, serverName)
-	ctx = config.SetFactotum(ctx, factotum)
-	ctx = config.SetStoreEndpoint(ctx, endpointInProcess)
-	ctx = config.SetKeyEndpoint(ctx, endpointInProcess)
-	ctx = config.SetPacking(ctx, upspin.EEPack)
-	key, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
+	cfg := config.New()
+	cfg = config.SetUserName(cfg, serverName)
+	cfg = config.SetFactotum(cfg, factotum)
+	cfg = config.SetStoreEndpoint(cfg, endpointInProcess)
+	cfg = config.SetKeyEndpoint(cfg, endpointInProcess)
+	cfg = config.SetPacking(cfg, upspin.EEPack)
+	key, err := bind.KeyServer(cfg, cfg.KeyEndpoint())
 	if err != nil {
 		t.Fatal(err)
 	}
 	// Set the public key for the tree, since it must do Auth against the Store.
 	user := &upspin.User{
 		Name:      serverName,
-		Dirs:      []upspin.Endpoint{ctx.DirEndpoint()},
-		Stores:    []upspin.Endpoint{ctx.StoreEndpoint()},
+		Dirs:      []upspin.Endpoint{cfg.DirEndpoint()},
+		Stores:    []upspin.Endpoint{cfg.StoreEndpoint()},
 		PublicKey: factotum.PublicKey(),
 	}
 	err = key.Put(user)
@@ -1107,8 +1107,8 @@ func newConfigForTesting(t *testing.T, userName upspin.UserName) (upspin.Config,
 	// Set the public key for the user, since EE Pack requires the dir owner to have a wrapped key.
 	user = &upspin.User{
 		Name:      userName,
-		Dirs:      []upspin.Endpoint{ctx.DirEndpoint()},
-		Stores:    []upspin.Endpoint{ctx.StoreEndpoint()},
+		Dirs:      []upspin.Endpoint{cfg.DirEndpoint()},
+		Stores:    []upspin.Endpoint{cfg.StoreEndpoint()},
 		PublicKey: factotum.PublicKey(),
 	}
 	err = key.Put(user)
@@ -1129,7 +1129,7 @@ func newConfigForTesting(t *testing.T, userName upspin.UserName) (upspin.Config,
 	if err != nil {
 		t.Fatal(err)
 	}
-	return ctx, log, logIndex
+	return cfg, log, logIndex
 }
 
 // repo returns the local pathname of a file in the upspin repository.
@@ -1149,7 +1149,7 @@ func entrySize(t *testing.T, entry *upspin.DirEntry) int {
 	return len(buf)
 }
 
-func buildTree(t *testing.T, tree *Tree, context upspin.Config) {
+func buildTree(t *testing.T, tree *Tree, config upspin.Config) {
 	// Create some directories and files.
 	for _, e := range []struct {
 		name upspin.PathName
@@ -1164,7 +1164,7 @@ func buildTree(t *testing.T, tree *Tree, context upspin.Config) {
 		{"/other", isDir},
 		{"/orig/sub1/file1.txt", !isDir},
 	} {
-		p, de := newDirEntry(e.name, e.dir, context)
+		p, de := newDirEntry(e.name, e.dir, config)
 		_, err := tree.Put(p, de)
 		if err != nil {
 			t.Fatal(err)
