@@ -33,7 +33,7 @@ import (
 const serverName = "storeserver"
 
 func main() {
-	flags.Parse("addr", "config", "context", "https", "kind", "letscache", "log", "project", "tls")
+	flags.Parse("addr", "config", "https", "kind", "letscache", "log", "project", "serverconfig", "tls")
 
 	if flags.Project != "" {
 		log.Connect(flags.Project, serverName)
@@ -45,8 +45,8 @@ func main() {
 		}
 	}
 
-	// Load context and keys for this server. It needs a real upspin username and keys.
-	ctx, err := config.FromFile(flags.Context)
+	// Load configuration and keys for this server. It needs a real upspin username and keys.
+	ctx, err := config.FromFile(flags.Config)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -58,9 +58,9 @@ func main() {
 	case "inprocess":
 		store = inprocess.New()
 	case "gcp":
-		store, err = gcp.New(flags.Config...)
+		store, err = gcp.New(flags.ServerConfig...)
 	case "filesystem":
-		store, err = filesystem.New(ctx, flags.Config...)
+		store, err = filesystem.New(ctx, flags.ServerConfig...)
 	default:
 		err = errors.Errorf("bad -kind %q", flags.ServerKind)
 	}
