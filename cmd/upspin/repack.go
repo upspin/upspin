@@ -48,7 +48,7 @@ func (s *State) repackCommand(fs *flag.FlagSet) {
 	}
 
 	prevClient := s.client
-	s.client = client.New(config.SetPacking(s.context, packer.Packing()))
+	s.client = client.New(config.SetPacking(s.config, packer.Packing()))
 	defer func() { s.client = prevClient }()
 
 	for _, entry := range s.globAllUpspin(fs.Args()) {

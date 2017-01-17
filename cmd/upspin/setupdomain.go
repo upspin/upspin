@@ -162,8 +162,8 @@ set access controls.
 	}
 
 	// Generate signature.
-	msg := "upspin-domain:" + domain + "-" + string(s.context.UserName())
-	sig, err := s.context.Factotum().Sign([]byte(msg))
+	msg := "upspin-domain:" + domain + "-" + string(s.config.UserName())
+	sig, err := s.config.Factotum().Sign([]byte(msg))
 	if err != nil {
 		s.exit(err)
 	}
@@ -173,7 +173,7 @@ set access controls.
 		Where:     *where,
 		Domain:    domain,
 		Project:   flags.Project,
-		UserName:  s.context.UserName(),
+		UserName:  s.config.UserName(),
 		Signature: fmt.Sprintf("%x-%x", sig.R, sig.S),
 	})
 	if err != nil {
@@ -213,11 +213,11 @@ To register the users listed above, run this command:
 // writeUserFile reads the specified rc file and writes a YAML-encoded
 // upspin.User to userFile. It also returns the username.
 func writeUserFile(rcFile string) (userFile string, u upspin.UserName, err error) {
-	ctx, err := config.FromFile(rcFile)
+	cfg, err := config.FromFile(rcFile)
 	if err != nil {
 		return "", "", err
 	}
-	b, err := yaml.Marshal(config.User(ctx))
+	b, err := yaml.Marshal(config.User(cfg))
 	if err != nil {
 		return "", "", err
 	}
@@ -233,5 +233,5 @@ func writeUserFile(rcFile string) (userFile string, u upspin.UserName, err error
 		os.Remove(f.Name())
 		return "", "", err
 	}
-	return f.Name(), ctx.UserName(), nil
+	return f.Name(), cfg.UserName(), nil
 }
