@@ -37,6 +37,23 @@
     },
     {
       "key": {
+        "uuid": "63db1d69_4e9ff340",
+        "filename": "transport/dircacheserver/proxied.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-17T23:58:48Z",
+      "side": 1,
+      "message": "I trusted you to include the sleep ;)",
+      "revId": "ce1c094ea1a8d09bbeb84adf755960e634118408",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "63db1d69_8e8cbb1c",
         "filename": "transport/dircacheserver/proxied.go",
         "patchSetId": 4
@@ -66,6 +83,23 @@
       "side": 1,
       "message": "Because, as the watch() comment says below, it returns an error if there is an error and a nil if the watcher has been told to die.",
       "parentUuid": "63db1d69_8e8cbb1c",
+      "revId": "ce1c094ea1a8d09bbeb84adf755960e634118408",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "63db1d69_2e9ca749",
+        "filename": "transport/dircacheserver/proxied.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-17T23:58:48Z",
+      "side": 1,
+      "message": "ah ok, missed it",
       "revId": "ce1c094ea1a8d09bbeb84adf755960e634118408",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
