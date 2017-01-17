@@ -38,7 +38,7 @@ type server struct {
 }
 
 func newServer() *server {
-	ctx, err := config.InitContext(nil)
+	ctx, err := config.InitConfig(nil)
 	if err != nil {
 		log.Fatal(err)
 	}

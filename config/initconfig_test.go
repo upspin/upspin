@@ -51,7 +51,7 @@ func init() {
 	secretsDir = filepath.Join(cwd, "../key/testdata/user1")
 }
 
-func TestInitContext(t *testing.T) {
+func TestInitConfig(t *testing.T) {
 	expect := expectations{
 		username:    "p@google.com",
 		keyserver:   upspin.Endpoint{Transport: upspin.InProcess, NetAddr: ""},
@@ -80,7 +80,7 @@ packing: ee
 keyserver: inprocess
 dirserver: inprocess
 storeserver: inprocess`
-	_, err := InitContext(strings.NewReader(config))
+	_, err := InitConfig(strings.NewReader(config))
 	if err == nil {
 		t.Fatalf("expected error, got none")
 	}
@@ -130,7 +130,7 @@ func TestBadEnv(t *testing.T) {
 	}
 	config := makeConfig(&expect)
 	os.Setenv("upspinuser", string(expect.username)) // Should be upspinusername.
-	_, err := InitContext(strings.NewReader(config))
+	_, err := InitConfig(strings.NewReader(config))
 	os.Unsetenv("upspinuser")
 	if err == nil {
 		t.Fatalf("expected error, got none")
@@ -147,12 +147,12 @@ func TestNoSecrets(t *testing.T) {
 		secrets:  "none",
 	}
 	r := strings.NewReader(makeConfig(&expect))
-	ctx, err := InitContext(r)
+	cfg, err := InitConfig(r)
 	if err != ErrNoFactotum {
-		t.Errorf("InitContext returned error %v, want %v", err, ErrNoFactotum)
+		t.Errorf("InitConfig returned error %v, want %v", err, ErrNoFactotum)
 	}
-	if ctx != nil && ctx.Factotum() != nil {
-		t.Errorf("InitContext returned a non-nil Factotum")
+	if cfg != nil && cfg.Factotum() != nil {
+		t.Errorf("InitConfig returned a non-nil Factotum")
 	}
 }
 
@@ -232,7 +232,7 @@ func TestMain(m *testing.M) {
 }
 
 func testConfig(t *testing.T, expect *expectations, configuration string) {
-	config, err := InitContext(strings.NewReader(configuration))
+	config, err := InitConfig(strings.NewReader(configuration))
 	if err != nil {
 		t.Fatalf("could not parse config %v: %v", configuration, err)
 	}
