@@ -18,7 +18,7 @@ func TestDirIntegration(t *testing.T) {
 	defer cleanup()
 
 	r := testenv.NewRunner()
-	r.AddUser(ownerEnv.Context)
+	r.AddUser(ownerEnv.Config)
 	r.As(owner)
 	r.MakeDirectory(groupDir)
 	r.Put(accessFile, "r,l:all") // Permission for anyone to read and list.
