@@ -21,7 +21,7 @@ import (
 )
 
 type server struct {
-	context upspin.Config
+	config upspin.Config
 
 	// What this server reports itself as through its Endpoint method.
 	endpoint upspin.Endpoint
@@ -30,16 +30,16 @@ type server struct {
 	key upspin.KeyServer
 }
 
-func New(ctx upspin.Config, key upspin.KeyServer, addr upspin.NetAddr) http.Handler {
+func New(cfg upspin.Config, key upspin.KeyServer, addr upspin.NetAddr) http.Handler {
 	s := &server{
-		context: ctx,
+		config: cfg,
 		endpoint: upspin.Endpoint{
 			Transport: upspin.Remote,
 			NetAddr:   addr,
 		},
 		key: key,
 	}
-	return auth.NewServer(ctx, &auth.ServerConfig{
+	return auth.NewServer(cfg, &auth.ServerConfig{
 		Lookup: func(userName upspin.UserName) (upspin.PublicKey, error) {
 			user, err := key.Lookup(userName)
 			if err != nil {
@@ -61,7 +61,7 @@ func (s *server) serverFor(session auth.Session, reqBytes []byte, req pb.Message
 	if err := pb.Unmarshal(reqBytes, req); err != nil {
 		return nil, err
 	}
-	svc, err := s.key.Dial(config.SetUserName(s.context, session.User()), s.key.Endpoint())
+	svc, err := s.key.Dial(config.SetUserName(s.config, session.User()), s.key.Endpoint())
 	if err != nil {
 		return nil, err
 	}

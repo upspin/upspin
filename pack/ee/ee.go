@@ -95,14 +95,14 @@ func (ee ee) Packing() upspin.Packing {
 	return upspin.EEPack
 }
 
-func (ee ee) PackLen(ctx upspin.Config, cleartext []byte, d *upspin.DirEntry) int {
+func (ee ee) PackLen(cfg upspin.Config, cleartext []byte, d *upspin.DirEntry) int {
 	if err := pack.CheckPacking(ee, d); err != nil {
 		return -1
 	}
 	return len(cleartext)
 }
 
-func (ee ee) UnpackLen(ctx upspin.Config, ciphertext []byte, d *upspin.DirEntry) int {
+func (ee ee) UnpackLen(cfg upspin.Config, ciphertext []byte, d *upspin.DirEntry) int {
 	if err := pack.CheckPacking(ee, d); err != nil {
 		return -1
 	}
@@ -113,7 +113,7 @@ func (ee ee) String() string {
 	return "ee"
 }
 
-func (ee ee) Pack(ctx upspin.Config, d *upspin.DirEntry) (upspin.BlockPacker, error) {
+func (ee ee) Pack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockPacker, error) {
 	const op = "pack/ee.Pack"
 	if err := pack.CheckPacking(ee, d); err != nil {
 		return nil, errors.E(op, errors.Invalid, d.Name, err)
@@ -131,7 +131,7 @@ func (ee ee) Pack(ctx upspin.Config, d *upspin.DirEntry) (upspin.BlockPacker, er
 	}
 
 	return &blockPacker{
-		ctx:    ctx,
+		cfg:    cfg,
 		entry:  d,
 		cipher: blockCipher,
 		dkey:   dkey,
@@ -160,7 +160,7 @@ func newKeyAndCipher() ([]byte, cipher.Block, error) {
 }
 
 type blockPacker struct {
-	ctx    upspin.Config
+	cfg    upspin.Config
 	entry  *upspin.DirEntry
 	cipher cipher.Block
 	dkey   []byte
@@ -219,13 +219,13 @@ func (bp *blockPacker) Close() error {
 	}
 
 	name := bp.entry.SignedName
-	ctx := bp.ctx
+	cfg := bp.cfg
 
 	// Wrap keys.
 	wrap := make([]wrappedKey, 2)
 
 	// First, wrap for myself.
-	p, _, err := factotum.ParsePublicKey(ctx.Factotum().PublicKey())
+	p, _, err := factotum.ParsePublicKey(cfg.Factotum().PublicKey())
 	if err != nil {
 		return errors.E(op, name, err)
 	}
@@ -240,10 +240,10 @@ func (bp *blockPacker) Close() error {
 		return errors.E(op, name, err)
 	}
 	owner := parsed.User()
-	if owner == ctx.UserName() {
+	if owner == cfg.UserName() {
 		wrap = wrap[:1]
 	} else {
-		keyServer, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
+		keyServer, err := bind.KeyServer(cfg, cfg.KeyEndpoint())
 		if err != nil {
 			return errors.E(op, name, err)
 		}
@@ -252,8 +252,8 @@ func (bp *blockPacker) Close() error {
 			return errors.E(op, name, owner, err)
 		}
 		ownerKey := u.PublicKey
-		if ownerKey == ctx.Factotum().PublicKey() {
-			log.Debug.Printf("pack/ee: %q and %q have the same keys", owner, ctx.UserName())
+		if ownerKey == cfg.Factotum().PublicKey() {
+			log.Debug.Printf("pack/ee: %q and %q have the same keys", owner, cfg.UserName())
 			wrap = wrap[:1]
 		} else {
 			p, _, err = factotum.ParsePublicKey(ownerKey)
@@ -271,7 +271,7 @@ func (bp *blockPacker) Close() error {
 	sum := internal.BlockSum(bp.entry.Blocks)
 
 	// Compute entry signature.
-	sig, err := ctx.Factotum().FileSign(path.Clean(name), bp.entry.Time, bp.dkey, sum)
+	sig, err := cfg.Factotum().FileSign(path.Clean(name), bp.entry.Time, bp.dkey, sum)
 	if err != nil {
 		return errors.E(op, err)
 	}
@@ -279,7 +279,7 @@ func (bp *blockPacker) Close() error {
 	return pdMarshal(&bp.entry.Packdata, sig, upspin.Signature{}, wrap, sum)
 }
 
-func (ee ee) Unpack(ctx upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker, error) {
+func (ee ee) Unpack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker, error) {
 	const op = "pack/ee.Unpack"
 	if err := pack.CheckPacking(ee, d); err != nil {
 		return nil, errors.E(op, errors.Invalid, d.Name, err)
@@ -305,7 +305,7 @@ func (ee ee) Unpack(ctx upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker
 	if len(writer) == 0 {
 		return nil, errors.E(op, d.Name, errWriter)
 	}
-	writerRawPubKey, err := publicKey(ctx, writer)
+	writerRawPubKey, err := publicKey(cfg, writer)
 	if err != nil {
 		return nil, errors.E(op, writer, err)
 	}
@@ -315,8 +315,8 @@ func (ee ee) Unpack(ctx upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker
 	}
 
 	// Fetch my own keys, as I am the recipient of the file.
-	me := ctx.UserName()
-	rawPublicKey, err := publicKey(ctx, me)
+	me := cfg.UserName()
+	rawPublicKey, err := publicKey(cfg, me)
 	if err != nil {
 		return nil, errors.E(op, d.Name, err)
 	}
@@ -330,7 +330,7 @@ func (ee ee) Unpack(ctx upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker
 			continue
 		}
 		// Decode my wrapped key using my private key.
-		dkey, err = aesUnwrap(ctx.Factotum(), w)
+		dkey, err = aesUnwrap(cfg.Factotum(), w)
 		if err != nil {
 			return nil, errors.E(op, d.Name, me, err)
 		}
@@ -351,7 +351,7 @@ func (ee ee) Unpack(ctx upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker
 		}
 		// We're OK to start decrypting blocks.
 		return &blockUnpacker{
-			ctx:          ctx,
+			cfg:          cfg,
 			entry:        d,
 			BlockTracker: internal.NewBlockTracker(d.Blocks),
 			cipher:       blockCipher,
@@ -361,7 +361,7 @@ func (ee ee) Unpack(ctx upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker
 }
 
 type blockUnpacker struct {
-	ctx                   upspin.Config
+	cfg                   upspin.Config
 	entry                 *upspin.DirEntry
 	internal.BlockTracker // provides NextBlock method and Block field
 	cipher                cipher.Block
@@ -407,7 +407,7 @@ func (ee ee) ReaderHashes(packdata []byte) (readers [][]byte, err error) {
 }
 
 // Share extracts the file decryption key from the packdata, wraps it for a revised list of readers, and updates packdata.
-func (ee ee) Share(ctx upspin.Config, readers []upspin.PublicKey, packdata []*[]byte) {
+func (ee ee) Share(cfg upspin.Config, readers []upspin.PublicKey, packdata []*[]byte) {
 
 	// A Packdata holds a cipherSum, a Signature, and a list of wrapped keys.
 	// Share updates the wrapped keys, leaving the other two fields unchanged.
@@ -445,12 +445,12 @@ func (ee ee) Share(ctx upspin.Config, readers []upspin.PublicKey, packdata []*[]
 			var h keyHashArray
 			copy(h[:], w.keyHash)
 			alreadyWrapped[h] = &wrap[i]
-			_, err := ctx.Factotum().PublicKeyFromHash(w.keyHash)
+			_, err := cfg.Factotum().PublicKeyFromHash(w.keyHash)
 			if err != nil {
 				// to unwrap dkey, we can only use our own private keys
 				continue
 			}
-			dkey, err = aesUnwrap(ctx.Factotum(), w)
+			dkey, err = aesUnwrap(cfg.Factotum(), w)
 			if err != nil {
 				log.Error.Printf("pack/ee: dkey unwrap failed: %v", err)
 				break
@@ -492,7 +492,7 @@ func (ee ee) Share(ctx upspin.Config, readers []upspin.PublicKey, packdata []*[]
 }
 
 // Name implements upspin.Name.
-func (ee ee) Name(ctx upspin.Config, d *upspin.DirEntry, newName upspin.PathName) error {
+func (ee ee) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName) error {
 	const op = "pack/ee.Name"
 	if d.IsDir() {
 		return errors.E(op, d.Name, errors.IsDir, "cannot rename directory")
@@ -514,7 +514,7 @@ func (ee ee) Name(ctx upspin.Config, d *upspin.DirEntry, newName upspin.PathName
 	}
 	owner := parsed.User()
 	// The owner has a well-known public key
-	ownerRawPubKey, err := publicKey(ctx, owner)
+	ownerRawPubKey, err := publicKey(cfg, owner)
 	if err != nil {
 		return errors.E(op, d.Name, err)
 	}
@@ -524,8 +524,8 @@ func (ee ee) Name(ctx upspin.Config, d *upspin.DirEntry, newName upspin.PathName
 	}
 
 	// Now get my own keys
-	me := ctx.UserName() // Recipient of the file is me (the user in the context)
-	rawPublicKey, err := publicKey(ctx, me)
+	me := cfg.UserName() // Recipient of the file is me (the user in the config)
+	rawPublicKey, err := publicKey(cfg, me)
 	if err != nil {
 		return errors.E(op, d.Name, err)
 	}
@@ -549,7 +549,7 @@ func (ee ee) Name(ctx upspin.Config, d *upspin.DirEntry, newName upspin.PathName
 	}
 
 	// Decode my wrapped key using my private key
-	dkey, err = aesUnwrap(ctx.Factotum(), w)
+	dkey, err = aesUnwrap(cfg.Factotum(), w)
 	if err != nil {
 		return errors.E(op, d.Name, errors.Str("unwrap failed"))
 	}
@@ -574,7 +574,7 @@ func (ee ee) Name(ctx upspin.Config, d *upspin.DirEntry, newName upspin.PathName
 
 	// Compute new signature, using the new name.
 	d.SignedName = newName
-	sig, err = ctx.Factotum().FileSign(newName, d.Time, dkey, cipherSum)
+	sig, err = cfg.Factotum().FileSign(newName, d.Time, dkey, cipherSum)
 	if err != nil {
 		return errors.E(op, d.Name, err)
 	}
@@ -842,7 +842,7 @@ func packdataLen(nwrap int) int {
 }
 
 // publicKey returns the string representation of a user's public key.
-func publicKey(ctx upspin.Config, user upspin.UserName) (upspin.PublicKey, error) {
+func publicKey(cfg upspin.Config, user upspin.UserName) (upspin.PublicKey, error) {
 
 	// Key pairs have three representations:
 	// 1. string, used for storage and between programs like User.Lookup
@@ -853,10 +853,10 @@ func publicKey(ctx upspin.Config, user upspin.UserName) (upspin.PublicKey, error
 	// Form 3, used only in keygen.go, is simply 128 bits of entropy.
 
 	// Are we requesting our own public key?
-	if string(user) == string(ctx.UserName()) {
-		return ctx.Factotum().PublicKey(), nil
+	if string(user) == string(cfg.UserName()) {
+		return cfg.Factotum().PublicKey(), nil
 	}
-	keyServer, err := bind.KeyServer(ctx, ctx.KeyEndpoint())
+	keyServer, err := bind.KeyServer(cfg, cfg.KeyEndpoint())
 	if err != nil {
 		return "", err
 	}

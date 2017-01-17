@@ -25,7 +25,7 @@ import (
 
 // server is a SecureServer that talks to a DirServer interface and serves requests.
 type server struct {
-	ctx  upspin.Config
+	cfg  upspin.Config
 	clog *clog
 
 	// userToDirServer is a mapping of users to directory server endpoints
@@ -33,19 +33,19 @@ type server struct {
 }
 
 // New creates a new DirServer cache reading in the log and writing out a new compacted log.
-func New(ctx upspin.Config, cacheDir string, maxLogBytes int64) (http.Handler, error) {
+func New(cfg upspin.Config, cacheDir string, maxLogBytes int64) (http.Handler, error) {
 	userToDirServer := newUserToDirServer()
-	clog, err := openLog(ctx, ospath.Join(cacheDir, "dircache"), maxLogBytes, userToDirServer)
+	clog, err := openLog(cfg, ospath.Join(cacheDir, "dircache"), maxLogBytes, userToDirServer)
 	if err != nil {
 		return nil, err
 	}
 	s := &server{
-		ctx:             ctx,
+		cfg:             cfg,
 		clog:            clog,
 		userToDirServer: userToDirServer,
 	}
 
-	return auth.NewServer(ctx, &auth.ServerConfig{
+	return auth.NewServer(cfg, &auth.ServerConfig{
 		Service: auth.Service{
 			Name: "Dir",
 			Methods: auth.Methods{
@@ -60,20 +60,20 @@ func New(ctx upspin.Config, cacheDir string, maxLogBytes int64) (http.Handler, e
 	}), nil
 }
 
-// dirFor returns a DirServer instance bound to the user specified in the context.
+// dirFor returns a DirServer instance bound to the user specified in the config.
 func (s *server) dirFor(session auth.Session, path upspin.PathName) (upspin.DirServer, error) {
 	ep := session.ProxiedEndpoint()
 	if ep.Transport == upspin.Unassigned {
 		return nil, errors.Str("not yet configured")
 	}
-	dir, err := bind.DirServer(s.ctx, ep)
+	dir, err := bind.DirServer(s.cfg, ep)
 	if err == nil {
 		s.userToDirServer.Set(path, &ep)
 	}
 	return dir, err
 }
 
-// endpointFor returns a DirServer endpoint for the context.
+// endpointFor returns a DirServer endpoint for the config.
 func (s *server) endpointFor(session auth.Session) (*upspin.Endpoint, error) {
 	ep := session.ProxiedEndpoint()
 	if ep.Transport == upspin.Unassigned {

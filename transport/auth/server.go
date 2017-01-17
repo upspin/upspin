@@ -82,30 +82,30 @@ type ServerConfig struct {
 
 // NewServer returns a new Server that uses the given config.
 // If a nil config is provided the defaults are used.
-func NewServer(ctx upspin.Config, cfg *ServerConfig) http.Handler {
+func NewServer(cfg upspin.Config, scfg *ServerConfig) http.Handler {
 	return &serverImpl{
-		context: ctx,
-		config:  cfg,
+		config:       cfg,
+		serverconfig: scfg,
 	}
 }
 
 type serverImpl struct {
-	context upspin.Config
-	config  *ServerConfig
+	config       upspin.Config
+	serverconfig *ServerConfig
 }
 
 func (s *serverImpl) lookup(u upspin.UserName) (upspin.PublicKey, error) {
-	if s.config == nil || s.config.Lookup == nil {
-		return PublicUserKeyService(s.context)(u)
+	if s.serverconfig == nil || s.serverconfig.Lookup == nil {
+		return PublicUserKeyService(s.config)(u)
 	}
-	return s.config.Lookup(u)
+	return s.serverconfig.Lookup(u)
 }
 
 func (s *serverImpl) service() *Service {
 	if s.config == nil {
 		return nil
 	}
-	return &s.config.Service
+	return &s.serverconfig.Service
 }
 
 func generateRandomToken() (string, error) {
@@ -263,7 +263,7 @@ func (s *serverImpl) handleSessionRequest(w http.ResponseWriter, authRequest []s
 			return nil, errors.E(errors.Invalid, errors.Errorf("invalid proxy endpoint: %v", err))
 		}
 		// Authenticate the server to the user.
-		authMsg, err := signUser(s.context, serverAuthMagic)
+		authMsg, err := signUser(s.config, serverAuthMagic)
 		if err != nil {
 			return nil, errors.E(errors.Permission, err)
 		}
@@ -311,18 +311,18 @@ func verifyUser(key upspin.PublicKey, msg []string, magic string, now time.Time)
 }
 
 // signUser creates a header authenticating the local user.
-func signUser(ctx upspin.Config, magic string) ([]string, error) {
-	if ctx == nil {
-		return nil, errors.Str("nil context")
+func signUser(cfg upspin.Config, magic string) ([]string, error) {
+	if cfg == nil {
+		return nil, errors.Str("nil config")
 	}
-	f := ctx.Factotum()
+	f := cfg.Factotum()
 	if f == nil {
 		return nil, errors.Str("no factotum available")
 	}
 
 	// Discourage replay attacks.
 	now := time.Now().UTC().Format(time.ANSIC)
-	userString := string(ctx.UserName())
+	userString := string(cfg.UserName())
 	sig, err := f.Sign([]byte(userString + magic + now))
 	if err != nil {
 		log.Error.Printf("proxyRequest signing server user: %v", err)

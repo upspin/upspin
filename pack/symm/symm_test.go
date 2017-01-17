@@ -38,9 +38,9 @@ func TestRegister(t *testing.T) {
 
 // packBlob packs text according to the parameters and returns the cipher.
 // TODO: move to pack/internal/packtest.
-func packBlob(t *testing.T, ctx upspin.Config, packer upspin.Packer, d *upspin.DirEntry, text []byte) []byte {
+func packBlob(t *testing.T, cfg upspin.Config, packer upspin.Packer, d *upspin.DirEntry, text []byte) []byte {
 	d.Packing = packer.Packing()
-	bp, err := packer.Pack(ctx, d)
+	bp, err := packer.Pack(cfg, d)
 	if err != nil {
 		t.Fatal("packBlob:", d.Name, err)
 	}
@@ -57,8 +57,8 @@ func packBlob(t *testing.T, ctx upspin.Config, packer upspin.Packer, d *upspin.D
 
 // unpackBlob unpacks cipher according to the parameters and returns the plain text.
 // TODO: move to pack/internal/packtest.
-func unpackBlob(t *testing.T, ctx upspin.Config, packer upspin.Packer, d *upspin.DirEntry, cipher []byte) []byte {
-	bp, err := packer.Unpack(ctx, d)
+func unpackBlob(t *testing.T, cfg upspin.Config, packer upspin.Packer, d *upspin.DirEntry, cipher []byte) []byte {
+	bp, err := packer.Unpack(cfg, d)
 	if err != nil {
 		t.Fatal("unpackBlob:", err)
 	}
@@ -73,17 +73,17 @@ func unpackBlob(t *testing.T, ctx upspin.Config, packer upspin.Packer, d *upspin
 }
 
 // TODO: move to pack/internal/packtest.
-func testPackAndUnpack(t *testing.T, ctx upspin.Config, packer upspin.Packer, name upspin.PathName, text []byte) {
+func testPackAndUnpack(t *testing.T, cfg upspin.Config, packer upspin.Packer, name upspin.PathName, text []byte) {
 	// First pack.
 	d := &upspin.DirEntry{
 		Name:       name,
 		SignedName: name,
-		Writer:     ctx.UserName(),
+		Writer:     cfg.UserName(),
 	}
-	cipher := packBlob(t, ctx, packer, d, text)
+	cipher := packBlob(t, cfg, packer, d, text)
 
 	// Now unpack.
-	clear := unpackBlob(t, ctx, packer, d, cipher)
+	clear := unpackBlob(t, cfg, packer, d, cipher)
 
 	if !bytes.Equal(text, clear) {
 		t.Errorf("text: expected %q; got %q", text, clear)
@@ -95,14 +95,14 @@ func TestBadkeyPack(t *testing.T) {
 		user upspin.UserName = "carla@upspin.io"
 		name                 = upspin.PathName(user + "/file/of/carla")
 	)
-	ctx, packer := setup(user)
+	cfg, packer := setup(user)
 	d := &upspin.DirEntry{
 		Name:       name,
 		SignedName: name,
-		Writer:     ctx.UserName(),
+		Writer:     cfg.UserName(),
 	}
 	d.Packing = packer.Packing()
-	_, err := packer.Pack(ctx, d)
+	_, err := packer.Pack(cfg, d)
 	if errors.Match(errors.E(errors.NotExist), err) {
 		return // User carla has no symmsecret.upspinkey, so this err is expected.
 	}
@@ -115,8 +115,8 @@ func TestPack(t *testing.T) {
 		name                 = upspin.PathName(user + "/file/of/joe")
 		text                 = "this is some text"
 	)
-	ctx, packer := setup(user)
-	testPackAndUnpack(t, ctx, packer, name, []byte(text))
+	cfg, packer := setup(user)
+	testPackAndUnpack(t, cfg, packer, name, []byte(text))
 }
 
 func benchmarkPack(b *testing.B, fileSize int, unpack bool) {
@@ -132,15 +132,15 @@ func benchmarkPack(b *testing.B, fileSize int, unpack bool) {
 	}
 	data = data[:n]
 	name := upspin.PathName(fmt.Sprintf("%s/file/of/user.%d", user, packing))
-	ctx, packer := setup(user)
+	cfg, packer := setup(user)
 	for i := 0; i < b.N; i++ {
 		d := &upspin.DirEntry{
 			Name:       name,
 			SignedName: name,
-			Writer:     ctx.UserName(),
+			Writer:     cfg.UserName(),
 			Packing:    packer.Packing(),
 		}
-		bp, err := packer.Pack(ctx, d)
+		bp, err := packer.Pack(cfg, d)
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -155,7 +155,7 @@ func benchmarkPack(b *testing.B, fileSize int, unpack bool) {
 		if !unpack {
 			continue
 		}
-		bu, err := packer.Unpack(ctx, d)
+		bu, err := packer.Unpack(cfg, d)
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -185,7 +185,7 @@ func BenchmarkPackUnpack_1Mbyte(b *testing.B) {
 }
 
 func setup(name upspin.UserName) (upspin.Config, upspin.Packer) {
-	ctx := config.SetUserName(config.New(), name)
+	cfg := config.SetUserName(config.New(), name)
 	packer := pack.Lookup(packing)
 	j := strings.IndexByte(string(name), '@')
 	if j < 0 {
@@ -195,14 +195,14 @@ func setup(name upspin.UserName) (upspin.Config, upspin.Packer) {
 	if err != nil {
 		log.Fatalf("unable to initialize factotum for %s", string(name[:j]))
 	}
-	ctx = config.SetFactotum(ctx, f)
-	return ctx, packer
+	cfg = config.SetFactotum(cfg, f)
+	return cfg, packer
 }
 
 func TestMultiBlockRoundTrip(t *testing.T) {
 	const userName = upspin.UserName("aly@upspin.io")
-	ctx, packer := setup(userName)
-	packtest.TestMultiBlockRoundTrip(t, ctx, packer, userName)
+	cfg, packer := setup(userName)
+	packtest.TestMultiBlockRoundTrip(t, cfg, packer, userName)
 }
 
 // repo returns the local pathname of a file in the upspin repository.

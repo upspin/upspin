@@ -21,20 +21,20 @@ import (
 )
 
 type server struct {
-	context upspin.Config
+	config upspin.Config
 
 	// The underlying storage implementation.
 	store upspin.StoreServer
 }
 
-func New(ctx upspin.Config, store upspin.StoreServer, _ upspin.NetAddr) http.Handler {
+func New(cfg upspin.Config, store upspin.StoreServer, _ upspin.NetAddr) http.Handler {
 	// TODO(adg): remove addr argument
 	s := &server{
-		context: ctx,
-		store:   store,
+		config: cfg,
+		store:  store,
 	}
 
-	return auth.NewServer(ctx, &auth.ServerConfig{
+	return auth.NewServer(cfg, &auth.ServerConfig{
 		Service: auth.Service{
 			Name: "Store",
 			Methods: auth.Methods{
@@ -54,7 +54,7 @@ func (s *server) serverFor(session auth.Session, reqBytes []byte, req pb.Message
 	if ep := session.ProxiedEndpoint(); ep.Transport != upspin.Unassigned {
 		e = ep
 	}
-	svc, err := s.store.Dial(config.SetUserName(s.context, session.User()), e)
+	svc, err := s.store.Dial(config.SetUserName(s.config, session.User()), e)
 	if err != nil {
 		return nil, err
 	}

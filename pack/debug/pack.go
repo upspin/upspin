@@ -47,7 +47,7 @@ func (testPack) ReaderHashes(packdata []byte) ([][]byte, error) {
 	return nil, nil
 }
 
-func (testPack) Share(context upspin.Config, readers []upspin.PublicKey, packdata []*[]byte) {
+func (testPack) Share(cfg upspin.Config, readers []upspin.PublicKey, packdata []*[]byte) {
 	// Nothing to do.
 }
 
@@ -94,7 +94,7 @@ func addSignature(d *upspin.DirEntry, signature byte) error {
 	}
 }
 
-func (p testPack) Pack(ctx upspin.Config, d *upspin.DirEntry) (upspin.BlockPacker, error) {
+func (p testPack) Pack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockPacker, error) {
 	const op = "pack/debug.Pack"
 	if err := pack.CheckPacking(p, d); err != nil {
 		return nil, errors.E(op, errors.Invalid, d.Name, err)
@@ -107,14 +107,14 @@ func (p testPack) Pack(ctx upspin.Config, d *upspin.DirEntry) (upspin.BlockPacke
 		return nil, errors.E(op, errors.Invalid, d.Name, err)
 	}
 	return &blockPacker{
-		ctx:       ctx,
+		cfg:       cfg,
 		entry:     d,
 		cryptByte: cb,
 	}, nil
 }
 
 type blockPacker struct {
-	ctx       upspin.Config
+	cfg       upspin.Config
 	entry     *upspin.DirEntry
 	cryptByte byte
 
@@ -175,10 +175,10 @@ func (bp *blockPacker) Close() error {
 		return err
 	}
 	putPath(bp.entry)
-	return addSignature(bp.entry, sign(bp.ctx, internal.BlockSum(bp.entry.Blocks), bp.entry.Name))
+	return addSignature(bp.entry, sign(bp.cfg, internal.BlockSum(bp.entry.Blocks), bp.entry.Name))
 }
 
-func (p testPack) Unpack(ctx upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker, error) {
+func (p testPack) Unpack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker, error) {
 	const op = "pack/debug.Unpack"
 	if err := pack.CheckPacking(p, d); err != nil {
 		return nil, errors.E(op, errors.Invalid, d.Name, err)
@@ -190,7 +190,7 @@ func (p testPack) Unpack(ctx upspin.Config, d *upspin.DirEntry) (upspin.BlockUnp
 	}
 
 	// Validate signature.
-	sig := sign(ctx, internal.BlockSum(d.Blocks), d.Name)
+	sig := sign(cfg, internal.BlockSum(d.Blocks), d.Name)
 	if len(d.Packdata) < 2 {
 		return nil, errors.E(op, errors.Invalid, d.Name, errors.Str("incomplete signature"))
 	}
@@ -203,7 +203,7 @@ func (p testPack) Unpack(ctx upspin.Config, d *upspin.DirEntry) (upspin.BlockUnp
 		return nil, errors.E(op, errors.Invalid, d.Name, err)
 	}
 	return &blockUnpacker{
-		ctx:          ctx,
+		cfg:          cfg,
 		entry:        d,
 		BlockTracker: internal.NewBlockTracker(d.Blocks),
 		cryptByte:    cb,
@@ -211,7 +211,7 @@ func (p testPack) Unpack(ctx upspin.Config, d *upspin.DirEntry) (upspin.BlockUnp
 }
 
 type blockUnpacker struct {
-	ctx                   upspin.Config
+	cfg                   upspin.Config
 	entry                 *upspin.DirEntry
 	internal.BlockTracker // provides NextBlock method and Block field
 	cryptByte             byte
@@ -244,7 +244,7 @@ func (bp *blockUnpacker) Close() error {
 	return nil
 }
 
-func (p testPack) PackLen(context upspin.Config, cleartext []byte, d *upspin.DirEntry) int {
+func (p testPack) PackLen(cfg upspin.Config, cleartext []byte, d *upspin.DirEntry) int {
 	if err := pack.CheckPacking(p, d); err != nil {
 		return -1
 	}
@@ -255,15 +255,15 @@ func (p testPack) PackLen(context upspin.Config, cleartext []byte, d *upspin.Dir
 	return len(cleartext)
 }
 
-func (p testPack) UnpackLen(context upspin.Config, ciphertext []byte, d *upspin.DirEntry) int {
+func (p testPack) UnpackLen(cfg upspin.Config, ciphertext []byte, d *upspin.DirEntry) int {
 	if err := pack.CheckPacking(p, d); err != nil {
 		return -1
 	}
 	return len(ciphertext)
 }
 
-func sign(ctx upspin.Config, data []byte, name upspin.PathName) byte {
-	key, err := getKey(ctx, name)
+func sign(cfg upspin.Config, data []byte, name upspin.PathName) byte {
+	key, err := getKey(cfg, name)
 	if err != nil {
 		panic(err)
 	}
@@ -278,7 +278,7 @@ func sign(ctx upspin.Config, data []byte, name upspin.PathName) byte {
 }
 
 // Name implements upspin.Pack.Name.
-func (testPack) Name(ctx upspin.Config, d *upspin.DirEntry, newName upspin.PathName) error {
+func (testPack) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName) error {
 	const op = "pack/debug.Name"
 	if d.IsDir() {
 		return errors.E(op, errors.IsDir, d.Name, "cannot rename directory")
@@ -300,7 +300,7 @@ func (testPack) Name(ctx upspin.Config, d *upspin.DirEntry, newName upspin.PathN
 
 	// Remove old name from signature.
 	signature := d.Packdata[1]
-	key, err := getKey(ctx, oldName)
+	key, err := getKey(cfg, oldName)
 	if err != nil {
 		panic(err)
 	}
@@ -310,7 +310,7 @@ func (testPack) Name(ctx upspin.Config, d *upspin.DirEntry, newName upspin.PathN
 
 	// Add new name to signature. The key may also be different since this
 	// may be a different user.
-	key, err = getKey(ctx, name)
+	key, err = getKey(cfg, name)
 	for i, c := range []byte(name) {
 		signature ^= c ^ key[i%len(key)]
 	}
@@ -322,7 +322,7 @@ func (testPack) Name(ctx upspin.Config, d *upspin.DirEntry, newName upspin.PathN
 // getKey returns the user key for the user in name.
 // Actually it just returns the user name as a key: this is not a secure
 // packing. Its purpose is to test the flow of packdata, and this is sufficient.
-func getKey(ctx upspin.Config, name upspin.PathName) (upspin.PublicKey, error) {
+func getKey(cfg upspin.Config, name upspin.PathName) (upspin.PublicKey, error) {
 	parsed, err := path.Parse(name)
 	if err != nil {
 		return "", err

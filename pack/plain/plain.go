@@ -36,23 +36,23 @@ func (plainPack) ReaderHashes(packdata []byte) ([][]byte, error) {
 	return nil, nil
 }
 
-func (plainPack) Share(context upspin.Config, readers []upspin.PublicKey, packdata []*[]byte) {
+func (plainPack) Share(cfg upspin.Config, readers []upspin.PublicKey, packdata []*[]byte) {
 	// Nothing to do.
 }
 
-func (p plainPack) Pack(ctx upspin.Config, d *upspin.DirEntry) (upspin.BlockPacker, error) {
+func (p plainPack) Pack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockPacker, error) {
 	const op = "pack/plain.Pack"
 	if err := pack.CheckPacking(p, d); err != nil {
 		return nil, errors.E(op, errors.Invalid, d.Name, err)
 	}
 	return &blockPacker{
-		ctx:   ctx,
+		cfg:   cfg,
 		entry: d,
 	}, nil
 }
 
 type blockPacker struct {
-	ctx   upspin.Config
+	cfg   upspin.Config
 	entry *upspin.DirEntry
 }
 
@@ -88,7 +88,7 @@ func (bp *blockPacker) Close() error {
 	return internal.CheckLocationSet(bp.entry)
 }
 
-func (p plainPack) Unpack(ctx upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker, error) {
+func (p plainPack) Unpack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker, error) {
 	const op = "pack/plain.Unpack"
 	if err := pack.CheckPacking(p, d); err != nil {
 		return nil, errors.E(op, errors.Invalid, d.Name, err)
@@ -98,14 +98,14 @@ func (p plainPack) Unpack(ctx upspin.Config, d *upspin.DirEntry) (upspin.BlockUn
 		return nil, errors.E(op, d.Name, err)
 	}
 	return &blockUnpacker{
-		ctx:          ctx,
+		cfg:          cfg,
 		entry:        d,
 		BlockTracker: internal.NewBlockTracker(d.Blocks),
 	}, nil
 }
 
 type blockUnpacker struct {
-	ctx                   upspin.Config
+	cfg                   upspin.Config
 	entry                 *upspin.DirEntry
 	internal.BlockTracker // provides NextBlock method and Block field
 }
@@ -120,7 +120,7 @@ func (bp *blockUnpacker) Close() error {
 }
 
 // Name implements upspin.Name.
-func (p plainPack) Name(ctx upspin.Config, dirEntry *upspin.DirEntry, newName upspin.PathName) error {
+func (p plainPack) Name(cfg upspin.Config, dirEntry *upspin.DirEntry, newName upspin.PathName) error {
 	const op = "pack/plain.Name"
 	if dirEntry.IsDir() {
 		return errors.E(op, errors.IsDir, dirEntry.Name, "cannot rename directory")
@@ -134,14 +134,14 @@ func (p plainPack) Name(ctx upspin.Config, dirEntry *upspin.DirEntry, newName up
 	return nil
 }
 
-func (p plainPack) PackLen(context upspin.Config, cleartext []byte, entry *upspin.DirEntry) int {
+func (p plainPack) PackLen(cfg upspin.Config, cleartext []byte, entry *upspin.DirEntry) int {
 	if err := pack.CheckPacking(p, entry); err != nil {
 		return -1
 	}
 	return len(cleartext)
 }
 
-func (p plainPack) UnpackLen(context upspin.Config, ciphertext []byte, entry *upspin.DirEntry) int {
+func (p plainPack) UnpackLen(cfg upspin.Config, ciphertext []byte, entry *upspin.DirEntry) int {
 	if err := pack.CheckPacking(p, entry); err != nil {
 		return -1
 	}
