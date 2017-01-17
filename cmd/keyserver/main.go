@@ -38,7 +38,7 @@ var (
 )
 
 func main() {
-	flags.Parse("addr", "config", "context", "https", "kind", "letscache", "log", "project", "tls")
+	flags.Parse("addr", "config", "https", "kind", "letscache", "log", "project", "servercontext", "tls")
 
 	if flags.Project != "" {
 		log.Connect(flags.Project, serverName)
@@ -60,7 +60,7 @@ func main() {
 	case "inprocess":
 		key = inprocess.New()
 	case "gcp":
-		key, err = gcp.New(flags.Config...)
+		key, err = gcp.New(flags.ServerConfig...)
 	default:
 		err = errors.Errorf("bad -kind %q", flags.ServerKind)
 

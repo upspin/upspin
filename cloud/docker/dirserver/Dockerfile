@@ -4,5 +4,5 @@ COPY public.upspinkey /upspin/public.upspinkey
 COPY secret.upspinkey /upspin/secret.upspinkey
 COPY symmsecret.upspinkey /upspin/symmsecret.upspinkey
 COPY bin/dirserver /dirserver
-ENTRYPOINT ["/dirserver", "-context=/upspin/rc", "-kind=server", "-storeserveruser=STORESERVERUSER", "-config=userCacheSize=1000,logDir=/dirserver-logs", "-project=PROJECT", "-log=debug"]
+ENTRYPOINT ["/dirserver", "-config=/upspin/rc", "-kind=server", "-storeserveruser=STORESERVERUSER", "-serverconfig=userCacheSize=1000,logDir=/dirserver-logs", "-project=PROJECT", "-log=debug"]
 EXPOSE 80 443
