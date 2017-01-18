@@ -40,7 +40,7 @@ func New(cfg upspin.Config, cacheDir string, maxBytes int64) (upspin.StoreServer
 
 func (s *server) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
 	s2 := *s
-	s.authority = e
+	s2.authority = e
 	return &s2, nil
 }
 
