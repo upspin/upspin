@@ -8,6 +8,9 @@ package remote
 
 import (
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"net/url"
 
 	"upspin.io/bind"
 	"upspin.io/errors"
@@ -27,6 +30,10 @@ type dialConfig struct {
 type remote struct {
 	rpc.Client // For sessions, Ping, and Close.
 	cfg        dialConfig
+
+	// If non-empty, the base HTTP URL under which references for this
+	// server may be found.
+	baseURL string
 }
 
 var _ upspin.StoreServer = (*remote)(nil)
@@ -34,6 +41,29 @@ var _ upspin.StoreServer = (*remote)(nil)
 // Get implements upspin.StoreServer.Get.
 func (r *remote) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Location, error) {
 	op := r.opf("Get", "%q", ref)
+
+	if r.baseURL != "" {
+		// If we can fetch this by HTTP, do so.
+		u := r.baseURL + string(ref)
+		resp, err := http.Get(u)
+		if err != nil {
+			return nil, nil, nil, op.error(err)
+		}
+		if resp.StatusCode != http.StatusOK {
+			return nil, nil, nil, op.error(errors.Errorf("fetching %s: %s", u, resp.Status))
+		}
+		body, err := ioutil.ReadAll(resp.Body)
+		resp.Body.Close()
+		if err != nil {
+			return nil, nil, nil, op.error(err)
+		}
+		refData := &upspin.Refdata{
+			Reference: ref,
+			Volatile:  false,
+			Duration:  0,
+		}
+		return body, refData, nil, nil
+	}
 
 	req := &proto.StoreGetRequest{
 		Reference: string(ref),
@@ -124,13 +154,45 @@ func (r *remote) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service, 
 		return nil, op.error(errors.IO, err)
 	}
 
-	return &remote{
+	r2 := &remote{
 		Client: authClient,
 		cfg: dialConfig{
 			endpoint: e,
 			userName: config.UserName(),
 		},
-	}, nil
+	}
+	if err := r2.probeDirect(); err != nil {
+		op.error(err)
+	}
+
+	return r2, nil
+}
+
+const httpBaseRef = upspin.Reference("metadata:HTTP-Base")
+
+// probeDirect performs a Get request to the remote server for the reference
+// httpBaseRef. The server may respond with an HTTP URL that may be used as a
+// base for fetching objects directly by HTTP (from Google Cloud Storage, for
+// instance).
+func (r *remote) probeDirect() error {
+	const op = "store/remote.probeDirect"
+
+	b, _, _, err := r.Get(httpBaseRef)
+	if errors.Match(errors.E(errors.NotExist), err) {
+		return nil
+	} else if err != nil {
+		return errors.E(op, err)
+	}
+	s := string(b)
+
+	u, err := url.Parse(s)
+	if err != nil {
+		return errors.E(op, errors.Errorf("parsing %q: %v", s, err))
+	}
+
+	// We have a valid URL. Use it as a base.
+	r.baseURL = u.String()
+	return nil
 }
 
 const transport = upspin.Remote

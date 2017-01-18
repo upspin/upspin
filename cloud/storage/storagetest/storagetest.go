@@ -11,55 +11,20 @@ import (
 	"upspin.io/errors"
 )
 
-// DummyStorage is a dummy version of storage.Storage that does nothing.
-type DummyStorage struct {
-}
+// DummyStorage implements storage.Storage, but does nothing.
+type DummyStorage struct{}
 
 var _ storage.Storage = (*DummyStorage)(nil)
 
-// PutLocalFile implements storage.Storage.
-func (m *DummyStorage) PutLocalFile(srcLocalFilename string, ref string) (refLink string, error error) {
-	return "", nil
-}
-
-// Get implements storage.Storage.
-func (m *DummyStorage) Get(ref string) (link string, error error) {
-	return "", nil
-}
-
-// Download implements storage.Storage.
-func (m *DummyStorage) Download(ref string) ([]byte, error) {
-	return nil, nil
-}
-
-// Put implements storage.Storage.
-func (m *DummyStorage) Put(ref string, contents []byte) (refLink string, error error) {
-	return "", nil
-}
-
-// ListPrefix implements storage.Storage.
-func (m *DummyStorage) ListPrefix(prefix string, depth int) ([]string, error) {
-	return []string{}, nil
-}
-
-// ListDir implements storage.Storage.
-func (m *DummyStorage) ListDir(dir string) ([]string, error) {
-	return []string{}, nil
-}
-
-// Delete implements storage.Storage.
-func (m *DummyStorage) Delete(ref string) error {
-	return nil
-}
-
-// Dial implements storage.Storage.
-func (m *DummyStorage) Dial(opts *storage.Opts) error {
-	return nil
-}
-
-// Close implements storage.Storage.
-func (m *DummyStorage) Close() {
-}
+func (m *DummyStorage) Get(ref string) (link string, error error)                     { return "", nil }
+func (m *DummyStorage) LinkBase() (base string, err error)                            { return "", nil }
+func (m *DummyStorage) Download(ref string) ([]byte, error)                           { return nil, nil }
+func (m *DummyStorage) Put(ref string, contents []byte) (refLink string, error error) { return "", nil }
+func (m *DummyStorage) ListPrefix(prefix string, depth int) ([]string, error)         { return []string{}, nil }
+func (m *DummyStorage) ListDir(dir string) ([]string, error)                          { return []string{}, nil }
+func (m *DummyStorage) Delete(ref string) error                                       { return nil }
+func (m *DummyStorage) Dial(opts *storage.Opts) error                                 { return nil }
+func (m *DummyStorage) Close()                                                        {}
 
 // ExpectGet is a DummyStorage that expects Get will be called with a
 // given ref and when it does, it replies with the preset link.
