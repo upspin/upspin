@@ -19,7 +19,14 @@ import (
 type Storage interface {
 	// Get returns a link for downloading ref from the storage backend,
 	// if the ref is publicly readable and the backend offers direct links.
-	Get(ref string) (link string, error error)
+	// If the backend does not offer direct links it returns
+	// upspin.ErrNotSupported.
+	Get(ref string) (link string, err error)
+
+	// LinkBase returns the base URL from which any ref may be downloaded.
+	// If the backend does not offer direct links it returns
+	// upspin.ErrNotSupported.
+	LinkBase() (base string, err error)
 
 	// Download retrieves the bytes associated with a ref.
 	Download(ref string) ([]byte, error)
@@ -27,7 +34,7 @@ type Storage interface {
 	// Put stores the contents given as ref on the storage backend.
 	// It may return a direct link for retrieving data directly from
 	// the backend, if it provides direct links.
-	Put(ref string, contents []byte) (refLink string, error error)
+	Put(ref string, contents []byte) (refLink string, err error)
 
 	// ListPrefix lists all files that match a given prefix, up to a
 	// certain depth, counting from the prefix, not absolute
