@@ -24,8 +24,8 @@ func (s *State) signup(args ...string) {
 	const help = `
 Signup registers new users with Upspin. It creates a private/public key pair,
 stores the private key locally, and prepares to store the private key with the
-public upspin key server. It writes an "rc" file into $HOME/upspin/rc, holding
-the username and the location of the directory and store servers.
+public upspin key server. It writes a "config" file into $HOME/upspin/config,
+holding the username and the location of the directory and store servers.
 
 By default, signup creates new keys with the p256 cryptographic curve set.
 The -curve and -secretseed flags allow the user to control the curve or to
@@ -38,8 +38,8 @@ signup@key.upspin.io to complete the signup process.
 `
 	fs := flag.NewFlagSet("signup", flag.ExitOnError)
 	var (
-		force       = fs.Bool("force", false, "create a new user even if keys and rc file exist")
-		rcFile      = fs.String("rc", "upspin/rc", "location of the rc file")
+		force       = fs.Bool("force", false, "create a new user even if keys and config file exist")
+		configFile  = fs.String("config", "upspin/config", "location of the config `file`")
 		where       = fs.String("where", filepath.Join(os.Getenv("HOME"), ".ssh"), "`directory` to store keys")
 		dirServer   = fs.String("dir", "", "DirServer `address`")
 		storeServer = fs.String("store", "", "StoreServer `address`")
@@ -80,23 +80,23 @@ signup@key.upspin.io to complete the signup process.
 	}
 	userName := upspin.UserName(uname + "@" + domain)
 
-	// Figure out location of the rc file.
-	if !filepath.IsAbs(*rcFile) {
-		*rcFile = filepath.Join(homedir, *rcFile)
+	// Figure out location of the config file.
+	if !filepath.IsAbs(*configFile) {
+		*configFile = filepath.Join(homedir, *configFile)
 	}
 	env := os.Environ()
 	wipeUpspinEnvironment()
 	defer restoreEnvironment(env)
 
-	// Verify if we have an rc file.
-	_, err = config.FromFile(*rcFile)
+	// Verify if we have a config file.
+	_, err = config.FromFile(*configFile)
 	if err == nil && !*force {
-		s.exitf("%s already exists", *rcFile)
+		s.exitf("%s already exists", *configFile)
 	}
 
-	// Write the rc file.
-	var rcContents bytes.Buffer
-	err = rcTemplate.Execute(&rcContents, rcData{
+	// Write the config file.
+	var configContents bytes.Buffer
+	err = configTemplate.Execute(&configContents, configData{
 		UserName:  userName,
 		Dir:       dirEndpoint,
 		Store:     storeEndpoint,
@@ -106,33 +106,33 @@ signup@key.upspin.io to complete the signup process.
 	if err != nil {
 		s.exit(err)
 	}
-	err = ioutil.WriteFile(*rcFile, rcContents.Bytes(), 0640)
+	err = ioutil.WriteFile(*configFile, configContents.Bytes(), 0640)
 	if err != nil {
 		// Directory doesn't exist, perhaps.
 		if !os.IsNotExist(err) {
-			s.exitf("cannot create %s: %v", *rcFile, err)
+			s.exitf("cannot create %s: %v", *configFile, err)
 		}
-		dir := filepath.Dir(*rcFile)
+		dir := filepath.Dir(*configFile)
 		if _, statErr := os.Stat(dir); !os.IsNotExist(statErr) {
 			// Looks like the directory exists, so stop now and report original error.
-			s.exitf("cannot create %s: %v", *rcFile, err)
+			s.exitf("cannot create %s: %v", *configFile, err)
 		}
 		if mkdirErr := os.Mkdir(dir, 0700); mkdirErr != nil {
 			s.exitf("cannot make directory %s: %v", dir, mkdirErr)
 		}
-		err = ioutil.WriteFile(*rcFile, rcContents.Bytes(), 0640)
+		err = ioutil.WriteFile(*configFile, configContents.Bytes(), 0640)
 		if err != nil {
 			s.exit(err)
 		}
 	}
 	fmt.Println("Configuration file written to:")
-	fmt.Printf("\t%s\n\n", *rcFile)
+	fmt.Printf("\t%s\n\n", *configFile)
 
 	// Generate a new key.
 	s.keygenCommand(fs)
 
 	// Now load the config. This time it should succeed.
-	cfg, err := config.FromFile(*rcFile)
+	cfg, err := config.FromFile(*configFile)
 	if err != nil {
 		s.exit(err)
 	}
@@ -166,14 +166,14 @@ signup@key.upspin.io to complete the signup process.
 	fmt.Printf("%s\n", &msg)
 }
 
-type rcData struct {
+type configData struct {
 	UserName   upspin.UserName
 	Store, Dir *upspin.Endpoint
 	SecretDir  string
 	Packing    string
 }
 
-var rcTemplate = template.Must(template.New("rc").Parse(`
+var configTemplate = template.Must(template.New("config").Parse(`
 username: {{.UserName}}
 secrets: {{.SecretDir}}
 storeserver: {{.Store}}

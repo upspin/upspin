@@ -8,7 +8,7 @@
 Command upspinfs is a FUSE interface for Upspin. It presents Upspin
 files as a locally mounted file system.
 
-If $HOME/upspin/rc specifies a cache server endpoint and cacheserver
+If $HOME/upspin/config specifies a cache server endpoint and cacheserver
 is not running, upspinfs will attempt to start it. Upspinfs will pass
 to cacheserver both its -log and -cache flags.
 

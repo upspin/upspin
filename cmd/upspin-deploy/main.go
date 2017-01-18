@@ -419,7 +419,7 @@ func (c *Config) buildServer(server string) error {
 
 	switch server {
 	case "dirserver":
-		err = writeRC(dir,
+		err = writeConfig(dir,
 			"username: "+c.dirServerUserName(),
 			"secrets: /upspin",
 			"keyserver: "+c.endpoint("keyserver"),
@@ -427,7 +427,7 @@ func (c *Config) buildServer(server string) error {
 			"dirserver: "+c.endpoint("dirserver"),
 		)
 	case "storeserver":
-		err = writeRC(dir,
+		err = writeConfig(dir,
 			"username: "+c.storeServerUserName(),
 			"secrets: /upspin",
 			"keyserver: "+c.endpoint("keyserver"),
@@ -542,13 +542,13 @@ func (c *Config) storeServerUserName() string {
 	return "upspin-store@" + c.Domain
 }
 
-func writeRC(dir string, lines ...string) error {
+func writeConfig(dir string, lines ...string) error {
 	var buf bytes.Buffer
 	for _, s := range lines {
 		buf.WriteString(s)
 		buf.WriteByte('\n')
 	}
-	return ioutil.WriteFile(filepath.Join(dir, "rc"), buf.Bytes(), 0644)
+	return ioutil.WriteFile(filepath.Join(dir, "config"), buf.Bytes(), 0644)
 }
 
 func (c *Config) copyDockerfile(dir, server string) error {

@@ -52,11 +52,11 @@ This command is designed to operate on projects created by setupdomain.
 		s.exitf("specified location is not a directory: %v", cfgDir)
 	}
 
-	storeCfg, err := config.FromFile(filepath.Join(cfgDir, "storeserver/rc"))
+	storeCfg, err := config.FromFile(filepath.Join(cfgDir, "storeserver/config"))
 	if err != nil {
 		s.exit(err)
 	}
-	dirCfg, err := config.FromFile(filepath.Join(cfgDir, "dirserver/rc"))
+	dirCfg, err := config.FromFile(filepath.Join(cfgDir, "dirserver/config"))
 	if err != nil {
 		s.exit(err)
 	}

@@ -26,9 +26,9 @@ import (
 func (s *State) setupdomain(args ...string) {
 	const (
 		help = `
-Setupdomain generates keys and rc files for the Upspin users upspin-dir@domain
-and upspin-store@domain, and generates a signature to be added as a DNS TXT
-record to prove that the calling Upspin user has control over domain.
+Setupdomain generates keys and config files for the Upspin users upspin-dir@domain
+and upspin-store@domain, and generates a signature to be added as a DNS TXT record
+to prove that the calling Upspin user has control over domain.
 
 If any state exists at the given location (-where) then the command aborts.
 
@@ -69,16 +69,16 @@ set access controls.
 	var (
 		dirServerPath   = filepath.Join(*where, flags.Project, "dirserver")
 		storeServerPath = filepath.Join(*where, flags.Project, "storeserver")
-		dirRC           = filepath.Join(dirServerPath, "rc")
-		storeRC         = filepath.Join(storeServerPath, "rc")
+		dirConfig       = filepath.Join(dirServerPath, "config")
+		storeConfig     = filepath.Join(storeServerPath, "config")
 	)
 
 	if *putUsers {
-		dirFile, dirUser, err := writeUserFile(dirRC)
+		dirFile, dirUser, err := writeUserFile(dirConfig)
 		if err != nil {
 			s.exit(err)
 		}
-		storeFile, storeUser, err := writeUserFile(storeRC)
+		storeFile, storeUser, err := writeUserFile(storeConfig)
 		if err != nil {
 			s.exit(err)
 		}
@@ -125,7 +125,7 @@ set access controls.
 		s.exit(err)
 	}
 
-	// Generate rc files for those users.
+	// Generate config files for those users.
 	dirEndpoint := upspin.Endpoint{
 		Transport: upspin.Remote,
 		NetAddr:   upspin.NetAddr("dir." + domain + ":443"),
@@ -135,7 +135,7 @@ set access controls.
 		NetAddr:   upspin.NetAddr("store." + domain + ":443"),
 	}
 	var dirBody bytes.Buffer
-	if err := rcTemplate.Execute(&dirBody, rcData{
+	if err := configTemplate.Execute(&dirBody, configData{
 		UserName:  upspin.UserName("upspin-dir@" + domain),
 		Store:     &storeEndpoint,
 		Dir:       &dirEndpoint,
@@ -144,11 +144,11 @@ set access controls.
 	}); err != nil {
 		s.exit(err)
 	}
-	if err := ioutil.WriteFile(dirRC, dirBody.Bytes(), 0644); err != nil {
+	if err := ioutil.WriteFile(dirConfig, dirBody.Bytes(), 0644); err != nil {
 		s.exit(err)
 	}
 	var storeBody bytes.Buffer
-	if err := rcTemplate.Execute(&storeBody, rcData{
+	if err := configTemplate.Execute(&storeBody, configData{
 		UserName:  upspin.UserName("upspin-store@" + domain),
 		Store:     &storeEndpoint,
 		Dir:       &dirEndpoint,
@@ -157,7 +157,7 @@ set access controls.
 	}); err != nil {
 		s.exit(err)
 	}
-	if err := ioutil.WriteFile(storeRC, storeBody.Bytes(), 0644); err != nil {
+	if err := ioutil.WriteFile(storeConfig, storeBody.Bytes(), 0644); err != nil {
 		s.exit(err)
 	}
 
@@ -190,7 +190,7 @@ type setupDomainData struct {
 }
 
 var setupDomainTemplate = template.Must(template.New("setupdomain").Parse(`
-Keys and rc files for the users
+Keys and config files for the users
 	upspin-dir@{{.Domain}}
 	upspin-store@{{.Domain}}
 were generated and placed under the directory:
@@ -210,10 +210,10 @@ To register the users listed above, run this command:
 
 `))
 
-// writeUserFile reads the specified rc file and writes a YAML-encoded
+// writeUserFile reads the specified config file and writes a YAML-encoded
 // upspin.User to userFile. It also returns the username.
-func writeUserFile(rcFile string) (userFile string, u upspin.UserName, err error) {
-	cfg, err := config.FromFile(rcFile)
+func writeUserFile(configFile string) (userFile string, u upspin.UserName, err error) {
+	cfg, err := config.FromFile(configFile)
 	if err != nil {
 		return "", "", err
 	}
