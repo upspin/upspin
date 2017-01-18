@@ -83,7 +83,7 @@ func (gcs *gcsImpl) PutLocalFile(srcLocalFilename string, ref string) (refLink s
 }
 
 // Get implements Storage.
-func (gcs *gcsImpl) Get(ref string) (link string, error error) {
+func (gcs *gcsImpl) Get(ref string) (link string, err error) {
 	const op = "cloud/storage/gcs.Get"
 	// Get the link of the blob
 	res, err := gcs.service.Objects.Get(gcs.bucketName, ref).Do()
@@ -91,9 +91,15 @@ func (gcs *gcsImpl) Get(ref string) (link string, error error) {
 		if gcsErr, ok := err.(*googleapi.Error); ok && gcsErr.Code == 404 {
 			return "", errors.E(op, errors.NotExist, err)
 		}
-		return "", err
+		return "", errors.E(op, err)
 	}
 	return res.MediaLink, nil
+}
+
+func (gcs *gcsImpl) LinkBase() (base string, err error) {
+	const op = "cloud/storage/gcs.LinkBase"
+
+	return "https://storage.googleapis.com/" + gcs.bucketName + "/", nil
 }
 
 // Download implements Storage.
