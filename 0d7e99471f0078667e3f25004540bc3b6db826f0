@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "03a6e127_ebe3f1a6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-18T04:42:13Z",
+      "side": 1,
+      "message": "We should file an issue about this. It is a serious security concern.",
+      "revId": "0d7e99471f0078667e3f25004540bc3b6db826f0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
