@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a3b51546_307ba82b",
+        "filename": "transport/auth/doc.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-18T02:14:27Z",
+      "side": 1,
+      "message": "s/codea/code/",
+      "revId": "95505c9b94b68c4a0f8874609381c3db315076da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
