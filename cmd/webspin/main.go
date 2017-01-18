@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // Command webspin is an HTTP frontend that serves Upspin content
-// accessible to the current user (as configured by upspin/rc).
+// accessible to the current user (as configured by upspin/config).
 package main
 
 import (

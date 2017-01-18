@@ -252,7 +252,7 @@ func valsFromYAML(vals map[string]string, data []byte) error {
 // Unrecognized variable names are normally logged but
 // generate an error during testing.
 func valsFromEnvironment(vals map[string]string) error {
-	// Environment variables trump the RC file
+	// Environment variables trump the config file
 	for _, v := range os.Environ() {
 		if !strings.HasPrefix(v, "upspin") {
 			continue

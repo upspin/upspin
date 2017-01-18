@@ -34,7 +34,7 @@ import (
 	// Load useful packers
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
-	_ "upspin.io/pack/symm" // For reading dirserver RC files.
+	_ "upspin.io/pack/symm" // For reading dirserver config files.
 
 	// Load required transports
 	"upspin.io/transports"

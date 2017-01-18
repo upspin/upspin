@@ -159,9 +159,9 @@ func (cfg *Config) Run() error {
 	}
 
 	// Generate keys.
-	// Write an empty RC file for use by 'upspin keygen'.
-	rcKeygen := filepath.Join(tmpDir, "rc.keygen")
-	if err := ioutil.WriteFile(rcKeygen, []byte("secrets: none"), 0644); err != nil {
+	// Write an empty  file for use by 'upspin keygen'.
+	configKeygen := filepath.Join(tmpDir, "config.keygen")
+	if err := ioutil.WriteFile(configKeygen, []byte("secrets: none"), 0644); err != nil {
 		return err
 	}
 	for _, u := range cfg.Users {
@@ -170,7 +170,7 @@ func (cfg *Config) Run() error {
 		if err := os.MkdirAll(dir, 0700); err != nil {
 			return err
 		}
-		keygen := exec.Command("upspin", "-config="+rcKeygen, "keygen", "-where="+dir)
+		keygen := exec.Command("upspin", "-config="+configKeygen, "keygen", "-where="+dir)
 		keygen.Stdout = prefix("keygen: ", os.Stdout)
 		keygen.Stderr = prefix("keygen: ", os.Stderr)
 		if err := keygen.Run(); err != nil {
@@ -179,13 +179,13 @@ func (cfg *Config) Run() error {
 		u.secrets = dir
 	}
 
-	writeRC := func(server, user string) (string, error) {
+	writeConfig := func(server, user string) (string, error) {
 		u, ok := cfg.user[user]
 		if !ok {
 			return "", fmt.Errorf("unknown user %q", user)
 		}
 
-		rcContent := []string{
+		configContent := []string{
 			"username: " + u.Name,
 			"tlscerts: " + tmpDir,
 			"packing: " + u.Packing,
@@ -194,34 +194,34 @@ func (cfg *Config) Run() error {
 		}
 		switch server {
 		case "keyserver":
-			rcContent = append(rcContent,
+			configContent = append(configContent,
 				"keyserver: inprocess,",
 				"secrets: none",
 			)
 		default:
-			rcContent = append(rcContent,
+			configContent = append(configContent,
 				"keyserver: remote,"+cfg.KeyServer,
 				"secrets: "+userDir(user),
 			)
 		}
-		rcFile := filepath.Join(tmpDir, "rc."+server)
-		if err := ioutil.WriteFile(rcFile, []byte(strings.Join(rcContent, "\n")), 0644); err != nil {
+		configFile := filepath.Join(tmpDir, "config."+server)
+		if err := ioutil.WriteFile(configFile, []byte(strings.Join(configContent, "\n")), 0644); err != nil {
 			return "", err
 		}
-		return rcFile, nil
+		return configFile, nil
 	}
 
 	// Start servers.
 	for i := range cfg.Servers {
 		s := cfg.Servers[i]
 
-		rcFile, err := writeRC(s.Name, s.User)
+		configFile, err := writeConfig(s.Name, s.User)
 		if err != nil {
-			return fmt.Errorf("writing rc for %v: %v", s.Name, err)
+			return fmt.Errorf("writing config for %v: %v", s.Name, err)
 		}
 
 		args := []string{
-			"-config=" + rcFile,
+			"-config=" + configFile,
 			"-log=" + *logLevel,
 			"-tls_cert=" + filepath.Join(tmpDir, "cert.pem"),
 			"-tls_key=" + filepath.Join(tmpDir, "key.pem"),
@@ -251,7 +251,7 @@ func (cfg *Config) Run() error {
 	if s, ok := cfg.server["keyserver"]; ok {
 		keyUser = s.User
 	}
-	rcFile, err := writeRC("key-bootstrap", keyUser)
+	configFile, err := writeConfig("key-bootstrap", keyUser)
 	if err != nil {
 		return err
 	}
@@ -279,7 +279,7 @@ func (cfg *Config) Run() error {
 			return err
 		}
 		cmd := exec.Command("upspin",
-			"-config="+rcFile,
+			"-config="+configFile,
 			"-log="+*logLevel,
 			"user", "-put",
 		)
@@ -292,12 +292,12 @@ func (cfg *Config) Run() error {
 	}
 
 	// Start a shell as the first user.
-	rcFile, err = writeRC("shell", cfg.Users[0].Name)
+	configFile, err = writeConfig("shell", cfg.Users[0].Name)
 	if err != nil {
 		return err
 	}
 	shell := exec.Command("upspin",
-		"-config="+rcFile,
+		"-config="+configFile,
 		"-log="+*logLevel,
 		"shell",
 	)
