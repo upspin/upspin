@@ -38,6 +38,7 @@ const (
 type server struct {
 	mu       sync.RWMutex // Protects fields below.
 	refCount uint64       // How many clones of us exist.
+	linkBase []byte
 	storage  storage.Storage
 	cache    *cache.FileCache
 }
@@ -117,12 +118,35 @@ func (s *server) Put(data []byte) (*upspin.Refdata, error) {
 	return refdata, nil
 }
 
+const httpBaseRef = upspin.Reference("Upspin-Store-HTTP-Base")
+
 // Get implements upspin.StoreServer.
 func (s *server) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Location, error) {
 	const op = "store/gcp.Get"
 
 	m, sp := metric.NewSpan(op)
 	defer m.Done()
+
+	if ref == httpBaseRef {
+		refData := &upspin.Refdata{Reference: ref}
+		s.mu.Lock()
+		base := s.linkBase
+		s.mu.Unlock()
+		if base != nil {
+			return base, refData, nil, nil
+		}
+		baseStr, err := s.storage.LinkBase()
+		if err == upspin.ErrNotSupported {
+			return nil, nil, nil, errors.E(op, errors.NotExist)
+		} else if err != nil {
+			return nil, nil, nil, errors.E(op, err)
+		}
+		base = []byte(baseStr)
+		s.mu.Lock()
+		s.linkBase = base
+		s.mu.Unlock()
+		return base, refData, nil, nil
+	}
 
 	file, loc, err := s.innerGet(ref, sp.StartSpan("innerGet"))
 	if err != nil {
