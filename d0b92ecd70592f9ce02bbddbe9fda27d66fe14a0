@@ -16,6 +16,24 @@
       "revId": "d0b92ecd70592f9ce02bbddbe9fda27d66fe14a0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e8d36ae9_f2762840",
+        "filename": "store/remote/remote.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-18T23:25:34Z",
+      "side": 1,
+      "message": "The LinkBase request only happens once after each Dial, so it adds an extra round trip when the connection opens, but reduces round trips after that point.",
+      "parentUuid": "4851d61e_a5403e65",
+      "revId": "d0b92ecd70592f9ce02bbddbe9fda27d66fe14a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
