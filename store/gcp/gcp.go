@@ -27,6 +27,7 @@ type server struct {
 
 	mu       sync.RWMutex // Protects fields below.
 	refCount uint64       // How many clones of us exist.
+	linkBase []byte
 }
 
 var _ upspin.StoreServer = (*server)(nil)
@@ -72,6 +73,8 @@ func (s *server) Put(data []byte) (*upspin.Refdata, error) {
 	return refdata, nil
 }
 
+const httpBaseRef = upspin.Reference("metadata:HTTP-Base")
+
 // Get implements upspin.StoreServer.
 func (s *server) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Location, error) {
 	const op = "store/gcp.Get"
@@ -79,6 +82,27 @@ func (s *server) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Lo
 	m, sp := metric.NewSpan(op)
 	defer m.Done()
 	defer sp.End()
+
+	if ref == httpBaseRef {
+		refData := &upspin.Refdata{Reference: ref}
+		s.mu.Lock()
+		base := s.linkBase
+		s.mu.Unlock()
+		if base != nil {
+			return base, refData, nil, nil
+		}
+		baseStr, err := s.storage.LinkBase()
+		if err == upspin.ErrNotSupported {
+			return nil, nil, nil, errors.E(op, errors.NotExist)
+		} else if err != nil {
+			return nil, nil, nil, errors.E(op, err)
+		}
+		base = []byte(baseStr)
+		s.mu.Lock()
+		s.linkBase = base
+		s.mu.Unlock()
+		return base, refData, nil, nil
+	}
 
 	data, err := s.storage.Download(string(ref))
 	if err != nil {
