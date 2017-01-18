@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "63db1d69_8ec39b1b",
+        "filename": "transport/auth/client.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-18T00:27:35Z",
+      "side": 1,
+      "message": "you could just mention the proto file if you describe the watch api there.",
+      "revId": "c89a0e75eb99830806f47a957cd9893e8928238d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "23b3e516_706ef817",
         "filename": "transport/auth/client.go",
         "patchSetId": 6
@@ -88,6 +105,40 @@
         "endLine": 296,
         "endChar": 4
       },
+      "revId": "c89a0e75eb99830806f47a957cd9893e8928238d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "63db1d69_aebe57a1",
+        "filename": "transport/auth/server.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-18T00:27:35Z",
+      "side": 1,
+      "message": "no error checks?",
+      "revId": "c89a0e75eb99830806f47a957cd9893e8928238d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "63db1d69_eeb45fc5",
+        "filename": "upspin/proto/upspin.proto",
+        "patchSetId": 6
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-18T00:27:35Z",
+      "side": 1,
+      "message": "might as well do it in this CL",
       "revId": "c89a0e75eb99830806f47a957cd9893e8928238d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
