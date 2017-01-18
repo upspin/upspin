@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4851d61e_a5403e65",
+        "filename": "store/remote/remote.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-01-18T21:50:33Z",
+      "side": 1,
+      "message": "When the server does not support LinkBase, does this add yet another round trip to each Get?\nIn other words, baseURL should have three states:  1) here\u0027s the link  2) there is no link  3) don\u0027t know yet.",
+      "revId": "d0b92ecd70592f9ce02bbddbe9fda27d66fe14a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
