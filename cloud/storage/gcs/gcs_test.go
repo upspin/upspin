@@ -70,56 +70,6 @@ func TestPutGetAndDownload(t *testing.T) {
 	}
 }
 
-func TestPutLocalFile(t *testing.T) {
-	// Create a temporary local file.
-	f, err := ioutil.TempFile("", "test-gcp-")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer f.Close()
-	localName := f.Name()
-	defer os.Remove(localName)
-	n, err := f.Write(testData)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if n != len(testData) {
-		t.Fatalf("Expected to write %d bytes, got %d", len(testData), n)
-	}
-	// Put to GCP
-	const testFileName = "a-new-name"
-	link, err := client.PutLocalFile(localName, testFileName)
-	if err != nil {
-		t.Fatal(err)
-	}
-	// Check that we get the same link back from Get.
-	retLink, err := client.Get(testFileName)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if retLink != link {
-		t.Errorf("Not the same link as stored: %v vs received: %v", link, retLink)
-	}
-	resp, err := http.Get(retLink)
-	if err != nil {
-		t.Fatal(err)
-	}
-	// Download contents
-	defer resp.Body.Close()
-	data, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		t.Fatalf("Can't read HTTP body: %v", err)
-	}
-	if string(data) != testDataStr {
-		t.Errorf("Expected %q got %q", testDataStr, string(data))
-	}
-	// Clean up
-	err = client.Delete(testFileName)
-	if err != nil {
-		t.Fatal(err)
-	}
-}
-
 func Put(t *testing.T, path string) {
 	_, err := client.Put(path, testData)
 	if err != nil {
