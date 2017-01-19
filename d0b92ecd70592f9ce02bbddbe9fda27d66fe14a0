@@ -34,6 +34,24 @@
       "revId": "d0b92ecd70592f9ce02bbddbe9fda27d66fe14a0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4851d61e_ce435771",
+        "filename": "store/remote/remote.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-01-19T00:24:03Z",
+      "side": 1,
+      "message": "In our current implementation for which LinkBase always return non-nil, that\u0027s true.  But it worried me this would not be so for a different storage backend.   I may just misunderstand when the Get here is called.\n\nAnd anyway fine to submit this as is;  if there is a performance issue sometime, we can deal with it then.",
+      "parentUuid": "e8d36ae9_f2762840",
+      "revId": "d0b92ecd70592f9ce02bbddbe9fda27d66fe14a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
