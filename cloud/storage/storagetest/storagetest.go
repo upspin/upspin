@@ -32,6 +32,10 @@ func (m *DummyStorage) Download(ref string) ([]byte, error) {
 	return nil, nil
 }
 
+func (m *DummyStorage) LinkBase() (string, error) {
+	return "", nil
+}
+
 // Put implements storage.Storage.
 func (m *DummyStorage) Put(ref string, contents []byte) (refLink string, error error) {
 	return "", nil
