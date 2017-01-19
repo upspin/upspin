@@ -19,10 +19,10 @@ import (
 	"upspin.io/dir/server"
 	"upspin.io/flags"
 	"upspin.io/log"
+	"upspin.io/rpc/dirserver"
+	"upspin.io/rpc/storeserver"
 	"upspin.io/serverutil/perm"
 	"upspin.io/store/gcp"
-	"upspin.io/transport/dirserver"
-	"upspin.io/transport/storeserver"
 	"upspin.io/upspin"
 
 	// Load useful packers
