@@ -14,14 +14,9 @@ import (
 	"upspin.io/upspin"
 )
 
-// Storage is a low-level storage interface for services to store their data permanently.
+// Storage is a low-level storage interface for services to store their data
+// permanently. Storage implementations must be safe for concurrent use.
 type Storage interface {
-	// PutLocalFile copies a local file to storage using ref as its
-	// name. It may return a direct link for downloading the file
-	// from the storage backend, or empty if the backend does not offer
-	// direct links into it.
-	PutLocalFile(srcLocalFilename string, ref string) (refLink string, error error)
-
 	// Get returns a link for downloading ref from the storage backend,
 	// if the ref is publicly readable and the backend offers direct links.
 	Get(ref string) (link string, error error)
