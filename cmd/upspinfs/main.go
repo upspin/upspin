@@ -14,10 +14,10 @@ import (
 	"path/filepath"
 	"time"
 
+	"upspin.io/bind"
 	"upspin.io/config"
 	"upspin.io/flags"
 	"upspin.io/log"
-	"upspin.io/rpc"
 	"upspin.io/upspin"
 
 	_ "upspin.io/pack/ee"
@@ -77,10 +77,8 @@ func startCache(cfg upspin.Config) {
 		return // not using a cache server
 	}
 
-	// Dial the cache server.
-	ac, err := rpc.NewClient(cfg, ce.NetAddr, rpc.NoSecurity, ce)
-	if err == nil {
-		ac.Close()
+	// Ping the cache server.
+	if err := ping(cfg, ce); err == nil {
 		return // cache server running
 	}
 
@@ -90,7 +88,7 @@ func startCache(cfg upspin.Config) {
 		cmd := exec.Command("cacheserver", "-cache="+*cacheFlag, "-log="+log.Level())
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
-		if err = cmd.Run(); err != nil {
+		if err := cmd.Run(); err != nil {
 			log.Info.Printf("upspinfs: starting cacheserver: %s", err)
 			fmt.Fprintf(os.Stderr, "Upspinfs failed to start cacheserver, continuing without.\n")
 			close(cacheErrorChan)
@@ -105,13 +103,23 @@ func startCache(cfg upspin.Config) {
 			return
 		default:
 		}
-		ac, err := rpc.NewClient(cfg, ce.NetAddr, rpc.NoSecurity, ce)
-		if err == nil {
-			fmt.Printf("Upspinfs started a cacheserver\n")
-			ac.Close()
+		if err := ping(cfg, ce); err == nil {
 			return
 		}
 	}
 
 	fmt.Fprintf(os.Stderr, "Upspinfs timed out waiting for cacheserver to start.\n")
+}
+
+// ping determines if the cacheserver is functioning.
+func ping(cfg upspin.Config, ce upspin.Endpoint) error {
+	store, err := bind.StoreServer(cfg, ce)
+	if err != nil {
+		return err
+	}
+	msg, _, _, err := store.Get(upspin.Reference("metadata:Health"))
+	if err == nil {
+		log.Debug.Printf("upspinfs: cacheserver said %q", string(msg))
+	}
+	return err
 }

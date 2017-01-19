@@ -17,8 +17,8 @@ import (
 
 	"bazil.org/fuse"
 
-	"upspin.io/bind"
 	"upspin.io/client"
+	"upspin.io/client/clientutil"
 	os "upspin.io/cmd/upspinfs/internal/ose"
 	"upspin.io/errors"
 	"upspin.io/pack"
@@ -124,28 +124,6 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 		return errors.E(op, err)
 	}
 
-	// firstError remembers the first error we saw. If we fail completely we return it.
-	var firstError error
-	// isError reports whether err is non-nil and remembers it if it is.
-	isError := func(err error) bool {
-		if err == nil {
-			return false
-		}
-		if firstError == nil {
-			firstError = err
-		}
-		return true
-	}
-
-	packer := pack.Lookup(entry.Packing)
-	if packer == nil {
-		return errors.E(op, name, errors.Errorf("unrecognized Packing %d", entry.Packing))
-	}
-	bu, err := packer.Unpack(n.f.config, entry)
-	if err != nil {
-		return errors.E(op, name, err) // Showstopper.
-	}
-
 	// If we have a cached version, just return it.
 	//
 	// We assume that plain pack files are mutable and not completely
@@ -166,75 +144,37 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 		}
 	}
 
-	// Read into a temporary file. We don't want to use it as cached on store file
-	// until the read completes.
+	// Create an unpacker to decrypt the file blocks.
+	packer := pack.Lookup(entry.Packing)
+	if packer == nil {
+		return errors.E(op, name, errors.Errorf("unrecognized Packing %d", entry.Packing))
+	}
+	bu, err := packer.Unpack(n.f.config, entry)
+	if err != nil {
+		return errors.E(op, name, err) // Showstopper.
+	}
+
+	// Read into a temporary file. We don't want to use it
+	// until we've copied over the complete file.
 	tmpName := c.mkTemp()
 	var file *os.File // The open cache file.
-	var at int64      // The write offset into the cache file.
+	var offset int64  // The write offset into the cache file.
 	if file, err = os.OpenFile(tmpName, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0700); err != nil {
 		return errors.E(op, err)
 	}
-Blocks:
+
 	for b := 0; ; b++ {
+		// Read the next block.
 		block, ok := bu.NextBlock()
 		if !ok {
 			break // EOF
 		}
-		if block.Offset != at {
+		offset, err = copyBlock(n.f.config, offset, &block, bu, file)
+		if err != nil {
 			file.Close()
 			os.Remove(tmpName)
-			return errors.E(op, name, errors.Str("inconsistent block offset")) // Showstopper.
+			return errors.E(op, name, err)
 		}
-		// Get the data for this block.
-		// where is the list of locations to examine. It is updated in the loop.
-		where := []upspin.Location{block.Location}
-		for i := 0; i < len(where); i++ { // Not range loop - where changes as we run.
-			loc := where[i]
-			store, err := bind.StoreServer(n.f.config, loc.Endpoint)
-			if isError(err) {
-				continue
-			}
-			cipher, _, locs, err := store.Get(loc.Reference) // TODO: Use refdata
-			if isError(err) {
-				continue // locs guaranteed to be nil.
-			}
-			if locs == nil && err == nil {
-				// Found the data. Unpack it.
-				clear, err := bu.Unpack(cipher)
-				if err != nil {
-					file.Close()
-					os.Remove(tmpName)
-					return errors.E(op, name, err) // Showstopper.
-				}
-				// Write it to the local cache file.
-				n, err := file.WriteAt(clear, at)
-				if err != nil {
-					file.Close()
-					os.Remove(tmpName)
-					return errors.E(op, name, err) // Showstopper.
-				}
-				at += int64(n)
-				continue Blocks
-			}
-			// Add new locs to the list. Skip ones already there - they've been processed. TODO: n^2.
-		outer:
-			for _, newLoc := range locs {
-				for _, oldLoc := range where {
-					if oldLoc == newLoc {
-						continue outer
-					}
-				}
-				where = append(where, newLoc)
-			}
-		}
-		// If we arrive here, we have failed to find a block.
-		// TODO: custom error types.
-		if firstError != nil {
-			file.Close()
-			os.Remove(tmpName)
-			return errors.E(op, name, firstError)
-		}
-		return errors.Errorf("client: data for block %d in %q not found on any store server", b, name)
 	}
 
 	// Rename to indicate it is in the store.
@@ -251,9 +191,29 @@ Blocks:
 	cf.fname = fname
 	cf.file = file
 	h.flags = flags
-	n.attr.Size = uint64(at)
+	n.attr.Size = uint64(offset)
 	n.cf = cf
 	return nil
+}
+
+// CopyBlock reads a block from the store, decrypts it, and writes to the local file.
+func copyBlock(cfg upspin.Config, offset int64, block *upspin.DirBlock, bu upspin.BlockUnpacker, file *os.File) (int64, error) {
+	if block.Offset != offset {
+		return 0, errors.Str("inconsistent block offset")
+	}
+	cipher, err := clientutil.ReadLocation(cfg, block.Location)
+	if err != nil {
+		return 0, err
+	}
+	clear, err := bu.Unpack(cipher)
+	if err != nil {
+		return 0, err
+	}
+	n, err := file.WriteAt(clear, offset)
+	if err != nil {
+		return 0, err
+	}
+	return offset + int64(n), nil
 }
 
 // close is called when the last handle for a node has been closed.
