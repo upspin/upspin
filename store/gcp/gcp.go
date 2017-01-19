@@ -2,16 +2,12 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package gcp implements upspin.StoreServer using Google Cloud Platform as its storage.
+// Package gcp implements upspin.StoreServer using Google Cloud Storage as its
+// storage back end.
 package gcp
 
 import (
-	"bytes"
 	"fmt"
-	"io/ioutil"
-	"net/url"
-	"os"
-	"strings"
 	"sync"
 
 	"upspin.io/cloud/storage"
@@ -19,27 +15,18 @@ import (
 	"upspin.io/key/sha256key"
 	"upspin.io/log"
 	"upspin.io/metric"
-	"upspin.io/store/gcp/cache"
 	"upspin.io/upspin"
 
 	// We use GCS as the backing for our data.
 	_ "upspin.io/cloud/storage/gcs"
 )
 
-// Configuration options for this package.
-const (
-	// ConfigTemporaryDir specifies which temporary directory to write files to before they're
-	// uploaded to the destination bucket. If not present, one will be created in the
-	// system's default location.
-	ConfigTemporaryDir = "gcpTemporaryDir"
-)
-
 // server implements upspin.StoreServer.
 type server struct {
+	storage storage.Storage
+
 	mu       sync.RWMutex // Protects fields below.
 	refCount uint64       // How many clones of us exist.
-	storage  storage.Storage
-	cache    *cache.FileCache
 }
 
 var _ upspin.StoreServer = (*server)(nil)
@@ -48,31 +35,18 @@ var _ upspin.StoreServer = (*server)(nil)
 func New(options ...string) (upspin.StoreServer, error) {
 	const op = "store/gcp.New"
 
+	// Pass options to the storage backend.
 	var dialOpts []storage.DialOpts
-	var tempDir string
 	for _, option := range options {
-		// Parse all options we understand.
-		// What we don't understand we pass it down to the storage.
-		switch {
-		case strings.HasPrefix(option, ConfigTemporaryDir):
-			tempDir = option[len(ConfigTemporaryDir)+1:] // skip 'ConfigTemporaryDir='
-		default:
-			dialOpts = append(dialOpts, storage.WithOptions(option))
-		}
+		dialOpts = append(dialOpts, storage.WithOptions(option))
 	}
 
 	s, err := storage.Dial("GCS", dialOpts...)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
-	c := cache.NewFileCache(tempDir)
-	if c == nil {
-		return nil, errors.E(op, errors.Str("filecache failed to create temp directory"))
-	}
-
 	return &server{
 		storage: s,
-		cache:   c,
 	}, nil
 }
 
@@ -82,33 +56,14 @@ func (s *server) Put(data []byte) (*upspin.Refdata, error) {
 
 	m, sp := metric.NewSpan(op)
 	sp.SetAnnotation(fmt.Sprintf("size=%d", len(data)))
-	s2 := sp.StartSpan("cacheData")
+	defer m.Done()
+	defer sp.End()
 
 	ref := sha256key.Of(data).String()
-	s.mu.RLock()
-	err := s.cache.Put(ref, bytes.NewReader(data))
-	s2.End()
-	if err != nil {
-		s.mu.RUnlock()
-		m.Done()
+	if _, err := s.storage.Put(ref, data); err != nil {
 		return nil, errors.E(op, err)
 	}
 
-	// Now go store it in the cloud.
-	go func() {
-		sp = sp.StartSpan("gcsUpload")
-		if _, err := s.storage.PutLocalFile(s.cache.GetFileLocation(ref), ref); err == nil {
-			// Remove the locally-cached entry so we never
-			// keep files locally, as we're a tiny server
-			// compared with our much better-provisioned
-			// storage backend.  This is safe to do
-			// because FileCache is thread safe.
-			s.cache.Purge(ref)
-		}
-		sp.End()
-		s.mu.RUnlock()
-		m.Done()
-	}()
 	refdata := &upspin.Refdata{
 		Reference: upspin.Reference(ref),
 		Volatile:  false,
@@ -123,21 +78,11 @@ func (s *server) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Lo
 
 	m, sp := metric.NewSpan(op)
 	defer m.Done()
+	defer sp.End()
 
-	file, loc, err := s.innerGet(ref, sp.StartSpan("innerGet"))
+	data, err := s.storage.Download(string(ref))
 	if err != nil {
-		return nil, nil, nil, err
-	}
-	if file != nil {
-		sp = sp.StartSpan("readAll")
-		defer sp.End()
-		defer file.Close()
-		bytes, err := ioutil.ReadAll(file)
-		if err != nil {
-			err = errors.E(op, err)
-		}
-		sp.SetAnnotation(fmt.Sprintf("size=%d", len(bytes)))
-		return bytes, nil, nil, err
+		return nil, nil, nil, errors.E(op, err)
 	}
 	refdata := &upspin.Refdata{
 		Reference: ref,
@@ -145,51 +90,7 @@ func (s *server) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Lo
 		Duration:  0,
 	}
 	sp.SetAnnotation(fmt.Sprintf("refsize=%d", len(ref)))
-	return nil, refdata, []upspin.Location{loc}, nil
-}
-
-// innerGet gets a local file descriptor or a new location for the reference. It returns only one of the two return
-// values or an error. file is non-nil when the ref is found locally; the file is open for read and the
-// caller should close it. If location is non-zero ref is in the backend at that location.
-func (s *server) innerGet(ref upspin.Reference, span *metric.Span) (file *os.File, location upspin.Location, err error) {
-	const op = "store/gcp.Get"
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-
-	s1 := span.StartSpan("localLookup")
-	file, err = s.cache.OpenRefForRead(string(ref))
-	s1.End()
-	if err == nil {
-		// Ref is in the local cache. Send the file and be done.
-		return
-	}
-
-	// File is not local, try to get it from our storage.
-	sp := span.StartSpan("gcsLookup")
-	defer sp.End()
-	var link string
-	link, err = s.storage.Get(string(ref))
-	if err != nil {
-		err = errors.E(op, err)
-		return
-	}
-	// GCP should return an http link
-	if !strings.HasPrefix(link, "http") {
-		err = errors.E(op, errors.Errorf("invalid link returned from GCP: %s", link))
-		return
-	}
-
-	url, err := url.Parse(link)
-	if err != nil {
-		err = errors.E(op, errors.Errorf("can't parse url: %s: %s", link, err))
-		return
-	}
-	location.Reference = upspin.Reference(link)
-	// Go fetch using the provided link. NetAddr is important so we can both ping the server and also cache the
-	// HTTPS transport client efficiently.
-	location.Endpoint.Transport = upspin.HTTPS
-	location.Endpoint.NetAddr = upspin.NetAddr(fmt.Sprintf("%s://%s", url.Scheme, url.Host))
-	return
+	return data, refdata, nil, nil
 }
 
 // Delete implements upspin.StoreServer.
@@ -237,10 +138,6 @@ func (s *server) Close() {
 			s.storage.Close()
 		}
 		s.storage = nil
-		if s.cache != nil {
-			s.cache.Delete()
-		}
-		s.cache = nil
 	}
 }
 
