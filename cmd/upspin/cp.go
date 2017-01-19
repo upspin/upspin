@@ -100,7 +100,7 @@ func (s *State) copyCommand(cs *copyState, srcFiles []cpFile, dstFile cpFile) {
 	}
 	reader, err := s.open(srcFiles[0])
 	if err != nil {
-		s.fail(err)
+		s.exit(err)
 	}
 	s.copyToFile(cs, reader, srcFiles[0], dstFile)
 }
