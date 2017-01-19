@@ -13,7 +13,7 @@ import (
 	"upspin.io/errors"
 	"upspin.io/key/usercache"
 	"upspin.io/log"
-	"upspin.io/transport/auth"
+	"upspin.io/rpc"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
 )
@@ -26,8 +26,8 @@ type dialConfig struct {
 
 // remote implements upspin.KeyServer.
 type remote struct {
-	auth.Client // For sessions, Ping, and Close.
-	cfg         dialConfig
+	rpc.Client // For sessions, Ping, and Close.
+	cfg        dialConfig
 }
 
 var _ upspin.KeyServer = (*remote)(nil)
@@ -86,7 +86,7 @@ func (r *remote) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service, 
 		return nil, op.error(errors.Invalid, errors.Str("unrecognized transport"))
 	}
 
-	authClient, err := auth.NewClient(config, e.NetAddr, auth.Secure, upspin.Endpoint{})
+	authClient, err := rpc.NewClient(config, e.NetAddr, rpc.Secure, upspin.Endpoint{})
 	if err != nil {
 		return nil, op.error(errors.IO, err)
 	}

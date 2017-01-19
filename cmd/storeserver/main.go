@@ -15,11 +15,11 @@ import (
 	"upspin.io/flags"
 	"upspin.io/log"
 	"upspin.io/metric"
+	"upspin.io/rpc/storeserver"
 	"upspin.io/serverutil/perm"
 	"upspin.io/store/filesystem"
 	"upspin.io/store/gcp"
 	"upspin.io/store/inprocess"
-	"upspin.io/transport/storeserver"
 	"upspin.io/upspin"
 
 	// We need the directory transports to fetch write permissions.

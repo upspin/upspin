@@ -20,7 +20,7 @@ import (
 	"upspin.io/key/inprocess"
 	"upspin.io/log"
 	"upspin.io/metric"
-	"upspin.io/transport/keyserver"
+	"upspin.io/rpc/keyserver"
 	"upspin.io/upspin"
 
 	// Load required transports

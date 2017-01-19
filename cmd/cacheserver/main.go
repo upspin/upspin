@@ -15,9 +15,9 @@ import (
 	"upspin.io/config"
 	"upspin.io/flags"
 	"upspin.io/log"
+	"upspin.io/rpc/dircacheserver"
+	"upspin.io/rpc/storeserver"
 	"upspin.io/store/storecache"
-	"upspin.io/transport/dircacheserver"
-	"upspin.io/transport/storeserver"
 
 	"upspin.io/upspin"
 

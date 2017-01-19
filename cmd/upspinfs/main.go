@@ -17,7 +17,7 @@ import (
 	"upspin.io/config"
 	"upspin.io/flags"
 	"upspin.io/log"
-	"upspin.io/transport/auth"
+	"upspin.io/rpc"
 	"upspin.io/upspin"
 
 	_ "upspin.io/pack/ee"
@@ -78,7 +78,7 @@ func startCache(cfg upspin.Config) {
 	}
 
 	// Dial the cache server.
-	ac, err := auth.NewClient(cfg, ce.NetAddr, auth.NoSecurity, ce)
+	ac, err := rpc.NewClient(cfg, ce.NetAddr, rpc.NoSecurity, ce)
 	if err == nil {
 		ac.Close()
 		return // cache server running
@@ -105,7 +105,7 @@ func startCache(cfg upspin.Config) {
 			return
 		default:
 		}
-		ac, err := auth.NewClient(cfg, ce.NetAddr, auth.NoSecurity, ce)
+		ac, err := rpc.NewClient(cfg, ce.NetAddr, rpc.NoSecurity, ce)
 		if err == nil {
 			fmt.Printf("Upspinfs started a cacheserver\n")
 			ac.Close()

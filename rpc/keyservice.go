@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package auth
+package rpc
 
 import (
 	"upspin.io/bind"
@@ -13,7 +13,7 @@ import (
 // PublicUserKeyService returns a Lookup function that looks up user's public keys.
 // The lookup function returned is bound to a well-known public Upspin user service.
 func PublicUserKeyService(cfg upspin.Config) func(userName upspin.UserName) (upspin.PublicKey, error) {
-	const op = "transport/auth.PublicUserKeyService"
+	const op = "rpc.PublicUserKeyService"
 	return func(userName upspin.UserName) (upspin.PublicKey, error) {
 		key, err := bind.KeyServer(cfg, cfg.KeyEndpoint())
 		if err != nil {

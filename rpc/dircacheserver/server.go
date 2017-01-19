@@ -17,7 +17,7 @@ import (
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/path"
-	"upspin.io/transport/auth"
+	"upspin.io/rpc"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
 )
@@ -39,10 +39,10 @@ func New(cfg upspin.Config, cacheDir string, maxLogBytes int64) (http.Handler, e
 		clog: clog,
 	}
 
-	return auth.NewServer(cfg, &auth.ServerConfig{
-		Service: auth.Service{
+	return rpc.NewServer(cfg, &rpc.ServerConfig{
+		Service: rpc.Service{
 			Name: "Dir",
-			Methods: map[string]auth.Method{
+			Methods: map[string]rpc.Method{
 				"Delete":      s.Delete,
 				"Glob":        s.Glob,
 				"Lookup":      s.Lookup,
@@ -55,7 +55,7 @@ func New(cfg upspin.Config, cacheDir string, maxLogBytes int64) (http.Handler, e
 }
 
 // dirFor returns a DirServer instance bound to the user specified in the config.
-func (s *server) dirFor(session auth.Session, path upspin.PathName) (upspin.DirServer, error) {
+func (s *server) dirFor(session rpc.Session, path upspin.PathName) (upspin.DirServer, error) {
 	ep := session.ProxiedEndpoint()
 	if ep.Transport == upspin.Unassigned {
 		return nil, errors.Str("not yet configured")
@@ -68,7 +68,7 @@ func (s *server) dirFor(session auth.Session, path upspin.PathName) (upspin.DirS
 }
 
 // endpointFor returns a DirServer endpoint for the config.
-func (s *server) endpointFor(session auth.Session) (*upspin.Endpoint, error) {
+func (s *server) endpointFor(session rpc.Session) (*upspin.Endpoint, error) {
 	ep := session.ProxiedEndpoint()
 	if ep.Transport == upspin.Unassigned {
 		return &ep, errors.Str("not yet configured")
@@ -77,7 +77,7 @@ func (s *server) endpointFor(session auth.Session) (*upspin.Endpoint, error) {
 }
 
 // Lookup implements proto.DirServer.
-func (s *server) Lookup(session auth.Session, reqBytes []byte) (pb.Message, error) {
+func (s *server) Lookup(session rpc.Session, reqBytes []byte) (pb.Message, error) {
 	var req proto.DirLookupRequest
 	if err := pb.Unmarshal(reqBytes, &req); err != nil {
 		return nil, err
@@ -102,7 +102,7 @@ func (s *server) Lookup(session auth.Session, reqBytes []byte) (pb.Message, erro
 }
 
 // Glob implements proto.DirServer.
-func (s *server) Glob(session auth.Session, reqBytes []byte) (pb.Message, error) {
+func (s *server) Glob(session rpc.Session, reqBytes []byte) (pb.Message, error) {
 	var req proto.DirGlobRequest
 	if err := pb.Unmarshal(reqBytes, &req); err != nil {
 		return nil, err
@@ -128,7 +128,7 @@ func (s *server) Glob(session auth.Session, reqBytes []byte) (pb.Message, error)
 
 // Put implements proto.DirServer.
 // TODO(p): Remember access errors to avoid even trying?
-func (s *server) Put(session auth.Session, reqBytes []byte) (pb.Message, error) {
+func (s *server) Put(session rpc.Session, reqBytes []byte) (pb.Message, error) {
 	var req proto.DirPutRequest
 	if err := pb.Unmarshal(reqBytes, &req); err != nil {
 		return nil, err
@@ -153,7 +153,7 @@ func (s *server) Put(session auth.Session, reqBytes []byte) (pb.Message, error) 
 }
 
 // Delete implements proto.DirServer.
-func (s *server) Delete(session auth.Session, reqBytes []byte) (pb.Message, error) {
+func (s *server) Delete(session rpc.Session, reqBytes []byte) (pb.Message, error) {
 	var req proto.DirDeleteRequest
 	if err := pb.Unmarshal(reqBytes, &req); err != nil {
 		return nil, err
@@ -174,7 +174,7 @@ func (s *server) Delete(session auth.Session, reqBytes []byte) (pb.Message, erro
 }
 
 // WhichAccess implements proto.DirServer.
-func (s *server) WhichAccess(session auth.Session, reqBytes []byte) (pb.Message, error) {
+func (s *server) WhichAccess(session rpc.Session, reqBytes []byte) (pb.Message, error) {
 	var req proto.DirWhichAccessRequest
 	if err := pb.Unmarshal(reqBytes, &req); err != nil {
 		return nil, err
@@ -198,12 +198,12 @@ func (s *server) WhichAccess(session auth.Session, reqBytes []byte) (pb.Message,
 }
 
 // Watch implements proto.Watch.
-func (s *server) Watch(session auth.Session, reqBytes []byte) (pb.Message, error) {
+func (s *server) Watch(session rpc.Session, reqBytes []byte) (pb.Message, error) {
 	return nil, upspin.ErrNotSupported
 }
 
 // Endpoint implements proto.DirServer.
-func (s *server) Endpoint(session auth.Session, reqBytes []byte) (pb.Message, error) {
+func (s *server) Endpoint(session rpc.Session, reqBytes []byte) (pb.Message, error) {
 	var req proto.EndpointRequest
 	if err := pb.Unmarshal(reqBytes, &req); err != nil {
 		return nil, err

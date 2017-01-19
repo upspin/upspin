@@ -18,8 +18,8 @@ import (
 	"upspin.io/flags"
 	"upspin.io/log"
 	"upspin.io/metric"
+	"upspin.io/rpc/dirserver"
 	"upspin.io/serverutil/perm"
-	"upspin.io/transport/dirserver"
 	"upspin.io/upspin"
 
 	// TODO: Which of these are actually needed?

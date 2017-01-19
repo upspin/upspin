@@ -15,7 +15,7 @@ import (
 	"upspin.io/config"
 	"upspin.io/errors"
 	"upspin.io/log"
-	"upspin.io/transport/auth"
+	"upspin.io/rpc"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
 )
@@ -39,7 +39,7 @@ func New(cfg upspin.Config, key upspin.KeyServer, addr upspin.NetAddr) http.Hand
 		},
 		key: key,
 	}
-	return auth.NewServer(cfg, &auth.ServerConfig{
+	return rpc.NewServer(cfg, &rpc.ServerConfig{
 		Lookup: func(userName upspin.UserName) (upspin.PublicKey, error) {
 			user, err := key.Lookup(userName)
 			if err != nil {
@@ -47,9 +47,9 @@ func New(cfg upspin.Config, key upspin.KeyServer, addr upspin.NetAddr) http.Hand
 			}
 			return user.PublicKey, nil
 		},
-		Service: auth.Service{
+		Service: rpc.Service{
 			Name: "Key",
-			Methods: map[string]auth.Method{
+			Methods: map[string]rpc.Method{
 				"Lookup": s.Lookup,
 				"Put":    s.Put,
 			},
@@ -57,7 +57,7 @@ func New(cfg upspin.Config, key upspin.KeyServer, addr upspin.NetAddr) http.Hand
 	})
 }
 
-func (s *server) serverFor(session auth.Session, reqBytes []byte, req pb.Message) (upspin.KeyServer, error) {
+func (s *server) serverFor(session rpc.Session, reqBytes []byte, req pb.Message) (upspin.KeyServer, error) {
 	if err := pb.Unmarshal(reqBytes, req); err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (s *server) serverFor(session auth.Session, reqBytes []byte, req pb.Message
 }
 
 // Lookup implements proto.KeyServer, and does not do any authentication.
-func (s *server) Lookup(session auth.Session, reqBytes []byte) (pb.Message, error) {
+func (s *server) Lookup(session rpc.Session, reqBytes []byte) (pb.Message, error) {
 	// TODO(adg): Lookup should be accessible even to unauthenticated users.
 
 	var req proto.KeyLookupRequest
@@ -88,7 +88,7 @@ func (s *server) Lookup(session auth.Session, reqBytes []byte) (pb.Message, erro
 }
 
 // Put implements proto.KeyServer.
-func (s *server) Put(session auth.Session, reqBytes []byte) (pb.Message, error) {
+func (s *server) Put(session rpc.Session, reqBytes []byte) (pb.Message, error) {
 	var req proto.KeyPutRequest
 	key, err := s.serverFor(session, reqBytes, &req)
 	if err != nil {

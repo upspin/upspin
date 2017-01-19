@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 /*
-Package auth provides a framework for implementing RPC servers and clients.
+Package rpc provides a framework for implementing RPC servers and clients.
 
 RPC wire protocol
 
@@ -32,4 +32,4 @@ string.
 For details of transcoding between Upspin types and their protocol buffer form,
 see the documentation in upspin.io/upspin/proto.
 */
-package auth
+package rpc
