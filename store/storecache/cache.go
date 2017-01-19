@@ -132,6 +132,10 @@ func (c *storeCache) newCachedRef(file string) *cachedRef {
 // get fetches a reference. If possible, it stores it as a local file.
 // No locks are held on entry or exit.
 func (c *storeCache) get(cfg upspin.Config, ref upspin.Reference, e upspin.Endpoint) ([]byte, []upspin.Location, error) {
+	if ref == "metadata:Health" {
+		return []byte("you never write, you never call, I could be dead for all you know"), nil, nil
+	}
+
 	file := c.cachePath(ref, e)
 	c.enforceByteLimitByRemovingLeastRecentlyUsedFile()
 
