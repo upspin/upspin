@@ -12,7 +12,7 @@ import (
 	"upspin.io/bind"
 	"upspin.io/errors"
 	"upspin.io/log"
-	"upspin.io/transport/auth"
+	"upspin.io/rpc"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
 )
@@ -25,8 +25,8 @@ type dialConfig struct {
 
 // remote implements upspin.StoreServer.
 type remote struct {
-	auth.Client // For sessions, Ping, and Close.
-	cfg         dialConfig
+	rpc.Client // For sessions, Ping, and Close.
+	cfg        dialConfig
 }
 
 var _ upspin.StoreServer = (*remote)(nil)
@@ -89,7 +89,7 @@ func dialCache(op *operation, config upspin.Config, proxyFor upspin.Endpoint) up
 	}
 
 	// Call the cache. The cache is local so don't bother with TLS.
-	authClient, err := auth.NewClient(config, ce.NetAddr, auth.NoSecurity, proxyFor)
+	authClient, err := rpc.NewClient(config, ce.NetAddr, rpc.NoSecurity, proxyFor)
 	if err != nil {
 		// On error dial direct.
 		op.error(errors.IO, err)
@@ -119,7 +119,7 @@ func (r *remote) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service, 
 	}
 
 	// Call the server directly.
-	authClient, err := auth.NewClient(config, e.NetAddr, auth.Secure, upspin.Endpoint{})
+	authClient, err := rpc.NewClient(config, e.NetAddr, rpc.Secure, upspin.Endpoint{})
 	if err != nil {
 		return nil, op.error(errors.IO, err)
 	}

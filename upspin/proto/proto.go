@@ -7,7 +7,7 @@
 // package itself.
 //
 // These protocol buffers are used in the networking API to talk to Upspin
-// servers. The wire protocol is described by package upspin.io/transport/auth.
+// servers. The wire protocol is described by package upspin.io/rpc.
 //
 // Unlike in some other systems, the protocol buffer types themselves are not
 // used within the rest of the Upspin implementation. Instead, native Go types

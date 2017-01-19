@@ -15,7 +15,7 @@ import (
 	"upspin.io/config"
 	"upspin.io/errors"
 	"upspin.io/log"
-	"upspin.io/transport/auth"
+	"upspin.io/rpc"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
 )
@@ -40,17 +40,17 @@ func New(cfg upspin.Config, dir upspin.DirServer, addr upspin.NetAddr) http.Hand
 		dir: dir,
 	}
 
-	return auth.NewServer(cfg, &auth.ServerConfig{
-		Service: auth.Service{
+	return rpc.NewServer(cfg, &rpc.ServerConfig{
+		Service: rpc.Service{
 			Name: "Dir",
-			Methods: map[string]auth.Method{
+			Methods: map[string]rpc.Method{
 				"Delete":      s.Delete,
 				"Glob":        s.Glob,
 				"Lookup":      s.Lookup,
 				"Put":         s.Put,
 				"WhichAccess": s.WhichAccess,
 			},
-			Streams: map[string]auth.Stream{
+			Streams: map[string]rpc.Stream{
 				"Watch": s.Watch,
 			},
 		},
@@ -58,7 +58,7 @@ func New(cfg upspin.Config, dir upspin.DirServer, addr upspin.NetAddr) http.Hand
 
 }
 
-func (s *server) serverFor(session auth.Session, reqBytes []byte, req pb.Message) (upspin.DirServer, error) {
+func (s *server) serverFor(session rpc.Session, reqBytes []byte, req pb.Message) (upspin.DirServer, error) {
 	if err := pb.Unmarshal(reqBytes, req); err != nil {
 		return nil, err
 	}
@@ -70,7 +70,7 @@ func (s *server) serverFor(session auth.Session, reqBytes []byte, req pb.Message
 }
 
 // Lookup implements proto.DirServer.
-func (s *server) Lookup(session auth.Session, reqBytes []byte) (pb.Message, error) {
+func (s *server) Lookup(session rpc.Session, reqBytes []byte) (pb.Message, error) {
 	var req proto.DirLookupRequest
 	dir, err := s.serverFor(session, reqBytes, &req)
 	if err != nil {
@@ -82,7 +82,7 @@ func (s *server) Lookup(session auth.Session, reqBytes []byte) (pb.Message, erro
 }
 
 // Put implements proto.DirServer.
-func (s *server) Put(session auth.Session, reqBytes []byte) (pb.Message, error) {
+func (s *server) Put(session rpc.Session, reqBytes []byte) (pb.Message, error) {
 	var req proto.DirPutRequest
 	dir, err := s.serverFor(session, reqBytes, &req)
 	if err != nil {
@@ -98,7 +98,7 @@ func (s *server) Put(session auth.Session, reqBytes []byte) (pb.Message, error) 
 }
 
 // Glob implements proto.DirServer.
-func (s *server) Glob(session auth.Session, reqBytes []byte) (pb.Message, error) {
+func (s *server) Glob(session rpc.Session, reqBytes []byte) (pb.Message, error) {
 	var req proto.DirGlobRequest
 	dir, err := s.serverFor(session, reqBytes, &req)
 	if err != nil {
@@ -129,7 +129,7 @@ func globError(err error) *proto.EntriesError {
 }
 
 // Watch implements proto.Watch.
-func (s *server) Watch(session auth.Session, reqBytes []byte, done <-chan struct{}) (<-chan pb.Message, error) {
+func (s *server) Watch(session rpc.Session, reqBytes []byte, done <-chan struct{}) (<-chan pb.Message, error) {
 	var req proto.DirWatchRequest
 	dir, err := s.serverFor(session, reqBytes, &req)
 	if err != nil {
@@ -158,7 +158,7 @@ func (s *server) Watch(session auth.Session, reqBytes []byte, done <-chan struct
 }
 
 // Delete implements proto.DirServer.
-func (s *server) Delete(session auth.Session, reqBytes []byte) (pb.Message, error) {
+func (s *server) Delete(session rpc.Session, reqBytes []byte) (pb.Message, error) {
 	var req proto.DirDeleteRequest
 	dir, err := s.serverFor(session, reqBytes, &req)
 	if err != nil {
@@ -170,7 +170,7 @@ func (s *server) Delete(session auth.Session, reqBytes []byte) (pb.Message, erro
 }
 
 // WhichAccess implements proto.DirServer.
-func (s *server) WhichAccess(session auth.Session, reqBytes []byte) (pb.Message, error) {
+func (s *server) WhichAccess(session rpc.Session, reqBytes []byte) (pb.Message, error) {
 	var req proto.DirWhichAccessRequest
 	dir, err := s.serverFor(session, reqBytes, &req)
 	if err != nil {

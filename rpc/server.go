@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package auth
+package rpc
 
 import (
 	"crypto/rand"
@@ -234,7 +234,7 @@ func serveStream(s Stream, sess Session, w http.ResponseWriter, body []byte) {
 }
 
 func (s *serverImpl) SessionForRequest(w http.ResponseWriter, r *http.Request) (session Session, err error) {
-	const op = "transport/auth.SessionForRequest"
+	const op = "rpc.SessionForRequest"
 	defer func() {
 		if err == nil {
 			return

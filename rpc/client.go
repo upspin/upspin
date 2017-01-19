@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package auth
+package rpc
 
 import (
 	"bytes"
@@ -85,7 +85,7 @@ type httpClient struct {
 // it indicates that this connection is being used to proxy request to that
 // endpoint.
 func NewClient(cfg upspin.Config, netAddr upspin.NetAddr, security SecurityLevel, proxyFor upspin.Endpoint) (Client, error) {
-	const op = "transport/auth.NewClient"
+	const op = "rpc.NewClient"
 
 	c := &httpClient{
 		proxyFor: proxyFor,
@@ -121,7 +121,7 @@ func NewClient(cfg upspin.Config, netAddr upspin.NetAddr, security SecurityLevel
 }
 
 func (c *httpClient) Invoke(method string, req, resp pb.Message, stream ResponseChan, done <-chan struct{}) error {
-	const op = "transport/auth.Invoke"
+	const op = "rpc.Invoke"
 
 	if (resp == nil) == (stream == nil) {
 		return errors.E(op, errors.Str("exactly one of resp and stream must be nil"))

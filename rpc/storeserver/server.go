@@ -15,7 +15,7 @@ import (
 	"upspin.io/config"
 	"upspin.io/errors"
 	"upspin.io/log"
-	"upspin.io/transport/auth"
+	"upspin.io/rpc"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
 )
@@ -34,10 +34,10 @@ func New(cfg upspin.Config, store upspin.StoreServer, _ upspin.NetAddr) http.Han
 		store:  store,
 	}
 
-	return auth.NewServer(cfg, &auth.ServerConfig{
-		Service: auth.Service{
+	return rpc.NewServer(cfg, &rpc.ServerConfig{
+		Service: rpc.Service{
 			Name: "Store",
-			Methods: map[string]auth.Method{
+			Methods: map[string]rpc.Method{
 				"Get":    s.Get,
 				"Put":    s.Put,
 				"Delete": s.Delete,
@@ -46,7 +46,7 @@ func New(cfg upspin.Config, store upspin.StoreServer, _ upspin.NetAddr) http.Han
 	})
 }
 
-func (s *server) serverFor(session auth.Session, reqBytes []byte, req pb.Message) (upspin.StoreServer, error) {
+func (s *server) serverFor(session rpc.Session, reqBytes []byte, req pb.Message) (upspin.StoreServer, error) {
 	if err := pb.Unmarshal(reqBytes, req); err != nil {
 		return nil, err
 	}
@@ -63,7 +63,7 @@ func (s *server) serverFor(session auth.Session, reqBytes []byte, req pb.Message
 }
 
 // Get implements proto.StoreServer.
-func (s *server) Get(session auth.Session, reqBytes []byte) (pb.Message, error) {
+func (s *server) Get(session rpc.Session, reqBytes []byte) (pb.Message, error) {
 	var req proto.StoreGetRequest
 	store, err := s.serverFor(session, reqBytes, &req)
 	if err != nil {
@@ -85,7 +85,7 @@ func (s *server) Get(session auth.Session, reqBytes []byte) (pb.Message, error) 
 }
 
 // Put implements proto.StoreServer.
-func (s *server) Put(session auth.Session, reqBytes []byte) (pb.Message, error) {
+func (s *server) Put(session rpc.Session, reqBytes []byte) (pb.Message, error) {
 	var req proto.StorePutRequest
 	store, err := s.serverFor(session, reqBytes, &req)
 	if err != nil {
@@ -108,7 +108,7 @@ func (s *server) Put(session auth.Session, reqBytes []byte) (pb.Message, error) 
 var deleteResponse proto.StoreDeleteResponse
 
 // Delete implements proto.StoreServer.
-func (s *server) Delete(session auth.Session, reqBytes []byte) (pb.Message, error) {
+func (s *server) Delete(session rpc.Session, reqBytes []byte) (pb.Message, error) {
 	var req proto.StoreGetRequest
 	store, err := s.serverFor(session, reqBytes, &req)
 	if err != nil {
