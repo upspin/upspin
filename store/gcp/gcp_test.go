@@ -5,15 +5,12 @@
 package gcp
 
 import (
-	"bytes"
 	"strings"
 	"testing"
-	"time"
 
+	"upspin.io/cloud/storage"
 	"upspin.io/cloud/storage/storagetest"
 	"upspin.io/errors"
-	"upspin.io/store/gcp/cache"
-	"upspin.io/upspin"
 
 	// Import needed storage backend.
 	_ "upspin.io/cloud/storage/gcs"
@@ -27,10 +24,9 @@ const (
 )
 
 func TestPutAndGet(t *testing.T) {
-	s := newStoreServer()
-	defer s.server.cache.Delete() // cleanup -- can't call s.Close because we did not use bind
+	s := newStoreServer(nil)
 
-	refdata, err := s.server.Put([]byte(contents))
+	refdata, err := s.Put([]byte(contents))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -39,65 +35,29 @@ func TestPutAndGet(t *testing.T) {
 		t.Errorf("Expected reference %q, got %q", expectedRef, ref)
 	}
 
-	<-s.ch // Wait for the server thread to put to GCP safely.
-
-	data, _, locs, err := s.server.Get(ref)
+	data, _, locs, err := s.Get(ref)
 	if err != nil {
 		t.Fatal(err)
-	}
-	if data != nil {
-		t.Fatal("Expected data to be nil")
-	}
-	if len(locs) != 1 {
-		t.Fatalf("Expected one new location, got %d", len(locs))
-	}
-	expectedLoc := upspin.Location{
-		Endpoint: upspin.Endpoint{
-			Transport: upspin.HTTPS,
-			NetAddr:   serverBaseURL,
-		},
-		Reference: linkForRef,
-	}
-	if locs[0] != expectedLoc {
-		t.Errorf("Expected %v, got %v", expectedLoc, locs[0])
-	}
-}
-
-func TestGetFromLocalCache(t *testing.T) {
-	s := newStoreServer()
-	cache := s.server.cache
-	defer cache.Delete() // cleanup -- can't call s.Close because we did not use bind
-
-	// Simulate file still being locally on the server. Get the bytes instead of a new location.
-	err := cache.Put(expectedRef, bytes.NewReader([]byte(contents)))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	data, _, locs, err := s.server.Get(expectedRef)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if len(locs) != 0 {
-		t.Fatalf("Expected no new location, got %d", len(locs))
 	}
 	if data == nil {
-		t.Fatal("Expected data")
+		t.Fatal("Expected data to be non-nil")
+	}
+	if len(locs) != 0 {
+		t.Fatalf("Expected 0 location, got %d", len(locs))
 	}
 	if string(data) != contents {
-		t.Errorf("Expected contents %q, got %q", contents, data)
+		t.Errorf("Got data %q, want %q", data, contents)
 	}
 }
 
 func TestDelete(t *testing.T) {
-	s := newStoreServer()
-	defer s.server.cache.Delete() // cleanup -- can't call s.Close because we did not use bind
+	s := newStoreServer(nil)
 
-	err := s.server.Delete(expectedRef)
+	err := s.Delete(expectedRef)
 	if err != nil {
 		t.Fatal(err)
 	}
-	gotRef := s.server.storage.(*testGCP).deletedRef
+	gotRef := s.storage.(*testGCP).deletedRef
 	if gotRef != expectedRef {
 		t.Errorf("Expected delete call to %q, got %q", gotRef, expectedRef)
 	}
@@ -106,37 +66,15 @@ func TestDelete(t *testing.T) {
 // Test some error conditions.
 
 func TestGetInvalidRef(t *testing.T) {
-	s := newStoreServer()
-	defer s.server.cache.Delete() // cleanup -- can't call s.Close because we did not use bind
+	s := newStoreServer(nil)
 
-	_, _, _, err := s.server.Get("bla bla bla")
+	_, _, _, err := s.Get("bla bla bla")
 	if err == nil {
 		t.Fatal("Expected error")
 	}
 	want := errors.E(errors.NotExist)
 	if !errors.Match(want, err) {
 		t.Errorf("Expected error %q, got %q", want, err)
-	}
-}
-
-func TestGCPErrorsOut(t *testing.T) {
-	s := newStoreServer()
-	defer s.server.cache.Delete() // cleanup -- can't call s.Close because we did not use bind
-
-	oldStorage := s.server.storage
-	defer func() { s.server.storage = oldStorage }()
-	s.server.storage = &storagetest.ExpectGet{
-		Ref:  "123",
-		Link: "very poorly-formated url",
-	}
-
-	_, _, _, err := s.server.Get("123")
-	if err == nil {
-		t.Fatal("Expected error")
-	}
-	expectedError := "invalid link returned from GCP"
-	if !strings.Contains(err.Error(), expectedError) {
-		t.Errorf("Expected error %q, got %q", expectedError, err)
 	}
 }
 
@@ -153,50 +91,33 @@ func TestNew(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping part of test when network unavailable; depends on credential availability")
 	}
-	_, err = New("defaultACL=publicRead", "gcpProjectId=some project id", "gcpBucketName=zee bucket", ConfigTemporaryDir+"=")
+	_, err = New("defaultACL=publicRead", "gcpProjectId=some project id", "gcpBucketName=zee bucket")
 	if err != nil {
 		t.Fatal(err)
 	}
 }
 
-func newStoreServer() *storeTestServer {
-	ch := make(chan bool)
-
-	s := &storeTestServer{
-		server: &server{
-			cache: cache.NewFileCache(""),
-			storage: &testGCP{
-				ExpectGet: storagetest.ExpectGet{
-					Ref:  expectedRef,
-					Link: linkForRef,
-				},
-				ch: ch,
+func newStoreServer(s storage.Storage) *server {
+	if s == nil {
+		s = &testGCP{
+			Storage: &storagetest.ExpectDownloadCapturePut{
+				Ref:  []string{expectedRef},
+				Data: [][]byte{[]byte(contents)},
 			},
-		},
-		ch: ch,
+		}
 	}
-	return s
+	return &server{
+		storage: s,
+	}
 }
 
 type storeTestServer struct {
 	server *server
-	ch     chan bool // channel for listening to GCP events.
 }
 
 type testGCP struct {
-	storagetest.ExpectGet
-	ch         chan bool
+	storage.Storage
 	deletedRef string
-}
-
-// PutLocalFile implements GCP.
-func (t *testGCP) PutLocalFile(srcLocalFilename string, ref string) (refLink string, error error) {
-	go func() {
-		time.Sleep(50 * time.Millisecond) // Allow time for the cache purge to happen.
-		t.ch <- true                      // Inform we've been called.
-	}()
-
-	return "", nil
 }
 
 // Delete implements GCP.

@@ -9,7 +9,6 @@ import (
 	"bytes"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"strings"
 
 	gContext "golang.org/x/net/context"
@@ -60,27 +59,6 @@ type gcsImpl struct {
 
 // Guarantee we implement the Storage interface.
 var _ storage.Storage = (*gcsImpl)(nil)
-
-// PutLocalFile implements Storage.
-func (gcs *gcsImpl) PutLocalFile(srcLocalFilename string, ref string) (refLink string, error error) {
-	// Insert an object into a bucket.
-	object := &gcsBE.Object{Name: ref}
-	file, err := os.Open(srcLocalFilename)
-	if err != nil {
-		log.Printf("Error opening: %v", err)
-		return "", err
-	}
-	defer file.Close()
-	acl := string(gcs.defaultWriteACL)
-	res, err := gcs.service.Objects.Insert(gcs.bucketName, object).Media(file).PredefinedAcl(acl).Do()
-	if err == nil {
-		log.Debug.Printf("Created object %v at location %v", res.Name, res.SelfLink)
-	} else {
-		log.Error.Printf("Objects.Insert failed: %v", err)
-		return "", err
-	}
-	return res.MediaLink, err
-}
 
 // Get implements Storage.
 func (gcs *gcsImpl) Get(ref string) (link string, error error) {
