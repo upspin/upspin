@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "4851d61e_79d1c1ad",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-01-20T02:18:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e8d36ae9_756b025a",
+      "revId": "3ebaf4092250f8d55481e4e5cba47405bdc624bf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e8d36ae9_35757a36",
         "filename": "cmd/frontend/frontend_test.go",
         "patchSetId": 3
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "4851d61e_b9ae1941",
+        "filename": "cmd/frontend/frontend_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-01-20T02:18:01Z",
+      "side": 1,
+      "message": "Doesn’t appear to, no. It’s likely that most code doesn’t set the Accept-Encoding: gzip header so it seems to do it automatically.",
+      "parentUuid": "e8d36ae9_35757a36",
+      "revId": "3ebaf4092250f8d55481e4e5cba47405bdc624bf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e8d36ae9_15707645",
         "filename": "cmd/frontend/gzip.go",
         "patchSetId": 3
@@ -47,6 +83,24 @@
       "writtenOn": "2017-01-20T02:04:45Z",
       "side": 1,
       "message": "why bother with this? when would it be used?",
+      "revId": "3ebaf4092250f8d55481e4e5cba47405bdc624bf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4851d61e_19bf6d6d",
+        "filename": "cmd/frontend/gzip.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-01-20T02:18:01Z",
+      "side": 1,
+      "message": "WebSocket implementations hijack the connection. Happy to remove since we don’t use anything WS related.",
+      "parentUuid": "e8d36ae9_15707645",
       "revId": "3ebaf4092250f8d55481e4e5cba47405bdc624bf",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
