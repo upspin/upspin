@@ -20,6 +20,7 @@ func newGzipResponseWriter(w http.ResponseWriter) *gzipResponseWriter {
 	return &gzipResponseWriter{WriteCloser: gz, ResponseWriter: w}
 }
 
+// Write implements io.Writer.
 func (w gzipResponseWriter) Write(b []byte) (int, error) {
 	return w.WriteCloser.Write(b)
 }
