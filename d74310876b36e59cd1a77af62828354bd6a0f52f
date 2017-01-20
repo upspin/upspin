@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "4851d61e_8b8656b4",
+        "filename": "cmd/frontend/frontend.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-01-20T21:14:26Z",
+      "side": 1,
+      "message": "Done in follow-up change.",
+      "parentUuid": "4851d61e_a84a3d90",
+      "revId": "d74310876b36e59cd1a77af62828354bd6a0f52f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4851d61e_884f81a1",
         "filename": "cmd/frontend/gzip.go",
         "patchSetId": 7
@@ -30,6 +48,24 @@
       "writtenOn": "2017-01-20T17:09:28Z",
       "side": 1,
       "message": "// Write implements io.Writer",
+      "revId": "d74310876b36e59cd1a77af62828354bd6a0f52f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4851d61e_4b705ef4",
+        "filename": "cmd/frontend/gzip.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-01-20T21:14:26Z",
+      "side": 1,
+      "message": "Done in follow-up change.",
+      "parentUuid": "4851d61e_884f81a1",
       "revId": "d74310876b36e59cd1a77af62828354bd6a0f52f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
