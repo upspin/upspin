@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e8d36ae9_756b025a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-20T02:04:45Z",
+      "side": 1,
+      "message": "cmd/frontend: serve gzip responses\n\nAlso some restructuring in preparation for future work.",
+      "revId": "3ebaf4092250f8d55481e4e5cba47405bdc624bf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e8d36ae9_35757a36",
+        "filename": "cmd/frontend/frontend_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-20T02:04:45Z",
+      "side": 1,
+      "message": "shouldn\u0027t the client do this by default?",
+      "revId": "3ebaf4092250f8d55481e4e5cba47405bdc624bf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e8d36ae9_15707645",
+        "filename": "cmd/frontend/gzip.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-20T02:04:45Z",
+      "side": 1,
+      "message": "why bother with this? when would it be used?",
+      "revId": "3ebaf4092250f8d55481e4e5cba47405bdc624bf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
