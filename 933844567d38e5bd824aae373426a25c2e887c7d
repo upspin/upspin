@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e8d36ae9_7538e20e",
+        "filename": "cmd/frontend/frontend",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-20T05:45:23Z",
+      "side": 0,
+      "message": "accidentally committed the binary",
+      "revId": "933844567d38e5bd824aae373426a25c2e887c7d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
