@@ -90,6 +90,24 @@
     },
     {
       "key": {
+        "uuid": "4851d61e_dc4ae3ba",
+        "filename": "cmd/frontend/frontend_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-01-20T02:57:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e8d36ae9_35c33a1e",
+      "revId": "3ebaf4092250f8d55481e4e5cba47405bdc624bf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e8d36ae9_15707645",
         "filename": "cmd/frontend/gzip.go",
         "patchSetId": 3
@@ -137,6 +155,24 @@
       "side": 1,
       "message": "Yeah drop it",
       "parentUuid": "4851d61e_19bf6d6d",
+      "revId": "3ebaf4092250f8d55481e4e5cba47405bdc624bf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4851d61e_bc396745",
+        "filename": "cmd/frontend/gzip.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-01-20T02:57:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e8d36ae9_d5a74e92",
       "revId": "3ebaf4092250f8d55481e4e5cba47405bdc624bf",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
