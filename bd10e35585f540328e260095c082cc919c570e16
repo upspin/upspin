@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e8d36ae9_55e35eeb",
+        "filename": "cmd/upspin-deploy/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 569,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-20T23:19:48Z",
+      "side": 1,
+      "message": "rather than this long multi-line expression, add a function\n\nlogLevel(project string) string\n\nand here\n\ndata \u003d  bytes.Replace(data, []byte(\"LOGLEVEL\"), []byte(\"info\"), []byte(logLevel(c.Project)))",
+      "revId": "bd10e35585f540328e260095c082cc919c570e16",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
