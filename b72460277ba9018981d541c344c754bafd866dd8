@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e8d36ae9_75ff8288",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 763,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-20T23:04:11Z",
+      "side": 1,
+      "message": "add context to this message",
+      "revId": "b72460277ba9018981d541c344c754bafd866dd8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e8d36ae9_1504f6cb",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 791,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-20T23:04:11Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "b72460277ba9018981d541c344c754bafd866dd8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e8d36ae9_3509fae2",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 794,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-20T23:04:11Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "b72460277ba9018981d541c344c754bafd866dd8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
