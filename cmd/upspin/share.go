@@ -160,6 +160,21 @@ func (s *State) shareCommand(fs *flag.FlagSet) {
 			fmt.Fprintf(os.Stderr, "looking up users for %q: %s", entry.Name, err)
 			continue
 		}
+		if !s.sharer.quiet {
+			// Check whether readers include "all", because we have encryption but
+			// no way to get all the world's keys.
+			for i, user := range users {
+				if user == access.AllUsers {
+					fmt.Fprintf(os.Stderr, "%s:\n\tWarning: file readable by \"all\" but encrypted.", entry.Name)
+					// There will always be at least one reader, the owner, so the print always looks right.
+					userList := userListToString(append(users[:i], users[i+1:]...))
+					fmt.Fprintf(os.Stderr, "\n\tSharing can be fixed only for these readers: %s", userList)
+					s.exitCode = 1
+					break
+				}
+			}
+		}
+		entriesToFix = append(entriesToFix, entry)
 		userList := userListToString(users)
 		if userList != keyUsers || self {
 			if !s.sharer.quiet {
