@@ -16,6 +16,7 @@ import (
 
 var (
 	testResponse = "ok"
+	testDocPath  = "testdata/doc"
 
 	testServer http.Handler
 	addr       string
@@ -23,6 +24,7 @@ var (
 )
 
 func startServer() {
+	*docPath = testDocPath
 	s := newServer().(*server)
 	s.mux.HandleFunc("/_test", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, testResponse)
@@ -34,6 +36,7 @@ func startServer() {
 func TestNoGzip(t *testing.T) {
 	once.Do(startServer)
 	req, err := http.NewRequest("GET", "http://"+addr+"/_test", nil)
+
 	// Don’t ask for gzipped responses.
 	req.Header.Set("Accept-Encoding", "")
 	if err != nil {
@@ -53,9 +56,8 @@ func TestNoGzip(t *testing.T) {
 	}
 }
 
-func TestGoImport(t *testing.T) {
-	once.Do(startServer)
-	resp, err := http.Get("http://" + addr + "/?go-get=1")
+func get(t *testing.T, url string) []byte {
+	resp, err := http.Get(url)
 	if err != nil {
 		t.Fatalf("expected no error, but got %v", err)
 	}
@@ -67,8 +69,41 @@ func TestGoImport(t *testing.T) {
 	if err != nil {
 		t.Fatalf("expected no error reading response body, got %v", err)
 	}
+	return b
+}
+
+func TestGoImport(t *testing.T) {
+	once.Do(startServer)
+	b := get(t, "http://"+addr+"/?go-get=1")
 	expected := fmt.Sprintf(`<meta name="go-import" content="%v git %v">`, sourceBase, sourceRepo)
 	if strings.TrimSpace(string(b)) != expected {
 		t.Errorf("expected response body to be %q, got %q", expected, b)
+	}
+}
+
+func TestDocList(t *testing.T) {
+	once.Do(startServer)
+	b := get(t, "http://"+addr+"/")
+	expected := `<a href="/doc/test.md">test.md</a>`
+	if !strings.Contains(string(b), expected) {
+		t.Errorf("expected response body to contain %q; body: %q", expected, b)
+	}
+}
+
+func TestDoc(t *testing.T) {
+	once.Do(startServer)
+	b := get(t, "http://"+addr+"/doc/test.md")
+	expected := `<h1>Test</h1>`
+	if !strings.Contains(string(b), expected) {
+		t.Errorf("expected response body to contain %q; body: %q", expected, b)
+	}
+
+	resp, err := http.Get("http://" + addr + "/doc/notfounddoc")
+	if err != nil {
+		t.Fatalf("expected no error, but got %v", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusNotFound {
+		t.Errorf("expected status code to be %d, got %d", http.StatusNotFound, resp.StatusCode)
 	}
 }
