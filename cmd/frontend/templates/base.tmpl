@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<!--
+Copyright 2017 The Upspin Authors. All rights reserved.
+Use of this source code is governed by a BSD-style
+license that can be found in the LICENSE file.
+-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Upspin</title>
+<style>
+* {
+  box-sizing: border-box;
+}
+html,
+body {
+  height: 100vh;
+}
+body {
+  display: flex;
+  flex-direction: column;
+  font: 62.5% arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+header,
+main,
+footer {
+  font-size: 1.3em;
+}
+header,
+footer {
+  background-color: #f1f2f3;
+  padding: 1em;
+}
+main {
+  flex: 1;
+}
+.u-centeredMaxWidth70 {
+  margin: 0 auto;
+  max-width: 68em;
+  padding: 0 1em;
+}
+</style>
+<header>
+  <div class="u-centeredMaxWidth70">
+    Upspin
+  </div>
+</header>
+<main class="u-centeredMaxWidth70">
+  {{block "content" .}}Hello, Upspin!{{end}}
+</main>
+<footer>
+  <div class="u-centeredMaxWidth70">
+    Copyright 2017 The Upspin Authors. All Rights Reserved.
+  </div>
+</footer>
