@@ -13,9 +13,10 @@ import (
 	"os"
 
 	"upspin.io/config"
+	"upspin.io/dir/dircache"
 	"upspin.io/flags"
 	"upspin.io/log"
-	"upspin.io/rpc/dircacheserver"
+	"upspin.io/rpc/dirserver"
 	"upspin.io/rpc/storeserver"
 	"upspin.io/store/storecache"
 
@@ -74,10 +75,11 @@ func main() {
 	}
 	ss := storeserver.New(cfg, sc, "")
 
-	ds, err := dircacheserver.New(cfg, *cacheFlag, maxLogBytes)
+	dc, err := dircache.New(cfg, *cacheFlag, maxLogBytes)
 	if err != nil {
 		log.Fatalf("opening cache: %s", err)
 	}
+	ds := dirserver.New(cfg, dc, "")
 
 	ln, err := net.Listen("tcp", addr)
 	if err != nil {
