@@ -175,7 +175,7 @@ func (l *Log) Append(e *LogEntry) error {
 }
 
 // ReadAt reads at most n entries from the log starting at offset. It
-// returns the next offset. In case of errors, if dst is not nil it means the
+// returns the next offset. In case of error, if dst is not nil it means the
 // error occurred after reading some entries (<n).
 func (l *Log) ReadAt(n int, offset int64) (dst []LogEntry, next int64, err error) {
 	const op = "dir/server/tree.Log.Read"

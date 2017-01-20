@@ -981,6 +981,20 @@ func TestCorruptTreeAndRecover(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	// Ensure reading the log again does not cause problems.
+	tree3, err := New(config, log, logIndex)
+	if err != nil {
+		t.Fatal(err)
+	}
+	entries, _, err = tree3.List(mkpath(t, userName+"/"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = checkDirList(entries, want)
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 var topDir string // where we write our test data.
