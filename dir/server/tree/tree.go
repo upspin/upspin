@@ -771,6 +771,10 @@ func (t *Tree) recoverFromLog() error {
 			if err != nil {
 				return errors.E(op, err)
 			}
+			err = t.log.Truncate(next)
+			if err != nil {
+				return errors.E(op, err)
+			}
 			hadError = true
 		}
 		for _, logEntry := range replay {
