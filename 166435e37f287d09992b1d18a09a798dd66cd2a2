@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e8d36ae9_b21420fb",
+        "filename": ".gitignore",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-20T00:37:34Z",
+      "side": 1,
+      "message": "Please don\u0027t add a .gitignore. It\u0027s easier to keep the tree clean than to maintain this file.",
+      "revId": "166435e37f287d09992b1d18a09a798dd66cd2a2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
