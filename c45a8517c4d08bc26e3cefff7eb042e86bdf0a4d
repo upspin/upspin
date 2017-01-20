@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e8d36ae9_55fa7e99",
+        "filename": "cloud/docker/dirserver/Dockerfile",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-20T23:04:11Z",
+      "side": 0,
+      "message": "please make the replacement string LOGLEVEL",
+      "revId": "c45a8517c4d08bc26e3cefff7eb042e86bdf0a4d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
