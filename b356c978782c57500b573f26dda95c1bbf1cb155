@@ -16,6 +16,24 @@
       "revId": "b356c978782c57500b573f26dda95c1bbf1cb155",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e8d36ae9_35549abd",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-20T22:12:32Z",
+      "side": 1,
+      "message": "You\u0027re missing some context.\nSee https://upspin-review.googlesource.com/c/7120/",
+      "parentUuid": "4851d61e_688685b7",
+      "revId": "b356c978782c57500b573f26dda95c1bbf1cb155",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
