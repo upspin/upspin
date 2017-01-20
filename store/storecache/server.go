@@ -22,7 +22,7 @@ type server struct {
 	// The on disk cache.
 	cache *storeCache
 
-	// The cache server this dialed server should talk to.
+	// The store server this dialed server should talk to.
 	authority upspin.Endpoint
 }
 

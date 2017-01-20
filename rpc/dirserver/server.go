@@ -62,7 +62,11 @@ func (s *server) serverFor(session rpc.Session, reqBytes []byte, req pb.Message)
 	if err := pb.Unmarshal(reqBytes, req); err != nil {
 		return nil, err
 	}
-	svc, err := s.dir.Dial(config.SetUserName(s.config, session.User()), s.dir.Endpoint())
+	e := s.dir.Endpoint()
+	if ep := session.ProxiedEndpoint(); ep.Transport != upspin.Unassigned {
+		e = ep
+	}
+	svc, err := s.dir.Dial(config.SetUserName(s.config, session.User()), e)
 	if err != nil {
 		return nil, err
 	}

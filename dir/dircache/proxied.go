@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package dircacheserver
+package dircache
 
 // This file defines structures that keep track of individual target directories.
 // It particular it keeps a count of entries from the directory still in the LRU
