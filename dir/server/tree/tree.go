@@ -745,8 +745,7 @@ func (t *Tree) recoverFromLog() error {
 	}
 	if lastOffset == lastProcessed {
 		// All caught up.
-		// Uncomment for debugging.
-		//log.Debug.Printf("Tree is all caught up for user %s", t.user)
+		log.Debug.Printf("Tree is all caught up for user %s", t.user)
 		return nil
 	}
 	err = t.loadRoot()
@@ -761,8 +760,7 @@ func (t *Tree) recoverFromLog() error {
 	next := lastProcessed
 	hadError := false
 	for {
-		// Uncomment for debugging.
-		//log.Debug.Printf("Recovering from log...")
+		log.Debug.Printf("Recovering from log...")
 		var replay []LogEntry
 		replay, next, err = t.log.ReadAt(batchSize, next)
 		if err != nil {
@@ -790,12 +788,10 @@ func (t *Tree) recoverFromLog() error {
 
 			switch logEntry.Op {
 			case Put:
-				// Uncomment for debugging.
-				//log.Debug.Printf("Putting dirEntry: %q", de.Name)
+				log.Debug.Printf("Putting dirEntry: %q", de.Name)
 				_, _, err = t.put(p, &de)
 			case Delete:
-				// Uncomment for debugging.
-				//log.Debug.Printf("Deleting path: %q", p.Path())
+				log.Debug.Printf("Deleting path: %q", p.Path())
 				_, _, err = t.delete(p)
 			default:
 				return errors.E(op, errors.Internal, errors.Errorf("no such log operation: %v", logEntry.Op))
@@ -813,17 +809,15 @@ func (t *Tree) recoverFromLog() error {
 			break
 		}
 	}
-	// Uncomment for debugging.
-	//log.Debug.Printf("%s: %d entries recovered. Tree is current.", op, recovered)
-	//log.Debug.Printf("%s: Tree:\n%s\n", op, t)
+	log.Debug.Printf("%s: %d entries recovered. Tree is current.", op, recovered)
+	log.Debug.Printf("%s: Tree:\n%s\n", op, t)
 	return nil
 }
 
 // OnEviction implements cache.EvictionNotifier.
 func (t *Tree) OnEviction(key interface{}) {
 	const op = "dir/server/tree.OnEviction"
-	// Uncomment for debugging sessions.
-	//log.Debug.Printf("%s: tree being evicted: %s", t.log.User())
+	log.Debug.Printf("%s: tree being evicted: %s", op, t.log.User())
 	err := t.Flush()
 	if err != nil {
 		log.Error.Printf("%s: flush: %v", op, err)

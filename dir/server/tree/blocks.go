@@ -59,8 +59,6 @@ func (t *Tree) store(n *node) error {
 		if err != nil {
 			return errors.E(err)
 		}
-		// Uncomment for debugging sessions.
-		//log.Debug.Printf("dir/server/tree.Tree.store: %s: Saving child: %s. Size: %d", n.entry.Name, kid.entry.Name, len(block))
 
 		// Don't let blocks grow too much (but we never split a large DirEntry in the middle).
 		if len(data) > 0 && len(data)+len(block) > blockSize {
