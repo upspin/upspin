@@ -2,17 +2,24 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// A web server that serves "hello world" and meta tags to instruct "go get"
+// A web server that serves documentation and meta tags to instruct "go get"
 // where to find the upspin source repository.
 package main
 
 import (
+	"flag"
 	"fmt"
+	"html/template"
+	"io/ioutil"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strings"
 
+	"github.com/russross/blackfriday"
 	"upspin.io/cloud/https"
 	"upspin.io/flags"
+	"upspin.io/log"
 )
 
 func main() {
@@ -25,6 +32,8 @@ const (
 	sourceBase = "upspin.io"
 	sourceRepo = "https://upspin.googlesource.com/upspin"
 )
+
+var docBasePath = flag.String("docpath", "../../doc", "location of folder containing documentation")
 
 type server struct {
 	mux *http.ServeMux
@@ -41,6 +50,7 @@ func newServer() http.Handler {
 // handler functions.
 func (s *server) init() {
 	s.mux.HandleFunc("/", s.handleRoot)
+	s.mux.HandleFunc("/doc/", s.handleDoc)
 }
 
 func (s *server) handleRoot(w http.ResponseWriter, r *http.Request) {
@@ -49,7 +59,47 @@ func (s *server) handleRoot(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, `<meta name="go-import" content="%v git %v">`, sourceBase, sourceRepo)
 		return
 	}
-	w.Write([]byte("Hello, upspin"))
+	t, err := template.ParseFiles("templates/base.tmpl")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := t.Execute(w, nil); err != nil {
+		log.Error.Printf("Error executing root content template: %s", err)
+		return
+	}
+}
+
+func (s *server) handleDoc(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html; charset=utf-8")
+
+	filename := filepath.Base(r.URL.Path) + ".md"
+	f, err := os.Open(filepath.Join(*docBasePath, filename))
+	if err != nil {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
+	defer f.Close()
+	b, err := ioutil.ReadAll(f)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	output := blackfriday.MarkdownCommon(b)
+	baseTmpl, err := template.ParseFiles("templates/base.tmpl")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	contentTmpl, err := template.Must(baseTmpl.Clone()).Parse(`{{define "content"}}{{.}}{{end}}`)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	if err := contentTmpl.Execute(w, template.HTML(output)); err != nil {
+		log.Error.Printf("Error executing doc content template: %s", err)
+		return
+	}
 }
 
 // ServeHTTP satisfies the http.Handler interface for a server. It
