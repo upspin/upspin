@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4851d61e_688685b7",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-01-20T16:59:15Z",
+      "side": 1,
+      "message": "I\u0027m not sure we want this behavior here. We probably don\u0027t as the storeserver might become a hotspot if it has to download data from GCS and funnel them all through it. \n\nSure, it\u0027s a matter of scaling the storeserver, but we have a mechanism to do this cheaply, which is the redirection of location -- in this case, to the GCS public service itself. We should use it.",
+      "revId": "b356c978782c57500b573f26dda95c1bbf1cb155",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
