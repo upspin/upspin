@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e8d36ae9_b5996a5a",
+        "filename": "store/storecache/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-20T02:34:17Z",
+      "side": 1,
+      "message": "cute, but can we just say \"OK\" ?",
+      "revId": "bfbb003787720ee4e22a48161f258cb98e65ef37",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
