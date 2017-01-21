@@ -111,7 +111,7 @@ func putError(err error) *proto.KeyPutResponse {
 
 func logf(format string, args ...interface{}) operation {
 	s := fmt.Sprintf(format, args...)
-	log.Info.Print("transport/keyserver: " + s)
+	log.Info.Print("rpc/keyserver: " + s)
 	return operation(s)
 }
 
