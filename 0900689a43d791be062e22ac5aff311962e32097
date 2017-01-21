@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4851d61e_29ec0942",
+        "filename": "cloud/storage/storage.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-01-21T00:26:06Z",
+      "side": 1,
+      "message": "This is great for GCP and AWS but it may need to be generalizable later, say, if the URL is something of the form: https://mystorage.com/dl?bucket\u003dbucketname\u0026object\u003dobj.\n\nI think it\u0027s fine for now.",
+      "revId": "0900689a43d791be062e22ac5aff311962e32097",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4851d61e_c987b568",
+        "filename": "store/gcp/gcp.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-01-21T00:26:06Z",
+      "side": 1,
+      "message": "// TODO: move this upspin.go or a more suitable place.",
+      "revId": "0900689a43d791be062e22ac5aff311962e32097",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4851d61e_8981bd54",
+        "filename": "store/remote/remote.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-01-21T00:26:06Z",
+      "side": 1,
+      "message": "// TODO: move this upspin.go or a more suitable place.",
+      "revId": "0900689a43d791be062e22ac5aff311962e32097",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
