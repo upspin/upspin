@@ -125,7 +125,7 @@ func (s *server) Delete(session rpc.Session, reqBytes []byte) (pb.Message, error
 
 func logf(format string, args ...interface{}) operation {
 	s := fmt.Sprintf(format, args...)
-	log.Info.Print("transport/storeserver: " + s)
+	log.Debug.Print("rpc/storeserver: " + s)
 	return operation(s)
 }
 

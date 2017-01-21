@@ -187,7 +187,7 @@ func (s *server) WhichAccess(session rpc.Session, reqBytes []byte) (pb.Message, 
 
 func logf(format string, args ...interface{}) operation {
 	s := fmt.Sprintf(format, args...)
-	log.Info.Print("transport/dirserver: " + s)
+	log.Debug.Print("rpc/dirserver: " + s)
 	return operation(s)
 }
 

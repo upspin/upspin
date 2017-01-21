@@ -143,7 +143,7 @@ func (d *proxiedDir) watcher() {
 		}
 		if err == upspin.ErrNotSupported {
 			// Can't survive this.
-			log.Info.Printf("transport/dircacheserver.watcher: %s: %s", d.user, err)
+			log.Info.Printf("rpc/dircache.watcher: %s: %s", d.user, err)
 			return
 		}
 		if strings.Contains(err.Error(), "log misaligned") {
@@ -153,7 +153,7 @@ func (d *proxiedDir) watcher() {
 			d.order = -1
 		}
 		if time.Now().After(nextLogTime) {
-			log.Info.Printf("transport/dircacheserver.watcher: %s: %s", d.user, err)
+			log.Info.Printf("rpc/dircache.watcher: %s: %s", d.user, err)
 			nextLogTime = time.Now().Add(time.Hour)
 		}
 		time.Sleep(10 * time.Second)
@@ -193,7 +193,7 @@ func (d *proxiedDir) watch() error {
 func (d *proxiedDir) handleEvent(e *upspin.Event) error {
 	// Something odd happened?
 	if e.Error != nil {
-		log.Info.Printf("transport/dircacheserver.handleEvent: %s", e.Error)
+		log.Info.Printf("rpc/dircache.handleEvent: %s", e.Error)
 		return e.Error
 	}
 

@@ -214,7 +214,7 @@ func serveStream(s Stream, sess Session, w http.ResponseWriter, body []byte) {
 
 			b, err := pb.Marshal(msg)
 			if err != nil {
-				log.Error.Printf("transport/auth: error encoding proto in stream: %v", err)
+				log.Error.Printf("rpc/auth: error encoding proto in stream: %v", err)
 				return
 			}
 
