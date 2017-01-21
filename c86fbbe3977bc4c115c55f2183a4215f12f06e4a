@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "4851d61e_ab06b23c",
+        "filename": "cmd/frontend/frontend.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-01-21T22:24:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e8d36ae9_35325a2f",
+      "revId": "c86fbbe3977bc4c115c55f2183a4215f12f06e4a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e8d36ae9_d5466e83",
         "filename": "cmd/frontend/frontend.go",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "4851d61e_2bc3e28b",
+        "filename": "cmd/frontend/frontend.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-01-21T22:24:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e8d36ae9_d5466e83",
+      "revId": "c86fbbe3977bc4c115c55f2183a4215f12f06e4a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e8d36ae9_f5437270",
         "filename": "cmd/frontend/frontend.go",
         "patchSetId": 1
@@ -47,6 +83,24 @@
       "writtenOn": "2017-01-20T05:45:23Z",
       "side": 1,
       "message": "similarly, we should probably just parse all the markdown files under /doc/ and convert them to HTML at startup",
+      "revId": "c86fbbe3977bc4c115c55f2183a4215f12f06e4a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4851d61e_0ba946cb",
+        "filename": "cmd/frontend/frontend.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-01-21T22:24:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e8d36ae9_f5437270",
       "revId": "c86fbbe3977bc4c115c55f2183a4215f12f06e4a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
