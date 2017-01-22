@@ -71,6 +71,18 @@ type NetAddr string
 // A Reference is the string identifying an item in a StoreServer.
 type Reference string
 
+// These special references are used to obtain out-of-band information from
+// StoreServer implementations. StoreServers are not required to support them.
+var (
+	// HealthMetadata is used to check that a StoreServer is up. Servers
+	// need not return any special response when asked for this reference.
+	HealthMetadata Reference = "metadata:Health"
+
+	// HTTPBaseMetadata is used to obtain a base URL from which references
+	// may be requested by HTTP(S).
+	HTTPBaseMetadata Reference = "metadata:HTTP-Base"
+)
+
 // Signature is an ECDSA signature.
 type Signature struct {
 	R, S *big.Int

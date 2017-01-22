@@ -168,8 +168,6 @@ func (r *remote) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service, 
 	return r2, nil
 }
 
-const httpBaseRef = upspin.Reference("metadata:HTTP-Base")
-
 // probeDirect performs a Get request to the remote server for the reference
 // httpBaseRef. The server may respond with an HTTP URL that may be used as a
 // base for fetching objects directly by HTTP (from Google Cloud Storage, for
@@ -177,7 +175,7 @@ const httpBaseRef = upspin.Reference("metadata:HTTP-Base")
 func (r *remote) probeDirect() error {
 	const op = "store/remote.probeDirect"
 
-	b, _, _, err := r.Get(httpBaseRef)
+	b, _, _, err := r.Get(upspin.HTTPBaseMetadata)
 	if errors.Match(errors.E(errors.NotExist), err) {
 		return nil
 	} else if err != nil {
