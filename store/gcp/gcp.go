@@ -73,8 +73,6 @@ func (s *server) Put(data []byte) (*upspin.Refdata, error) {
 	return refdata, nil
 }
 
-const httpBaseRef = upspin.Reference("metadata:HTTP-Base")
-
 // Get implements upspin.StoreServer.
 func (s *server) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Location, error) {
 	const op = "store/gcp.Get"
@@ -83,7 +81,7 @@ func (s *server) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Lo
 	defer m.Done()
 	defer sp.End()
 
-	if ref == httpBaseRef {
+	if ref == upspin.HTTPBaseMetadata {
 		refData := &upspin.Refdata{Reference: ref}
 		s.mu.Lock()
 		base := s.linkBase
