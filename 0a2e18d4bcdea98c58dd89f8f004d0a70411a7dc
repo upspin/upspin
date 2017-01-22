@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e8d36ae9_98eedd3b",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-22T23:46:28Z",
+      "side": 1,
+      "message": "but they need to respond with something. explain better, perhaps in the overview comment",
+      "revId": "0a2e18d4bcdea98c58dd89f8f004d0a70411a7dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
