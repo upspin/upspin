@@ -92,7 +92,7 @@ func Endpoint(endpoint upspin.Endpoint) error {
 		if endpoint.NetAddr != "" {
 			return errors.E(op, errors.Invalid, errors.Errorf("%q: extraneous network address", endpoint))
 		}
-	case upspin.Remote, upspin.HTTPS:
+	case upspin.Remote:
 		if endpoint.NetAddr == "" {
 			return errors.E(op, errors.Invalid, errors.Errorf("%q: missing network address", endpoint))
 		}

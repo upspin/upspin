@@ -33,9 +33,6 @@ import (
 	// Transports that are selected implicitly by bind.
 	_ "upspin.io/dir/remote"
 	_ "upspin.io/store/remote"
-
-	// Transport required to use the remote store server.
-	_ "upspin.io/store/https"
 )
 
 // The servers that "remote" tests will work against.
