@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e8d36ae9_58015525",
+        "filename": "store/remote/remote.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-22T23:36:22Z",
+      "side": 1,
+      "message": "I was expecting a metadata: thingy here.",
+      "revId": "091b8234d5dfe3f5312ae06f4ee1d5834112fc83",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
