@@ -117,7 +117,7 @@ func ping(cfg upspin.Config, ce upspin.Endpoint) error {
 	if err != nil {
 		return err
 	}
-	msg, _, _, err := store.Get(upspin.Reference("metadata:Health"))
+	msg, _, _, err := store.Get(upspin.HealthMetadata)
 	if err == nil {
 		log.Debug.Printf("upspinfs: cacheserver said %q", string(msg))
 	}
