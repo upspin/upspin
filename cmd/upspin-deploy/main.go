@@ -602,6 +602,20 @@ func (c *Config) copySource(dir, pkgPath string) error {
 		return err
 	}
 
+	if pkgPath == "upspin.io/cmd/frontend" {
+		// Copy frontend dependencies.
+		for _, d := range []string{
+			"/doc",
+			"/cmd/frontend/images",
+			"/cmd/frontend/templates",
+		} {
+			s := fmt.Sprintf("%s %s\n",
+				filepath.Join("upspin.io", d),
+				filepath.Join(os.Getenv("GOPATH"), "src/upspin.io", d))
+			out = append(out, s...)
+		}
+	}
+
 	// Copy the contents of those directories to a workspace at dir.
 	for _, line := range strings.Split(string(bytes.TrimSpace(out)), "\n") {
 		pair := strings.SplitN(line, " ", 2)
