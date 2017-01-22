@@ -417,8 +417,6 @@ func (t Transport) String() string {
 		return "inprocess"
 	case Remote:
 		return "remote"
-	case HTTPS:
-		return "https"
 	default:
 		return fmt.Sprintf("transport(%d)", int(t))
 	}

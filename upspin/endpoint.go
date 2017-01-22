@@ -21,11 +21,6 @@ func ParseEndpoint(v string) (*Endpoint, error) {
 			return nil, fmt.Errorf("remote endpoint %q requires a netaddr", v)
 		}
 		return &Endpoint{Transport: Remote, NetAddr: NetAddr(elems[1])}, nil
-	case "https":
-		if len(elems) < 2 {
-			return nil, fmt.Errorf("https endpoint %q requires a netaddr", v)
-		}
-		return &Endpoint{Transport: HTTPS, NetAddr: NetAddr(elems[1])}, nil
 	case "unassigned":
 		return &Endpoint{Transport: Unassigned}, nil
 	}
@@ -36,7 +31,7 @@ func ParseEndpoint(v string) (*Endpoint, error) {
 // toString converts an endpoint to a string.
 func (ep Endpoint) toString() (string, error) {
 	switch ep.Transport {
-	case Remote, HTTPS:
+	case Remote:
 		return fmt.Sprintf("%v,%v", ep.Transport, ep.NetAddr), nil
 	case InProcess, Unassigned:
 		return ep.Transport.String(), nil

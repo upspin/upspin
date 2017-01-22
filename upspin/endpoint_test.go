@@ -13,7 +13,6 @@ import (
 func TestParseAndString(t *testing.T) {
 	tests := []string{
 		"remote,localhost:8080",
-		"https,https://localhost:8080",
 		"inprocess",
 	}
 	for _, test := range tests {
@@ -35,7 +34,6 @@ func TestErrorCases(t *testing.T) {
 	}{
 		{"remote", "requires a netaddr"},
 		{"supersonic,https://supersonic.com", "unknown transport type"},
-		{"https", "requires a netaddr"},
 	}
 	for _, test := range tests {
 		_, err := ParseEndpoint(test.endpoint)
