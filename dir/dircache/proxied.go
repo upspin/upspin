@@ -86,7 +86,7 @@ func (p *proxiedDirs) proxyFor(name upspin.PathName, ep *upspin.Endpoint) {
 	d.atime = time.Now()
 
 	// If the endpoint changed, kill off the current watcher.
-	if d.ep != ep {
+	if d.ep != nil && *d.ep != *ep {
 		d.close()
 	}
 
@@ -132,11 +132,13 @@ func (d *proxiedDir) close() {
 
 // watcher watches a directory and caches any changes to something already in the LRU.
 func (d *proxiedDir) watcher() {
+	log.Info.Printf("dircache.Watcher %s %s", d.user, d.ep)
 	defer close(d.dying)
 	nextLogTime := time.Now()
 	for {
 		err := d.watch()
 		if err == nil {
+			log.Info.Printf("dircache.Watcher %s %s exiting", d.user, d.ep)
 			// watch() only returns if the watcher has been told to die
 			// or if there is an error requiring a new Watch.
 			return
