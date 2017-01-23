@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "4851d61e_f25ed5f7",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-01-23T19:40:44Z",
+      "side": 1,
+      "message": "No, this is not the root. It\u0027s \"2017/01/23*\" as opposed to \"2017/01/23\" so it lists 2017/01/23.1,2017/01/23.2, etc.\n\nAdded comment.",
+      "parentUuid": "4851d61e_b25a9d90",
+      "range": {
+        "startLine": 158,
+        "startChar": 23,
+        "endLine": 158,
+        "endChar": 24
+      },
+      "revId": "81b74183969dfcb302c3e446259cc1e7a5d7e573",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4851d61e_92ea017a",
         "filename": "dir/server/snapshot.go",
         "patchSetId": 1
@@ -36,6 +60,30 @@
       "writtenOn": "2017-01-23T19:09:38Z",
       "side": 1,
       "message": "Why UTC?  Time comparisons don\u0027t check timezone.",
+      "range": {
+        "startLine": 172,
+        "startChar": 0,
+        "endLine": 172,
+        "endChar": 89
+      },
+      "revId": "81b74183969dfcb302c3e446259cc1e7a5d7e573",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4851d61e_32feadb7",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-01-23T19:40:44Z",
+      "side": 1,
+      "message": "This was dumb. Comparisons don\u0027t matter. Reverted.",
+      "parentUuid": "4851d61e_92ea017a",
       "range": {
         "startLine": 172,
         "startChar": 0,
