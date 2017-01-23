@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "4851d61e_1d886748",
+        "filename": "cmd/frontend/frontend.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-01-23T03:02:20Z",
+      "side": 1,
+      "message": "I’m assuming you mean put the flag declarations above the main function?\n\nDone.",
+      "parentUuid": "e8d36ae9_18874d6b",
+      "revId": "93ab59ce87e22a0b8b8e1b7cdd7e0383805324e1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e8d36ae9_f854c905",
         "filename": "cmd/frontend/frontend.go",
         "patchSetId": 5
@@ -30,6 +48,24 @@
       "writtenOn": "2017-01-23T02:50:09Z",
       "side": 1,
       "message": "therefore they *are* safe\nbut I think you can/should delete this comment and also the initial values you have here.\ninstead, initialize the map inside parseDocs",
+      "revId": "93ab59ce87e22a0b8b8e1b7cdd7e0383805324e1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4851d61e_fd8c6b5e",
+        "filename": "cmd/frontend/frontend.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-01-23T03:02:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e8d36ae9_f854c905",
       "revId": "93ab59ce87e22a0b8b8e1b7cdd7e0383805324e1",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "4851d61e_9d9b3794",
+        "filename": "cmd/frontend/frontend.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-01-23T03:02:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e8d36ae9_9861fde6",
+      "revId": "93ab59ce87e22a0b8b8e1b7cdd7e0383805324e1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e8d36ae9_588dd588",
         "filename": "cmd/frontend/frontend.go",
         "patchSetId": 5
@@ -64,6 +118,24 @@
       "writtenOn": "2017-01-23T02:50:09Z",
       "side": 1,
       "message": "rendered[fi.Name()] \u003d ...",
+      "revId": "93ab59ce87e22a0b8b8e1b7cdd7e0383805324e1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4851d61e_7d987b96",
+        "filename": "cmd/frontend/frontend.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-01-23T03:02:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e8d36ae9_588dd588",
       "revId": "93ab59ce87e22a0b8b8e1b7cdd7e0383805324e1",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "4851d61e_5d95bf5d",
+        "filename": "cmd/frontend/frontend.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-01-23T03:02:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e8d36ae9_789219ae",
+      "revId": "93ab59ce87e22a0b8b8e1b7cdd7e0383805324e1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e8d36ae9_d880e550",
         "filename": "doc/access_control.md",
         "patchSetId": 5
@@ -98,6 +188,24 @@
       "writtenOn": "2017-01-23T02:55:02Z",
       "side": 1,
       "message": "We need to wrap these lines at ~80 columns.\nIt would be even better if—in addition to wrapping—we could start new sentences on new lines, as that would make editing much easier in the future.\n\nThe former is a requirement, the latter a suggestion.",
+      "revId": "93ab59ce87e22a0b8b8e1b7cdd7e0383805324e1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4851d61e_1d5627ca",
+        "filename": "doc/access_control.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-01-23T03:02:20Z",
+      "side": 1,
+      "message": "Rob will be altering almost all the Google docs by the end of today, so I’ll have to re-export them. Should I just not check in the docs until that happens?",
+      "parentUuid": "e8d36ae9_d880e550",
       "revId": "93ab59ce87e22a0b8b8e1b7cdd7e0383805324e1",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
