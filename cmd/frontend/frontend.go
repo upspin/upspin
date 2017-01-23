@@ -39,6 +39,10 @@ const (
 	sourceRepo = "https://upspin.googlesource.com/upspin"
 
 	extMarkdown = ".md"
+
+	// TODO(adg): remove the auth check before launch
+	username = "upspin"
+	password = "cheesemaster"
 )
 
 var (
@@ -71,11 +75,6 @@ func (s *server) init() {
 		log.Error.Fatalf("Could not parse docs in %s: %s", *docPath, err)
 	}
 
-	// TODO(adg): remove this auth check before launch
-	const (
-		username = "upspin"
-		password = "cheesemaster"
-	)
 	s.mux.Handle("/", goGetHandler{&basicAuthHandler{
 		Username: username,
 		Password: password,
