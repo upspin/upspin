@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e8d36ae9_b87721a2",
+        "filename": "cmd/frontend/frontend.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-23T03:24:34Z",
+      "side": 1,
+      "message": "Ah, please move the template declarations after func main :)",
+      "revId": "a31752bcde20cc72999a30602ea7e2501f18f5c2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
