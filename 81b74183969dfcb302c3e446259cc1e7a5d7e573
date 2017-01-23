@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4851d61e_b25a9d90",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-01-23T19:09:38Z",
+      "side": 1,
+      "message": "A comment is due here. I don\u0027t understand the reason for the change. Was it that the root node\u0027s time doesn\u0027t update?",
+      "range": {
+        "startLine": 158,
+        "startChar": 23,
+        "endLine": 158,
+        "endChar": 24
+      },
+      "revId": "81b74183969dfcb302c3e446259cc1e7a5d7e573",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4851d61e_92ea017a",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-01-23T19:09:38Z",
+      "side": 1,
+      "message": "Why UTC?  Time comparisons don\u0027t check timezone.",
+      "range": {
+        "startLine": 172,
+        "startChar": 0,
+        "endLine": 172,
+        "endChar": 89
+      },
+      "revId": "81b74183969dfcb302c3e446259cc1e7a5d7e573",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
