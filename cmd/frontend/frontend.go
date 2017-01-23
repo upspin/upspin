@@ -126,6 +126,10 @@ func (s *server) handleDoc(w http.ResponseWriter, r *http.Request) {
 // ServeHTTP satisfies the http.Handler interface for a server. It
 // will compress all responses if the appropriate request headers are set.
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path == "/favicon.ico" {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
+		return
+	}
 	if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
 		s.mux.ServeHTTP(w, r)
 		return
