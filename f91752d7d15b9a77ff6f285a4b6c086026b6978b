@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "4851d61e_7813e9d4",
+        "filename": "dir/dircache/proxied.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-01-23T06:01:28Z",
+      "side": 1,
+      "message": "You\u0027re right, a bit much.  I changed to Debug.",
+      "parentUuid": "e8d36ae9_7863f9c2",
+      "revId": "f91752d7d15b9a77ff6f285a4b6c086026b6978b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e8d36ae9_1868ad9a",
         "filename": "dir/dircache/proxied.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2017-01-23T05:53:35Z",
       "side": 1,
       "message": "ditto",
+      "revId": "f91752d7d15b9a77ff6f285a4b6c086026b6978b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4851d61e_58202d18",
+        "filename": "dir/dircache/proxied.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-01-23T06:01:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e8d36ae9_1868ad9a",
       "revId": "f91752d7d15b9a77ff6f285a4b6c086026b6978b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
