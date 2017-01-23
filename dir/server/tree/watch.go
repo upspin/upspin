@@ -209,13 +209,13 @@ func (w *watcher) sendEvent(logEntry *LogEntry, offset int64) error {
 		event = &upspin.Event{
 			Order:  offset,
 			Delete: logEntry.Op == Delete,
-			Entry:  &entry,
+			Entry:  &entry, // already a copy.
 		}
 	} else {
 		event = &upspin.Event{
 			Order:  offset,
 			Delete: logEntry.Op == Delete,
-			Entry:  &logEntry.Entry,
+			Entry:  &logEntry.Entry, // already a copy.
 		}
 	}
 	select {

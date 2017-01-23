@@ -46,9 +46,6 @@ type node struct {
 // The tree reads and writes from/to its backing Store server, which is
 // configured when instantiating the Tree. It uses a Log to log changes not
 // yet committed to the Store.
-// For all methods returning directory entries, the entries are of pointer type
-// for performance reasons and modifying them is not allowed -- make a copy
-// first if necessary.
 type Tree struct {
 	// mu protects all accesses to the tree and its nodes and must
 	// be held when calling all unexported methods.
@@ -153,7 +150,7 @@ func (t *Tree) Lookup(p path.Parsed) (de *upspin.DirEntry, dirty bool, err error
 	if err != nil {
 		return nil, false, errors.E(op, err)
 	}
-	return &node.entry, node.dirty, nil
+	return node.entry.Copy(), node.dirty, nil
 }
 
 // Put puts an entry at path p into the Tree. If the entry exists, it will be
@@ -173,7 +170,7 @@ func (t *Tree) Put(p path.Parsed, de *upspin.DirEntry) (*upspin.DirEntry, error)
 	}
 	node, watchers, err := t.put(p, de)
 	if err == upspin.ErrFollowLink {
-		return &node.entry, err
+		return node.entry.Copy(), err
 	}
 	if err != nil {
 		return nil, err
@@ -188,7 +185,7 @@ func (t *Tree) Put(p path.Parsed, de *upspin.DirEntry) (*upspin.DirEntry, error)
 		return nil, errors.E(op, err)
 	}
 	notifyWatchers(watchers)
-	return de, nil
+	return de.Copy(), nil
 }
 
 // put implements the bulk of Tree.Put, but does not append to the log so it
@@ -258,7 +255,7 @@ func (t *Tree) PutDir(dstDir path.Parsed, de *upspin.DirEntry) (*upspin.DirEntry
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
-	return &n.entry, nil
+	return n.entry.Copy(), nil
 }
 
 // addKid adds a node n with path nodePath as the kid of parent, whose path is parentPath.
@@ -504,13 +501,13 @@ func (t *Tree) List(prefix path.Parsed) ([]*upspin.DirEntry, bool, error) {
 
 	node, _, err := t.loadPath(prefix)
 	if err == upspin.ErrFollowLink {
-		return []*upspin.DirEntry{&node.entry}, node.dirty, err
+		return []*upspin.DirEntry{node.entry.Copy()}, node.dirty, err
 	}
 	if err != nil {
 		return nil, false, errors.E(op, err)
 	}
 	if !node.entry.IsDir() {
-		return []*upspin.DirEntry{&node.entry}, node.dirty, nil
+		return []*upspin.DirEntry{node.entry.Copy()}, node.dirty, nil
 	}
 	err = t.loadDir(node)
 	if err != nil {
@@ -519,7 +516,7 @@ func (t *Tree) List(prefix path.Parsed) ([]*upspin.DirEntry, bool, error) {
 	dirty := node.dirty
 	var entries []*upspin.DirEntry
 	for _, n := range node.kids {
-		entries = append(entries, &n.entry)
+		entries = append(entries, n.entry.Copy())
 	}
 	return entries, dirty, nil
 }
@@ -544,7 +541,7 @@ func (t *Tree) Delete(p path.Parsed) (*upspin.DirEntry, error) {
 
 	node, watchers, err := t.delete(p)
 	if err == upspin.ErrFollowLink {
-		return &node.entry, err
+		return node.entry.Copy(), err
 	}
 	if err != nil {
 		return nil, errors.E(op, err)
@@ -559,7 +556,7 @@ func (t *Tree) Delete(p path.Parsed) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, err)
 	}
 	notifyWatchers(watchers)
-	return &node.entry, err
+	return node.entry.Copy(), err
 }
 
 // delete implements the bulk of Tree.Delete, but does not append to the log
@@ -721,14 +718,6 @@ func (t *Tree) Close() error {
 	}
 
 	return nil
-}
-
-// Root returns the root of the Tree. Its blocks will be empty if the tree is
-// empty.
-func (t *Tree) Root() (*upspin.DirEntry, error) {
-	t.mu.Lock()
-	defer t.mu.Unlock()
-	return t.logIndex.Root()
 }
 
 // recoverFromLog inspects the LogIndex and the Log and replays the missing
