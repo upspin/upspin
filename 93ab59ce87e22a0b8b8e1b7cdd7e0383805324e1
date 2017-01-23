@@ -84,6 +84,23 @@
       "revId": "93ab59ce87e22a0b8b8e1b7cdd7e0383805324e1",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e8d36ae9_d880e550",
+        "filename": "doc/access_control.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-23T02:55:02Z",
+      "side": 1,
+      "message": "We need to wrap these lines at ~80 columns.\nIt would be even better if—in addition to wrapping—we could start new sentences on new lines, as that would make editing much easier in the future.\n\nThe former is a requirement, the latter a suggestion.",
+      "revId": "93ab59ce87e22a0b8b8e1b7cdd7e0383805324e1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
