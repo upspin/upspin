@@ -155,7 +155,8 @@ func (s *server) shouldSnapshot(cfg *snapshotConfig) (bool, path.Parsed, error) 
 		return false, path.Parsed{}, errors.E(op, err)
 	}
 
-	entry, err := s.lookup(op, p, !entryMustBeClean)
+	// List today's snapshot directory, including any suffixed snapshot.
+	entries, err := s.Glob(p.String() + "*")
 	if err != nil {
 		if err == upspin.ErrFollowLink {
 			// We need to get the real entry and we cannot resolve links on our own.
@@ -167,8 +168,9 @@ func (s *server) shouldSnapshot(cfg *snapshotConfig) (bool, path.Parsed, error) 
 		}
 		// Ok, proceed.
 	} else {
-		// Is entry so old that a new snapshot is now warranted?
-		if entry.Time.Go().Add(cfg.interval).After(s.now().Go()) {
+		l := len(entries)
+		// Is the last entry so old that a new snapshot is now warranted?
+		if l == 0 || entries[l-1].Time.Go().Add(cfg.interval).After(s.now().Go()) {
 			// Not time yet. Nothing to do.
 			return false, p, nil
 		}
