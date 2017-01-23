@@ -51,6 +51,14 @@ func TestSnapshot(t *testing.T) {
 		t.Fatalf("got = %d entries, want = 0", len(ents))
 	}
 
+	// Set an arbitrary time close to midnight so we can move the
+	// clock within a 24-hour period.
+	tm, err := time.Parse(time.RFC3339, "2017-01-02T01:00:00+00:00")
+	if err != nil {
+		t.Fatal(err)
+	}
+	mockTime.set(tm)
+
 	// Force a snapshot for all users who have a +snapshot tree.
 	err = snap.snapshotAll()
 	if err != nil {
@@ -91,6 +99,8 @@ func TestSnapshot(t *testing.T) {
 		}
 	}
 
+	mockTime.addSecond(3 * 60 * 60) // Add three hours.
+
 	// Snapshot again and nothing happens, because the previous snapshot is
 	// recent enough.
 	err = snap.snapshotAll()
@@ -105,6 +115,38 @@ func TestSnapshot(t *testing.T) {
 	if len(ents) != 1 {
 		t.Fatalf("got = %d entries, want = 1", len(ents))
 	}
+
+	// add ten hours, for a total of 13 since the previous snapshot.
+	mockTime.addSecond(10 * 60 * 60)
+
+	// Run the snapshot loop again.
+	err = snap.snapshotAll()
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Now two entries should exist.
+	ents, err = snap.Glob(snapshotUser + "/*/*/*")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(ents) != 2 {
+		t.Fatalf("got = %d entries, want = 2", len(ents))
+	}
+
+	// Add another three hours. It should not snapshot again yet.
+	mockTime.addSecond(3 * 60 * 60)
+
+	err = snap.snapshotAll()
+	if err != nil {
+		t.Fatal(err)
+	}
+	ents, err = snap.Glob(snapshotUser + "/*/*/*")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(ents) != 2 {
+		t.Fatalf("got = %d entries, want = 2", len(ents))
+	}
 }
 
 func TestForceSnapshotVersioning(t *testing.T) {
@@ -113,9 +155,9 @@ func TestForceSnapshotVersioning(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	// A pre-existing entry exists.
-	if len(ents) != 1 {
-		t.Fatalf("got = %d entries, want = 1", len(ents))
+	// Two pre-existing entries exist.
+	if len(ents) != 2 {
+		t.Fatalf("got = %d entries, want = 2", len(ents))
 	}
 	// Re-use the same destination name, so we force the creation of a new
 	// version.
@@ -146,30 +188,30 @@ func TestForceSnapshotVersioning(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Two new entries were created.
-	if len(ents) != 3 {
-		t.Fatalf("got = %d entries, want = 3", len(ents))
+	if len(ents) != 4 {
+		t.Fatalf("got = %d entries, want = 4", len(ents))
 	}
-	// Verify the last element of the second entry contains a ".0" appended
+	// Verify the last element of the second entry contains a ".2" appended
 	// to it.
 	if !strings.HasSuffix(string(ents[2].Name), ".2") {
 		t.Errorf("got %q, want suffix '.2'", ents[1].Name)
 	}
 
 	// Assert the newly-created name contains only one ".version" number.
-	p, _ := path.Parse(ents[1].Name) // path is known valid.
+	p, _ := path.Parse(ents[2].Name) // path is known valid.
 	if got, want := strings.Count(p.FilePath(), "."), 1; got != want {
 		t.Errorf("num .version = %d, want = %d: %s", got, want, p.FilePath())
 	}
-	p, _ = path.Parse(ents[2].Name) // path is known valid.
+	p, _ = path.Parse(ents[3].Name) // path is known valid.
 	if got, want := strings.Count(p.FilePath(), "."), 1; got != want {
 		t.Errorf("num .version = %d, want = %d: %s", got, want, p.FilePath())
 	}
 	// Assert times are monotonically increasing.
+	if ents[2].Time >= ents[3].Time {
+		t.Errorf("time = %d, want < %d", ents[2].Time, ents[3].Time)
+	}
 	if ents[1].Time >= ents[2].Time {
 		t.Errorf("time = %d, want < %d", ents[1].Time, ents[2].Time)
-	}
-	if ents[0].Time >= ents[1].Time {
-		t.Errorf("time = %d, want < %d", ents[0].Time, ents[1].Time)
 	}
 }
 
