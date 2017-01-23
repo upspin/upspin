@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e8d36ae9_d8dc6556",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-23T05:22:59Z",
+      "side": 1,
+      "message": "you should explain why this is happening and that it\u0027s going away when we release",
+      "revId": "4da1ca1bbb2eb49fe73ec331cfe202246b947d30",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e8d36ae9_f8d92963",
+        "filename": "cmd/frontend/auth.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-23T05:22:59Z",
+      "side": 1,
+      "message": "// It lets us deploy the docs without publishing them to unauthorized people.",
+      "revId": "4da1ca1bbb2eb49fe73ec331cfe202246b947d30",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
