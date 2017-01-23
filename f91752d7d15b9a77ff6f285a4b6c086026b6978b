@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e8d36ae9_7863f9c2",
+        "filename": "dir/dircache/proxied.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-23T05:53:35Z",
+      "side": 1,
+      "message": "d? or maybe Debug",
+      "revId": "f91752d7d15b9a77ff6f285a4b6c086026b6978b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e8d36ae9_1868ad9a",
+        "filename": "dir/dircache/proxied.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-23T05:53:35Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "f91752d7d15b9a77ff6f285a4b6c086026b6978b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
