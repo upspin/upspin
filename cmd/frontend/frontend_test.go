@@ -7,6 +7,7 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -36,6 +37,7 @@ func startServer() {
 func TestNoGzip(t *testing.T) {
 	once.Do(startServer)
 	req, err := http.NewRequest("GET", "http://"+addr+"/_test", nil)
+	req.SetBasicAuth("upspin", "cheesemaster")
 
 	// Don’t ask for gzipped responses.
 	req.Header.Set("Accept-Encoding", "")
@@ -57,7 +59,12 @@ func TestNoGzip(t *testing.T) {
 }
 
 func get(t *testing.T, url string) []byte {
-	resp, err := http.Get(url)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		log.Fatalf("expected no error, but got %v", err)
+	}
+	req.SetBasicAuth("upspin", "cheesemaster")
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		t.Fatalf("expected no error, but got %v", err)
 	}
@@ -81,6 +88,18 @@ func TestGoImport(t *testing.T) {
 	}
 }
 
+func TestFavicon(t *testing.T) {
+	once.Do(startServer)
+	resp, err := http.Get("http://" + addr + "/favicon.ico")
+	if err != nil {
+		t.Fatalf("expected no error, but got %v", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusNotFound {
+		t.Errorf("expected status code to be %d, got %d", http.StatusNotFound, resp.StatusCode)
+	}
+}
+
 func TestDocList(t *testing.T) {
 	once.Do(startServer)
 	b := get(t, "http://"+addr+"/")
@@ -98,7 +117,12 @@ func TestDoc(t *testing.T) {
 		t.Errorf("expected response body to contain %q; body: %q", expected, b)
 	}
 
-	resp, err := http.Get("http://" + addr + "/doc/notfounddoc")
+	req, err := http.NewRequest("GET", "http://"+addr+"/doc/notfounddoc", nil)
+	if err != nil {
+		log.Fatalf("expected no error, but got %v", err)
+	}
+	req.SetBasicAuth("upspin", "cheesemaster")
+	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		t.Fatalf("expected no error, but got %v", err)
 	}
