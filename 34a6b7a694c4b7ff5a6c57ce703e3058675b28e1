@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "4851d61e_5d437f01",
+        "filename": "cmd/upspin-deploy/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 608,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-01-23T03:09:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e8d36ae9_387331c4",
+      "revId": "34a6b7a694c4b7ff5a6c57ce703e3058675b28e1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e8d36ae9_186e6dd9",
         "filename": "cmd/upspin-deploy/main.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2017-01-23T02:38:38Z",
       "side": 1,
       "message": "move the call to Getenv above the loop\n\ngopath :\u003d os.Getenv(...)",
+      "revId": "34a6b7a694c4b7ff5a6c57ce703e3058675b28e1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4851d61e_1dfbc79d",
+        "filename": "cmd/upspin-deploy/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 614,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-01-23T03:09:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e8d36ae9_186e6dd9",
       "revId": "34a6b7a694c4b7ff5a6c57ce703e3058675b28e1",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
