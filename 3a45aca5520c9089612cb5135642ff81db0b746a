@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e8d36ae9_7bf0d36f",
+        "filename": "~~sam~~",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-23T20:28:49Z",
+      "side": 0,
+      "message": "oh that\u0027s lovely. sorry about that.",
+      "range": {
+        "startLine": 1,
+        "startChar": 9,
+        "endLine": 1,
+        "endChar": 23
+      },
+      "revId": "3a45aca5520c9089612cb5135642ff81db0b746a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
