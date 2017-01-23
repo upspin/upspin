@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "4851d61e_8859ae6e",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 994,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-01-23T20:38:11Z",
+      "side": 1,
+      "message": "I use it with seconds in another test.",
+      "parentUuid": "e8d36ae9_fbfb634d",
+      "revId": "3a45aca5520c9089612cb5135642ff81db0b746a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e8d36ae9_9bf81753",
         "filename": "dir/server/all_test.go",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2017-01-23T20:34:00Z",
       "side": 1,
       "message": "this isn\u0027t right. the unit of time.Time, and upspin.TIme, is nanoseconds.\n\n\nbugs aside, it would be better if you followed the guide of the existing time package, which has been carefully designed.",
+      "revId": "3a45aca5520c9089612cb5135642ff81db0b746a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4851d61e_08901edc",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 997,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-01-23T20:38:11Z",
+      "side": 1,
+      "message": "upspin.Time is int64 and it\u0027s seconds.\n\nFrom upspin.go:\n// Time represents a timestamp in units of seconds since\n// the Unix epoch, Jan 1 1970 0:00 UTC.\ntype Time int64\n\nNot sure how this would work with time package. Do you have something in mind?",
+      "parentUuid": "e8d36ae9_9bf81753",
       "revId": "3a45aca5520c9089612cb5135642ff81db0b746a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
