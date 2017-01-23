@@ -997,6 +997,12 @@ func (m *mockClock) addSecond(n int) {
 	m.time += upspin.Time(n)
 }
 
+func (m *mockClock) set(t time.Time) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.time = upspin.TimeFromGo(t)
+}
+
 var generatorInstance upspin.DirServer
 
 // newDirServerForTesting returns a new server and a user config.
