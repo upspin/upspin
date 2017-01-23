@@ -237,9 +237,6 @@ func (s *server) lookupWithPermissions(op string, name upspin.PathName, opts ...
 		if !canAny {
 			return nil, s.errPerm(op, p, opts...)
 		}
-		// Make a copy and mark incomplete.
-		e := *entry
-		entry = &e
 		entry.MarkIncomplete()
 	}
 	return entry, nil
@@ -541,15 +538,12 @@ func (s *server) listDir(op string, dirName upspin.PathName, opts ...options) ([
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
-	var results []*upspin.DirEntry
-	for i := range entries {
-		e := *entries[i] // Make a copy.
-		if !canRead {
+	if !canRead {
+		for _, e := range entries {
 			e.MarkIncomplete()
 		}
-		results = append(results, &e)
 	}
-	return results, nil
+	return entries, nil
 }
 
 // Delete implements upspin.DirServer.
@@ -718,9 +712,7 @@ func (s *server) watch(op string, treeEvents <-chan *upspin.Event, outEvents cha
 			return
 		}
 		if !hasRead {
-			entry := *e.Entry
-			entry.MarkIncomplete()
-			e.Entry = &entry
+			e.Entry.MarkIncomplete()
 		}
 		// Send e on outEvents, with a timeout.
 		if !t.Stop() {
