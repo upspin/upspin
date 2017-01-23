@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "4851d61e_889aceaf",
+        "filename": "install-client.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-01-23T20:49:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e8d36ae9_1be507ad",
+      "revId": "19f747d34ab0878f0eab25351d54557917c6cbfa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e8d36ae9_3bea4b7c",
         "filename": "install-client.sh",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2017-01-23T20:28:49Z",
       "side": 1,
       "message": "these should not use relative paths. \n\ncd $GOPATH/upspin.io/cmd/upspin etc. etc.\n\nor maybe it\u0027s just better to test that we\u0027re in the upspin.io directory when we start\n\nin any case, given that we are, you can do\n\ngo install cmd/upspin cmd/upspinfs cmd/cacheserver",
+      "revId": "19f747d34ab0878f0eab25351d54557917c6cbfa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "4851d61e_a8958a84",
+        "filename": "install-client.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-01-23T20:49:56Z",
+      "side": 1,
+      "message": "That was the first thing I tried but fails.   Dave now taught me the magic;  I need a ./ before cmd.  $GOPATH is not allowed.",
+      "parentUuid": "e8d36ae9_3bea4b7c",
       "revId": "19f747d34ab0878f0eab25351d54557917c6cbfa",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
