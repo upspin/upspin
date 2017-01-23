@@ -18,6 +18,7 @@ import (
 	"strings"
 
 	"github.com/russross/blackfriday"
+
 	"upspin.io/cloud/https"
 	"upspin.io/flags"
 	"upspin.io/log"
@@ -70,8 +71,21 @@ func (s *server) init() {
 		log.Error.Fatalf("Could not parse docs in %s: %s", *docPath, err)
 	}
 
-	s.mux.HandleFunc("/", s.handleRoot)
-	s.mux.HandleFunc("/doc/", s.handleDoc)
+	// TODO(adg): remove this auth check before launch
+	const (
+		username = "upspin"
+		password = "cheesemaster"
+	)
+	s.mux.Handle("/", goGetHandler{&basicAuthHandler{
+		Username: username,
+		Password: password,
+		Handler:  http.HandlerFunc(s.handleRoot),
+	}})
+	s.mux.Handle("/doc/", &basicAuthHandler{
+		Username: username,
+		Password: password,
+		Handler:  http.HandlerFunc(s.handleDoc),
+	})
 	s.mux.Handle("/images/", http.FileServer(http.Dir("./")))
 }
 
@@ -162,4 +176,16 @@ func (s *server) parseDocs(path string) error {
 	sort.Strings(doclist)
 	s.doclist = doclist
 	return nil
+}
+
+type goGetHandler struct {
+	Handler http.Handler
+}
+
+func (h goGetHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Query().Get("go-get") == "1" {
+		fmt.Fprintf(w, `<meta name="go-import" content="%v git %v">`, sourceBase, sourceRepo)
+		return
+	}
+	h.Handler.ServeHTTP(w, r)
 }
