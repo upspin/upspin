@@ -44,5 +44,11 @@ data.
 Finally, the Client interface provides a coherent high-level file-like API that,
 internally, calls upon the other services to access and manage the data.
 Most applications using Upspin will talk to the Client interface alone.
+
+Many of the methods of the types in this package returns slices or
+pointers to data structures. It is a requirement that all implementations
+of these methods return data that can be modified safely by the
+caller, that is, the returned addresses point to copies rather than
+internal data structures.
 */
 package upspin
