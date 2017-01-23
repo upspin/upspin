@@ -16,6 +16,24 @@
       "revId": "0a2e18d4bcdea98c58dd89f8f004d0a70411a7dc",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e8d36ae9_d829c5a6",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-23T00:16:53Z",
+      "side": 1,
+      "message": "Maybe Presotto can explain what this comment should say. I\u0027m not sure of its veracity at the moment.",
+      "parentUuid": "e8d36ae9_98eedd3b",
+      "revId": "0a2e18d4bcdea98c58dd89f8f004d0a70411a7dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
