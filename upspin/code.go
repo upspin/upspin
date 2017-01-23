@@ -394,6 +394,27 @@ func (d *DirEntry) MarkIncomplete() {
 	d.Packdata = nil
 }
 
+// Copy makes a deep copy of the entry and returns a new pointer to the copy.
+func (d *DirEntry) Copy() *DirEntry {
+	cp := *d
+	cp.Packdata = append([]byte{}, d.Packdata...)
+	cp.Blocks = nil
+	if len(d.Blocks) > 0 {
+		cp.Blocks = make([]DirBlock, 0, len(d.Blocks))
+	}
+	for _, b := range d.Blocks {
+		cp.Blocks = append(cp.Blocks, *b.Copy())
+	}
+	return &cp
+}
+
+// Copy makes a deep copy of the block and returns a new pointer to the copy.
+func (d *DirBlock) Copy() *DirBlock {
+	cp := *d
+	cp.Packdata = append([]byte{}, d.Packdata...)
+	return &cp
+}
+
 func (p Packing) String() string {
 	switch p {
 	case PlainPack:
