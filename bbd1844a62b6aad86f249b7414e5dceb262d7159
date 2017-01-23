@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e8d36ae9_7b553363",
+        "filename": "install-client.sh",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-23T20:55:13Z",
+      "side": 1,
+      "message": "the problem with this is that GOPATH can be a list.\nso i suggest something like (untested)\n\ncase $(pwd) in\n*/upspin.io)\n do it\n ;;\n*)\n  echo 1\u003e\u00262 install-client.sh: must run in root of upspin.io repository\n  exit 1\nesac",
+      "revId": "bbd1844a62b6aad86f249b7414e5dceb262d7159",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
