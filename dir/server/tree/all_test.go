@@ -477,7 +477,8 @@ func TestPutLargeNode(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	root, err := tree.Root()
+	// Reach inside, read the root entry and verify its blocks.
+	root, err := tree.logIndex.Root()
 	if err != nil {
 		t.Fatal(err)
 	}
