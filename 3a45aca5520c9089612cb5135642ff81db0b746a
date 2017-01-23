@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e8d36ae9_fbfb634d",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 994,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-23T20:34:00Z",
+      "side": 1,
+      "message": "given that you only call it with hours, why not addHour instead?",
+      "revId": "3a45aca5520c9089612cb5135642ff81db0b746a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e8d36ae9_9bf81753",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 997,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-23T20:34:00Z",
+      "side": 1,
+      "message": "this isn\u0027t right. the unit of time.Time, and upspin.TIme, is nanoseconds.\n\n\nbugs aside, it would be better if you followed the guide of the existing time package, which has been carefully designed.",
+      "revId": "3a45aca5520c9089612cb5135642ff81db0b746a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
