@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "aa216e14_a59941f0",
+        "filename": "test/copy_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-24T22:34:03Z",
+      "side": 1,
+      "message": "You should actually modify the contents of the Packdata slice, not the Packdata slice value. Otherwise this doesn\u0027t test anything different to the change to Sequence on the line above.",
+      "revId": "0e94eeb5a07c2101463ff4306b4946e045145a43",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1d9c1575_733d3053",
+        "filename": "test/copy_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-24T22:34:03Z",
+      "side": 1,
+      "message": "This tests that the Blocks slice is preserved, but it might be nice to add an additional check that Block Packdata fields are not being modified. Ie, mutate the contents of  Blocks[0].Packdata and see what happens.",
+      "revId": "0e94eeb5a07c2101463ff4306b4946e045145a43",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5111d430_5d80b36e",
+        "filename": "upspin/copy_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-24T22:34:03Z",
+      "side": 1,
+      "message": "again, you need to modify the contents of the existing Packdata slice, otherwise this check is the same as changing the Name",
+      "revId": "0e94eeb5a07c2101463ff4306b4946e045145a43",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
