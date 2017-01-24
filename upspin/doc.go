@@ -45,8 +45,8 @@ Most applications using Upspin will talk to the Client interface alone.
 
 Many of the methods of the types in this package accept or return slices or
 pointers to data structures. It is a requirement that all implementations of
-these methods do not share data with the caller, that is, that data that can be
-modified safely by the method or the caller without affecting the memory of the
-caller or the method, respectively.
+these methods do not share data with the caller, that is, that data passed can
+be modified safely by the method or the caller without affecting the memory of
+the caller or the method, respectively.
 */
 package upspin
