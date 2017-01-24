@@ -36,6 +36,23 @@
     },
     {
       "key": {
+        "uuid": "85d5e9ae_334f994d",
+        "filename": "test/copy_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-24T21:54:27Z",
+      "side": 1,
+      "message": "don\u0027t just test your server, test the abstract idea of the interface. a server might save dir entries.",
+      "revId": "cef61dd5e7af44a3c6389a2ebb8d1156d7eb9ddd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "155c8fa9_2d3dd001",
         "filename": "upspin/code.go",
         "patchSetId": 4
