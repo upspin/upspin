@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "c1922716_a389768e",
+        "filename": "test/copy_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-01-24T20:47:36Z",
+      "side": 1,
+      "message": "I was trying to figure out how to do this too. I think I just figured it out (it has to be on a directory block, since the server does not inspect contents of file\u0027s DirEntries).\n\nDone.",
+      "revId": "cef61dd5e7af44a3c6389a2ebb8d1156d7eb9ddd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "155c8fa9_2d3dd001",
         "filename": "upspin/code.go",
         "patchSetId": 4
@@ -30,6 +47,23 @@
       "writtenOn": "2017-01-24T20:35:51Z",
       "side": 1,
       "message": "s/new //  here and below.\nit\u0027s redundant.",
+      "revId": "cef61dd5e7af44a3c6389a2ebb8d1156d7eb9ddd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b44d3b5e_837f21a0",
+        "filename": "upspin/code.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 397,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-01-24T20:47:36Z",
+      "side": 1,
+      "message": "Done",
       "revId": "cef61dd5e7af44a3c6389a2ebb8d1156d7eb9ddd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
