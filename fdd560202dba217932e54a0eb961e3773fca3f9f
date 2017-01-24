@@ -16,6 +16,24 @@
       "revId": "fdd560202dba217932e54a0eb961e3773fca3f9f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a805f24b_307cc8d3",
+        "filename": "install-client.sh",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-01-24T00:21:05Z",
+      "side": 1,
+      "message": "Thanks, I didn\u0027t know that.\n\nI agree this script can be removed as soon as there is a \"building a client\" doc.   (But let\u0027s finish the \"building a cloud\" doc first.)",
+      "parentUuid": "e8d36ae9_1b33c764",
+      "revId": "fdd560202dba217932e54a0eb961e3773fca3f9f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
