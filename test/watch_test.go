@@ -105,7 +105,9 @@ func testWatchErrors(t *testing.T, r *testenv.Runner) {
 		t.Fatal(r.Diag())
 	}
 
-	r.DirWatch(base, 7) // 7 is an implausible order number.
+	// 777 is an implausible order number, at least in this test.
+	// TODO: Find a better way to test this.
+	r.DirWatch(base, 777)
 	if r.Failed() {
 		err := r.Diag()
 		if strings.Contains(err, upspin.ErrNotSupported.Error()) {
