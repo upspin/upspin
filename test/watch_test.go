@@ -32,12 +32,14 @@ func testWatchCurrent(t *testing.T, r *testenv.Runner) {
 	}
 
 	done := r.DirWatch(base, -1)
-	if r.Match(upspin.ErrNotSupported) {
-		t.Logf("Watch not supported for this DirServer.")
-		return
-	}
 	if r.Failed() {
-		t.Fatal(r.Diag())
+		// Match clears the error, so remember it.
+		err := r.Diag()
+		if r.Match(upspin.ErrNotSupported) {
+			t.Logf("Watch not supported for this DirServer.")
+			return
+		}
+		t.Fatal(err)
 	}
 	if !r.GotEvent(base, !hasBlocks) {
 		t.Fatal(r.Diag())
@@ -56,7 +58,7 @@ func testWatchCurrent(t *testing.T, r *testenv.Runner) {
 	// Reader can set a watcher, but will get no data due to lack of rights.
 	r.As(readerName)
 	done = r.DirWatch(base, -1)
-	if !r.GotErrorEvent(errors.E(errors.Str("event channel timed out"))) {
+	if !r.GotErrorEvent(errors.E(errors.Str("no response on event channel after one second"))) {
 		t.Fatal(r.Diag())
 	}
 	close(done)
@@ -101,10 +103,14 @@ func testWatchErrors(t *testing.T, r *testenv.Runner) {
 		t.Fatal(r.Diag())
 	}
 
-	r.DirWatch(base, 3)
-	if r.Match(upspin.ErrNotSupported) {
-		t.Logf("Watch not supported in this DirServer")
-		return
+	r.DirWatch(base, -77) // -77 is an implausible order number.
+	if r.Failed() {
+		err := r.Diag()
+		if r.Match(upspin.ErrNotSupported) {
+			t.Logf("Watch not supported in this DirServer")
+			return
+		}
+		t.Fatal(err)
 	}
 	if !r.GotErrorEvent(errors.E(errors.IO)) {
 		t.Fatal(r.Diag())
