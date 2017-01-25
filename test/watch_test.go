@@ -41,6 +41,7 @@ func testWatchCurrent(t *testing.T, r *testenv.Runner) {
 		}
 		t.Fatal(err)
 	}
+	r.GetNEvents(2)
 	if !r.GotEvent(base, !hasBlocks) {
 		t.Fatal(r.Diag())
 	}
@@ -50,6 +51,7 @@ func testWatchCurrent(t *testing.T, r *testenv.Runner) {
 
 	// Put an Access file; watch it appear on the channel.
 	r.Put(access, accessContent)
+	r.GetNEvents(1)
 	if !r.GotEvent(access, hasBlocks) {
 		t.Fatal(r.Diag())
 	}
@@ -58,7 +60,7 @@ func testWatchCurrent(t *testing.T, r *testenv.Runner) {
 	// Reader can set a watcher, but will get no data due to lack of rights.
 	r.As(readerName)
 	done = r.DirWatch(base, -1)
-	if !r.GotErrorEvent(errors.E(errors.Str("no response on event channel after one second"))) {
+	if !r.GetErrorEvent(errors.E(errors.Str("no response on event channel after one second"))) {
 		t.Fatal(r.Diag())
 	}
 	close(done)
@@ -72,19 +74,19 @@ func testWatchCurrent(t *testing.T, r *testenv.Runner) {
 	if r.Failed() {
 		t.Fatal(r.Diag())
 	}
+	r.GetNEvents(3)
 	if !r.GotEvent(base, !hasBlocks) {
 		t.Fatal(r.Diag())
 	}
-	if !r.GotEvent(access, !hasBlocks) { // No blocks returned!
+	if !r.GotEvent(access, !hasBlocks) {
 		t.Fatal(r.Diag())
 	}
-	if !r.GotEvent(file, !hasBlocks) { // No blocks returned!
+	if !r.GotEvent(file, !hasBlocks) {
 		t.Fatal(r.Diag())
 	}
 	close(done)
-	e, ok := <-r.Events
-	if ok {
-		t.Fatalf("Channel had more events: %v", e)
+	if r.GetNEvents(1) {
+		t.Fatalf("Channel had more events")
 	}
 }
 
@@ -103,16 +105,19 @@ func testWatchErrors(t *testing.T, r *testenv.Runner) {
 		t.Fatal(r.Diag())
 	}
 
-	r.DirWatch(base, -77) // -77 is an implausible order number.
+	r.DirWatch(base, 7) // 7 is an implausible order number.
 	if r.Failed() {
+		// Match clears the error, so remember it.
 		err := r.Diag()
 		if r.Match(upspin.ErrNotSupported) {
-			t.Logf("Watch not supported in this DirServer")
+			t.Logf("Watch not supported for this DirServer.")
 			return
 		}
 		t.Fatal(err)
 	}
-	if !r.GotErrorEvent(errors.E(errors.IO)) {
+	if !r.GetErrorEvent(errors.E(errors.Invalid)) {
 		t.Fatal(r.Diag())
 	}
 }
+
+// TODO: Test that Watch returns error for invalid name or non-existent root.

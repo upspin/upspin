@@ -263,7 +263,7 @@ func (w *watcher) sendEventFromLog(offset int64) (int64, error) {
 
 		logs, next, err := w.log.ReadAt(1, curr)
 		if err != nil {
-			return next, errors.E(op, errors.IO, errors.Errorf("cannot read log at order %d: %v", curr, err))
+			return next, errors.E(op, errors.Invalid, errors.Errorf("cannot read log at order %d: %v", curr, err))
 		}
 		if len(logs) != 1 {
 			// End of log.
