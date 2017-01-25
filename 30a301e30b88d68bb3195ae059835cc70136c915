@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7e3db0cc_1fce8ed4",
+        "filename": "dir/inprocess/watch.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-01-25T07:33:34Z",
+      "side": 1,
+      "message": "I don\u0027t see event.Order being set anywhere for replies.  Am I missing something?",
+      "range": {
+        "startLine": 89,
+        "startChar": 18,
+        "endLine": 89,
+        "endChar": 23
+      },
+      "revId": "30a301e30b88d68bb3195ae059835cc70136c915",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b45e3325_6eb10cb4",
+        "filename": "dir/inprocess/watch.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-01-25T07:33:34Z",
+      "side": 1,
+      "message": "in?",
+      "range": {
+        "startLine": 217,
+        "startChar": 12,
+        "endLine": 217,
+        "endChar": 20
+      },
+      "revId": "30a301e30b88d68bb3195ae059835cc70136c915",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e3a538b6_b3cebf23",
+        "filename": "dir/inprocess/watch.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-01-25T07:33:34Z",
+      "side": 1,
+      "message": "I\u0027m confused.  When does this  slice get filled? What is it for?",
+      "range": {
+        "startLine": 236,
+        "startChar": 16,
+        "endLine": 236,
+        "endChar": 28
+      },
+      "revId": "30a301e30b88d68bb3195ae059835cc70136c915",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
