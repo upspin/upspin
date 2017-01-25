@@ -257,17 +257,17 @@ func (r *Runner) getNextEvent() *upspin.Event {
 	select {
 	case e, ok = <-r.Events:
 	case <-time.After(time.Second):
-		r.setErr(errors.E(errors.Str("event channel timed out")))
+		r.lastErr = errors.E(errors.Str("no response on event channel after one second"))
 		_, r.errFile, r.errLine, _ = runtime.Caller(2)
 		return nil
 	}
 	if !ok {
-		r.setErr(errors.E(errors.Str("event channel closed")))
+		r.lastErr = errors.E(errors.Str("event channel closed"))
 		_, r.errFile, r.errLine, _ = runtime.Caller(2)
 		return nil
 	}
 	if e.Error != nil {
-		r.setErr(e.Error)
+		r.lastErr = e.Error
 		_, r.errFile, r.errLine, _ = runtime.Caller(2)
 		return nil
 	}
@@ -412,7 +412,10 @@ func (r *Runner) Failed() bool {
 // and if not it notes the discrepancy as the last error state;
 // otherwise it clears the error.
 func (r *Runner) Match(want error) bool {
-	got := r.Err()
+	return r.match(want, r.Err())
+}
+
+func (r *Runner) match(want, got error) bool {
 	if want == got || errorMatch(want, got) {
 		return true
 	}
@@ -432,7 +435,7 @@ func (r *Runner) GotErrorEvent(want error) bool {
 		return false
 	}
 	r.getNextEvent()
-	return r.Match(want)
+	return r.match(want, r.lastErr)
 }
 
 // Diag returns a string containing the most recent saved error
