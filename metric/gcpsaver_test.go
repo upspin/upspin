@@ -34,11 +34,11 @@ func TestLabelsAndAnnotations(t *testing.T) {
 	}
 	s1 := sink.traces[0].Traces[0].Spans[0]
 	s2 := sink.traces[0].Traces[0].Spans[1]
-	expected := "metric1.Span1"
+	expected := "Span1"
 	if s1.Name != expected {
 		t.Errorf("Expected span one to be named %q, got %q", expected, s1.Name)
 	}
-	expected = "metric1.Span2"
+	expected = "Span2"
 	if s2.Name != expected {
 		t.Errorf("Expected span two to be named %q, got %q", expected, s2.Name)
 	}

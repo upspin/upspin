@@ -23,18 +23,18 @@ func TestAll(t *testing.T) {
 	if len(m.spans) != 3 {
 		t.Fatalf("Expected 3 spans, got %d", len(m.spans))
 	}
-	expected := "DirGet.getRoot"
+	expected := "getRoot"
 	if m.spans[0].name != expected {
 		t.Errorf("Expected span named %q, got %q", expected, m.spans[0].name)
 	}
-	expected = "DirGet.getInnerRoot"
+	expected = "getInnerRoot"
 	if m.spans[1].name != expected {
 		t.Errorf("Expected span named %q, got %q", expected, m.spans[1].name)
 	}
 	if m.spans[1].parentSpan != m.spans[0] {
 		t.Errorf("Expected parent span to be %q, got %v", m.spans[0].name, m.spans[1].parentSpan)
 	}
-	expected = "DirGet.getCloudBytes"
+	expected = "getCloudBytes"
 	if m.spans[2].name != expected {
 		t.Errorf("Expected span named %q, got %q", expected, m.spans[2].name)
 	}
@@ -52,11 +52,11 @@ func TestAll(t *testing.T) {
 	if len(saver.metricsReceived) != 2 {
 		t.Fatalf("Expected 2 metrics processed, got %d", len(saver.metricsReceived))
 	}
-	err := verifyMetric(t, saver.metricsReceived[0], "DirGet", "DirGet.getRoot", "DirGet.getInnerRoot", "DirGet.getCloudBytes")
+	err := verifyMetric(t, saver.metricsReceived[0], "DirGet", "getRoot", "getInnerRoot", "getCloudBytes")
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = verifyMetric(t, saver.metricsReceived[1], "", "putBytes")
+	err = verifyMetric(t, saver.metricsReceived[1], "putBytes", "putBytes")
 	if err != nil {
 		t.Fatal(err)
 	}
