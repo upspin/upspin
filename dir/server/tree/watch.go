@@ -294,6 +294,7 @@ func (w *watcher) watch(offset int64) {
 		offset, err = w.sendEventFromLog(offset)
 		if err != nil {
 			if err != errTimeout && err != errClosed {
+				log.Error.Printf("watch: sending error to client: %s", err)
 				w.sendError(err)
 			}
 			return
