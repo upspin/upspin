@@ -292,11 +292,6 @@ var (
 	// DirEntry.
 	ErrFollowLink = errors.New("action incomplete: must follow link")
 
-	// ErrTimeout indicates that a client calling Watch did not consume the
-	// event stream quickly enough and that the server will subsequently
-	// close the event channel.
-	ErrTimeout = errors.New("watch failed: client fell behind")
-
 	// ErrNotSupported indicates that the server does not support the
 	// requested operation.
 	ErrNotSupported = errors.New("not supported")
@@ -403,24 +398,42 @@ type DirServer interface {
 	// DirEntry will be nil.
 	WhichAccess(name PathName) (*DirEntry, error)
 
-	// Watch returns a channel of Events that affect the specified path and
-	// any of its descendants, beginning at the specified order (an opaque,
-	// monotonic value that denotes a position in the event log).
-	// If order is zero, all events known to the DirServer are sent.
-	// If order is -1, the current entries under the specified path are
-	// sent first, then all subsequent events. When the provided done
-	// channel is closed the event channel is closed by the server.
+	// Watch returns a channel of Events that describe operations that
+	// affect the specified path and any of its descendants, beginning
+	// at the specified order (an opaque, monotonic value that denotes
+	// a position in the sequence of all events).
 	//
-	// The caller must have one or more of the Upspin access rights to watch
-	// name. Events for which the caller does not have enough rights to
-	// watch will be suppressed, or if the caller does have rights but not
-	// Read right, the entry will be marked incomplete.
+	// If order is 0, all events known to the DirServer are sent.
+	//
+	// If order is -1, the server first sends a sequence of events describing
+	// the entire tree rooted at name. The Events are sent in sequence
+	// such that a directory is sent before its contents. After that,
+	// the operation proceeds as normal.
+	//
+	// If the order is otherwise invalid, this is reported by the
+	// server sending a single event with a non-nil Error field with
+	// Kind=errors.Invalid. The events channel is then closed.
+	//
+	// When the provided done channel is closed the event channel
+	// is closed by the server.
+	//
+	// To receive an event for a given path under name, the caller must have
+	// one or more of the Upspin access rights to that path. Events for
+	// which the caller does not have enough rights to watch will not be
+	// sent. If the caller has rights but not Read, the entry will be
+	// present but incomplete (see the description of AttrIncomplete). If
+	// the name does not exist, Watch will succeed and report events if and
+	// when it is created.
 	//
 	// If the caller does not consume events in a timely fashion
-	// the server will send an Event containing an ErrTimeout.
+	// the server will close the event channel.
 	//
 	// If this server does not support this method it returns
 	// ErrNotSupported.
+	//
+	// The only errors returned by the Watch method itself are
+	// to report that the name is invalid or refers to a non-existent
+	// root, or that the operation is not supported.
 	Watch(name PathName, order int64, done <-chan struct{}) (<-chan Event, error)
 }
 
@@ -431,15 +444,15 @@ type Event struct {
 	Entry *DirEntry
 
 	// Order is an opaque, monotonic value that denotes the position
-	// of this event in the event log.
+	// of this event in the sequence of all of events.
 	Order int64
 
-	// Delete is true only if the entry is being deleted,
+	// Delete is true only if the entry is being deleted;
 	// otherwise it is being created or modified.
 	Delete bool
 
-	// Error is non-nil if an error occurred while watching for events.
-	// In that case, all other fields are their zero values.
+	// Error is non-nil if an error occurred while waiting for events.
+	// In that case, all other fields are zero.
 	Error error
 }
 
