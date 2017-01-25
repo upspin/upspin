@@ -206,14 +206,16 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	}
 
 	// Special case for making a root.
-	if entry.IsDir() {
-		if parsed.IsRoot() {
-			return s.makeRoot(parsed)
-		}
+	if entry.IsDir() && parsed.IsRoot() {
+		entry, err = s.makeRoot(parsed)
+	} else {
+		entry, err = s.put(op, entry, parsed, false)
 	}
-	entry, err = s.put(op, entry, parsed, false)
 	if err != nil {
 		return nil, err
+	}
+	eventMgr.newEvent <- upspin.Event{
+		Entry: entry,
 	}
 	// Successful Put returns no entry.
 	return nil, nil
@@ -423,8 +425,13 @@ func (s *server) whichAccess(parsed path.Parsed) *access.Access {
 }
 
 // Watch implements upspin.DirServer.Watch.
-func (s *server) Watch(upspin.PathName, int64, <-chan struct{}) (<-chan upspin.Event, error) {
-	return nil, upspin.ErrNotSupported
+func (s *server) Watch(name upspin.PathName, order int64, done <-chan struct{}) (<-chan upspin.Event, error) {
+	const op = "dir/inprocess.Watch"
+	parsed, err := path.Parse(name)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+	return eventMgr.watch(s, parsed, order, done)
 }
 
 // readAll retrieves the data for the entry.
@@ -466,7 +473,14 @@ func (s *server) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
 		}
 	}
 
-	return s.put(op, entry, parsed, true)
+	entry, err = s.put(op, entry, parsed, true)
+	if err != nil {
+		eventMgr.newEvent <- upspin.Event{
+			Entry:  entry,
+			Delete: true,
+		}
+	}
+	return entry, err
 }
 
 func (s *server) isEmptyDirectory(op string, entry *upspin.DirEntry) bool {
