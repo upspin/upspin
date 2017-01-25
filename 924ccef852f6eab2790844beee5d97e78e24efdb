@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "6bdff415_51296cb5",
+        "filename": "test/copy_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-01-25T00:06:16Z",
+      "side": 1,
+      "message": "Done",
+      "revId": "924ccef852f6eab2790844beee5d97e78e24efdb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "6fee9f78_98ba1b9b",
         "filename": "upspin/copy_test.go",
         "patchSetId": 6
@@ -30,6 +47,23 @@
       "writtenOn": "2017-01-24T23:42:07Z",
       "side": 1,
       "message": "cp.Packdata[0] \u003d \u0027!\u0027",
+      "revId": "924ccef852f6eab2790844beee5d97e78e24efdb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7d2fef91_d54f1dfa",
+        "filename": "upspin/copy_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-01-25T00:06:16Z",
+      "side": 1,
+      "message": "Done",
       "revId": "924ccef852f6eab2790844beee5d97e78e24efdb",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
