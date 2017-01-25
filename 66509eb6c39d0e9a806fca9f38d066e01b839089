@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "55b39081_a196b603",
+        "filename": "test/testenv/runner.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-25T05:22:19Z",
+      "side": 1,
+      "message": "result",
+      "range": {
+        "startLine": 43,
+        "startChar": 21,
+        "endLine": 43,
+        "endChar": 26
+      },
+      "revId": "66509eb6c39d0e9a806fca9f38d066e01b839089",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "99524d51_bfe5f6c6",
+        "filename": "test/testenv/runner.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 380,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-25T05:22:19Z",
+      "side": 1,
+      "message": "two spaces",
+      "range": {
+        "startLine": 380,
+        "startChar": 32,
+        "endLine": 380,
+        "endChar": 33
+      },
+      "revId": "66509eb6c39d0e9a806fca9f38d066e01b839089",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
