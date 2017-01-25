@@ -6,7 +6,6 @@
 package metric
 
 import (
-	"fmt"
 	"sync"
 	"sync/atomic"
 	"time"
@@ -71,7 +70,7 @@ func New(name string) *Metric {
 
 // NewSpan creates a new unamed metric with a newly-started named span.
 func NewSpan(name string) (*Metric, *Span) {
-	m := New("")
+	m := New(name)
 	return m, m.StartSpan(name)
 }
 
@@ -98,12 +97,8 @@ func (m *Metric) StartSpan(name string) *Span {
 	if m.spans == nil {
 		m.spans = make([]*Span, 0, 16)
 	}
-	spanName := name
-	if m.name != "" {
-		spanName = fmt.Sprintf("%s.%s", m.name, name)
-	}
 	s := &Span{
-		name:      spanName,
+		name:      name,
 		startTime: time.Now(),
 		metric:    m,
 		kind:      Server,
