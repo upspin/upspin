@@ -40,9 +40,8 @@ type Runner struct {
 	// Data holds the result of the most recent Get operation.
 	Data string
 
-	// Events holds the event channel returned by the most recent DirWatch
-	// operation for the current user.
-	Events <-chan upspin.Event
+	// Events holds the result of the most recent GetEvents operation.
+	Events []upspin.Event
 
 	user    upspin.UserName
 	clients map[upspin.UserName]upspin.Client
@@ -91,7 +90,6 @@ func (r *Runner) As(u upspin.UserName) {
 		return
 	}
 	r.user = u
-	r.Events = r.events[u]
 }
 
 // Get performs a Get request as the user
@@ -203,75 +201,9 @@ func (r *Runner) DirWatch(p upspin.PathName, order int64) chan struct{} {
 		return nil
 	}
 	done := make(chan struct{})
-	events, err := dir.Watch(p, order, done)
-	r.Events = events
-	r.events[r.user] = events
+	r.events[r.user], err = dir.Watch(p, order, done)
 	r.setErr(err)
 	return done
-}
-
-// GotEvent reports whether the next Event in the Events channel has the given
-// name and blocks and if not  notes the discrepancy as the last error state.
-func (r *Runner) GotEvent(p upspin.PathName, withBlocks bool) bool {
-	if r.Failed() {
-		return false
-	}
-	if r.Events == nil {
-		r.lastErr = errors.Str("nil event channel")
-		_, r.errFile, r.errLine, _ = runtime.Caller(1)
-		return false
-	}
-	e := r.getNextEvent()
-	if e == nil {
-		return false
-	}
-	if e.Entry == nil {
-		r.lastErr = errors.Errorf("got nil entry, want %q", p)
-		_, r.errFile, r.errLine, _ = runtime.Caller(1)
-		return false
-	}
-	if e.Entry.Name == p {
-		hasBlocks := len(e.Entry.Blocks) > 0
-		if withBlocks {
-			if hasBlocks {
-				return true
-			}
-			r.lastErr = errors.Errorf("expected blocks present for %q", p)
-			_, r.errFile, r.errLine, _ = runtime.Caller(1)
-			return false
-		} else if hasBlocks {
-			r.lastErr = errors.Errorf("expected no blocks present for %q, got %d", p, len(e.Entry.Blocks))
-			_, r.errFile, r.errLine, _ = runtime.Caller(1)
-			return false
-		}
-		return true
-	}
-	r.lastErr = errors.Errorf("got %q, want %q", e.Entry.Name, p)
-	_, r.errFile, r.errLine, _ = runtime.Caller(1)
-	return false
-}
-
-func (r *Runner) getNextEvent() *upspin.Event {
-	var e upspin.Event
-	var ok bool
-	select {
-	case e, ok = <-r.Events:
-	case <-time.After(time.Second):
-		r.lastErr = errors.E(errors.Str("no response on event channel after one second"))
-		_, r.errFile, r.errLine, _ = runtime.Caller(2)
-		return nil
-	}
-	if !ok {
-		r.lastErr = errors.E(errors.Str("event channel closed"))
-		_, r.errFile, r.errLine, _ = runtime.Caller(2)
-		return nil
-	}
-	if e.Error != nil {
-		r.lastErr = e.Error
-		_, r.errFile, r.errLine, _ = runtime.Caller(2)
-		return nil
-	}
-	return &e
 }
 
 // GotEntry reports whether the Entry has the given name
@@ -427,15 +359,84 @@ func (r *Runner) match(want, got error) bool {
 	return false
 }
 
-// GotErrorEvent checks whether the Event returned an error that matches the
-// given error and if not it notes the discrepancy as the last error state;
-// otherwise it clears the error.
-func (r *Runner) GotErrorEvent(want error) bool {
+// GetNEvents receives n events from the event channel of the calling user.
+// If it cannot fulfill the request it sets the last error state.
+func (r *Runner) GetNEvents(n int) bool {
+	if r.Failed() {
+		return false
+	}
+	r.Events = make([]upspin.Event, 0, n)
+	for i := 0; i < n; i++ {
+		e := r.getNextEvent()
+		if e == nil {
+			return false
+		}
+		r.Events = append(r.Events, *e)
+	}
+	return true
+}
+
+// GotEvent reports whether some Event we received has the given
+// name and presence of blocks. It notes any discrepancy as the last error state.
+func (r *Runner) GotEvent(p upspin.PathName, withBlocks bool) bool {
+	if r.Failed() {
+		return false
+	}
+	for _, e := range r.Events {
+		if e.Entry.Name != p {
+			continue
+		}
+		hasBlocks := len(e.Entry.Blocks) > 0
+		if withBlocks {
+			if hasBlocks {
+				return true
+			}
+			r.lastErr = errors.Errorf("expected blocks present for %q", p)
+			_, r.errFile, r.errLine, _ = runtime.Caller(1)
+			return false
+		} else if hasBlocks {
+			r.lastErr = errors.Errorf("expected no blocks present for %q, got %d", p, len(e.Entry.Blocks))
+			_, r.errFile, r.errLine, _ = runtime.Caller(1)
+			return false
+		}
+		return true
+	}
+	r.lastErr = errors.Errorf("expected Event for for %q", p)
+	_, r.errFile, r.errLine, _ = runtime.Caller(1)
+	return false
+}
+
+// GetErrorEvent gets one event from the user's Event channel and expects
+// it to contain an error. If not, it records the discrepancy in the last error state.
+func (r *Runner) GetErrorEvent(want error) bool {
 	if r.Failed() {
 		return false
 	}
 	r.getNextEvent()
 	return r.match(want, r.lastErr)
+}
+
+func (r *Runner) getNextEvent() *upspin.Event {
+	var e upspin.Event
+	var ok bool
+	select {
+	case e, ok = <-r.events[r.user]:
+	case <-time.After(time.Second):
+		r.lastErr = errors.E(errors.Str("no response on event channel after one second"))
+		_, r.errFile, r.errLine, _ = runtime.Caller(2)
+		return nil
+	}
+	if !ok {
+		r.lastErr = errors.E(errors.Str("event channel closed"))
+		_, r.errFile, r.errLine, _ = runtime.Caller(2)
+		return nil
+	}
+	if e.Error != nil {
+		r.lastErr = e.Error
+		_, r.errFile, r.errLine, _ = runtime.Caller(2)
+		return nil
+	}
+	return &e
 }
 
 // Diag returns a string containing the most recent saved error
