@@ -213,7 +213,7 @@ func (r *Runner) DirWatch(p upspin.PathName, order int64) chan struct{} {
 // GotEvent reports whether the next Event in the Events channel has the given
 // name and blocks and if not  notes the discrepancy as the last error state.
 func (r *Runner) GotEvent(p upspin.PathName, withBlocks bool) bool {
-	if r.Failed() {
+	if r.lastErr != nil {
 		return false
 	}
 	if r.Events == nil {
@@ -257,7 +257,7 @@ func (r *Runner) getNextEvent() *upspin.Event {
 	select {
 	case e, ok = <-r.Events:
 	case <-time.After(time.Second):
-		r.setErr(errors.E(errors.Str("event channel timed out")))
+		r.setErr(errors.E(errors.Str("no response on event channel after one second")))
 		_, r.errFile, r.errLine, _ = runtime.Caller(2)
 		return nil
 	}
