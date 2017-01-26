@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "347896f5_fcccc92b",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-26T23:01:17Z",
+      "side": 1,
+      "message": "I suggest putting this constant in a separate block, lets it be confused with the other entries that are set by \"iota\"",
+      "revId": "496f54ba6882d0d0db9271e3c14960d75e849fb6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "17a3bdd4_751c00cd",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 538,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-26T23:01:17Z",
+      "side": 1,
+      "message": "\"(1)\" ?",
+      "revId": "496f54ba6882d0d0db9271e3c14960d75e849fb6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "75585f58_4f7c7a1c",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 549,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-26T23:01:17Z",
+      "side": 1,
+      "message": "if ce \u003d\u003d nil || ce.error !\u003d nil || ce.de \u003d\u003d nil {\n  plock.Unlock()\n  return false\n}\nplock.Unlock()",
+      "revId": "496f54ba6882d0d0db9271e3c14960d75e849fb6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
