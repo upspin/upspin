@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "7e15758e_d6323a03",
+        "filename": "dir/inprocess/watch.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-26T22:59:46Z",
+      "side": 1,
+      "message": "Done",
+      "revId": "3b1da76d060447e42355b485676c60cc16ce5587",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b8bd6dd9_02552044",
         "filename": "dir/inprocess/watch.go",
         "patchSetId": 2
@@ -30,6 +47,23 @@
       "writtenOn": "2017-01-26T17:12:35Z",
       "side": 1,
       "message": "Yours is clearer, but if you want one without the loop, this is what I wrote in dir/server/tree (arguments reversed):\n\n func isPrefixPath(name upspin.PathName, prefix path.Parsed) bool {\n\tp :\u003d string(name)\n\tpref :\u003d prefix.String()\n\n\tif !strings.HasPrefix(p, pref) {\n\t\treturn false\n\t}\n\tif prefix.IsRoot() {\n\t\treturn true\n\t}\n\t// Make sure we are at a path element boundary.\n\treturn len(pref) \u003d\u003d len(p) || p[len(pref)] \u003d\u003d \u0027/\u0027\n }",
+      "revId": "3b1da76d060447e42355b485676c60cc16ce5587",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a824157e_5e8c0f95",
+        "filename": "dir/inprocess/watch.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-26T22:59:46Z",
+      "side": 1,
+      "message": "yours is harder to believe (it\u0027s correct) but avoids a potentially bad n^2, so i\u0027ll take it.",
       "revId": "3b1da76d060447e42355b485676c60cc16ce5587",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -53,6 +87,23 @@
     },
     {
       "key": {
+        "uuid": "ce1d3eb0_5d191541",
+        "filename": "dir/inprocess/watch.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-26T22:59:46Z",
+      "side": 1,
+      "message": "Done",
+      "revId": "3b1da76d060447e42355b485676c60cc16ce5587",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6e2041d1_e84a5799",
         "filename": "dir/inprocess/watch.go",
         "patchSetId": 2
@@ -67,6 +118,23 @@
       "revId": "3b1da76d060447e42355b485676c60cc16ce5587",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b82ce40f_254f8bac",
+        "filename": "dir/inprocess/watch.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-26T22:59:46Z",
+      "side": 1,
+      "message": "aha, good point. missed one line in \u003c-e.newEvent",
+      "revId": "3b1da76d060447e42355b485676c60cc16ce5587",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -101,6 +169,23 @@
       "revId": "3b1da76d060447e42355b485676c60cc16ce5587",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d5d00851_7b1c30dd",
+        "filename": "dir/inprocess/watch.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-26T22:59:46Z",
+      "side": 1,
+      "message": "yes, as dave said.",
+      "revId": "3b1da76d060447e42355b485676c60cc16ce5587",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
