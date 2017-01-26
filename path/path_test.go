@@ -163,6 +163,7 @@ var prefixTests = []prefixTest{
 	{"u@google.com/", "u@google.com/", true},
 	{"u@google.com/a", "u@google.com/a", true},
 	{"u@google.com/a", "u@google.com/a/b", true},
+	{"user@domain.com/", "user@domain.com/dir/fileB.txt", true},
 	{"u@google.com/a/b/c", "u@google.com/a/b/c/d", true},
 	{"u@google.com/", "x@google.com/", false},
 	{"u@google.com/a", "u@google.com/b", false},
