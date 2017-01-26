@@ -1,0 +1,72 @@
+// Copyright 2017 The Upspin Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package main
+
+import (
+	"flag"
+	"fmt"
+	"os"
+	"path/filepath"
+
+	"upspin.io/flags"
+)
+
+func (s *State) setupserver(args ...string) {
+	const (
+		help = `
+Setupserver
+`
+	)
+	fs := flag.NewFlagSet("setupserver", flag.ExitOnError)
+	where := fs.String("where", filepath.Join(os.Getenv("HOME"), "upspin", "deploy"), "`directory` to store private configuration files")
+	s.parseFlags(fs, args, help, "setupserver [-where=$HOME/upspin/deploy] <domain>")
+	if fs.NArg() != 1 {
+		fs.Usage()
+	}
+	domain := fs.Arg(0)
+
+	// TODO: Check whether the TXT record for this domain is in place.
+
+	// Put the server users to the key server.
+	var (
+		dirServerPath   = filepath.Join(*where, domain, "dirserver")
+		storeServerPath = filepath.Join(*where, domain, "storeserver")
+		dirConfig       = filepath.Join(dirServerPath, "config")
+		storeConfig     = filepath.Join(storeServerPath, "config")
+	)
+	dirFile, dirUser, err := writeUserFile(dirConfig)
+	if err != nil {
+		s.exit(err)
+	}
+	storeFile, storeUser, err := writeUserFile(storeConfig)
+	if err != nil {
+		s.exit(err)
+	}
+	s.user("-put", "-in", dirFile)
+	os.Remove(dirFile)
+	s.user("-put", "-in", storeFile)
+	os.Remove(storeFile)
+	fmt.Printf("Successfully put %q and %q to the key server.\n", dirUser, storeUser)
+
+	cfg := s.config
+
+	// TODO(adg): add other writers?
+	s.setupwriters("-where="+*where, string(cfg.UserName()), string(dirUser))
+
+	// Check that the current configuration points to our new server.
+	// If not, ask the user to change it and update the key server.
+	if cfg.DirEndpoint() != dirConfig.DirEndpoint() ||
+		cfg.StoreEndpoint() != dirConfig.StoreEndpoint() {
+
+		fmt.Printf("Your current configuration in %q has these values:\n", flags.Config)
+		fmt.Printf("\tdirserver: %v\tstoreserver: %v\n\n", cfg.DirEndpoint(), cfg.StoreEndpoint())
+		fmt.Printf("To use the server we are setting up now, these values should be\n")
+		fmt.Printf("\tdirserver: %v\tstoreserver: %v\n\n", dirConfig.DirEndpoint(), dirConfig.StoreEndpoint())
+		return
+	}
+
+	// Make the current user root.
+	s.mkdir(string(cfg.UserName()))
+}
