@@ -107,9 +107,6 @@ func (g *gcpSaver) saverLoop() {
 				traces = traces[:0]
 			}
 			// Revert to the long timeout.
-			if !timer.Stop() {
-				<-timer.C
-			}
 			timer.Reset(idleTimeout)
 		}
 	}
