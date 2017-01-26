@@ -231,9 +231,16 @@ func (p Parsed) HasPrefix(root Parsed) bool {
 
 	// The root must be a prefix of the string representation.
 	if !strings.HasPrefix(pStr, rootStr) {
+		println(p.String(), root.String(), "not prefix")
 		return false
 	}
-	// And it must be equal or the next char must be a slash.
+
+	// If it's a user root, we're done.
+	if root.IsRoot() {
+		return true
+	}
+
+	// Or it must be equal or the next char must be a slash.
 	return len(rootStr) == len(pStr) || pStr[len(rootStr)] == '/'
 }
 
