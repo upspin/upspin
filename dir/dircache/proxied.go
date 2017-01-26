@@ -135,6 +135,11 @@ func (d *proxiedDir) watcher() {
 	log.Debug.Printf("dircache.Watcher %s %s", d.user, d.ep)
 	defer close(d.dying)
 	nextLogTime := time.Now()
+	// If we don't no better, always read in the whole state. It
+	// is shorter than the the history of all operations.
+	if d.order == 0 {
+		d.order = -1
+	}
 	for {
 		err := d.watch()
 		if err == nil {
@@ -148,10 +153,8 @@ func (d *proxiedDir) watcher() {
 			log.Debug.Printf("rpc/dircache.watcher: %s: %s", d.user, err)
 			return
 		}
-		if strings.Contains(err.Error(), "log misaligned") {
-			// For now we have a problem with unreadable log entries
-			// blocking the log reading. If we hit that, just
-			// continue with the current state.
+		if strings.Contains(err.Error(), "cannot read log at order") {
+			// Reread current state.
 			d.order = -1
 		}
 		if time.Now().After(nextLogTime) {
@@ -197,6 +200,11 @@ func (d *proxiedDir) handleEvent(e *upspin.Event) error {
 	if e.Error != nil {
 		log.Info.Printf("rpc/dircache.handleEvent: %s", e.Error)
 		return e.Error
+	}
+
+	// If we are rereading the current state, wipe what we know.
+	if d.order == -1 {
+		d.l.wipeLog(d.user)
 	}
 
 	// Is this a file we are watching?
