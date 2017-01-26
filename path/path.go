@@ -223,6 +223,20 @@ func (p Parsed) Compare(q Parsed) int {
 	return -1
 }
 
+// HasPrefix reports whether the path has the specified element-wise prefix.
+// That is, it reports whether name is in the subtree starting at root.
+func (p Parsed) HasPrefix(root Parsed) bool {
+	pStr := p.String()
+	rootStr := root.String()
+
+	// The root must be a prefix of the string representation.
+	if !strings.HasPrefix(pStr, rootStr) {
+		return false
+	}
+	// And it must be equal or the next char must be a slash.
+	return len(rootStr) == len(pStr) || pStr[len(rootStr)] == '/'
+}
+
 // Join appends any number of path elements onto a (possibly empty)
 // Upspin path, adding a separating slash if necessary. All empty
 // strings are ignored. The result, if non-empty, is passed through
