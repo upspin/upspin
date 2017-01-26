@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2a326bf8_a350c556",
+        "filename": "dir/inprocess/watch.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-01-26T17:12:35Z",
+      "side": 1,
+      "message": "s/Fromt/From t/",
+      "revId": "3b1da76d060447e42355b485676c60cc16ce5587",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b8bd6dd9_02552044",
+        "filename": "dir/inprocess/watch.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-01-26T17:12:35Z",
+      "side": 1,
+      "message": "Yours is clearer, but if you want one without the loop, this is what I wrote in dir/server/tree (arguments reversed):\n\n func isPrefixPath(name upspin.PathName, prefix path.Parsed) bool {\n\tp :\u003d string(name)\n\tpref :\u003d prefix.String()\n\n\tif !strings.HasPrefix(p, pref) {\n\t\treturn false\n\t}\n\tif prefix.IsRoot() {\n\t\treturn true\n\t}\n\t// Make sure we are at a path element boundary.\n\treturn len(pref) \u003d\u003d len(p) || p[len(pref)] \u003d\u003d \u0027/\u0027\n }",
+      "revId": "3b1da76d060447e42355b485676c60cc16ce5587",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b2afe532_665eb05b",
+        "filename": "dir/inprocess/watch.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-01-26T17:12:35Z",
+      "side": 1,
+      "message": "print the op?",
+      "revId": "3b1da76d060447e42355b485676c60cc16ce5587",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6e2041d1_e84a5799",
+        "filename": "dir/inprocess/watch.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-01-26T17:12:35Z",
+      "side": 1,
+      "message": "How does e.events get populated?",
+      "revId": "3b1da76d060447e42355b485676c60cc16ce5587",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3dd53bab_1d7b8c26",
+        "filename": "dir/inprocess/watch.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-01-26T17:12:35Z",
+      "side": 1,
+      "message": "Does this mean it does not move other listeners forward while this one is catching up? I guess this is not an issue because this is inprocess, even though we could still be sending this through the network via remote?",
+      "revId": "3b1da76d060447e42355b485676c60cc16ce5587",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
