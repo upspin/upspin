@@ -17,7 +17,6 @@ package tree
 //   goroutine if we don't want to impose a short timeout on the channel).
 
 import (
-	"strings"
 	"sync/atomic"
 	"time"
 
@@ -391,17 +390,12 @@ func notifyWatchers(watchers []*watcher) {
 	}
 }
 
-// isPrefixPath reports whether the path has a pathwise prefix.
+// newIsPrefixPath reports whether the path has a pathwise prefix.
 func isPrefixPath(name upspin.PathName, prefix path.Parsed) bool {
-	p := string(name)
-	pref := prefix.String()
-
-	if !strings.HasPrefix(p, pref) {
+	parsed, err := path.Parse(name)
+	if err != nil {
+		log.Error.Printf("dir/server/tree.isPrefixPath: error parsing path", name)
 		return false
 	}
-	if prefix.IsRoot() {
-		return true
-	}
-	// Make sure we are at a path element boundary.
-	return len(pref) == len(p) || p[len(pref)] == '/'
+	return parsed.HasPrefix(prefix)
 }
