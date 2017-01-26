@@ -84,6 +84,23 @@
       "revId": "3b1da76d060447e42355b485676c60cc16ce5587",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e07c038c_5bd2451e",
+        "filename": "dir/inprocess/watch.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-01-26T17:53:47Z",
+      "side": 1,
+      "message": "True but this is just sending the events that showed up while we were executing lines 253 and 270 so hopefully it will be short.  For InProcess it\u0027s probably acceptable.",
+      "revId": "3b1da76d060447e42355b485676c60cc16ce5587",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
