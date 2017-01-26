@@ -8,6 +8,7 @@ package test
 // that support Watch; on others it simply skips this test.
 
 import (
+	"strings"
 	"testing"
 
 	"upspin.io/errors"
@@ -33,9 +34,8 @@ func testWatchCurrent(t *testing.T, r *testenv.Runner) {
 
 	done := r.DirWatch(base, -1)
 	if r.Failed() {
-		// Match clears the error, so remember it.
 		err := r.Diag()
-		if r.Match(upspin.ErrNotSupported) {
+		if strings.Contains(err, upspin.ErrNotSupported.Error()) {
 			t.Logf("Watch not supported for this DirServer.")
 			return
 		}
@@ -107,9 +107,8 @@ func testWatchErrors(t *testing.T, r *testenv.Runner) {
 
 	r.DirWatch(base, 7) // 7 is an implausible order number.
 	if r.Failed() {
-		// Match clears the error, so remember it.
 		err := r.Diag()
-		if r.Match(upspin.ErrNotSupported) {
+		if strings.Contains(err, upspin.ErrNotSupported.Error()) {
 			t.Logf("Watch not supported for this DirServer.")
 			return
 		}
