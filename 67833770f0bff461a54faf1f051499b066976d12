@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "adc32034_623d0683",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-01-26T21:58:53Z",
+      "side": 1,
+      "message": "did you mean s/any entry/all entries/?",
+      "revId": "67833770f0bff461a54faf1f051499b066976d12",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e3da7a88_d7cedd0a",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 807,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-01-26T21:58:53Z",
+      "side": 1,
+      "message": "you may not need the boolean since nil \u003d\u003e false here.",
+      "revId": "67833770f0bff461a54faf1f051499b066976d12",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
