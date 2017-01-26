@@ -58,21 +58,38 @@ var notExist = errors.E(errors.NotExist)
 type request int
 
 const (
+	// Requests that correspond to DirServer Calls.
 	lookupReq request = iota
 	globReq
 	deleteReq
 	putReq
 	whichAccessReq
+
+	// versionReq is the first request in each log file. If
+	// the version doesn't match the binary, we ignore the
+	// file.
 	versionReq
+
+	// obsoleteReq marks an LRU entry as no longer necessarily
+	// matching what is in the directory server. Whenever the
+	// watcher gets an error saying that the log cannot be
+	// watched at its current order, we mark all entries obsolete.
+	//
+	// obsoleteReq entries are never written to log files.
+	obsoleteReq
+
+	// maxReq is one past the highest legal value for a request.
 	maxReq
 
-	version = "20170118" // Must change every time we change the log file format.
+	// version is the version of the formatting of the log file.
+	// It must change every time we change the log file format.
+	version = "20170118"
 )
 
 // noAccessFile is used to indicate we did a WhichAccess and it returned no DirEntry.
 const noAccessFile = upspin.PathName("no known Access file")
 
-// clogEntry corresponds to an cached operation.
+// clogEntry corresponds to a cached operation.
 type clogEntry struct {
 	request request
 	name    upspin.PathName
@@ -229,6 +246,41 @@ func (l *clog) rotateLog() {
 	l.appendToLogFile(&clogEntry{request: versionReq, name: version})
 }
 
+// wipeLog is called whenever we suspect the cache to not reflect
+// the true contents of the directory.
+//
+// Make LRU entries obsolete so that we don't believe them. However, we
+// leave them in the LRU since they do tell us what files the users
+// were most recently interested in. The watcher should eventually
+// replace them with trusted information.
+func (l *clog) wipeLog(user upspin.UserName) {
+	const op = "rpc/dircache.wipeLog"
+	l.globalLock.Lock()
+	defer l.globalLock.Unlock()
+
+	// Obsolete all entries for this user.
+	iter := l.lru.NewIterator()
+	for {
+		_, v, ok := iter.GetAndAdvance()
+		if !ok {
+			break
+		}
+		e := v.(*clogEntry)
+
+		parsed, err := path.Parse(e.name)
+		if err != nil || parsed.User() != user {
+			continue
+		}
+
+		// Glob requests are obsoleted by obsoleting their children.
+		if e.request == globReq || e.request == obsoleteReq {
+			continue
+		}
+		e.request = obsoleteReq
+		l.appendToLogFile(e)
+	}
+}
+
 func (l *clog) flush() {
 	// Flush current file.
 	l.logFileLock.Lock()
@@ -367,9 +419,9 @@ func (l *clog) readLogFile(fn string) error {
 			// we read the actual glob entry, we need to find this manufactured
 			// glob and mark it complete. If the directory was empty, that glob
 			// will not yet exist and we must manufacture it also.
-			v, ok := l.lru.Get(lruKey{name: e.name, glob: true})
-			if ok {
-				e.children = v.(*clogEntry).children
+			ge := l.getFromLRU(lruKey{name: e.name, glob: true})
+			if ge != nil {
+				e.children = ge.children
 				e.complete = true
 			} else {
 				e.children = make(map[string]bool)
@@ -418,10 +470,9 @@ func (l *clog) lookup(name upspin.PathName) (*upspin.DirEntry, error, bool) {
 	defer l.globalLock.RUnlock()
 
 	plock := l.pathLocks.lock(name)
-	v, ok := l.lru.Get(lruKey{name: name, glob: false})
+	e := l.getFromLRU(lruKey{name: name, glob: false})
 	plock.Unlock()
-	if ok {
-		e := v.(*clogEntry)
+	if e != nil {
 		return e.de, e.error, true
 	}
 
@@ -430,15 +481,14 @@ func (l *clog) lookup(name upspin.PathName) (*upspin.DirEntry, error, bool) {
 	dirName := path.DropPath(name, 1)
 	glock := l.globLocks.lock(dirName)
 	defer glock.Unlock()
-	v, ok = l.lru.Get(lruKey{name: dirName, glob: true})
-	if !ok {
+	ge := l.getFromLRU(lruKey{name: dirName, glob: true})
+	if ge == nil {
 		return nil, nil, false
 	}
-	e := v.(*clogEntry)
-	if !e.complete {
+	if !l.complete(ge) {
 		return nil, nil, false
 	}
-	if e.children[lastElem(name)] {
+	if ge.children[lastElem(name)] {
 		// The glob entry contains this but we dropped the actual entry.
 		return nil, nil, false
 	}
@@ -458,11 +508,10 @@ func (l *clog) lookupGlob(pattern upspin.PathName) ([]*upspin.DirEntry, error, b
 	// Lookup the glob.
 	glock := l.globLocks.lock(dirPath)
 	defer glock.Unlock()
-	v, ok := l.lru.Get(lruKey{name: dirPath, glob: true})
-	if !ok {
+	e := l.getFromLRU(lruKey{name: dirPath, glob: true})
+	if e == nil {
 		return nil, nil, false
 	}
-	e := v.(*clogEntry)
 	if !e.complete {
 		return nil, nil, false
 	}
@@ -471,22 +520,43 @@ func (l *clog) lookupGlob(pattern upspin.PathName) ([]*upspin.DirEntry, error, b
 	for n := range e.children {
 		name := path.Join(e.name, n)
 		plock := l.pathLocks.lock(name)
-		v, ok := l.lru.Get(lruKey{name: name, glob: false})
-		if !ok {
-			e.complete = false
+		ce := l.getFromLRU(lruKey{name: name, glob: false})
+		if ce == nil {
 			plock.Unlock()
 			return nil, nil, false
 		}
-		ce := v.(*clogEntry)
 		if ce.error != nil || ce.de == nil {
-			e.complete = false
 			plock.Unlock()
 			return nil, nil, false
 		}
 		entries = append(entries, ce.de)
 		plock.Unlock()
 	}
-	return entries, e.error, ok
+	return entries, e.error, true
+}
+
+// complete returns true if (1) this was the result of a '*' glob and if
+// all its children are still valid in the LRU.
+func (l *clog) complete(e *clogEntry) bool {
+	if !e.complete {
+		return false
+	}
+	// It's not complete unless all its children are still in the LRU.
+	for n := range e.children {
+		name := path.Join(e.name, n)
+		plock := l.pathLocks.lock(name)
+		ce := l.getFromLRU(lruKey{name: name, glob: false})
+		if ce == nil {
+			plock.Unlock()
+			return false
+		}
+		if ce.error != nil || ce.de == nil {
+			plock.Unlock()
+			return false
+		}
+		plock.Unlock()
+	}
+	return true
 }
 
 func (l *clog) whichAccess(name upspin.PathName) (*upspin.DirEntry, bool) {
@@ -497,13 +567,12 @@ func (l *clog) whichAccess(name upspin.PathName) (*upspin.DirEntry, bool) {
 	dirName := path.DropPath(name, 1)
 	glock := l.globLocks.lock(dirName)
 	defer glock.Unlock()
-	v, ok := l.lru.Get(lruKey{name: dirName, glob: true})
-	if !ok {
+	e := l.getFromLRU(lruKey{name: dirName, glob: true})
+	if e == nil {
 		return nil, false
 	}
 
 	// See if we have a directory entry for it.
-	e := v.(*clogEntry)
 	if len(e.access) == 0 {
 		return nil, false
 	}
@@ -512,11 +581,10 @@ func (l *clog) whichAccess(name upspin.PathName) (*upspin.DirEntry, bool) {
 	}
 	plock := l.pathLocks.lock(e.access)
 	defer plock.Unlock()
-	v, ok = l.lru.Get(lruKey{name: e.access})
-	if !ok {
+	e = l.getFromLRU(lruKey{name: e.access})
+	if e == nil {
 		return nil, false
 	}
-	e = v.(*clogEntry)
 	return e.de, true
 }
 
@@ -597,10 +665,9 @@ func (l *clog) logGlobRequest(pattern upspin.PathName, err error, entries []*ups
 
 	// If any files have disappeared from a preexisting glob, remove them.
 	glock := l.globLocks.lock(dirName)
-	v, ok := l.lru.Get(lruKey{name: dirName, glob: true})
+	oe := l.getFromLRU(lruKey{name: dirName, glob: true})
 	var todelete []*clogEntry
-	if ok {
-		oe := v.(*clogEntry)
+	if oe != nil {
 		for n := range oe.children {
 			if !children[n] {
 				e := &clogEntry{request: deleteReq, name: path.Join(dirName, n)}
@@ -709,14 +776,14 @@ func (l *clog) updateLRU(e *clogEntry) {
 		dirName := path.DropPath(e.name, 1)
 		glock := l.globLocks.lock(dirName)
 		defer glock.Unlock()
-		v, ok := l.lru.Get(lruKey{name: dirName, glob: true})
-		if ok {
+		ge := l.getFromLRU(lruKey{name: dirName, glob: true})
+		if ge != nil {
 			newVal := noAccessFile
 			if e.de != nil {
 				newVal = e.de.Name
 			}
-			if v.(*clogEntry).access != newVal {
-				v.(*clogEntry).access = newVal
+			if ge.access != newVal {
+				ge.access = newVal
 			}
 		}
 	default:
@@ -736,17 +803,32 @@ func (l *clog) removeFromLRU(e *clogEntry, isGlob bool) {
 	l.lru.Remove(lruKey{name: e.name, glob: isGlob})
 }
 
+// getFromLRU looks up an entry and returns it if not obsolete.
+func (l *clog) getFromLRU(k lruKey) *clogEntry {
+	v, ok := l.lru.Get(k)
+	if !ok {
+		return nil
+	}
+	e := v.(*clogEntry)
+	if e.request == obsoleteReq {
+		return nil
+	}
+	return e
+}
+
 // addToGlob creates the glob if it doesn't exist and adds an entry to it.
 func (l *clog) addToGlob(e *clogEntry) {
 	dirName := path.DropPath(e.name, 1)
 	if dirName == e.name {
 		return
 	}
-	var ge *clogEntry
 	k := lruKey{name: dirName, glob: true}
 	glock := l.globLocks.lock(dirName)
 	defer glock.Unlock()
-	if v, ok := l.lru.Get(k); !ok {
+	ge := l.getFromLRU(k)
+	if ge == nil {
+		// When creating a glob entry this way, we don't know all of
+		// its children so it is incomplete.
 		ge = &clogEntry{
 			request:  globReq,
 			name:     dirName,
@@ -754,13 +836,9 @@ func (l *clog) addToGlob(e *clogEntry) {
 			complete: false,
 		}
 		l.lru.Add(k, ge)
-	} else {
-		ge = v.(*clogEntry)
 	}
 	lelem := lastElem(e.name)
-	if !ge.children[lelem] {
-		ge.children[lelem] = true
-	}
+	ge.children[lelem] = true
 }
 
 // removeFromGlob removes an entry from a glob, should that glob exist.
@@ -772,11 +850,8 @@ func (l *clog) removeFromGlob(e *clogEntry) {
 	lelem := lastElem(e.name)
 	k := lruKey{name: dirName, glob: true}
 	glock := l.globLocks.lock(dirName)
-	if v, ok := l.lru.Get(k); ok {
-		ge := v.(*clogEntry)
-		if ge.children[lelem] {
-			delete(ge.children, lelem)
-		}
+	if ge := l.getFromLRU(k); ge != nil {
+		delete(ge.children, lelem)
 	}
 	glock.Unlock()
 }
@@ -802,10 +877,10 @@ func (l *clog) addAccess(e *clogEntry) {
 
 	// Add the access reference to its immediate directory.
 	dirName := path.DropPath(e.name, 1)
-	v, ok := l.lru.Get(lruKey{name: dirName, glob: true})
-	if ok {
-		if v.(*clogEntry).access != e.name {
-			v.(*clogEntry).access = e.name
+	ge := l.getFromLRU(lruKey{name: dirName, glob: true})
+	if ge != nil {
+		if ge.access != e.name {
+			ge.access = e.name
 		}
 	}
 
@@ -854,9 +929,9 @@ func (l *clog) removeAccess(e *clogEntry) {
 
 	// Remove this access reference from its immediate directory.
 	dirName := path.DropPath(e.name, 1)
-	v, ok := l.lru.Get(lruKey{name: dirName, glob: true})
-	if ok {
-		v.(*clogEntry).access = ""
+	ge := l.getFromLRU(lruKey{name: dirName, glob: true})
+	if ge != nil {
+		ge.access = ""
 	}
 
 	// Remove this access reference from any descendant.
