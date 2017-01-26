@@ -153,6 +153,49 @@ func TestElem(t *testing.T) {
 	}
 }
 
+type prefixTest struct {
+	root      upspin.PathName
+	path      upspin.PathName
+	hasPrefix bool
+}
+
+var prefixTests = []prefixTest{
+	{"u@google.com/", "u@google.com/", true},
+	{"u@google.com/a", "u@google.com/a", true},
+	{"u@google.com/a", "u@google.com/a/b", true},
+	{"u@google.com/a/b/c", "u@google.com/a/b/c/d", true},
+	{"u@google.com/", "x@google.com/", false},
+	{"u@google.com/a", "u@google.com/b", false},
+	{"u@google.com/a/b", "u@google.com/a", false},
+}
+
+func TestHasPrefix(t *testing.T) {
+	for _, test := range prefixTests {
+		p, err := Parse(test.path)
+		if err != nil {
+			t.Errorf("%q: unexpected error %v", test.path, err)
+			continue
+		}
+		r, err := Parse(test.root)
+		if err != nil {
+			t.Errorf("%q: unexpected error %v", test.root, err)
+			continue
+		}
+		// Validate the input - they must be canonical.
+		if p.Path() != test.path {
+			t.Errorf("path %q not canonical", test.path)
+			continue
+		}
+		if r.Path() != test.root {
+			t.Errorf("root %q not canonical", test.root)
+			continue
+		}
+		if hasPrefix := p.HasPrefix(r); hasPrefix != test.hasPrefix {
+			t.Errorf("HasPrefix(%q, %q)=%t; expected %t", test.path, test.root, hasPrefix, test.hasPrefix)
+		}
+	}
+}
+
 // The join and clean tests are based on those in Go's path/path_test.go.
 type JoinTest struct {
 	elem []string
