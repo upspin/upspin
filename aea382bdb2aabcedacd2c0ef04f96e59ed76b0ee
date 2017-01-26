@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa96bedd_f1bf5603",
+        "filename": "path/path_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-01-26T23:35:20Z",
+      "side": 1,
+      "message": "The type and var could move inside the test. For now, at least.",
+      "revId": "aea382bdb2aabcedacd2c0ef04f96e59ed76b0ee",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
