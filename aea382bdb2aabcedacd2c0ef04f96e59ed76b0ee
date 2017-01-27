@@ -16,6 +16,23 @@
       "revId": "aea382bdb2aabcedacd2c0ef04f96e59ed76b0ee",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d6eed50b_a9b78e63",
+        "filename": "path/path_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-27T01:59:59Z",
+      "side": 1,
+      "message": "It\u0027s just taste, but I don\u0027t favor that style. More important, it\u0027s not the style used elsewhere in this file.",
+      "revId": "aea382bdb2aabcedacd2c0ef04f96e59ed76b0ee",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
