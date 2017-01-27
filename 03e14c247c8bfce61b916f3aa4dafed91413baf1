@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f6669df_c433a085",
+        "filename": "dir/inprocess/watch.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-27T00:24:21Z",
+      "side": 1,
+      "message": "i\u0027d swap these around\n\ncase 0:\n  // 0 is a special case in the API, but it\u0027s not a special case here.\n  fallthrough\ndefault:",
+      "revId": "03e14c247c8bfce61b916f3aa4dafed91413baf1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
