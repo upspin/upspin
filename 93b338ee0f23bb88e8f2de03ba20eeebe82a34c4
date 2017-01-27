@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f9cbd80d_de1fea00",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 5140
+      },
+      "writtenOn": "2017-01-27T18:24:33Z",
+      "side": 1,
+      "message": "Is it our curve (curve of private key) or peer\u0027s curve? We have to check against *private key*\u0027s curve; otherwise an attacker can still generate a public key on its curve; but not on our curve.\nIt\u0027s tricky to fix ECDH correctly.",
+      "range": {
+        "startLine": 194,
+        "startChar": 6,
+        "endLine": 194,
+        "endChar": 11
+      },
+      "revId": "93b338ee0f23bb88e8f2de03ba20eeebe82a34c4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "41a838c9_3a7a4088",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 654,
+      "author": {
+        "id": 5140
+      },
+      "writtenOn": "2017-01-27T18:24:33Z",
+      "side": 1,
+      "message": "Is it our curve (curve of private key) or peer\u0027s curve? We have to check against *private key*\u0027s curve; otherwise an attacker can still generate a public key on its curve; but not on our curve.\nIt\u0027s tricky to fix ECDH correctly.",
+      "range": {
+        "startLine": 654,
+        "startChar": 5,
+        "endLine": 654,
+        "endChar": 10
+      },
+      "revId": "93b338ee0f23bb88e8f2de03ba20eeebe82a34c4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
