@@ -4,5 +4,5 @@ COPY public.upspinkey /upspin/public.upspinkey
 COPY secret.upspinkey /upspin/secret.upspinkey
 COPY bin/storeserver /storeserver
 ENV TMPDIR /
-ENTRYPOINT ["/storeserver", "-config=/upspin/config", "-kind=gcp", "-serverconfig=gcpProjectId=PROJECT,gcpBucketName=BUCKET,defaultACL=publicRead", "-project=PROJECT", "-log=LOGLEVEL"]
+ENTRYPOINT ["/storeserver", "-config=/upspin/config", "-kind=gcp", "-serverconfig=gcpBucketName=BUCKET,defaultACL=publicRead", "-project=PROJECT", "-log=LOGLEVEL"]
 EXPOSE 80 443
