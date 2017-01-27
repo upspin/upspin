@@ -18,10 +18,7 @@ import (
 	"upspin.io/log"
 )
 
-const (
-	testProjectID  = "upspin-test"
-	testBucketName = "upspin-test-scratch"
-)
+const testBucketName = "upspin-test-scratch"
 
 var (
 	client      storage.Storage
@@ -232,7 +229,6 @@ func TestMain(m *testing.M) {
 	// Create client that writes to test bucket.
 	var err error
 	client, err = storage.Dial("GCS",
-		storage.WithKeyValue("gcpProjectId", testProjectID),
 		storage.WithKeyValue("gcpBucketName", testBucketName),
 		storage.WithKeyValue("defaultACL", PublicRead))
 	if err != nil {

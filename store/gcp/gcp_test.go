@@ -91,7 +91,7 @@ func TestNew(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping part of test when network unavailable; depends on credential availability")
 	}
-	_, err = New("defaultACL=publicRead", "gcpProjectId=some project id", "gcpBucketName=zee bucket")
+	_, err = New("defaultACL=publicRead", "gcpBucketName=zee bucket")
 	if err != nil {
 		t.Fatal(err)
 	}

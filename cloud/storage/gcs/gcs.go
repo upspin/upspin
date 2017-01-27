@@ -43,7 +43,6 @@ const (
 
 // Keys used for storing dial options.
 const (
-	projectID  = "gcpProjectId"
 	bucketName = "gcpBucketName"
 	defaultACL = "defaultACL"
 )
@@ -52,7 +51,6 @@ const (
 type gcsImpl struct {
 	client          *http.Client
 	service         *gcsBE.Service
-	projectID       string
 	bucketName      string
 	defaultWriteACL string
 }
@@ -214,11 +212,6 @@ func (gcs *gcsImpl) EmptyBucket(verbose bool) error {
 func (gcs *gcsImpl) Dial(opts *storage.Opts) error {
 	const op = "cloud/storage/gcs.Dial"
 
-	if v, ok := opts.Opts[projectID]; ok {
-		gcs.projectID = v
-	} else {
-		return errors.E(op, errors.Invalid, errors.Str("Project ID argument is required"))
-	}
 	if v, ok := opts.Opts[bucketName]; ok {
 		gcs.bucketName = v
 	} else {
