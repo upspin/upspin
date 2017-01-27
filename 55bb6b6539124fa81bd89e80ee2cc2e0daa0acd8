@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "efa0638b_d4679cc4",
+        "filename": "dir/inprocess/watch.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-27T00:24:21Z",
+      "side": 1,
+      "message": "There should not be a single global eventManager, but rather a new one created for each call to New. The eventManager should hang off the database type.",
+      "revId": "55bb6b6539124fa81bd89e80ee2cc2e0daa0acd8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
