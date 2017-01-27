@@ -80,29 +80,27 @@ func (l *listener) sendAll(events []upspin.Event) bool {
 // return reports whether it sent all valid info to the client. Thus a
 // false return means this listener did not start properly, but it is
 // not an error if name does not exist, as it may appear later.
-// TODO: Could send some errors as Events.
+// If it returns false, it attempts to send an error event unless the
+// problem was an unresponsive client.
 func (l *listener) sendTree(name upspin.PathName) bool {
 	const op = "dir/inprocess.Watch"
 	parsed, err := path.Parse(name)
 	if err != nil {
 		// Shouldn't happen.
 		log.Info.Printf("%s: parse error in sendTree for %q: %v", op, name, err)
+		l.sendEvent(upspin.Event{Error: errors.E(op, err)})
 		return false
 	}
 	entry, err := l.server.lookup(op, parsed, false)
 	if err != nil {
+		// Ignore error. The problem (existence, permission) might resolve later.
 		return true
 	}
 	event, ok := l.want(upspin.Event{Entry: entry}, parsed)
 	if !ok {
 		return true
 	}
-	select {
-	case l.events <- event:
-		// Delivered.
-		// Do not increment order: these events are not part of the standard stream.
-	case <-time.After(watchTimeout):
-		// Failed to deliver; client is not keeping up.
+	if !l.sendEvent(event) {
 		return false
 	}
 	if !entry.IsDir() {
@@ -120,6 +118,19 @@ func (l *listener) sendTree(name upspin.PathName) bool {
 	return true
 }
 
+// sendEvent sends an event on the channel, or returns false if it cannot.
+func (l *listener) sendEvent(event upspin.Event) bool {
+	select {
+	case l.events <- event:
+		// Delivered.
+		// Do not increment order: these events are not part of the standard stream.
+		return true
+	case <-time.After(watchTimeout):
+		// Failed to deliver; client is not keeping up.
+		return false
+	}
+}
+
 // eventManager is the structure that delivers events to all the listeners.
 type eventManager struct {
 	events    []upspin.Event
@@ -132,18 +143,18 @@ type eventManager struct {
 	listenerDone chan *listener
 }
 
-// TODO: There should be one per database, not one per package.
-var eventMgr = &eventManager{
+// newEventManager returns a new event manager. There is one per database.
+func newEventManager() *eventManager {
 	// The numbers here are arbitrary, but for the testing purposes of
 	// this package should be enough to prevent blocking the client.
 	// A more serious attempt would scale these dynamically as needed.
-	newListener: make(chan *listener, 100),
-	newEvent:    make(chan upspin.Event, 100),
-	eventsSoFar: make(chan []upspin.Event),
-}
-
-func init() {
-	go eventMgr.run()
+	em := &eventManager{
+		newListener: make(chan *listener, 100),
+		newEvent:    make(chan upspin.Event, 100),
+		eventsSoFar: make(chan []upspin.Event),
+	}
+	go em.run()
+	return em
 }
 
 // run is the goroutine managing the single event manager.
@@ -178,11 +189,10 @@ func (e *eventManager) run() {
 			for i := 0; i < n; i++ {
 				l := e.listeners[i]
 				if cleanEvent, ok := l.want(event, parsed); ok {
-					select {
-					case l.events <- cleanEvent:
+					if l.sendEvent(cleanEvent) {
 						// Delivered.
 						l.order++
-					case <-time.After(watchTimeout):
+					} else {
 						// Failed to deliver; client is not keeping up.
 						e.deleteNth(i)
 						i-- // Back up the loop counter; ith guy is gone.
@@ -218,7 +228,7 @@ func (e *eventManager) watch(server *server, root path.Parsed, order int64, done
 	const op = "dir/inprocess.Watch"
 	events := make(chan upspin.Event, 10)
 	l := &listener{
-		eventMgr: eventMgr,
+		eventMgr: e,
 		root:     root,
 		server:   server,
 		done:     done,
