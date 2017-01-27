@@ -38,6 +38,7 @@ func New(config upspin.Config) upspin.DirServer {
 			root:       make(map[upspin.UserName]*upspin.DirEntry),
 			rootAccess: make(map[upspin.UserName]*access.Access),
 			access:     make(map[upspin.PathName]*access.Access),
+			eventMgr:   newEventManager(),
 		},
 	}
 }
@@ -62,6 +63,7 @@ var _ upspin.DirServer = (*server)(nil)
 // database represents the shared state of the directory forest.
 type database struct {
 	dirConfig upspin.Config // For accessing store holding directory entries.
+	eventMgr  *eventManager // Handles Watch events.
 
 	// mu is used to serialize access to the maps.
 	// It's also used to serialize all access to the store through the
@@ -214,7 +216,7 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	if err != nil {
 		return nil, err
 	}
-	eventMgr.newEvent <- upspin.Event{
+	s.db.eventMgr.newEvent <- upspin.Event{
 		Entry: entry,
 	}
 	// Successful Put returns no entry.
@@ -431,7 +433,7 @@ func (s *server) Watch(name upspin.PathName, order int64, done <-chan struct{}) 
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
-	return eventMgr.watch(s, parsed, order, done)
+	return s.db.eventMgr.watch(s, parsed, order, done)
 }
 
 // readAll retrieves the data for the entry.
@@ -475,7 +477,7 @@ func (s *server) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
 
 	entry, err = s.put(op, entry, parsed, true)
 	if err != nil {
-		eventMgr.newEvent <- upspin.Event{
+		s.db.eventMgr.newEvent <- upspin.Event{
 			Entry:  entry,
 			Delete: true,
 		}
