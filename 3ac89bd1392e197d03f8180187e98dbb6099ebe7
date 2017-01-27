@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b209262d_9061bbd9",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 656,
+      "author": {
+        "id": 5140
+      },
+      "writtenOn": "2017-01-27T03:54:47Z",
+      "side": 1,
+      "message": "It\u0027s safer to check whether the peer\u0027s public key is on the curve before any calculation.\nThere is a way to bypass the check after calculation, i.e., I could make a public key invalid (not on the curve) and make the final result is on the curve. For instance:\nConsider Edwards curve:\n      x^2 + y^2 \u003d 1 + 3 x^2 y^2 over F_17\nThe point (3, 8, 1) is *not* on the curve.\nHowever: 2*(3, 8, 1) \u003d (3, 8, 1) + (3, 8, 1) \u003d (13, 14, 16) \u003d (4, 3, 1) is on the curve.",
+      "revId": "3ac89bd1392e197d03f8180187e98dbb6099ebe7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
