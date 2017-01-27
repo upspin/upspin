@@ -130,6 +130,23 @@
       "revId": "93b338ee0f23bb88e8f2de03ba20eeebe82a34c4",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c17e6354_80e57b49",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 654,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-01-27T18:56:21Z",
+      "side": 1,
+      "message": "I\u0027ll think that through and fix in a future CL if there is a gap.  I want to allow 25519, for example, but supposedly we\u0027re already making sure that only a fixed approved set of curves are in use here.",
+      "revId": "93b338ee0f23bb88e8f2de03ba20eeebe82a34c4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
