@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "32be3d7a_c234f8a5",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-27T20:04:11Z",
+      "side": 1,
+      "message": "that\u0027s a very strange error string. perhaps it\u0027s missing a word or two of explanation.\n\nmore important it doesn\u0027t say what the problem is. we don\u0027t as a rule give URLs as error strings. (how would you like it if EACCES gave you a link to a book on operating system design?) i don\u0027t know what the actual issue is, but i would have thought the error would be something like\n\nunsafe cryptography: user key does not match the frenectomy\u0027s entabulation\n\nthus telling me that my key is bad (or whatever the problem is) even if i don\u0027t know what a frenectomy\u0027s entabulation is.",
+      "revId": "e9c1a9c45ba15c59331c85deec5f2fb2e720b2e1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6220e595_6777ea39",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-27T20:04:11Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "e9c1a9c45ba15c59331c85deec5f2fb2e720b2e1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
