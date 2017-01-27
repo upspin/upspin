@@ -36,6 +36,23 @@
     },
     {
       "key": {
+        "uuid": "98cc3463_a519bca1",
+        "filename": "dir/inprocess/watch.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-27T00:24:21Z",
+      "side": 1,
+      "message": "MarkIncomplete does this already",
+      "revId": "3b1da76d060447e42355b485676c60cc16ce5587",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "b8bd6dd9_02552044",
         "filename": "dir/inprocess/watch.go",
         "patchSetId": 2
@@ -64,6 +81,23 @@
       "writtenOn": "2017-01-26T22:59:46Z",
       "side": 1,
       "message": "yours is harder to believe (it\u0027s correct) but avoids a potentially bad n^2, so i\u0027ll take it.",
+      "revId": "3b1da76d060447e42355b485676c60cc16ce5587",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "33c9d24a_7d742243",
+        "filename": "dir/inprocess/watch.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-27T00:24:21Z",
+      "side": 1,
+      "message": "It seems like there should be some error reporting here.\nMaybe this function should return (bool, error) and pass the errors back up.\nOr maybe it should just return error.",
       "revId": "3b1da76d060447e42355b485676c60cc16ce5587",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -101,6 +135,40 @@
       "revId": "3b1da76d060447e42355b485676c60cc16ce5587",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2b74b320_6106e6b1",
+        "filename": "dir/inprocess/watch.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-27T00:24:21Z",
+      "side": 1,
+      "message": "return true",
+      "revId": "3b1da76d060447e42355b485676c60cc16ce5587",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "999461c3_8efb6d12",
+        "filename": "dir/inprocess/watch.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-27T00:24:21Z",
+      "side": 1,
+      "message": "if you don\u0027t check the return values of sendTree here, then what are they for?",
+      "revId": "3b1da76d060447e42355b485676c60cc16ce5587",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     },
     {
       "key": {
