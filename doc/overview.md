@@ -126,7 +126,7 @@ As another example, the path name
 ann@example.com/
 ```
 
-is called the *user root* for `ann@example.com, analogous to Unix's $HOME`.
+is called the *user root* for `ann@example.com`, analogous to Unix's `$HOME`.
 Looking at the full path, `ann@example.com/dir/file`, there is a directory
 `dir` in the user root; it in turn contains the named file.
 
@@ -155,8 +155,8 @@ user.
 The access control mechanism determines who can read, write, delete, or even
 discover the existence of Upspin files.
 
-A separate document (Access control, TODO,link) describes it in detail, but the
-basic idea is simple.
+A separate document [Access Control](/doc/access_control.md) describes it in
+detail, but the basic idea is simple.
 
 By default, nothing is shared.
 When a user is added to Upspin, all data created by that user is invisible to
