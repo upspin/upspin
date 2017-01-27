@@ -25,6 +25,23 @@
     },
     {
       "key": {
+        "uuid": "b2c57d52_88c57c34",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-01-27T18:42:02Z",
+      "side": 1,
+      "message": "f.ScalarMult is called from one place, pack/ee/ee.go:707, where we (intend to) set curve to be our private key\u0027s curve.  I\u0027ll go double check the logic and think about whether to add an additional test, just so the code is not brittle against future change.",
+      "revId": "93b338ee0f23bb88e8f2de03ba20eeebe82a34c4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "41a838c9_3a7a4088",
         "filename": "pack/ee/ee.go",
         "patchSetId": 2
@@ -42,6 +59,23 @@
         "endLine": 654,
         "endChar": 10
       },
+      "revId": "93b338ee0f23bb88e8f2de03ba20eeebe82a34c4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "478d8379_fdde48f8",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 654,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-01-27T18:42:02Z",
+      "side": 1,
+      "message": "The curve is the peer\u0027s curve and could be anything.  At line 658, we generate an ephemeral private key that is definitely on the peer\u0027s curve.  If the peer\u0027s declared curve is malicious, then the key wrapping will be weak.\n\nBut we are getting the peer\u0027s curve from the central keyserver.  If the real peer wants to leak file contents, no need for them to play crypto games;  they can just leak directly.  If an attacker is maliciously modifying the central keyserver, we hope to detect this via key transparency.\n\nSo I think we\u0027re ok here.",
       "revId": "93b338ee0f23bb88e8f2de03ba20eeebe82a34c4",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
