@@ -87,6 +87,7 @@ var (
 	errKeyLength          = errors.Str("wrong key length for AES-256")
 	errNoKnownKeysForUser = errors.Str("no known keys for user")
 	errSignedNameNotSet   = errors.Str("empty SignedName")
+	errNotOnCurve         = errors.Str("possible attack safecurves.cr.yp.to/twist.html")
 	sig0                  upspin.Signature  // for returning nil of correct type
 	ellipticNames         map[string]string // ellipticNames maps ECDSA curve names to upspin-friendly curve names.
 )
@@ -650,6 +651,10 @@ func aesWrap(R *ecdsa.PublicKey, dkey []byte) (w wrappedKey, err error) {
 	// v, V=vG  ephemeral key pair
 	// S = vR   shared point
 	curve := R.Curve
+	if !curve.IsOnCurve(R.X, R.Y) {
+		err = errNotOnCurve
+		return
+	}
 	v, err := ecdsa.GenerateKey(curve, rand.Reader)
 	sx, sy := curve.ScalarMult(R.X, R.Y, v.D.Bytes())
 	S := elliptic.Marshal(curve, sx, sy)

@@ -41,6 +41,7 @@ type factotum struct {
 
 var _ upspin.Factotum = factotum{}
 
+var errNotOnCurve = errors.Str("possible attack safecurves.cr.yp.to/twist.html")
 var sig0 upspin.Signature // for returning nil
 
 // KeyHash returns the hash of a key, given in string format.
@@ -190,6 +191,10 @@ func (f factotum) ScalarMult(keyHash []byte, curve elliptic.Curve, x, y *big.Int
 	if !ok {
 		err = errors.E(op, errors.Errorf("no such key %x", keyHash))
 	} else {
+		if !curve.IsOnCurve(x, y) {
+			err = errNotOnCurve
+			return
+		}
 		sx, sy = curve.ScalarMult(x, y, fk.ecdsaKeyPair.D.Bytes())
 	}
 	return
