@@ -252,17 +252,25 @@ func (c *storeCache) get(cfg upspin.Config, ref upspin.Reference, e upspin.Endpo
 func (c *storeCache) put(cfg upspin.Config, data []byte, e upspin.Endpoint) (upspin.Reference, error) {
 	// If we can't put it to the store, don't cache.
 	// TODO(p): This will change with a write through cache.
-	// TODO(p): Use refdata information.
 	store, err := bind.StoreServer(cfg, e)
 	if err != nil {
 		return "", err
 	}
-	refdata, err := store.Put(data)
-	if err != nil {
-		return "", err
+	// The following loop exists to survive very temporary errors in the backend. At
+	// the moment we get them from GCS but one might expect them elsewhere.
+	var ref upspin.Reference
+	for tries := 0; ; tries++ {
+		refdata, err := store.Put(data)
+		if err == nil {
+			ref = refdata.Reference
+			break
+		}
+		if tries > 3 {
+			return "", err
+		}
+		log.Info.Printf("storecache.Put retrying: %s", err)
+		time.Sleep(250 * time.Millisecond)
 	}
-	ref := refdata.Reference
-
 	file := c.cachePath(ref, e)
 	c.enforceByteLimitByRemovingLeastRecentlyUsedFile()
 
