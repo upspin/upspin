@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "48f744ee_928596f5",
+        "filename": "dir/inprocess/watch.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-27T00:47:21Z",
+      "side": 1,
+      "message": "add context",
+      "revId": "f95a4df6e4e1f996c7b0e5b4796608c15067e656",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4dbac1d4_b3d5a122",
+        "filename": "dir/inprocess/watch.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-27T00:47:21Z",
+      "side": 1,
+      "message": "needs context",
+      "revId": "f95a4df6e4e1f996c7b0e5b4796608c15067e656",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c9d77801_d6a5f7b7",
+        "filename": "dir/inprocess/watch.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-27T00:47:21Z",
+      "side": 1,
+      "message": "context",
+      "revId": "f95a4df6e4e1f996c7b0e5b4796608c15067e656",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "77518701_c081629b",
+        "filename": "dir/inprocess/watch.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-27T00:47:21Z",
+      "side": 1,
+      "message": "context",
+      "revId": "f95a4df6e4e1f996c7b0e5b4796608c15067e656",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
