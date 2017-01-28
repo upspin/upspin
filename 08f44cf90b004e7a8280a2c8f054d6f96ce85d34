@@ -16,6 +16,23 @@
       "revId": "08f44cf90b004e7a8280a2c8f054d6f96ce85d34",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f3ad0fad_c785ebac",
+        "filename": "store/storecache/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-01-28T01:13:09Z",
+      "side": 1,
+      "message": "At the moment I don\u0027t really understand why it is happening.  It wasn\u0027t always this bad.  I think the correct fix might be in the store server since it is what is returning us this error.  It is its job to mask the foibles of GCS, I believe.  I\u0027ll have a look at the store server before submitting this.",
+      "revId": "08f44cf90b004e7a8280a2c8f054d6f96ce85d34",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
