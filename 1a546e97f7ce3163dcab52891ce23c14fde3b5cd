@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a19f63f_5f11eb58",
+        "filename": "store/storecache/cache.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-29T22:44:25Z",
+      "side": 1,
+      "message": "It would be nice if there were a specific error kind that we could test for that would indicate transient errors. For transient errors, it makes sense to retry indefinitely (with exponential backoff). For other errors, we should stop trying altogether.",
+      "revId": "1a546e97f7ce3163dcab52891ce23c14fde3b5cd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
