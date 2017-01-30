@@ -26,37 +26,34 @@ import (
 func (s *State) setupdomain(args ...string) {
 	const (
 		help = `
-Setupdomain generates keys and config files for the Upspin users upspin-dir@domain
-and upspin-store@domain, and generates a signature to be added as a DNS TXT record
-to prove that the calling Upspin user has control over domain.
+Setupdomain is the first step in setting up an upspinserver.
+
+It generates keys and config files for Upspin server users and generates a
+signature to be added as a DNS TXT record to prove that the calling Upspin user
+has control over domain.
+
+If the -cluster flag is specified, keys for upspin-dir@domain and
+upspin-store@domain are created instead. This flag should be used when
+setting up a domain that will run its dir and store servers separately,
+requiring separate users. When -cluster is not specified, keys for a single
+user (upspin@domain) are generated.
 
 If any state exists at the given location (-where) then the command aborts.
-
-If you intend to deploy to a Google Cloud Platform project you must specify the
-project ID with -project. This permits later steps to find the generated keys
-and configuration files.
-
-TODO: how to complete the process with 'upspin user -put'
-
-Once the domain has been set up and its servers deployed, use setupwriters to
-set access controls.
 `
 	)
 	fs := flag.NewFlagSet("setupdomain", flag.ExitOnError)
 	where := fs.String("where", filepath.Join(os.Getenv("HOME"), "upspin", "deploy"), "`directory` to store private configuration files")
+	domain := fs.String("domain", "", "domain `name` for this Upspin installation")
 	curveName := fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
 	putUsers := fs.Bool("put-users", false, "put server users to the key server")
-	s.parseFlags(fs, args, help, "[-project=<gcp_project_name>] setupdomain [-where=$HOME/upspin/deploy] <domain_name>")
-	if fs.NArg() != 1 {
-		fs.Usage()
-	}
+	cluster := fs.Bool("cluster", false, "generate keys for upspin-dir@domain and upspin-store@domain (default is upspin@domain only)")
+	s.parseFlags(fs, args, help, "setupdomain [-where=$HOME/upspin/deploy] [-cluster] -domain=<name>")
 	if *where == "" {
 		s.failf("the -where flag must not be empty")
 		fs.Usage()
 	}
-	domain := fs.Arg(0)
-	if domain == "" {
-		s.failf("domain must be provided")
+	if *domain == "" {
+		s.failf("the -domain flag must be provided")
 		fs.Usage()
 	}
 	switch *curveName {
@@ -66,9 +63,17 @@ set access controls.
 		s.exitf("no such curve %q", *curveName)
 	}
 
+	if !*cluster {
+		if *putUsers {
+			s.exitf("the -put-users flag requires -cluster")
+		}
+		s.setuphost(*where, *domain, *curveName)
+		return
+	}
+
 	var (
-		dirServerPath   = filepath.Join(*where, flags.Project, "dirserver")
-		storeServerPath = filepath.Join(*where, flags.Project, "storeserver")
+		dirServerPath   = filepath.Join(*where, *domain, "dirserver")
+		storeServerPath = filepath.Join(*where, *domain, "storeserver")
 		dirConfig       = filepath.Join(dirServerPath, "config")
 		storeConfig     = filepath.Join(storeServerPath, "config")
 	)
@@ -120,7 +125,7 @@ set access controls.
 	if err != nil {
 		s.exit(err)
 	}
-	err = ioutil.WriteFile(filepath.Join(dirServerPath, "symmsecret.upspinkey"), symmSecret[:], 0600)
+	err = ioutil.WriteFile(filepath.Join(dirServerPath, "symmsecret.upspinkey"), symmSecret[:], 0400)
 	if err != nil {
 		s.exit(err)
 	}
@@ -128,15 +133,15 @@ set access controls.
 	// Generate config files for those users.
 	dirEndpoint := upspin.Endpoint{
 		Transport: upspin.Remote,
-		NetAddr:   upspin.NetAddr("dir." + domain + ":443"),
+		NetAddr:   upspin.NetAddr("dir." + *domain + ":443"),
 	}
 	storeEndpoint := upspin.Endpoint{
 		Transport: upspin.Remote,
-		NetAddr:   upspin.NetAddr("store." + domain + ":443"),
+		NetAddr:   upspin.NetAddr("store." + *domain + ":443"),
 	}
 	var dirBody bytes.Buffer
 	if err := configTemplate.Execute(&dirBody, configData{
-		UserName:  upspin.UserName("upspin-dir@" + domain),
+		UserName:  upspin.UserName("upspin-dir@" + *domain),
 		Store:     &storeEndpoint,
 		Dir:       &dirEndpoint,
 		SecretDir: dirServerPath,
@@ -149,7 +154,7 @@ set access controls.
 	}
 	var storeBody bytes.Buffer
 	if err := configTemplate.Execute(&storeBody, configData{
-		UserName:  upspin.UserName("upspin-store@" + domain),
+		UserName:  upspin.UserName("upspin-store@" + *domain),
 		Store:     &storeEndpoint,
 		Dir:       &dirEndpoint,
 		SecretDir: storeServerPath,
@@ -162,7 +167,7 @@ set access controls.
 	}
 
 	// Generate signature.
-	msg := "upspin-domain:" + domain + "-" + string(s.config.UserName())
+	msg := "upspin-domain:" + *domain + "-" + string(s.config.UserName())
 	sig, err := s.config.Factotum().Sign([]byte(msg))
 	if err != nil {
 		s.exit(err)
@@ -171,7 +176,7 @@ set access controls.
 	err = setupDomainTemplate.Execute(os.Stdout, setupDomainData{
 		Dir:       filepath.Join(*where, flags.Project),
 		Where:     *where,
-		Domain:    domain,
+		Domain:    *domain,
 		Project:   flags.Project,
 		UserName:  s.config.UserName(),
 		Signature: fmt.Sprintf("%x-%x", sig.R, sig.S),
@@ -235,3 +240,73 @@ func writeUserFile(configFile string) (userFile string, u upspin.UserName, err e
 	}
 	return f.Name(), cfg.UserName(), nil
 }
+
+func (s *State) setuphost(where, domain, curve string) {
+	cfgPath := filepath.Join(where, domain)
+	s.shouldNotExist(cfgPath)
+	s.mkdirAllLocal(cfgPath)
+
+	// Generate and write keys for the server user.
+	var noProquint string
+	pub, pri, _, err := createKeys(curve, noProquint)
+	if err != nil {
+		s.exit(err)
+	}
+	err = writeKeys(cfgPath, pub, pri)
+	if err != nil {
+		s.exit(err)
+	}
+
+	// Generate and write symmetric key for DirServer data.
+	var symmSecret [32]byte
+	_, err = rand.Read(symmSecret[:])
+	if err != nil {
+		s.exit(err)
+	}
+	err = ioutil.WriteFile(filepath.Join(cfgPath, "symmsecret.upspinkey"), symmSecret[:], 0600)
+	if err != nil {
+		s.exit(err)
+	}
+
+	// Generate signature.
+	msg := "upspin-domain:" + domain + "-" + string(s.config.UserName())
+	sig, err := s.config.Factotum().Sign([]byte(msg))
+	if err != nil {
+		s.exit(err)
+	}
+
+	// Write server config file.
+	s.writeServerConfig(cfgPath, &ServerConfig{
+		User: upspin.UserName("upspin@" + domain),
+	})
+
+	err = setupHostTemplate.Execute(os.Stdout, setupDomainData{
+		Dir:       cfgPath,
+		Where:     where,
+		Domain:    domain,
+		Project:   flags.Project,
+		UserName:  s.config.UserName(),
+		Signature: fmt.Sprintf("%x-%x", sig.R, sig.S),
+	})
+	if err != nil {
+		s.exit(err)
+	}
+}
+
+var setupHostTemplate = template.Must(template.New("setuphost").Parse(`
+Domain configuration and keys for the user
+	upspin@{{.Domain}}
+were generated and placed under the directory:
+	{{.Dir}}
+
+To prove that {{.UserName}} is the owner of {{.Domain}},
+add the following record to {{.Domain}}'s DNS zone:
+
+	NAME	TYPE	TTL	DATA
+	@	TXT	15m	upspin:{{.Signature}}
+
+Once the DNS change propagates the key server will use the TXT record to verify
+that {{.UserName}} is authorized to register users under {{.Domain}}.
+
+After that, the next step is to run 'upspin setupstorage'.
+`))
