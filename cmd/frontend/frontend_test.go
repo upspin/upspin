@@ -12,6 +12,8 @@ import (
 	"strings"
 	"sync"
 	"testing"
+
+	"upspin.io/flags"
 )
 
 var (
@@ -29,20 +31,57 @@ func startServer() {
 	s.mux.HandleFunc("/_test", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, testResponse)
 	})
+	s.mux.Handle("/_redirect", redirectToHTTPSHandler())
 	testServer := httptest.NewServer(s)
 	addr = testServer.Listener.Addr().String()
+}
+
+func TestHTTPSRedirect(t *testing.T) {
+	once.Do(startServer)
+	c := &http.Client{
+		CheckRedirect: func(req *http.Request, via []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+	}
+	resp, err := c.Get("http://" + addr + "/_redirect")
+	if err != nil {
+		t.Fatalf("expected no error making request, but got %v", err)
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusTemporaryRedirect {
+		t.Errorf("expected status code to be %v, got %v", http.StatusTemporaryRedirect, resp.StatusCode)
+	}
+	expected := "https://" + flags.HTTPSAddr + "/_redirect"
+	if resp.Header["Location"][0] != expected {
+		t.Errorf("expected Location header to be %q, got %q", expected, resp.Header["Location"][0])
+	}
+}
+
+func TestHSTS(t *testing.T) {
+	once.Do(startServer)
+	resp, err := http.Get("http://" + addr + "/_test")
+	if err != nil {
+		t.Fatalf("expected no error when creating request, but got %v", err)
+	}
+	defer resp.Body.Close()
+	expected := "max-age=86400; includeSubDomains"
+	if resp.Header["Strict-Transport-Security"][0] != expected {
+		t.Errorf("expected Strict-Transport-Security to be set to %q, got %q",
+			expected, resp.Header["Strict-Transport-Security"][0])
+	}
 }
 
 func TestNoGzip(t *testing.T) {
 	once.Do(startServer)
 	req, err := http.NewRequest("GET", "http://"+addr+"/_test", nil)
+	if err != nil {
+		t.Fatalf("expected no error when creating request, but got %v", err)
+	}
 	req.SetBasicAuth(username, password)
 
 	// Don’t ask for gzipped responses.
 	req.Header.Set("Accept-Encoding", "")
-	if err != nil {
-		t.Fatalf("expected no error when creating request, but got %v", err)
-	}
+
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		t.Fatalf("expected no error making request, but got %v", err)

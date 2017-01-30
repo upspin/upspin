@@ -26,7 +26,10 @@ var (
 	// NetAddr is the publicly accessible network address of this server.
 	NetAddr string
 
-	// HTTPSAddr is the network address on which to listen for incoming network connections.
+	// HTTPAddr is the network address on which to listen for incoming insecure network connections.
+	HTTPAddr = "localhost:80"
+
+	// HTTPSAddr is the network address on which to listen for incoming secure network connections.
 	HTTPSAddr = "localhost:443"
 
 	// LetsEncryptCache is the location of a file in which the Let's
@@ -65,8 +68,11 @@ var flags = map[string]func(){
 	"addr": func() {
 		flag.StringVar(&NetAddr, "addr", NetAddr, "publicly accessible network address (`host:port`)")
 	},
+	"http": func() {
+		flag.StringVar(&HTTPAddr, "http", HTTPAddr, "`address` for incoming insecure network connections")
+	},
 	"https": func() {
-		flag.StringVar(&HTTPSAddr, "https", HTTPSAddr, "`address` for incoming network connections")
+		flag.StringVar(&HTTPSAddr, "https", HTTPSAddr, "`address` for incoming secure network connections")
 	},
 	"letscache": func() {
 		flag.StringVar(&LetsEncryptCache, "letscache", "", "Let's Encrypt cache `file`")
