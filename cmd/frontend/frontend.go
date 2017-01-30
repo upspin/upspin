@@ -99,15 +99,25 @@ func (s *server) handleRoot(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, `<meta name="go-import" content="%v git %v">`, sourceBase, sourceRepo)
 		return
 	}
-	if err := doclistTmpl.Execute(w, pageData{Content: s.doclist}); err != nil {
-		log.Error.Printf("Error executing root content template: %s", err)
+	if r.URL.Path != "/" {
+		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
+	s.renderDoc(w, "index.md")
 }
 
 func (s *server) handleDoc(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	fn := filepath.Base(r.URL.Path)
+	if r.URL.Path == "/doc/" {
+		if err := doclistTmpl.Execute(w, pageData{Content: s.doclist}); err != nil {
+			log.Error.Printf("Error executing root content template: %s", err)
+		}
+		return
+	}
+	s.renderDoc(w, filepath.Base(r.URL.Path))
+}
+
+func (s *server) renderDoc(w http.ResponseWriter, fn string) {
 	b, ok := s.renderedDocs[fn]
 	if !ok {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
