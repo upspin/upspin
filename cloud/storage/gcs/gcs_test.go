@@ -24,7 +24,7 @@ var (
 	client      storage.Storage
 	testDataStr = fmt.Sprintf("This is test at %v", time.Now())
 	testData    = []byte(testDataStr)
-	fileName    = "test-file"
+	fileName    = fmt.Sprintf("test-file-%d", time.Now().Second())
 )
 
 // This is more of a regression test as it uses the running cloud
