@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"time"
 
 	gContext "golang.org/x/net/context"
 
@@ -101,11 +102,17 @@ func (gcs *gcsImpl) Put(ref string, contents []byte) (refLink string, error erro
 	buf := bytes.NewBuffer(contents)
 	acl := string(gcs.defaultWriteACL)
 	object := &gcsBE.Object{Name: ref}
-	res, err := gcs.service.Objects.Insert(gcs.bucketName, object).Media(buf).PredefinedAcl(acl).Do()
-	if err != nil {
-		return "", err
+	for tries := 0; ; tries++ {
+		res, err := gcs.service.Objects.Insert(gcs.bucketName, object).Media(buf).PredefinedAcl(acl).Do()
+		if err == nil {
+			return res.MediaLink, err
+		}
+		if !strings.Contains(err.Error(), "503") || tries > 4 {
+			return "", err
+		}
+		log.Info.Printf("cloud/storage/gcs: WARNING: retrying Insert(%s): %s", ref, err)
+		time.Sleep(time.Duration(100*(tries+1)) * time.Millisecond)
 	}
-	return res.MediaLink, err
 }
 
 // ListPrefilx implements Storage.
