@@ -159,20 +159,7 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) parseDocs(path string) error {
-	f, err := os.Open(path)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-	fi, err := f.Stat()
-	if err != nil {
-		return err
-	}
-	if !fi.IsDir() {
-		return fmt.Errorf("%s is not a directory", path)
-	}
-
-	fis, err := f.Readdir(0)
+	fis, err := ioutil.ReadDir(path)
 	if err != nil {
 		return err
 	}
