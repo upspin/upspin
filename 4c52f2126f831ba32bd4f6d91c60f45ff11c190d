@@ -16,6 +16,23 @@
       "revId": "4c52f2126f831ba32bd4f6d91c60f45ff11c190d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "35bc415c_f2c9c925",
+        "filename": "cloud/storage/gcs/gcs.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-01-30T23:09:06Z",
+      "side": 1,
+      "message": "They are related.  Once I have an error Kind, I will still retry here but once the retry fails, I\u0027ll return a transient error.",
+      "revId": "4c52f2126f831ba32bd4f6d91c60f45ff11c190d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
