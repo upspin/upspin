@@ -225,3 +225,11 @@ func newLogger(level level, cloudSeverity logging.Severity) Logger {
 		cloudSeverity: cloudSeverity,
 	}
 }
+
+// ShutdownLogger is the shutdown routine for the logs. It exists to avoid an
+// import cycle with serverutil.RegisterShutdown.
+func ShutdownLogger() {
+	if cloudLogger != nil {
+		cloudLogger.Flush()
+	}
+}
