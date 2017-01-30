@@ -22,6 +22,23 @@
       "revId": "e6003da6f7f6892bb03bdf165d9458c73fc83f71",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "24db405a_a82991d3",
+        "filename": "doc/index.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-30T00:20:14Z",
+      "side": 1,
+      "message": "the x was a dreg. removed. added height.",
+      "revId": "e6003da6f7f6892bb03bdf165d9458c73fc83f71",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
