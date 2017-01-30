@@ -11,7 +11,9 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"os/signal"
 	"path/filepath"
+	"syscall"
 
 	"golang.org/x/crypto/acme/autocert"
 	gContext "golang.org/x/net/context"
@@ -24,6 +26,7 @@ import (
 	"upspin.io/errors"
 	"upspin.io/flags"
 	"upspin.io/log"
+	"upspin.io/serverutil"
 )
 
 // Options permits the configuration of TLS certificates for servers running
@@ -120,11 +123,25 @@ func ListenAndServe(ready chan<- struct{}, serverName, addr string, opt *Options
 	if err != nil {
 		log.Fatalf("https: %v", err)
 	}
+
+	// Close the listener when a shutdown event happens.
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, syscall.SIGTERM)
+	go func() {
+		log.Printf("=== waiting for shutdown notification")
+		<-c
+		log.Printf("=== Got shutdown signal")
+		ln.Close()
+	}()
 	if ready != nil {
 		close(ready)
 	}
 	err = server.Serve(tls.NewListener(ln, config))
-	log.Fatalf("https: %v", err)
+	if err != nil {
+		log.Printf("=== https: %v", err)
+	}
+	log.Printf("=== https: calling shutdown")
+	serverutil.Shutdown()
 }
 
 // ListenAndServeFromFlags is the same as ListenAndServe, but it determines the
