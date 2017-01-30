@@ -175,6 +175,7 @@ func New(cfg upspin.Config, options ...string) (upspin.DirServer, error) {
 		remoteGroups:  cache.NewLRU(groupCacheSize),
 		now:           upspin.Now,
 	}
+	serverutil.RegisterShutdown(5, s.shutdown)
 	// Start background services.
 	s.startSnapshotLoop()
 	go s.groupRefreshLoop()
@@ -896,6 +897,23 @@ func (s *server) errLink(op string, link *upspin.DirEntry, opts ...options) (*up
 	}
 	// Denied. User has no right on link. Return a 'Private' error.
 	return nil, errors.E(op, p.Path(), errors.Private)
+}
+
+// shutdown is called when the server is being forcefully shut down.
+func (s *server) shutdown() {
+	it := s.userTrees.NewIterator()
+	for {
+		k, v, next := it.GetAndAdvance()
+		if !next {
+			break
+		}
+		user := k.(upspin.UserName)
+		tree := v.(*tree.Tree)
+		err := tree.Close()
+		if err != nil {
+			log.Error.Printf("dir/server.shutdown: Error closing tree for user %s: %s", user, err)
+		}
+	}
 }
 
 // newOptMetric creates a new options populated with a metric for operation op.
