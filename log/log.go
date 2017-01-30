@@ -47,6 +47,7 @@ const (
 // ExternalLogger describes a service that processes logs.
 type ExternalLogger interface {
 	Log(Level, string)
+	Flush()
 }
 
 // Pre-allocated Loggers at each logging level.
@@ -124,6 +125,13 @@ func (l *logger) Fatalf(format string, v ...interface{}) {
 		external.Log(l.level, fmt.Sprintf(format, v...))
 	}
 	defaultLogger.Fatalf(format, v...)
+}
+
+// Flush implements ExternalLogger.
+func (l *logger) Flush() {
+	if external != nil {
+		external.Flush()
+	}
 }
 
 // String returns the name of the logger.
@@ -206,4 +214,11 @@ func Fatal(v ...interface{}) {
 // Fatalf writes a formated message to the log and aborts.
 func Fatalf(format string, v ...interface{}) {
 	Info.Fatalf(format, v...)
+}
+
+// Flush flushes the external logger, if any.
+func Flush() {
+	if external != nil {
+		external.Flush()
+	}
 }
