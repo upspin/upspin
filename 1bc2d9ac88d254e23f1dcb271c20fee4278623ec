@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "b8713fee_afd00386",
+        "filename": "cmd/upspin/setupdomain.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-30T22:57:36Z",
+      "side": 1,
+      "message": "We actually don\u0027t need the -host flag until the setupserver step. I\u0027ll look at moving it there.",
+      "revId": "1bc2d9ac88d254e23f1dcb271c20fee4278623ec",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f0d260f_01f485b9",
         "filename": "cmd/upspin/setupstorage.go",
         "patchSetId": 7
@@ -36,6 +53,23 @@
     },
     {
       "key": {
+        "uuid": "53c07339_3943aaa5",
+        "filename": "cmd/upspin/setupstorage.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-30T22:57:36Z",
+      "side": 1,
+      "message": "These machines don\u0027t necessarily run on Compute (mine doesn\u0027t), so we can\u0027t depend on their metadata service .",
+      "revId": "1bc2d9ac88d254e23f1dcb271c20fee4278623ec",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c160781f_a3c47ffe",
         "filename": "cmd/upspinserver/main.go",
         "patchSetId": 7
@@ -47,6 +81,23 @@
       "writtenOn": "2017-01-30T20:55:27Z",
       "side": 1,
       "message": "This is GCP specific. None of the other servers had to include this explicitly. Can we hide it somewhere else?",
+      "revId": "1bc2d9ac88d254e23f1dcb271c20fee4278623ec",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9e03c823_16dc8d4e",
+        "filename": "cmd/upspinserver/main.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-30T22:57:36Z",
+      "side": 1,
+      "message": "This whole server is GCP-specific.",
       "revId": "1bc2d9ac88d254e23f1dcb271c20fee4278623ec",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -98,6 +149,23 @@
       "writtenOn": "2017-01-30T20:55:27Z",
       "side": 1,
       "message": "Should this move to maybe cloud/config? TODO?",
+      "revId": "1bc2d9ac88d254e23f1dcb271c20fee4278623ec",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "d93731db_99fcca21",
+        "filename": "cmd/upspinserver/main.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-30T22:57:36Z",
+      "side": 1,
+      "message": "Seems like a bunch of bureaucracy for no good reason.\nMaybe if a third user comes along.",
       "revId": "1bc2d9ac88d254e23f1dcb271c20fee4278623ec",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
