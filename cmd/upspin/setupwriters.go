@@ -14,15 +14,14 @@ import (
 	"upspin.io/client"
 	"upspin.io/config"
 	"upspin.io/errors"
-	"upspin.io/flags"
 	"upspin.io/upspin"
 	"upspin.io/user"
 )
 
 func (s *State) setupwriters(args ...string) {
 	const help = `
-Setupwriters creates or updates the Writers file for the given project.
-The file lists the names of users granted access to write to the project's
+Setupwriters creates or updates the Writers file for the given domain.
+The file lists the names of users granted access to write to the domain's
 store server and to create their own root on the directory server.
 
 A wildcard permits access to all users of a domain ("*@example.com").
@@ -30,11 +29,21 @@ A wildcard permits access to all users of a domain ("*@example.com").
 The user name of the project's directory server is automatically included in
 the list, so the directory server can use the store for its own data storage.
 
-This command is designed to operate on projects created by setupdomain.
+This command is designed to operate on projects created by setupdomain -cluster.
 `
 	fs := flag.NewFlagSet("setupwriters", flag.ExitOnError)
 	where := fs.String("where", filepath.Join(os.Getenv("HOME"), "upspin", "deploy"), "`directory` containing private configuration files")
-	s.parseFlags(fs, args, help, "[-project=<gcp_project_name>] setupwriters [-where=$HOME/upspin/deploy] <user names>")
+	domain := fs.String("domain", "", "domain `name` for this Upspin installation")
+	s.parseFlags(fs, args, help, "[-project=<gcp_project_name>] setupwriters [-where=$HOME/upspin/deploy] -domain=<domain> <user names>")
+
+	if *where == "" {
+		s.failf("the -where flag must not be empty")
+		fs.Usage()
+	}
+	if *domain == "" {
+		s.failf("domain must be provided")
+		fs.Usage()
+	}
 
 	var users []upspin.UserName
 	for _, arg := range fs.Args() {
@@ -45,7 +54,7 @@ This command is designed to operate on projects created by setupdomain.
 		users = append(users, u)
 	}
 
-	cfgDir := filepath.Join(*where, flags.Project)
+	cfgDir := filepath.Join(*where, *domain)
 	if fi, err := os.Stat(cfgDir); err != nil {
 		s.exitf("error reading configuration directory: %v", err)
 	} else if !fi.IsDir() {
