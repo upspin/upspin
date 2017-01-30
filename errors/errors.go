@@ -73,6 +73,7 @@ const (
 	Private                   // Information withheld.
 	Internal                  // Internal error or inconsistency.
 	CannotDecrypt             // No wrapped key for user with read access.
+	Transient                 // A transient error.
 )
 
 func (k Kind) String() string {
@@ -101,6 +102,8 @@ func (k Kind) String() string {
 		return "internal error"
 	case CannotDecrypt:
 		return `no wrapped key for user; owner must "upspin share -fix"`
+	case Transient:
+		return "transient error"
 	}
 	return "unknown error kind"
 }
