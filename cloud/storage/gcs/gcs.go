@@ -192,9 +192,12 @@ func (gcs *gcsImpl) EmptyBucket(verbose bool) error {
 			log.Error.Printf("EmptyBucket: List(%q): %v", gcs.bucketName, err)
 			break
 		}
+		if verbose {
+			log.Printf("Going to delete %d items from bucket %s", len(objs.Items), gcs.bucketName)
+		}
 		for _, o := range objs.Items {
 			if verbose {
-				log.Debug.Printf("Deleting: %q", o.Name)
+				log.Printf("Deleting: %q", o.Name)
 			}
 			err = gcs.Delete(o.Name)
 			if recordErr(err) {
