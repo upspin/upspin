@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b7ca19f3_fb1ebda1",
+        "filename": "cloud/storage/gcs/gcs.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-30T23:05:34Z",
+      "side": 1,
+      "message": "It might have been cleaner to submit this after errors.Transient is in.",
+      "revId": "4c52f2126f831ba32bd4f6d91c60f45ff11c190d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
