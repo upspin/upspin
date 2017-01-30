@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package gcp
+package server
 
 import (
 	"strings"
@@ -19,7 +19,6 @@ import (
 const (
 	expectedRef   = "978F93921702F861CF941AAACE56B83AE17C8F6845FD674263FFF374A2696A4F"
 	serverBaseURL = "http://go-download-from-gcp.goog.com"
-	linkForRef    = serverBaseURL + "/ref/978F...4F"
 	contents      = "contents of our file"
 )
 

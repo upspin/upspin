@@ -2,9 +2,9 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package gcp implements upspin.StoreServer using Google Cloud Storage as its
+// Package server implements upspin.StoreServer using storage.Storage as its
 // storage back end.
-package gcp
+package server
 
 import (
 	"fmt"
@@ -34,7 +34,7 @@ var _ upspin.StoreServer = (*server)(nil)
 
 // New returns a StoreServer that serves the given endpoint with the provided options.
 func New(options ...string) (upspin.StoreServer, error) {
-	const op = "store/gcp.New"
+	const op = "store/server.New"
 
 	// Pass options to the storage backend.
 	var dialOpts []storage.DialOpts
@@ -53,7 +53,7 @@ func New(options ...string) (upspin.StoreServer, error) {
 
 // Put implements upspin.StoreServer.
 func (s *server) Put(data []byte) (*upspin.Refdata, error) {
-	const op = "store/gcp.Put"
+	const op = "store/server.Put"
 
 	m, sp := metric.NewSpan(op)
 	sp.SetAnnotation(fmt.Sprintf("size=%d", len(data)))
@@ -75,7 +75,7 @@ func (s *server) Put(data []byte) (*upspin.Refdata, error) {
 
 // Get implements upspin.StoreServer.
 func (s *server) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Location, error) {
-	const op = "store/gcp.Get"
+	const op = "store/server.Get"
 
 	m, sp := metric.NewSpan(op)
 	defer m.Done()
@@ -117,7 +117,7 @@ func (s *server) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Lo
 
 // Delete implements upspin.StoreServer.
 func (s *server) Delete(ref upspin.Reference) error {
-	const op = "store/gcp.Delete"
+	const op = "store/server.Delete"
 
 	m, _ := metric.NewSpan(op)
 	defer m.Done()

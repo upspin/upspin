@@ -16,13 +16,13 @@ import (
 
 	"upspin.io/cloud/https"
 	"upspin.io/config"
-	"upspin.io/dir/server"
+	dirServer "upspin.io/dir/server"
 	"upspin.io/flags"
 	"upspin.io/log"
 	"upspin.io/rpc/dirserver"
 	"upspin.io/rpc/storeserver"
 	"upspin.io/serverutil/perm"
-	"upspin.io/store/gcp"
+	storeServer "upspin.io/store/server"
 	"upspin.io/upspin"
 
 	// Load useful packers
@@ -63,7 +63,7 @@ func main() {
 	ready := make(chan struct{})
 
 	// Set up StoreServer.
-	store, err := gcp.New(storeServerConfig...)
+	store, err := storeServer.New(storeServerConfig...)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -73,7 +73,7 @@ func main() {
 	}
 
 	// Set up DirServer.
-	dir, err := server.New(dirCfg, dirServerConfig...)
+	dir, err := dirServer.New(dirCfg, dirServerConfig...)
 	if err != nil {
 		log.Fatal(err)
 	}

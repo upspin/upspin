@@ -18,8 +18,8 @@ import (
 	"upspin.io/rpc/storeserver"
 	"upspin.io/serverutil/perm"
 	"upspin.io/store/filesystem"
-	"upspin.io/store/gcp"
 	"upspin.io/store/inprocess"
+	"upspin.io/store/server"
 	"upspin.io/upspin"
 
 	// We need the directory transports to fetch write permissions.
@@ -57,8 +57,8 @@ func main() {
 	switch flags.ServerKind {
 	case "inprocess":
 		store = inprocess.New()
-	case "gcp":
-		store, err = gcp.New(flags.ServerConfig...)
+	case "server":
+		store, err = server.New(flags.ServerConfig...)
 	case "filesystem":
 		store, err = filesystem.New(cfg, flags.ServerConfig...)
 	default:
