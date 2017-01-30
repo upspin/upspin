@@ -2,12 +2,17 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+// +build linux windows
+
 // Dirserver is a wrapper for a directory implementation that presents it as an
 // HTTP interface.
 package main
 
 import (
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"upspin.io/cloud/https"
 	"upspin.io/config"

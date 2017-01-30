@@ -24,6 +24,7 @@ import (
 	"upspin.io/errors"
 	"upspin.io/flags"
 	"upspin.io/log"
+	"upspin.io/serverutil"
 )
 
 // Options permits the configuration of TLS certificates for servers running
@@ -120,6 +121,10 @@ func ListenAndServe(ready chan<- struct{}, serverName, addr string, opt *Options
 	if err != nil {
 		log.Fatalf("https: %v", err)
 	}
+	// Close the listener when a shutdown event happens.
+	serverutil.RegisterShutdown(0, func() {
+		ln.Close()
+	})
 	if ready != nil {
 		close(ready)
 	}
