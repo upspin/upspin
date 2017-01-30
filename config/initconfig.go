@@ -36,7 +36,7 @@ type base struct{}
 func (base) UserName() upspin.UserName      { return defaultUserName }
 func (base) Factotum() upspin.Factotum      { return nil }
 func (base) Packing() upspin.Packing        { return defaultPacking }
-func (base) KeyEndpoint() upspin.Endpoint   { return upspin.Endpoint{} }
+func (base) KeyEndpoint() upspin.Endpoint   { return defaultKeyEndpoint }
 func (base) DirEndpoint() upspin.Endpoint   { return upspin.Endpoint{} }
 func (base) StoreEndpoint() upspin.Endpoint { return upspin.Endpoint{} }
 func (base) CacheEndpoint() upspin.Endpoint { return upspin.Endpoint{} }
