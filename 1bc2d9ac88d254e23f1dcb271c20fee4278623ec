@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c7496542_dfd6dba2",
+        "filename": "cmd/upspin/setupdomain.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-01-30T20:55:27Z",
+      "side": 1,
+      "message": "It\u0027s weird that the flag is called \"host\" when you\u0027re generating a \"key\" for a \"user\". There\u0027s no host involved here.\n\nThis description does not seem consistent with the description for the flag below on line 46.\n\nNot sure how to fix; I see why it\u0027s this way. Just saying I found it confusing.",
+      "revId": "1bc2d9ac88d254e23f1dcb271c20fee4278623ec",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9f0d260f_01f485b9",
+        "filename": "cmd/upspin/setupstorage.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-01-30T20:55:27Z",
+      "side": 1,
+      "message": "Can we use the metadata trick instead? That removes the need for yet another local file and the Setenv in upspinserver.",
+      "revId": "1bc2d9ac88d254e23f1dcb271c20fee4278623ec",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c160781f_a3c47ffe",
+        "filename": "cmd/upspinserver/main.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-01-30T20:55:27Z",
+      "side": 1,
+      "message": "This is GCP specific. None of the other servers had to include this explicitly. Can we hide it somewhere else?",
+      "revId": "1bc2d9ac88d254e23f1dcb271c20fee4278623ec",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "19acffcd_a15b611d",
+        "filename": "cmd/upspinserver/main.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-01-30T20:55:27Z",
+      "side": 1,
+      "message": "s/gcp/server/",
+      "revId": "1bc2d9ac88d254e23f1dcb271c20fee4278623ec",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "173f3a00_e211b225",
+        "filename": "cmd/upspinserver/main.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-01-30T20:55:27Z",
+      "side": 1,
+      "message": "Not sure what this means. If you mean if r.Method \u003d\u003d \"POST\" why not include it now?",
+      "revId": "1bc2d9ac88d254e23f1dcb271c20fee4278623ec",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "21550694_08156ae6",
+        "filename": "cmd/upspinserver/main.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-01-30T20:55:27Z",
+      "side": 1,
+      "message": "Should this move to maybe cloud/config? TODO?",
+      "revId": "1bc2d9ac88d254e23f1dcb271c20fee4278623ec",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
