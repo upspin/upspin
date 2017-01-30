@@ -393,7 +393,7 @@ servers can authenticate the user.
 The public key is made truly public by creating a user record to hold it in the
 key server at [key.upspin.io](https://key.upspin.io).
 The process for doing this is described in a
-[separate document](/doc/signing_up_a_new_user.md).
+[separate document](/doc/signup.md).
 
 Once registered in the key server, the user can access existing content stored
 in Upspin, assuming permission is granted.
@@ -405,7 +405,7 @@ instances on local machines or cloud systems.
 The addresses of the user's servers are then stored in the public key server's
 record for the user, at which point the user can start saving data in the
 system.
-Again the details are presented [separately](/doc/signing_up_a_new_user.md).
+Again the details are presented [separately](/doc/signup.md).
 
 ## Comparison with existing systems
 

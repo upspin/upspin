@@ -66,7 +66,7 @@ This user will become the administrator of your chosen domain, and to keep
 things simple it's better if the administrator is from a domain, such as
 `gmail.com`, separate from the one you are setting up.
 Follow the instructions in
-[Signing up a new Upspin user](/doc/signing_up_a_new_user.md)
+[Signing up a new Upspin user](/doc/signup.md)
 to register as an Upspin user.
 
 Upspin servers also run as Upspin users, with all the rights and requirements
@@ -243,5 +243,5 @@ $ upspin -project=example-project setupwriters you@gmail.com *@example.com
 
 The servers are now available for general use.
 You might continue reading
-[Signing up a new Upspin user](/doc/signing_up_a_new_user.md), if that's how you
+[Signing up a new Upspin user](/doc/signup.md), if that's how you
 got here.
