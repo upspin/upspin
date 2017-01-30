@@ -2,12 +2,17 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+// +build linux windows
+
 // Dirserver is a wrapper for a directory implementation that presents it as an
 // HTTP interface.
 package main
 
 import (
 	"net/http"
+	"os"
+	"os/signal"
+	"syscall"
 
 	"upspin.io/cloud/https"
 	"upspin.io/config"
@@ -73,6 +78,10 @@ func main() {
 		log.Fatalf("Setting up DirServer: %v", err)
 	}
 
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, syscall.SIGTERM) // only works on Linux, Windows.
+	go watchTerm(c, dir)
+
 	// Wrap with permission checks, if requested.
 	var ready chan struct{}
 	if flags.StoreServerUser != "" {
@@ -89,4 +98,12 @@ func main() {
 	http.Handle("/api/Dir/", httpDir)
 
 	https.ListenAndServeFromFlags(ready, serverName)
+}
+
+func watchTerm(c chan os.Signal, dir upspin.DirServer) {
+	<-c
+	log.Printf("==== Got SIGTERM. Shutting down now.")
+	dir.Close()
+	// TODO: do more...?
+	os.Exit(0) // Exit now or wait for the SIGKILL...?
 }
