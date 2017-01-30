@@ -101,7 +101,7 @@ func TestFavicon(t *testing.T) {
 
 func TestDocList(t *testing.T) {
 	once.Do(startServer)
-	b := get(t, "http://"+addr+"/")
+	b := get(t, "http://"+addr+"/doc/")
 	expected := `<a href="/doc/test.md">test.md</a>`
 	if !strings.Contains(string(b), expected) {
 		t.Errorf("expected response body to contain %q; body: %q", expected, b)
