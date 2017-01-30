@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5195f58a_216f1d59",
+        "filename": "cmd/frontend/frontend.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-01-30T22:00:52Z",
+      "side": 1,
+      "message": "I thought the right status return was http.StatusMovedPermanently but maybe with HSTS it no longer matters.",
+      "revId": "e2f05658ea8d3c69a3ef10764df6f25bf6ca55e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
