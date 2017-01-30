@@ -29,8 +29,9 @@ var (
 )
 
 func main() {
-	flags.Parse("https", "letscache", "log", "tls")
+	flags.Parse("http", "https", "letscache", "log", "tls")
 	http.Handle("/", newServer())
+	go http.ListenAndServe(flags.HTTPAddr, redirectToHTTPSHandler())
 	https.ListenAndServeFromFlags(nil, "frontend")
 }
 
@@ -53,6 +54,12 @@ var (
 
 func defaultDocPath() string {
 	return filepath.Join(os.Getenv("GOPATH"), "src/upspin.io/doc")
+}
+
+func redirectToHTTPSHandler() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		http.Redirect(w, r, "https://"+flags.HTTPSAddr+r.RequestURI, http.StatusTemporaryRedirect)
+	})
 }
 
 type server struct {
@@ -125,6 +132,8 @@ func (s *server) handleDoc(w http.ResponseWriter, r *http.Request) {
 // ServeHTTP satisfies the http.Handler interface for a server. It
 // will compress all responses if the appropriate request headers are set.
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Strict-Transport-Security", "max-age=86400; includeSubDomains")
+
 	if r.URL.Path == "/favicon.ico" {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
