@@ -46,3 +46,7 @@ func (l logger) Log(level log.Level, message string) {
 	}
 	l.cloud.StandardLogger(s).Print(message)
 }
+
+func (l logger) Flush() {
+	l.cloud.Flush()
+}
