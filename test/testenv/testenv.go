@@ -130,7 +130,7 @@ func New(setup *Setup) (*Env, error) {
 		cfg = config.SetDirEndpoint(cfg, dirEndpoint)
 
 		// Set up a StoreServer instance. Just use the inprocess
-		// version for offline tests; the store/gcp implementation
+		// version for offline tests; the store/server implementation
 		// isn't interesting when run offline.
 		env.StoreServer = storeserver.New()
 		storeServerMux.Register(storeEndpoint, env.StoreServer)
