@@ -10,13 +10,22 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
+	"fmt"
+	"io/ioutil"
 	"net/http"
-	"strings"
+	"os"
+	"path/filepath"
+	"sync"
 
+	"upspin.io/errors"
+
+	"upspin.io/client"
 	"upspin.io/cloud/https"
 	"upspin.io/config"
 	dirServer "upspin.io/dir/server"
+	"upspin.io/factotum"
 	"upspin.io/flags"
 	"upspin.io/log"
 	"upspin.io/rpc/dirserver"
@@ -36,95 +45,217 @@ import (
 	_ "upspin.io/transports"
 )
 
+var (
+	cfgPath = flag.String("serverconfig", filepath.Join(os.Getenv("HOME"), "upspin/server"), "server configuration `directory`")
+	ready   = make(chan struct{})
+)
+
 func main() {
-	// TODO(adg): replace these flags with a server configuration file
-	var (
-		storeServerConfig []string
-		storeCfgFile      = flag.String("store_config", "", "store config `file`")
-		storeAddr         = flag.String("store_addr", "", "store `host:port`")
-		dirServerConfig   []string
-		dirCfgFile        = flag.String("dir_config", "", "directory config `file`")
-		dirAddr           = flag.String("dir_addr", "", "directory `host:port`")
-	)
-	flag.Var(configFlag{&storeServerConfig}, "store_serverconfig", "store configuration")
-	flag.Var(configFlag{&dirServerConfig}, "dir_serverconfig", "directory configuration")
-	flags.Parse("https", "storeservername", "letscache", "log", "tls")
+	flags.Parse("https", "log")
+	flags.LetsEncryptCache = filepath.Join(*cfgPath, "letsencrypt")
 
-	// Parse configs.
-	storeCfg, err := config.FromFile(*storeCfgFile)
-	if err != nil {
+	err := initServer()
+	if err == noConfig {
+		log.Print("Configuration file not found. Running in setup mode.")
+		http.HandleFunc("/", setupHandler)
+	} else if err != nil {
 		log.Fatal(err)
 	}
-	dirCfg, err := config.FromFile(*dirCfgFile)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	ready := make(chan struct{})
-
-	// Set up StoreServer.
-	store, err := storeServer.New(storeServerConfig...)
-	if err != nil {
-		log.Fatal(err)
-	}
-	store, err = perm.WrapStore(storeCfg, ready, store)
-	if err != nil {
-		log.Fatalf("Error wrapping store: %s", err)
-	}
-
-	// Set up DirServer.
-	dir, err := dirServer.New(dirCfg, dirServerConfig...)
-	if err != nil {
-		log.Fatal(err)
-	}
-	if flags.StoreServerUser != "" {
-		dir, err = perm.WrapDir(dirCfg, ready, upspin.UserName(flags.StoreServerUser), dir)
-		if err != nil {
-			log.Fatalf("Can't wrap DirServer monitoring %s: %s", flags.StoreServerUser, err)
-		}
-	} else {
-		log.Printf("Warning: no Writers Group file protection -- all access permitted")
-	}
-
-	// Set up RPC server.
-	httpStore := storeserver.New(storeCfg, store, upspin.NetAddr(*storeAddr))
-	httpDir := dirserver.New(dirCfg, dir, upspin.NetAddr(*dirAddr))
-	http.Handle("/api/Store/", httpStore)
-	http.Handle("/api/Dir/", httpDir)
 
 	// Set up HTTPS server.
 	https.ListenAndServeFromFlags(ready, "upspinserver")
 }
 
-type configFlag struct {
-	s *[]string
-}
+var noConfig = errors.Str("no configuration")
 
-// String implements flag.Value.
-func (f configFlag) String() string {
-	if f.s == nil {
-		return ""
+func initServer() error {
+	serverConfig, err := readServerConfig()
+	if os.IsNotExist(err) {
+		return noConfig
+	} else if err != nil {
+		return err
 	}
-	return strings.Join(*f.s, ",")
-}
 
-// Set implements flag.Value.
-func (f configFlag) Set(s string) error {
-	ss := strings.Split(strings.TrimSpace(s), ",")
-	// Drop empty elements.
-	for i := 0; i < len(ss); i++ {
-		if ss[i] == "" {
-			ss = append(ss[:i], ss[i+1:]...)
+	os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", filepath.Join(*cfgPath, "serviceaccount.json"))
+
+	cfg := config.New()
+	cfg = config.SetUserName(cfg, serverConfig.User)
+
+	f, err := factotum.NewFromDir(*cfgPath)
+	if err != nil {
+		return err
+	}
+	cfg = config.SetFactotum(cfg, f)
+
+	ep := upspin.Endpoint{
+		Transport: upspin.Remote,
+		NetAddr:   serverConfig.Addr,
+	}
+	cfg = config.SetDirEndpoint(cfg, ep)
+	cfg = config.SetStoreEndpoint(cfg, ep)
+
+	storeCfg := config.SetPacking(cfg, upspin.EEIntegrityPack)
+	dirCfg := config.SetPacking(cfg, upspin.SymmPack)
+
+	// Set up StoreServer.
+	store, err := storeServer.New("gcpBucketName="+serverConfig.Bucket, "defaultACL=publicRead")
+	if err != nil {
+		return err
+	}
+	store, err = perm.WrapStore(storeCfg, ready, store)
+	if err != nil {
+		return fmt.Errorf("error wrapping store: %s", err)
+	}
+
+	// Set up DirServer.
+	logDir := filepath.Join(*cfgPath, "dirserver-logs")
+	if err := os.MkdirAll(logDir, 0700); err != nil {
+		return err
+	}
+	dir, err := dirServer.New(dirCfg, "userCacheSize=1000", "logDir="+logDir)
+	if err != nil {
+		return err
+	}
+	dir, err = perm.WrapDir(dirCfg, ready, serverConfig.User, dir)
+	if err != nil {
+		return fmt.Errorf("Can't wrap DirServer monitoring %s: %s", flags.StoreServerUser, err)
+	}
+
+	// Set up RPC server.
+	httpStore := storeserver.New(storeCfg, store, serverConfig.Addr)
+	httpDir := dirserver.New(dirCfg, dir, serverConfig.Addr)
+	http.Handle("/api/Store/", httpStore)
+	http.Handle("/api/Dir/", httpDir)
+
+	log.Println("Store and Directory servers initialized.")
+
+	go func() {
+		if err := setupWriters(storeCfg); err != nil {
+			log.Printf("Error creating Writers file: %v", err)
 		}
-	}
-	*f.s = ss
+	}()
 	return nil
 }
 
-// Get implements flag.Getter.
-func (f configFlag) Get() interface{} {
-	if f.s == nil {
-		return ""
+var (
+	setupDone = false
+	setupMu   sync.Mutex
+)
+
+func setupHandler(w http.ResponseWriter, r *http.Request) {
+	setupMu.Lock()
+	defer setupMu.Unlock()
+	if setupDone {
+		http.NotFound(w, r)
+		return
 	}
-	return *f.s
+
+	switch r.URL.Path {
+	case "/":
+		fmt.Fprint(w, "Unconfigured Upspin Server")
+		return
+	default:
+		http.NotFound(w, r)
+		return
+	case "/setupserver":
+		if r.Method != "POST" {
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+		// The rest of this function is the setupserver handler.
+	}
+
+	files := map[string][]byte{}
+	if err := json.NewDecoder(r.Body).Decode(&files); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if err := os.MkdirAll(*cfgPath, 0700); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	for _, name := range configureServerFiles {
+		body, ok := files[name]
+		if !ok {
+			http.Error(w, fmt.Sprintf("missing config file %q", name), http.StatusBadRequest)
+			return
+		}
+		err := ioutil.WriteFile(filepath.Join(*cfgPath, name), body, 0600)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			os.RemoveAll(*cfgPath)
+			return
+		}
+	}
+	if err := initServer(); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	fmt.Fprintf(w, "OK")
+
+	setupDone = true
+}
+
+func setupWriters(cfg upspin.Config) error {
+	writers, err := ioutil.ReadFile(filepath.Join(*cfgPath, "Writers"))
+	if err != nil {
+		return err
+	}
+
+	c := client.New(cfg)
+
+	dir := upspin.PathName(cfg.UserName())
+	if err := existsOK(c.MakeDirectory(dir)); err != nil {
+		return err
+	}
+
+	dir += "/Group"
+	if err := existsOK(c.MakeDirectory(dir)); err != nil {
+		return err
+	}
+
+	file := dir + "/Writers"
+	_, err = c.Put(file, writers)
+	return err
+}
+
+func existsOK(_ *upspin.DirEntry, err error) error {
+	if errors.Match(errors.E(errors.Exist), err) {
+		return nil
+	}
+	return err
+}
+
+func readServerConfig() (*ServerConfig, error) {
+	cfgFile := filepath.Join(*cfgPath, serverConfigFile)
+	b, err := ioutil.ReadFile(cfgFile)
+	if err != nil {
+		return nil, err
+	}
+	cfg := &ServerConfig{}
+	if err := json.Unmarshal(b, cfg); err != nil {
+		return nil, err
+	}
+	return cfg, nil
+}
+
+// Keep the following declarations in sync with cmd/upspin/setupserver.go.
+
+type ServerConfig struct {
+	Addr   upspin.NetAddr
+	User   upspin.UserName
+	Bucket string
+}
+
+const serverConfigFile = "serverconfig.json"
+
+var configureServerFiles = []string{
+	"Writers",
+	"public.upspinkey",
+	"secret.upspinkey",
+	"serverconfig.json",
+	"serviceaccount.json",
+	"symmsecret.upspinkey",
 }
