@@ -24,6 +24,7 @@ import (
 	"upspin.io/errors"
 	"upspin.io/flags"
 	"upspin.io/log"
+	"upspin.io/serverutil"
 )
 
 // Options permits the configuration of TLS certificates for servers running
@@ -68,6 +69,9 @@ func (opt *Options) applyDefaults() {
 //
 // The given channel, if any, is closed when the TCP listener has succeeded.
 // It may be used to signal that the server is ready to start serving requests.
+//
+// ListenAndServe does not return. It exits the program when the server is
+// shutdown (via SIGTERM or due to an error) and calls serverutil.Shutdown.
 func ListenAndServe(ready chan<- struct{}, serverName, addr string, opt *Options) {
 	if opt == nil {
 		opt = defaultOptions
@@ -130,8 +134,17 @@ func ListenAndServe(ready chan<- struct{}, serverName, addr string, opt *Options
 	if ready != nil {
 		close(ready)
 	}
+	serverutil.RegisterShutdown(0, func() {
+		// Stops accepting connections and forces the server to stop
+		// its serving loop.
+		ln.Close()
+	})
 	err = server.Serve(tls.NewListener(ln, config))
-	log.Fatalf("https: %v", err)
+	if err != nil {
+		log.Printf("https: %v", err)
+	}
+	// Ensure we terminate cleanly.
+	serverutil.Shutdown()
 }
 
 // ListenAndServeFromFlags is the same as ListenAndServe, but it determines the
