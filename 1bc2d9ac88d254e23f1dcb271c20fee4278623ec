@@ -138,6 +138,23 @@
     },
     {
       "key": {
+        "uuid": "418b8113_c3b773ca",
+        "filename": "cmd/upspinserver/main.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-31T04:47:01Z",
+      "side": 1,
+      "message": "What does it even mean to use inprocess in this context? It\u0027s just more design work (flag etc) with no payoff that I can see. This is supposed to be the minimal server required to run your own upspin instance.",
+      "revId": "1bc2d9ac88d254e23f1dcb271c20fee4278623ec",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "19acffcd_a15b611d",
         "filename": "cmd/upspinserver/main.go",
         "patchSetId": 7
@@ -254,6 +271,23 @@
       "revId": "1bc2d9ac88d254e23f1dcb271c20fee4278623ec",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "95578a94_7a717689",
+        "filename": "cmd/upspinserver/main.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-31T04:47:01Z",
+      "side": 1,
+      "message": "Done",
+      "revId": "1bc2d9ac88d254e23f1dcb271c20fee4278623ec",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
