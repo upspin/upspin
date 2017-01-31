@@ -16,6 +16,23 @@
       "revId": "21f95c3a1040c436f5c77719fcdb487dfca8e258",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3fdc8d85_19606290",
+        "filename": "cloud/https/https.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-31T03:04:03Z",
+      "side": 1,
+      "message": "No, there\u0027s a point in the setup process where the server needs to serve requests but it does not yet know where it lives.",
+      "revId": "21f95c3a1040c436f5c77719fcdb487dfca8e258",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
