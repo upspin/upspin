@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "d1d01303_b7c1330f",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-31T23:31:49Z",
+      "side": 1,
+      "message": "it\u0027s not nil, it\u0027s an empty struct. maybe // for returning errors.",
+      "revId": "24dc65d717eeb9216e10cecb0fd927c8b86c825a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "8998e654_2637abde",
         "filename": "pack/ee/ee.go",
         "patchSetId": 1
