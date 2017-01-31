@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2228867a_2bafe79f",
+        "filename": "cmd/dirserver/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-01-31T00:00:01Z",
+      "side": 1,
+      "message": "I don\u0027t see that this closes everything.  It looks like it only removes the tree for user that the server was started as.  Also, between the close and the exit, another request can read that tree back in.\n\nWhat you should be doing (I think) is killing the listen so noone else can call in, wait for all requests to terminate (in the case of Watch force them to), and only then exit.",
+      "range": {
+        "startLine": 106,
+        "startChar": 1,
+        "endLine": 106,
+        "endChar": 12
+      },
+      "revId": "231ac3ffb5bbcf873f27801737263a083cf187b3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "93ace184_5da1bec3",
+        "filename": "cmd/dirserver/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-01-31T00:00:01Z",
+      "side": 1,
+      "message": "exit now",
+      "range": {
+        "startLine": 108,
+        "startChar": 12,
+        "endLine": 108,
+        "endChar": 51
+      },
+      "revId": "231ac3ffb5bbcf873f27801737263a083cf187b3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
