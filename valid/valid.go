@@ -8,6 +8,8 @@
 package valid
 
 import (
+	"strconv"
+
 	"upspin.io/errors"
 	"upspin.io/path"
 	"upspin.io/upspin"
@@ -73,10 +75,10 @@ func DirBlock(block upspin.DirBlock) error {
 		return errors.E(op, errors.Invalid, errors.Errorf("negative block offset %d", block.Offset))
 	}
 	if err := Endpoint(block.Location.Endpoint); err != nil {
-		return err
+		return errors.E(op, err)
 	}
-	if block.Location.Reference == "" {
-		return errors.E(op, errors.Invalid, errors.Str("empty reference in block"))
+	if err := Reference(block.Location.Reference); err != nil {
+		return errors.E(op, err)
 	}
 	return nil
 }
@@ -173,6 +175,32 @@ func DirEntry(entry *upspin.DirEntry) error {
 		if err := DirBlock(block); err != nil {
 			return errors.E(op, errors.Invalid, entry.Name, err)
 		}
+	}
+	return nil
+}
+
+// Reference verifies that the Reference is valid. A Reference must be a non-empty
+// UTF-8-encoded string of printable characters, as defined by Unicode. Also, although
+// printable, the replacement rune (U+FFFD) is considered invalid, even if it is explicitly
+// present, as it usually indicates erroneous UTF-8 or Unicode.
+func Reference(ref upspin.Reference) error {
+	const op = "valid.Reference"
+	if ref == "" {
+		return errors.E(op, errors.Invalid, errors.Str("empty reference"))
+	}
+	previ := 0
+	for i, r := range ref {
+		// U+FFFD might mean invalid UTF-8, or be present for real. Either way, we reject it.
+		if r == '\uFFFD' {
+			if i-previ == 1 {
+				return errors.E(op, errors.Invalid, errors.Errorf("invalid UTF-8 in reference"))
+			}
+			return errors.E(op, errors.Invalid, errors.Errorf("invalid code point %#U in reference", r))
+		}
+		if !strconv.IsPrint(r) {
+			return errors.E(op, errors.Invalid, errors.Errorf("invalid code point %#U in reference", r))
+		}
+		previ = i
 	}
 	return nil
 }
