@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8998e654_2637abde",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-31T23:28:01Z",
+      "side": 1,
+      "message": "although putting a URL in an error was something I complained about explicitly, now that i can parse the error i think it may be the right thing to do, especially since it\u0027s rare but scary:\n\nvar errNotOnCurve \u003d errors.Str(\"crypto attack was attempted against you; see safecurves.cr.yp.to/twist.html for details\")",
+      "revId": "24dc65d717eeb9216e10cecb0fd927c8b86c825a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
