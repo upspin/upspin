@@ -483,5 +483,19 @@ $ go get -u upspin.io/cmd/...
 This will also install its dependencies, including libraries for the
 [Google Cloud SDK](https://cloud.google.com/sdk/).
 
+If you get an error saying something like:
+
+```
+error: RPC failed; http 301 ...
+fatal: The remote end hung unexpectedly
+```
+
+Then you have hit [this bug](https://github.com/niemeyer/gopkg/issues/50) and
+need to instruct git to follow redirects for gopkg.in by default:
+
+```
+git config --global http.https://gopkg.in.followRedirects true
+```
+
 The guidelines for contributing back to the project are in a separate document,
 "TODO".
