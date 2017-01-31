@@ -36,6 +36,23 @@
     },
     {
       "key": {
+        "uuid": "cef107eb_73331240",
+        "filename": "cmd/upspin/setupdomain.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-01-31T00:00:50Z",
+      "side": 1,
+      "message": "It\u0027s now an argument to setupserver, which is the natural place for it because that\u0027s the server you\u0027re setting up.",
+      "revId": "1bc2d9ac88d254e23f1dcb271c20fee4278623ec",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9f0d260f_01f485b9",
         "filename": "cmd/upspin/setupstorage.go",
         "patchSetId": 7
