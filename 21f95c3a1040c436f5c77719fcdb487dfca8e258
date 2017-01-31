@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8610b263_5dfe28cb",
+        "filename": "cloud/https/https.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-31T02:57:27Z",
+      "side": 1,
+      "message": "should \u0027should\u0027 be \u0027must\u0027 and enforced?",
+      "revId": "21f95c3a1040c436f5c77719fcdb487dfca8e258",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
