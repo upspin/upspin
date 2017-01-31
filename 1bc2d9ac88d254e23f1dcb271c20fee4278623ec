@@ -121,6 +121,23 @@
     },
     {
       "key": {
+        "uuid": "f565135c_6782334e",
+        "filename": "cmd/upspinserver/main.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-01-31T04:43:38Z",
+      "side": 1,
+      "message": "But should it be? Why shouldn\u0027t its main be the same as cmd/dirserver, where one can configure inprocess, server, fileserver, etc?",
+      "revId": "1bc2d9ac88d254e23f1dcb271c20fee4278623ec",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "19acffcd_a15b611d",
         "filename": "cmd/upspinserver/main.go",
         "patchSetId": 7
@@ -220,6 +237,23 @@
       "revId": "1bc2d9ac88d254e23f1dcb271c20fee4278623ec",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9e219553_ec85822a",
+        "filename": "cmd/upspinserver/main.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-01-31T04:43:38Z",
+      "side": 1,
+      "message": "That\u0027s what a TODO could say.",
+      "revId": "1bc2d9ac88d254e23f1dcb271c20fee4278623ec",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
