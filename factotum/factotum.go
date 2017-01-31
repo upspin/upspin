@@ -41,8 +41,8 @@ type factotum struct {
 
 var _ upspin.Factotum = factotum{}
 
-var errNotOnCurve = errors.Str("possible attack safecurves.cr.yp.to/twist.html")
-var sig0 upspin.Signature // for returning nil
+var sig0 upspin.Signature                                                 // for returning nil
+var errNotOnCurve = errors.Str("crypto attack was attempted against you") // See safecurves.cr.yp.to/twist.html.
 
 // KeyHash returns the hash of a key, given in string format.
 func KeyHash(p upspin.PublicKey) []byte {
