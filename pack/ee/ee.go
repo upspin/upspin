@@ -87,10 +87,11 @@ var (
 	errKeyLength          = errors.Str("wrong key length for AES-256")
 	errNoKnownKeysForUser = errors.Str("no known keys for user")
 	errSignedNameNotSet   = errors.Str("empty SignedName")
-	errNotOnCurve         = errors.Str("possible attack safecurves.cr.yp.to/twist.html")
-	sig0                  upspin.Signature  // for returning nil of correct type
+	sig0                  upspin.Signature  // for returning error of correct type
 	ellipticNames         map[string]string // ellipticNames maps ECDSA curve names to upspin-friendly curve names.
 )
+
+var errNotOnCurve = errors.Str("a crypto attack was attempted against you; see safecurves.cr.yp.to/twist.html for details")
 
 func (ee ee) Packing() upspin.Packing {
 	return upspin.EEPack
