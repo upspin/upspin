@@ -1,0 +1,225 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "68901751_07f8c6dc",
+        "filename": "cmd/upspin/setupdomain.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-31T23:20:24Z",
+      "side": 1,
+      "message": "say what other commands are run after",
+      "revId": "89f7563f23dff7ac3cec19b4847601787bc78533",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1e8923be_b069ec8c",
+        "filename": "cmd/upspin/setupdomain.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-31T23:20:24Z",
+      "side": 1,
+      "message": "s/dir/directory/",
+      "revId": "89f7563f23dff7ac3cec19b4847601787bc78533",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4be72932_1bae8eb1",
+        "filename": "cmd/upspin/setupdomain.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-31T23:20:24Z",
+      "side": 1,
+      "message": "s/users/\u0026 to administer each one/",
+      "revId": "89f7563f23dff7ac3cec19b4847601787bc78533",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "75b2019d_df06e8bd",
+        "filename": "cmd/upspin/setupserver.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-31T23:20:24Z",
+      "side": 1,
+      "message": "say what other commands must be run first.",
+      "revId": "89f7563f23dff7ac3cec19b4847601787bc78533",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8ae707c1_bb031aff",
+        "filename": "cmd/upspin/setupserver.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-31T23:20:24Z",
+      "side": 1,
+      "message": "\"server user\" is obscure.",
+      "revId": "89f7563f23dff7ac3cec19b4847601787bc78533",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "56fbff58_d05b07ca",
+        "filename": "cmd/upspin/setupserver.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-31T23:20:24Z",
+      "side": 1,
+      "message": "put quotes around *@example.com.",
+      "revId": "89f7563f23dff7ac3cec19b4847601787bc78533",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f072334f_aa5ae089",
+        "filename": "cmd/upspin/setupserver.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-31T23:20:24Z",
+      "side": 1,
+      "message": "this reads like something i should do, because Put is its own participle. clarify.\n\nor maybe just delete",
+      "revId": "89f7563f23dff7ac3cec19b4847601787bc78533",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0ac095b2_52baccaa",
+        "filename": "cmd/upspin/setupserver.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-31T23:20:24Z",
+      "side": 1,
+      "message": "escape this? or at least validate cfg.Addr. looks dangerous",
+      "revId": "89f7563f23dff7ac3cec19b4847601787bc78533",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6a913e6c_dab49f85",
+        "filename": "cmd/upspin/setupstorage.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-31T23:20:24Z",
+      "side": 1,
+      "message": "say what the other steps are.",
+      "revId": "89f7563f23dff7ac3cec19b4847601787bc78533",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9aeacb91_c7db745e",
+        "filename": "cmd/upspin/setupstorage.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-31T23:20:24Z",
+      "side": 1,
+      "message": "here you call \"server user\" a \"service account\". i like this phrase better",
+      "revId": "89f7563f23dff7ac3cec19b4847601787bc78533",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3cb36ef0_a7bae457",
+        "filename": "cmd/upspin/setupstorage.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-31T23:20:24Z",
+      "side": 1,
+      "message": "or maybe gcloud auth login. or both. who knows?",
+      "revId": "89f7563f23dff7ac3cec19b4847601787bc78533",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f091be00_455c1f5c",
+        "filename": "cmd/upspin/setupwriters.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-31T23:20:24Z",
+      "side": 1,
+      "message": "inconsistent wording of these two error messages",
+      "revId": "89f7563f23dff7ac3cec19b4847601787bc78533",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9afbaf6f_f496dd33",
+        "filename": "cmd/upspinserver/main.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-01-31T23:20:24Z",
+      "side": 1,
+      "message": "worth a comment. this threw me for a moment",
+      "revId": "89f7563f23dff7ac3cec19b4847601787bc78533",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
