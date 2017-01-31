@@ -68,7 +68,8 @@ type Endpoint struct {
 // Dial method to connect to the service.
 type NetAddr string
 
-// A Reference is the string identifying an item in a StoreServer.
+// A Reference is the string identifying an item in a StoreServer. It must
+// be a valid UTF-8-encoded Unicode string and not contain U+FFFD.
 type Reference string
 
 // These special references are used to obtain out-of-band information from

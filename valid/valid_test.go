@@ -285,3 +285,24 @@ func TestDirEntry(t *testing.T) {
 	}
 	restore()
 }
+
+func TestReference(t *testing.T) {
+	tests := []struct {
+		ref   upspin.Reference
+		valid bool
+	}{
+		{"", false}, // Empty string is invalid reference.
+		{"5745647547654764567", true},
+		{"日本語", true},
+		{"abced\x80", false},   // Invalid UTF-8
+		{"a\tb", false},        // Unprintable character.
+		{"abded\uFFFD", false}, // Replacement rune is invalid.
+	}
+	for _, test := range tests {
+		err := Reference(test.ref)
+		if test.valid == (err == nil) {
+			continue
+		}
+		t.Errorf("%q: expected valid=%t; got error %v", test.ref, test.valid, err)
+	}
+}
