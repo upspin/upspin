@@ -75,7 +75,7 @@ var flags = map[string]func(){
 		flag.StringVar(&HTTPSAddr, "https", HTTPSAddr, "`address` for incoming secure network connections")
 	},
 	"letscache": func() {
-		flag.StringVar(&LetsEncryptCache, "letscache", "", "Let's Encrypt cache `file`")
+		flag.StringVar(&LetsEncryptCache, "letscache", "", "Let's Encrypt cache `directory`")
 	},
 	"log": func() {
 		Log.Set("info")

@@ -34,6 +34,11 @@ type Options struct {
 	// If non-empty, enables Let's Encrypt certificates for this server.
 	LetsEncryptCache string
 
+	// LetsEncryptHosts specifies the list of hosts for which we should
+	// obtain TLS certificates through Let's Encrypt. If LetsEncryptCache
+	// is specified this should be specified also.
+	LetsEncryptHosts []string
+
 	// CertFile and KeyFile specifies the TLS certificates to use.
 	// It has no effect if LetsEncryptCache is non-empty.
 	CertFile string
@@ -69,13 +74,19 @@ func ListenAndServe(ready chan<- struct{}, serverName, addr string, opt *Options
 	} else {
 		opt.applyDefaults()
 	}
-	var config *tls.Config
+
 	var m autocert.Manager
 	m.Prompt = autocert.AcceptTOS
-	// TODO(ehg) How do I capture the --domain flags from deploy?
-	// m.HostPolicy = autocert.HostWhitelist("dir.upspin.io")
+	if h := opt.LetsEncryptHosts; len(h) > 0 {
+		m.HostPolicy = autocert.HostWhitelist(h...)
+	}
 
-	if metadata.OnGCE() {
+	var config *tls.Config
+	if file := opt.LetsEncryptCache; file != "" {
+		log.Info.Printf("https: serving HTTPS on %q using Let's Encrypt certificates", addr)
+		m.Cache = autocert.DirCache(file)
+		config = &tls.Config{GetCertificate: m.GetCertificate}
+	} else if metadata.OnGCE() {
 		addr = ":443"
 		log.Info.Printf("https: serving HTTPS on GCE %q using Let's Encrypt certificates", addr)
 		const key = "letsencrypt-bucket"
@@ -88,10 +99,6 @@ func ListenAndServe(ready chan<- struct{}, serverName, addr string, opt *Options
 			log.Fatalf("https: couldn't set up letsencrypt cache: %v", err)
 		}
 		m.Cache = cache
-		config = &tls.Config{GetCertificate: m.GetCertificate}
-	} else if file := opt.LetsEncryptCache; file != "" {
-		log.Info.Printf("https: serving HTTPS on %q using Let's Encrypt certificates", addr)
-		m.Cache = autocert.DirCache(file)
 		config = &tls.Config{GetCertificate: m.GetCertificate}
 	} else {
 		log.Info.Printf("https: not on GCE; serving HTTPS on %q using provided certificates", addr)
