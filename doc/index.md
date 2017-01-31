@@ -14,3 +14,5 @@
   access control mechanisms.
 - The [Upspin Configuration](/doc/config.md) document describes Upspin's
   configuration file format and settings.
+- The [Setting up `upspinserver`](/doc/server_setup.md) document explains how
+  to set up your own Upspin installation on a Linux server.
