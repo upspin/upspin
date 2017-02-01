@@ -16,6 +16,23 @@
       "revId": "139ee9abe3174dd3b6b569517eb73a0892c67662",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e444753e_39897fe5",
+        "filename": "log/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-01T23:46:38Z",
+      "side": 1,
+      "message": "LevelNow sounds like it does something now\n\nCurrentLevel?\n\nI don\u0027t really care. It has barely any consumers. Most people don\u0027t care about the log level.",
+      "revId": "139ee9abe3174dd3b6b569517eb73a0892c67662",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
