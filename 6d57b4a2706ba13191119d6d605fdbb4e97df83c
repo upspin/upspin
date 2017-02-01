@@ -33,6 +33,23 @@
       "revId": "6d57b4a2706ba13191119d6d605fdbb4e97df83c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c4908f8c_53dccabf",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-01T00:40:26Z",
+      "side": 1,
+      "message": "oh sorry, I got confused about Put, thinking it took a reference.\n\nI think this change is sufficient.",
+      "revId": "6d57b4a2706ba13191119d6d605fdbb4e97df83c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
