@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "6d1cf354_95edbc72",
+        "filename": "cmd/upspin/setupdomain.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-01T02:25:21Z",
+      "side": 1,
+      "message": "Done",
+      "revId": "89f7563f23dff7ac3cec19b4847601787bc78533",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1e8923be_b069ec8c",
         "filename": "cmd/upspin/setupdomain.go",
         "patchSetId": 14
@@ -33,6 +50,23 @@
       "revId": "89f7563f23dff7ac3cec19b4847601787bc78533",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "68512402_2a92dbaf",
+        "filename": "cmd/upspin/setupdomain.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-01T02:25:21Z",
+      "side": 1,
+      "message": "Done",
+      "revId": "89f7563f23dff7ac3cec19b4847601787bc78533",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -53,6 +87,23 @@
     },
     {
       "key": {
+        "uuid": "effb821c_ba8df0fb",
+        "filename": "cmd/upspin/setupdomain.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-01T02:25:21Z",
+      "side": 1,
+      "message": "Done",
+      "revId": "89f7563f23dff7ac3cec19b4847601787bc78533",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "75b2019d_df06e8bd",
         "filename": "cmd/upspin/setupserver.go",
         "patchSetId": 14
@@ -67,6 +118,23 @@
       "revId": "89f7563f23dff7ac3cec19b4847601787bc78533",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0d20a1c5_28630e82",
+        "filename": "cmd/upspin/setupserver.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-01T02:25:21Z",
+      "side": 1,
+      "message": "Done",
+      "revId": "89f7563f23dff7ac3cec19b4847601787bc78533",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -87,6 +155,23 @@
     },
     {
       "key": {
+        "uuid": "8582a521_33626530",
+        "filename": "cmd/upspin/setupserver.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-01T02:25:21Z",
+      "side": 1,
+      "message": "Done",
+      "revId": "89f7563f23dff7ac3cec19b4847601787bc78533",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "56fbff58_d05b07ca",
         "filename": "cmd/upspin/setupserver.go",
         "patchSetId": 14
@@ -101,6 +186,23 @@
       "revId": "89f7563f23dff7ac3cec19b4847601787bc78533",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5e7f5af1_7d219b63",
+        "filename": "cmd/upspin/setupserver.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-01T02:25:21Z",
+      "side": 1,
+      "message": "Done",
+      "revId": "89f7563f23dff7ac3cec19b4847601787bc78533",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -121,6 +223,23 @@
     },
     {
       "key": {
+        "uuid": "4ddd3f15_c4af6443",
+        "filename": "cmd/upspin/setupserver.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-01T02:25:21Z",
+      "side": 1,
+      "message": "Done",
+      "revId": "89f7563f23dff7ac3cec19b4847601787bc78533",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0ac095b2_52baccaa",
         "filename": "cmd/upspin/setupserver.go",
         "patchSetId": 14
@@ -132,6 +251,23 @@
       "writtenOn": "2017-01-31T23:20:24Z",
       "side": 1,
       "message": "escape this? or at least validate cfg.Addr. looks dangerous",
+      "revId": "89f7563f23dff7ac3cec19b4847601787bc78533",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2542d067_02bd17a8",
+        "filename": "cmd/upspin/setupserver.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-01T02:25:21Z",
+      "side": 1,
+      "message": "sanitized it earlier",
       "revId": "89f7563f23dff7ac3cec19b4847601787bc78533",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -155,6 +291,23 @@
     },
     {
       "key": {
+        "uuid": "c99c667e_3848f13a",
+        "filename": "cmd/upspin/setupstorage.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-01T02:25:21Z",
+      "side": 1,
+      "message": "Done",
+      "revId": "89f7563f23dff7ac3cec19b4847601787bc78533",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9aeacb91_c7db745e",
         "filename": "cmd/upspin/setupstorage.go",
         "patchSetId": 14
@@ -166,6 +319,23 @@
       "writtenOn": "2017-01-31T23:20:24Z",
       "side": 1,
       "message": "here you call \"server user\" a \"service account\". i like this phrase better",
+      "revId": "89f7563f23dff7ac3cec19b4847601787bc78533",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1c673a32_c4bb38e4",
+        "filename": "cmd/upspin/setupstorage.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-01T02:25:21Z",
+      "side": 1,
+      "message": "nope, they\u0027re separate things. that\u0027s why I call them different names",
       "revId": "89f7563f23dff7ac3cec19b4847601787bc78533",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -189,6 +359,23 @@
     },
     {
       "key": {
+        "uuid": "9fd821a8_2c500da0",
+        "filename": "cmd/upspin/setupstorage.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-01T02:25:21Z",
+      "side": 1,
+      "message": "I know. it\u0027s application-default in this case.",
+      "revId": "89f7563f23dff7ac3cec19b4847601787bc78533",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f091be00_455c1f5c",
         "filename": "cmd/upspin/setupwriters.go",
         "patchSetId": 14
@@ -206,6 +393,23 @@
     },
     {
       "key": {
+        "uuid": "5713ead5_372c605b",
+        "filename": "cmd/upspin/setupwriters.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-01T02:25:21Z",
+      "side": 1,
+      "message": "Done",
+      "revId": "89f7563f23dff7ac3cec19b4847601787bc78533",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9afbaf6f_f496dd33",
         "filename": "cmd/upspinserver/main.go",
         "patchSetId": 14
@@ -220,6 +424,23 @@
       "revId": "89f7563f23dff7ac3cec19b4847601787bc78533",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "63e0c4a0_bbe0778d",
+        "filename": "cmd/upspinserver/main.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-01T02:25:21Z",
+      "side": 1,
+      "message": "Done",
+      "revId": "89f7563f23dff7ac3cec19b4847601787bc78533",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
