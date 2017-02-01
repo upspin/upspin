@@ -11,12 +11,8 @@ package log
 
 import (
 	"fmt"
-	goLog "log"
+	"log"
 	"os"
-
-	"cloud.google.com/go/logging"
-	"golang.org/x/net/context"
-	"google.golang.org/api/option"
 )
 
 // Logger is the interface for logging messages.
@@ -37,31 +33,46 @@ type Logger interface {
 	Fatalf(format string, v ...interface{})
 }
 
-// level represents the level of logging.
-type level int
+// Level represents the level of logging.
+type Level int
 
 // Different levels of logging.
 const (
-	debug level = iota
-	info
-	errors
-	disabled
+	DebugLevel Level = iota
+	InfoLevel
+	ErrorLevel
+	DisabledLevel
 )
+
+// ExternalLogger describes a service that processes logs.
+type ExternalLogger interface {
+	Log(Level, string)
+}
 
 // Pre-allocated Loggers at each logging level.
 var (
-	Debug = newLogger(debug, logging.Debug)
-	Info  = newLogger(info, logging.Info)
-	Error = newLogger(errors, logging.Error)
-
-	currentLevel  = info
-	cloudLogger   *logging.Logger
-	defaultLogger Logger = goLog.New(os.Stderr, "", goLog.Ldate|goLog.Ltime|goLog.LUTC|goLog.Lmicroseconds)
+	Debug = &logger{DebugLevel}
+	Info  = &logger{InfoLevel}
+	Error = &logger{ErrorLevel}
 )
 
+var (
+	currentLevel         = InfoLevel
+	defaultLogger Logger = log.New(os.Stderr, "", log.Ldate|log.Ltime|log.LUTC|log.Lmicroseconds)
+	external      ExternalLogger
+)
+
+// Register connects an ExternalLogger to the default logger.
+// This may only be called once.
+func Register(e ExternalLogger) {
+	if external != nil {
+		panic("cannot register second external logger")
+	}
+	external = e
+}
+
 type logger struct {
-	level         level
-	cloudSeverity logging.Severity
+	level Level
 }
 
 var _ Logger = (*logger)(nil)
@@ -71,8 +82,8 @@ func (l *logger) Printf(format string, v ...interface{}) {
 	if l.level < currentLevel {
 		return // Don't log at lower levels.
 	}
-	if cloudLogger != nil {
-		cloudLogger.StandardLogger(l.cloudSeverity).Printf(format, v...)
+	if external != nil {
+		external.Log(l.level, fmt.Sprintf(format, v...))
 	}
 	defaultLogger.Printf(format, v...)
 }
@@ -82,8 +93,8 @@ func (l *logger) Print(v ...interface{}) {
 	if l.level < currentLevel {
 		return // Don't log at lower levels.
 	}
-	if cloudLogger != nil {
-		cloudLogger.StandardLogger(l.cloudSeverity).Print(v...)
+	if external != nil {
+		external.Log(l.level, fmt.Sprint(v...))
 	}
 	defaultLogger.Print(v...)
 }
@@ -93,24 +104,24 @@ func (l *logger) Println(v ...interface{}) {
 	if l.level < currentLevel {
 		return // Don't log at lower levels.
 	}
-	if cloudLogger != nil {
-		cloudLogger.StandardLogger(l.cloudSeverity).Println(v...)
+	if external != nil {
+		external.Log(l.level, fmt.Sprintln(v...))
 	}
 	defaultLogger.Println(v...)
 }
 
 // Fatal writes a message to the log and aborts, regardless of the current log level.
 func (l *logger) Fatal(v ...interface{}) {
-	if cloudLogger != nil {
-		cloudLogger.StandardLogger(l.cloudSeverity).Print(v...)
+	if external != nil {
+		external.Log(l.level, fmt.Sprint(v...))
 	}
 	defaultLogger.Fatal(v...)
 }
 
 // Fatalf writes a formated message to the log and aborts, regardless of the current log level.
 func (l *logger) Fatalf(format string, v ...interface{}) {
-	if cloudLogger != nil {
-		cloudLogger.StandardLogger(l.cloudSeverity).Printf(format, v...)
+	if external != nil {
+		external.Log(l.level, fmt.Sprintf(format, v...))
 	}
 	defaultLogger.Fatalf(format, v...)
 }
@@ -120,37 +131,37 @@ func (l *logger) String() string {
 	return toString(l.level)
 }
 
-func toString(level level) string {
+func toString(level Level) string {
 	switch level {
-	case info:
+	case InfoLevel:
 		return "info"
-	case debug:
+	case DebugLevel:
 		return "debug"
-	case errors:
+	case ErrorLevel:
 		return "error"
-	case disabled:
+	case DisabledLevel:
 		return "disabled"
 	}
 	return "unknown"
 }
 
-// Level returns the current logging level.
-func Level() string {
-	return toString(currentLevel)
-}
-
-func toLevel(level string) (level, error) {
+func toLevel(level string) (Level, error) {
 	switch level {
 	case "info":
-		return info, nil
+		return InfoLevel, nil
 	case "debug":
-		return debug, nil
+		return DebugLevel, nil
 	case "error":
-		return errors, nil
+		return ErrorLevel, nil
 	case "disabled":
-		return disabled, nil
+		return DisabledLevel, nil
 	}
-	return disabled, fmt.Errorf("invalid log level %q", level)
+	return DisabledLevel, fmt.Errorf("invalid log level %q", level)
+}
+
+// GetLevel returns the current logging level.
+func GetLevel() string {
+	return toString(currentLevel)
 }
 
 // SetLevel sets the current level of logging.
@@ -195,33 +206,4 @@ func Fatal(v ...interface{}) {
 // Fatalf writes a formated message to the log and aborts.
 func Fatalf(format string, v ...interface{}) {
 	Info.Fatalf(format, v...)
-}
-
-// Connect connects all non-custom loggers (those not created by New) in this address space to a GCP Logging
-// instance writing to a given logName.
-func Connect(projectID, logName string) error {
-	var err error
-	client, err := newClient(projectID)
-	if err != nil {
-		return err
-	}
-	cloudLogger = client.Logger(logName)
-	return nil
-}
-
-// newClient creates a new client connected to the GCP Logging API with an assigned logName.
-func newClient(projectID string) (*logging.Client, error) {
-	client, err := logging.NewClient(context.Background(), projectID, option.WithScopes(logging.WriteScope))
-	if err != nil {
-		return nil, err
-	}
-	return client, nil
-}
-
-// newLogger instantiates an implicit Logger using the default client.
-func newLogger(level level, cloudSeverity logging.Severity) Logger {
-	return &logger{
-		level:         level,
-		cloudSeverity: cloudSeverity,
-	}
 }

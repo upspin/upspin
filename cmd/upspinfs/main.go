@@ -85,7 +85,7 @@ func startCache(cfg upspin.Config) {
 	// Start a cache server.
 	cacheErrorChan := make(chan bool)
 	go func() {
-		cmd := exec.Command("cacheserver", "-cache="+*cacheFlag, "-log="+log.Level())
+		cmd := exec.Command("cacheserver", "-cache="+*cacheFlag, "-log="+log.GetLevel())
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 		if err := cmd.Run(); err != nil {

@@ -21,8 +21,8 @@ func TestLogLevel(t *testing.T) {
 
 	level := "info"
 	SetLevel(level)
-	if Level() != level {
-		t.Fatalf("Expected %q, got %q", level, Level())
+	if GetLevel() != level {
+		t.Fatalf("Expected %q, got %q", level, GetLevel())
 	}
 	Debug.Println(msg1)             // not logged
 	Info.Print(msg2)                // logged

@@ -10,6 +10,7 @@ import (
 	"net/http"
 
 	"upspin.io/cloud/https"
+	cloudLog "upspin.io/cloud/log"
 	"upspin.io/config"
 	"upspin.io/dir/filesystem"
 	"upspin.io/dir/inprocess"
@@ -41,7 +42,7 @@ func main() {
 	flags.Parse("addr", "config", "https", "kind", "storeservername", "letscache", "log", "project", "serverconfig", "tls")
 
 	if flags.Project != "" {
-		log.Connect(flags.Project, serverName)
+		cloudLog.Connect(flags.Project, serverName)
 		svr, err := metric.NewGCPSaver(flags.Project, "serverName", serverName)
 		if err != nil {
 			log.Fatalf("Can't start a metric saver for GCP project %q: %s", flags.Project, err)
