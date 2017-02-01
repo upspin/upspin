@@ -135,13 +135,13 @@ func (f *logFlag) Set(level string) error {
 	if err != nil {
 		return err
 	}
-	*f = logFlag(log.Level())
+	*f = logFlag(log.GetLevel())
 	return nil
 }
 
 // Get implements flag.Getter.
 func (logFlag) Get() interface{} {
-	return log.Level()
+	return log.GetLevel()
 }
 
 type configFlag struct {
