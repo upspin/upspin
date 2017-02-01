@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "00750d7f_623cb8a1",
+        "filename": "log/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-01T23:16:46Z",
+      "side": 1,
+      "message": "LevelNow might be a nicer name",
+      "revId": "139ee9abe3174dd3b6b569517eb73a0892c67662",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
