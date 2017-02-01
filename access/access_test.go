@@ -346,10 +346,8 @@ func TestHasAccessWithGroups(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	var checkErr error
 	check := func(user upspin.UserName, right Right, file upspin.PathName, truth bool) {
 		ok, err := a.Can(user, right, file, loadTest)
-		checkErr = err
 		if ok == truth {
 			return
 		}
