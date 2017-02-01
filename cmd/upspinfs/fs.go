@@ -863,7 +863,7 @@ func debug(msg interface{}) {
 // do is called both by main and testing to mount a FUSE file system. It exits on failure
 // and returns when the file system has been mounted and is ready for requests.
 func do(cfg upspin.Config, mountpoint string, cacheDir string) chan bool {
-	if log.Level() == "debug" {
+	if log.GetLevel() == "debug" {
 		fuse.Debug = debug
 	}
 
