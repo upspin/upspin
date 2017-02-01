@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "87e6ecdd_cd6fcd83",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-01T02:39:49Z",
+      "side": 1,
+      "message": "s/A/a/ s/\\.\"/\"/\nerrors don\u0027t start with capitals or end with periods, since they are often embedded inside other things.",
+      "revId": "3c60f947e7ea346d5f1b8b3532901152f38b5da7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "8e0ae7b7_c35578bf",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-01T02:39:49Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "3c60f947e7ea346d5f1b8b3532901152f38b5da7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
