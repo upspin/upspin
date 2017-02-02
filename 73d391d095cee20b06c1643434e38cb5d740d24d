@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0824d824_8dfca186",
+        "filename": "serverutil/shutdown.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-02T04:44:23Z",
+      "side": 1,
+      "message": "I was just thinking about this earlier and realized that it is not necessary at all. Anything that is trying to stop the process will first send SIGTERM and if it doesn\u0027t shut down in a timely fashion it\u0027ll send SIGKILL.\n\nI think it\u0027s more sensible for us to let administrators decide how long they want to wait between SIGTERM and SIGKILL, rather than replicating the functionality of SIGKILL here without any of the control.",
+      "revId": "73d391d095cee20b06c1643434e38cb5d740d24d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
