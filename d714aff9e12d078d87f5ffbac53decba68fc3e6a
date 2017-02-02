@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "0813e9aa_1619846a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-02T00:01:17Z",
+      "side": 1,
+      "message": "Done",
+      "revId": "d714aff9e12d078d87f5ffbac53decba68fc3e6a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "5722b761_dbe6f50b",
         "filename": "/COMMIT_MSG",
         "patchSetId": 10
@@ -30,6 +47,23 @@
       "writtenOn": "2017-02-01T21:44:26Z",
       "side": 1,
       "message": "immediately\nexits",
+      "revId": "d714aff9e12d078d87f5ffbac53decba68fc3e6a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c9c32696_a4325241",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-02T00:01:17Z",
+      "side": 1,
+      "message": "Done",
       "revId": "d714aff9e12d078d87f5ffbac53decba68fc3e6a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -53,6 +87,23 @@
     },
     {
       "key": {
+        "uuid": "19a89ddd_f1494532",
+        "filename": "cloud/https/https.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-02T00:01:17Z",
+      "side": 1,
+      "message": "Done",
+      "revId": "d714aff9e12d078d87f5ffbac53decba68fc3e6a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "fa2ba447_46dba173",
         "filename": "dir/server/server.go",
         "patchSetId": 10
@@ -64,6 +115,23 @@
       "writtenOn": "2017-02-01T21:44:26Z",
       "side": 1,
       "message": "shouldn\u0027t this be Close ?",
+      "revId": "d714aff9e12d078d87f5ffbac53decba68fc3e6a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "957538e4_0c5a6889",
+        "filename": "dir/server/server.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 903,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-02T00:01:17Z",
+      "side": 1,
+      "message": "Strictly speaking, Close closes the service *instance*, not all instances. Shutdown is more blunt.",
       "revId": "d714aff9e12d078d87f5ffbac53decba68fc3e6a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -87,6 +155,23 @@
     },
     {
       "key": {
+        "uuid": "11166a53_69dcb7fa",
+        "filename": "dir/server/server.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 905,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-02T00:01:17Z",
+      "side": 1,
+      "message": "Done",
+      "revId": "d714aff9e12d078d87f5ffbac53decba68fc3e6a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "79a50980_5f6af5a2",
         "filename": "dir/server/server.go",
         "patchSetId": 10
@@ -98,6 +183,23 @@
       "writtenOn": "2017-02-01T21:44:26Z",
       "side": 1,
       "message": "op",
+      "revId": "d714aff9e12d078d87f5ffbac53decba68fc3e6a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bb064d4e_193f97ed",
+        "filename": "dir/server/server.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 910,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-02T00:01:17Z",
+      "side": 1,
+      "message": "Done",
       "revId": "d714aff9e12d078d87f5ffbac53decba68fc3e6a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -127,6 +229,29 @@
     },
     {
       "key": {
+        "uuid": "a5f0a4df_46a542b1",
+        "filename": "serverutil/shutdown.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-02T00:01:17Z",
+      "side": 1,
+      "message": "Done",
+      "range": {
+        "startLine": 17,
+        "startChar": 45,
+        "endLine": 17,
+        "endChar": 52
+      },
+      "revId": "d714aff9e12d078d87f5ffbac53decba68fc3e6a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "a6599875_2911911d",
         "filename": "serverutil/shutdown.go",
         "patchSetId": 10
@@ -138,6 +263,23 @@
       "writtenOn": "2017-02-01T21:44:26Z",
       "side": 1,
       "message": "do we really need priorities? can\u0027t we just do them last-in-first-out order?",
+      "revId": "d714aff9e12d078d87f5ffbac53decba68fc3e6a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0b6b7b67_d21fa43d",
+        "filename": "serverutil/shutdown.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-02T00:01:17Z",
+      "side": 1,
+      "message": "This should work with any init function ordering. In this CL, the 3 shutdown functions I use are registered out of order.",
       "revId": "d714aff9e12d078d87f5ffbac53decba68fc3e6a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -161,6 +303,23 @@
     },
     {
       "key": {
+        "uuid": "6f9669cb_30d4dbcc",
+        "filename": "serverutil/shutdown.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-02T00:01:17Z",
+      "side": 1,
+      "message": "Why? This is very important.",
+      "revId": "d714aff9e12d078d87f5ffbac53decba68fc3e6a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "68370ead_ad2403db",
         "filename": "serverutil/shutdown.go",
         "patchSetId": 10
@@ -178,6 +337,23 @@
     },
     {
       "key": {
+        "uuid": "f0abb3ed_ea5c69b5",
+        "filename": "serverutil/shutdown.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-02T00:01:17Z",
+      "side": 1,
+      "message": "No longer necessary, as you pointed out in the CL description. I thought the second call to once didn\u0027t wait for the first one to complete and would just return. But as you pointed out -- and I now tested it -- once waits for the first one to complete.",
+      "revId": "d714aff9e12d078d87f5ffbac53decba68fc3e6a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "ef841ce9_5177be03",
         "filename": "serverutil/shutdown.go",
         "patchSetId": 10
@@ -189,6 +365,23 @@
       "writtenOn": "2017-02-01T21:44:26Z",
       "side": 1,
       "message": "shutdown.once.Do(shutdown)",
+      "revId": "d714aff9e12d078d87f5ffbac53decba68fc3e6a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "982aa739_e1b49d11",
+        "filename": "serverutil/shutdown.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-02T00:01:17Z",
+      "side": 1,
+      "message": "No, because Shutdown() calls doShutdown.",
       "revId": "d714aff9e12d078d87f5ffbac53decba68fc3e6a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
