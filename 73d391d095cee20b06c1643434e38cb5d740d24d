@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "0fc9a7e7_f73969ea",
+        "filename": "log/log.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-02T05:22:52Z",
+      "side": 1,
+      "message": "There is no log.Flush.\n\nAnd adding to the interface would force me to wrap Go\u0027s log.",
+      "revId": "73d391d095cee20b06c1643434e38cb5d740d24d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0824d824_8dfca186",
         "filename": "serverutil/shutdown.go",
         "patchSetId": 12
@@ -30,6 +47,23 @@
       "writtenOn": "2017-02-02T04:44:23Z",
       "side": 1,
       "message": "I was just thinking about this earlier and realized that it is not necessary at all. Anything that is trying to stop the process will first send SIGTERM and if it doesn\u0027t shut down in a timely fashion it\u0027ll send SIGKILL.\n\nI think it\u0027s more sensible for us to let administrators decide how long they want to wait between SIGTERM and SIGKILL, rather than replicating the functionality of SIGKILL here without any of the control.",
+      "revId": "73d391d095cee20b06c1643434e38cb5d740d24d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "76e0a890_8062f6ab",
+        "filename": "serverutil/shutdown.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-02T05:22:52Z",
+      "side": 1,
+      "message": "This was requested by Rob. If we take a SIGTERM, we should terminate, regardless of the requestor having the ability to send a SIGKILL. Happy to remove, but will wait for Rob.",
       "revId": "73d391d095cee20b06c1643434e38cb5d740d24d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
