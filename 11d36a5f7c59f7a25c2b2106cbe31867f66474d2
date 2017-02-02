@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "318a50ac_aac73045",
+        "filename": "rpc/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-02T23:33:38Z",
+      "side": 1,
+      "message": "A watcher is not an idle connection.",
+      "parentUuid": "17bb0b74_34a42444",
+      "revId": "11d36a5f7c59f7a25c2b2106cbe31867f66474d2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "794eef56_78192ee8",
         "filename": "rpc/client.go",
         "patchSetId": 1
@@ -48,6 +66,24 @@
       "side": 1,
       "message": "Highly likely.",
       "parentUuid": "794eef56_78192ee8",
+      "revId": "11d36a5f7c59f7a25c2b2106cbe31867f66474d2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ed43487b_f64b2e7e",
+        "filename": "rpc/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-02T23:33:38Z",
+      "side": 1,
+      "message": "Go 1.8 will be out when we launch and we already depend on it in other areas.\n\nHowever, this feature is in Go 1.7.\n\nhttps://golang.org/pkg/net/http/#DefaultTransport",
+      "parentUuid": "25ec5da0_d90dfe69",
       "revId": "11d36a5f7c59f7a25c2b2106cbe31867f66474d2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
