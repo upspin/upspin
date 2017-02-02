@@ -371,6 +371,23 @@
     },
     {
       "key": {
+        "uuid": "cf3a61ee_0c18d5e2",
+        "filename": "serverutil/shutdown.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-02T16:49:32Z",
+      "side": 1,
+      "message": "Thanks. It will be important for metrics, which we should flush second-to-last, just before the logs.",
+      "revId": "d714aff9e12d078d87f5ffbac53decba68fc3e6a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f5e42b98_8e45743a",
         "filename": "serverutil/shutdown.go",
         "patchSetId": 10
