@@ -135,6 +135,23 @@
       "revId": "73d391d095cee20b06c1643434e38cb5d740d24d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6f557632_7e8ae92d",
+        "filename": "serverutil/shutdown.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-02T18:38:31Z",
+      "side": 1,
+      "message": "I see no problem with guaranteeing we exit even if surrounding environment doesn\u0027t force us out.",
+      "revId": "73d391d095cee20b06c1643434e38cb5d740d24d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
