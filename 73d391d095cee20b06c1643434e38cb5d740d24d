@@ -36,6 +36,23 @@
     },
     {
       "key": {
+        "uuid": "882edc0a_d8915a45",
+        "filename": "log/log.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-02T05:27:52Z",
+      "side": 1,
+      "message": "Ah right. Well name this Flush then, because that\u0027s what it does, and have it call defaultLogger.Flush",
+      "revId": "73d391d095cee20b06c1643434e38cb5d740d24d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0824d824_8dfca186",
         "filename": "serverutil/shutdown.go",
         "patchSetId": 12
@@ -64,6 +81,23 @@
       "writtenOn": "2017-02-02T05:22:52Z",
       "side": 1,
       "message": "This was requested by Rob. If we take a SIGTERM, we should terminate, regardless of the requestor having the ability to send a SIGKILL. Happy to remove, but will wait for Rob.",
+      "revId": "73d391d095cee20b06c1643434e38cb5d740d24d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "419539a1_831b27f7",
+        "filename": "serverutil/shutdown.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-02T05:27:52Z",
+      "side": 1,
+      "message": "Let\u0027s see what he says.",
       "revId": "73d391d095cee20b06c1643434e38cb5d740d24d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
