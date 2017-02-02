@@ -354,6 +354,23 @@
     },
     {
       "key": {
+        "uuid": "7b11600a_a443db42",
+        "filename": "serverutil/shutdown.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-02T05:27:52Z",
+      "side": 1,
+      "message": "Well if you\u0027re committed to removing it after you find it unnecessary, then that\u0027s fine with me.\n\nSeems easier not to introduce it in the first place, though. I really don\u0027t think you\u0027ll need it.",
+      "revId": "d714aff9e12d078d87f5ffbac53decba68fc3e6a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f5e42b98_8e45743a",
         "filename": "serverutil/shutdown.go",
         "patchSetId": 10
