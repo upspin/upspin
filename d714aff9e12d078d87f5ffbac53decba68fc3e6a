@@ -286,6 +286,40 @@
     },
     {
       "key": {
+        "uuid": "d436f84b_9114bfbf",
+        "filename": "serverutil/shutdown.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-02T00:58:53Z",
+      "side": 1,
+      "message": "How so? What is registered and in which order?",
+      "revId": "d714aff9e12d078d87f5ffbac53decba68fc3e6a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f5e42b98_8e45743a",
+        "filename": "serverutil/shutdown.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-02T00:58:53Z",
+      "side": 1,
+      "message": "var shutdown struct {\n...\n}",
+      "revId": "d714aff9e12d078d87f5ffbac53decba68fc3e6a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "64585ff3_1fd69307",
         "filename": "serverutil/shutdown.go",
         "patchSetId": 10
@@ -382,6 +416,23 @@
       "writtenOn": "2017-02-02T00:01:17Z",
       "side": 1,
       "message": "No, because Shutdown() calls doShutdown.",
+      "revId": "d714aff9e12d078d87f5ffbac53decba68fc3e6a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "821bf77b_caa139f6",
+        "filename": "serverutil/shutdown.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-02T00:58:53Z",
+      "side": 1,
+      "message": "Then make the body of Shutdown be simply\n\n   shutdown.once.Do(doShutdown)\n\nand then here just call Shutdown",
       "revId": "d714aff9e12d078d87f5ffbac53decba68fc3e6a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
