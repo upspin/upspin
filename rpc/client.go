@@ -107,9 +107,19 @@ func NewClient(cfg upspin.Config, netAddr upspin.NetAddr, security SecurityLevel
 		return nil, errors.E(op, errors.Invalid, errors.Errorf("invalid security level to NewClient: %v", security))
 	}
 
-	// TODO(adg): Configure transport and client timeouts etc.
 	t := &http.Transport{
 		TLSClientConfig: tlsConfig,
+		// The following values are the same as
+		// net/http.DefaultTransport.
+		Proxy: http.ProxyFromEnvironment,
+		DialContext: (&net.Dialer{
+			Timeout:   30 * time.Second,
+			KeepAlive: 30 * time.Second,
+		}).DialContext,
+		MaxIdleConns:          100,
+		IdleConnTimeout:       90 * time.Second,
+		TLSHandshakeTimeout:   10 * time.Second,
+		ExpectContinueTimeout: 1 * time.Second,
 	}
 	// TOOD(adg): Re-enable HTTP/2 once it's fast enough to be usable.
 	//if err := http2.ConfigureTransport(t); err != nil {
