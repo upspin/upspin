@@ -320,6 +320,23 @@
     },
     {
       "key": {
+        "uuid": "a6690dc2_f7f6ed78",
+        "filename": "serverutil/shutdown.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-02T04:44:23Z",
+      "side": 1,
+      "message": "It\u0027s not an accident that they are declared in that order. It\u0027s because that\u0027s the order in which the dependencies are set up, so it is natural that they should be torn down in reverse order. \n\nRight now it\u0027s log \u003c- dir/server \u003c- https. If any other dependency needs to shut down later, it\u0027ll be set up as needed in dependency order, and so the shutdown will happen in the reverse order.\n\nRather than complicate the design with priorities off the bat, why don\u0027t we wait until we have an actual need for them? They\u0027re not necessary now and I\u0027d gamble that they won\u0027t be necessary later.",
+      "revId": "d714aff9e12d078d87f5ffbac53decba68fc3e6a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f5e42b98_8e45743a",
         "filename": "serverutil/shutdown.go",
         "patchSetId": 10
