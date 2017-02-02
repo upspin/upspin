@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d2530562_ea7cbcbc",
+        "filename": "serverutil/shutdown.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-02T00:58:53Z",
+      "side": 1,
+      "message": "delete",
+      "revId": "1e3b15e9e600011881108b2675a0bcc1474660da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "47a15452_056f8a97",
+        "filename": "serverutil/shutdown.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-02T00:58:53Z",
+      "side": 1,
+      "message": "shutdown.once.Do(doShutdown)",
+      "revId": "1e3b15e9e600011881108b2675a0bcc1474660da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1d0f6a07_1682339b",
+        "filename": "serverutil/shutdown.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-02T00:58:53Z",
+      "side": 1,
+      "message": "log.Info?\n\ncan\u0027t imagine anyone not being interested in this fact",
+      "revId": "1e3b15e9e600011881108b2675a0bcc1474660da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3242c55c_ab38979b",
+        "filename": "serverutil/shutdown.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-02T00:58:53Z",
+      "side": 1,
+      "message": "I feel like something should be logged here too",
+      "revId": "1e3b15e9e600011881108b2675a0bcc1474660da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dfa610d2_cca9ba6b",
+        "filename": "serverutil/shutdown.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-02T00:58:53Z",
+      "side": 1,
+      "message": "Shutdown()",
+      "revId": "1e3b15e9e600011881108b2675a0bcc1474660da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
