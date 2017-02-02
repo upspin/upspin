@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "815b375b_f57ebf8b",
+        "filename": "cloud/https/https.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-02T18:38:31Z",
+      "side": 1,
+      "message": "s/shutdown/shut down/\nshutdown is a  noun. shut down is a verb phrase.",
+      "revId": "fdc7b159c507fb223d69d00bb5ce2bbd4c8a346f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fda371e1_168f3882",
+        "filename": "cloud/https/https.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-02T18:38:31Z",
+      "side": 1,
+      "message": "s/Stops/Stop/",
+      "revId": "fdc7b159c507fb223d69d00bb5ce2bbd4c8a346f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "216bd648_3af6b7b9",
+        "filename": "dir/server/server.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 902,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-02T18:38:31Z",
+      "side": 1,
+      "message": "s2/shutdown/shut down/",
+      "revId": "fdc7b159c507fb223d69d00bb5ce2bbd4c8a346f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2dc50508_14ee982a",
+        "filename": "dir/server/server.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 910,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-02T18:38:31Z",
+      "side": 1,
+      "message": "you don\u0027t need this variable, although it doesn\u0027t hurt. you could just print k in the error, i believe. it\u0027s an interface so will be asserted to a string in the print.",
+      "revId": "fdc7b159c507fb223d69d00bb5ce2bbd4c8a346f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7afaa326_3d1b8b2b",
+        "filename": "serverutil/shutdown.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-02T18:38:31Z",
+      "side": 1,
+      "message": "shut down",
+      "revId": "fdc7b159c507fb223d69d00bb5ce2bbd4c8a346f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0d42a953_d10e4f9e",
+        "filename": "serverutil/shutdown.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-02T18:38:31Z",
+      "side": 1,
+      "message": "i wonder if 0 is right here. there\u0027s no record of why we\u0027re shutting down, and it could be due to error.\nperhaps Shutdown should take an error or record one somehow, and if it\u0027s not nil, log/print it and os.Exit(1)\n\ncould be a TODO for another CL.",
+      "revId": "fdc7b159c507fb223d69d00bb5ce2bbd4c8a346f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
