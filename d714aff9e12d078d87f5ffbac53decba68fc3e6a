@@ -303,6 +303,23 @@
     },
     {
       "key": {
+        "uuid": "074f4e1f_942859aa",
+        "filename": "serverutil/shutdown.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-02T01:50:13Z",
+      "side": 1,
+      "message": "It\u0027s all in this CL: the log calls flush as the last thing (priority 255). https closes the listener as first thing (priority 0). Then the dirserver flushes all trees -- this one does not matter so I picked order 5.\n\nRight now, by accident, they appear to get registered in the reverse execution order. But I can\u0027t guarantee that there won\u0027t be another init function somewhere else. It\u0027s just not robust enough to let registration order dictate the shutdown order. If order is not important for some of these, then we can always pick some arbitrary number (119 or 127). But when it\u0027s relevant, like log and https, the priority should be there.\n\nIf we want to complicate the logic to save storage space, we can define three levels: First, DontCare and Last. If two or more things must be First or Last, they would compete. \n\nBut I\u0027d hate to have to add two or three more levels later on just to break a tie, so 256 levels seems like a reasonable choice and the space wasted is that of a few pointers. \n\nWe can always change it later if our experience shows that reverse order is all we ever need. For now, I prefer to have explicit control.\n\nThanks.",
+      "revId": "d714aff9e12d078d87f5ffbac53decba68fc3e6a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f5e42b98_8e45743a",
         "filename": "serverutil/shutdown.go",
         "patchSetId": 10
@@ -314,6 +331,23 @@
       "writtenOn": "2017-02-02T00:58:53Z",
       "side": 1,
       "message": "var shutdown struct {\n...\n}",
+      "revId": "d714aff9e12d078d87f5ffbac53decba68fc3e6a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "70329b49_3565ae1e",
+        "filename": "serverutil/shutdown.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-02T01:50:13Z",
+      "side": 1,
+      "message": "Done",
       "revId": "d714aff9e12d078d87f5ffbac53decba68fc3e6a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -433,6 +467,23 @@
       "writtenOn": "2017-02-02T00:58:53Z",
       "side": 1,
       "message": "Then make the body of Shutdown be simply\n\n   shutdown.once.Do(doShutdown)\n\nand then here just call Shutdown",
+      "revId": "d714aff9e12d078d87f5ffbac53decba68fc3e6a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "26e46d52_ed7ca390",
+        "filename": "serverutil/shutdown.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-02T01:50:13Z",
+      "side": 1,
+      "message": "Done",
       "revId": "d714aff9e12d078d87f5ffbac53decba68fc3e6a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
