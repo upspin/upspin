@@ -388,6 +388,24 @@
     },
     {
       "key": {
+        "uuid": "50cf2686_d4a8f7b9",
+        "filename": "serverutil/shutdown.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-02T22:24:16Z",
+      "side": 1,
+      "message": "And metrics will register its shutdown function at init time, before any of the other services, but before log. It just works. ;-)",
+      "parentUuid": "cf3a61ee_0c18d5e2",
+      "revId": "d714aff9e12d078d87f5ffbac53decba68fc3e6a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f5e42b98_8e45743a",
         "filename": "serverutil/shutdown.go",
         "patchSetId": 10
