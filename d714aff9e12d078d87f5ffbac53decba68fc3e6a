@@ -337,6 +337,23 @@
     },
     {
       "key": {
+        "uuid": "33186516_a3235422",
+        "filename": "serverutil/shutdown.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-02T05:22:52Z",
+      "side": 1,
+      "message": "If we have multiple init functions registering shutdown handlers, we may need to specify priorities. In my last reply I explained that I want that flexibility now while I\u0027m still deploying this to the rest of the code. Removing it later is just as simple as adding it.",
+      "revId": "d714aff9e12d078d87f5ffbac53decba68fc3e6a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f5e42b98_8e45743a",
         "filename": "serverutil/shutdown.go",
         "patchSetId": 10
