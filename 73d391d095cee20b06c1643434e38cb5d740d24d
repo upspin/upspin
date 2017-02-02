@@ -53,6 +53,23 @@
     },
     {
       "key": {
+        "uuid": "faaba137_bf4dc450",
+        "filename": "log/log.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-02T16:49:32Z",
+      "side": 1,
+      "message": "Done.",
+      "revId": "73d391d095cee20b06c1643434e38cb5d740d24d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0824d824_8dfca186",
         "filename": "serverutil/shutdown.go",
         "patchSetId": 12
@@ -98,6 +115,23 @@
       "writtenOn": "2017-02-02T05:27:52Z",
       "side": 1,
       "message": "Let\u0027s see what he says.",
+      "revId": "73d391d095cee20b06c1643434e38cb5d740d24d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "59a646b3_c24d3890",
+        "filename": "serverutil/shutdown.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-02T16:49:32Z",
+      "side": 1,
+      "message": "Ack",
       "revId": "73d391d095cee20b06c1643434e38cb5d740d24d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
