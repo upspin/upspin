@@ -1,105 +1,139 @@
-// Copyright 2016 The Upspin Authors. All rights reserved.
+// Copyright 2017 The Upspin Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
 package serverutil
 
 import (
+	"bufio"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"os"
 	"os/exec"
 	"syscall"
 	"testing"
 	"time"
-	"upspin.io/log"
 )
 
-const magicPort = ":9781"
-
-// Test strategy:
-// Launch test binary, get the PID.
-// Check that it's running.
-// Send SIGTERM
-// Wait termination.
-// Check that it's no longer running.
-// Check side-effects to prove the shutdown routines ran.
-// Profit!
+// TestShutdown launches a child process, sends it SIGTERM, and, by reading its
+// standard output, checks that the process runs the required shutdown
+// functions. It also checks that the process will be forced to exit if a
+// timeout handler stalls.
 func TestShutdown(t *testing.T) {
-	if testing.Short() {
-		t.Skip("Skipping shutdown test")
+	const key = "SHUTDOWN_CHILD_PROCESS"
+	if os.Getenv(key) == "true" {
+		testShutdownChild()
+		return
 	}
-	now := time.Now()
 
-	err := exec.Command("go", "install", "upspin.io/serverutil/testshutdown").Run()
+	t.Run("clean", func(t *testing.T) { testShutdown(t, true) })
+	t.Run("messy", func(t *testing.T) { testShutdown(t, false) })
+}
+
+var shutdownMessages = []string{
+	"Hello",
+	"How are you?",
+	"Goodbye",
+}
+
+func testShutdown(t *testing.T, clean bool) {
+	cmd := exec.Command(os.Args[0], "-test.run=TestShutdown")
+	cmd.Env = []string{"SHUTDOWN_CHILD_PROCESS=true"}
+	if !clean {
+		cmd.Env = append(cmd.Env, "SHUTDOWN_TIMEOUT=true")
+	}
+	rc, err := cmd.StdoutPipe()
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	exitCode := fmt.Sprintf("exiting-now-%d-%d-%d", now.Nanosecond(), now.Second(), os.Getpid())
-	cmd := exec.Command("testshutdown", exitCode)
-	f, err := ioutil.TempFile("", "testshutdown")
-	if err != nil {
-		t.Fatal(err)
-	}
-	cmd.Stdout = f
-	err = cmd.Start()
-	if err != nil {
+	out := bufio.NewScanner(rc)
+	if err := cmd.Start(); err != nil {
 		t.Fatal(err)
 	}
 
-	// Check that the server is up by making it return a secret message.
-	for tries := 0; ; tries++ {
-		testData := now.Format("04:05.000000000")
-		err = pingServer(t, testData)
-		if err == nil {
-			break
+	// Check that we get the initial "hello" message from the client,
+	// so we know it's running.
+	readErr := make(chan error)
+	go func() {
+		out.Scan()
+		if err := out.Err(); err != nil {
+			readErr <- err
+			return
 		}
-		if err != nil && tries > 4 {
+		if got, want := out.Text(), shutdownMessages[0]; got != want {
+			readErr <- fmt.Errorf("child said %q, want %q", got, want)
+			return
+		}
+		readErr <- nil
+	}()
+	select {
+	case err := <-readErr:
+		if err != nil {
+			cmd.Process.Kill()
 			t.Fatal(err)
 		}
-		log.Error.Print(err)
-		time.Sleep(50 * time.Millisecond)
+	case <-time.After(2 * time.Second):
+		t.Fatal("timed out waiting for child process to say hello")
 	}
 
-	// Send SIGTERM.
-	err = syscall.Kill(cmd.Process.Pid, syscall.SIGTERM)
-	if err != nil {
+	// Concurrently collect and compare the remaining output lines.
+	go func() {
+		for n := 1; n < len(shutdownMessages); n++ {
+			if !out.Scan() {
+				readErr <- fmt.Errorf("child output ended, expected more lines")
+				return
+			}
+			if got, want := out.Text(), shutdownMessages[n]; got != want {
+				readErr <- fmt.Errorf("got output line %q, want %q", got, want)
+				return
+			}
+		}
+		readErr <- nil
+	}()
+
+	// Kill the process and wait for it to exit, checking its exit status
+	// depending on whether this is a clean or messy text.
+	if err := syscall.Kill(cmd.Process.Pid, syscall.SIGTERM); err != nil {
 		t.Fatal(err)
+	}
+	waitErr := make(chan error)
+	go func() {
+		waitErr <- cmd.Wait()
+	}()
+	select {
+	case err := <-waitErr:
+		if err != nil && clean {
+			t.Fatalf("child process exited with non-zero status: %v", err)
+		} else if err == nil && !clean {
+			t.Fatal("child proces exited cleanly, want non-zero status")
+		}
+	case <-time.After(2 * time.Second):
+		t.Fatal("timed out waiting for child process to exit")
 	}
 
-	// Wait for process to exit
-	err = cmd.Wait()
-	if err != nil {
+	// Check that the output was what we expected.
+	if err := <-readErr; err != nil {
 		t.Fatal(err)
-	}
-
-	// Read and validate output.
-	output := make([]byte, len(exitCode))
-	_, err = f.ReadAt(output, 0)
-	if err != nil {
-		t.Fatal(err)
-	}
-	f.Close()
-	os.Remove(f.Name())
-	if string(output) != exitCode {
-		t.Fatalf("Expected %s, got %d", exitCode, output)
 	}
 }
 
-func pingServer(t *testing.T, ping string) error {
-	resp, err := http.Get("http://localhost" + magicPort + "/echo?str=" + ping)
-	if err != nil {
-		return err
+func testShutdownChild() {
+	var terminate chan bool
+	if os.Getenv("SHUTDOWN_TIMEOUT") == "true" {
+		terminate = make(chan bool)
+		terminateSleep = func(time.Duration) {
+			<-terminate
+		}
 	}
-	defer resp.Body.Close()
-	data, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if string(data) != ping {
-		return fmt.Errorf("expected %q, got %q", ping, data)
-	}
-	return nil
+	fmt.Println(shutdownMessages[0])
+	RegisterShutdown(0, func() {
+		fmt.Println(shutdownMessages[1])
+	})
+	RegisterShutdown(1, func() {
+		fmt.Println(shutdownMessages[2])
+		if terminate != nil {
+			terminate <- true
+			select {} // Block forever.
+		}
+	})
+	Shutdown()
 }

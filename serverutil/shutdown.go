@@ -39,10 +39,10 @@ func Shutdown() {
 		shutdown.mu.Lock()
 
 		// Ensure we terminate after a fixed amount of time.
-		time.AfterFunc(time.Minute, func() {
-			log.Error.Printf("%s: Clean shutdown interrupted, forcing shutdown now", op)
+		go func() {
+			terminateSleep(1 * time.Minute)
 			os.Exit(1)
-		})
+		}()
 
 		for pri, funcs := range shutdown.sequence {
 			if len(funcs) == 0 {
@@ -68,6 +68,9 @@ func Shutdown() {
 		os.Exit(0)
 	})
 }
+
+// For tests.
+var terminateSleep = time.Sleep
 
 var shutdown struct {
 	mu       sync.Mutex
