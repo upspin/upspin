@@ -152,6 +152,23 @@
       "revId": "73d391d095cee20b06c1643434e38cb5d740d24d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6c4a4041_ad7ccf84",
+        "filename": "serverutil/shutdown.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-02T19:08:16Z",
+      "side": 1,
+      "message": "Ok.",
+      "revId": "73d391d095cee20b06c1643434e38cb5d740d24d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
