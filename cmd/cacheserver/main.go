@@ -39,6 +39,7 @@ const serverName = "cacheserver"
 var (
 	cacheFlag     = flag.String("cache", defaultCacheDir(), "`directory` for cache")
 	cacheSizeFlag = flag.Int64("cachesize", 5e9, "max disk `bytes` for cache")
+	writebackFlag = flag.Bool("writeback", false, "make storage cache writeback")
 )
 
 func main() {
@@ -69,7 +70,7 @@ func main() {
 	maxRefBytes := (9 * (*cacheSizeFlag)) / 10
 	maxLogBytes := maxRefBytes / 9
 
-	sc, err := storecache.New(cfg, *cacheFlag, maxRefBytes)
+	sc, err := storecache.New(cfg, *cacheFlag, maxRefBytes, *writebackFlag)
 	if err != nil {
 		log.Fatalf("opening cache: %s", err)
 	}
