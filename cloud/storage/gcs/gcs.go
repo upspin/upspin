@@ -99,6 +99,7 @@ func (gcs *gcsImpl) Download(ref string) ([]byte, error) {
 
 // Put implements Storage.
 func (gcs *gcsImpl) Put(ref string, contents []byte) (refLink string, error error) {
+	const op = "cloud/storage/gcs.Put"
 	buf := bytes.NewBuffer(contents)
 	acl := string(gcs.defaultWriteACL)
 	object := &gcsBE.Object{Name: ref}
@@ -108,7 +109,7 @@ func (gcs *gcsImpl) Put(ref string, contents []byte) (refLink string, error erro
 			return res.MediaLink, err
 		}
 		if !strings.Contains(err.Error(), "503") || tries > 4 {
-			return "", err
+			return "", errors.E(op, errors.Transient, err)
 		}
 		log.Info.Printf("cloud/storage/gcs: WARNING: retrying Insert(%s): %s", ref, err)
 		time.Sleep(time.Duration(100*(tries+1)) * time.Millisecond)
