@@ -2,9 +2,9 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package gcp implements the user service upspin.KeyServer
-// that runs on the Google Cloud Platform (GCP).
-package gcp
+// Package server implements the user service upspin.KeyServer
+// that runs with the backing of storage.Storage.
+package server
 
 import (
 	"encoding/json"
@@ -28,7 +28,7 @@ import (
 // New initializes an instance of the key service.
 // Required configuration options are listed at the package comments.
 func New(options ...string) (upspin.KeyServer, error) {
-	const op = "key/gcp.New"
+	const op = "key/server.New"
 
 	// All options are for the Storage layer.
 	var storageOpts []storage.DialOpts
@@ -81,7 +81,7 @@ type userEntry struct {
 
 // Lookup implements upspin.KeyServer.
 func (s *server) Lookup(name upspin.UserName) (*upspin.User, error) {
-	const op = "key/gcp.Lookup"
+	const op = "key/server.Lookup"
 	if err := valid.UserName(name); err != nil {
 		return nil, errors.E(op, name, err)
 	}
@@ -94,7 +94,7 @@ func (s *server) Lookup(name upspin.UserName) (*upspin.User, error) {
 
 // Put implements upspin.KeyServer.
 func (s *server) Put(u *upspin.User) error {
-	const op = "key/gcp.Put"
+	const op = "key/server.Put"
 	if s.user == "" {
 		return errors.E(op, errors.Internal, errors.Str("not bound to user"))
 	}
@@ -263,7 +263,7 @@ func (s *server) verifyOwns(u upspin.UserName, pubKey upspin.PublicKey, domain s
 
 // Log implements Logger.
 func (s *server) Log() ([]byte, error) {
-	const op = "key/gcp.Log"
+	const op = "key/server.Log"
 
 	data, err := s.logger.ReadAll()
 	if err != nil {

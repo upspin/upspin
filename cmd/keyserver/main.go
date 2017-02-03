@@ -17,8 +17,8 @@ import (
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/flags"
-	"upspin.io/key/gcp"
 	"upspin.io/key/inprocess"
+	"upspin.io/key/server"
 	"upspin.io/log"
 	"upspin.io/metric"
 	"upspin.io/rpc/keyserver"
@@ -60,8 +60,8 @@ func main() {
 	switch flags.ServerKind {
 	case "inprocess":
 		key = inprocess.New()
-	case "gcp":
-		key, err = gcp.New(flags.ServerConfig...)
+	case "server":
+		key, err = server.New(flags.ServerConfig...)
 	default:
 		err = errors.Errorf("bad -kind %q", flags.ServerKind)
 
@@ -76,7 +76,7 @@ func main() {
 	httpStore := keyserver.New(cfg, key, upspin.NetAddr(flags.NetAddr))
 	http.Handle("/api/Key/", httpStore)
 
-	if logger, ok := key.(gcp.Logger); ok {
+	if logger, ok := key.(server.Logger); ok {
 		http.Handle("/log", logHandler{logger: logger})
 	}
 	if *mailConfigFile != "" {
