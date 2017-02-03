@@ -12,6 +12,7 @@ import (
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/path"
+	"upspin.io/serverutil"
 	"upspin.io/upspin"
 	"upspin.io/user"
 )
@@ -156,7 +157,7 @@ func (s *server) shouldSnapshot(cfg *snapshotConfig) (bool, path.Parsed, error) 
 	}
 
 	// List today's snapshot directory, including any suffixed snapshot.
-	entries, err := s.Glob(p.String() + "*")
+	entries, err := s.globWithoutPermissions(p.String() + "*")
 	if err != nil {
 		if err == upspin.ErrFollowLink {
 			// We need to get the real entry and we cannot resolve links on our own.
@@ -357,4 +358,45 @@ func isValidSnapshotControlEntry(entry *upspin.DirEntry) error {
 		return errors.E(errors.Invalid, entry.Name, errors.Str("snapshot control entry must be an empty plain-packed file"))
 	}
 	return nil
+}
+
+func (s *server) globWithoutPermissions(pattern string) ([]*upspin.DirEntry, error) {
+	const op = "dir/server.globWithoutPermissions"
+	o, m := newOptMetric(op)
+	defer m.Done()
+
+	lookup := func(name upspin.PathName) (*upspin.DirEntry, error) {
+		const op = "dir/server.Lookup"
+		o, ss := subspan(op, []options{o})
+		defer ss.End()
+		p, err := path.Parse(name)
+		if err != nil {
+			return nil, errors.E(op, name, err)
+		}
+		return s.lookup(op, p, !entryMustBeClean, o)
+	}
+	listDir := func(dirName upspin.PathName) ([]*upspin.DirEntry, error) {
+		const op = "dir/server.listDir"
+		o, ss := subspan(op, []options{o})
+		defer ss.End()
+		p, err := path.Parse(dirName)
+		if err != nil {
+			return nil, errors.E(op, dirName, err)
+		}
+		tree, err := s.loadTreeFor(p.User(), o)
+		if err != nil {
+			return nil, errors.E(op, err)
+		}
+		entries, _, err := tree.List(p)
+		if err != nil {
+			return nil, errors.E(op, err)
+		}
+		return entries, nil
+	}
+
+	entries, err := serverutil.Glob(pattern, lookup, listDir)
+	if err != nil && err != upspin.ErrFollowLink {
+		err = errors.E(op, err)
+	}
+	return entries, err
 }
