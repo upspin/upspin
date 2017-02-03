@@ -20,6 +20,7 @@ import (
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/log"
+	"upspin.io/metric"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
 	"upspin.io/valid"
@@ -128,6 +129,9 @@ func generateRandomToken() (string, error) {
 
 // ServeHTTP exposes the configured Service as an HTTP API.
 func (s *serverImpl) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	m, span := metric.NewSpan("rpc/server.ServeHTTP")
+	defer m.Done()
+
 	d := s.service()
 	if d == nil {
 		http.NotFound(w, r)
@@ -148,7 +152,9 @@ func (s *serverImpl) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	sp := span.StartSpan("SessionForRequest")
 	session, err := s.SessionForRequest(w, r)
+	sp.End()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusUnauthorized)
 		return
@@ -162,14 +168,18 @@ func (s *serverImpl) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if method != nil {
-		serveMethod(method, session, w, body)
+		sp := span.StartSpan("serveMethod " + name)
+		serveMethod(method, session, w, body, sp)
+		sp.End()
 		return
 	}
 	serveStream(stream, session, w, body)
 }
 
-func serveMethod(m Method, sess Session, w http.ResponseWriter, body []byte) {
+func serveMethod(m Method, sess Session, w http.ResponseWriter, body []byte, span *metric.Span) {
+	sp := span.StartSpan("innerFunction")
 	resp, err := m(sess, body)
+	sp.End()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

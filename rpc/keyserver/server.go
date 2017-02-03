@@ -15,6 +15,7 @@ import (
 	"upspin.io/config"
 	"upspin.io/errors"
 	"upspin.io/log"
+	"upspin.io/metric"
 	"upspin.io/rpc"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
@@ -70,10 +71,15 @@ func (s *server) serverFor(session rpc.Session, reqBytes []byte, req pb.Message)
 
 // Lookup implements proto.KeyServer, and does not do any authentication.
 func (s *server) Lookup(session rpc.Session, reqBytes []byte) (pb.Message, error) {
+	m, span := metric.NewSpan("keyserver.Lookup")
+	defer m.Done()
+
 	// TODO(adg): Lookup should be accessible even to unauthenticated users.
 
+	sp := span.StartSpan("serverFor")
 	var req proto.KeyLookupRequest
 	key, err := s.serverFor(session, reqBytes, &req)
+	sp.End()
 	if err != nil {
 		return nil, err
 	}
