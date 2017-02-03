@@ -116,10 +116,10 @@ func ListenAndServe(ready chan<- struct{}, serverName, addr string, opt *Options
 		}
 	}
 	server := &http.Server{
-		// ReadTimeout:  15 * time.Second,
-		// WriteTimeout: 15 * time.Second,
-		// IdleTimeout:  60 * time.Second,
-		TLSConfig: config,
+	// ReadTimeout:  15 * time.Second,
+	// WriteTimeout: 15 * time.Second,
+	// IdleTimeout:  60 * time.Second,
+	//TLSConfig: config,
 	}
 	// TODO(adg): enable HTTP/2 once it's fast enough
 	//err := http2.ConfigureServer(server, nil)
@@ -139,10 +139,11 @@ func ListenAndServe(ready chan<- struct{}, serverName, addr string, opt *Options
 		// its serving loop.
 		ln.Close()
 	})
-	err = server.Serve(tls.NewListener(ln, config))
+	err = server.Serve(ln) //tls.NewListener(ln, config))
 	if err != nil {
 		log.Printf("https: %v", err)
 	}
+	log.Printf("config=%p", config)
 	// Ensure we terminate cleanly.
 	serverutil.Shutdown()
 }

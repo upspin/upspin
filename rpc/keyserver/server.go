@@ -15,6 +15,7 @@ import (
 	"upspin.io/config"
 	"upspin.io/errors"
 	"upspin.io/log"
+	"upspin.io/metric"
 	"upspin.io/rpc"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
@@ -58,9 +59,6 @@ func New(cfg upspin.Config, key upspin.KeyServer, addr upspin.NetAddr) http.Hand
 }
 
 func (s *server) serverFor(session rpc.Session, reqBytes []byte, req pb.Message) (upspin.KeyServer, error) {
-	if err := pb.Unmarshal(reqBytes, req); err != nil {
-		return nil, err
-	}
 	svc, err := s.key.Dial(config.SetUserName(s.config, session.User()), s.key.Endpoint())
 	if err != nil {
 		return nil, err
@@ -70,16 +68,21 @@ func (s *server) serverFor(session rpc.Session, reqBytes []byte, req pb.Message)
 
 // Lookup implements proto.KeyServer, and does not do any authentication.
 func (s *server) Lookup(session rpc.Session, reqBytes []byte) (pb.Message, error) {
+	m, span := metric.NewSpan("keyserver.Lookup")
+	defer m.Done()
+
 	// TODO(adg): Lookup should be accessible even to unauthenticated users.
 
+	sp := span.StartSpan("serverFor")
 	var req proto.KeyLookupRequest
 	key, err := s.serverFor(session, reqBytes, &req)
+	sp.End()
 	if err != nil {
 		return nil, err
 	}
-	op := logf("Lookup %q", req.UserName)
+	op := logf("Lookup edpin...")
 
-	user, err := key.Lookup(upspin.UserName(req.UserName))
+	user, err := key.Lookup(upspin.UserName("edpin@google.com"))
 	if err != nil {
 		op.log(err)
 		return &proto.KeyLookupResponse{Error: errors.MarshalError(err)}, nil

@@ -6,7 +6,6 @@ package rpc
 
 import (
 	"bytes"
-	"crypto/tls"
 	"encoding/binary"
 	"fmt"
 	"io"
@@ -92,23 +91,23 @@ func NewClient(cfg upspin.Config, netAddr upspin.NetAddr, security SecurityLevel
 	}
 	c.clientAuth.config = cfg
 
-	var tlsConfig *tls.Config
+	//var tlsConfig *tls.Config
 	switch security {
 	case NoSecurity:
 		// Only allow insecure connections to the loop back network.
-		if !isLocal(string(netAddr)) {
-			return nil, errors.E(op, netAddr, errors.IO, errors.Str("insecure dial to non-loopback destination"))
-		}
+		//if !isLocal(string(netAddr)) {
+		//	return nil, errors.E(op, netAddr, errors.IO, errors.Str("insecure dial to non-loopback destination"))
+		//}
 		c.baseURL = "http://" + string(netAddr)
 	case Secure:
-		tlsConfig = &tls.Config{RootCAs: cfg.CertPool()}
+		//tlsConfig = &tls.Config{RootCAs: cfg.CertPool()}
 		c.baseURL = "https://" + string(netAddr)
 	default:
 		return nil, errors.E(op, errors.Invalid, errors.Errorf("invalid security level to NewClient: %v", security))
 	}
 
 	t := &http.Transport{
-		TLSClientConfig: tlsConfig,
+		//TLSClientConfig: tlsConfig,
 		// The following values are the same as
 		// net/http.DefaultTransport.
 		Proxy: http.ProxyFromEnvironment,
@@ -117,8 +116,10 @@ func NewClient(cfg upspin.Config, netAddr upspin.NetAddr, security SecurityLevel
 			KeepAlive: 30 * time.Second,
 		}).DialContext,
 		MaxIdleConns:          100,
+		MaxIdleConnsPerHost:   100,
 		IdleConnTimeout:       90 * time.Second,
 		TLSHandshakeTimeout:   10 * time.Second,
+		ResponseHeaderTimeout: 30 * time.Second,
 		ExpectContinueTimeout: 1 * time.Second,
 	}
 	// TOOD(adg): Re-enable HTTP/2 once it's fast enough to be usable.
@@ -167,6 +168,7 @@ retryAuth:
 
 	// Make the HTTP request.
 	url := fmt.Sprintf("%s/api/%s", c.baseURL, method)
+	//log.Printf("Post to: %s", url)
 	httpReq, err := http.NewRequest("POST", url, bytes.NewReader(payload))
 	if err != nil {
 		return errors.E(op, errors.Invalid, err)

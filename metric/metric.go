@@ -91,6 +91,8 @@ func RegisterSaver(saver Saver) {
 // StartSpan starts a new span of the metric with implicit start time being the current time and Kind being Server.
 // Spans need not be contiguous and may or may not overlap.
 func (m *Metric) StartSpan(name string) *Span {
+	return &Span{}
+
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	// Lazily allocate the spans slice.
@@ -110,6 +112,7 @@ func (m *Metric) StartSpan(name string) *Span {
 // Done ends the metric and any not-yet-ended span and saves it to stable storage. Further use of the metric or any of
 // its spans or subspans are invalid and may produce erroneous results or be silently dropped.
 func (m *Metric) Done() {
+	return
 	// End open spans.
 	m.mu.Lock() // Lock protects the slice of spans changing size.
 	var zeroTime time.Time
@@ -139,6 +142,7 @@ func (m *Metric) Done() {
 // End marks the end time of the span as the current time. It returns the parent metric for convenience which
 // may be nil if the metric is Done.
 func (s *Span) End() *Metric {
+	return nil
 	s.endTime = time.Now()
 	return s.metric
 }
@@ -146,6 +150,7 @@ func (s *Span) End() *Metric {
 // StartSpan starts a new span as a child of s with start time set to the current time.
 // It may return nil if the parent Metric of s is Done.
 func (s *Span) StartSpan(name string) *Span {
+	return &Span{}
 	if s.metric == nil {
 		log.Error.Printf("metric: parent metric of span %q is nil", s.name)
 		return nil
