@@ -27,8 +27,8 @@ type server struct {
 }
 
 // New creates a new store cache that implements upspin.StoreServer.
-func New(cfg upspin.Config, cacheDir string, maxBytes int64) (upspin.StoreServer, error) {
-	c, err := newCache(path.Join(cacheDir, "storecache"), maxBytes)
+func New(cfg upspin.Config, cacheDir string, maxBytes int64, writeBack bool) (upspin.StoreServer, error) {
+	c, err := newCache(cfg, path.Join(cacheDir, "storecache"), maxBytes, writeBack)
 	if err != nil {
 		return nil, err
 	}
