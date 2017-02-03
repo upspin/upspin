@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6981f9f5_6af87cb0",
+        "filename": "serverutil/shutdown_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-03T00:00:19Z",
+      "side": 1,
+      "message": "It\u0027s doing it sequentially. You need to say it\u0027s concurrently with  SIGTERM being requested.",
+      "revId": "2dff74141c119740e8c98cccc7bce749aa9c82d5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9409ca2d_d6f81b6f",
+        "filename": "serverutil/shutdown_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-03T00:00:19Z",
+      "side": 1,
+      "message": "I\u0027d call this testServer or testServerChildProcess. I was waiting for it to send a signal since I read it as \"shut down the child\".",
+      "revId": "2dff74141c119740e8c98cccc7bce749aa9c82d5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
