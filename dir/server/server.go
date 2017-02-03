@@ -489,6 +489,47 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	return entries, err
 }
 
+func (s *server) globWithoutPermissions(pattern string) ([]*upspin.DirEntry, error) {
+	const op = "dir/server.globWithoutPermissions"
+	o, m := newOptMetric(op)
+	defer m.Done()
+
+	lookup := func(name upspin.PathName) (*upspin.DirEntry, error) {
+		const op = "dir/server.Lookup"
+		o, ss := subspan(op, []options{o})
+		defer ss.End()
+		p, err := path.Parse(name)
+		if err != nil {
+			return nil, errors.E(op, name, err)
+		}
+		return s.lookup(op, p, !entryMustBeClean, o)
+	}
+	listDir := func(dirName upspin.PathName) ([]*upspin.DirEntry, error) {
+		const op = "dir/server.listDir"
+		o, ss := subspan(op, []options{o})
+		defer ss.End()
+		p, err := path.Parse(dirName)
+		if err != nil {
+			return nil, errors.E(op, dirName, err)
+		}
+		tree, err := s.loadTreeFor(p.User(), o)
+		if err != nil {
+			return nil, errors.E(op, err)
+		}
+		entries, _, err := tree.List(p)
+		if err != nil {
+			return nil, errors.E(op, err)
+		}
+		return entries, nil
+	}
+
+	entries, err := serverutil.Glob(pattern, lookup, listDir)
+	if err != nil && err != upspin.ErrFollowLink {
+		err = errors.E(op, err)
+	}
+	return entries, err
+}
+
 // listDir implements serverutil.ListFunc, with an additional options variadic.
 // dirName should always be a directory.
 func (s *server) listDir(op string, dirName upspin.PathName, opts ...options) ([]*upspin.DirEntry, error) {

@@ -156,7 +156,7 @@ func (s *server) shouldSnapshot(cfg *snapshotConfig) (bool, path.Parsed, error) 
 	}
 
 	// List today's snapshot directory, including any suffixed snapshot.
-	entries, err := s.Glob(p.String() + "*")
+	entries, err := s.globWithoutPermissions(p.String() + "*")
 	if err != nil {
 		if err == upspin.ErrFollowLink {
 			// We need to get the real entry and we cannot resolve links on our own.
