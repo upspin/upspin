@@ -301,9 +301,9 @@ func (cf *cachedFile) writeAt(buf []byte, offset int64) (int, error) {
 	return rv, err
 }
 
-// writeBack writes the cached file to the store if it is dirty. Called with node locked.
-func (cf *cachedFile) writeBack(h *handle) error {
-	const op = "upspinfs/cache.writeBack"
+// writeback writes the cached file to the store if it is dirty. Called with node locked.
+func (cf *cachedFile) writeback(h *handle) error {
+	const op = "upspinfs/cache.writeback"
 	n := h.n
 
 	// Nothing to do if the cache file isn't dirty.

@@ -253,7 +253,7 @@ func (n *node) Create(context gContext.Context, req *fuse.CreateRequest, resp *f
 
 	// Make sure we can actually create this node.
 	// TODO(p): this creates trash objects in a immutable store. Must be a better way.
-	if err := nn.cf.writeBack(h); err != nil {
+	if err := nn.cf.writeback(h); err != nil {
 		return nil, nil, e2e(errors.E(op, err))
 	}
 
@@ -596,7 +596,7 @@ func (h *handle) Flush(context gContext.Context, req *fuse.FlushRequest) error {
 	defer h.n.Unlock()
 	var err error
 	if h.n.cf != nil && !h.n.noWB {
-		err = h.n.cf.writeBack(h)
+		err = h.n.cf.writeback(h)
 		if err != nil {
 			err = e2e(errors.E(op, h.n.uname, err))
 		}
@@ -668,7 +668,7 @@ func (h *handle) Release(context gContext.Context, req *fuse.ReleaseRequest) err
 	defer h.n.Unlock()
 	var err error
 	if h.n.cf != nil && !h.n.noWB {
-		err = h.n.cf.writeBack(h)
+		err = h.n.cf.writeback(h)
 		if err != nil {
 			err = e2e(errors.E(op, h.n.uname, err))
 		}
