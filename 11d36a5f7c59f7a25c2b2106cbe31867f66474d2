@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "16c7087d_a2a0ab0b",
+        "filename": "rpc/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-03T00:02:05Z",
+      "side": 1,
+      "message": "If there are no updates, what keeps it from being idle?",
+      "parentUuid": "318a50ac_aac73045",
+      "revId": "11d36a5f7c59f7a25c2b2106cbe31867f66474d2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "794eef56_78192ee8",
         "filename": "rpc/client.go",
         "patchSetId": 1
