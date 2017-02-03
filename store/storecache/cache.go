@@ -17,6 +17,7 @@ import (
 
 	"upspin.io/bind"
 	"upspin.io/cache"
+	"upspin.io/key/sha256key"
 	"upspin.io/log"
 	"upspin.io/upspin"
 )
@@ -48,15 +49,17 @@ type cachedRef struct {
 // TODO(p): make this a write-back cache to allow disconnected operation.
 type storeCache struct {
 	inUse int64 // Current bytes cached.
+	cfg   upspin.Config
 	sync.Mutex
 	dir   string     // Top directory for cached references.
 	limit int64      // Sort limit of the maximum bytes to store.
 	lru   *cache.LRU // Key is the reference. Value is &cachedRef.
+	wbq   *writeBackQueue
 }
 
 // newCache returns the cache rooted at dir. It will walk the cache to put all files
 // into the LRU.
-func newCache(dir string, maxBytes int64) (*storeCache, error) {
+func newCache(cfg upspin.Config, dir string, maxBytes int64, writeBack bool) (*storeCache, error) {
 	if err := os.MkdirAll(dir, 0700); err != nil {
 		return nil, err
 	}
@@ -64,9 +67,22 @@ func newCache(dir string, maxBytes int64) (*storeCache, error) {
 	if maxRefs > 100000 {
 		maxRefs = 100000
 	}
-	c := &storeCache{dir: dir, limit: maxBytes, lru: cache.NewLRU(maxRefs)}
+	c := &storeCache{cfg: cfg, dir: dir, limit: maxBytes, lru: cache.NewLRU(maxRefs)}
 	c.walk(dir)
+	if writeBack {
+		var err error
+		c.wbq, err = newWriteBackQueue(c)
+		if err != nil {
+			return nil, err
+		}
+	}
 	return c, nil
+}
+
+func (c *storeCache) close() {
+	if c.wbq != nil {
+		c.wbq.close()
+	}
 }
 
 // walk does a recursive walk of the cache directories adding cached references
@@ -251,18 +267,21 @@ func (c *storeCache) get(cfg upspin.Config, ref upspin.Reference, e upspin.Endpo
 // put saves a reference in the cache. put has the same invariants as get.
 func (c *storeCache) put(cfg upspin.Config, data []byte, e upspin.Endpoint) (upspin.Reference, error) {
 	// If we can't put it to the store, don't cache.
-	// TODO(p): This will change with a write through cache.
-	// TODO(p): Use refdata information.
-	store, err := bind.StoreServer(cfg, e)
-	if err != nil {
-		return "", err
-	}
-	refdata, err := store.Put(data)
-	if err != nil {
-		return "", err
-	}
-	ref := refdata.Reference
 
+	var ref upspin.Reference
+	if c.wbq == nil {
+		store, err := bind.StoreServer(cfg, e)
+		if err != nil {
+			return "", err
+		}
+		refdata, err := store.Put(data)
+		if err != nil {
+			return "", err
+		}
+		ref = refdata.Reference
+	} else {
+		ref = upspin.Reference(sha256key.Of(data).String())
+	}
 	file := c.cachePath(ref, e)
 	c.enforceByteLimitByRemovingLeastRecentlyUsedFile()
 
@@ -289,6 +308,18 @@ func (c *storeCache) put(cfg upspin.Config, data []byte, e upspin.Endpoint) (ups
 	// Save the data in a file and remember we cached it.
 	if err := cr.saveToCacheFile(file, data); err != nil {
 		log.Info.Printf("saving cached ref %s to %s: %s", string(ref), file, err)
+		if c.wbq == nil {
+			// When writing back, any problem writing the file into the
+			// cache is fatal.
+			return "", err
+		}
+	}
+
+	// Add to list of files to write back.
+	if c.wbq != nil {
+		if err := c.wbq.newRequest(ref, e); err != nil {
+			return "", err
+		}
 	}
 
 	// Wake up anyone waiting for us to finish.
@@ -398,7 +429,7 @@ func (cr *cachedRef) saveToCacheFile(file string, data []byte) error {
 // enforceByteLimitByRemovingLeastRecentlyUsedFile removes the oldest entries until inUse is below limit. We take a leap
 // of faith that the least recently used entry is not currently in use.
 func (c *storeCache) enforceByteLimitByRemovingLeastRecentlyUsedFile() {
-	for {
+	for skips := 0; skips < 100; {
 		if atomic.LoadInt64(&c.inUse) < c.limit {
 			break
 		}
