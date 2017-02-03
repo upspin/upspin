@@ -28,6 +28,7 @@ import (
 
 var (
 	cacheFlag = flag.String("cache", defaultCacheDir(), "`directory` for file cache")
+	wbFlag    = flag.Bool("writeback", false, "true for write back instead of write through caching")
 )
 
 func usage() {
@@ -84,8 +85,9 @@ func startCache(cfg upspin.Config) {
 
 	// Start a cache server.
 	cacheErrorChan := make(chan bool)
+	wb := fmt.Sprintf("-writeback=%v", *wbFlag)
 	go func() {
-		cmd := exec.Command("cacheserver", "-cache="+*cacheFlag, "-log="+log.GetLevel())
+		cmd := exec.Command("cacheserver", "-cache="+*cacheFlag, "-log="+log.GetLevel(), wb)
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 		if err := cmd.Run(); err != nil {
@@ -96,7 +98,7 @@ func startCache(cfg upspin.Config) {
 	}()
 
 	// Wait for it. Give up and continue without if it doesn't start in a timely fashion.
-	for tries := 0; tries < 3; tries++ {
+	for tries := 0; tries < 10; tries++ {
 		time.Sleep(500 * time.Millisecond)
 		select {
 		case <-cacheErrorChan:
