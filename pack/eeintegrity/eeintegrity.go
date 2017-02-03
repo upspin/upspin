@@ -202,8 +202,8 @@ func (ei ei) Unpack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker
 	// Verify that this was signed with the writer's old or new public key.
 	vhash := factotum.VerHash(writerCurveName, path.Clean(d.SignedName), d.Time, dkey, hash)
 	if !ecdsa.Verify(writerPubKey, vhash, sig.R, sig.S) &&
-		sig2.R.Sign() != 0 && !ecdsa.Verify(writerPubKey, vhash, sig2.R, sig2.S) {
-		// Only check sig2 if non-zero and sig failed, likely because writerPubKey is rotating.
+		!ecdsa.Verify(writerPubKey, vhash, sig2.R, sig2.S) {
+		// Check sig2 in case writerPubKey is rotating.
 		return nil, errors.E(op, d.Name, writer, errVerify)
 		// TODO(ehg) If reader is owner, consider trying even older factotum keys.
 	}
@@ -286,8 +286,8 @@ func (ei ei) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName
 	// Verify that this was signed with the owner's old or new public key.
 	vhash := factotum.VerHash(ownerCurveName, path.Clean(d.SignedName), d.Time, dkey, cipherSum)
 	if !ecdsa.Verify(ownerPubKey, vhash, sig.R, sig.S) &&
-		sig2.R.Sign() != 0 && !ecdsa.Verify(ownerPubKey, vhash, sig2.R, sig2.S) {
-		// Only check sig2 if non-zero and sig failed, likely because ownerPubKey is rotating.
+		!ecdsa.Verify(ownerPubKey, vhash, sig2.R, sig2.S) {
+		// Check sig2 in case ownerPubKey is rotating.
 		return errors.E(op, d.Name, errVerify)
 	}
 
