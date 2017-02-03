@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d132e659_0fc2285e",
+        "filename": "serverutil/shutdown.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-03T00:00:19Z",
+      "side": 0,
+      "message": "I think we want the error, since this is a condition we don\u0027t expect  to happen.",
+      "revId": "11d36a5f7c59f7a25c2b2106cbe31867f66474d2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
