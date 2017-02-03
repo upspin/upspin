@@ -7,12 +7,12 @@ package main
 import (
 	"net/http"
 
-	"upspin.io/key/gcp"
+	"upspin.io/key/server"
 	"upspin.io/log"
 )
 
 type logHandler struct {
-	logger gcp.Logger
+	logger server.Logger
 }
 
 func (h logHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
