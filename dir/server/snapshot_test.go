@@ -32,6 +32,7 @@ var defaultEnt = upspin.DirEntry{
 }
 
 func TestSnapshot(t *testing.T) {
+	dir := generatorInstance.(*server)
 	s, _ := newDirServerForTesting(t, canonicalUser)
 	snap, _ := newDirServerForTesting(t, snapshotUser)
 
@@ -60,7 +61,7 @@ func TestSnapshot(t *testing.T) {
 	mockTime.set(tm)
 
 	// Force a snapshot for all users who have a +snapshot tree.
-	err = snap.snapshotAll()
+	err = dir.snapshotAll()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -103,7 +104,7 @@ func TestSnapshot(t *testing.T) {
 
 	// Snapshot again and nothing happens, because the previous snapshot is
 	// recent enough.
-	err = snap.snapshotAll()
+	err = dir.snapshotAll()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -120,7 +121,7 @@ func TestSnapshot(t *testing.T) {
 	mockTime.addSecond(10 * 60 * 60)
 
 	// Run the snapshot loop again.
-	err = snap.snapshotAll()
+	err = dir.snapshotAll()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -136,7 +137,7 @@ func TestSnapshot(t *testing.T) {
 	// Add another three hours. It should not snapshot again yet.
 	mockTime.addSecond(3 * 60 * 60)
 
-	err = snap.snapshotAll()
+	err = dir.snapshotAll()
 	if err != nil {
 		t.Fatal(err)
 	}
