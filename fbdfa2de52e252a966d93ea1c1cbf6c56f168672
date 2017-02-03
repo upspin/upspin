@@ -16,6 +16,24 @@
       "revId": "fbdfa2de52e252a966d93ea1c1cbf6c56f168672",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "06d44895_a8ebac41",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 363,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-03T16:20:10Z",
+      "side": 1,
+      "message": "I put it here intentionally since it\u0027s only used here. But colocation is also a valid reason.\nDone.",
+      "parentUuid": "ba1dbda0_a524bc59",
+      "revId": "fbdfa2de52e252a966d93ea1c1cbf6c56f168672",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
