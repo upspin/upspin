@@ -12,7 +12,7 @@ import (
 	"net/http"
 
 	"upspin.io/cloud/https"
-	cloudLog "upspin.io/cloud/log"
+	//	cloudLog "upspin.io/cloud/log"
 	"upspin.io/config"
 	"upspin.io/errors"
 	"upspin.io/factotum"
@@ -20,7 +20,7 @@ import (
 	"upspin.io/key/inprocess"
 	"upspin.io/key/server"
 	"upspin.io/log"
-	"upspin.io/metric"
+	//	"upspin.io/metric"
 	"upspin.io/rpc/keyserver"
 	"upspin.io/upspin"
 
@@ -42,13 +42,14 @@ func main() {
 	flags.Parse("addr", "config", "https", "kind", "letscache", "log", "project", "serverconfig", "tls")
 
 	if flags.Project != "" {
-		cloudLog.Connect(flags.Project, serverName)
-		svr, err := metric.NewGCPSaver(flags.Project, "serverName", serverName)
-		if err != nil {
-			log.Fatalf("Can't start a metric saver for GCP project %q: %s", flags.Project, err)
-		} else {
-			metric.RegisterSaver(svr)
-		}
+		/*
+			cloudLog.Connect(flags.Project, serverName)
+			svr, err := metric.NewGCPSaver(flags.Project, "serverName", serverName)
+			if err != nil {
+				log.Fatalf("Can't start a metric saver for GCP project %q: %s", flags.Project, err)
+			} else {
+				metric.RegisterSaver(svr)
+			}*/
 	}
 
 	// All we need in the config is some user name. It does not need to be registered as a "real" user.

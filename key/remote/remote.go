@@ -11,7 +11,7 @@ import (
 
 	"upspin.io/bind"
 	"upspin.io/errors"
-	"upspin.io/key/usercache"
+	//	"upspin.io/key/usercache"
 	"upspin.io/log"
 	"upspin.io/rpc"
 	"upspin.io/upspin"
@@ -86,7 +86,7 @@ func (r *remote) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service, 
 		return nil, op.error(errors.Invalid, errors.Str("unrecognized transport"))
 	}
 
-	authClient, err := rpc.NewClient(config, e.NetAddr, rpc.Secure, upspin.Endpoint{})
+	authClient, err := rpc.NewClient(config, e.NetAddr, rpc.NoSecurity, upspin.Endpoint{})
 	if err != nil {
 		return nil, op.error(errors.IO, err)
 	}
@@ -104,7 +104,7 @@ const transport = upspin.Remote
 
 func init() {
 	r := &remote{} // uninitialized until Dial time.
-	bind.RegisterKeyServer(transport, usercache.Global(r))
+	bind.RegisterKeyServer(transport, r)
 }
 
 func (r *remote) opf(method string, format string, args ...interface{}) *operation {
