@@ -27,15 +27,15 @@ type server struct {
 }
 
 // New creates a new store cache that implements upspin.StoreServer.
-func New(cfg upspin.Config, cacheDir string, maxBytes int64) (upspin.StoreServer, error) {
-	c, err := newCache(path.Join(cacheDir, "storecache"), maxBytes)
+func New(cfg upspin.Config, cacheDir string, maxBytes int64, writeback bool) (upspin.StoreServer, func(upspin.Location), error) {
+	c, blockFlusher, err := newCache(cfg, path.Join(cacheDir, "storecache"), maxBytes, writeback)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	return &server{
 		cfg:   cfg,
 		cache: c,
-	}, nil
+	}, blockFlusher, nil
 }
 
 func (s *server) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service, error) {

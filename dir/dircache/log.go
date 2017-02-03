@@ -389,7 +389,9 @@ func (l *clog) readLogFile(fn string) error {
 	// First request must be the right version.
 	var e clogEntry
 	if err := e.read(l, rd); err != nil {
-		log.Info.Printf("%s: %s", op, err)
+		if err != io.EOF {
+			log.Info.Printf("%s: %s", op, err)
+		}
 		return err
 	}
 	if e.request != versionReq {
@@ -408,7 +410,6 @@ func (l *clog) readLogFile(fn string) error {
 			log.Info.Printf("%s: %s", op, err)
 			break
 		}
-		log.Info.Printf("From log %s", &e)
 		switch e.request {
 		case versionReq:
 			log.Info.Printf("%s: verson other than first record", op)
@@ -786,6 +787,7 @@ func (l *clog) updateLRU(e *clogEntry) {
 				ge.access = newVal
 			}
 		}
+	case obsoleteReq:
 	default:
 		log.Printf("unknown request type: %s", e)
 	}
