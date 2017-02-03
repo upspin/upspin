@@ -34,6 +34,24 @@
       "revId": "fbdfa2de52e252a966d93ea1c1cbf6c56f168672",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "be0c0b67_0c1494c0",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 363,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-03T20:54:51Z",
+      "side": 1,
+      "message": "My reasoning is that it\u0027s so similar to the glob with permissions, that keeping them side by side will make them easier to maintain.",
+      "parentUuid": "06d44895_a8ebac41",
+      "revId": "fbdfa2de52e252a966d93ea1c1cbf6c56f168672",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
