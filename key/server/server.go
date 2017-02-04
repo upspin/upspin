@@ -17,6 +17,7 @@ import (
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/log"
+	"upspin.io/metric"
 	"upspin.io/upspin"
 	"upspin.io/user"
 	"upspin.io/valid"
@@ -82,10 +83,14 @@ type userEntry struct {
 // Lookup implements upspin.KeyServer.
 func (s *server) Lookup(name upspin.UserName) (*upspin.User, error) {
 	const op = "key/server.Lookup"
+	m, span := metric.NewSpan(op)
+	defer m.Done()
+
 	if err := valid.UserName(name); err != nil {
 		return nil, errors.E(op, name, err)
 	}
-	entry, err := s.fetchUserEntry(op, name)
+
+	entry, err := s.fetchUserEntry(op, name, span)
 	if err != nil {
 		return nil, err
 	}
@@ -95,6 +100,9 @@ func (s *server) Lookup(name upspin.UserName) (*upspin.User, error) {
 // Put implements upspin.KeyServer.
 func (s *server) Put(u *upspin.User) error {
 	const op = "key/server.Put"
+	m, span := metric.NewSpan(op)
+	defer m.Done()
+
 	if s.user == "" {
 		return errors.E(op, errors.Internal, errors.Str("not bound to user"))
 	}
@@ -105,7 +113,7 @@ func (s *server) Put(u *upspin.User) error {
 	// Retrieve info about the user we want to Put.
 	isAdmin := false
 	newUser := false
-	entry, err := s.fetchUserEntry(op, u.Name)
+	entry, err := s.fetchUserEntry(op, u.Name, span)
 	switch {
 	case errors.Match(errors.E(errors.NotExist), err):
 		// OK; adding new user.
@@ -117,20 +125,25 @@ func (s *server) Put(u *upspin.User) error {
 		isAdmin = entry.IsAdmin
 	}
 
-	if err := s.canPut(op, u.Name, newUser); err != nil {
+	if err := s.canPut(op, u.Name, newUser, span); err != nil {
 		return err
 	}
 
-	if err := s.logger.PutAttempt(s.user, u); err != nil {
+	sp := span.StartSpan("logger.PutAttempt")
+	err = s.logger.PutAttempt(s.user, u)
+	sp.End()
+	if err != nil {
 		return errors.E(op, err)
 	}
 
-	err = s.putUserEntry(op, &userEntry{User: *u, IsAdmin: isAdmin})
-	if err != nil {
+	if err = s.putUserEntry(op, &userEntry{User: *u, IsAdmin: isAdmin}, span); err != nil {
 		return err
 	}
 
-	if err := s.logger.PutSuccess(s.user, u); err != nil {
+	sp = span.StartSpan("logger.PutSuccess")
+	err = s.logger.PutSuccess(s.user, u)
+	sp.End()
+	if err != nil {
 		return errors.E(op, err)
 	}
 
@@ -139,7 +152,10 @@ func (s *server) Put(u *upspin.User) error {
 
 // canPut reports whether the current logged-in user can Put the (new or
 // existing) target user.
-func (s *server) canPut(op string, target upspin.UserName, isTargetNew bool) error {
+func (s *server) canPut(op string, target upspin.UserName, isTargetNew bool, span *metric.Span) error {
+	sp := span.StartSpan("canPut")
+	defer sp.End()
+
 	name, suffix, domain, err := user.Parse(target)
 	if err != nil {
 		return errors.E(op, err)
@@ -162,7 +178,7 @@ func (s *server) canPut(op string, target upspin.UserName, isTargetNew bool) err
 		}
 	}
 	// Check whether the current user is a global admin.
-	entry, err := s.fetchUserEntry(op, s.user)
+	entry, err := s.fetchUserEntry(op, s.user, sp)
 	if err != nil {
 		return err
 	}
@@ -184,31 +200,48 @@ func (s *server) canPut(op string, target upspin.UserName, isTargetNew bool) err
 }
 
 // fetchUserEntry reads the user entry for a given user from permanent storage on GCP.
-func (s *server) fetchUserEntry(op string, name upspin.UserName) (*userEntry, error) {
+func (s *server) fetchUserEntry(op string, name upspin.UserName, span *metric.Span) (*userEntry, error) {
 	log.Debug.Printf("%s: %s", op, name)
+	sp := span.StartSpan("fetchUserEntry")
+	defer sp.End()
+
+	ss := sp.StartSpan("storage.Download")
 	b, err := s.storage.Download(string(name))
+	ss.End()
 	if err != nil {
 		log.Error.Printf("%s: error fetching %q: %v", op, name, err)
 		return nil, errors.E(op, name, err)
 	}
+
 	var entry userEntry
-	if err := json.Unmarshal(b, &entry); err != nil {
+	sp.StartSpan("json.Unmarshal")
+	err = json.Unmarshal(b, &entry)
+	sp.End()
+	if err != nil {
 		return nil, errors.E(op, errors.Invalid, name, err)
 	}
 	return &entry, nil
 }
 
 // putUserEntry writes the user entry for a user to permanent storage on GCP.
-func (s *server) putUserEntry(op string, entry *userEntry) error {
+func (s *server) putUserEntry(op string, entry *userEntry, span *metric.Span) error {
 	log.Debug.Printf("%s: %s", op, entry.User.Name)
+	sp := span.StartSpan("putUserEntry")
+	defer sp.End()
+
 	if entry == nil {
 		return errors.E(op, errors.Invalid, errors.Str("nil userEntry"))
 	}
+	ss := sp.StartSpan("json.Marshal")
 	b, err := json.Marshal(entry)
+	ss.End()
 	if err != nil {
 		return errors.E(op, errors.Invalid, err)
 	}
-	if _, err := s.storage.Put(string(entry.User.Name), b); err != nil {
+	ss = sp.StartSpan("storage.Put")
+	_, err = s.storage.Put(string(entry.User.Name), b)
+	ss.End()
+	if err != nil {
 		return errors.E(op, errors.IO, err)
 	}
 	return nil
