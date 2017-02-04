@@ -17,6 +17,7 @@ import (
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/log"
+	"upspin.io/metric"
 	"upspin.io/upspin"
 	"upspin.io/user"
 	"upspin.io/valid"
@@ -82,10 +83,16 @@ type userEntry struct {
 // Lookup implements upspin.KeyServer.
 func (s *server) Lookup(name upspin.UserName) (*upspin.User, error) {
 	const op = "key/server.Lookup"
+	m, span := metric.NewSpan(op)
+	defer m.Done()
+
 	if err := valid.UserName(name); err != nil {
 		return nil, errors.E(op, name, err)
 	}
+
+	sp := span.StartSpan("fetchUserEntry")
 	entry, err := s.fetchUserEntry(op, name)
+	sp.End()
 	if err != nil {
 		return nil, err
 	}
@@ -95,6 +102,9 @@ func (s *server) Lookup(name upspin.UserName) (*upspin.User, error) {
 // Put implements upspin.KeyServer.
 func (s *server) Put(u *upspin.User) error {
 	const op = "key/server.Put"
+	m, span := metric.NewSpan(op)
+	defer m.Done()
+
 	if s.user == "" {
 		return errors.E(op, errors.Internal, errors.Str("not bound to user"))
 	}
@@ -105,7 +115,9 @@ func (s *server) Put(u *upspin.User) error {
 	// Retrieve info about the user we want to Put.
 	isAdmin := false
 	newUser := false
+	sp := span.StartSpan("fetchUserEntry")
 	entry, err := s.fetchUserEntry(op, u.Name)
+	sp.End()
 	switch {
 	case errors.Match(errors.E(errors.NotExist), err):
 		// OK; adding new user.
@@ -117,20 +129,28 @@ func (s *server) Put(u *upspin.User) error {
 		isAdmin = entry.IsAdmin
 	}
 
-	if err := s.canPut(op, u.Name, newUser); err != nil {
+	if err := s.canPut(op, u.Name, newUser, span); err != nil {
 		return err
 	}
 
-	if err := s.logger.PutAttempt(s.user, u); err != nil {
+	sp = span.StartSpan("logger.PutAttempt")
+	err = s.logger.PutAttempt(s.user, u)
+	sp.End()
+	if err != nil {
 		return errors.E(op, err)
 	}
 
+	sp = span.StartSpan("putUserEntry")
 	err = s.putUserEntry(op, &userEntry{User: *u, IsAdmin: isAdmin})
+	sp.End()
 	if err != nil {
 		return err
 	}
 
-	if err := s.logger.PutSuccess(s.user, u); err != nil {
+	sp = span.StartSpan("logger.PutSuccess")
+	err = s.logger.PutSuccess(s.user, u)
+	sp.End()
+	if err != nil {
 		return errors.E(op, err)
 	}
 
@@ -139,7 +159,10 @@ func (s *server) Put(u *upspin.User) error {
 
 // canPut reports whether the current logged-in user can Put the (new or
 // existing) target user.
-func (s *server) canPut(op string, target upspin.UserName, isTargetNew bool) error {
+func (s *server) canPut(op string, target upspin.UserName, isTargetNew bool, span *metric.Span) error {
+	sp := span.StartSpan("canPut")
+	defer sp.End()
+
 	name, suffix, domain, err := user.Parse(target)
 	if err != nil {
 		return errors.E(op, err)
@@ -162,7 +185,9 @@ func (s *server) canPut(op string, target upspin.UserName, isTargetNew bool) err
 		}
 	}
 	// Check whether the current user is a global admin.
+	ss := sp.StartSpan("fetchUserEntry")
 	entry, err := s.fetchUserEntry(op, s.user)
+	ss.End()
 	if err != nil {
 		return err
 	}
@@ -192,7 +217,7 @@ func (s *server) fetchUserEntry(op string, name upspin.UserName) (*userEntry, er
 		return nil, errors.E(op, name, err)
 	}
 	var entry userEntry
-	if err := json.Unmarshal(b, &entry); err != nil {
+	if err = json.Unmarshal(b, &entry); err != nil {
 		return nil, errors.E(op, errors.Invalid, name, err)
 	}
 	return &entry, nil
@@ -208,7 +233,7 @@ func (s *server) putUserEntry(op string, entry *userEntry) error {
 	if err != nil {
 		return errors.E(op, errors.Invalid, err)
 	}
-	if _, err := s.storage.Put(string(entry.User.Name), b); err != nil {
+	if _, err = s.storage.Put(string(entry.User.Name), b); err != nil {
 		return errors.E(op, errors.IO, err)
 	}
 	return nil
