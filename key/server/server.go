@@ -23,6 +23,7 @@ import (
 
 	// We use GCS as the backing for our data.
 	_ "upspin.io/cloud/storage/gcs"
+	"upspin.io/metric"
 )
 
 // New initializes an instance of the key service.
@@ -82,10 +83,17 @@ type userEntry struct {
 // Lookup implements upspin.KeyServer.
 func (s *server) Lookup(name upspin.UserName) (*upspin.User, error) {
 	const op = "key/server.Lookup"
+	m, span := metric.NewSpan(op)
+	defer m.Done()
+
+	sp := span.StartSpan("validateName")
 	if err := valid.UserName(name); err != nil {
 		return nil, errors.E(op, name, err)
 	}
-	entry, err := s.fetchUserEntry(op, name)
+	sp.End()
+	sp = span.StartSpan("fetchUserEntry")
+	defer sp.End()
+	entry, err := s.fetchUserEntry(op, name, sp)
 	if err != nil {
 		return nil, err
 	}
@@ -95,17 +103,24 @@ func (s *server) Lookup(name upspin.UserName) (*upspin.User, error) {
 // Put implements upspin.KeyServer.
 func (s *server) Put(u *upspin.User) error {
 	const op = "key/server.Put"
+	m, span := metric.NewSpan(op)
+	defer m.Done()
+
+	sp := span.StartSpan("valid.User")
 	if s.user == "" {
 		return errors.E(op, errors.Internal, errors.Str("not bound to user"))
 	}
 	if err := valid.User(u); err != nil {
 		return errors.E(op, err)
 	}
+	sp.End()
+	sp = span.StartSpan("fetchUserEntry")
 
 	// Retrieve info about the user we want to Put.
 	isAdmin := false
 	newUser := false
-	entry, err := s.fetchUserEntry(op, u.Name)
+	entry, err := s.fetchUserEntry(op, u.Name, span)
+	sp.End()
 	switch {
 	case errors.Match(errors.E(errors.NotExist), err):
 		// OK; adding new user.
@@ -116,8 +131,8 @@ func (s *server) Put(u *upspin.User) error {
 		// User exists.
 		isAdmin = entry.IsAdmin
 	}
-
-	if err := s.canPut(op, u.Name, newUser); err != nil {
+	sp = span.StartSpan("canPut")
+	if err := s.canPut(op, u.Name, newUser, sp); err != nil {
 		return err
 	}
 
@@ -139,7 +154,7 @@ func (s *server) Put(u *upspin.User) error {
 
 // canPut reports whether the current logged-in user can Put the (new or
 // existing) target user.
-func (s *server) canPut(op string, target upspin.UserName, isTargetNew bool) error {
+func (s *server) canPut(op string, target upspin.UserName, isTargetNew bool, span *metric.Span) error {
 	name, suffix, domain, err := user.Parse(target)
 	if err != nil {
 		return errors.E(op, err)
@@ -162,7 +177,7 @@ func (s *server) canPut(op string, target upspin.UserName, isTargetNew bool) err
 		}
 	}
 	// Check whether the current user is a global admin.
-	entry, err := s.fetchUserEntry(op, s.user)
+	entry, err := s.fetchUserEntry(op, s.user, span)
 	if err != nil {
 		return err
 	}
@@ -175,7 +190,9 @@ func (s *server) canPut(op string, target upspin.UserName, isTargetNew bool) err
 		// Even domain admins cannot update their users.
 		return errors.E(op, errors.Exist, s.user)
 	}
+	sp := span.StartSpan("verifyOwns")
 	err = s.verifyOwns(s.user, entry.User.PublicKey, domain)
+	sp.End()
 	if err == nil {
 		// User owns the domain for the target user.
 		return nil
@@ -184,15 +201,20 @@ func (s *server) canPut(op string, target upspin.UserName, isTargetNew bool) err
 }
 
 // fetchUserEntry reads the user entry for a given user from permanent storage on GCP.
-func (s *server) fetchUserEntry(op string, name upspin.UserName) (*userEntry, error) {
+func (s *server) fetchUserEntry(op string, name upspin.UserName, span *metric.Span) (*userEntry, error) {
 	log.Debug.Printf("%s: %s", op, name)
+	sp := span.StartSpan("storage.Download")
 	b, err := s.storage.Download(string(name))
+	sp.End()
 	if err != nil {
 		log.Error.Printf("%s: error fetching %q: %v", op, name, err)
 		return nil, errors.E(op, name, err)
 	}
+	sp = span.StartSpan("json.Unmarshal")
 	var entry userEntry
-	if err := json.Unmarshal(b, &entry); err != nil {
+	err = json.Unmarshal(b, &entry)
+	sp.End()
+	if err != nil {
 		return nil, errors.E(op, errors.Invalid, name, err)
 	}
 	return &entry, nil
