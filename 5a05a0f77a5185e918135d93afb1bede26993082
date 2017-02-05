@@ -1,0 +1,293 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4a1964a3_b2bd2c9a",
+        "filename": "store/storecache/cache.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-05T23:14:41Z",
+      "side": 1,
+      "message": "Is this comment still accurate?",
+      "revId": "5a05a0f77a5185e918135d93afb1bede26993082",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f27b0e2c_26f7228a",
+        "filename": "store/storecache/cache.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-05T23:14:41Z",
+      "side": 1,
+      "message": "should the condition above be !\u003d nil ?",
+      "revId": "5a05a0f77a5185e918135d93afb1bede26993082",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "84042d0d_a8a6d817",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-05T23:14:41Z",
+      "side": 1,
+      "message": "should this be a flag? seems like a pretty generic name for a top level global too\nwriteBackWriters ?",
+      "revId": "5a05a0f77a5185e918135d93afb1bede26993082",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "38c0fede_eb6b863a",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-05T23:14:41Z",
+      "side": 1,
+      "message": "put this in a function\n\nqueue, err :\u003d readQueue(logName)",
+      "revId": "5a05a0f77a5185e918135d93afb1bede26993082",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "90c8019c_400fa786",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-05T23:14:41Z",
+      "side": 1,
+      "message": "should differentiate and handle !os.IsNotExist errors",
+      "revId": "5a05a0f77a5185e918135d93afb1bede26993082",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0e146344_f9fa989a",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-05T23:14:41Z",
+      "side": 1,
+      "message": "errors reading the log seem pretty serious, as it implies data loss\nshould the program crash on startup?\nwe could offer a -recover flag to just ignore bad log lines, should the user choose to do that",
+      "revId": "5a05a0f77a5185e918135d93afb1bede26993082",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1210ef2e_1bd39f6c",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-05T23:14:41Z",
+      "side": 1,
+      "message": "I\u0027d put the reference last and then use strings.SplitN(s, \" \", 3)\neven though references must only be printable characters (not spaces), it seems prudent to put the most arbitrary field last.",
+      "revId": "5a05a0f77a5185e918135d93afb1bede26993082",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "612f3388_49217bf4",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-05T23:14:41Z",
+      "side": 1,
+      "message": "do this comparison outside the switch?",
+      "revId": "5a05a0f77a5185e918135d93afb1bede26993082",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2fb97356_5cbd8398",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-05T23:14:41Z",
+      "side": 1,
+      "message": "why not just do this first? it will be a noop if sc.dir exists already, and if it returns an error then we get a good diagnostic",
+      "revId": "5a05a0f77a5185e918135d93afb1bede26993082",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "55546640_008120fd",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-05T23:14:41Z",
+      "side": 1,
+      "message": "some context please",
+      "revId": "5a05a0f77a5185e918135d93afb1bede26993082",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5877af45_cc0707af",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-05T23:14:41Z",
+      "side": 1,
+      "message": "maybe we shouldn\u0027t retry for non-transient errors?\nperhaps add a TODO to decide on the conditions for retrying",
+      "revId": "5a05a0f77a5185e918135d93afb1bede26993082",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6bf84ac9_d45bde5b",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-05T23:14:41Z",
+      "side": 1,
+      "message": "this could happen in a goroutine, so that the writer can get on with writing more stuff while this reference fails",
+      "revId": "5a05a0f77a5185e918135d93afb1bede26993082",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "20fbee53_5716fa89",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-05T23:14:41Z",
+      "side": 1,
+      "message": "again, this seems really bad, and implies data loss. perhaps this should be treated as a more serious condition?",
+      "revId": "5a05a0f77a5185e918135d93afb1bede26993082",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3536e40b_a7dfc040",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-05T23:14:41Z",
+      "side": 1,
+      "message": "these are already logged at the call site, no need for them here",
+      "revId": "5a05a0f77a5185e918135d93afb1bede26993082",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c83d2f07_355d6a63",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-05T23:14:41Z",
+      "side": 1,
+      "message": "Scary",
+      "revId": "5a05a0f77a5185e918135d93afb1bede26993082",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "488c1b48_28ee7234",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-05T23:14:41Z",
+      "side": 1,
+      "message": "log.Error?",
+      "revId": "5a05a0f77a5185e918135d93afb1bede26993082",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "04229440_2c6761d1",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-05T23:14:41Z",
+      "side": 1,
+      "message": "log.Error ?",
+      "revId": "5a05a0f77a5185e918135d93afb1bede26993082",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
