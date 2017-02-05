@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3ab80026_5fe1634e",
+        "filename": "key/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-05T22:26:16Z",
+      "side": 1,
+      "message": "move to the block above",
+      "revId": "c3e45029d645f52a1a5216ba828c49b082c7ddb3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "710f7cd6_ea53370c",
+        "filename": "key/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-05T22:26:16Z",
+      "side": 1,
+      "message": "why not do this inside fetchUserEntry?",
+      "revId": "c3e45029d645f52a1a5216ba828c49b082c7ddb3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2ced0aeb_6983d4c5",
+        "filename": "key/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-05T22:26:16Z",
+      "side": 1,
+      "message": "seems like you never finished with this function",
+      "revId": "c3e45029d645f52a1a5216ba828c49b082c7ddb3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "06e05689_2cea2549",
+        "filename": "key/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-05T22:26:16Z",
+      "side": 1,
+      "message": "you have metrics for valid.UserName but not this?",
+      "revId": "c3e45029d645f52a1a5216ba828c49b082c7ddb3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "751bee2f_6877f544",
+        "filename": "key/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-05T22:26:16Z",
+      "side": 1,
+      "message": "nor this?",
+      "revId": "c3e45029d645f52a1a5216ba828c49b082c7ddb3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0f98073b_81359b73",
+        "filename": "key/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-05T22:26:16Z",
+      "side": 1,
+      "message": "this seems about as noteworthy as valid.UserName, but it\u0027s not tracked\nmake a decision about the level of metrics you need and be consistent",
+      "revId": "c3e45029d645f52a1a5216ba828c49b082c7ddb3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a8074ccb_df7781db",
+        "filename": "key/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-05T22:26:16Z",
+      "side": 1,
+      "message": "no metrics here?",
+      "revId": "c3e45029d645f52a1a5216ba828c49b082c7ddb3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
