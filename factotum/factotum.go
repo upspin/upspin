@@ -69,10 +69,22 @@ func NewFromDir(dir string) (upspin.Factotum, error) {
 	}
 	pubBytes = stripCR(pubBytes)
 
-	// TODO(ehg) symmSecret is not intended to be the final design.
-	symmSecret, err = readFile(op, dir, "symmsecret.upspinkey")
+	secret, err := readFile(op, dir, "symmsecret.upspinkey")
 	if err != nil && !errors.Match(errors.E(errors.NotExist), err) {
 		return nil, errors.E(op, err)
+	}
+	// TODO(ehg) symmSecret, a global, is not intended to be the final
+	// destination for this factotum's secret key.
+
+	// Currently, because it is global we do not overwrite it and warn if
+	// we're about to nil it out once it's set.
+	if secret != nil {
+		if symmSecret != nil {
+			panic(op + ": Resetting symmSecret for dir  " + dir)
+		}
+		symmSecret = secret
+	} else if symmSecret != nil { // secret == nil
+		log.Debug.Printf("%s: Keeping old symmSecret, but current user has no symmSecret in %s", op, dir)
 	}
 
 	// Read older key pairs.
