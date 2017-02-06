@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Command webspin is an HTTP frontend that serves Upspin content
-// accessible to the current user (as configured by upspin/config).
 package main
 
 import (
@@ -13,8 +11,6 @@ import (
 	"strings"
 
 	"upspin.io/client"
-	"upspin.io/config"
-	"upspin.io/flags"
 	"upspin.io/log"
 	"upspin.io/path"
 	"upspin.io/upspin"
@@ -22,33 +18,20 @@ import (
 	// Load useful packers
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
-
 	// Load required transports
-	"upspin.io/transports"
 )
 
-func main() {
-	flags.Parse("https")
-	http.Handle("/", newServer())
-	log.Fatal(http.ListenAndServe(flags.HTTPSAddr, nil))
-}
-
-type server struct {
+type web struct {
 	cli upspin.Client
 }
 
-func newServer() *server {
-	cfg, err := config.InitConfig(nil)
-	if err != nil {
-		log.Fatal(err)
-	}
-	transports.Init(cfg)
-	return &server{cli: client.New(cfg)}
+func newWeb(cfg upspin.Config) http.Handler {
+	return &web{cli: client.New(cfg)}
 }
 
-func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (s *web) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/" {
-		fmt.Fprintln(w, "Hello")
+		fmt.Fprintln(w, "Hello, upspin")
 		return
 	}
 
