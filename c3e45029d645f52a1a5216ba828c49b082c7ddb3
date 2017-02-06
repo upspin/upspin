@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "c9395eb2_65ecb591",
+        "filename": "key/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-06T17:34:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3ab80026_5fe1634e",
+      "revId": "c3e45029d645f52a1a5216ba828c49b082c7ddb3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "710f7cd6_ea53370c",
         "filename": "key/server/server.go",
         "patchSetId": 2
@@ -33,6 +51,24 @@
       "revId": "c3e45029d645f52a1a5216ba828c49b082c7ddb3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b567aae8_aa1e79a9",
+        "filename": "key/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-06T17:34:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "710f7cd6_ea53370c",
+      "revId": "c3e45029d645f52a1a5216ba828c49b082c7ddb3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "f2add64d_2e2835ae",
+        "filename": "key/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-06T17:34:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2ced0aeb_6983d4c5",
+      "revId": "c3e45029d645f52a1a5216ba828c49b082c7ddb3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "06e05689_2cea2549",
         "filename": "key/server/server.go",
         "patchSetId": 2
@@ -67,6 +121,24 @@
       "revId": "c3e45029d645f52a1a5216ba828c49b082c7ddb3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "aae200b4_5363e31a",
+        "filename": "key/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-06T17:34:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "06e05689_2cea2549",
+      "revId": "c3e45029d645f52a1a5216ba828c49b082c7ddb3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "9949ef16_16e2aeec",
+        "filename": "key/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-06T17:34:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "751bee2f_6877f544",
+      "revId": "c3e45029d645f52a1a5216ba828c49b082c7ddb3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0f98073b_81359b73",
         "filename": "key/server/server.go",
         "patchSetId": 2
@@ -104,6 +194,24 @@
     },
     {
       "key": {
+        "uuid": "2b5ff759_3f5dad64",
+        "filename": "key/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-06T17:34:20Z",
+      "side": 1,
+      "message": "Done (you\u0027re right, neither is worth tracking. They show up as 0ms and likely always will. Removed).",
+      "parentUuid": "0f98073b_81359b73",
+      "revId": "c3e45029d645f52a1a5216ba828c49b082c7ddb3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a8074ccb_df7781db",
         "filename": "key/server/server.go",
         "patchSetId": 2
@@ -115,6 +223,24 @@
       "writtenOn": "2017-02-05T22:26:16Z",
       "side": 1,
       "message": "no metrics here?",
+      "revId": "c3e45029d645f52a1a5216ba828c49b082c7ddb3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c2aaf235_ecf1630d",
+        "filename": "key/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-06T17:34:20Z",
+      "side": 1,
+      "message": "This would not be meaningful. A DNS lookup can take variable amounts of time because some names will be cached, others will be stored in close-by servers and some might be 20 hops away in very remote and uncacheable servers. \n\nAlso, there\u0027s no value in tracking this in aggregate (the average lookup does not matter). And for debugging a single request it\u0027s best to use cmdline tools or one-off instrumentation (trace records are not kept for very long to be helpful with single requests).\n\nI\u0027ve removed the span around verifyOwns, but if you really think we should measure it, I can put it back there. Plumbing a  span here would just pollute the code with more metrics.",
+      "parentUuid": "a8074ccb_df7781db",
       "revId": "c3e45029d645f52a1a5216ba828c49b082c7ddb3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
