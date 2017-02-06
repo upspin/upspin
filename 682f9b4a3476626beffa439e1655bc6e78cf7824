@@ -33,6 +33,24 @@
       "revId": "682f9b4a3476626beffa439e1655bc6e78cf7824",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4c561c9d_19935c43",
+        "filename": "cmd/upspinserver/web.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-06T21:38:58Z",
+      "side": 1,
+      "message": "In time it will say something more informative.\nMost likely it will link to upspin.io.",
+      "parentUuid": "59408e60_46857b34",
+      "revId": "682f9b4a3476626beffa439e1655bc6e78cf7824",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
