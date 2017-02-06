@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "659bd90a_208b9fb7",
+        "filename": "key/server/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-06T21:03:43Z",
+      "side": 1,
+      "message": "these are also likely to take 0ms almost all the time, I wouldn\u0027t bother\nthat being the case, it\u0027s probably not worth wrapping storage.Get and storage.Put either, as 99.9% of the time spent in fetchUserEntry and putUserEntry is just making those calls. the metrics for those functions should be sufficient",
+      "revId": "ec61cdc184a74d55b991ba333c9dc0dcb4942ecf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
