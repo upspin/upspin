@@ -55,22 +55,24 @@ var (
 func main() {
 	flags.Parse("https", "log")
 
-	cfg, err := initServer()
+	server, cfg, err := initServer()
 	if err == noConfig {
 		log.Print("Configuration file not found. Running in setup mode.")
-		http.HandleFunc("/", setupHandler)
+		http.Handle("/", &setupHandler{})
 	} else if err != nil {
 		log.Fatal(err)
+	} else {
+		http.Handle("/", newWeb(cfg))
 	}
 
 	// Set up HTTPS server.
 	opt := &https.Options{
 		LetsEncryptCache: *letsPath,
 	}
-	if cfg != nil {
-		host, _, err := net.SplitHostPort(string(cfg.Addr))
+	if server != nil {
+		host, _, err := net.SplitHostPort(string(server.Addr))
 		if err != nil {
-			log.Printf("Error parsing addr from config %q: %v", cfg.Addr, err)
+			log.Printf("Error parsing addr from config %q: %v", server.Addr, err)
 			log.Printf("Warning: Let's Encrypt certificates will be fetched for any host.")
 		} else {
 			opt.LetsEncryptHosts = []string{host}
@@ -81,12 +83,12 @@ func main() {
 
 var noConfig = errors.Str("no configuration")
 
-func initServer() (*ServerConfig, error) {
+func initServer() (*ServerConfig, upspin.Config, error) {
 	serverConfig, err := readServerConfig()
 	if os.IsNotExist(err) {
-		return nil, noConfig
+		return nil, nil, noConfig
 	} else if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", filepath.Join(*cfgPath, "serviceaccount.json"))
@@ -96,7 +98,7 @@ func initServer() (*ServerConfig, error) {
 
 	f, err := factotum.NewFromDir(*cfgPath)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	cfg = config.SetFactotum(cfg, f)
 
@@ -113,25 +115,25 @@ func initServer() (*ServerConfig, error) {
 	// Set up StoreServer.
 	store, err := storeServer.New("gcpBucketName="+serverConfig.Bucket, "defaultACL=publicRead")
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	store, err = perm.WrapStore(storeCfg, ready, store)
 	if err != nil {
-		return nil, fmt.Errorf("error wrapping store: %s", err)
+		return nil, nil, fmt.Errorf("error wrapping store: %s", err)
 	}
 
 	// Set up DirServer.
 	logDir := filepath.Join(*cfgPath, "dirserver-logs")
 	if err := os.MkdirAll(logDir, 0700); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	dir, err := dirServer.New(dirCfg, "userCacheSize=1000", "logDir="+logDir)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	dir, err = perm.WrapDir(dirCfg, ready, serverConfig.User, dir)
 	if err != nil {
-		return nil, fmt.Errorf("Can't wrap DirServer monitoring %s: %s", flags.StoreServerUser, err)
+		return nil, nil, fmt.Errorf("Can't wrap DirServer monitoring %s: %s", flags.StoreServerUser, err)
 	}
 
 	// Set up RPC server.
@@ -147,21 +149,28 @@ func initServer() (*ServerConfig, error) {
 			log.Printf("Error creating Writers file: %v", err)
 		}
 	}()
-	return serverConfig, nil
+	return serverConfig, cfg, nil
 }
 
-var (
-	setupDone = false
-	setupMu   sync.Mutex
-)
+type setupHandler struct {
+	mu   sync.Mutex
+	done bool
+	web  http.Handler
+}
 
-func setupHandler(w http.ResponseWriter, r *http.Request) {
-	setupMu.Lock()
-	defer setupMu.Unlock()
-	if setupDone {
-		http.NotFound(w, r)
+func (h *setupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	h.mu.Lock()
+	if h.done {
+		web := h.web
+		h.mu.Unlock()
+		if web != nil {
+			web.ServeHTTP(w, r)
+		} else {
+			http.NotFound(w, r)
+		}
 		return
 	}
+	defer h.mu.Unlock()
 
 	switch r.URL.Path {
 	case "/":
@@ -202,13 +211,15 @@ func setupHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	if _, err := initServer(); err != nil {
+	_, cfg, err := initServer()
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	fmt.Fprintf(w, "OK")
 
-	setupDone = true
+	h.done = true
+	h.web = newWeb(cfg)
 }
 
 func setupWriters(cfg upspin.Config) error {
