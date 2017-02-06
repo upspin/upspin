@@ -2,8 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Command webspin is an HTTP frontend that serves Upspin content
-// accessible to the current user (as configured by upspin/config).
+// TODO(adg,andybons): make the HTML pages prettier
+
 package main
 
 import (
@@ -13,8 +13,6 @@ import (
 	"strings"
 
 	"upspin.io/client"
-	"upspin.io/config"
-	"upspin.io/flags"
 	"upspin.io/log"
 	"upspin.io/path"
 	"upspin.io/upspin"
@@ -22,33 +20,24 @@ import (
 	// Load useful packers
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
-
 	// Load required transports
-	"upspin.io/transports"
 )
 
-func main() {
-	flags.Parse("https")
-	http.Handle("/", newServer())
-	log.Fatal(http.ListenAndServe(flags.HTTPSAddr, nil))
-}
-
-type server struct {
+type web struct {
+	cfg upspin.Config
 	cli upspin.Client
 }
 
-func newServer() *server {
-	cfg, err := config.InitConfig(nil)
-	if err != nil {
-		log.Fatal(err)
+func newWeb(cfg upspin.Config) http.Handler {
+	return &web{
+		cfg: cfg,
+		cli: client.New(cfg),
 	}
-	transports.Init(cfg)
-	return &server{cli: client.New(cfg)}
 }
 
-func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (s *web) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/" {
-		fmt.Fprintln(w, "Hello")
+		fmt.Fprintln(w, "Hello, upspin")
 		return
 	}
 
@@ -56,6 +45,14 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	p, err := path.Parse(urlName)
 	if err != nil {
 		http.Error(w, "Parse: "+err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// The server user can always see its own tree,
+	// so prevent access entirely from the web interface.
+	if p.User() == s.cfg.UserName() {
+		code := http.StatusForbidden
+		http.Error(w, http.StatusText(code), code)
 		return
 	}
 
@@ -68,11 +65,13 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	des, err := s.cli.Glob(string(name))
 	if err != nil {
+		// TODO(adg): use correct status code for 'information withheld'
 		http.Error(w, "Glob: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
 	if len(des) == 0 {
-		http.Error(w, "not found", http.StatusNotFound)
+		code := http.StatusNotFound
+		http.Error(w, http.StatusText(code), code)
 		return
 	}
 
@@ -86,6 +85,7 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			d.Dir = des[0]
 			d.Content, err = s.cli.Glob(string(name) + "/*")
 			if err != nil {
+				// TODO(adg): use correct status code for 'information withheld'
 				http.Error(w, "Glob: "+err.Error(), http.StatusInternalServerError)
 				return
 			}
@@ -102,6 +102,7 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Serve the file.
 	data, err := s.cli.Get(name)
 	if err != nil {
+		// TODO(adg): use correct status code for 'information withheld'
 		http.Error(w, "Get: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
