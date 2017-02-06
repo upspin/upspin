@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "fbebe05e_bb185202",
+        "filename": "access/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-06T19:33:00Z",
+      "side": 1,
+      "message": "I know, but all will be equal to either \"all\" or \"all@upspin.io\" because you tested it with isAll(user). It seems you could save yourself this []byte if you wanted. But passing a bool is not much savings, so ok.",
+      "parentUuid": "3f954e2b_b3bf9d7f",
+      "revId": "db4774056c283ae516e4bdbfa32840d1d7b74eb2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "88e5ecde_939acc6d",
         "filename": "access/access.go",
         "patchSetId": 1
