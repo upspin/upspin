@@ -28,9 +28,9 @@ import (
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/eeintegrity"
 	_ "upspin.io/pack/plain"
+	_ "upspin.io/pack/symm"
 
 	keyserver "upspin.io/key/inprocess"
-
 	storeserver "upspin.io/store/inprocess"
 )
 
@@ -65,6 +65,8 @@ func TestMakeRoot(t *testing.T) {
 		t.Fatal(err)
 	}
 	deExpected := *de
+	deExpected.Writer = serverName
+	deExpected.Packing = upspin.SymmPack
 	deExpected.Sequence = upspin.SeqBase | (de.Sequence ^ upspin.SeqVersion(de.Sequence))
 	err = checkDirEntry("TestMakeRoot", deLookup, &deExpected)
 	if err != nil {
@@ -154,6 +156,8 @@ func TestMakeDirectory(t *testing.T) {
 		t.Errorf("de2.Att = %v, want = %v", de2.Attr, upspin.AttrDirectory)
 	}
 	deExpected := *de
+	deExpected.Writer = serverName
+	deExpected.Packing = upspin.SymmPack
 	deExpected.Sequence = upspin.SeqBase
 	err = checkDirEntry("TestMakeDirectory", de2, &deExpected)
 	if err != nil {
@@ -540,12 +544,14 @@ func TestGlob(t *testing.T) {
 		if got, want := e.Name, expected[i]; got != want {
 			t.Errorf("%d: e.Name = %q, want = %q", i, got, want)
 		}
-		// Since both dirs contain subdirs, verify that Blocks and
-		// Packdata are not nil, because we have Read rights.
+		// Since both dirs contain subdirs, verify that Blocks is not
+		// nil, because we have Read rights.
 		if len(e.Blocks) == 0 {
 			t.Errorf("len(e.Blocks) = %d, want > 0", len(e.Blocks))
 		}
-		if len(e.Packdata) == 0 {
+		// Packadata shouldn't be nil unless Packing is Plain or
+		// SymmSecret.
+		if e.Packing != upspin.PlainPack && e.Packing != upspin.SymmPack && len(e.Packdata) == 0 {
 			t.Errorf("len(e.Packdata) = %d, want > 0", len(e.Packdata))
 		}
 	}
@@ -904,9 +910,7 @@ func makeDirectory(s *server, name upspin.PathName) (*upspin.DirEntry, error) {
 		Name:       parsed.Path(),
 		SignedName: parsed.Path(),
 		Attr:       upspin.AttrDirectory,
-		Packing:    s.serverConfig.Packing(),
-		Writer:     serverName,
-		Sequence:   upspin.SeqIgnore,
+		// Mimic what the client does -- it does not include any other field.
 	}
 	return s.Put(entry)
 }
@@ -1017,7 +1021,7 @@ func newDirServerForTesting(t *testing.T, userName upspin.UserName) (*server, up
 	}
 	ctx := config.New()
 	ctx = config.SetUserName(ctx, serverName)
-	ctx = config.SetPacking(ctx, upspin.EEPack)
+	ctx = config.SetPacking(ctx, upspin.SymmPack)
 	ctx = config.SetFactotum(ctx, f)
 	ctx = config.SetKeyEndpoint(ctx, endpointInProcess)
 	ctx = config.SetStoreEndpoint(ctx, endpointInProcess)
@@ -1044,6 +1048,7 @@ func newDirServerForTesting(t *testing.T, userName upspin.UserName) (*server, up
 	// to have a wrapped key.
 	userCtx := config.New()
 	userCtx = config.SetUserName(userCtx, userName)
+	userCtx = config.SetPacking(userCtx, upspin.EEPack)
 	userCtx = config.SetDirEndpoint(userCtx, ctx.DirEndpoint())
 	userCtx = config.SetStoreEndpoint(userCtx, endpointInProcess)
 	f, err = factotum.NewFromDir(repo("key/testdata/bob"))
