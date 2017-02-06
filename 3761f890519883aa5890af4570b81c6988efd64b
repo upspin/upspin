@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a02f36b0_e79e0fcb",
+        "filename": "cmd/upspinserver/web.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-02-06T22:12:07Z",
+      "side": 1,
+      "message": "any reason not to just inline these codes directly?\n\nhttp.Error(w, http.StatusText(http.StatusForbidden), http.StatusForbidden)",
+      "range": {
+        "startLine": 55,
+        "startChar": 32,
+        "endLine": 55,
+        "endChar": 36
+      },
+      "revId": "3761f890519883aa5890af4570b81c6988efd64b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
