@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "73b4c50e_81f5ebb6",
+        "filename": "access/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-06T19:18:15Z",
+      "side": 1,
+      "message": "MAybe you should name the returned values because \"returned user name\" could be in path.Parsed. Either that or change []byte to upspin.Username. Or clarify this sentence a bit more.\n\nBut, also, other than in an error message on line 526 below, you don\u0027t seem to make use of the contents of this returned value. You only test if it\u0027s not nil.",
+      "revId": "db4774056c283ae516e4bdbfa32840d1d7b74eb2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "88e5ecde_939acc6d",
+        "filename": "access/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 526,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-06T19:18:15Z",
+      "side": 1,
+      "message": "Just print \"all\" and drop the all argument. You only test whether it\u0027s not nil everywhere else. No need for it to be a []byte.",
+      "revId": "db4774056c283ae516e4bdbfa32840d1d7b74eb2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
