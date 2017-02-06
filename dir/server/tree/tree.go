@@ -223,7 +223,7 @@ func (t *Tree) put(p path.Parsed, de *upspin.DirEntry) (*node, []*watcher, error
 // element of dstDir must not yet exist. dstDir must not cross a link nor be
 // the root directory. It returns the newly put entry.
 func (t *Tree) PutDir(dstDir path.Parsed, de *upspin.DirEntry) (*upspin.DirEntry, error) {
-	const op = "dir/server/tree.CopyDir"
+	const op = "dir/server/tree.PutDir"
 	t.mu.Lock()
 	defer t.mu.Unlock()
 

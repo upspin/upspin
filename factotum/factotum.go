@@ -70,9 +70,19 @@ func NewFromDir(dir string) (upspin.Factotum, error) {
 	pubBytes = stripCR(pubBytes)
 
 	// TODO(ehg) symmSecret is not intended to be the final design.
-	symmSecret, err = readFile(op, dir, "symmsecret.upspinkey")
+	secret, err := readFile(op, dir, "symmsecret.upspinkey")
 	if err != nil && !errors.Match(errors.E(errors.NotExist), err) {
 		return nil, errors.E(op, err)
+	}
+	// Because symmSecret is global (see TODO above), do not overwrite it
+	// without a warning and never nil it out once it's set.
+	if secret != nil {
+		if symmSecret != nil {
+			log.Printf("Resetting previously set symmSecret")
+		}
+		symmSecret = secret
+	} else if symmSecret != nil { // secret == nil
+		log.Printf("Keeping old symmSecret, but current user has no symmSecret")
 	}
 
 	// Read older key pairs.
