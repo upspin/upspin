@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "59408e60_46857b34",
+        "filename": "cmd/upspinserver/web.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-06T16:16:04Z",
+      "side": 1,
+      "message": "This should be, ideally, an input box  that takes  one to their destination. At the very least, it should contain some helper text on how to manipulate the URL directly.",
+      "revId": "682f9b4a3476626beffa439e1655bc6e78cf7824",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
