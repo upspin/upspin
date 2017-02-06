@@ -244,6 +244,24 @@
       "revId": "c3e45029d645f52a1a5216ba828c49b082c7ddb3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "47ca6c3c_7d84b547",
+        "filename": "key/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-06T21:03:43Z",
+      "side": 1,
+      "message": "IMO we should add metrics to anything that makes network calls,\nbut I\u0027m happy for you to leave it out here considering Put will likely not be a bottleneck.\nWe\u0027re really more interested in Get.",
+      "parentUuid": "c2aaf235_ecf1630d",
+      "revId": "c3e45029d645f52a1a5216ba828c49b082c7ddb3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
