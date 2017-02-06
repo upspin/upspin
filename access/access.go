@@ -43,13 +43,16 @@ const (
 	// grants access to everyone who can authenticate to the Upspin system.
 	// This constant can be used in Access files, but will always be expanded
 	// to the the full name ("all@upspin.io") when returned from Access.Users
-	// and such. All is not allowed to be present in Group files.
+	// and such.
+	// If it is present with the Read or "*" rights, it must be the only read write
+	// explicitly granted. (Another user can have "*" rights.)
+	// All is not allowed to be present in Group files.
 	All = "all" // Case is ignored, so "All", "ALL", etc. also work.
 
 	// AllUsers is a reserved Upspin user name. Its appearance in a user list
 	// grants access to everyone who can authenticate to the Upspin system.
 	// It is the user name that is substituted for the shorthand "all" in a user
-	// list. AllUsers is not allowed to be present in Group files.
+	// list. See the comment about All for more details.
 	AllUsers upspin.UserName = "all@upspin.io"
 )
 
@@ -129,6 +132,9 @@ type Access struct {
 	// domain is the domain.com part of the user name of the path of the file.
 	domain string
 
+	// worldReadable states whether the file is world-readable, that is, has read:all
+	worldReadable bool
+
 	// list holds the lists of parsed user and group names.
 	// It is indexed by a right.
 	// Each list is stored in sorted order.
@@ -156,6 +162,8 @@ func Parse(pathName upspin.PathName, data []byte) (*Access, error) {
 	rights := make([][]byte, 10)
 	users := make([][]byte, 10)
 	s := bufio.NewScanner(bytes.NewReader(data))
+	numReaders := 0
+	var userAll []byte
 	for lineNum := 1; s.Scan(); lineNum++ {
 		line := clean(s.Bytes())
 		if len(line) == 0 {
@@ -181,14 +189,27 @@ func Parse(pathName upspin.PathName, data []byte) (*Access, error) {
 		}
 
 		var err error
+		var all []byte
 		for _, right := range rights {
 			switch r := which(right); r {
 			case AllRights:
 				for r := Right(0); r < numRights; r++ {
-					err = a.addRight(r, parsed.User(), users)
+					all, err = a.addRight(r, parsed.User(), users)
+					if all != nil && r == Read {
+						a.worldReadable = true
+						userAll = append([]byte(nil), all...)
+						numReaders++ // We count all as a reader if granted "*" rights.
+					}
 				}
-			case Read, Write, List, Create, Delete:
-				err = a.addRight(r, parsed.User(), users)
+			case Read:
+				all, err = a.addRight(r, parsed.User(), users)
+				if all != nil {
+					a.worldReadable = true
+					userAll = append([]byte(nil), all...)
+					numReaders += len(users)
+				}
+			case Write, List, Create, Delete:
+				_, err = a.addRight(r, parsed.User(), users)
 			case Invalid:
 				err = errors.Errorf("invalid access rights on line %d: %q", lineNum, right)
 			}
@@ -213,17 +234,21 @@ func Parse(pathName upspin.PathName, data []byte) (*Access, error) {
 		a.list[i] = a.allUsers[len(a.allUsers) : len(a.allUsers)+len(r)]
 		a.allUsers = append(a.allUsers, r...)
 	}
+	if numReaders > 1 && a.worldReadable {
+		return nil, errors.E(op, pathName, errors.Invalid, errors.Errorf("%q cannot appear with other users", userAll))
+	}
 	return a, nil
 }
 
-func (a *Access) addRight(r Right, owner upspin.UserName, users [][]byte) error {
+func (a *Access) addRight(r Right, owner upspin.UserName, users [][]byte) ([]byte, error) {
 	// Save allocations by doing some pre-emptively.
 	if a.list[r] == nil {
 		a.list[r] = make([]path.Parsed, 0, preallocSize(len(users)))
 	}
 	var err error
-	a.list[r], err = parsedAppend(a.list[r], owner, users...)
-	return err
+	var all []byte
+	a.list[r], all, err = parsedAppend(a.list[r], owner, users...)
+	return all, err
 }
 
 // New returns a new Access granting the owner of pathName all rights.
@@ -308,49 +333,51 @@ func isAll(user []byte) bool {
 }
 
 // parsedAppend parses the users (as path.Parse values) and appends them to the list.
-func parsedAppend(list []path.Parsed, owner upspin.UserName, users ...[]byte) ([]path.Parsed, error) {
-	for i, user := range users {
+// The returned byte slice is empty unless "all" is present, in which case the text of
+// the provided user name is returned, for use in error messages.
+// The check is case-insensitive.
+func parsedAppend(list []path.Parsed, owner upspin.UserName, users ...[]byte) ([]path.Parsed, []byte, error) {
+	var all []byte
+	for _, user := range users {
 		// Case-insensitive check for the "all" or "all@upspin.io", which we canonicalize to "all@upspin.io".
 		// We require it to be the only item on the line.
 		if isAll(user) {
-			if i != 0 || len(users) > 1 {
-				return nil, errors.Errorf("%q must be the only user listed on the line", user)
-			}
+			all = user
 			user = allUsersBytes
 		}
 		p, err := path.Parse(upspin.PathName(user) + "/")
 		if err != nil {
 			if bytes.IndexByte(user, '@') >= 0 {
 				// Has user name but doesn't parse: Invalid path.
-				return nil, err
+				return nil, nil, err
 			}
 			// Is it a badly formed group file?
 			const groupElem = "/" + GroupDir + "/"
 			slash := bytes.IndexByte(user, '/')
 			if slash >= 0 && bytes.Index(user, []byte(groupElem)) == slash {
 				// Looks like a group file but is missing the user name.
-				return nil, errors.Errorf("bad user name in group path %q", user)
+				return nil, nil, errors.Errorf("bad user name in group path %q", user)
 			}
 			// It has no user name, so it might be a path name for a group file.
 			p, err = path.Parse(upspin.PathName(owner) + groupElem + upspin.PathName(user))
 			if err != nil {
-				return nil, err
+				return nil, nil, err
 			}
 		}
 		// Check group syntax.
 		if !p.IsRoot() {
 			// First element must be group.
 			if p.Elem(0) != GroupDir {
-				return nil, errors.Errorf("illegal group %q", user)
+				return nil, nil, errors.Errorf("illegal group %q", user)
 			}
 			// Groups cannot be wild cards.
 			if bytes.HasPrefix(user, []byte("*@")) {
-				return nil, errors.Errorf("cannot have wildcard for group name %q", user)
+				return nil, nil, errors.Errorf("cannot have wildcard for group name %q", user)
 			}
 		}
 		list = append(list, p)
 	}
-	return list, nil
+	return list, all, nil
 }
 
 // splitList parses a comma- or space-separated list, skipping other
@@ -493,16 +520,15 @@ func ParseGroup(parsed path.Parsed, contents []byte) (group []path.Parsed, err e
 			return nil, errors.E(op, parsed.Path(), errors.Invalid,
 				errors.Errorf("syntax error in group file on line %d", lineNum))
 		}
-		for _, user := range users {
-			if isAll(user) {
-				return nil, errors.E(op, parsed.Path(), errors.Invalid,
-					errors.Errorf("cannot use %q in group file on line %d", user, lineNum))
-			}
-		}
 		if group == nil {
 			group = make([]path.Parsed, 0, preallocSize(len(users)))
 		}
-		group, err = parsedAppend(group, parsed.User(), users...)
+		var all []byte
+		group, all, err = parsedAppend(group, parsed.User(), users...)
+		if all != nil {
+			return nil, errors.E(op, parsed.Path(), errors.Invalid,
+				errors.Errorf("cannot use user %q in group file on line %d", all, lineNum))
+		}
 		if err != nil {
 			return nil, errors.E(op, parsed.Path(), errors.Invalid,
 				errors.Errorf("bad group users list on line %d: %v", lineNum, err))
@@ -896,4 +922,9 @@ Outer:
 		}
 	}
 	return false, groupsToCheck
+}
+
+// IsReadableByAll reports whether the Access file has read:all or read:all@upspin.io
+func (a *Access) IsReadableByAll() bool {
+	return a.worldReadable
 }

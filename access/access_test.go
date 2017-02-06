@@ -33,13 +33,6 @@ Read : reader@reader.org
 WRITE: anotherwriter@a.bc
   create,DeLeTe  :admin@c.com`)
 
-	// Duplicated "all" will exist but be canonicalized when parsed.
-	// Note we must put easch "all" entry on its own line.
-	allUsersAccessText = []byte("r : foo@bob.com\nr: All\nr:ALL@UPSPIN.IO")
-
-	// Here we put them all on one line, and should see an error.
-	allUsersAccessTextBad = []byte("r : foo@bob.com All ALL@UPSPIN.IO")
-
 	groupText = []byte("#This is my family\nfred@me.com, ann@me.com\njoe@me.com\n")
 )
 
@@ -56,6 +49,10 @@ func TestParse(t *testing.T) {
 	a, err := Parse(testFile, accessText)
 	if err != nil {
 		t.Fatal(err)
+	}
+
+	if a.IsReadableByAll() {
+		t.Error("file is readable by all")
 	}
 
 	list := []string{"a@b.co", "foo@bob.com", "reader@reader.org", "x@y.uk"}
@@ -88,6 +85,10 @@ func TestParseEmpty(t *testing.T) {
 		match(t, a.List(i), nil)
 	}
 
+	if a.IsReadableByAll() {
+		t.Error("file is readable by all")
+	}
+
 	// Nil should be OK too.
 	a, err = Parse(testFile, nil)
 	if err != nil {
@@ -99,22 +100,49 @@ func TestParseEmpty(t *testing.T) {
 }
 
 func TestParseAllUsers(t *testing.T) {
+	// Granting "*" to another user should be OK.
+	allUsersAccessText := []byte("* : foo@bob.com\nr: All")
 	a, err := Parse(testFile, allUsersAccessText)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	// AllUsers appears twice here as it's also twice in the input; that's OK.
-	match(t, a.list[Read], []string{"foo@bob.com", string(AllUsers), string(AllUsers)})
-	match(t, a.list[Write], nil)
-	match(t, a.list[List], nil)
-	match(t, a.list[Create], nil)
-	match(t, a.list[Delete], nil)
+	if !a.IsReadableByAll() {
+		t.Error("file is not readable by all")
+	}
+
+	match(t, a.list[Read], []string{"foo@bob.com", string(AllUsers)})
+	foo := []string{"foo@bob.com"}
+	match(t, a.list[Write], foo)
+	match(t, a.list[List], foo)
+	match(t, a.list[Create], foo)
+	match(t, a.list[Delete], foo)
+
+	// Should also work if we give "*" to all.
+	allUsersAccessText = []byte("* : foo@bob.com\n*: All")
+	a, err = Parse(testFile, allUsersAccessText)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !a.IsReadableByAll() {
+		t.Error("file is not readable by all")
+	}
+
+	fooAll := []string{"foo@bob.com", string(AllUsers)}
+	match(t, a.list[Read], fooAll)
+	match(t, a.list[Write], fooAll)
+	match(t, a.list[List], fooAll)
+	match(t, a.list[Create], fooAll)
+	match(t, a.list[Delete], fooAll)
 }
 
-func TestParseAllUsersNotAloneOnLine(t *testing.T) {
+func TestParseAllUsersBad(t *testing.T) {
+	// Here we have "all" with another explicit reader, and should see an error.
+	// "ALL@UPSPIN.IO" will be canonicalized when parsed.
+	allUsersAccessTextBad := []byte("r : foo@bob.com ALL@UPSPIN.IO")
 	_, err := Parse(testFile, allUsersAccessTextBad)
-	expectedErr := errors.E(errors.Invalid, errors.Str(`"All" must be the only user listed on the line`))
+	expectedErr := errors.E(errors.Invalid, errors.Str(`"ALL@UPSPIN.IO" cannot appear with other users`))
 	if !errors.Match(expectedErr, err) {
 		t.Fatalf(`unexpected error for "all" not alone: %v`, err)
 	}
