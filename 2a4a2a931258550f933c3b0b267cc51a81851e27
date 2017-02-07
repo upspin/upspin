@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f044e08_e3ded8f8",
+        "filename": "test/access_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 640,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-07T05:21:36Z",
+      "side": 1,
+      "message": "s/ l$/$/",
+      "revId": "2a4a2a931258550f933c3b0b267cc51a81851e27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e8a8497c_9a0bd621",
+        "filename": "test/access_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 641,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-07T05:21:36Z",
+      "side": 1,
+      "message": "s/ ist/list/",
+      "revId": "2a4a2a931258550f933c3b0b267cc51a81851e27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
