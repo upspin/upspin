@@ -51,12 +51,13 @@ func main() {
 		}
 	}
 
-	// All we need in the config is some user name. It does not need to be registered as a "real" user.
-	cfg := config.SetUserName(config.New(), serverName)
+	cfg, err := config.FromFile(flags.Config)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// Create a new key implementation.
 	var key upspin.KeyServer
-	var err error
 	switch flags.ServerKind {
 	case "inprocess":
 		key = inprocess.New()
@@ -80,11 +81,15 @@ func main() {
 		http.Handle("/log", logHandler{logger: logger})
 	}
 	if *mailConfigFile != "" {
-		mailHandler, err := newMailHandler(key, *mailConfigFile)
+		f := cfg.Factotum()
+		if f == nil {
+			log.Fatal("supplied config must include keys when -mail_config set")
+		}
+		h, err := newSignupHandler(f, key, *mailConfigFile)
 		if err != nil {
 			log.Fatal(err)
 		}
-		http.Handle("/mail", mailHandler)
+		http.Handle("/signup", h)
 	}
 
 	https.ListenAndServeFromFlags(nil, "keyserver")
