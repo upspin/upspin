@@ -551,6 +551,95 @@ func testGroupAccess(t *testing.T, r *testenv.Runner) {
 	}
 }
 
+func testWriteReadAllAccessFile(t *testing.T, r *testenv.Runner) {
+	const (
+		base             = ownerName + "/readall-access"
+		accessFile       = base + "/Access"
+		file             = base + "/file"
+		subDir           = ownerName + "/dir"
+		subDirAccessFile = subDir + "/Access"
+		subDirFile       = subDir + "/suvfile"
+	)
+
+	const (
+		readAll          = "read:all\n"
+		readAllPlusOwner = "read:all\n*:" + ownerName
+	)
+
+	cleanBase := func() {
+		r.Delete(accessFile)
+		r.Delete(file)
+		if r.Failed() {
+			t.Fatal(r.Diag())
+		}
+	}
+
+	cleanSubDir := func() {
+		r.Delete(subDirAccessFile)
+		r.Delete(subDirFile)
+		if r.Failed() {
+			t.Fatal(r.Diag())
+		}
+	}
+
+	// Always as owner, always use base.
+	r.As(ownerName)
+	r.MakeDirectory(base)
+
+	// Can create file with read:all if owner is allowed.
+	r.Put(accessFile, readAllPlusOwner)
+	r.Put(file, "text")
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+
+	// Cannot create file with read:all if owner is not allowed.
+	cleanBase()
+	r.Put(accessFile, readAll)
+	r.Put(file, "text")
+	if !r.Failed() {
+		t.Fatal("expected permission error writing file with only read:all permission")
+
+	}
+
+	// Cannot add read:all Access if file exists.
+	cleanBase()
+	r.Put(file, "text")
+	r.Put(accessFile, readAll)
+	if !r.Failed() {
+		t.Fatal("expected permission error writing read:all with existing files")
+
+	}
+
+	// OK to add read:all in subdirectory if files exist in parent.
+	cleanBase()
+	r.Put(accessFile, readAllPlusOwner)
+	r.Put(file, "text")
+	r.MakeDirectory(subDir)
+	r.Put(subDirAccessFile, readAll)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+
+	// OK to add read:all in subdirectory if controlling Access file is already read:all.
+	cleanSubDir()
+	cleanBase()
+	r.Put(accessFile, readAllPlusOwner)
+	r.Put(file, "text")
+	r.MakeDirectory(subDir)
+	r.Put(subDirFile, "text")
+	r.Put(subDirAccessFile, readAll)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+}
+
+// TODO: cross DirServer support for Group files.
+// Requires that DirServer implements it.
+// Also, requires that testenv supports configuring multiple DirServers at
+// once (it mostly does via serverMux, but requires that env.Setup passes a l
+// ist of servers to work with).
+
 // TODO: cross DirServer support for Group files.
 // Requires that DirServer implements it.
 // Also, requires that testenv supports configuring multiple DirServers at

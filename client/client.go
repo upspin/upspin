@@ -136,9 +136,15 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 
 	// Ensure Access file is valid.
 	if isAccessFile {
-		_, err := access.Parse(name, data)
+		a, err := access.Parse(name, data)
 		if err != nil {
 			return nil, errors.E(op, name, err)
+		}
+		if a.IsReadableByAll() {
+			// Check that we're not adding read:all to encrypted files.
+			if err := c.readAllOK(parsed); err != nil {
+				return nil, errors.E(op, name, err)
+			}
 		}
 	}
 	// Ensure Group file is valid.
@@ -182,6 +188,54 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 		return e, err
 	}
 	return entry, nil
+}
+
+var errReadAll = errors.Str(`cannot add "read:all" permission to existing files`)
+
+// readAllOK checks that we are not adding read:all permission to an existing
+// tree. There are two ways it is allowed:
+// 1) The directory is empty, so no files exist.
+// 2) The directory is already read:all, so no files will change status.
+// This is just a heuristic to avoid walking the tree looking for files, but it works
+// well enough. upspin share -fix can report or repair any mistakes later.
+func (c *Client) readAllOK(parsed path.Parsed) error {
+	// We have walked the path so there are no links; we can query the DirServer ourselves.
+	dir, err := c.DirServer(parsed.Path())
+	if err != nil {
+		return err
+	}
+	// If the directory is empty or the only file is an extant Access file, it's fine.
+	entries, err := dir.Glob(upspin.AllFilesGlob(parsed.Drop(1).Path()))
+	if err != nil {
+		return err
+	}
+	if len(entries) == 0 || (len(entries) == 1 && entries[0].Name == parsed.Path()) {
+		// We are guaranteed to have list permission because we are owner, so this is accurate.
+		return nil
+	}
+	// The directory has files, but it's OK if they're already read:all.
+	// We check this by seeing whether the controlling Access file,
+	// which could be in this directory or a parent, already has read:all.
+	whichAccess, err := dir.WhichAccess(parsed.Path())
+	if err != nil {
+		return err
+	}
+	if whichAccess == nil {
+		// There is no Access file so there is no read:all set already.
+		return errReadAll
+	}
+	accessData, err := c.Get(whichAccess.Name)
+	if err != nil {
+		return err
+	}
+	acc, err := access.Parse(whichAccess.Name, accessData)
+	if err != nil {
+		return err
+	}
+	if !acc.IsReadableByAll() {
+		return errReadAll
+	}
+	return nil
 }
 
 func (c *Client) pack(entry *upspin.DirEntry, data []byte, packer upspin.Packer, s *metric.Span) error {
