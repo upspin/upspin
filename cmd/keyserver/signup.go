@@ -4,191 +4,258 @@
 
 package main
 
-// This file deals with receiving signup user requests.
-
-// TODOs:
-// - make the body of the reply email much better: write better errors, send
-//   links to a FAQ and use proper greeting and goodbye.
-//
-
 import (
 	"bytes"
+	"crypto/sha256"
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"math/big"
 	"net/http"
+	"net/url"
+	"strconv"
 	"strings"
-	"text/template"
 	"time"
 
 	"upspin.io/cloud/mail"
 	"upspin.io/cloud/mail/sendgrid"
-	inbound "upspin.io/cmd/keyserver/internal/mail"
 	"upspin.io/config"
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/log"
+	"upspin.io/serverutil"
 	"upspin.io/upspin"
 	"upspin.io/user"
+	"upspin.io/valid"
 )
 
-// mailHandler handles incoming signup email.
-type mailHandler struct {
-	key upspin.KeyServer
+const (
+	// signupGracePeriod is the period of validity for a signup request.
+	signupGracePeriod = 24 * time.Hour
 
-	// information to authenticate the incoming email provider.
-	userName string
-	password string
+	// signupNotifyAddress is the address that should receive signup notifications.
+	signupNotifyAddress = "upspin-sendgrid@google.com"
 
-	// out is the outbound mail API.
-	out mail.Mail
+	noHTML = "" // for mail.Send
+)
+
+// signupHandler implements an http.Handler that handles user creation requests
+// made by 'upspin signup' and the user themselves.
+type signupHandler struct {
+	fact upspin.Factotum
+	key  upspin.KeyServer
+	mail mail.Mail
+
+	rate serverutil.RateLimiter
 }
 
-// newMailHandler creates a new handler interfacing with the given key server
-// and configured as named by the configFile.
-func newMailHandler(key upspin.KeyServer, configFile string) (*mailHandler, error) {
-	if key == nil {
-		return nil, errors.E(errors.Invalid, errors.Str("mailHandler: key server must be provided"))
-	}
-	apiKey, userName, password, err := parseConfigFile(configFile)
+// newSignupHandler creates a new handler that serves /signup.
+func newSignupHandler(fact upspin.Factotum, key upspin.KeyServer, mailConfig string) (*signupHandler, error) {
+	apiKey, _, _, err := parseMailConfig(mailConfig)
 	if err != nil {
-		return nil, errors.E("mailHandler", err)
+		return nil, err
 	}
-	m := &mailHandler{
-		key:      key,
-		userName: userName,
-		password: password,
-		out:      sendgrid.New(apiKey, "upspin.io"),
+	m := &signupHandler{
+		fact: fact,
+		key:  key,
+		mail: sendgrid.New(apiKey, "upspin.io"),
+		rate: serverutil.RateLimiter{
+			Backoff: 1 * time.Minute,
+			Max:     24 * time.Hour,
+		},
 	}
 	return m, nil
 }
 
-func (m *mailHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	caller, pwd, ok := r.BasicAuth()
-	if !ok {
-		http.Error(w, "authentication failed", http.StatusForbidden)
-		log.Error.Printf("mailHandler: No authentication provided by remote: %s", r.RemoteAddr)
-		return
-	}
-	if pwd != m.password || caller != m.userName {
-		http.Error(w, "authentication failed", http.StatusForbidden)
-		log.Error.Println("mailHandler: Error in basic auth: invalid credentials")
-		return
+func (m *signupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	errorf := func(code int, format string, args ...interface{}) {
+		s := fmt.Sprintf(format, args...)
+		http.Error(w, s, code)
 	}
 
-	// From here on, we accepted the delivery of the incoming email. Now
-	// parse its headers and contents.
-	w.WriteHeader(http.StatusOK)
-
-	// Now begin parsing it.
-	err := r.ParseMultipartForm(64 * 1024) // 64kB budget for email parsing.
-	if err != nil {
-		log.Error.Printf("mailHandler: Error parsing request: %v", err)
+	// Parse and validate request.
+	v := r.FormValue
+	u := &upspin.User{
+		Name: upspin.UserName(v("name")),
+		Dirs: []upspin.Endpoint{{
+			Transport: upspin.Remote,
+			NetAddr:   upspin.NetAddr(v("dir")),
+		}},
+		Stores: []upspin.Endpoint{{
+			Transport: upspin.Remote,
+			NetAddr:   upspin.NetAddr(v("store")),
+		}},
+		PublicKey: upspin.PublicKey(v("key")),
+	}
+	if err := valid.UserName(u.Name); err != nil {
+		errorf(http.StatusBadRequest, "invalid user name")
 		return
 	}
-
-	// TODO: here we trust the email processor; we should do DKIM validation
-	// ourselves.
-	from, body, err := inbound.ParseMail(r.Form)
-	if err != nil {
-		// Error validating email. Maybe 'from' is known but without
-		// a proper DKIM verification we can't reply to the sender since
-		// it could be spoofed. Log and drop it on the floor.
-		log.Printf("mailHandler: Received email from %q: %s", from, err)
-		return
-	}
-	// From address is valid. Further errors can be replied by email.
-
-	// Parse the contents of the email. The returned user name is guaranteed
-	// to be a valid Upspin user name.
-	msg, err := inbound.ParseBody(body)
-	if err != nil {
-		m.sendErrorMail(from, "Invalid email contents", err)
-		return
-	}
-
-	// Perform the following tasks next:
-	// 1) signature validation
-	// 2) compare userName with from address. Must be identical except for
-	//    an optional suffix.
-	// 3) verify userName does not yet exist.
-	if err := validateSignature(msg); err != nil {
-		m.sendErrorMail(from, "Error validating signature", err)
-		return
-	}
-	// Username and email must match. We don't allow email signups to come
-	// from different accounts or to use a suffix (for suffixes, the owner
-	// of the canonical user can use 'upspin user -put' to create it).
-	if string(msg.UserName) != from {
-		m.sendErrorMail(from, "Error validating email address",
-			errors.Errorf("email was sent from %q, but contents mention %q.", from, msg.UserName))
-		return
-	}
+	sigR, sigS, nowS := v("sigR"), v("sigS"), v("now")
+	create := sigR+sigS+nowS != ""
 
 	// Lookup userName. It must not exist yet.
-	_, err = m.key.Lookup(msg.UserName)
-	if err == nil || !errors.Match(errors.E(errors.NotExist), err) {
-		m.sendErrorMail(from, "Can't create user", errors.Errorf("Can't create user for %s", msg.UserName))
-		// Also log the error, if any.
-		if err != nil {
-			log.Error.Printf("mailHandler: Error looking up %q: %s", msg.UserName, err)
+	_, err := m.key.Lookup(u.Name)
+	if err == nil {
+		errorf(http.StatusBadRequest, "user already exists on key server")
+		return
+	} else if !errors.Match(errors.E(errors.NotExist), err) {
+		errorf(http.StatusInternalServerError, "error looking up user: %v", err)
+		return
+	}
+
+	if create {
+		// This is the user clicking the link in the signup mail.
+		// Validate the server signature and create the user.
+
+		// Parse signature.
+		var rs, ss big.Int
+		if _, ok := rs.SetString(sigR, 10); !ok {
+			errorf(http.StatusBadRequest, "invalid signature R value")
+			return
 		}
+		if _, ok := ss.SetString(sigS, 10); !ok {
+			errorf(http.StatusBadRequest, "invalid signature S value")
+			return
+		}
+		sig := upspin.Signature{R: &rs, S: &ss}
+
+		// Parse time.
+		nowI, err := strconv.ParseInt(nowS, 10, 64)
+		if err != nil {
+			errorf(http.StatusBadRequest, "invalid now value: %v", err)
+			return
+		}
+		now := time.Unix(nowI, 0)
+
+		// Validate signature.
+		if err := m.validateSignature(u, now, sig); err != nil {
+			errorf(http.StatusBadRequest, "invalid signature: %v", err)
+			return
+		}
+
+		// Create user.
+		err = m.createUser(u)
+		if err != nil {
+			errorf(http.StatusInternalServerError, "could not create user: %v", err)
+			return
+		}
+
+		// Send a note to our internal list, so we're aware of signups.
+		subject := "New signup: " + string(u.Name)
+		body := fmt.Sprintf("%s signed up on %s", u.Name, time.Now().Format(time.Stamp))
+		err = m.mail.Send(signupNotifyAddress, serverName, subject, body, noHTML)
+		if err != nil {
+			log.Error.Printf("Error sending mail to %q: %v", signupNotifyAddress, err)
+			// Don't prevent signup if this fails.
+		}
+
+		// TODO(adg): display user friendly welcome message
+		fmt.Fprintf(w, "An account for %q has been registered with the key server.", u.Name)
+		return
+	}
+	// We are being called by 'upspin signup'.
+
+	if r.Method != "POST" {
+		errorf(http.StatusMethodNotAllowed, "method not allowed")
 		return
 	}
 
-	// Create user.
-	err = m.createUser(msg)
+	// Aggressively rate limit requests to this service,
+	// so that we can't be used for a mail bomb.
+	// TODO(adg): also limit by remote IP address
+	name, _, domain, err := user.Parse(u.Name)
 	if err != nil {
-		m.sendErrorMail(from, fmt.Sprintf("Failure creating Upspin user %q", msg.UserName), err)
+		errorf(http.StatusBadRequest, "invalid user name: %v", err)
+		return
+	}
+	key := strings.ToLower(name + "@" + domain)
+	if ok, wait := m.rate.Pass(key); !ok {
+		errorf(http.StatusTooManyRequests, "repeated signup attempt; please wait %v before trying again", wait)
 		return
 	}
 
-	m.sendWelcomeEmail(msg)
+	// Construct signed sign-up URL.
+	// Important: the signaure must only be transmitted to the calling user
+	// by email, as it is proof of ownership of that email address. We must
+	// take care not to expose the signature in response to this request
+	// (in an error message, for example).
+	now := time.Now()
+	sig, err := m.sign(u, now)
+	if err != nil {
+		errorf(http.StatusInternalServerError, "could not generate signature: %v", err)
+		return
+	}
+	vals := url.Values{
+		"name":  {string(u.Name)},
+		"dir":   {string(u.Dirs[0].NetAddr)},
+		"store": {string(u.Stores[0].NetAddr)},
+		"key":   {string(u.PublicKey)},
+		"sigR":  {sig.R.String()},
+		"sigS":  {sig.S.String()},
+		"now":   {fmt.Sprint(now.Unix())},
+	}
+	signupURL := (&url.URL{
+		Scheme:   "https",
+		Host:     "key.upspin.io", // TODO(adg): make configurable
+		Path:     "/signup",
+		RawQuery: vals.Encode(),
+	}).String()
+
+	// Send signup confirmation mail to user.
+	body := new(bytes.Buffer)
+	fmt.Fprintln(body, "Follow this link to complete the Upspin signup process:")
+	fmt.Fprintln(body, signupURL)
+	fmt.Fprintln(body, "\nIf you were not expecting this message, please ignore it.")
+	// TODO(adg): implement opt out link
+	const subject = "Upspin signup confirmation"
+	err = m.mail.Send(string(u.Name), serverName, subject, body.String(), noHTML)
+	if err != nil {
+		log.Error.Printf("Error sending mail to %q: %v", u.Name, err)
+		errorf(http.StatusInternalServerError, "could not send signup email")
+		return
+	}
+
+	fmt.Fprintln(w, "OK")
 }
 
-func (m *mailHandler) createUser(msg *inbound.SignupMessage) error {
-	key, err := m.dialForUser(msg.UserName)
+func (m *signupHandler) createUser(u *upspin.User) error {
+	key, err := m.dialForUser(u.Name)
 	if err != nil {
 		return err
 	}
-	defer key.Close() // be nice and release resources.
-	err = key.Put(&upspin.User{
-		Name:      msg.UserName,
-		PublicKey: msg.PublicKey,
-		Dirs:      []upspin.Endpoint{msg.Dir},
-		Stores:    []upspin.Endpoint{msg.Store},
-	})
-	if err != nil {
+	defer key.Close()
+	if err := key.Put(u); err != nil {
 		return err
 	}
 
-	snapshotUser, err := snapshotUser(msg.UserName)
+	snapshotUser, err := snapshotUser(u.Name)
 	if err != nil {
 		return err
 	}
 
 	// Lookup snapshotUser to ensure we don't overwrite an existing one.
-	_, err = m.key.Lookup(snapshotUser)
+	_, err = key.Lookup(snapshotUser)
 	if err != nil && !errors.Match(errors.E(errors.NotExist), err) {
 		return err
 	}
 	if err == nil {
-		// We do not update the snapshot user if it already exists.
-		log.Printf("Attempt to re-create an existing user: %s", snapshotUser)
+		// Snapshot user exists; no need to create it.
 		return nil
 	}
-	// Else, if it does not exist, we create it.
-	keySnap, err := m.dialForUser(snapshotUser)
+	// Create snapshot user.
+	key, err = m.dialForUser(snapshotUser)
 	if err != nil {
 		return err
 	}
-	defer keySnap.Close() // be nice and release resources.
-	return keySnap.Put(&upspin.User{
+	defer key.Close() // be nice and release resources.
+	return key.Put(&upspin.User{
 		Name:      snapshotUser,
-		PublicKey: msg.PublicKey,
+		PublicKey: u.PublicKey,
 	})
 }
 
-func (m *mailHandler) dialForUser(name upspin.UserName) (upspin.KeyServer, error) {
+func (m *signupHandler) dialForUser(name upspin.UserName) (upspin.KeyServer, error) {
 	// We need to dial this server locally so the new user is authenticated
 	// with it implicitly.
 	cfg := config.New()
@@ -206,46 +273,38 @@ func (m *mailHandler) dialForUser(name upspin.UserName) (upspin.KeyServer, error
 	return keyServer, nil
 }
 
-func validateSignature(msg *inbound.SignupMessage) error {
-	input := []byte(string(msg.UserName) + string(msg.PublicKey) + msg.Dir.String() + msg.Store.String())
-	return factotum.Verify(input, msg.Signature, msg.PublicKey)
-}
-
-// sendMail sends email to a recipient with a given subject and contents.
-// If email processing fails, it logs an error.
-func (m *mailHandler) sendMail(to, subject, contents string) {
-	const noHTML = ""
-	err := m.out.Send(to, serverName, subject, contents, noHTML)
+// sign generates a signature for the given user creation request at time now.
+func (m *signupHandler) sign(u *upspin.User, now time.Time) (upspin.Signature, error) {
+	b, err := sigBytes(u, now)
 	if err != nil {
-		log.Error.Printf("Error sending email: %s", err)
+		return upspin.Signature{}, err
 	}
+	return m.fact.Sign(b)
 }
 
-func (m *mailHandler) sendErrorMail(to, reason string, err error) {
-	// TODO: don't send raw error messages (maybe a privacy/security issue).
-	body := fmt.Sprintf("Failure signing up for Upspin: %s\n%s\n-- The Upspin team", reason, err.Error())
-	m.sendMail(to, "Sign-up error", body)
-}
-
-// sendWelcomeEmail sends a welcome email to the user confirming the creation of
-// the account with a given public key.
-func (m *mailHandler) sendWelcomeEmail(msg *inbound.SignupMessage) {
-	to := string(msg.UserName)
-
-	var body bytes.Buffer
-	if err := replyTemplate.Execute(&body, msg.UserName); err != nil {
-		m.sendErrorMail(to, "An internal error occurred", err)
-		return
+func (m *signupHandler) validateSignature(u *upspin.User, now time.Time, sig upspin.Signature) error {
+	// Check that the signature is still valid.
+	if time.Now().After(now.Add(signupGracePeriod)) {
+		return errors.Str("request too old; please try again")
 	}
-
-	m.sendMail(to, "Welcome to Upspin", body.String())
-
-	// Send a note to our internal list, so we're aware of signups.
-	m.sendMail("upspin-sendgrid@google.com", "New signup: "+string(msg.UserName),
-		fmt.Sprintf("%s successfully signed up on %s", msg.UserName, time.Now().Format(time.UnixDate)))
+	b, err := sigBytes(u, now)
+	if err != nil {
+		return err
+	}
+	return factotum.Verify(b, sig, m.fact.PublicKey())
 }
 
-func parseConfigFile(name string) (apiKey, userName, password string, err error) {
+func sigBytes(u *upspin.User, now time.Time) ([]byte, error) {
+	b, err := json.Marshal(u)
+	if err != nil {
+		return nil, err
+	}
+	b = strconv.AppendInt(b, now.Unix(), 10)
+	h := sha256.Sum256(b)
+	return h[:], nil
+}
+
+func parseMailConfig(name string) (apiKey, userName, password string, err error) {
 	data, err := ioutil.ReadFile(name)
 	if err != nil {
 		return "", "", "", errors.E(errors.IO, err)
@@ -272,12 +331,3 @@ func snapshotUser(u upspin.UserName) (upspin.UserName, error) {
 	}
 	return upspin.UserName(name + "+snapshot@" + domain), nil
 }
-
-// replyTemplate is the email message we send back to the user after the
-// account is created.
-var replyTemplate = template.Must(template.New("reply").Parse(`
-Your Upspin account {{.}}
-has been registered with the public key server.
-
-For instructions on setting up your directory tree, see TODO.
-`))
