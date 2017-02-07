@@ -68,12 +68,15 @@ local workstation or other private device.
 To register your details with the key server takes two steps.
 
 First, the `upspin signup` command generates a key pair, saves it locally, and
-prepares instructions for the key server to remember the user's details.
+sends the user details and the public key to the key server.
 It also creates a local copy of the information called an "`config`" file that
 it stores in a local directory, typically `$HOME/upspin`.
 Config files are discussed in detail in [TODO LINK].
 
-The second step is to send mail to the key server to finalize the registration.
+The second step is to receive an email message from the key server and to click
+the confirmation link that it contains.
+Visiting that link proves to the key server that you control the email address
+that you are registering and completes the signup process.
 
 Here is the first step.
 Run this shell command, substituting your email address and directory and store
@@ -100,27 +103,8 @@ If you lose the keys you can re-create them by running this command:
 Write this command down and store it in a secure, private place.
 Do not share your private key or this command with anyone.
 
-To register your key with the key server,
-copy this email message and send it to signup@key.upspin.io:
-
-I am you@gmail.com;
-
-My public key is:
-p256;
-4953994978686598553220695820665578334776881714507948749731602561414105826492;
-66910428438522843239264968938397625098537992797641837719834448519317121655042;
-
-My directory server is:
-remote,dir.example.com:443;
-
-My store server is:
-remote,store.example.com:443;
-
-Signature:
-105424705881407947899850441112873315959074883283421704267305718920731238199673;
-23440675362566872099122712067769200456811520379123850064222464518954024259340;
-
-(End of message.)
+A signup email has been sent to "you@gmail.com",
+please read it for further instructions.
 ```
 
 ---
@@ -131,32 +115,15 @@ keys, and output the instructions to recover your keys if you lose them one day.
 Finally it prints the mail to send to tell the Upspin key server about you.
 Please read it carefully.
 
-As it says, you need to send mail to `signup@key.upspin.io` to complete your
-registration.
-This message tells the key server your details and instructs it to save them.
+As it says, you need to wait for an email message from the key server to
+proceed.
+The message contains a link.
+Clicking that link proves to the key server that you own the email address, and
+the key server will provide a copy of your public key to any Upspin user that
+requests it.
 (Your public key is needed for securing and sharing Upspin files, and it's safe
 to share.)
 
-
-Copy the message exactly as printed by the upspin signup command, and mail it
-to `signup@key.upspin.io`.
-It should succeed, and you will soon receive a mail message back confirming
-your registration.
-The confirmation mail will look like this:
-
----
-
-```
-From: keyserver@upspin.io
-Subject: Welcome to Upspin
-
-Your Upspin account you@gmail.com has been registered with the public key
-server.
-
-For instructions on setting up your directory tree, see TODO.
-```
-
----
 
 ## Creating your Upspin directory
 
