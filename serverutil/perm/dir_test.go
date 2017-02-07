@@ -20,9 +20,9 @@ func TestDirIntegration(t *testing.T) {
 	r := testenv.NewRunner()
 	r.AddUser(ownerEnv.Config)
 	r.As(owner)
+	r.Put(accessFile, "r,l:all\n*:"+owner) // Permission for anyone to read and list, owner has all rights.
 	r.MakeDirectory(groupDir)
-	r.Put(accessFile, "r,l:all") // Permission for anyone to read and list.
-	r.Put(writersGroup, owner)   // Only owner allowed to create roots.
+	r.Put(writersGroup, owner) // Only owner allowed to create roots.
 	if r.Failed() {
 		t.Fatal(r.Diag())
 	}
