@@ -79,7 +79,7 @@ func NewFromDir(dir string) (upspin.Factotum, error) {
 	// Currently, because it is global we do not overwrite it and warn if
 	// we're about to nil it out once it's set.
 	if secret != nil {
-		if symmSecret != nil {
+		if symmSecret != nil && string(symmSecret) != string(secret) {
 			panic(op + ": Resetting symmSecret for dir  " + dir)
 		}
 		symmSecret = secret
