@@ -74,23 +74,24 @@ func TestGroupFileMultiDir(t *testing.T) {
 		readerGroupTeam   = readerGroup + "/team"
 		readerGroupAccess = readerGroup + "/Access"
 		fileContent       = "tadda!"
+		readAllPlusOwner = "read:all\n*:"+ownerName
 	)
 
 	// Owner creates a root and Group file.
 	r.As(ownerName)
 	r.MakeDirectory(base)
 	r.MakeDirectory(ownerGroup)
-	r.Put(ownerGroupClique, readerGroupTeam)
 	r.Put(file, fileContent)
 	r.Put(ownerAccess, "r:"+ownerName)
-	r.Put(ownerGroupAccess, "r:all")
+	r.Put(ownerGroupAccess, readAllPlusOwner)
+	r.Put(ownerGroupClique, readerGroupTeam)
 
 	// Reader creates a root and a Group file and gives the dirserver
 	// read rights.
 	r.As(readerName)
 	r.MakeDirectory(readerGroup)
-	r.Put(readerGroupTeam, middleName)
 	r.Put(readerGroupAccess, "r:all")
+	r.Put(readerGroupTeam, middleName)
 
 	// MiddleName tries to access a file by owner, without success.
 	r.As(middleName)
