@@ -1,0 +1,288 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9fd00719_bc21de3a",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-07T00:16:13Z",
+      "side": 1,
+      "message": "I don\u0027t see this used anywhere?",
+      "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "44b035cf_85d4a184",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-07T00:16:13Z",
+      "side": 1,
+      "message": "note in the comment that this is owned by the scheduler goroutine",
+      "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d8113496_6ad5d8fd",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-07T00:16:13Z",
+      "side": 1,
+      "message": "channels don\u0027t contain, they carry",
+      "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dd4c677b_a2035785",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-07T00:16:13Z",
+      "side": 1,
+      "message": "writers",
+      "range": {
+        "startLine": 62,
+        "startChar": 28,
+        "endLine": 62,
+        "endChar": 39
+      },
+      "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dd5f3707_c6bbdeee",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-07T00:16:13Z",
+      "side": 1,
+      "message": "each writer sends a value on this channel before exiting.",
+      "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8c522f12_4bfa8d8c",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-07T00:16:13Z",
+      "side": 1,
+      "message": "errors.E(op, err)\n\nhere and elsewhere",
+      "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "63dbb490_beb0db1a",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-07T00:16:13Z",
+      "side": 1,
+      "message": "This function would be a bit cleaner if you return an error and do the logging at the call site.\nIt\u0027ll also make it easier to write tests for this.",
+      "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ce8be82e_6a08e60b",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-07T00:16:13Z",
+      "side": 1,
+      "message": "it might be clearer if you call these \u0027epq\u0027 in this function, to disambiguate from wbq",
+      "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2666aef6_82f1c5c2",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-07T00:16:13Z",
+      "side": 1,
+      "message": "I am concerned about a deadlock here.\nThe channel is buffered but only 20.\nCan you explain how a deadlock here is impossible?\nOr should this send be in a goroutine?",
+      "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b2b804d5_c80d41cc",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-07T00:16:13Z",
+      "side": 1,
+      "message": "add a constant for the timeout here",
+      "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "adb5603d_3460b3a7",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-07T00:16:13Z",
+      "side": 1,
+      "message": "// Queue full.",
+      "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fe3a8cee_abce6473",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-07T00:16:13Z",
+      "side": 1,
+      "message": "something",
+      "range": {
+        "startLine": 253,
+        "startChar": 14,
+        "endLine": 253,
+        "endChar": 24
+      },
+      "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "54c126c6_628a144f",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-07T00:16:13Z",
+      "side": 1,
+      "message": "perhaps add a method cachePath to writeBackQueue that takes a request?",
+      "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "19b1b41f_faf7e132",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-07T00:16:13Z",
+      "side": 1,
+      "message": "you\u0027re already logging the returned errors at the caller, you can drop these log statements that precede \"return err\"",
+      "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f47a52c0_13732ab0",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-07T00:16:13Z",
+      "side": 1,
+      "message": "wbq.logLock.Lock()\n_, err :\u003d fmt.Fprintf(wbq.logf, \"newRequest %s %s\\n\", ref, e)\nwbq.logLock.Unlock()\nif err !\u003d nil {\n  return err\n}",
+      "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "04c897f5_e33b03df",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-07T00:16:13Z",
+      "side": 1,
+      "message": "shouldn\u0027t the lock be held for this also? not sure that Sync is safe for concurrent use",
+      "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
