@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "d1dc269c_58f03ca9",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-07T00:36:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "44b035cf_85d4a184",
+      "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d8113496_6ad5d8fd",
         "filename": "store/storecache/wbq.go",
         "patchSetId": 4
@@ -50,6 +68,24 @@
       "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "90afcb8e_03d0137a",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-07T00:36:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d8113496_6ad5d8fd",
+      "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -76,6 +112,42 @@
     },
     {
       "key": {
+        "uuid": "de5e33ea_d0aaed1e",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-07T00:36:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "403d2471_7c4b90ae",
+      "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "403d2471_7c4b90ae",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-07T00:36:01Z",
+      "side": 1,
+      "message": "actually writers + scheduler.  changed",
+      "parentUuid": "dd4c677b_a2035785",
+      "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "dd5f3707_c6bbdeee",
         "filename": "store/storecache/wbq.go",
         "patchSetId": 4
@@ -90,6 +162,24 @@
       "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "89bae655_a4783cdb",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-07T00:36:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd5f3707_c6bbdeee",
+      "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -110,6 +200,24 @@
     },
     {
       "key": {
+        "uuid": "fe9b21a9_c474ff44",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-07T00:36:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8c522f12_4bfa8d8c",
+      "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "63dbb490_beb0db1a",
         "filename": "store/storecache/wbq.go",
         "patchSetId": 4
@@ -121,6 +229,24 @@
       "writtenOn": "2017-02-07T00:16:13Z",
       "side": 1,
       "message": "This function would be a bit cleaner if you return an error and do the logging at the call site.\nIt\u0027ll also make it easier to write tests for this.",
+      "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7bb82103_a68fac0f",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-07T00:36:01Z",
+      "side": 1,
+      "message": "Except there can be lots and lots of errors all of which we want to ride through.\n\nI\u0027m actually toying with removing the log and just dealing with the _wbf files as the log.  I think you just pushed me over they hump of doing that.",
+      "parentUuid": "63dbb490_beb0db1a",
       "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -144,6 +270,24 @@
     },
     {
       "key": {
+        "uuid": "8cbeb789_a4d35137",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-07T00:36:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ce8be82e_6a08e60b",
+      "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2666aef6_82f1c5c2",
         "filename": "store/storecache/wbq.go",
         "patchSetId": 4
@@ -155,6 +299,24 @@
       "writtenOn": "2017-02-07T00:16:13Z",
       "side": 1,
       "message": "I am concerned about a deadlock here.\nThe channel is buffered but only 20.\nCan you explain how a deadlock here is impossible?\nOr should this send be in a goroutine?",
+      "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ad8dbb7c_287fce9b",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-07T00:36:01Z",
+      "side": 1,
+      "message": "You are right, I should just do a goroutine here.",
+      "parentUuid": "2666aef6_82f1c5c2",
       "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -178,6 +340,24 @@
     },
     {
       "key": {
+        "uuid": "302aa10e_ccad6bc1",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-07T00:36:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b2b804d5_c80d41cc",
+      "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "adb5603d_3460b3a7",
         "filename": "store/storecache/wbq.go",
         "patchSetId": 4
@@ -192,6 +372,24 @@
       "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f49af49c_68bc2b8d",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-07T00:36:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "adb5603d_3460b3a7",
+      "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -215,6 +413,24 @@
       "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3dcf273a_93a15eb0",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-07T00:36:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fe3a8cee_abce6473",
+      "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -252,6 +468,24 @@
     },
     {
       "key": {
+        "uuid": "43ade4cd_754aab36",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-07T00:36:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "19b1b41f_faf7e132",
+      "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f47a52c0_13732ab0",
         "filename": "store/storecache/wbq.go",
         "patchSetId": 4
@@ -269,6 +503,24 @@
     },
     {
       "key": {
+        "uuid": "18861acf_f72b8748",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-07T00:36:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f47a52c0_13732ab0",
+      "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "04c897f5_e33b03df",
         "filename": "store/storecache/wbq.go",
         "patchSetId": 4
@@ -283,6 +535,23 @@
       "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6c5f605c_97c0094d",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-07T00:36:01Z",
+      "side": 1,
+      "message": "Done",
+      "revId": "715f525324b3571140085f76fab9a79d7b67c6ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
