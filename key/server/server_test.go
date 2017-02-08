@@ -11,6 +11,7 @@ import (
 	"reflect"
 	"testing"
 
+	"upspin.io/cache"
 	"upspin.io/cloud/storage/storagetest"
 	"upspin.io/errors"
 	"upspin.io/factotum"
@@ -407,6 +408,8 @@ func newKeyServerWithMocking(user upspin.UserName, ref string, data []byte) (*se
 		user:      user,
 		lookupTXT: mockLookupTXT,
 		logger:    &noopLogger{},
+		cache:     cache.NewLRU(10),
+		negCache:  cache.NewLRU(10),
 	}
 	return s, mockGCP
 }

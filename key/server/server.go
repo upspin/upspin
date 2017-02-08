@@ -10,9 +10,11 @@ import (
 	"encoding/json"
 	"math/big"
 	"net"
+	"strconv"
 	"strings"
 	"sync"
 
+	"upspin.io/cache"
 	"upspin.io/cloud/storage"
 	"upspin.io/errors"
 	"upspin.io/factotum"
@@ -27,14 +29,36 @@ import (
 )
 
 // New initializes an instance of the key service.
-// Required configuration options are listed at the package comments.
+// Required configuration options are:
+//   gcpBucketName=<BUCKET_NAME>
+// Optional configuration options are:
+//   defaultACL=<ACL>, as defined in storage.Storage (e.g. "projectPrivate")
+//   cacheSize=<number>
 func New(options ...string) (upspin.KeyServer, error) {
 	const op = "key/server.New"
+
+	cacheSize := 10000
 
 	// All options are for the Storage layer.
 	var storageOpts []storage.DialOpts
 	for _, o := range options {
-		storageOpts = append(storageOpts, storage.WithOptions(o))
+		vals := strings.Split(o, "=")
+		if len(vals) != 2 {
+			return nil, errors.E(op, "config options must be in the format 'key=value'")
+		}
+		k, v := vals[0], vals[1]
+		switch k {
+		case "cacheSize":
+			cacheSize, err := strconv.ParseInt(v, 10, 32)
+			if err != nil {
+				return nil, errors.E(op, errors.Invalid, errors.Errorf("invalid cache size %q: %s", v, err))
+			}
+			if cacheSize < 1 {
+				return nil, errors.E(op, errors.Invalid, errors.Errorf("%s: cache size too small: %d", k, cacheSize))
+			}
+		default:
+			storageOpts = append(storageOpts, storage.WithOptions(o))
+		}
 	}
 
 	s, err := storage.Dial("GCS", storageOpts...)
@@ -47,6 +71,8 @@ func New(options ...string) (upspin.KeyServer, error) {
 		refCount:  &refCount{count: 1},
 		lookupTXT: net.LookupTXT,
 		logger:    &loggerImpl{storage: s},
+		cache:     cache.NewLRU(cacheSize),
+		negCache:  cache.NewLRU(cacheSize),
 	}, nil
 }
 
@@ -64,6 +90,13 @@ type server struct {
 	// lookupTXT is a DNS lookup function that returns all TXT fields for a
 	// domain. It should alias net.LookupTXT except in tests.
 	lookupTXT func(domain string) ([]string, error)
+
+	// cache caches known users. Key is a UserName. Value is *userEntry.
+	cache *cache.LRU
+
+	// negCache caches the absence of a user. Key is a UserName and value is
+	// ignored.
+	negCache *cache.LRU
 }
 
 var _ upspin.KeyServer = (*server)(nil)
@@ -89,14 +122,40 @@ func (s *server) Lookup(name upspin.UserName) (*upspin.User, error) {
 	if err := valid.UserName(name); err != nil {
 		return nil, errors.E(op, name, err)
 	}
-
-	sp := span.StartSpan("fetchUserEntry")
-	entry, err := s.fetchUserEntry(op, name)
-	sp.End()
+	entry, err := s.lookup(op, name, span)
 	if err != nil {
 		return nil, err
 	}
 	return &entry.User, nil
+}
+
+// lookup looks up the internal user record, using caches when available.
+func (s *server) lookup(op string, name upspin.UserName, span *metric.Span) (*userEntry, error) {
+	// Check positive cache first.
+	if entry, found := s.cache.Get(name); found {
+		return entry.(*userEntry), nil
+	}
+	// Check negative cache next.
+	if _, found := s.negCache.Get(name); found {
+		return nil, errors.E(errors.NotExist, name)
+	}
+
+	// No information. Find it on our storage backend.
+	sp := span.StartSpan(op + ": fetchUserEntry")
+	entry, err := s.fetchUserEntry(op, name)
+	sp.End()
+	if err != nil {
+		// Not found: add to negative cache.
+		if errors.Match(errors.E(errors.NotExist), err) {
+			s.negCache.Add(name, true)
+		}
+		return nil, err
+	}
+
+	// Found. Add to positive cache.
+	s.cache.Add(name, entry)
+
+	return entry, nil
 }
 
 // Put implements upspin.KeyServer.
@@ -115,9 +174,8 @@ func (s *server) Put(u *upspin.User) error {
 	// Retrieve info about the user we want to Put.
 	isAdmin := false
 	newUser := false
-	sp := span.StartSpan("fetchUserEntry")
-	entry, err := s.fetchUserEntry(op, u.Name)
-	sp.End()
+
+	entry, err := s.lookup(op, u.Name, span)
 	switch {
 	case errors.Match(errors.E(errors.NotExist), err):
 		// OK; adding new user.
@@ -133,19 +191,25 @@ func (s *server) Put(u *upspin.User) error {
 		return err
 	}
 
-	sp = span.StartSpan("logger.PutAttempt")
+	sp := span.StartSpan("logger.PutAttempt")
 	err = s.logger.PutAttempt(s.user, u)
 	sp.End()
 	if err != nil {
 		return errors.E(op, err)
 	}
 
+	entry = &userEntry{User: *u, IsAdmin: isAdmin}
 	sp = span.StartSpan("putUserEntry")
-	err = s.putUserEntry(op, &userEntry{User: *u, IsAdmin: isAdmin})
+	err = s.putUserEntry(op, entry)
 	sp.End()
 	if err != nil {
 		return err
 	}
+
+	// Remove this new user from the negative cache and update it on the
+	// positive cache.
+	s.negCache.Remove(u.Name)
+	s.cache.Add(u.Name, entry)
 
 	sp = span.StartSpan("logger.PutSuccess")
 	err = s.logger.PutSuccess(s.user, u)
