@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7914ea66_532e42e4",
+        "filename": "doc/security.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-08T17:07:21Z",
+      "side": 1,
+      "message": "I thought we were going to encode the length here to address the issues Quan raised.",
+      "revId": "5a8b8864afbf59af078c28b8693336ff71b27f25",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "179efbb0_ea5cc852",
+        "filename": "doc/security.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-08T17:07:21Z",
+      "side": 1,
+      "message": "Is \"leaking\" the right word here? It\u0027s not the Dirserver allows any random person to see it. If this is the right security word, okay, but otherwise, despite the paragraph above explaining the \"leak\", I think it would read better something softer. Perhaps \"besides the issue above regarding metadata...\"",
+      "revId": "5a8b8864afbf59af078c28b8693336ff71b27f25",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
