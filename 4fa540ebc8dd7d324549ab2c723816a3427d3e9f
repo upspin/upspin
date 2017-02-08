@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "f33a1de7_8ec9aa3d",
+        "filename": "key/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-08T21:29:36Z",
+      "side": 1,
+      "message": "Good point",
+      "parentUuid": "f421a91e_f7c47007",
+      "revId": "4fa540ebc8dd7d324549ab2c723816a3427d3e9f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "9c1548bb_650d96b7",
         "filename": "key/server/server.go",
         "patchSetId": 1
@@ -66,6 +84,24 @@
       "side": 1,
       "message": "Why?  The lru cache takes an interface{} so why waste the space; you never look at the value, just that it exists.",
       "parentUuid": "9c1548bb_650d96b7",
+      "revId": "4fa540ebc8dd7d324549ab2c723816a3427d3e9f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "97f4e9ac_7c28b8a7",
+        "filename": "key/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-08T21:29:36Z",
+      "side": 1,
+      "message": "the storage for a nil interface{} and a nil pointer inside an interface{} is the same",
+      "parentUuid": "a2cf6eac_99de7054",
       "revId": "4fa540ebc8dd7d324549ab2c723816a3427d3e9f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
