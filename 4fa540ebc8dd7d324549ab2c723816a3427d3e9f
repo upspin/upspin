@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "f421a91e_f7c47007",
+        "filename": "key/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-08T21:24:48Z",
+      "side": 1,
+      "message": "There\u0027s a certain advantage to having them separate.  One thing that definitely happens is people looking for valid names. They are often pounding on the door with names that won\u0027t be found.  You don\u0027t want them emptying the positive cache entries.",
+      "parentUuid": "463ff809_e332ae7d",
+      "revId": "4fa540ebc8dd7d324549ab2c723816a3427d3e9f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "9c1548bb_650d96b7",
         "filename": "key/server/server.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2017-02-08T20:53:46Z",
       "side": 1,
       "message": "s.cache.Add(name, entry)",
+      "revId": "4fa540ebc8dd7d324549ab2c723816a3427d3e9f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a2cf6eac_99de7054",
+        "filename": "key/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-08T21:24:48Z",
+      "side": 1,
+      "message": "Why?  The lru cache takes an interface{} so why waste the space; you never look at the value, just that it exists.",
+      "parentUuid": "9c1548bb_650d96b7",
       "revId": "4fa540ebc8dd7d324549ab2c723816a3427d3e9f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
