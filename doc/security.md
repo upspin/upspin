@@ -6,33 +6,24 @@ The security design of Upspin has been sketched in the accompanying
 [Upspin overview](/doc/overview.md) document.
 Here we dive into the deeper security issues.
 Some of the discussion may be of interest only to experts, but the general
-design should be understood by anyone given background provided in the
+design should be understandable by anyone given background provided in the
 referenced links.
 
 When running the Directory and Storage servers on public cloud infrastructure
-such as Google Cloud, Upspin attempts to provide:
+Upspin attempts to provide:
 
-1. confidentiality and integrity protection of content even against state
-   actors, and
-1. protection of metadata against moderately capable attackers, but not against
-   due legal process.
-   Especially cautious users can run their directory server in a private cloud
-   to protect themselves against intrusion via metadata search warrants.
+1. confidentiality and integrity protection of content even against advanced
+   attackers, and
+1. protection of metadata against network attackers, but not against
+   due legal process upon the cloud provider.
+   Concerned users would run their directory server in a private cloud.
 
-Upspin's security model assumes that the Client endpoint platform is secure,
-that the Directory service is run on a machine considered adequately secure by
-its shared users, and that the Store service is reasonably available but not
-necessarily trusted for confidentiality.
+Upspin's security model assumes that the Client endpoint platform is secure.
+Additional trust discussion is in the Server Management section below.
 
 ## Upspin-specific Storage
 
-It is feasible to use Upspin with existing, perhaps unencrypted, storage
-systems.
-
-But Upspin's design can securely build on top of untrusted public cloud
-storage, and that will be the primary emphasis in this document.
-
-In our design, Alice (which is to say, Upspin software run by Alice) shares a
+In our design, Alice (which is to say, Upspin client software run by Alice) shares a
 file with Bob by picking a new random
 [symmetric key](https://en.wikipedia.org/wiki/Symmetric-key_algorithm),
 encrypting a file, wrapping the symmetric encryption key with Bob's
@@ -51,7 +42,7 @@ cryptographic packages.
 
 The basic idea is to choose a random number as an encryption key K, use AES to
 encrypt the data, and store the encrypted data in the storage server.
-Then, we encrypt K again, repeatedly using the private key of each potential
+Then, we encrypt K again, repeatedly using the public key of each potential
 reader of the file.
 We store those encrypted keys in the `DirEntry` for the item along with a
 digital signature of the data.
@@ -67,8 +58,6 @@ The ciphertext is sent to the Store server.
 The Store server returns a cryptographic location string, called a reference,
 that we assume may safely be given to anyone and used to retrieve the
 ciphertext.
-Thus Alice leaks information to the Store server consisting of the creation
-time and the file size, but nothing else.
 
 A username list {U} is assembled including Bob, Alice, and any others granted
 read access to items in the pathname's directory.
@@ -76,12 +65,11 @@ Alice looks up each of the username's public key P(U) from (a local cache of) a
 centralized `KeyServer` running at `key.upspin.io`.
 Alice wraps *dkey* for each reader, annotated with a hash of that user's public
 key.
-(Alice runs with only ciphersuites she considers adequate, say
-{p256,p384,p521}, though she may herself use a p384 key.
+(Alice shares with others using ciphersuites she considers adequate, say
+{p256,p384,p521}, though her own key may be p384.
 If Bob picks an RSA 1024 key, she'll decline to wrap for him.)
 
 Keys are wrapped as in NIST 800-56A rev2 and RFC6637 §8 using ECDH.
-TODO LINKS.
 Specifically, Alice creates an ephemeral key pair v, V=vG based on the agreed
 elliptic curve point G and random v.
 Using Bob's public key R, Alice computes the shared point S = vR.
@@ -101,7 +89,7 @@ secret via HKDF, and finally AES-GCM decrypting to recover dkey.
 Using her private key, Alice signs
 
 ```
-sha256("*ciphersuite*:*pathname*:*time*:*dkey*:*ciphertext*")
+sha256("ciphersuite:pathname:time:dkey:ciphertext")
 ```
 
 By signing, Alice ensures that even a reader colluding with upspin servers
@@ -122,7 +110,7 @@ The list of readers for key wrapping is taken from the read access list
 described in the [Access Control](/doc/access_control.md) document.
 When that list changes, wrapped keys should be removed for the dropped readers
 and extra wrapped keys made for the added readers.
-The Directory server manages this work queue, but needs cooperation of the
+The Directory server assists with this work queue, but needs cooperation of the
 owner's Client to do the actual wrapping for new readers.
 This lazy update process can also handle readers' public keys changing over
 time, which helps users who have lost old keys.
@@ -133,7 +121,7 @@ However, a somewhat similar effect is achieved by this update process.
 The pathname, revision number, encrypted content location, signature, and
 wrapped keys are the primary metadata about a file stored by the Directory
 server.
-Thus Alice leaks information to the Directory server, particularly the
+Thus Alice reveals information to the Directory server, particularly the
 cleartext pathnames and the (public keys of the) people she is sharing with.
 Also, to the extent that elliptic curves might be cryptographically weaker over
 time than AES, Alice also depends on the Directory server being unwilling to
@@ -141,7 +129,7 @@ distribute data to unauthorized people.
 
 The random bit generation, file encryption, and signing/key-wrapping all are
 done on the Client, not on any of the servers.
-So, with the exception of specific leaks called out above, we intend that this
+We intend that this
 system provides end-to-end encryption verifiably under the exclusive control of
 the end users.
 
@@ -159,9 +147,11 @@ AEAD, specifically AES GCM.
 ## Key Management
 
 An Upspin user joins the system by publishing a key to a central key server.
-We're running our own server for the moment but anticipate sharing with a
-CONIKS-like system being built for e2email.
-[TODO: link to blog post]
+We're running our own server for the moment but anticipate converting to
+[Key Transparency](https://security.googleblog.com/2017/01/security-through-transparency.html).
+For the time being, we enable detection of tampering with keys by
+publishing a full, incrementally hashed transaction log at
+https://key.upspin.io/log.
 
 As far as Upspin is concerned, a user is an email address, authenticated by an
 elliptic curve key pair used for signing and encrypting.
@@ -171,12 +161,10 @@ accept losing that access to that content if they lose all copies of their keys.
 
 To generate a new key pair, a user executes `keygen` and copies on paper the
 128 bit seed as backup.
-This seed is, expressed as a proquint
-[[arxiv.org/html/0901.4016](https://arxiv.org/html/0901.4016)].
+This seed is expressed as a [proquint](https://arxiv.org/html/0901.4016).
 The keygen program saves the elliptic curve public and private keys, as decimal
 integers in plain text files in the user's home .ssh directory.
-A user should be able to "restore" keys to multiple devices including
-smartphones.
+A user may "restore" keys to multiple devices including smartphones.
 
 The public part of the key pair is stored in a file `public.upspinkey,`
 conventionally in the directory $HOME/.ssh/ along with the user's other keys.
@@ -270,8 +258,8 @@ providing for an isolated implementation, as in qubes-split-gpg or ssh-agent.
 ## Server Management
 
 We're currently running our Store server (for encrypted bulk file content),
-Directory server (for metadata), and User server (for keys and location of
-directory server) on GKE at domain name `upspin.io`.
+Directory server (for metadata), and Key server (for keys and location of
+directory server) on Google Cloud Platform at domain name `upspin.io`.
 
 A user connects to these servers by HTTPS, implicitly using TLS 1.2.
 To identify the user accessing any Upspin server, the RPC framework presents an
@@ -288,3 +276,31 @@ users permitted to store blocks on the server.
 The `upspin.io` servers use certificates from LetsEncrypt.
 You may use the default system Root CA list, or specify `tlscerts` in your
 `~/upspin/rc` pointing to a directory with just `DST_Root_CA_X3.pem`.
+
+Implicit in the cryptographic discussion earlier is the fact that a Directory
+server administrator can read any file name, the writer, and the list of readers.
+This is roughly equivalent to using PGP inside
+an email system like Gmail:  very few attackers can reach the metadata,
+but a rogue insider or law enforcement with judicial oversight would be
+able to.  As mentioned in the introduction, a concerned user could choose
+to run the Directory server on their own machine.
+
+Besides observing metadata, a subverted Directory server can cause harm
+by returning an incorrrect Access file to the client.
+Access files are signed by the owner, but replay is possible;
+this might yield a stale list of readers or other permissions.
+(Similarly, the Directory server could serve a stale signed DirEntry.)
+In addition to checking signatures, the client confirms an Access file
+is in the path from the current directory up to the root to limit the
+damage of a malicious Directory server returning the wrong result from
+a call to WhichAccess().
+A cautious owner should not place private directories inside public directories.
+
+Finally, while the backup properties of Upspin improve on most people's file
+systems today, a malicious or buggy Directory or Storage server can
+certainly wreak havoc through deletion.
+
+Writing a file to a Store server reveals the creation time and the file size,
+but nothing else.  Thus we expect even very cautious users can enjoy
+the availability advantages of public cloud storage.  If they prefer,
+they can run the Upspin Store server code off their own local disk.
