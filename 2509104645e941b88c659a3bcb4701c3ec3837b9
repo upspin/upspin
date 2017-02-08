@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bfbcd3a4_bfe18bf4",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 11
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-08T19:57:47Z",
+      "side": 1,
+      "message": "I would be happier with \u0027an Internet domain to which you can add records\u0027 since that alone is required.  You don\u0027t have to control that domain, just make sure records can be added to it.  For example, your best friend may provide the domain.",
+      "parentUuid": "83bfd08a_8e1561bf",
+      "revId": "2509104645e941b88c659a3bcb4701c3ec3837b9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "4eda9e2a_d55aaadf",
         "filename": "doc/server_setup.md",
         "patchSetId": 11
@@ -30,6 +48,24 @@
       "writtenOn": "2017-02-08T03:38:17Z",
       "side": 1,
       "message": "no, it\u0027ll be the administrator of your upspin service. different meaning.\nagain, examples please",
+      "revId": "2509104645e941b88c659a3bcb4701c3ec3837b9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "87e2c162_3bf6d843",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 11
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-08T19:57:47Z",
+      "side": 1,
+      "message": "+1",
+      "parentUuid": "4eda9e2a_d55aaadf",
       "revId": "2509104645e941b88c659a3bcb4701c3ec3837b9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -115,6 +151,98 @@
       "writtenOn": "2017-02-08T03:38:17Z",
       "side": 1,
       "message": "... to enable the required APIs:",
+      "revId": "2509104645e941b88c659a3bcb4701c3ec3837b9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3153832d_d398d3b2",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 11
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-08T19:57:47Z",
+      "side": 1,
+      "message": "Just installed the sdk.  I get:\n\n% gcloud --project closedmind-upspin2 beta service-management enable iam.googleapis.com storage_api\nERROR: (gcloud.beta.service-management.enable) unrecognized arguments: storage_api\nUsage: gcloud beta service-management enable  SERVICE [optional flags]\n  optional flags may be  --async | --help | -h\n\nFor detailed information on this command and its flags, run:\n  gcloud beta service-management enable --help\n\nIt works if I give two different command, one enabling iam.googleapis.com and one enabling storage_api.",
+      "range": {
+        "startLine": 134,
+        "startChar": 2,
+        "endLine": 134,
+        "endChar": 8
+      },
+      "revId": "2509104645e941b88c659a3bcb4701c3ec3837b9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9169c1b5_6375d541",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 11
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-08T19:57:47Z",
+      "side": 1,
+      "message": "This seems unnecessarily tedious.  Why isn\u0027t this just a script that types out explanations as it goes?  I\u0027ve now managed to mistype my domain name twice in this sequence.",
+      "range": {
+        "startLine": 143,
+        "startChar": 1,
+        "endLine": 151,
+        "endChar": 0
+      },
+      "revId": "2509104645e941b88c659a3bcb4701c3ec3837b9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "38607310_58cf66f6",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 11
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-08T19:57:47Z",
+      "side": 1,
+      "message": "Of course I just saw this after typing the command.\n\nNow remove the bomb fuse...\n\nBut FIRST cut the green wire.",
+      "range": {
+        "startLine": 153,
+        "startChar": 0,
+        "endLine": 154,
+        "endChar": 79
+      },
+      "revId": "2509104645e941b88c659a3bcb4701c3ec3837b9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c33b46d1_30c6a801",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 11
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-08T19:57:47Z",
+      "side": 1,
+      "message": "s/but for/though/",
+      "range": {
+        "startLine": 159,
+        "startChar": 38,
+        "endLine": 159,
+        "endChar": 41
+      },
       "revId": "2509104645e941b88c659a3bcb4701c3ec3837b9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
