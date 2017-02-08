@@ -83,6 +83,7 @@ func testShutdown(t *testing.T, clean bool) {
 	}
 
 	// Collect and compare the remaining output lines.
+	waitErr := make(chan error, 1)
 	go func() {
 		for n := 1; n < len(shutdownMessages); n++ {
 			if !clean && n == 2 {
@@ -104,17 +105,21 @@ func testShutdown(t *testing.T, clean bool) {
 			return
 		}
 		readErr <- nil
+		waitErr <- cmd.Wait()
 	}()
 
-	// Kill the process and wait for it to exit, checking its exit status
-	// depending on whether this is a clean or messy text.
+	// Kill the process and wait for it to exit.
 	if err := syscall.Kill(cmd.Process.Pid, syscall.SIGTERM); err != nil {
 		t.Fatal(err)
 	}
-	waitErr := make(chan error, 1)
-	go func() {
-		waitErr <- cmd.Wait()
-	}()
+
+	// Check that the output was what we expected.
+	if err := <-readErr; err != nil {
+		cmd.Process.Kill()
+		t.Fatal(err)
+	}
+
+	// Check exit status.
 	select {
 	case err := <-waitErr:
 		if err != nil && clean {
@@ -123,12 +128,8 @@ func testShutdown(t *testing.T, clean bool) {
 			t.Fatal("child proces exited cleanly, want non-zero status")
 		}
 	case <-time.After(2 * time.Second):
+		cmd.Process.Kill()
 		t.Fatal("timed out waiting for child process to exit")
-	}
-
-	// Check that the output was what we expected.
-	if err := <-readErr; err != nil {
-		t.Fatal(err)
 	}
 }
 
