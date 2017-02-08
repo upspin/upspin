@@ -74,7 +74,7 @@ func TestGroupFileMultiDir(t *testing.T) {
 		readerGroupTeam   = readerGroup + "/team"
 		readerGroupAccess = readerGroup + "/Access"
 		fileContent       = "tadda!"
-		readAllPlusOwner = "read:all\n*:"+ownerName
+		readAllPlusOwner  = "read:all\n*:" + ownerName
 	)
 
 	// Owner creates a root and Group file.
