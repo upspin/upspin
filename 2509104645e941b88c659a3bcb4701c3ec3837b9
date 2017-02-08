@@ -53,6 +53,23 @@
     },
     {
       "key": {
+        "uuid": "c01b7888_c3e3d34c",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 11
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-08T17:12:31Z",
+      "side": 1,
+      "message": "I imagine this was discussed and discarded while I\u0027ve been away, so mentioning just to get history into the record...\n\nIt would be nice as we create what appears to the user as a merged server to also provide syntactic sugar to avoid retyping the host name.   \"-server\u003dupspin.example.com\" could be defined as an abbreviation for \"-dir\u003dupspin.example.com -store\u003dupspin.example.com\".\n\nOr maybe even adopt the convention that the server hostname is \"upspin\" so that the user only need say \"-domain\u003dexample.com\".  (The user can override for testing or whatever by falling back to -dir and -store.)  Even the domain can default to the base of the email address perhaps, though obviously that has more exceptions.",
+      "revId": "2509104645e941b88c659a3bcb4701c3ec3837b9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "882d43b8_0c7f7de0",
         "filename": "doc/server_setup.md",
         "patchSetId": 11
