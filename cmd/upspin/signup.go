@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net"
+	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -31,10 +33,8 @@ By default, signup creates new keys with the p256 cryptographic curve set.
 The -curve and -secretseed flags allow the user to control the curve or to
 recreate or reuse prior keys.
 
-As the final step, it writes the contents of a mail message to standard output.
-This message contains the information to be registered with the key server.
-After running signup, the new user must mail this message to
-signup@key.upspin.io to complete the signup process.
+As the final step, it sends a signup request to the key server at key.upspin.io
+that will then send a confirmation email to the given email address.
 `
 	fs := flag.NewFlagSet("signup", flag.ExitOnError)
 	var (
@@ -137,33 +137,34 @@ signup@key.upspin.io to complete the signup process.
 		s.exit(err)
 	}
 
-	f := cfg.Factotum()
-	if f == nil {
-		s.exitf("no factotum available")
+	// Make signup request.
+	vals := url.Values{
+		"name":  {string(cfg.UserName())},
+		"dir":   {string(cfg.DirEndpoint().NetAddr)},
+		"store": {string(cfg.StoreEndpoint().NetAddr)},
+		"key":   {string(cfg.Factotum().PublicKey())},
 	}
-	pubKey := strings.TrimSpace(string(f.PublicKey()))
+	signupURL := (&url.URL{
+		Scheme:   "https",
+		Host:     "key.upspin.io",
+		Path:     "/signup",
+		RawQuery: vals.Encode(),
+	}).String()
 
-	// Sign the username, key, and dir and store endpoints.
-	sig, err := f.Sign([]byte(string(cfg.UserName()) + pubKey + dirEndpoint.String() + storeEndpoint.String()))
+	r, err := http.Post(signupURL, "text/plain", nil)
 	if err != nil {
 		s.exit(err)
 	}
-
-	var msg bytes.Buffer
-	err = mailTemplate.Execute(&msg, mailData{
-		UserName:  userName,
-		PublicKey: strings.Replace(pubKey, "\n", ";\n", 3),
-		Dir:       dirEndpoint,
-		Store:     storeEndpoint,
-		Signature: sig.R.String() + ";\n" + sig.S.String(),
-	})
+	b, err := ioutil.ReadAll(r.Body)
+	r.Body.Close()
 	if err != nil {
 		s.exit(err)
 	}
-
-	fmt.Println("To register your key with the key server,")
-	fmt.Println("copy this email message and send it to signup@key.upspin.io:")
-	fmt.Printf("%s\n", &msg)
+	if r.StatusCode != http.StatusOK {
+		s.exitf("key server error: %s", b)
+	}
+	fmt.Printf("A signup email has been sent to %q,\n", cfg.UserName())
+	fmt.Println("please read it for further instructions.")
 }
 
 type configData struct {
@@ -179,31 +180,6 @@ secrets: {{.SecretDir}}
 storeserver: {{.Store}}
 dirserver: {{.Dir}}
 packing: {{.Packing}}
-`))
-
-type mailData struct {
-	UserName   upspin.UserName
-	PublicKey  string
-	Dir, Store *upspin.Endpoint
-	Signature  string
-}
-
-var mailTemplate = template.Must(template.New("mail").Parse(`
-I am {{.UserName}};
-
-My public key is:
-{{.PublicKey}};
-
-My directory server is:
-{{.Dir}};
-
-My store server is:
-{{.Store}};
-
-Signature:
-{{.Signature}};
-
-(End of message.)
 `))
 
 func parseAddress(a string) (*upspin.Endpoint, error) {
