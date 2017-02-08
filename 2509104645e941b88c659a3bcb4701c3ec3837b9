@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "83bfd08a_8e1561bf",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 11
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-08T03:38:17Z",
+      "side": 1,
+      "message": "i think this needs a more careful or at least less confusing explanation.\nan example would help, but so would more clarity\n\nsomething like a well-written version of, we\u0027re using example.com which means we\u0027ll deploy an upspin server at upspin.example.com and need to be able to create that domain name",
+      "revId": "2509104645e941b88c659a3bcb4701c3ec3837b9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4eda9e2a_d55aaadf",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 11
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-08T03:38:17Z",
+      "side": 1,
+      "message": "no, it\u0027ll be the administrator of your upspin service. different meaning.\nagain, examples please",
+      "revId": "2509104645e941b88c659a3bcb4701c3ec3837b9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "036b6dba_cf55d9fd",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 11
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-08T03:38:17Z",
+      "side": 1,
+      "message": "how could it not be? if it\u0027s not, i have no idea what \u0027chosen domain\u0027 means",
+      "revId": "2509104645e941b88c659a3bcb4701c3ec3837b9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "882d43b8_0c7f7de0",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 11
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-08T03:38:17Z",
+      "side": 1,
+      "message": "backquote you@gmail.com example.com etc. consistently",
+      "revId": "2509104645e941b88c659a3bcb4701c3ec3837b9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b759048e_a17ee939",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 11
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-08T03:38:17Z",
+      "side": 1,
+      "message": "still not in the CL",
+      "revId": "2509104645e941b88c659a3bcb4701c3ec3837b9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7ff5a38e_54834854",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 11
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-08T03:38:17Z",
+      "side": 1,
+      "message": "... to enable the required APIs:",
+      "revId": "2509104645e941b88c659a3bcb4701c3ec3837b9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
