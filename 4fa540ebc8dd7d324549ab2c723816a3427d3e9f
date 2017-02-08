@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "463ff809_e332ae7d",
+        "filename": "key/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-08T20:53:46Z",
+      "side": 1,
+      "message": "rather than having a positive and negative cache, you could just put nil in for a notexist error\n\nentry, found :\u003d s.cache.Get(name)\nif found {\n  e :\u003d entry.(*userEntry)\n  if e \u003d\u003d nil {\n    return nil, errors.E(errors.NotExist, name)\n  }\n  return e, nil\n}",
+      "revId": "4fa540ebc8dd7d324549ab2c723816a3427d3e9f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9c1548bb_650d96b7",
+        "filename": "key/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-08T20:53:46Z",
+      "side": 1,
+      "message": "s.cache.Add(name, entry)",
+      "revId": "4fa540ebc8dd7d324549ab2c723816a3427d3e9f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bab1844e_e17fe7e4",
+        "filename": "key/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-08T20:53:46Z",
+      "side": 1,
+      "message": "delete",
+      "revId": "4fa540ebc8dd7d324549ab2c723816a3427d3e9f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
