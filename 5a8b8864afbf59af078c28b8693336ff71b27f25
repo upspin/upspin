@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7ff1a6ae_7da189fa",
+        "filename": "doc/security.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-08T19:29:13Z",
+      "side": 1,
+      "message": "Yes, that\u0027s the plan but not because of the security review.   Rather, I\u0027m trying to decide if the link field needs to be signed.  (That would add a second user controlled string, which is what triggers the need for length.)\n\nAnyway, this will be in a forthcoming CL.",
+      "parentUuid": "7914ea66_532e42e4",
+      "revId": "5a8b8864afbf59af078c28b8693336ff71b27f25",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "179efbb0_ea5cc852",
         "filename": "doc/security.md",
         "patchSetId": 1
@@ -33,6 +51,24 @@
       "revId": "5a8b8864afbf59af078c28b8693336ff71b27f25",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "43734393_3d91611f",
+        "filename": "doc/security.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-08T19:29:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "179efbb0_ea5cc852",
+      "revId": "5a8b8864afbf59af078c28b8693336ff71b27f25",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
