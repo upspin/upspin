@@ -123,6 +123,24 @@
     },
     {
       "key": {
+        "uuid": "ff5546e3_2b1cff52",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 11
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-09T05:04:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "882d43b8_0c7f7de0",
+      "revId": "2509104645e941b88c659a3bcb4701c3ec3837b9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b759048e_a17ee939",
         "filename": "doc/server_setup.md",
         "patchSetId": 11
@@ -140,6 +158,24 @@
     },
     {
       "key": {
+        "uuid": "7ed8f569_a53125b4",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 11
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-09T05:04:54Z",
+      "side": 1,
+      "message": "it\u0027s already in the repo",
+      "parentUuid": "b759048e_a17ee939",
+      "revId": "2509104645e941b88c659a3bcb4701c3ec3837b9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "7ff5a38e_54834854",
         "filename": "doc/server_setup.md",
         "patchSetId": 11
@@ -151,6 +187,24 @@
       "writtenOn": "2017-02-08T03:38:17Z",
       "side": 1,
       "message": "... to enable the required APIs:",
+      "revId": "2509104645e941b88c659a3bcb4701c3ec3837b9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bcaea306_df7820be",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 11
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-09T05:04:54Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "7ff5a38e_54834854",
       "revId": "2509104645e941b88c659a3bcb4701c3ec3837b9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -180,6 +234,24 @@
     },
     {
       "key": {
+        "uuid": "710032ef_2029c528",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 11
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-09T05:04:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3153832d_d398d3b2",
+      "revId": "2509104645e941b88c659a3bcb4701c3ec3837b9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9169c1b5_6375d541",
         "filename": "doc/server_setup.md",
         "patchSetId": 11
@@ -197,6 +269,24 @@
         "endLine": 151,
         "endChar": 0
       },
+      "revId": "2509104645e941b88c659a3bcb4701c3ec3837b9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5152b530_2d1e495a",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 11
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-09T05:04:54Z",
+      "side": 1,
+      "message": "agree, i\u0027ll arrange to do this all inside upspinstorage in a followup CL",
+      "parentUuid": "9169c1b5_6375d541",
       "revId": "2509104645e941b88c659a3bcb4701c3ec3837b9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -226,6 +316,24 @@
     },
     {
       "key": {
+        "uuid": "fd54c421_918b91e3",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 11
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-09T05:04:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "38607310_58cf66f6",
+      "revId": "2509104645e941b88c659a3bcb4701c3ec3837b9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c33b46d1_30c6a801",
         "filename": "doc/server_setup.md",
         "patchSetId": 11
@@ -249,6 +357,24 @@
     },
     {
       "key": {
+        "uuid": "6a8088c9_a55d3209",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 11
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-09T05:04:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c33b46d1_30c6a801",
+      "revId": "2509104645e941b88c659a3bcb4701c3ec3837b9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "196574cc_5512c5ed",
         "filename": "doc/server_setup.md",
         "patchSetId": 11
@@ -266,6 +392,24 @@
         "endLine": 163,
         "endChar": 23
       },
+      "revId": "2509104645e941b88c659a3bcb4701c3ec3837b9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0d24247b_b94f225d",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 11
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-09T05:04:54Z",
+      "side": 1,
+      "message": "I\u0027m not actually sure what our requirements are at this stage.\nI wrote a TODO",
+      "parentUuid": "196574cc_5512c5ed",
       "revId": "2509104645e941b88c659a3bcb4701c3ec3837b9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
