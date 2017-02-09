@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d0c075f0_473b30cc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-09T21:32:11Z",
+      "side": 1,
+      "message": "store/storecache: remaining changes from previous review",
+      "revId": "db3eb59abacd50a395325ae68fcbc2bb3ba2ecee",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
