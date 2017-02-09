@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "20f9e609_165788f0",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-09T17:28:11Z",
+      "side": 1,
+      "message": "s/delete/ignore/?",
+      "revId": "c8866f9087723bfb4213e94b0883033b3719dcfe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9464248c_effb70c5",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-09T17:28:11Z",
+      "side": 1,
+      "message": "There was an interesting feature that we had before which is an email to our mailing list letting us know someone new signed up. I was using upspin-sendgrid for that, but we could use upspin or create a new one. It seems valuable to get a notification though.",
+      "revId": "c8866f9087723bfb4213e94b0883033b3719dcfe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c2e82481_6ec5c12f",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-09T17:28:11Z",
+      "side": 1,
+      "message": "Should we be hashing before signing? @ehg?",
+      "revId": "c8866f9087723bfb4213e94b0883033b3719dcfe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
