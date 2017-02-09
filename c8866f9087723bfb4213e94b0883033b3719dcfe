@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "19525483_7ac867f1",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-09T19:09:04Z",
+      "side": 1,
+      "message": "TODO  Also limit equivalent email addresses, for example user+foo@gmail.com and maybe all emails from a single little-used domain.\n\nI expect abusers will eventually use that loophole, but fine to skip for this version.",
+      "revId": "c8866f9087723bfb4213e94b0883033b3719dcfe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "20f9e609_165788f0",
         "filename": "cmd/keyserver/signup.go",
         "patchSetId": 4
@@ -47,6 +64,24 @@
       "writtenOn": "2017-02-09T17:28:11Z",
       "side": 1,
       "message": "Should we be hashing before signing? @ehg?",
+      "revId": "c8866f9087723bfb4213e94b0883033b3719dcfe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c46bc105_39a3e998",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-09T19:09:04Z",
+      "side": 1,
+      "message": "Yes, hash before sign is sound and the implementation here LGTM.",
+      "parentUuid": "c2e82481_6ec5c12f",
       "revId": "c8866f9087723bfb4213e94b0883033b3719dcfe",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
