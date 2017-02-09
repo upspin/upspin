@@ -112,9 +112,12 @@ func (c *storeCache) walk(dir string) error {
 			}
 			continue
 		}
-		if c.wbq.isWritebackFile(pathName) {
+		// If this is a writeback link, assume the write back cache
+		// will assume responsibility for it.
+		if c.wbq.enqueueWritebackFile(pathName) {
 			continue
 		}
+		// Not a writeback link, remember it and account for its size.
 		cr := c.newCachedRef(pathName)
 		cr.size = i.Size()
 		cr.valid = true
@@ -429,7 +432,7 @@ func (cr *cachedRef) saveToCacheFile(file string, data []byte) error {
 // enforceByteLimitByRemovingLeastRecentlyUsedFile removes the oldest entries until inUse is below limit. We take a leap
 // of faith that the least recently used entry is not currently in use.
 func (c *storeCache) enforceByteLimitByRemovingLeastRecentlyUsedFile() {
-	for skips := 0; skips < 100; {
+	for {
 		if atomic.LoadInt64(&c.inUse) < c.limit {
 			break
 		}

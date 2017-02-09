@@ -5,7 +5,6 @@
 package storecache
 
 import (
-	"fmt"
 	"os"
 	"strings"
 	"time"
@@ -53,10 +52,11 @@ type writebackQueue struct {
 	sc *storeCache
 
 	// byEndpoint contains references to be written back. This
-	// is used/modifid exclusively by the scheduler goroutine.
+	// is used/modified exclusively by the scheduler goroutine.
 	byEndpoint map[upspin.Endpoint]*endpointQueue
 
-	// All queued writeback requests.
+	// All queued writeback requests. Also used/modified
+	// exclusively by the scheduler goroutine.
 	inFlight map[upspin.Location]*request
 
 	// request carries writeback requests to the scheduler.
@@ -108,12 +108,9 @@ func newWritebackQueue(sc *storeCache) *writebackQueue {
 	return wbq
 }
 
-// isWritebackFile reports whether the path names a writeback file.
-// It is called by the cache startup code for each file found when walking
-// the cache directories.
-//
-// This is used to populate the writeback queues on startup.
-func (wbq *writebackQueue) isWritebackFile(path string) bool {
+// enqueueWritebackFile populates the writeback queue on startup.
+// It returns true if this was indeed a write back file.
+func (wbq *writebackQueue) enqueueWritebackFile(path string) bool {
 	const op = "store/storecache.isWritebackFile"
 	f := strings.TrimSuffix(path, writebackSuffix)
 	if f == path {
@@ -158,7 +155,7 @@ func (wbq *writebackQueue) scheduler() {
 	for {
 		select {
 		case r := <-wbq.request:
-			log.Debug.Printf("%s: %s %s rcvd", op, r.Reference, r.Endpoint)
+			log.Debug.Printf("%s: received %s %s", op, r.Reference, r.Endpoint)
 			// Keep a map of requests so that we can handle flushes
 			// and avoid Duplicates.
 			if wbq.inFlight[r.Location] != nil {
@@ -252,7 +249,7 @@ func (wbq *writebackQueue) pickAndQueue() bool {
 			return true
 		default:
 			// Queue full.
-			break
+			return false
 		}
 	}
 	return false
@@ -299,7 +296,7 @@ func (wbq *writebackQueue) writeback(r *request) error {
 		return err
 	}
 	if refdata.Reference != r.Reference {
-		err := errors.E(fmt.Sprintf("refdata mismatch expected %s got %s", r.Reference, refdata.Reference))
+		err := errors.Errorf("refdata mismatch expected %q got %q", r.Reference, refdata.Reference)
 		return err
 	}
 	if err := os.Remove(file); err != nil {
