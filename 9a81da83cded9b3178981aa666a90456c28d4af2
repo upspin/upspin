@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "dab970cb_77594f6b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-09T03:23:14Z",
+      "side": 1,
+      "message": "Can you please wrap the commit message at 80 columns? sorry",
+      "revId": "9a81da83cded9b3178981aa666a90456c28d4af2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "bd6c4cee_d02fa349",
         "filename": "dir/dircache/log.go",
         "patchSetId": 10
