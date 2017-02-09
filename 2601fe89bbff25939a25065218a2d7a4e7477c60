@@ -16,6 +16,24 @@
       "revId": "2601fe89bbff25939a25065218a2d7a4e7477c60",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "98be1e4b_040051af",
+        "filename": "doc/security.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-09T17:36:08Z",
+      "side": 1,
+      "message": "Exactly my plan.   But this is easier to do than to undo, so I wanted to let Rob opine first.",
+      "parentUuid": "58b35568_c7862c35",
+      "revId": "2601fe89bbff25939a25065218a2d7a4e7477c60",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
