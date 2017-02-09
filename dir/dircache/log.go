@@ -788,6 +788,8 @@ func (l *clog) updateLRU(e *clogEntry) {
 			}
 		}
 	case obsoleteReq:
+		// These never get logged. They are just markers that the file
+		// is of interest to the watcher.
 	default:
 		log.Printf("unknown request type: %s", e)
 	}
