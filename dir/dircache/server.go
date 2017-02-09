@@ -25,24 +25,24 @@ type server struct {
 	// The on disk log.
 	clog *clog
 
-	// blockFlusher is a routine to flush blocks in a writeback store.
+	// flushBlock is a routine to flush blocks in a writeback store.
 	// TODO(p): make this less of a hack somehow
-	blockFlusher func(upspin.Location)
+	flushBlock func(upspin.Location)
 
 	// The directory server this dialed server should talk to.
 	authority upspin.Endpoint
 }
 
 // New creates a new DirServer cache reading in the log and writing out a new compacted log.
-func New(cfg upspin.Config, cacheDir string, maxLogBytes int64, blockFlusher func(upspin.Location)) (upspin.DirServer, error) {
+func New(cfg upspin.Config, cacheDir string, maxLogBytes int64, flushBlock func(upspin.Location)) (upspin.DirServer, error) {
 	clog, err := openLog(cfg, ospath.Join(cacheDir, "dircache"), maxLogBytes)
 	if err != nil {
 		return nil, err
 	}
 	return &server{
-		cfg:          cfg,
-		clog:         clog,
-		blockFlusher: blockFlusher,
+		cfg:        cfg,
+		clog:       clog,
+		flushBlock: flushBlock,
 	}, nil
 }
 
@@ -125,9 +125,9 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	// Since the directory server needs to read the Access file
 	// we need to ensure that it is flushed from any cache
 	// before the Put.
-	if s.blockFlusher != nil && access.IsAccessFile(entry.Name) {
+	if s.flushBlock != nil && access.IsAccessFile(entry.Name) {
 		for _, b := range entry.Blocks {
-			s.blockFlusher(b.Location)
+			s.flushBlock(b.Location)
 		}
 	}
 	de, err := dir.Put(entry)

@@ -27,6 +27,10 @@ type server struct {
 }
 
 // New creates a new store cache that implements upspin.StoreServer.
+// For writeback caches, it also returns a function to flush Blocks
+// that are waiting to be written back. This is important to allow
+// the client to flush out Access file blocks before writing the
+// DirEntry.
 func New(cfg upspin.Config, cacheDir string, maxBytes int64, writeback bool) (upspin.StoreServer, func(upspin.Location), error) {
 	c, blockFlusher, err := newCache(cfg, path.Join(cacheDir, "storecache"), maxBytes, writeback)
 	if err != nil {
