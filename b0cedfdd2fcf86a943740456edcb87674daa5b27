@@ -54,6 +54,41 @@
     },
     {
       "key": {
+        "uuid": "46e0b7cf_21b0fca6",
+        "filename": "serverutil/rate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-09T23:57:41Z",
+      "side": 1,
+      "message": "it\u0027s not a godoc comment, so I think these comments are fine hre",
+      "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "590a2a84_9f55e8f6",
+        "filename": "serverutil/rate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-09T23:57:41Z",
+      "side": 1,
+      "message": "dreg",
+      "parentUuid": "bc91479a_9190d370",
+      "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "5653b476_e1e203e6",
         "filename": "serverutil/rate.go",
         "patchSetId": 4
@@ -65,6 +100,24 @@
       "writtenOn": "2017-02-09T17:08:43Z",
       "side": 1,
       "message": "why s? visitors?",
+      "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7bb47701_355505bf",
+        "filename": "serverutil/rate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-09T23:57:41Z",
+      "side": 1,
+      "message": "slice, but gone now",
+      "parentUuid": "5653b476_e1e203e6",
       "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -88,6 +141,24 @@
     },
     {
       "key": {
+        "uuid": "d143996c_f9a29a9d",
+        "filename": "serverutil/rate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-09T23:57:41Z",
+      "side": 1,
+      "message": "it was gate, now r",
+      "parentUuid": "1b8a055d_2c6fb58e",
+      "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "b7269cda_83042a5f",
         "filename": "serverutil/rate.go",
         "patchSetId": 4
@@ -99,6 +170,24 @@
       "writtenOn": "2017-02-09T17:08:43Z",
       "side": 1,
       "message": "Gate again. Did you rename it? That explains the g as the receiver name.",
+      "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cc25bd6f_11752c13",
+        "filename": "serverutil/rate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-09T23:57:41Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "b7269cda_83042a5f",
       "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -122,6 +211,24 @@
     },
     {
       "key": {
+        "uuid": "9a202c61_b261b187",
+        "filename": "serverutil/rate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-09T23:57:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "469b077d_f1273a07",
+      "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9e7aeffb_3a514eb1",
         "filename": "serverutil/rate.go",
         "patchSetId": 4
@@ -136,6 +243,24 @@
       "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "857e3693_499ac4a7",
+        "filename": "serverutil/rate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-09T23:57:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9e7aeffb_3a514eb1",
+      "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -156,6 +281,24 @@
     },
     {
       "key": {
+        "uuid": "89518df6_796cbd08",
+        "filename": "serverutil/rate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-09T23:57:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f87256b8_90dfa0b6",
+      "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6a02a343_a707be86",
         "filename": "serverutil/rate.go",
         "patchSetId": 4
@@ -167,6 +310,24 @@
       "writtenOn": "2017-02-09T17:08:43Z",
       "side": 1,
       "message": "This seems it could be fairly expensive. A linked list would be more practical here. We use it in the LRU cache. We should use it here too.",
+      "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f592a67b_ee2556ed",
+        "filename": "serverutil/rate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-09T23:57:41Z",
+      "side": 1,
+      "message": "used a linked list, less code",
+      "parentUuid": "6a02a343_a707be86",
       "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -190,6 +351,24 @@
     },
     {
       "key": {
+        "uuid": "bf8a2008_a6710eb6",
+        "filename": "serverutil/rate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-09T23:57:41Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "188f6bad_90156e0b",
+      "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "8f92f0fb_6217f9f6",
         "filename": "serverutil/rate_test.go",
         "patchSetId": 4
@@ -204,6 +383,24 @@
       "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "043cc339_e60880e8",
+        "filename": "serverutil/rate_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-09T23:57:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8f92f0fb_6217f9f6",
+      "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -224,6 +421,24 @@
     },
     {
       "key": {
+        "uuid": "5c32f7f3_4c50fabd",
+        "filename": "serverutil/rate_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-09T23:57:41Z",
+      "side": 1,
+      "message": "These tests *do* check the backoff in a black box sense.\nI\u0027d prefer to avoid reaching into the internals as much as I could.",
+      "parentUuid": "5921c41e_bb729f41",
+      "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "6489c67e_09fe52c8",
         "filename": "serverutil/rate_test.go",
         "patchSetId": 4
@@ -235,6 +450,24 @@
       "writtenOn": "2017-02-09T17:08:43Z",
       "side": 1,
       "message": "Drop comment? true means no backoff right?",
+      "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4b445788_0c140070",
+        "filename": "serverutil/rate_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-09T23:57:41Z",
+      "side": 1,
+      "message": "no. any key the first time it is seen is given a backoff of InitialBackoff",
+      "parentUuid": "6489c67e_09fe52c8",
       "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
