@@ -273,7 +273,7 @@ func (bp *blockPacker) Close() error {
 	sum := internal.BlockSum(bp.entry.Blocks)
 
 	// Compute entry signature.
-	sig, err := cfg.Factotum().FileSign(path.Clean(name), bp.entry.Time, bp.dkey, sum)
+	sig, err := cfg.Factotum().FileSign(name, bp.entry.Time, bp.dkey, sum)
 	if err != nil {
 		return errors.E(op, err)
 	}
@@ -340,7 +340,7 @@ func (ee ee) Unpack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker
 			return nil, errors.E(op, d.Name, errKeyLength)
 		}
 		// Verify that this was signed with the writer's old or new public key.
-		vhash := factotum.VerHash(writerCurveName, path.Clean(d.SignedName), d.Time, dkey, hash)
+		vhash := factotum.VerHash(writerCurveName, d.SignedName, d.Time, dkey, hash)
 		if !ecdsa.Verify(writerPubKey, vhash, sig.R, sig.S) &&
 			!ecdsa.Verify(writerPubKey, vhash, sig2.R, sig2.S) {
 			// Check sig2 in case writerPubKey is rotating.
@@ -557,7 +557,7 @@ func (ee ee) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName
 	}
 
 	// Verify that this was signed with the owner's old or new public key.
-	vhash := factotum.VerHash(ownerCurveName, path.Clean(d.SignedName), d.Time, dkey, cipherSum)
+	vhash := factotum.VerHash(ownerCurveName, d.SignedName, d.Time, dkey, cipherSum)
 	if !ecdsa.Verify(ownerPubKey, vhash, sig.R, sig.S) &&
 		!ecdsa.Verify(ownerPubKey, vhash, sig2.R, sig2.S) {
 		// Check sig2 in case ownerPubKey is rotating.
@@ -631,7 +631,7 @@ func Countersign(oldKey upspin.PublicKey, f upspin.Factotum, d *upspin.DirEntry)
 	}
 
 	// Verify existing signature with oldKey.
-	name := path.Clean(d.SignedName)
+	name := d.SignedName
 	vhash := factotum.VerHash(oldCurveName, name, d.Time, dkey, cipherSum)
 	if !ecdsa.Verify(oldPubKey, vhash, sig.R, sig.S) {
 		return errors.E(op, d.Name, errVerify, "unable to verify existing signature")
