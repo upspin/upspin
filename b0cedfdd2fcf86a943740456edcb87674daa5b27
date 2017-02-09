@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "23291b35_04aadea3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-09T17:08:43Z",
+      "side": 1,
+      "message": "Suggestion: A one-liner describing its intended use and brief \"features\" would be interesting.",
+      "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "81d9bc39_ac645866",
         "filename": "serverutil/rate.go",
         "patchSetId": 4
@@ -13,6 +30,75 @@
       "writtenOn": "2017-02-09T13:31:02Z",
       "side": 1,
       "message": "is there a reason not to use the usual Go comment style?",
+      "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bc91479a_9190d370",
+        "filename": "serverutil/rate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-09T17:08:43Z",
+      "side": 1,
+      "message": "What is a Gate?",
+      "parentUuid": "81d9bc39_ac645866",
+      "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5653b476_e1e203e6",
+        "filename": "serverutil/rate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-09T17:08:43Z",
+      "side": 1,
+      "message": "why s? visitors?",
+      "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1b8a055d_2c6fb58e",
+        "filename": "serverutil/rate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-09T17:08:43Z",
+      "side": 1,
+      "message": "Why g and not r?",
+      "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b7269cda_83042a5f",
+        "filename": "serverutil/rate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-09T17:08:43Z",
+      "side": 1,
+      "message": "Gate again. Did you rename it? That explains the g as the receiver name.",
       "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -64,6 +150,91 @@
       "writtenOn": "2017-02-09T13:31:02Z",
       "side": 1,
       "message": "s/them/it/ here and on next line",
+      "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6a02a343_a707be86",
+        "filename": "serverutil/rate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-09T17:08:43Z",
+      "side": 1,
+      "message": "This seems it could be fairly expensive. A linked list would be more practical here. We use it in the LRU cache. We should use it here too.",
+      "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "188f6bad_90156e0b",
+        "filename": "serverutil/rate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-09T17:08:43Z",
+      "side": 1,
+      "message": "All this reindexing business can go away with a linked list.",
+      "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8f92f0fb_6217f9f6",
+        "filename": "serverutil/rate_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-09T17:08:43Z",
+      "side": 1,
+      "message": "s/Gate/RateLimiter/",
+      "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5921c41e_bb729f41",
+        "filename": "serverutil/rate_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-09T17:08:43Z",
+      "side": 1,
+      "message": "You should check the backoff as well.",
+      "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6489c67e_09fe52c8",
+        "filename": "serverutil/rate_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-09T17:08:43Z",
+      "side": 1,
+      "message": "Drop comment? true means no backoff right?",
       "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
