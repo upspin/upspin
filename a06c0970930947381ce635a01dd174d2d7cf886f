@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "933069eb_3872336c",
+        "filename": "doc/security.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 283,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-09T16:30:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1d2e352b_7bed5f71",
+      "revId": "a06c0970930947381ce635a01dd174d2d7cf886f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6cc8e5af_fd87998b",
         "filename": "doc/security.md",
         "patchSetId": 3
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "2918d26b_42a17852",
+        "filename": "doc/security.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-09T16:30:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6cc8e5af_fd87998b",
+      "revId": "a06c0970930947381ce635a01dd174d2d7cf886f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6d76460a_2c191dda",
         "filename": "doc/security.md",
         "patchSetId": 3
@@ -47,6 +83,24 @@
       "writtenOn": "2017-02-09T13:19:57Z",
       "side": 1,
       "message": "Store or Storage? I think Store is Store but storage is storage.\nbe consistent.",
+      "revId": "a06c0970930947381ce635a01dd174d2d7cf886f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fa35a36c_b8cb96c7",
+        "filename": "doc/security.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-09T16:30:31Z",
+      "side": 1,
+      "message": "Done;  converted to Storage everywhere.  (I had mis-remembered that we\u0027d used Store server elsewhere.)\n\nI\u0027m inclined to change both Directory and Storage to lower case here, since it no longer ties to names from the source tree.  Any opinion?",
+      "parentUuid": "6d76460a_2c191dda",
       "revId": "a06c0970930947381ce635a01dd174d2d7cf886f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
