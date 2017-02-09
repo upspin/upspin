@@ -472,13 +472,13 @@ type DirEntry struct {
 	Time       Time       // Time associated with file; might be when it was last written.
 	Blocks     []DirBlock // Descriptors for each block. A nil or empty slice represents an empty file.
 	Packdata   []byte     // Information maintained by the packing algorithm.
-	Link       PathName   // The link target, iff the DirEntry has Attr=AttrLink.
 
 	// Field determining the key used for the signature, hence also tamper-resistant.
 	Writer UserName // Writer of the file, often the same as owner.
 
 	// Fields not included in the signature.
 	Name     PathName  // The full path name of the file. Only the last element can be a link.
+	Link     PathName  // The link target, iff the DirEntry has Attr=AttrLink.
 	Attr     Attribute // Attributes for the DirEntry.
 	Sequence int64     // The sequence (version) number of the item.
 }
