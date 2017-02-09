@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e9da74e3_e792824c",
+        "filename": "doc/security.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-09T02:28:23Z",
+      "side": 1,
+      "message": "[https://key.upspin.io/log](https://key.upspin.io/log).",
+      "revId": "b5283ee9f22d2ade72c955597baab68370da2d30",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c64e0eca_7411b697",
+        "filename": "doc/security.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-09T02:28:23Z",
+      "side": 1,
+      "message": "drop parens",
+      "range": {
+        "startLine": 296,
+        "startChar": 21,
+        "endLine": 296,
+        "endChar": 23
+      },
+      "revId": "b5283ee9f22d2ade72c955597baab68370da2d30",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
