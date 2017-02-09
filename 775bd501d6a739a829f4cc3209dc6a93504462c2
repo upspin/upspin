@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1bd5670f_e26bbe39",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-09T03:17:56Z",
+      "side": 1,
+      "message": "at least the map iteration will be randomish",
+      "revId": "775bd501d6a739a829f4cc3209dc6a93504462c2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
