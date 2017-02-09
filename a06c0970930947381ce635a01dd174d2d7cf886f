@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1d2e352b_7bed5f71",
+        "filename": "doc/security.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 283,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-09T13:19:57Z",
+      "side": 1,
+      "message": "s/  / / througout when you next update.\nalso start new sentences on new lines (which usually obviates the previous point)",
+      "revId": "a06c0970930947381ce635a01dd174d2d7cf886f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6cc8e5af_fd87998b",
+        "filename": "doc/security.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 296,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-09T13:19:57Z",
+      "side": 1,
+      "message": "s/()//\nalso CW the WhichAccess.",
+      "revId": "a06c0970930947381ce635a01dd174d2d7cf886f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6d76460a_2c191dda",
+        "filename": "doc/security.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-09T13:19:57Z",
+      "side": 1,
+      "message": "Store or Storage? I think Store is Store but storage is storage.\nbe consistent.",
+      "revId": "a06c0970930947381ce635a01dd174d2d7cf886f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
