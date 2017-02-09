@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "81d9bc39_ac645866",
+        "filename": "serverutil/rate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-09T13:31:02Z",
+      "side": 1,
+      "message": "is there a reason not to use the usual Go comment style?",
+      "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "469b077d_f1273a07",
+        "filename": "serverutil/rate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-09T13:31:02Z",
+      "side": 1,
+      "message": "ungrammatical. either \u0027so add\u0027 or s/,/;/\n\ns/them/it/",
+      "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9e7aeffb_3a514eb1",
+        "filename": "serverutil/rate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-09T13:31:02Z",
+      "side": 1,
+      "message": "s/their/its/",
+      "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f87256b8_90dfa0b6",
+        "filename": "serverutil/rate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-09T13:31:02Z",
+      "side": 1,
+      "message": "s/them/it/ here and on next line",
+      "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
