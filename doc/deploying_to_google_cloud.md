@@ -47,7 +47,7 @@ the servers will be addressed as `dir.example.com` and `store.example.com`.
 Once you know the domain names of your directory and storage servers, you can
 register an Upspin user name with the key server to act as the administrator
 for this domain.
-For details on this process, see the Signup document [TODO].
+For details on this process, see the [Signup document](/doc/signup.md).
 
 ### Create project and billing account with GCP
 
