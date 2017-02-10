@@ -285,7 +285,7 @@ The public keys of all users are registered in a central server to enable
 sharing even between strangers.
 
 The details of the encryption algorithm and the security guarantees they can
-make are described in a separate Upspin Security document (Security TODO link).
+make are described in a separate [Upspin Security document](/doc/security.md).
 
 Upspin also provides authentication mechanisms to block unauthorized users from
 accessing the network servers in the first place.

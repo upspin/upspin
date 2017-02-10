@@ -71,7 +71,7 @@ First, the `upspin signup` command generates a key pair, saves it locally, and
 sends the user details and the public key to the key server.
 It also creates a local copy of the information called an "`config`" file that
 it stores in a local directory, typically `$HOME/upspin`.
-Config files are discussed in detail in [TODO LINK].
+Config files are discussed in detail in [Upspin configuration](/doc/config.md).
 
 The second step is to receive an email message from the key server and to click
 the confirmation link that it contains.
