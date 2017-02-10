@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "6404dfd7_f1e65243",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-10T20:20:14Z",
+      "side": 1,
+      "message": "It\u0027ll be GET, which is fine because the request is signed and idempotent.\nThe check for POST here is an admittedly weak protection against CSRF.\nIe, a site can\u0027t send mail by writing\n\n\u003cimg src\u003d\"https://key.upspin.io/signup?name\u003dtarget@address.net\"\u003e",
+      "parentUuid": "dafb5e6b_5eb4cf96",
+      "range": {
+        "startLine": 159,
+        "startChar": 1,
+        "endLine": 162,
+        "endChar": 2
+      },
+      "revId": "5104ca41677cd2fcdf0cf4fe22fc79dcf31ead43",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b1ce4417_7243f43d",
         "filename": "cmd/keyserver/signup.go",
         "patchSetId": 9
@@ -36,6 +60,30 @@
       "writtenOn": "2017-02-10T17:57:55Z",
       "side": 1,
       "message": "Why not do it now?  You can use the same m.rate.Pass since addr won\u0027t conflict with user name.  Or is it just hard to get?",
+      "range": {
+        "startLine": 166,
+        "startChar": 4,
+        "endLine": 166,
+        "endChar": 46
+      },
+      "revId": "5104ca41677cd2fcdf0cf4fe22fc79dcf31ead43",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f2483b49_b6e80a78",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-10T20:20:14Z",
+      "side": 1,
+      "message": "It\u0027s hard to get. In fact, the way we have our servers set up, it may be impossible.\n\n(The keyserver terminates TLS itself behind a load balancer, so it only sees the balancer\u0027s IP. I need to investigate how to find the remote address in this instance.)",
+      "parentUuid": "b1ce4417_7243f43d",
       "range": {
         "startLine": 166,
         "startChar": 4,
