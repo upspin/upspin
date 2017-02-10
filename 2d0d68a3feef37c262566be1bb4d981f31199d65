@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "76ae6774_cff4cb09",
+        "filename": "serverutil/rate.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-10T05:47:14Z",
+      "side": 0,
+      "message": "Looks like a git rebase SNAFU caused the body of the signup.md change to be submitted as part of the rate limiter change.  Oops.",
+      "revId": "2d0d68a3feef37c262566be1bb4d981f31199d65",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
