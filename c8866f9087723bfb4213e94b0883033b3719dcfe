@@ -157,6 +157,24 @@
       "revId": "c8866f9087723bfb4213e94b0883033b3719dcfe",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e0711709_5438d13c",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-10T18:07:52Z",
+      "side": 1,
+      "message": "Ack. I thought Sign already hashed it.",
+      "parentUuid": "ee503ba7_b49418f9",
+      "revId": "c8866f9087723bfb4213e94b0883033b3719dcfe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
