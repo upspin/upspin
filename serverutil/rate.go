@@ -48,7 +48,7 @@ func (r *RateLimiter) pass(now time.Time, key string) (bool, time.Duration) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	// Initialize the map lazily so that Gate
+	// Initialize the map lazily so that RateLimiter
 	// may be useful in its zero form.
 	if r.m == nil {
 		r.m = map[string]*visitor{}
