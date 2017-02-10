@@ -439,6 +439,24 @@
     },
     {
       "key": {
+        "uuid": "63cbd200_443f5ba8",
+        "filename": "serverutil/rate_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-10T16:40:51Z",
+      "side": 1,
+      "message": "It\u0027s not internals, it\u0027s in the signature of Pass. You should check that the backoff returned is what your comment below expects. All it entails is creating a backOff field here and then remove the underscore on line 54 and compare them. Why should this not be tested?",
+      "parentUuid": "5c32f7f3_4c50fabd",
+      "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "6489c67e_09fe52c8",
         "filename": "serverutil/rate_test.go",
         "patchSetId": 4
@@ -468,6 +486,23 @@
       "side": 1,
       "message": "no. any key the first time it is seen is given a backoff of InitialBackoff",
       "parentUuid": "6489c67e_09fe52c8",
+      "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e96f63e9_89428761",
+        "filename": "serverutil/rate_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-10T16:40:51Z",
+      "side": 1,
+      "message": "got, backOff :\u003d ...\nif backOff !\u003d c.backOff {\n        t.Errorf(....)\n}",
       "revId": "b0cedfdd2fcf86a943740456edcb87674daa5b27",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
