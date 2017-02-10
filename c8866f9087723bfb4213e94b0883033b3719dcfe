@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1f34c682_1afe00a7",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-10T03:51:42Z",
+      "side": 1,
+      "message": "Added code to strip any +suffix from the address, if present.\nAlso convert to lowercase to further limit abuse vectors.",
+      "parentUuid": "19525483_7ac867f1",
+      "revId": "c8866f9087723bfb4213e94b0883033b3719dcfe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "20f9e609_165788f0",
         "filename": "cmd/keyserver/signup.go",
         "patchSetId": 4
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "f4207640_922e5da0",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-10T03:51:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "20f9e609_165788f0",
+      "revId": "c8866f9087723bfb4213e94b0883033b3719dcfe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9464248c_effb70c5",
         "filename": "cmd/keyserver/signup.go",
         "patchSetId": 4
@@ -47,6 +83,24 @@
       "writtenOn": "2017-02-09T17:28:11Z",
       "side": 1,
       "message": "There was an interesting feature that we had before which is an email to our mailing list letting us know someone new signed up. I was using upspin-sendgrid for that, but we could use upspin or create a new one. It seems valuable to get a notification though.",
+      "revId": "c8866f9087723bfb4213e94b0883033b3719dcfe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8d270e25_4f53d2e1",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-10T03:51:42Z",
+      "side": 1,
+      "message": "I dropped this by mistake. Resurrected it.",
+      "parentUuid": "9464248c_effb70c5",
       "revId": "c8866f9087723bfb4213e94b0883033b3719dcfe",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -82,6 +136,24 @@
       "side": 1,
       "message": "Yes, hash before sign is sound and the implementation here LGTM.",
       "parentUuid": "c2e82481_6ec5c12f",
+      "revId": "c8866f9087723bfb4213e94b0883033b3719dcfe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ee503ba7_b49418f9",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-10T03:51:42Z",
+      "side": 1,
+      "message": "hash before sign is essential\nif you don\u0027t hash and your input is longer than the private key, the remainder of the input is ignored\nnot very useful for a signature",
+      "parentUuid": "c46bc105_39a3e998",
       "revId": "c8866f9087723bfb4213e94b0883033b3719dcfe",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
