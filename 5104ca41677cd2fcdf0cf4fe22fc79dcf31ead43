@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dafb5e6b_5eb4cf96",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-10T17:57:55Z",
+      "side": 1,
+      "message": "I take it we don\u0027t care what flavor method the above create was?  Is that because everything relevant is in the URL params?",
+      "range": {
+        "startLine": 159,
+        "startChar": 1,
+        "endLine": 162,
+        "endChar": 2
+      },
+      "revId": "5104ca41677cd2fcdf0cf4fe22fc79dcf31ead43",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b1ce4417_7243f43d",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-10T17:57:55Z",
+      "side": 1,
+      "message": "Why not do it now?  You can use the same m.rate.Pass since addr won\u0027t conflict with user name.  Or is it just hard to get?",
+      "range": {
+        "startLine": 166,
+        "startChar": 4,
+        "endLine": 166,
+        "endChar": 46
+      },
+      "revId": "5104ca41677cd2fcdf0cf4fe22fc79dcf31ead43",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
