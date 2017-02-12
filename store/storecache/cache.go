@@ -59,7 +59,7 @@ type storeCache struct {
 
 // newCache returns the cache rooted at dir. It will walk the cache to put all files
 // into the LRU.
-func newCache(cfg upspin.Config, dir string, maxBytes int64, writeback bool) (*storeCache, func(upspin.Location), error) {
+func newCache(cfg upspin.Config, dir string, maxBytes int64, writethrough bool) (*storeCache, func(upspin.Location), error) {
 	if err := os.MkdirAll(dir, 0700); err != nil {
 		return nil, nil, err
 	}
@@ -69,7 +69,7 @@ func newCache(cfg upspin.Config, dir string, maxBytes int64, writeback bool) (*s
 	}
 	c := &storeCache{cfg: cfg, dir: dir, limit: maxBytes, lru: cache.NewLRU(maxRefs)}
 	var blockFlusher func(upspin.Location)
-	if writeback {
+	if !writethrough {
 		c.wbq = newWritebackQueue(c)
 		blockFlusher = func(l upspin.Location) { c.wbq.flush(l) }
 	}
