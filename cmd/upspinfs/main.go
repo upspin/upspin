@@ -28,7 +28,7 @@ import (
 
 var (
 	cacheFlag = flag.String("cache", defaultCacheDir(), "`directory` for file cache")
-	wbFlag    = flag.Bool("writeback", false, "true for write back instead of write through caching")
+	wbFlag    = flag.Bool("writeback", true, "make storage cache writeback")
 )
 
 func usage() {

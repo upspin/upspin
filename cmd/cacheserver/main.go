@@ -39,7 +39,7 @@ const serverName = "cacheserver"
 var (
 	cacheFlag     = flag.String("cache", defaultCacheDir(), "`directory` for cache")
 	cacheSizeFlag = flag.Int64("cachesize", 5e9, "max disk `bytes` for cache")
-	writebackFlag = flag.Bool("writeback", false, "make storage cache writeback")
+	writebackFlag = flag.Bool("writeback", true, "make storage cache writeback")
 )
 
 func main() {
