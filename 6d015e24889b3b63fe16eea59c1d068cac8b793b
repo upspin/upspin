@@ -16,6 +16,24 @@
       "revId": "6d015e24889b3b63fe16eea59c1d068cac8b793b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "adaabeb2_d29b481f",
+        "filename": "cmd/upspinfs/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-12T22:43:38Z",
+      "side": 1,
+      "message": "in fact, just call the flag \u0027writethrough\u0027 not \u0027wtFlag\u0027.",
+      "parentUuid": "74307b0d_561c5d31",
+      "revId": "6d015e24889b3b63fe16eea59c1d068cac8b793b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
