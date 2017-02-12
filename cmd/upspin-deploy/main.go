@@ -576,8 +576,12 @@ func (c *Config) copyDockerfile(dir, server string) error {
 	return ioutil.WriteFile(filepath.Join(dir, "Dockerfile"), data, 0644)
 }
 
-func (c *Config) logLevel() string {
+func (c *Config) logLevel(server string) string {
 	switch {
+	// The production keyserver logs only on error, to maximize performance.
+	// For reference, see issue #160.
+	case c.Project == "upspin-prod" && server == "keyserver":
+		return "error"
 	case strings.Contains(c.Project, "test"),
 		strings.Contains(c.Project, "dev"),
 		// TODO: remove when done debugging upspin-prod.
@@ -591,7 +595,7 @@ func (c *Config) prepareConfig(data []byte, server string) []byte {
 	data = bytes.Replace(data, []byte("PREFIX"), []byte(c.Prefix), -1)
 	data = bytes.Replace(data, []byte("PROJECT"), []byte(c.Project), -1)
 	data = bytes.Replace(data, []byte("STORESERVERUSER"), []byte(c.storeServerUserName()), -1)
-	data = bytes.Replace(data, []byte("LOGLEVEL"), []byte(c.logLevel()), -1)
+	data = bytes.Replace(data, []byte("LOGLEVEL"), []byte(c.logLevel(server)), -1)
 
 	bucket := ""
 	switch server {
