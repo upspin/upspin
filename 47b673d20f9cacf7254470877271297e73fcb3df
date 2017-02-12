@@ -1,0 +1,188 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "592a0291_e7b4a84c",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 12
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-02-12T16:44:04Z",
+      "side": 1,
+      "message": "From the title of this document, it seems as if I’m going to be setting up an upspin server that I control completely, so it’s somewhat surprising that it still relies on the key.upspin.io server. Perhaps clarify what the user controls vs what external dependencies are needed?",
+      "range": {
+        "startLine": 44,
+        "startChar": 0,
+        "endLine": 46,
+        "endChar": 38
+      },
+      "revId": "47b673d20f9cacf7254470877271297e73fcb3df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c650d77c_0acee0ed",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 12
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-02-12T16:44:04Z",
+      "side": 1,
+      "message": "It’s not very clear in Cloud DNS — https://screenshot.googleplex.com/z6VersUd0gq\n\nPerhaps providing a dig command to confirm successful addition?",
+      "range": {
+        "startLine": 106,
+        "startChar": 0,
+        "endLine": 107,
+        "endChar": 8
+      },
+      "revId": "47b673d20f9cacf7254470877271297e73fcb3df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "edf3140d_f890072e",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 12
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-02-12T16:44:04Z",
+      "side": 1,
+      "message": "Why does a user need to install the beta version of the components?",
+      "range": {
+        "startLine": 132,
+        "startChar": 28,
+        "endLine": 132,
+        "endChar": 32
+      },
+      "revId": "47b673d20f9cacf7254470877271297e73fcb3df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f65d1b4f_f30ab9d6",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 12
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-02-12T16:44:04Z",
+      "side": 1,
+      "message": "I would put in something like “Congratulations! You’ve set up your upspin server!” after this :)",
+      "range": {
+        "startLine": 225,
+        "startChar": 0,
+        "endLine": 225,
+        "endChar": 3
+      },
+      "revId": "47b673d20f9cacf7254470877271297e73fcb3df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bb26bb6e_334ee726",
+        "filename": "doc/server_setup_ubuntu.md",
+        "patchSetId": 12
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-02-12T16:44:04Z",
+      "side": 1,
+      "message": "Is there a recommended size or class of VMs? I guess I want to know what the minimal requirement for setup is.",
+      "range": {
+        "startLine": 14,
+        "startChar": 10,
+        "endLine": 14,
+        "endChar": 19
+      },
+      "revId": "47b673d20f9cacf7254470877271297e73fcb3df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "722eb2e1_5487b503",
+        "filename": "doc/server_setup_ubuntu.md",
+        "patchSetId": 12
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-02-12T16:44:04Z",
+      "side": 1,
+      "message": "this has to have a path:\n\nupspin@upspin.example.com:~/\n\notherwise it silently fails",
+      "range": {
+        "startLine": 53,
+        "startChar": 19,
+        "endLine": 53,
+        "endChar": 44
+      },
+      "revId": "47b673d20f9cacf7254470877271297e73fcb3df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f22cc070_226b0d23",
+        "filename": "doc/server_setup_ubuntu.md",
+        "patchSetId": 12
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-02-12T16:44:04Z",
+      "side": 1,
+      "message": "Don’t you mean systemctl restart xinetd.service?",
+      "range": {
+        "startLine": 152,
+        "startChar": 2,
+        "endLine": 152,
+        "endChar": 38
+      },
+      "revId": "47b673d20f9cacf7254470877271297e73fcb3df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "34fb64a9_fbc67f77",
+        "filename": "doc/server_setup_ubuntu.md",
+        "patchSetId": 12
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-02-12T16:44:04Z",
+      "side": 1,
+      "message": "instructions",
+      "range": {
+        "startLine": 157,
+        "startChar": 35,
+        "endLine": 157,
+        "endChar": 47
+      },
+      "revId": "47b673d20f9cacf7254470877271297e73fcb3df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
