@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "84dfe68a_361c5747",
+        "filename": "log/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-13T18:16:30Z",
+      "side": 1,
+      "message": "what is this comment about? delete?",
+      "revId": "333b6ab9487eaefd1094e076a3cfcdf1e7bf0af7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
