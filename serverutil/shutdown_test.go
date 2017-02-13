@@ -144,16 +144,16 @@ func testShutdownChildProcess() {
 
 	fmt.Println(shutdownMessages[0])
 
-	RegisterShutdown(0, func() {
+	RegisterShutdown(func() {
+		fmt.Println(shutdownMessages[2])
+	})
+
+	RegisterShutdown(func() {
 		fmt.Println(shutdownMessages[1])
 		if kill != nil {
 			kill <- true
 			select {} // Block forever, stalling Shutdown.
 		}
-	})
-
-	RegisterShutdown(1, func() {
-		fmt.Println(shutdownMessages[2])
 	})
 
 	Shutdown()

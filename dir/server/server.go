@@ -175,7 +175,7 @@ func New(cfg upspin.Config, options ...string) (upspin.DirServer, error) {
 		remoteGroups:  cache.NewLRU(groupCacheSize),
 		now:           upspin.Now,
 	}
-	serverutil.RegisterShutdown(5, s.shutdown)
+	serverutil.RegisterShutdown(s.shutdown)
 	// Start background services.
 	s.startSnapshotLoop()
 	go s.groupRefreshLoop()
