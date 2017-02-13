@@ -32,6 +32,7 @@ import (
 	"upspin.io/log"
 	"upspin.io/pack"
 	"upspin.io/pack/internal"
+	"upspin.io/pack/packutil"
 	"upspin.io/path"
 	"upspin.io/upspin"
 )
@@ -80,15 +81,14 @@ func init() {
 }
 
 var (
-	errTooShort           = errors.Str("destination slice too short")
-	errVerify             = errors.Str("does not verify")
-	errWriter             = errors.Str("empty Writer in Metadata")
-	errNoWrappedKey       = errors.Str("no wrapped key for me")
-	errKeyLength          = errors.Str("wrong key length for AES-256")
-	errNoKnownKeysForUser = errors.Str("no known keys for user")
-	errSignedNameNotSet   = errors.Str("empty SignedName")
-	sig0                  upspin.Signature  // for returning error of correct type
-	ellipticNames         map[string]string // ellipticNames maps ECDSA curve names to upspin-friendly curve names.
+	errTooShort         = errors.Str("destination slice too short")
+	errVerify           = errors.Str("does not verify")
+	errWriter           = errors.Str("empty Writer in Metadata")
+	errNoWrappedKey     = errors.Str("no wrapped key for me")
+	errKeyLength        = errors.Str("wrong key length for AES-256")
+	errSignedNameNotSet = errors.Str("empty SignedName")
+	sig0                upspin.Signature  // for returning error of correct type
+	ellipticNames       map[string]string // ellipticNames maps ECDSA curve names to upspin-friendly curve names.
 )
 
 var errNotOnCurve = errors.Str("a crypto attack was attempted against you; see safecurves.cr.yp.to/twist.html for details")
@@ -307,7 +307,7 @@ func (ee ee) Unpack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker
 	if len(writer) == 0 {
 		return nil, errors.E(op, d.Name, errWriter)
 	}
-	writerRawPubKey, err := publicKey(cfg, writer)
+	writerRawPubKey, err := packutil.GetPublicKey(cfg, writer)
 	if err != nil {
 		return nil, errors.E(op, writer, err)
 	}
@@ -318,7 +318,7 @@ func (ee ee) Unpack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker
 
 	// Fetch my own keys, as I am the recipient of the file.
 	me := cfg.UserName()
-	rawPublicKey, err := publicKey(cfg, me)
+	rawPublicKey, err := packutil.GetPublicKey(cfg, me)
 	if err != nil {
 		return nil, errors.E(op, d.Name, err)
 	}
@@ -516,7 +516,7 @@ func (ee ee) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName
 	}
 	owner := parsed.User()
 	// The owner has a well-known public key
-	ownerRawPubKey, err := publicKey(cfg, owner)
+	ownerRawPubKey, err := packutil.GetPublicKey(cfg, owner)
 	if err != nil {
 		return errors.E(op, d.Name, err)
 	}
@@ -527,7 +527,7 @@ func (ee ee) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName
 
 	// Now get my own keys
 	me := cfg.UserName() // Recipient of the file is me (the user in the config)
-	rawPublicKey, err := publicKey(cfg, me)
+	rawPublicKey, err := packutil.GetPublicKey(cfg, me)
 	if err != nil {
 		return errors.E(op, d.Name, err)
 	}
@@ -740,31 +740,31 @@ func aesUnwrap(f upspin.Factotum, w wrappedKey) (dkey []byte, err error) {
 }
 
 func pdMarshal(dst *[]byte, sig, sig2 upspin.Signature, wrap []wrappedKey, cipherSum []byte) error {
-	// sig2 is a signature with another owner key, to enable smoother key rotation
+	// sig2 is a signature with another owner key, to enable smoother key rotation.
 	n := packdataLen(len(wrap))
 	if len(*dst) < n {
 		*dst = make([]byte, n)
 	}
 	n = 0
-	n += pdPutBytes((*dst)[n:], sig.R.Bytes())
-	n += pdPutBytes((*dst)[n:], sig.S.Bytes())
+	n += packutil.PutBytes((*dst)[n:], sig.R.Bytes())
+	n += packutil.PutBytes((*dst)[n:], sig.S.Bytes())
 	if sig2.R == nil {
 		zero := big.NewInt(0)
 		sig2 = upspin.Signature{R: zero, S: zero}
 	}
-	n += pdPutBytes((*dst)[n:], sig2.R.Bytes())
-	n += pdPutBytes((*dst)[n:], sig2.S.Bytes())
+	n += packutil.PutBytes((*dst)[n:], sig2.R.Bytes())
+	n += packutil.PutBytes((*dst)[n:], sig2.S.Bytes())
 	n += binary.PutVarint((*dst)[n:], int64(len(wrap)))
 	for _, w := range wrap {
-		n += pdPutBytes((*dst)[n:], w.keyHash)
-		n += pdPutBytes((*dst)[n:], w.dkey)
-		n += pdPutBytes((*dst)[n:], w.nonce)
-		n += pdPutBytes((*dst)[n:], w.ephemeral.X.Bytes())
-		n += pdPutBytes((*dst)[n:], w.ephemeral.Y.Bytes())
+		n += packutil.PutBytes((*dst)[n:], w.keyHash)
+		n += packutil.PutBytes((*dst)[n:], w.dkey)
+		n += packutil.PutBytes((*dst)[n:], w.nonce)
+		n += packutil.PutBytes((*dst)[n:], w.ephemeral.X.Bytes())
+		n += packutil.PutBytes((*dst)[n:], w.ephemeral.Y.Bytes())
 	}
-	n += pdPutBytes((*dst)[n:], cipherSum)
+	n += packutil.PutBytes((*dst)[n:], cipherSum)
 	*dst = (*dst)[:n]
-	return nil // err impossible for now but the night is young
+	return nil
 }
 
 func pdUnmarshal(pd []byte) (sig, sig2 upspin.Signature, wrap []wrappedKey, hash []byte, err error) {
@@ -777,13 +777,13 @@ func pdUnmarshal(pd []byte) (sig, sig2 upspin.Signature, wrap []wrappedKey, hash
 	sig2.R = big.NewInt(0)
 	sig2.S = big.NewInt(0)
 	buf := make([]byte, marshalBufLen)
-	n += pdGetBytes(&buf, pd[n:])
+	n += packutil.GetBytes(&buf, pd[n:])
 	sig.R.SetBytes(buf)
-	n += pdGetBytes(&buf, pd[n:])
+	n += packutil.GetBytes(&buf, pd[n:])
 	sig.S.SetBytes(buf)
-	n += pdGetBytes(&buf, pd[n:])
+	n += packutil.GetBytes(&buf, pd[n:])
 	sig2.R.SetBytes(buf)
-	n += pdGetBytes(&buf, pd[n:])
+	n += packutil.GetBytes(&buf, pd[n:])
 	sig2.S.SetBytes(buf)
 	nwrap64, vlen := binary.Varint(pd[n:])
 	n += vlen
@@ -798,12 +798,12 @@ func pdUnmarshal(pd []byte) (sig, sig2 upspin.Signature, wrap []wrappedKey, hash
 		w.dkey = make([]byte, aesKeyLen+gcmTagSize)
 		w.nonce = make([]byte, gcmStandardNonceSize)
 		w.ephemeral = ecdsa.PublicKey{X: big.NewInt(0), Y: big.NewInt(0)}
-		n += pdGetBytes(&w.keyHash, pd[n:])
-		n += pdGetBytes(&w.dkey, pd[n:])
-		n += pdGetBytes(&w.nonce, pd[n:])
-		n += pdGetBytes(&buf, pd[n:])
+		n += packutil.GetBytes(&w.keyHash, pd[n:])
+		n += packutil.GetBytes(&w.dkey, pd[n:])
+		n += packutil.GetBytes(&w.nonce, pd[n:])
+		n += packutil.GetBytes(&buf, pd[n:])
 		w.ephemeral.X.SetBytes(buf)
-		n += pdGetBytes(&buf, pd[n:])
+		n += packutil.GetBytes(&buf, pd[n:])
 		w.ephemeral.Y.SetBytes(buf)
 		if w.ephemeral.Y.BitLen() > 393 {
 			w.ephemeral.Curve = elliptic.P521()
@@ -815,30 +815,11 @@ func pdUnmarshal(pd []byte) (sig, sig2 upspin.Signature, wrap []wrappedKey, hash
 		wrap[i] = w
 	}
 	hash = make([]byte, sha256.Size)
-	n += pdGetBytes(&hash, pd[n:])
+	n += packutil.GetBytes(&hash, pd[n:])
 	if hash == nil {
 		return sig0, sig0, nil, nil, errors.Errorf("pdUnmarshal: file hash is required")
 	}
 	return sig, sig2, wrap, hash, nil
-}
-
-// pdPutBytes puts length header in dst and then copies src to dst; returns bytes consumed
-func pdPutBytes(dst, src []byte) int {
-	vlen := binary.PutVarint(dst, int64(len(src)))
-	return vlen + copy(dst[vlen:], src)
-}
-
-// pdGetBytes copies (part of) src to dst, based on length header; returns bytes consumed
-func pdGetBytes(dst *[]byte, src []byte) int {
-	n, vlen := binary.Varint(src)
-	*dst = (*dst)[:n]
-	k := copy(*dst, src[vlen:n+int64(vlen)])
-	if int64(k) != n {
-		// can't happen unless dst too short?
-		*dst = (*dst)[:0]
-		return k + vlen
-	}
-	return k + vlen
 }
 
 // packdataLen returns n big enough for packing, sig.R, sig.S, nwrap, {keyHash, encrypted, nonce, X, y}
@@ -846,35 +827,6 @@ func packdataLen(nwrap int) int {
 	return 2*marshalBufLen + (1+5*nwrap)*binary.MaxVarintLen64 +
 		nwrap*(sha256.Size+(aesKeyLen+gcmTagSize)+gcmStandardNonceSize+2*marshalBufLen) +
 		sha256.Size + 1
-}
-
-// publicKey returns the string representation of a user's public key.
-func publicKey(cfg upspin.Config, user upspin.UserName) (upspin.PublicKey, error) {
-
-	// Key pairs have three representations:
-	// 1. string, used for storage and between programs like User.Lookup
-	// 2. ecdsa, internal binary format for computation
-	// 3. a secret seed sufficient to reconstruct the key pair
-	// In form 1, the first bytes describe the packing name, e.g. "p256".
-	// In form 2, there is an Curve field in the struct that plays that role.
-	// Form 3, used only in keygen.go, is simply 128 bits of entropy.
-
-	// Are we requesting our own public key?
-	if string(user) == string(cfg.UserName()) {
-		return cfg.Factotum().PublicKey(), nil
-	}
-	keyServer, err := bind.KeyServer(cfg, cfg.KeyEndpoint())
-	if err != nil {
-		return "", err
-	}
-	u, err := keyServer.Lookup(user)
-	if err != nil {
-		return "", err
-	}
-	if len(u.PublicKey) == 0 {
-		return "", errors.E(user, errors.NotExist, errNoKnownKeysForUser)
-	}
-	return u.PublicKey, nil
 }
 
 // zeroSlice replaces the contents of the given slice with zeroes.
