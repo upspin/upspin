@@ -28,8 +28,16 @@ import (
 	_ "upspin.io/key/transports"
 )
 
-// The upspin username for this server.
-const serverName = "keyserver"
+const (
+	// serverName is the upspin username for this server.
+	serverName = "keyserver"
+
+	// metricSampleSize is the size of the sample to pick one metric to save.
+	metricSampleSize = 100
+
+	// metricMaxQPS is the maximum number of metric batches to save.
+	metricMaxQPS = 5
+)
 
 var (
 	testUser    = flag.String("test_user", "", "initialize a test `user` (localhost, inprocess only)")
@@ -43,7 +51,7 @@ func main() {
 
 	if flags.Project != "" {
 		cloudLog.Connect(flags.Project, serverName)
-		svr, err := metric.NewGCPSaver(flags.Project, "serverName", serverName)
+		svr, err := metric.NewGCPSaver(flags.Project, metricSampleSize, metricMaxQPS, "serverName", serverName)
 		if err != nil {
 			log.Fatalf("Can't start a metric saver for GCP project %q: %s", flags.Project, err)
 		} else {
