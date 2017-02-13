@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "02026f31_4ba87239",
+        "filename": "log/log.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-13T05:54:44Z",
+      "side": 1,
+      "message": "Need to document that this turns of standard error logs.\nPerhaps it should even log something to standard error before doing that, so that people know that the logs are being sent somewhere else.",
+      "revId": "bcd40a823d69737af32f7c30cbb49cd7199017e3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
