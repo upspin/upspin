@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "400c6548_3266a670",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 12
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-13T02:32:06Z",
+      "side": 1,
+      "message": "I added a note in the first paragraph that I hope will make this clearer.",
+      "parentUuid": "592a0291_e7b4a84c",
+      "range": {
+        "startLine": 44,
+        "startChar": 0,
+        "endLine": 46,
+        "endChar": 38
+      },
+      "revId": "47b673d20f9cacf7254470877271297e73fcb3df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "c650d77c_0acee0ed",
         "filename": "doc/server_setup.md",
         "patchSetId": 12
@@ -36,6 +60,30 @@
       "writtenOn": "2017-02-12T16:44:04Z",
       "side": 1,
       "message": "It’s not very clear in Cloud DNS — https://screenshot.googleplex.com/z6VersUd0gq\n\nPerhaps providing a dig command to confirm successful addition?",
+      "range": {
+        "startLine": 106,
+        "startChar": 0,
+        "endLine": 107,
+        "endChar": 8
+      },
+      "revId": "47b673d20f9cacf7254470877271297e73fcb3df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "eff9fa55_2236176c",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 12
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-13T02:32:06Z",
+      "side": 1,
+      "message": "I reworded this, pointing to registrar docs.\nRather than making dig available, we could instead have the \u0027setupserver\u0027 command diagnose it for us.",
+      "parentUuid": "c650d77c_0acee0ed",
       "range": {
         "startLine": 106,
         "startChar": 0,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "19184c19_c4b69f6b",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 12
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-13T02:32:06Z",
+      "side": 1,
+      "message": "the service-management part of the tool is in beta, if you can believe it\ni\u0027m going to automate all of this anyway",
+      "parentUuid": "edf3140d_f890072e",
+      "range": {
+        "startLine": 132,
+        "startChar": 28,
+        "endLine": 132,
+        "endChar": 32
+      },
+      "revId": "47b673d20f9cacf7254470877271297e73fcb3df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f65d1b4f_f30ab9d6",
         "filename": "doc/server_setup.md",
         "patchSetId": 12
@@ -91,6 +163,30 @@
       "revId": "47b673d20f9cacf7254470877271297e73fcb3df",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1ed95a98_e77ff4d4",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 12
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-13T02:32:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f65d1b4f_f30ab9d6",
+      "range": {
+        "startLine": 225,
+        "startChar": 0,
+        "endLine": 225,
+        "endChar": 3
+      },
+      "revId": "47b673d20f9cacf7254470877271297e73fcb3df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -117,6 +213,30 @@
     },
     {
       "key": {
+        "uuid": "904aebd7_ede0f97c",
+        "filename": "doc/server_setup_ubuntu.md",
+        "patchSetId": 12
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-13T02:32:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bb26bb6e_334ee726",
+      "range": {
+        "startLine": 14,
+        "startChar": 10,
+        "endLine": 14,
+        "endChar": 19
+      },
+      "revId": "47b673d20f9cacf7254470877271297e73fcb3df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "722eb2e1_5487b503",
         "filename": "doc/server_setup_ubuntu.md",
         "patchSetId": 12
@@ -140,6 +260,30 @@
     },
     {
       "key": {
+        "uuid": "9a7f7ba4_ddfaef82",
+        "filename": "doc/server_setup_ubuntu.md",
+        "patchSetId": 12
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-13T02:32:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "722eb2e1_5487b503",
+      "range": {
+        "startLine": 53,
+        "startChar": 19,
+        "endLine": 53,
+        "endChar": 44
+      },
+      "revId": "47b673d20f9cacf7254470877271297e73fcb3df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9710e521_7bf47699",
         "filename": "doc/server_setup_ubuntu.md",
         "patchSetId": 12
@@ -154,6 +298,24 @@
       "revId": "47b673d20f9cacf7254470877271297e73fcb3df",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "33b8d2a9_2f56b5c2",
+        "filename": "doc/server_setup_ubuntu.md",
+        "patchSetId": 12
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-13T02:32:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9710e521_7bf47699",
+      "revId": "47b673d20f9cacf7254470877271297e73fcb3df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -180,6 +342,30 @@
     },
     {
       "key": {
+        "uuid": "feb7977b_0489d530",
+        "filename": "doc/server_setup_ubuntu.md",
+        "patchSetId": 12
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-13T02:32:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f22cc070_226b0d23",
+      "range": {
+        "startLine": 152,
+        "startChar": 2,
+        "endLine": 152,
+        "endChar": 38
+      },
+      "revId": "47b673d20f9cacf7254470877271297e73fcb3df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "34fb64a9_fbc67f77",
         "filename": "doc/server_setup_ubuntu.md",
         "patchSetId": 12
@@ -200,6 +386,30 @@
       "revId": "47b673d20f9cacf7254470877271297e73fcb3df",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0568d6d6_2524a151",
+        "filename": "doc/server_setup_ubuntu.md",
+        "patchSetId": 12
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-13T02:32:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "34fb64a9_fbc67f77",
+      "range": {
+        "startLine": 157,
+        "startChar": 35,
+        "endLine": 157,
+        "endChar": 47
+      },
+      "revId": "47b673d20f9cacf7254470877271297e73fcb3df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
