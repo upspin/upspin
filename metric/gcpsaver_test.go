@@ -5,6 +5,7 @@
 package metric
 
 import (
+	"math/rand"
 	"reflect"
 	"testing"
 
@@ -13,7 +14,7 @@ import (
 
 func TestLabelsAndAnnotations(t *testing.T) {
 	sink := new(sinkTraces)
-	saver := newDummyGCPSaver(sink, "static label", "static value")
+	saver := newDummyGCPSaver(sink, 1, 1000, "static label", "static value")
 
 	m := New("metric1").StartSpan("Span1").SetAnnotation("comment1").SetAnnotation("comment2").End()
 	m.StartSpan("Span2").End()
@@ -54,7 +55,7 @@ func TestLabelsAndAnnotations(t *testing.T) {
 
 func TestNoLabelsAndAnnotation(t *testing.T) {
 	sink := new(sinkTraces)
-	saver := newDummyGCPSaver(sink)
+	saver := newDummyGCPSaver(sink, 1, 1000)
 
 	m := New("metric1").StartSpan("Span1").SetAnnotation("comment17").End()
 	m.StartSpan("Span2").End()
@@ -87,7 +88,7 @@ func TestNoLabelsAndAnnotation(t *testing.T) {
 
 func TestBatchesMultipleMetrics(t *testing.T) {
 	sink := new(sinkTraces)
-	saver := newDummyGCPSaver(sink)
+	saver := newDummyGCPSaver(sink, 1, 1000)
 
 	done := make(chan bool)
 	onFlush = func() {
@@ -115,11 +116,44 @@ func TestBatchesMultipleMetrics(t *testing.T) {
 	}
 }
 
-func newDummyGCPSaver(s traceSaver, labels ...string) *gcpSaver {
+func TestSampling(t *testing.T) {
+	sink := new(sinkTraces)
+	saver := newDummyGCPSaver(sink, 10, 1000)
+
+	saveQueue = make(chan *Metric, 100)
+	registered = 0
+	// We know the sequence with this random seed, so test is deterministic.
+	rand.Seed(1234)
+	RegisterSaver(saver)
+
+	done := make(chan bool)
+	onFlush = func() {
+		done <- true
+	}
+	defer func() {
+		onFlush = func() {}
+	}()
+
+	for i := 0; i < 100; i++ {
+		m, _ := NewSpan("sampling")
+		m.Done()
+	}
+
+	<-done
+
+	// We expect about 1/10th were sampled, which is 10, but it's
+	// probabilistic. 14 is what we get with the rand seed above.
+	if saver.NumProcessed() != 14 {
+		t.Errorf("saved = %d, want = 14 ", saver.NumProcessed())
+	}
+}
+
+func newDummyGCPSaver(s traceSaver, n int, maxQPS int, labels ...string) *gcpSaver {
 	saver := &gcpSaver{
 		projectID:    "test",
 		api:          s,
 		staticLabels: makeLabels(labels),
+		n:            n,
 	}
 	return saver
 }
