@@ -134,7 +134,7 @@ func ListenAndServe(ready chan<- struct{}, serverName, addr string, opt *Options
 	if ready != nil {
 		close(ready)
 	}
-	serverutil.RegisterShutdown(0, func() {
+	serverutil.RegisterShutdown(func() {
 		// Stop accepting connections and forces the server to stop
 		// its serving loop.
 		ln.Close()

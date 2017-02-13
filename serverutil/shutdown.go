@@ -15,16 +15,13 @@ import (
 )
 
 // RegisterShutdown registers the onShutdown function to be run when the system
-// is being shut down. The function is run at a given priority, where 0 is the
-// highest priority and runs before all others. If multiple shutdown functions
-// are registered at the same priority, they are run in arbitrary order.
+// is being shut down. On shutdown, registered functions are run in LIFO order.
 // RegisterShutdown may be called concurrently.
-func RegisterShutdown(priority uint8, onShutdown func()) {
-	log.Debug.Printf("serverutil.RegisterShutdown: registering closure for priority: %d", priority)
+func RegisterShutdown(onShutdown func()) {
 	shutdown.mu.Lock()
 	defer shutdown.mu.Unlock()
 
-	shutdown.sequence[priority] = append(shutdown.sequence[priority], onShutdown)
+	shutdown.sequence = append(shutdown.sequence, onShutdown)
 }
 
 // Shutdown calls all registered shutdown closures in their priority order and
@@ -45,14 +42,9 @@ func Shutdown() {
 			os.Exit(1)
 		}()
 
-		for pri, funcs := range shutdown.sequence {
-			if len(funcs) == 0 {
-				continue
-			}
-			log.Debug.Printf("%s: Running shutdown priority %d", op, pri)
-			for _, f := range funcs {
-				f()
-			}
+		for i := len(shutdown.sequence) - 1; i >= 0; i-- {
+			log.Debug.Printf("%s: Running shutdown function", op)
+			shutdown.sequence[i]()
 		}
 		shutdown.mu.Unlock()
 
@@ -76,7 +68,7 @@ var killSleep = time.Sleep
 var shutdown struct {
 	mu       sync.Mutex
 	c        chan os.Signal
-	sequence [256][]func()
+	sequence []func()
 	once     sync.Once
 }
 
@@ -91,5 +83,5 @@ func init() {
 
 	// Register the log shutdown routine here, to avoid an import cycle.
 	// Shutting down the logger is the last thing we do.
-	RegisterShutdown(255, log.Flush)
+	RegisterShutdown(log.Flush)
 }
