@@ -24,8 +24,9 @@ import (
 	"upspin.io/path"
 	"upspin.io/upspin"
 
-	_ "upspin.io/pack/debug"
+	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/eeintegrity"
+	_ "upspin.io/pack/plain"
 
 	keyserver "upspin.io/key/inprocess"
 	storeserver "upspin.io/store/inprocess"
@@ -52,7 +53,7 @@ func newConfigAndServices(name upspin.UserName) (cfg upspin.Config, key upspin.K
 	}
 	cfg = config.New()
 	cfg = config.SetUserName(cfg, name)
-	cfg = config.SetPacking(cfg, upspin.DebugPack)
+	cfg = config.SetPacking(cfg, upspin.EEPack)
 	cfg = config.SetKeyEndpoint(cfg, endpoint)
 	cfg = config.SetStoreEndpoint(cfg, endpoint)
 	cfg = config.SetDirEndpoint(cfg, endpoint)

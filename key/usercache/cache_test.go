@@ -57,7 +57,7 @@ var (
 func setup(t *testing.T, user string) (uncached, cached upspin.KeyServer) {
 	c := config.New()
 	c = config.SetUserName(c, upspin.UserName(user))
-	c = config.SetPacking(c, upspin.DebugPack)
+	c = config.SetPacking(c, upspin.PlainPack)
 	c = config.SetKeyEndpoint(c, keyService.endpoint)
 	keyService.config = c
 

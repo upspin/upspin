@@ -26,8 +26,7 @@ import (
 	"upspin.io/upspin"
 	"upspin.io/valid"
 
-	_ "upspin.io/pack/debug" // Used to pack directory entries.
-	_ "upspin.io/pack/plain"
+	_ "upspin.io/pack/ee"
 )
 
 func New(config upspin.Config) upspin.DirServer {
@@ -46,7 +45,7 @@ func New(config upspin.Config) upspin.DirServer {
 // Used to store directory entries.
 // All directories are encoded with this packing.
 var (
-	dirPacking = upspin.DebugPack
+	dirPacking = upspin.EEPack
 	dirPacker  = pack.Lookup(dirPacking)
 )
 

@@ -135,19 +135,19 @@ func New(setup *Setup) (*Env, error) {
 		env.StoreServer = storeserver.New()
 		storeServerMux.Register(storeEndpoint, env.StoreServer)
 
+		// Set up user and factotum.
+		cfg = config.SetUserName(cfg, TestServerName)
+		f, err := factotum.NewFromDir(repo("key/testdata/" + TestServerName[:strings.Index(TestServerName, "@")]))
+		if err != nil {
+			return nil, errors.E(op, err)
+		}
+		cfg = config.SetFactotum(cfg, f)
+
 		// Set up DirServer instance.
 		switch k {
 		case "inprocess":
 			env.DirServer = dirserver_inprocess.New(cfg)
 		case "server":
-			// Set up user and factotum.
-			cfg = config.SetUserName(cfg, TestServerName)
-			f, err := factotum.NewFromDir(repo("key/testdata/" + TestServerName[:strings.Index(TestServerName, "@")]))
-			if err != nil {
-				return nil, errors.E(op, err)
-			}
-			cfg = config.SetFactotum(cfg, f)
-
 			// Create temporary directory for DirServer storage.
 			logDir, err := ioutil.TempDir("", "testenv-dirserver")
 			if err != nil {
