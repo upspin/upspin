@@ -213,14 +213,13 @@ type Packer interface {
 }
 
 const (
-	// PlainPack is the trivial, no-op packing. Bytes are copied untouched.
-	// It is the default packing but is, of course, insecure.
-	PlainPack Packing = 0
+	// PlainPack is a no-encryption, no-integrity packing. Bytes are copied untouched.
+	PlainPack Packing = 0 // TODO(edpin or ehg) change to 1
 
-	// Packings from 1 through 19 are not for production use. This region
+	// Packings from 2 through 19 are not for production use. This region
 	// is reserved for debugging and other temporary packing implementations.
 
-	// Packings from 20 and above (as well as PlainPack=0) are fixed in
+	// Packings from 20 and above (as well as PlainPack) are fixed in
 	// value and semantics and may be used in production.
 
 	// EEPack provides elliptic-curve end-to-end confidentiality and

@@ -348,7 +348,7 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 			return nil, errors.E(op, err)
 		}
 	}
-	if isGroup {
+	if isGroupFile {
 		// Validate group files at Put time to detect bad ones early.
 		err = s.loadGroup(p, entry)
 		if err != nil {

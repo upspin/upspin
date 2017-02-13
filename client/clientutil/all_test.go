@@ -4,9 +4,10 @@
 
 package clientutil
 
-// TODO: test with EEPack; check more error conditions.
-
 import (
+	"crypto/sha256"
+	"encoding/binary"
+	"math/big"
 	"os"
 	"path/filepath"
 	"testing"
@@ -16,6 +17,7 @@ import (
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/log"
+	"upspin.io/pack/packutil"
 	"upspin.io/test/testfixtures"
 	"upspin.io/upspin"
 
@@ -29,7 +31,9 @@ func init() {
 }
 
 const (
-	userName = "bob@smith.com"
+	userName      = "bob@smith.com"
+	aesKeyLen     = 32 // AES-256 because public cloud should withstand multifile multikey attack.
+	marshalBufLen = 66 // big enough for p521 according to (c.curve.Params().BitSize + 7) >> 3
 )
 
 var (
@@ -69,8 +73,19 @@ func TestReadAll(t *testing.T) {
 				Location: tLocs[0],
 			},
 		},
+		Time:     12345,
 		Writer:   userName,
 		Sequence: upspin.SeqBase,
+	}
+	dkey := make([]byte, aesKeyLen)
+	sum := make([]byte, sha256.Size)
+	sig, err := cfg.Factotum().FileSign(entry.Name, entry.Time, dkey, sum)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = pdMarshal(&entry.Packdata, sig, upspin.Signature{})
+	if err != nil {
+		t.Fatal(err)
 	}
 
 	got, err := ReadAll(cfg, entry)
@@ -80,6 +95,30 @@ func TestReadAll(t *testing.T) {
 	if string(got) != string(store.content) {
 		t.Errorf("got = %q, want = %s", got, store.content)
 	}
+}
+
+func pdMarshal(dst *[]byte, sig, sig2 upspin.Signature) error {
+	// sig2 is a signature with another owner key, to enable smoother key rotation.
+	n := packdataLen()
+	if len(*dst) < n {
+		*dst = make([]byte, n)
+	}
+	n = 0
+	n += packutil.PutBytes((*dst)[n:], sig.R.Bytes())
+	n += packutil.PutBytes((*dst)[n:], sig.S.Bytes())
+	if sig2.R == nil {
+		zero := big.NewInt(0)
+		sig2 = upspin.Signature{R: zero, S: zero}
+	}
+	n += packutil.PutBytes((*dst)[n:], sig2.R.Bytes())
+	n += packutil.PutBytes((*dst)[n:], sig2.S.Bytes())
+	*dst = (*dst)[:n]
+	return nil
+}
+
+// packdataLen returns n big enough for packing, sig.R, sig.S
+func packdataLen() int {
+	return 2*marshalBufLen + binary.MaxVarintLen64 + 1
 }
 
 func setupTestConfig(t *testing.T) upspin.Config {
