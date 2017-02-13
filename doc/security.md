@@ -60,7 +60,7 @@ that we assume may safely be given to anyone and used to retrieve the
 ciphertext.
 
 A username list {U} is assembled including Bob, Alice, and any others granted
-read access to items in the pathname's directory.
+read access to items in the path name's directory.
 Alice looks up each of the username's public key P(U) from (a local cache of) a
 centralized `KeyServer` running at `key.upspin.io`.
 Alice wraps *dkey* for each reader, annotated with a hash of that user's public
@@ -95,11 +95,12 @@ sha256("ciphersuite:pathname:time:dkey:ciphertext")
 By signing, Alice ensures that even a reader colluding with upspin servers
 cannot change the file contents undetected.
 Alice is only claiming that she intended to save those contents with that
-pathname, not that she necessarily is the original author or even that the
+path name, not that she necessarily is the original author or even that the
 contents are harmless; in this regard, we're adopting the same semantics as
 "owner" in a classic Unix filesystem.
 
-We do not insist that Alice bind her name inside the file contents.
+We do not insist that Alice bind her name inside the file contents,
+only inside the directory entry.
 It is cryptographically possible that two authors of a file could each have
 their own equally valid directory entries pointing to the same storage blob.
 However, unlike with some content-addressable storage systems, if two
@@ -118,11 +119,11 @@ It is inherent in the notion of a file archive that there is no perfect forward
 secrecy.
 However, a somewhat similar effect is achieved by this update process.
 
-The pathname, revision number, encrypted content location, signature, and
+The path name, revision number, encrypted content location, signature, and
 wrapped keys are the primary metadata about a file stored by the directory
 server.
 Thus Alice reveals information to the directory server, particularly the
-cleartext pathnames and the (public keys of the) people she is sharing with.
+cleartext path names and the (public keys of the) people she is sharing with.
 Also, to the extent that elliptic curves might be cryptographically weaker over
 time than AES, Alice also depends on the directory server being unwilling to
 distribute data to unauthorized people.
@@ -132,6 +133,14 @@ done on the Client, not on any of the servers.
 We intend that this
 system provides end-to-end encryption verifiably under the exclusive control of
 the end users.
+
+This discussion is about a data-encrypting method, or in Upspin terminology, a packing,
+that is called **ee**.
+It uses NIST elliptic curves for end-to-end encryption, and is the default.
+There are other packings available, notably **eeintegrity**
+which is useful when one is willing to store signed cleartext
+in order to make the content available to everyone, not just to an
+explicit list of readers.
 
 The directory server needs to store its hierarchy of directory entries
 somewhere.
@@ -252,6 +261,15 @@ We look forward to adopting some Security Key or other hardware-protected
 private key storage.
 There are no passwords in our system and we don't intend to have any.
 
+Key pairs have three representations:
+1. string, used for storage and between programs like User.Lookup
+2. ecdsa, internal binary format for computation
+3. a secret seed sufficient to reconstruct the key pair
+In form 1, the first bytes describe the packing name, e.g. "p256".
+In form 2, there is a Curve field in the struct that plays that role.
+Form 3, used only in **cmd/upspin/keygen.go**, is simply 128 bits of entropy.
+
+
 By collecting all the private key operations into the factotum package, we are
 providing for an isolated implementation, as in qubes-split-gpg or ssh-agent.
 
@@ -297,6 +315,15 @@ is in the path from the current directory up to the root to limit the
 damage of a malicious directory server returning the wrong result from
 a call to `WhichAccess`.
 A cautious owner should not place private directories inside public directories.
+
+To prevent a subverted directory server from returning entirely fraudulent
+directory entries that would be undetectable by upspinfs,
+**ee** and all the other packings at a minimum
+include a signature by the writer of the path name, packing, and timestamp.
+**Plain** packing does only this minimum,
+with no signature or encryption on the content,
+to simplify implementation of lightweight dynamic file systems
+as might be associated with devices such as cameras.
 
 Finally, while the backup properties of Upspin improve on most people's file
 systems today, a malicious or buggy directory or storage server can
