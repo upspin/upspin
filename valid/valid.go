@@ -156,7 +156,7 @@ func DirEntry(entry *upspin.DirEntry) error {
 
 	// Packing must be valid.
 	switch entry.Packing {
-	case upspin.PlainPack, upspin.DebugPack, upspin.EEPack, upspin.EEIntegrityPack:
+	case upspin.PlainPack, upspin.EEPack, upspin.EEIntegrityPack:
 		// OK
 	default:
 		return errors.E(op, errors.Invalid, entry.Name, errors.Errorf("invalid packing %d", entry.Packing))
