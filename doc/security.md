@@ -99,7 +99,8 @@ pathname, not that she necessarily is the original author or even that the
 contents are harmless; in this regard, we're adopting the same semantics as
 "owner" in a classic Unix filesystem.
 
-We do not insist that Alice bind her name inside the file contents.
+We do not insist that Alice bind her name inside the file contents,
+only inside the directory entry.
 It is cryptographically possible that two authors of a file could each have
 their own equally valid directory entries pointing to the same storage blob.
 However, unlike with some content-addressable storage systems, if two
@@ -132,6 +133,13 @@ done on the Client, not on any of the servers.
 We intend that this
 system provides end-to-end encryption verifiably under the exclusive control of
 the end users.
+
+The discussion above is internally called **packing ee**, short for
+end-to-end NIST elliptic curves, and is the default.
+There are other packings available, notably **eeintegrity**
+which is useful when one is willing to store signed cleartext
+in order to make the content available to everyone, not just an
+explicit list of readers.
 
 The directory server needs to store its hierarchy of directory entries
 somewhere.
@@ -252,6 +260,16 @@ We look forward to adopting some Security Key or other hardware-protected
 private key storage.
 There are no passwords in our system and we don't intend to have any.
 
+When reading our implementation, it may be helpful to note that
+key pairs have three representations:
+1. string, used for storage and between programs like User.Lookup
+2. ecdsa, internal binary format for computation
+3. a secret seed sufficient to reconstruct the key pair
+In form 1, the first bytes describe the packing name, e.g. "p256".
+In form 2, there is an Curve field in the struct that plays that role.
+Form 3, used only in keygen.go, is simply 128 bits of entropy.
+
+
 By collecting all the private key operations into the factotum package, we are
 providing for an isolated implementation, as in qubes-split-gpg or ssh-agent.
 
@@ -297,6 +315,15 @@ is in the path from the current directory up to the root to limit the
 damage of a malicious directory server returning the wrong result from
 a call to `WhichAccess`.
 A cautious owner should not place private directories inside public directories.
+
+To prevent a subverted directory server from returning entirely fraudulent
+directory entries that would be undetectable by upspinfs,
+**packing ee** and all the other packings at a minimum
+include a signature by the writer of (pathname, packing, timestamp.)
+**Packing plain** does only this minimum,
+with no signature or encryption on the content,
+to simplify implementation of lightweight dynamic file systems
+as might be associated with cameras.
 
 Finally, while the backup properties of Upspin improve on most people's file
 systems today, a malicious or buggy directory or storage server can
