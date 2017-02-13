@@ -29,6 +29,11 @@ stores the private key locally, and prepares to store the private key with the
 public upspin key server. It writes a "config" file into $HOME/upspin/config,
 holding the username and the location of the directory and store servers.
 
+The -dir and -store flags specify the network addresses of the Store and
+Directory servers that the Upspin user will use. The -server flag may be used
+to specify a single server that acts as both Store and Directory, in which case
+the -dir and -store flags must not be set.
+
 By default, signup creates new keys with the p256 cryptographic curve set.
 The -curve and -secretseed flags allow the user to control the curve or to
 recreate or reuse prior keys.
@@ -41,16 +46,25 @@ that will then send a confirmation email to the given email address.
 		force       = fs.Bool("force", false, "create a new user even if keys and config file exist")
 		configFile  = fs.String("config", "upspin/config", "location of the config `file`")
 		where       = fs.String("where", filepath.Join(os.Getenv("HOME"), ".ssh"), "`directory` to store keys")
-		dirServer   = fs.String("dir", "", "DirServer `address`")
-		storeServer = fs.String("store", "", "StoreServer `address`")
+		dirServer   = fs.String("dir", "", "Directory server `address`")
+		storeServer = fs.String("store", "", "Store server `address`")
+		bothServer  = fs.String("server", "", "Store and Directory server `address` (if combined)")
 	)
 	// Used only in keygen.
 	fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
 	fs.String("secretseed", "", "128 bit secret `seed` in proquint format")
 
-	s.parseFlags(fs, args, help, "signup [-dir=address] [-store=address] [-secretseed=seed] [-curve=p256] [email]")
+	s.parseFlags(fs, args, help, "signup [flags] <username>")
 	if fs.NArg() != 1 {
 		fs.Usage()
+	}
+	if *bothServer != "" {
+		if *dirServer != "" || *storeServer != "" {
+			s.failf("if -server provided -dir and -store must not be set")
+			fs.Usage()
+		}
+		*dirServer = *bothServer
+		*storeServer = *bothServer
 	}
 	if *dirServer == "" || *storeServer == "" {
 		s.failf("-dir and -store must both be provided")

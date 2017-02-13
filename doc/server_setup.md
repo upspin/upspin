@@ -44,14 +44,14 @@ To deploy an `upspinserver` you need to decide on values for:
 
 ## Sign up for an Upspin account
 
-Run `upspin signup`, passing your chosen host name as its `-dir` and `-store`
-arguments and your chosen Upspin user name as its final argument.
+Run `upspin signup`, passing your chosen host name as its `-server` argument
+and your chosen Upspin user name as its final argument.
 Then follow the onscreen instructions.
 
 For example:
 
 ```
-$ upspin signup -dir=upspin.example.com -store=upspin.example.com you@gmail.com
+$ upspin signup -server=upspin.example.com you@gmail.com
 ```
 
 The [Signing up a new user](/doc/signup.md) document describes this process in
