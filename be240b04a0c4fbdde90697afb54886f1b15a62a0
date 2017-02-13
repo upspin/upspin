@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f1767f53_dd6ddf43",
+        "filename": "serverutil/rate_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-13T19:40:32Z",
+      "side": 1,
+      "message": "the \"%d seconds\" should be sufficient to identify the test case that\u0027s failing, \"case %d\" just means you have to count from the top down",
+      "revId": "be240b04a0c4fbdde90697afb54886f1b15a62a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
