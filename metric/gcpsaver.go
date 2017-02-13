@@ -5,8 +5,8 @@
 package metric
 
 import (
-	"crypto/rand"
 	"fmt"
+	"math/rand"
 	"sync/atomic"
 	"time"
 
@@ -16,6 +16,7 @@ import (
 
 	"upspin.io/errors"
 	"upspin.io/log"
+	"upspin.io/serverutil"
 )
 
 // traceSaver is an interface to cloudtrace API. It is used mostly for testing.
@@ -31,6 +32,8 @@ type gcpSaver struct {
 	saverQueue   chan *Metric
 	staticLabels map[string]string
 	processed    int32
+	n            int // sampling 1 out of every n metrics.
+	rate         *serverutil.RateLimiter
 }
 
 var _ Saver = (*gcpSaver)(nil)
@@ -38,18 +41,30 @@ var _ Saver = (*gcpSaver)(nil)
 // onFlush is called when data is saved to the backend. It's used in tests only.
 var onFlush = func() {}
 
-// NewGCPSaver returns a Saver that saves metrics to GCP Traces for a GCP projectID.
-// The caller must have enabled the StackDriver Traces API for the projectID and have sufficient permission
-// to use the scope "cloud-platform". An optional set of string key-value pairs can be given and they
-// will be saved as labels on GCP. They are useful, for example, in the case of differentiating
-// a metric coming from a test instance versus production.
-func NewGCPSaver(projectID string, labels ...string) (Saver, error) {
+// NewGCPSaver returns a Saver that saves metrics to GCP Traces for a GCP
+// projectID. The caller must have enabled the StackDriver Traces API for the
+// projectID and have sufficient permission to use the scope "cloud-platform".
+//
+// A random sampling ratio of 1-to-n is taken. Setting n to 1 reports every
+// event.
+//
+// A maximum number of outbound network requests per second (maxQPS) when
+// uploading metrics to the GCP backend is enforced. Values equal to or larger
+// than 1000 mean unlimited.
+//
+// An optional set of string key-value pairs can be given and they will be saved
+// as labels on GCP. They are useful, for example, in the case of
+// differentiating a metric coming from a test instance versus production.
+func NewGCPSaver(projectID string, n, maxQPS int, labels ...string) (Saver, error) {
 	const op = "metric.NewGCPSaver"
 	// Authentication is provided by the gcloud tool when running locally, and
 	// by the associated service account when running on Compute Engine.
 	client, err := google.DefaultClient(context.Background(), trace.CloudPlatformScope)
 	if err != nil {
-		log.Fatalf("metric: unable to get default client: %v", err)
+		return nil, errors.E(op, errors.Internal, errors.Errorf("unable to get default client: %v", err))
+	}
+	if n < 1 {
+		return nil, errors.E(op, errors.Invalid, errors.Errorf("invalid sampling rate n=%d", n))
 	}
 
 	srv, err := trace.New(client)
@@ -59,6 +74,17 @@ func NewGCPSaver(projectID string, labels ...string) (Saver, error) {
 	if len(labels)%2 != 0 {
 		return nil, errors.E(op, errors.Invalid, errors.Str("metric labels must come in pairs"))
 	}
+
+	var rate *serverutil.RateLimiter
+	if maxQPS < 1000 {
+		maxQPS++
+		rate = &serverutil.RateLimiter{
+			Backoff: time.Second / time.Duration(maxQPS),
+			Max:     time.Second / time.Duration(maxQPS),
+		}
+	}
+	rand.Seed(time.Now().Unix())
+
 	return &gcpSaver{
 		projectID: projectID,
 		api: &traceSaverImpl{
@@ -66,6 +92,8 @@ func NewGCPSaver(projectID string, labels ...string) (Saver, error) {
 			api:       srv.Projects,
 		},
 		staticLabels: makeLabels(labels),
+		n:            n,
+		rate:         rate,
 	}, nil
 }
 
@@ -79,21 +107,42 @@ func (g *gcpSaver) NumProcessed() int32 {
 }
 
 func (g *gcpSaver) saverLoop() {
-	const (
-		batchTimeout = 250 * time.Millisecond
-		idleTimeout  = time.Hour
+	const idleTimeout = time.Hour
+	var (
+		batchTimeout time.Duration
+		traces       []*trace.Trace
 	)
+	if g.rate != nil {
+		batchTimeout = g.rate.Backoff
+	} else {
+		batchTimeout = 50 * time.Millisecond
+	}
+	maybeSave := func() bool {
+		if g.rate != nil {
+			if pass, _ := g.rate.Pass("metric"); !pass {
+				return false
+			}
+		}
+		g.save(traces)
+		traces = traces[:0]
+		return true
+	}
 	timer := time.NewTimer(idleTimeout)
-	var traces []*trace.Trace
 	for {
 		select {
 		case metric := <-g.saverQueue:
-			traces = append(traces, g.prepareToSave(metric))
-			if len(traces) >= saveQueueLength {
-				// Buffer is full. Flush now.
-				g.save(traces)
-				traces = traces[:0]
+			if len(traces) >= saveQueueLength/2 {
+				// Buffer is half full. Start trying to save.
+				maybeSave()
 			}
+			if g.n > 1 {
+				// Only 1 out every n is buffered to be saved.
+				if rand.Intn(g.n) > 0 {
+					continue
+				}
+			}
+			// Buffer metric for later.
+			traces = append(traces, g.prepareToSave(metric))
 			// While we're getting new metrics, reset the timer so
 			// we have time to fill the buffer.
 			if !timer.Stop() {
@@ -101,13 +150,16 @@ func (g *gcpSaver) saverLoop() {
 			}
 			timer.Reset(batchTimeout)
 		case <-timer.C:
-			// Timer expired. Flush if there's anything to flush.
-			if len(traces) > 0 {
-				g.save(traces)
-				traces = traces[:0]
+			// Timer expired. Try to flush if there's anything
+			// buffered.
+			if len(traces) == 0 || maybeSave() {
+				// Nothing left to save. Revert to the long
+				// timeout.
+				timer.Reset(idleTimeout)
+			} else {
+				// Buffered metrics remain. Try again soon.
+				timer.Reset(batchTimeout)
 			}
-			// Revert to the long timeout.
-			timer.Reset(idleTimeout)
 		}
 	}
 }
