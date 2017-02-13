@@ -16,6 +16,24 @@
       "revId": "9def5c518399d96b61f4866e23d03b30481a6100",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1a6fe05f_f1162033",
+        "filename": "log/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-13T04:12:25Z",
+      "side": 1,
+      "message": "Good point. Fixed.",
+      "parentUuid": "01965bb2_625599e9",
+      "revId": "9def5c518399d96b61f4866e23d03b30481a6100",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
