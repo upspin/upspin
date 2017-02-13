@@ -5,10 +5,6 @@
 // Package log exports logging primitives that log to stderr and also to Google Cloud Logging.
 package log
 
-// We call this log instead of logging for two reasons:
-// 1) It's shorter to type;
-// 2) it mimics Go's log package and can be used as a drop-in replacement for it.
-
 import (
 	"fmt"
 	"log"
@@ -63,13 +59,14 @@ var (
 	external      ExternalLogger
 )
 
-// Register connects an ExternalLogger to the default logger.
-// This may only be called once.
+// Register connects an ExternalLogger to the default logger and turns off
+// non-fatal local logs. This may only be called once.
 func Register(e ExternalLogger) {
 	if external != nil {
 		panic("cannot register second external logger")
 	}
 	external = e
+	Info.Println("External logger is on. Local logging is turned off.")
 }
 
 type logger struct {
@@ -85,8 +82,9 @@ func (l *logger) Printf(format string, v ...interface{}) {
 	}
 	if external != nil {
 		external.Log(l.level, fmt.Sprintf(format, v...))
+	} else {
+		defaultLogger.Printf(format, v...)
 	}
-	defaultLogger.Printf(format, v...)
 }
 
 // Print writes a message to the log.
@@ -96,8 +94,9 @@ func (l *logger) Print(v ...interface{}) {
 	}
 	if external != nil {
 		external.Log(l.level, fmt.Sprint(v...))
+	} else {
+		defaultLogger.Print(v...)
 	}
-	defaultLogger.Print(v...)
 }
 
 // Println writes a line to the log.
@@ -107,14 +106,18 @@ func (l *logger) Println(v ...interface{}) {
 	}
 	if external != nil {
 		external.Log(l.level, fmt.Sprintln(v...))
+	} else {
+		defaultLogger.Println(v...)
 	}
-	defaultLogger.Println(v...)
 }
 
 // Fatal writes a message to the log and aborts, regardless of the current log level.
 func (l *logger) Fatal(v ...interface{}) {
 	if external != nil {
 		external.Log(l.level, fmt.Sprint(v...))
+		// Make sure we get the Fatal recorded.
+		external.Flush()
+		// Fall through to ensure we record it locally too.
 	}
 	defaultLogger.Fatal(v...)
 }
@@ -123,6 +126,9 @@ func (l *logger) Fatal(v ...interface{}) {
 func (l *logger) Fatalf(format string, v ...interface{}) {
 	if external != nil {
 		external.Log(l.level, fmt.Sprintf(format, v...))
+		// Make sure we get the Fatal recorded.
+		external.Flush()
+		// Fall through to ensure we record it locally too.
 	}
 	defaultLogger.Fatalf(format, v...)
 }
