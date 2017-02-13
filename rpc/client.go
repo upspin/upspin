@@ -97,7 +97,7 @@ func NewClient(cfg upspin.Config, netAddr upspin.NetAddr, security SecurityLevel
 	case NoSecurity:
 		// Only allow insecure connections to the loop back network.
 		if !isLocal(string(netAddr)) {
-			return nil, errors.E(op, netAddr, errors.IO, errors.Str("insecure dial to non-loopback destination"))
+			return nil, errors.E(op, errors.IO, errors.Errorf("insecure dial to non-loopback destination %q", netAddr))
 		}
 		c.baseURL = "http://" + string(netAddr)
 	case Secure:
