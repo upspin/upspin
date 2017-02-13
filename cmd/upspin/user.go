@@ -89,20 +89,20 @@ same YAML format printed by the command without the -put flag.
 		var buf bytes.Buffer
 		if keyU.Name != u.Name {
 			fmt.Fprintf(&buf, "user name in configuration: %s\n", u.Name)
-			fmt.Fprintf(&buf, "user name in key server: %s", keyU.Name)
+			fmt.Fprintf(&buf, "user name in key server: %s\n", keyU.Name)
 		}
 		if keyU.PublicKey != u.PublicKey {
-			fmt.Fprintf(&buf, "public key in configuration does not match key server")
+			fmt.Fprintf(&buf, "public key in configuration does not match key server\n")
 		}
 		// There must be dir servers defined in both and we expect agreement.
 		if !equalEndpoints(keyU.Dirs, u.Dirs) {
 			fmt.Fprintf(&buf, "dirs in configuration: %s\n", u.Dirs)
-			fmt.Fprintf(&buf, "dirs in key server: %s", keyU.Dirs)
+			fmt.Fprintf(&buf, "dirs in key server: %s\n", keyU.Dirs)
 		}
 		// Remote stores need not be defined (yet).
 		if len(keyU.Stores) > 0 && !equalEndpoints(keyU.Stores, u.Stores) {
-			fmt.Fprintf(&buf, "stores in configuration: %s", u.Stores)
-			fmt.Fprintf(&buf, "stores in key server: %s", keyU.Stores)
+			fmt.Fprintf(&buf, "stores in configuration: %s\n", u.Stores)
+			fmt.Fprintf(&buf, "stores in key server: %s\n", keyU.Stores)
 		}
 		if buf.Len() > 0 {
 			s.exitf("local configuration differs from public record in key server:\n%s", &buf)
