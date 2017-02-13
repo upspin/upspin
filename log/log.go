@@ -10,6 +10,7 @@ package log
 // 2) it mimics Go's log package and can be used as a drop-in replacement for it.
 
 import (
+	"bufio"
 	"fmt"
 	"log"
 	"os"
@@ -58,9 +59,10 @@ var (
 )
 
 var (
-	currentLevel         = InfoLevel
-	defaultLogger Logger = log.New(os.Stderr, "", log.Ldate|log.Ltime|log.LUTC|log.Lmicroseconds)
-	external      ExternalLogger
+	currentLevel          = InfoLevel
+	bufferedStderr        = bufio.NewWriterSize(os.Stderr, 3*1024*1024)
+	defaultLogger  Logger = log.New(bufferedStderr, "", log.Ldate|log.Ltime|log.LUTC|log.Lmicroseconds)
+	external       ExternalLogger
 )
 
 // Register connects an ExternalLogger to the default logger.
@@ -85,8 +87,9 @@ func (l *logger) Printf(format string, v ...interface{}) {
 	}
 	if external != nil {
 		external.Log(l.level, fmt.Sprintf(format, v...))
+	} else {
+		defaultLogger.Printf(format, v...)
 	}
-	defaultLogger.Printf(format, v...)
 }
 
 // Print writes a message to the log.
@@ -96,8 +99,9 @@ func (l *logger) Print(v ...interface{}) {
 	}
 	if external != nil {
 		external.Log(l.level, fmt.Sprint(v...))
+	} else {
+		defaultLogger.Print(v...)
 	}
-	defaultLogger.Print(v...)
 }
 
 // Println writes a line to the log.
@@ -107,14 +111,18 @@ func (l *logger) Println(v ...interface{}) {
 	}
 	if external != nil {
 		external.Log(l.level, fmt.Sprintln(v...))
+	} else {
+		defaultLogger.Println(v...)
 	}
-	defaultLogger.Println(v...)
 }
 
 // Fatal writes a message to the log and aborts, regardless of the current log level.
 func (l *logger) Fatal(v ...interface{}) {
 	if external != nil {
 		external.Log(l.level, fmt.Sprint(v...))
+		// Make sure we get the Fatal recorded.
+		external.Flush()
+		// Fall through to ensure we record it locally too.
 	}
 	defaultLogger.Fatal(v...)
 }
@@ -123,6 +131,9 @@ func (l *logger) Fatal(v ...interface{}) {
 func (l *logger) Fatalf(format string, v ...interface{}) {
 	if external != nil {
 		external.Log(l.level, fmt.Sprintf(format, v...))
+		// Make sure we get the Fatal recorded.
+		external.Flush()
+		// Fall through to ensure we record it locally too.
 	}
 	defaultLogger.Fatalf(format, v...)
 }
@@ -221,4 +232,5 @@ func Flush() {
 	if external != nil {
 		external.Flush()
 	}
+	bufferedStderr.Flush()
 }
