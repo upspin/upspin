@@ -14,14 +14,14 @@ import (
 	"upspin.io/upspin"
 
 	_ "upspin.io/dir/inprocess"
-	_ "upspin.io/pack/debug"
 	_ "upspin.io/pack/ee"
+	_ "upspin.io/pack/eeintegrity"
 	_ "upspin.io/pack/plain"
 	_ "upspin.io/store/inprocess"
 )
 
 func TestClientFile(t *testing.T) {
-	for _, p := range []upspin.Packing{upspin.DebugPack, upspin.PlainPack, upspin.EEPack} {
+	for _, p := range []upspin.Packing{upspin.PlainPack, upspin.EEIntegrityPack, upspin.EEPack} {
 		t.Run(fmt.Sprintf("packing=%v", p), func(t *testing.T) {
 			testFileSequentialAccess(t, newEnv(t, p))
 		})
@@ -30,6 +30,7 @@ func TestClientFile(t *testing.T) {
 
 // newEnv configures a test environment using a packing.
 func newEnv(t *testing.T, packing upspin.Packing) *testenv.Env {
+	println(packing.String())
 	s := &testenv.Setup{
 		OwnerName: "user1@domain.com",
 		Kind:      "inprocess",

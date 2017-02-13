@@ -21,6 +21,7 @@ import (
 	"upspin.io/upspin"
 
 	_ "upspin.io/pack/ee"
+	_ "upspin.io/pack/eeintegrity"
 	_ "upspin.io/pack/plain"
 
 	"upspin.io/transports"

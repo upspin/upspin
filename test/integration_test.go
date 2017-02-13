@@ -18,7 +18,6 @@ import (
 	"upspin.io/test/testenv"
 	"upspin.io/upspin"
 
-	_ "upspin.io/pack/debug"
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
 )
@@ -366,7 +365,7 @@ func TestIntegration(t *testing.T) {
 				remoteOK bool
 			}{
 				{upspin.PlainPack, false},
-				{upspin.DebugPack, false},
+				{upspin.EEIntegrityPack, false},
 				{upspin.EEPack, true}, // Only run this test against remote.
 			} {
 				setup.Packing = p.packing

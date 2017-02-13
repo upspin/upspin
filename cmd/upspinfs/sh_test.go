@@ -10,12 +10,15 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"testing"
 
 	"upspin.io/bind"
 	"upspin.io/config"
+	"upspin.io/factotum"
 	"upspin.io/upspin"
 
 	dirserver "upspin.io/dir/inprocess"
@@ -38,12 +41,19 @@ func testSetup(name string) (cfg upspin.Config, err error) {
 		Transport: upspin.InProcess,
 		NetAddr:   "", // ignored
 	}
+
+	f, err := factotum.NewFromDir(repo("key/testdata/user1")) // Always use user1's keys.
+	if err != nil {
+		panic("cannot initialize factotum: " + err.Error())
+	}
+
 	cfg = config.New()
 	cfg = config.SetUserName(cfg, upspin.UserName(name))
-	cfg = config.SetPacking(cfg, upspin.DebugPack)
+	cfg = config.SetPacking(cfg, upspin.EEPack)
 	cfg = config.SetKeyEndpoint(cfg, endpoint)
 	cfg = config.SetStoreEndpoint(cfg, endpoint)
 	cfg = config.SetDirEndpoint(cfg, endpoint)
+	cfg = config.SetFactotum(cfg, f)
 
 	bind.RegisterKeyServer(upspin.InProcess, keyserver.New())
 	bind.RegisterStoreServer(upspin.InProcess, storeserver.New())
@@ -124,4 +134,12 @@ func TestShell(t *testing.T) {
 	if err != nil {
 		t.Fatal(err.Error())
 	}
+}
+
+func repo(dir string) string {
+	gopath := os.Getenv("GOPATH")
+	if len(gopath) == 0 {
+		log.Fatal("no GOPATH")
+	}
+	return filepath.Join(gopath, "src/upspin.io/"+dir)
 }

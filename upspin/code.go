@@ -419,8 +419,6 @@ func (p Packing) String() string {
 	switch p {
 	case PlainPack:
 		return "plain"
-	case DebugPack:
-		return "debug"
 	case EEPack:
 		return "ee"
 	case EEIntegrityPack:

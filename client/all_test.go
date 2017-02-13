@@ -12,6 +12,7 @@ import (
 
 	"upspin.io/bind"
 	"upspin.io/config"
+	"upspin.io/factotum"
 	"upspin.io/log"
 	"upspin.io/upspin"
 
@@ -20,7 +21,6 @@ import (
 	storeserver "upspin.io/store/inprocess"
 
 	"upspin.io/errors"
-	_ "upspin.io/pack/debug"
 )
 
 var baseCfg upspin.Config
@@ -31,11 +31,17 @@ func init() {
 		NetAddr:   "", // ignored
 	}
 
+	f, err := factotum.NewFromDir(repo("key/testdata/user1")) // Always use user1's keys.
+	if err != nil {
+		panic("cannot initialize factotum: " + err.Error())
+	}
+
 	baseCfg = config.New()
-	baseCfg = config.SetPacking(baseCfg, upspin.DebugPack)
+	baseCfg = config.SetPacking(baseCfg, upspin.EEIntegrityPack)
 	baseCfg = config.SetKeyEndpoint(baseCfg, inProcess)
 	baseCfg = config.SetStoreEndpoint(baseCfg, inProcess)
 	baseCfg = config.SetDirEndpoint(baseCfg, inProcess)
+	baseCfg = config.SetFactotum(baseCfg, f)
 
 	bind.RegisterKeyServer(upspin.InProcess, keyserver.New())
 	bind.RegisterStoreServer(upspin.InProcess, storeserver.New())
@@ -57,14 +63,15 @@ func setup(userName upspin.UserName, publicKey upspin.PublicKey) upspin.Config {
 	checkTransport(key)
 	dir, _ := bind.DirServer(cfg, cfg.DirEndpoint())
 	checkTransport(dir)
-	if publicKey == "" {
-		publicKey = upspin.PublicKey(fmt.Sprintf("key for %s", userName))
+	if cfg.Factotum().PublicKey() == "" {
+		panic("empty public key")
+		// publicKey = upspin.PublicKey(fmt.Sprintf("key for %s", userName))
 	}
 	user := &upspin.User{
 		Name:      upspin.UserName(userName),
 		Dirs:      []upspin.Endpoint{cfg.DirEndpoint()},
 		Stores:    []upspin.Endpoint{cfg.StoreEndpoint()},
-		PublicKey: publicKey,
+		PublicKey: cfg.Factotum().PublicKey(),
 	}
 	err := key.Put(user)
 	if err != nil {

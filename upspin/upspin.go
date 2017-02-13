@@ -220,10 +220,6 @@ const (
 	// Packings from 1 through 19 are not for production use. This region
 	// is reserved for debugging and other temporary packing implementations.
 
-	// DebugPack is available for use in tests for any purpose.
-	// It is never used in production.
-	DebugPack Packing = 1
-
 	// Packings from 20 and above (as well as PlainPack=0) are fixed in
 	// value and semantics and may be used in production.
 

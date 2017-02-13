@@ -36,7 +36,6 @@ import (
 	"upspin.io/upspin"
 
 	// Load useful packers
-	_ "upspin.io/pack/debug"
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/eeintegrity"
 	_ "upspin.io/pack/plain"
