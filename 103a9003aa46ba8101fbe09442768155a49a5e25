@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "26193451_25d30918",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-14T00:16:53Z",
+      "side": 1,
+      "message": "this is a minor mistake. internal shouldn\u0027t be the name of the package; instead, the functions here should be in a subdirectory of internal.\n\nfor another CL.",
+      "revId": "103a9003aa46ba8101fbe09442768155a49a5e25",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "98c6b3a5_5f1f3032",
+        "filename": "pack/internal/packdata.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-14T00:16:53Z",
+      "side": 1,
+      "message": "PutBytes stores the varint-encoded length of src in dst, followed by a copy of src.\nIt returns the number of bytes written to dst.",
+      "revId": "103a9003aa46ba8101fbe09442768155a49a5e25",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a7134324_4dcddd1e",
+        "filename": "pack/internal/packdata.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-14T00:16:53Z",
+      "side": 1,
+      "message": "\"length header\" needs an article.\nalso split into two sentences; see above.",
+      "revId": "103a9003aa46ba8101fbe09442768155a49a5e25",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
