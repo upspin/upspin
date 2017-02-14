@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "8b65a291_b4ff422f",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-14T00:51:44Z",
+      "side": 1,
+      "message": "I don\u0027t disagee, just was trying to be consistent with what\u0027s there now.",
+      "parentUuid": "26193451_25d30918",
+      "revId": "103a9003aa46ba8101fbe09442768155a49a5e25",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "98c6b3a5_5f1f3032",
         "filename": "pack/internal/packdata.go",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "8ec0f2a8_45f625f5",
+        "filename": "pack/internal/packdata.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-14T00:51:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "98c6b3a5_5f1f3032",
+      "revId": "103a9003aa46ba8101fbe09442768155a49a5e25",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a7134324_4dcddd1e",
         "filename": "pack/internal/packdata.go",
         "patchSetId": 1
@@ -50,6 +86,24 @@
       "revId": "103a9003aa46ba8101fbe09442768155a49a5e25",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "46ef4340_f57e4377",
+        "filename": "pack/internal/packdata.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-14T00:51:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a7134324_4dcddd1e",
+      "revId": "103a9003aa46ba8101fbe09442768155a49a5e25",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
