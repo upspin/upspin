@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d122678e_d69ac411",
+        "filename": "access/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 435,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-14T20:05:34Z",
+      "side": 1,
+      "message": "Where is the other colon? I take it you mean the one separating the rights list from the user names? Perhaps a better comment would be no comment since you cover it all describing the routine.",
+      "range": {
+        "startLine": 435,
+        "startChar": 19,
+        "endLine": 435,
+        "endChar": 55
+      },
+      "revId": "419e657988c636ac59ad4e8bc65367f7b307c9cf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
