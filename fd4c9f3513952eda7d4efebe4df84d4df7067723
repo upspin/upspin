@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "275f1bc8_b9cc04d9",
+        "filename": "doc/security.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-14T01:01:09Z",
+      "side": 1,
+      "message": "the discussion isn\u0027t called packing ee. plus i\u0027m not a fan of \u0027above\u0027. it\u0027s unnecessary if the prose is clear (where else would it be?). also must introduce the definition of packing.\n\nThis discussion is about a data-encrypting method, or in Upspin terminology, a packing,\nthat is called **ee**.\nIt uses ....",
+      "revId": "fd4c9f3513952eda7d4efebe4df84d4df7067723",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2f12a296_ea9ee942",
+        "filename": "doc/security.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-14T01:01:09Z",
+      "side": 1,
+      "message": "line 263 carries no information. delete.",
+      "revId": "fd4c9f3513952eda7d4efebe4df84d4df7067723",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "253f15e1_8be10a66",
+        "filename": "doc/security.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 270,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-14T01:01:09Z",
+      "side": 1,
+      "message": "`cmd/upspin/keygen.go`",
+      "revId": "fd4c9f3513952eda7d4efebe4df84d4df7067723",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "992014fc_d3e64a3b",
+        "filename": "doc/security.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-14T01:01:09Z",
+      "side": 1,
+      "message": "s/packing// here and in the other **..**",
+      "revId": "fd4c9f3513952eda7d4efebe4df84d4df7067723",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c011acdf_e06c53ac",
+        "filename": "doc/security.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 323,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-14T01:01:09Z",
+      "side": 1,
+      "message": "i think 322 has a period in the wrong place - does it end a sentence?\nif so, you\u0027ll need to capitalize  here too after the edit, or avoid it.\nThe **plain** packing",
+      "revId": "fd4c9f3513952eda7d4efebe4df84d4df7067723",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
