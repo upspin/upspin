@@ -31,14 +31,18 @@ import (
 	_ "upspin.io/pack/plain"
 )
 
-const serverName = "storeserver"
+const (
+	serverName    = "storeserver"
+	samplingRatio = 1    // report all metrics
+	maxQPS        = 1000 // unlimited metric reports per second
+)
 
 func main() {
 	flags.Parse("addr", "config", "https", "kind", "letscache", "log", "project", "serverconfig", "tls")
 
 	if flags.Project != "" {
 		cloudLog.Connect(flags.Project, serverName)
-		svr, err := metric.NewGCPSaver(flags.Project, "serverName", serverName)
+		svr, err := metric.NewGCPSaver(flags.Project, samplingRatio, maxQPS, "serverName", serverName)
 		if err != nil {
 			log.Fatalf("Can't start a metric saver for GCP project %q: %s", flags.Project, err)
 		} else {
