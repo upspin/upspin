@@ -479,8 +479,14 @@ type DirEntry struct {
 	Sequence int64     // The sequence (version) number of the item.
 }
 
+// BlockSize is an arbitrarily chosen size that packers use when breaking
+// data into blocks for storage. Clients are free to use any size, but this
+// value is used in various helper libraries.
+const BlockSize = 1024 * 1024
+
 // DirBlock describes a block of data representing a contiguous section of a file.
-// The block may be of any size, including zero bytes.
+// The block may be of any size, including zero bytes, but in large files is usually
+// BlockSize long.
 type DirBlock struct {
 	Location Location // Location of data in store.
 	Offset   int64    // Byte offset of start of block's data in file.

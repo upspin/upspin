@@ -14,10 +14,6 @@ import (
 	"upspin.io/upspin"
 )
 
-// copied from client/client.go
-// TODO(adg): should this be a constant in package upspin?
-const maxBlockSize = 1024 * 1024
-
 // maxInt is the int64 representation of the maximum value of an int.
 // It allows us to verify that an int64 value never exceeds the length of a slice.
 // In the tests, we cut it down to manageable size for overflow checking.
