@@ -473,6 +473,15 @@ func (n *node) Lookup(context gContext.Context, name string) (fs.Node, error) {
 	}
 	f.Unlock()
 
+	// Hack to avoid bothering the keyserver. Extended attributes for
+	// file "<name>" is implemented as an upspin file named "._<name>".
+	// Because a user's root is represented as a file, this often
+	// results in lookups of "._<user name>" . We short circuit these
+	// requests here. Hopefully no user valid name starts with "._".
+	if strings.HasPrefix(string(uname), "._") {
+		return nil, e2e(errors.E(op, errors.NotExist, uname))
+	}
+
 	// Ask the Dirserver.
 	_, de, err := n.directoryLookup(uname)
 	if err != nil {
