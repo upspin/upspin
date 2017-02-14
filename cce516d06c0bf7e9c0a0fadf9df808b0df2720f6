@@ -37,6 +37,23 @@
     },
     {
       "key": {
+        "uuid": "7c7923c9_8389e8da",
+        "filename": "metric/gcpsaver.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-14T01:07:57Z",
+      "side": 1,
+      "message": "// A random sampling ratio of 1-to-n is taken. Setting n to 1 reports every event.",
+      "revId": "cce516d06c0bf7e9c0a0fadf9df808b0df2720f6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "ee5c249e_cdae607a",
         "filename": "metric/gcpsaver.go",
         "patchSetId": 1
@@ -66,6 +83,24 @@
       "side": 1,
       "message": "Done",
       "parentUuid": "ee5c249e_cdae607a",
+      "revId": "cce516d06c0bf7e9c0a0fadf9df808b0df2720f6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "1d3e9c87_e90a047e",
+        "filename": "metric/gcpsaver.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-14T01:07:57Z",
+      "side": 1,
+      "message": "sorry, still don\u0027t get this. how about\nwhat network events are you talking about, inbound or metric reports? this is a second unlimited thing in this one comment.\n\nit\u0027s not clear.",
+      "parentUuid": "4a45d7bd_d9919768",
       "revId": "cce516d06c0bf7e9c0a0fadf9df808b0df2720f6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -136,6 +171,24 @@
       "side": 1,
       "message": "These two don\u0027t divide. maxQPS is an int.",
       "parentUuid": "ef358117_0eb1fd93",
+      "revId": "cce516d06c0bf7e9c0a0fadf9df808b0df2720f6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "25e3117e_e6e0ffba",
+        "filename": "metric/gcpsaver.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-14T01:07:57Z",
+      "side": 1,
+      "message": "that\u0027s not the point. the 1000/maxQPS loses precision and is unnecessary - just use seconds, which also makes the expression easier to understand\n\nBackoff: time.Second/time.Duration(maxQPS),",
+      "parentUuid": "18f57435_9ac2a8f7",
       "revId": "cce516d06c0bf7e9c0a0fadf9df808b0df2720f6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
