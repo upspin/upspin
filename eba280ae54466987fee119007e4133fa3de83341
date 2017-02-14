@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6e8e08c6_d956596b",
+        "filename": "doc/security.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 322,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-14T01:18:00Z",
+      "side": 1,
+      "message": "s/pathname/the pathname/\n\nalthough globally i may push back on this in the docs to be two words. not in this CL, though.",
+      "revId": "eba280ae54466987fee119007e4133fa3de83341",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "23a0493b_a097ba02",
+        "filename": "doc/security.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 323,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-14T01:18:00Z",
+      "side": 1,
+      "message": "s/Plain/plain/",
+      "revId": "eba280ae54466987fee119007e4133fa3de83341",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d03f7439_9ed66940",
+        "filename": "doc/security.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-14T01:18:00Z",
+      "side": 1,
+      "message": "s/cameras/devices such as cameras/",
+      "revId": "eba280ae54466987fee119007e4133fa3de83341",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
