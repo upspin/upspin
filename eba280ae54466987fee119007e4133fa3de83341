@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "5c13a13d_2aa27860",
+        "filename": "doc/security.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-14T05:17:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "076e0293_43db5033",
+      "range": {
+        "startLine": 269,
+        "startChar": 20,
+        "endLine": 269,
+        "endChar": 22
+      },
+      "revId": "eba280ae54466987fee119007e4133fa3de83341",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6e8e08c6_d956596b",
         "filename": "doc/security.md",
         "patchSetId": 3
@@ -39,6 +63,24 @@
       "revId": "eba280ae54466987fee119007e4133fa3de83341",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "71379a5e_9710f98d",
+        "filename": "doc/security.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 322,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-14T05:17:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6e8e08c6_d956596b",
+      "revId": "eba280ae54466987fee119007e4133fa3de83341",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -59,6 +101,24 @@
     },
     {
       "key": {
+        "uuid": "6ef4ca26_81048b7e",
+        "filename": "doc/security.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 323,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-14T05:17:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "23a0493b_a097ba02",
+      "revId": "eba280ae54466987fee119007e4133fa3de83341",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d03f7439_9ed66940",
         "filename": "doc/security.md",
         "patchSetId": 3
@@ -76,6 +136,24 @@
     },
     {
       "key": {
+        "uuid": "bfe1fdb8_21b2534b",
+        "filename": "doc/security.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-14T05:17:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d03f7439_9ed66940",
+      "revId": "eba280ae54466987fee119007e4133fa3de83341",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4b83edd5_e390b752",
         "filename": "pack/internal/packdata.go",
         "patchSetId": 3
@@ -87,6 +165,30 @@
       "writtenOn": "2017-02-14T04:46:08Z",
       "side": 1,
       "message": "client.addReaders has to do this same thing.  Perhaps we should make it part of bind like bind.DirServerFor?",
+      "range": {
+        "startLine": 39,
+        "startChar": 1,
+        "endLine": 57,
+        "endChar": 1
+      },
+      "revId": "eba280ae54466987fee119007e4133fa3de83341",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cd95fe6b_80e6290b",
+        "filename": "pack/internal/packdata.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-14T05:17:36Z",
+      "side": 1,
+      "message": "Fine by me.\n\nI\u0027ll leave to others to do it in another CL.",
+      "parentUuid": "4b83edd5_e390b752",
       "range": {
         "startLine": 39,
         "startChar": 1,
