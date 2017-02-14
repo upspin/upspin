@@ -68,7 +68,7 @@ func validPathName(name upspin.PathName) error {
 // non-negative Size, non-negative Offset, and valid Location.
 func DirBlock(block upspin.DirBlock) error {
 	const op = "valid.DirBlock"
-	if block.Size < 0 { // TODO: This be <= 0 but dir/inprocess creates empty blocks.
+	if block.Size < 0 { // TODO: This should be <= 0 but dir/inprocess creates empty blocks.
 		return errors.E(op, errors.Invalid, errors.Errorf("negative block size %d", block.Size))
 	}
 	if block.Offset < 0 {

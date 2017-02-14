@@ -72,7 +72,8 @@ func (c *Countersigner) countersign(entry *upspin.DirEntry, newF upspin.Factotum
 	}
 	_, err = c.state.DirServer().Put(entry)
 	if err != nil {
-		// TODO: implement links.
+		// If we get ErrFollowLink, the item changed underfoot, so reporting
+		// an error in that case is OK.
 		fmt.Fprintf(os.Stderr, "error putting entry back for %q: %s\n", entry.Name, err)
 		c.state.exitCode = 1
 	}

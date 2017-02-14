@@ -12,8 +12,6 @@ import (
 func (s *State) get(args ...string) {
 	const help = `
 Get writes to standard output the contents identified by the Upspin path.
-
-TODO: Delete in favor of cp?
 `
 	fs := flag.NewFlagSet("get", flag.ExitOnError)
 	outFile := fs.String("out", "", "output file (default standard output)")

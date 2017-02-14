@@ -38,7 +38,7 @@ func ExampleError() {
 	//	Get: network unreachable
 }
 
-func ExampleError_Match() {
+func ExampleMatch() {
 	path := upspin.PathName("jane@doe.com/file")
 	user := upspin.UserName("joe@blow.com")
 	err := errors.Str("network unreachable")
