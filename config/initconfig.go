@@ -60,7 +60,10 @@ func New() upspin.Config {
 var (
 	defaultUserName    = upspin.UserName("noone@nowhere.org")
 	defaultPacking     = upspin.EEPack
-	defaultKeyEndpoint = upspin.Endpoint{upspin.Remote, "key.upspin.io:443"}
+	defaultKeyEndpoint = upspin.Endpoint{
+		Transport: upspin.Remote,
+		NetAddr:   "key.upspin.io:443",
+	}
 )
 
 // Known keys. All others are treated as errors.

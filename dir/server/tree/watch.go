@@ -394,7 +394,7 @@ func notifyWatchers(watchers []*watcher) {
 func isPrefixPath(name upspin.PathName, prefix path.Parsed) bool {
 	parsed, err := path.Parse(name)
 	if err != nil {
-		log.Error.Printf("dir/server/tree.isPrefixPath: error parsing path", name)
+		log.Error.Print("dir/server/tree.isPrefixPath: error parsing path", name)
 		return false
 	}
 	return parsed.HasPrefix(prefix)

@@ -90,8 +90,6 @@ func setup(userName upspin.UserName, publicKey upspin.PublicKey) upspin.Config {
 	return cfg
 }
 
-// TODO: End of copied code.
-
 func TestPutGetTopLevelFile(t *testing.T) {
 	const (
 		user = "user1@google.com"

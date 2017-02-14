@@ -126,8 +126,6 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 		packer = pack.Lookup(upspin.EEIntegrityPack)
 	} else {
 		// Encrypt data according to the preferred packer
-		// TODO: Do a Lookup in the parent directory to find the overriding packer.
-		// TODO: Should we log that we're doing this?
 		packer = pack.Lookup(c.config.Packing())
 		if packer == nil {
 			return nil, errors.E(op, name, errors.Errorf("unrecognized Packing %d", c.config.Packing()))
@@ -369,11 +367,7 @@ func (c *Client) getReaders(op string, name upspin.PathName, accessEntry *upspin
 // The default is false, for example if there are any errors in reading Access.
 // The access package restricts where the "all" word can appear; here we
 // trust that it has done its job.
-// TODO  Enforce group limitation; issue #122.
 func (c *Client) isReadableByAll(readers []upspin.UserName) bool {
-	if len(readers) < 1 {
-		return false
-	}
 	for _, reader := range readers {
 		if reader == access.AllUsers {
 			return true
@@ -727,7 +721,7 @@ func (c *Client) dupOrRename(op string, oldName, newName upspin.PathName, rename
 	}
 
 	// Rewrap reader keys only if changing directory.
-	// TODO: This could be cheaper (just compare the prefix), but it's clear and correct as written.
+	// This could be cheaper (just compare the prefix), but it's clear and correct as written.
 	newParsed, err := path.Parse(entry.Name)
 	if err != nil {
 		return nil, errors.E(op, err)

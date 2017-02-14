@@ -635,7 +635,3 @@ func testWriteReadAllAccessFile(t *testing.T, r *testenv.Runner) {
 }
 
 // TODO: cross DirServer support for Group files.
-// Requires that DirServer implements it.
-// Also, requires that testenv supports configuring multiple DirServers at
-// once (it mostly does via serverMux, but requires that env.Setup passes a
-// list of servers to work with).
