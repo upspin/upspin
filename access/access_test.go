@@ -547,7 +547,7 @@ func TestParseContainsGroupName(t *testing.T) {
 	match(t, a.list[Delete], empty)
 }
 
-func TestParseWrongFormat1(t *testing.T) {
+func TestParseBadRight(t *testing.T) {
 	expectedErr := errors.E(upspin.PathName(testFile), errors.Invalid, errors.Str("invalid access rights on line 1: \"rrrr\""))
 
 	accessText := []byte("rrrr: bob@abc.com") // "rrrr" is wrong. should be just "r"
@@ -560,7 +560,7 @@ func TestParseWrongFormat1(t *testing.T) {
 	}
 }
 
-func TestParseWrongFormat2(t *testing.T) {
+func TestParseExtraColon(t *testing.T) {
 	expectedErr := errors.E(upspin.PathName(testFile), errors.Invalid, errors.Str(`invalid users list on line 2: "a@b.co : x"`))
 	accessText := []byte("#A comment\n r: a@b.co : x")
 	_, err := Parse(testFile, accessText)
@@ -572,64 +572,39 @@ func TestParseWrongFormat2(t *testing.T) {
 	}
 }
 
-func TestParseWrongFormat3(t *testing.T) {
-	expectedErr := errors.E(upspin.PathName(testFile), errors.Invalid, errors.Str(`invalid rights list on line 1: ""`))
-	accessText := []byte(": bob@abc.com") // missing access format text.
-	_, err := Parse(testFile, accessText)
-	if err == nil {
-		t.Fatal("Expected error, got none")
-	}
-	if !errors.Match(expectedErr, err) {
-		t.Errorf("err = %s, want %s", err, expectedErr)
-	}
+type invalidTest struct {
+	text     string
+	errorStr string
 }
 
-func TestParseWrongFormat4(t *testing.T) {
-	expectedErr := errors.E(upspin.PathName(testFile), errors.Invalid, errors.Str(`invalid access rights on line 1: "rea"`))
-	accessText := []byte("rea:bob@abc.com") // invalid access format text.
-	_, err := Parse(testFile, accessText)
-	if err == nil {
-		t.Fatal("Expected error, got none")
-	}
-	if !errors.Match(expectedErr, err) {
-		t.Errorf("err = %s, want %s", err, expectedErr)
-	}
+var invalidAccessFileTests = []invalidTest{
+	// No right or colon.
+	{"bob@abc.com", `no colon on line 1: "bob@abc.com"`},
+	// No right.
+	{": bob@abc.com", `invalid rights list on line 1: ""`},
+	// Misspelled right.
+	{"rea:bob@abc.com", `invalid access rights on line 1: "rea"`},
+	// Bad UTF-8.
+	{"r:ren\xe9e@abc.com", `invalid users list on line 1: "ren\xe9e@abc.com"`},
+	// Unprintable group name.
+	{"r:abc\x04de", `invalid users list on line 1: "abc\x04de"`},
+	// Too many fields.
+	{"\n\nr: a@b.co r: c@b.co", `invalid users list on line 3: "a@b.co r: c@b.co"`},
+	// Bad group path.
+	{"r: notanemail/Group/family", `bad user name in group path "notanemail/Group/family"`},
 }
 
-func TestParseMissingAccessField(t *testing.T) {
-	expectedErr := errors.E(upspin.PathName(testFile), errors.Invalid, errors.Str(`no colon on line 1: "bob@abc.com"`))
-	accessText := []byte("bob@abc.com")
-	_, err := Parse(testFile, accessText)
-	if err == nil {
-		t.Fatal("Expected error, got none")
-	}
-	if !errors.Match(expectedErr, err) {
-		t.Errorf("err = %s, want %s", err, expectedErr)
-	}
-}
-
-func TestParseTooManyFieldsOnSingleLine(t *testing.T) {
-	expectedErr := errors.E(upspin.PathName(testFile), errors.Invalid, errors.Str(`invalid users list on line 3: "a@b.co r: c@b.co"`))
-	accessText := []byte("\n\nr: a@b.co r: c@b.co")
-	_, err := Parse(testFile, accessText)
-	if err == nil {
-		t.Fatal("Expected error, got none")
-	}
-	if !errors.Match(expectedErr, err) {
-		t.Errorf("err = %s, want %s", err, expectedErr)
-	}
-}
-
-func TestParseBadGroupPath(t *testing.T) {
-	expectedErr := errors.E(upspin.PathName(testFile), errors.Invalid, errors.Str(`bad user name in group path "notanemail/Group/family"`))
-
-	accessText := []byte("r: notanemail/Group/family")
-	_, err := Parse(testFile, accessText)
-	if err == nil {
-		t.Fatal("expected error, got none")
-	}
-	if !errors.Match(expectedErr, err) {
-		t.Errorf("err = %s, want %s", err, expectedErr)
+func TestInvalidParse(t *testing.T) {
+	for _, test := range invalidAccessFileTests {
+		accessText := []byte(test.text)
+		_, err := Parse(testFile, accessText)
+		if err == nil {
+			t.Fatal("Expected error, got none")
+		}
+		expectedErr := errors.E(upspin.PathName(testFile), errors.Invalid, errors.Str(test.errorStr))
+		if !errors.Match(expectedErr, err) {
+			t.Errorf("given %q: err = %s, want %s", test.text, err, expectedErr)
+		}
 	}
 }
 
@@ -693,7 +668,7 @@ func TestNew(t *testing.T) {
 		t.Fatal(err)
 	}
 	if !a.equal(expected) {
-		t.Errorf("Expected %s to equal %s", a, expected)
+		t.Errorf("Expected %v to equal %v", a, expected)
 	}
 }
 

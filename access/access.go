@@ -21,8 +21,10 @@ import (
 	"bytes"
 	"encoding/json"
 	"sort"
+	"strconv"
 	"strings"
 	"sync"
+	"unicode/utf8"
 
 	"upspin.io/errors"
 	"upspin.io/path"
@@ -404,7 +406,7 @@ func splitList(list [][]byte, text []byte) [][]byte {
 	}
 	for i, elem := range list {
 		elem = bytes.TrimSpace(elem)
-		if !isValidUserOrGroupName(elem) {
+		if !isPlausibleUserOrGroupName(elem) {
 			return nil
 		}
 		list[i] = elem
@@ -412,14 +414,31 @@ func splitList(list [][]byte, text []byte) [][]byte {
 	return list
 }
 
-// TODO: What is the right syntax for a user/group name?
-func isValidUserOrGroupName(name []byte) bool {
+// isPlausibleUserOrGroupName reports whether the name is sane enough to
+// possibly be a user name or a group name. Group names can be just a single
+// path element, so lacking any better definition we force it to be printable,
+// and also free of space, comma, or colon to avoid parsing ambiguities, just
+// to be safe. The argument is a byte slice, not a string, which keeps us away
+// from the string-based valid and user packages, which could do a better
+// job, but they are invoked higher up once we have a string. This function
+// is mostly about validating the syntax of Access and Group files.
+func isPlausibleUserOrGroupName(name []byte) bool {
 	if len(name) == 0 {
 		return false
 	}
-	for _, b := range name {
-		if isSpace(b) || b == ':' {
-			return false
+	// Need to UTF-8 decode by hand, as name is []byte not string. Don't allocate.
+	for i, width := 0, 0; i < len(name); i += width {
+		var r rune
+		r, width = utf8.DecodeRune(name[i:])
+		switch {
+		case r == ':':
+			return false // Bad syntax: two colons on same line.
+		case width == 1 && isSeparator(byte(r)):
+			return false // More bad syntax. Shouldn't happen but be careful.
+		case width == 1 && r == utf8.RuneError:
+			return false // Bad UTF-8.
+		case !strconv.IsPrint(r):
+			return false // Bad character for name.
 		}
 	}
 	return true
