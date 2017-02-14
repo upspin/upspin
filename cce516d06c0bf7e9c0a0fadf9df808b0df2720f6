@@ -54,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "8c52a255_d7566085",
+        "filename": "metric/gcpsaver.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-14T01:16:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7c7923c9_8389e8da",
+      "revId": "cce516d06c0bf7e9c0a0fadf9df808b0df2720f6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ee5c249e_cdae607a",
         "filename": "metric/gcpsaver.go",
         "patchSetId": 1
@@ -101,6 +119,24 @@
       "side": 1,
       "message": "sorry, still don\u0027t get this. how about\nwhat network events are you talking about, inbound or metric reports? this is a second unlimited thing in this one comment.\n\nit\u0027s not clear.",
       "parentUuid": "4a45d7bd_d9919768",
+      "revId": "cce516d06c0bf7e9c0a0fadf9df808b0df2720f6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "735acc4b_0d1519ea",
+        "filename": "metric/gcpsaver.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-14T01:16:35Z",
+      "side": 1,
+      "message": "Outbound. These are the calls we make to save the metrics to the backend on GCP.\n\nThe unlimited thing is just so we don\u0027t wait on a timer for less than 1 ms, which seems dangerously close to when we would just start to spin. I\u0027m fine with allowing this to be any number and letting people shoot themselves in the foot if they choose too big a value.",
+      "parentUuid": "1d3e9c87_e90a047e",
       "revId": "cce516d06c0bf7e9c0a0fadf9df808b0df2720f6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -192,6 +228,24 @@
       "revId": "cce516d06c0bf7e9c0a0fadf9df808b0df2720f6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bf322adb_a0f049df",
+        "filename": "metric/gcpsaver.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-14T01:16:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "25e3117e_e6e0ffba",
+      "revId": "cce516d06c0bf7e9c0a0fadf9df808b0df2720f6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
