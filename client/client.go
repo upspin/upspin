@@ -31,7 +31,7 @@ type Client struct {
 
 var _ upspin.Client = (*Client)(nil)
 
-var maxBlockSize = 1024 * 1024 // modified by tests
+var maxBlockSize = upspin.BlockSize // modified by tests
 
 const (
 	followFinalLink      = true

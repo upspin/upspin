@@ -13,9 +13,6 @@ import (
 	"upspin.io/upspin"
 )
 
-// TODO: move to package upspin or somewhere else more appropriate.
-const blockSize = 1024 * 1024 // 1MB
-
 // store stores a node to the StoreServer. It does not reset the dirty bit.
 // Children of n, if any, must not be dirty.
 func (t *Tree) store(n *node) error {
@@ -47,7 +44,7 @@ func (t *Tree) store(n *node) error {
 		return errors.E(err)
 	}
 
-	// Pack and store child nodes, keeping blocks at ~blockSize.
+	// Pack and store child nodes, keeping blocks at ~BlockSize.
 	var data []byte
 	for _, kid := range n.kids {
 		// TODO: also check whether there are any Blocks with empty locations that are non-empty dirs or files.
@@ -61,7 +58,7 @@ func (t *Tree) store(n *node) error {
 		}
 
 		// Don't let blocks grow too much (but we never split a large DirEntry in the middle).
-		if len(data) > 0 && len(data)+len(block) > blockSize {
+		if len(data) > 0 && len(data)+len(block) > upspin.BlockSize {
 			// Flush now.
 			err = storeBlock(storeServer, bp, data)
 			if err != nil {
