@@ -16,6 +16,24 @@
       "revId": "b2a934b0fc0e8be1db443be4b2ac49960b0a7c48",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "42f03966_5e86a0ef",
+        "filename": "rpc/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-15T22:47:26Z",
+      "side": 0,
+      "message": "I tried and it\u0027s actually more messy than i thought because of variable scoping. it\u0027s clear as is. stet.",
+      "parentUuid": "835d2a72_d3ef19a4",
+      "revId": "b2a934b0fc0e8be1db443be4b2ac49960b0a7c48",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
