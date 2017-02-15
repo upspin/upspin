@@ -1,3 +1,9 @@
+# Upspin
+
+Documentation: [upspin.io](https://upspin.io/)
+
+## About the project
+
 Upspin is an experimental project to build a framework for naming
 and sharing files and other data securely, uniformly, and globally:
 a global name system of sorts.
@@ -8,5 +14,34 @@ and other storage services to the name space.
 
 Performance is not a primary goal. Uniformity and security are.
 
+Upspin is not an official Google product.
 
-This is not an official Google product.
+
+## Status
+
+Upspin has rough edges, and is not yet suitable for non-technical users.
+
+
+## Contributing
+
+See the [Contribution Guidelines](CONTRIBUTING.md)
+for information on contributing to the project.
+
+
+### Reporting issues
+
+Please report issues through
+[our issue tracker](https://github.com/upspin/upspin/issues).
+
+
+## Community
+
+Use the [Upspin mailing list](https://groups.google.com/forum/#!forum/upspin)
+for discussion about Upspin use and development.
+
+
+### Code of Conduct
+
+Please note that this project is released with a [Contributor Code of Conduct](CONDUCT.md).
+By participating in this project you agree to abide by its terms.
+
