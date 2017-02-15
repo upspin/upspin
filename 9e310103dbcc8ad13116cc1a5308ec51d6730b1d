@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "326a430c_d835bb51",
+        "filename": "dir/inprocess/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-15T21:30:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "47aff687_a63eba2a",
+      "revId": "9e310103dbcc8ad13116cc1a5308ec51d6730b1d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "03a73e52_865a525d",
         "filename": "dir/inprocess/directory.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2017-02-15T21:22:11Z",
       "side": 1,
       "message": "If this test comes first, you can drop the \"entry.IsDir() \u0026\u0026\" before IsRoot.   To me, the logic then flows more smoothly.\nBut it\u0027s a matter of taste;  do as you like.",
+      "revId": "9e310103dbcc8ad13116cc1a5308ec51d6730b1d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "620bbec6_4c782bb1",
+        "filename": "dir/inprocess/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-15T21:30:10Z",
+      "side": 1,
+      "message": "I tried a switch and a nested if and neither one looked much better. This at least keeps the nested ifs at bay, which we frown upon.",
+      "parentUuid": "03a73e52_865a525d",
       "revId": "9e310103dbcc8ad13116cc1a5308ec51d6730b1d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
