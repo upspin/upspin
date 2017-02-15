@@ -463,7 +463,7 @@ func TestPutLargeNode(t *testing.T) {
 		t.Fatal(err)
 	}
 	p, dir2 := newDirEntry("/largefile", !isDir, config)
-	dir2.Packdata = make([]byte, blockSize+1) // force a block split on the next file.
+	dir2.Packdata = make([]byte, upspin.BlockSize+1) // force a block split on the next file.
 	_, err = tree.Put(p, dir2)
 	if err != nil {
 		t.Fatal(err)
