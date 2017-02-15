@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "eb466050_33648707",
+        "filename": "cmd/frontend/templates/base.tmpl",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-15T01:51:53Z",
+      "side": 1,
+      "message": "github.com/upspin/upspin",
+      "revId": "185f2cddc9e8e1addb0a1da6e97df234d9a98cf2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b0d57be8_842303c2",
+        "filename": "cmd/frontend/templates/base.tmpl",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-15T01:51:53Z",
+      "side": 1,
+      "message": "ditto\n\nalso make this MASCOT.md",
+      "revId": "185f2cddc9e8e1addb0a1da6e97df234d9a98cf2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d41d346d_1a1580ed",
+        "filename": "cmd/frontend/templates/base.tmpl",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-15T01:51:53Z",
+      "side": 1,
+      "message": "drop trailing space",
+      "revId": "185f2cddc9e8e1addb0a1da6e97df234d9a98cf2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
