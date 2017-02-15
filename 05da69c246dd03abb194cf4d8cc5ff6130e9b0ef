@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "22e67316_fc075452",
+        "filename": "cmd/upspin/signup.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-15T06:49:53Z",
+      "side": 1,
+      "message": "s/ and/,/",
+      "revId": "05da69c246dd03abb194cf4d8cc5ff6130e9b0ef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4c74c6b0_8804df86",
+        "filename": "cmd/upspin/signup.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-15T06:49:53Z",
+      "side": 1,
+      "message": "s/locally/\u0026,/",
+      "revId": "05da69c246dd03abb194cf4d8cc5ff6130e9b0ef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7096fb2b_2f7d36eb",
+        "filename": "cmd/upspin/signup.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-15T06:49:53Z",
+      "side": 1,
+      "message": "s/tell/\u0026s/",
+      "revId": "05da69c246dd03abb194cf4d8cc5ff6130e9b0ef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "25ef81a4_39e3e5d6",
+        "filename": "cmd/upspin/signup.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-15T06:49:53Z",
+      "side": 1,
+      "message": "s/Only/only/\n\ni think this is a bad name though. maybe signuponly or sendkeys or noconfig",
+      "revId": "05da69c246dd03abb194cf4d8cc5ff6130e9b0ef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
