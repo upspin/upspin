@@ -278,8 +278,6 @@ func (s *server) canPut(op string, parsed path.Parsed, makeDirectory bool) (*ups
 
 // put is the underlying implementation of Put, including making links and directories..
 // If deleting, we expect the entry to already be present and skip it on the rewrite.
-// TODO: implement links.
-// TODO add Share?
 func (s *server) put(op string, entry *upspin.DirEntry, parsed path.Parsed, deleting bool) (*upspin.DirEntry, error) {
 	pathName := parsed.Path()
 	if parsed.IsRoot() {
@@ -370,7 +368,7 @@ func (s *server) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, error)
 	}
 	// Does the item exist?
 	entry, err := s.lookup(op, parsed, true)
-	if err == upspin.ErrFollowLink { // TODO: Is this leaking information?
+	if err == upspin.ErrFollowLink {
 		return s.errLink(op, entry, err)
 	}
 	if errors.Match(err, notExist) {
@@ -571,7 +569,6 @@ func (s *server) lookup(op string, parsed path.Parsed, followFinal bool) (*upspi
 }
 
 // Glob implements upspin.DirServer.Glob.
-// TODO: Test access control for this method.
 func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	const op = "dir/inprocess.Glob"
 	log.Debug.Print(pattern)
@@ -863,5 +860,5 @@ func (s *server) Ping() bool {
 
 // Close implements upspin.server.
 func (s *server) Close() {
-	// TODO
+	// TODO: unimplemented.
 }

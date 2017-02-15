@@ -189,7 +189,6 @@ retryAuth:
 			c.invalidateSession()
 			haveToken = false // Retry exactly once.
 			goto retryAuth
-			// TODO(adg): refactor to get rid of the goto
 		}
 		return errors.E(op, errors.IO, errors.Errorf("%s: %s", httpResp.Status, msg))
 	}
