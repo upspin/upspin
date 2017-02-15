@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "548d619c_cd1805b6",
+        "filename": "cmd/frontend/templates/base.tmpl",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-15T04:40:10Z",
+      "side": 1,
+      "message": "trailing space",
+      "revId": "eb8dc214f90f49566ad2c0a371f9f2a4c4ff78e0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
