@@ -209,7 +209,13 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	// Special case for making a root.
 	if entry.IsDir() && parsed.IsRoot() {
 		entry, err = s.makeRoot(parsed)
+	} else if !entry.IsDir() {
+		entry, err = s.put(op, entry, parsed, false)
 	} else {
+		entry, err = s.newDirEntry(entry.Name, []byte(""), entry.Sequence)
+		if err != nil {
+			return nil, err
+		}
 		entry, err = s.put(op, entry, parsed, false)
 	}
 	if err != nil {
