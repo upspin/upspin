@@ -196,13 +196,13 @@ type Packer interface {
 
 	// Share updates each packdata element to enable all the readers,
 	// and only those readers, to be able to decrypt the associated ciphertext,
-	// which is held separate from this call. It is invoked in response to
-	// DirServer updates returning information about entries that need updating due to
-	// changes in the set of users with permissions to read the associated items.
-	// (TODO: DirServer updates not yet implemented.)
+	// which is held separate from this call. It is used to repair incorrect
+	// key wrapping after access rights are changed.
 	// In case of error, Share skips processing for that reader or packdata.
 	// If packdata[i] is nil on return, it was skipped.
 	// Share trusts the caller to check the arguments are not malicious.
+	// TODO: It would be nice if DirServer provided a method to report
+	// which items need updates, so this could be automated.
 	Share(config Config, readers []PublicKey, packdata []*[]byte)
 
 	// Name updates the DirEntry to refer to a new path. If the new
@@ -233,7 +233,7 @@ const (
 	// "p256": AES-256, SHA-256, and curve P256; strength 128.
 	// "p384": AES-256, SHA-512, and curve P384; strength 192.
 	// "p521": AES-256, SHA-512, and curve P521; strength 256.
-	// "25519": TODO(ehg) x/crypto/curve25519, github.com/agl/ed25519
+	// TODO(ehg) add "25519":  x/crypto/curve25519, github.com/agl/ed25519
 	EEPack Packing = 20
 
 	// SymmPack stores AES-encrypted data, using a symmetric key.
@@ -250,12 +250,14 @@ type User struct {
 	// Name represents the user's name as an e-mail address, such as joe@smith.com.
 	Name UserName
 
-	// Dirs is a slice of DirServer endpoints where the user's root directory may be located.
-	// TODO: Provide full documentation.
+	// Dirs is a slice of DirServer endpoints where the user's root directory may be located,
+	// which should be contacted in order when trying to access the user's tree. Multiple
+	// entries represent mirrors, which are as yet unimplemented. TODO.
 	Dirs []Endpoint
 
-	// Stores is a slice of StoreServer endpoints where the user's data is primarily written to.
-	// TODO: Provide full documentation.
+	// Stores is a slice of StoreServer endpoints where the user's data is primarily written to,
+	// which should be contacted in order when trying to access the user's data. Multiple
+	// entries represent mirrors, which are as yet unimplemented. TODO.
 	Stores []Endpoint
 
 	// PublicKey is the user's current public key.
@@ -271,8 +273,9 @@ type KeyServer interface {
 	Lookup(userName UserName) (*User, error)
 
 	// Put sets or updates information about a user. The user's name must
-	// match the authenticated user.
-	// TODO: Provide full documentation.
+	// match the authenticated user. The call can update any field except
+	// the user name.
+	// To add new users, see the signup subcommand of cmd/upspin.
 	Put(user *User) error
 }
 
@@ -610,7 +613,6 @@ type Client interface {
 	// MakeDirectory creates a directory with the given name, which
 	// must not already exist. All but the last element of the path
 	// name must already exist and be directories.
-	// TODO: Make multiple elems?
 	MakeDirectory(dirName PathName) (*DirEntry, error)
 
 	// Rename renames oldName to newName. The old name is no longer valid.

@@ -163,7 +163,6 @@ func UpspinUser(user *User) *upspin.User {
 		Dirs:      UpspinEndpoints(user.Dirs),
 		Stores:    UpspinEndpoints(user.Stores),
 		PublicKey: upspin.PublicKey(user.PublicKey),
-		// TODO: other fields?
 	}
 }
 
@@ -174,7 +173,6 @@ func UserProto(user *upspin.User) *User {
 		Dirs:      Endpoints(user.Dirs),
 		Stores:    Endpoints(user.Stores),
 		PublicKey: string(user.PublicKey),
-		// TODO: other fields?
 	}
 }
 
