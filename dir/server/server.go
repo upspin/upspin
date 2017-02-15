@@ -80,7 +80,7 @@ type server struct {
 	// use. This fixed pool ensures we don't have a growing number of locks
 	// and that we also don't have a race creating new locks when we first
 	// touch a user.
-	userLocks [numUserLocks]sync.Mutex
+	userLocks []sync.Mutex
 
 	// snapshotControl is a channel for passing control messages to the
 	// snapshot loop. Possible control messages are: the username to
@@ -173,6 +173,7 @@ func New(cfg upspin.Config, options ...string) (upspin.DirServer, error) {
 		access:        cache.NewLRU(accessCacheSize),
 		defaultAccess: cache.NewLRU(accessCacheSize),
 		remoteGroups:  cache.NewLRU(groupCacheSize),
+		userLocks:     make([]sync.Mutex, numUserLocks),
 		now:           upspin.Now,
 	}
 	serverutil.RegisterShutdown(s.shutdown)
