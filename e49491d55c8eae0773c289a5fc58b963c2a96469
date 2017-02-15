@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2ce0d4b2_080571b9",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 397,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-15T17:33:40Z",
+      "side": 1,
+      "message": "Ah, thanks. I saw this just now and was going to fix.",
+      "revId": "e49491d55c8eae0773c289a5fc58b963c2a96469",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
