@@ -24,10 +24,15 @@ import (
 
 func (s *State) signup(args ...string) {
 	const help = `
-Signup registers new users with Upspin. It creates a private/public key pair,
-stores the private key locally, and prepares to store the private key with the
-public upspin key server. It writes a "config" file into $HOME/upspin/config,
-holding the username and the location of the directory and store servers.
+Signup generates an Upspin configuration file and private/public key pair,
+stores them locally, and sends a signup request to the public Upspin key server
+at key.upspin.io. The server will respond by sending a confirmation email to
+the given email address (or "username").
+
+Signup writes a the configuration file to $HOME/upspin/config, holding the
+username and the location of the directory and store servers. It writes the
+public and private keys to $HOME/.ssh. These locations may be set using the
+-config and -where flags.
 
 The -dir and -store flags specify the network addresses of the Store and
 Directory servers that the Upspin user will use. The -server flag may be used
@@ -38,8 +43,8 @@ By default, signup creates new keys with the p256 cryptographic curve set.
 The -curve and -secretseed flags allow the user to control the curve or to
 recreate or reuse prior keys.
 
-As the final step, it sends a signup request to the key server at key.upspin.io
-that will then send a confirmation email to the given email address.
+The -signuponly flag tells signup to skip the generation of the configuration
+file and keys and only send the signup request to the key server.
 `
 	fs := flag.NewFlagSet("signup", flag.ExitOnError)
 	var (
@@ -49,12 +54,31 @@ that will then send a confirmation email to the given email address.
 		dirServer   = fs.String("dir", "", "Directory server `address`")
 		storeServer = fs.String("store", "", "Store server `address`")
 		bothServer  = fs.String("server", "", "Store and Directory server `address` (if combined)")
+		signupOnly  = fs.Bool("signuponly", false, "only send signup request to key server; do not generate config or keys")
 	)
 	// Used only in keygen.
 	fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
 	fs.String("secretseed", "", "128 bit secret `seed` in proquint format")
 
 	s.parseFlags(fs, args, help, "signup [flags] <username>")
+
+	// Determine config file location.
+	if !filepath.IsAbs(*configFile) {
+		// User must have a home dir in the local OS.
+		homedir, err := config.Homedir()
+		if err != nil {
+			s.exit(err)
+		}
+		*configFile = filepath.Join(homedir, *configFile)
+	}
+
+	if *signupOnly {
+		// Don't generate; just send the signup request to the key server.
+		s.registerUser(*configFile)
+		return
+	}
+
+	// Check flags.
 	if fs.NArg() != 1 {
 		fs.Usage()
 	}
@@ -69,12 +93,6 @@ that will then send a confirmation email to the given email address.
 	if *dirServer == "" || *storeServer == "" {
 		s.failf("-dir and -store must both be provided")
 		fs.Usage()
-	}
-
-	// User must have a home dir in the local OS.
-	homedir, err := config.Homedir()
-	if err != nil {
-		s.exit(err)
 	}
 
 	// Parse -dir and -store flags as addresses and construct remote endpoints.
@@ -94,10 +112,6 @@ that will then send a confirmation email to the given email address.
 	}
 	userName := upspin.UserName(uname + "@" + domain)
 
-	// Figure out location of the config file.
-	if !filepath.IsAbs(*configFile) {
-		*configFile = filepath.Join(homedir, *configFile)
-	}
 	env := os.Environ()
 	wipeUpspinEnvironment()
 	defer restoreEnvironment(env)
@@ -145,8 +159,12 @@ that will then send a confirmation email to the given email address.
 	// Generate a new key.
 	s.keygenCommand(fs)
 
-	// Now load the config. This time it should succeed.
-	cfg, err := config.FromFile(*configFile)
+	// Send the signup request to the key server.
+	s.registerUser(*configFile)
+}
+
+func (s *State) registerUser(configFile string) {
+	cfg, err := config.FromFile(configFile)
 	if err != nil {
 		s.exit(err)
 	}
