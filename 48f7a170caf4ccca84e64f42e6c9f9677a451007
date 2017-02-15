@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c159d0e3_83042cb9",
+        "filename": "doc/mascot.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-15T23:48:55Z",
+      "side": 1,
+      "message": "purpose ?",
+      "revId": "48f7a170caf4ccca84e64f42e6c9f9677a451007",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
