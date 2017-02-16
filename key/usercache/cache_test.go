@@ -6,8 +6,6 @@ package usercache
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
 	"reflect"
 	"testing"
 	"time"
@@ -17,6 +15,7 @@ import (
 	"upspin.io/config"
 	"upspin.io/errors"
 	"upspin.io/factotum"
+	"upspin.io/test/testutil"
 	"upspin.io/upspin"
 )
 
@@ -72,7 +71,7 @@ func setup(t *testing.T, user string) (uncached, cached upspin.KeyServer) {
 	if user == "upspin-test@google.com" {
 		c = config.SetDirEndpoint(c, testDirEndpoint)
 		c = config.SetStoreEndpoint(c, testStoreEndpoint)
-		f, err := factotum.NewFromDir(repo("key/testdata/upspin-test"))
+		f, err := factotum.NewFromDir(testutil.Repo("key", "testdata", "upspin-test"))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -293,13 +292,4 @@ func (s *service) Ping() bool {
 }
 
 func (s *service) Close() {
-}
-
-// repo returns the local pathname of a file in the upspin repository.
-func repo(dir string) string {
-	gopath := os.Getenv("GOPATH")
-	if len(gopath) == 0 {
-		panic("test/testenv: no GOPATH")
-	}
-	return filepath.Join(gopath, "src/upspin.io/"+dir)
 }

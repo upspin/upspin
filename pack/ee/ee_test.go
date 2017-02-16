@@ -10,8 +10,6 @@ import (
 	"crypto/rand"
 	"fmt"
 	"log"
-	"os"
-	"path/filepath"
 	"strings"
 	"testing"
 
@@ -23,6 +21,7 @@ import (
 	"upspin.io/pack/ee"
 	"upspin.io/pack/internal/packtest"
 	"upspin.io/test/testfixtures"
+	"upspin.io/test/testutil"
 	"upspin.io/upspin"
 )
 
@@ -296,7 +295,7 @@ func TestBadSharing(t *testing.T) {
 		userToMatch: []upspin.UserName{bobsUserName, joesUserName},
 		keyToReturn: []upspin.PublicKey{bobPublic, joePublic},
 	}
-	f, err := factotum.NewFromDir(repo("key", "testdata", "joe"))
+	f, err := factotum.NewFromDir(testutil.Repo("key", "testdata", "joe"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -315,7 +314,7 @@ func TestBadSharing(t *testing.T) {
 
 	// Now load Bob as the current user.
 	cfg = config.SetUserName(cfg, bobsUserName)
-	f, err = factotum.NewFromDir(repo("key", "testdata", "bob"))
+	f, err = factotum.NewFromDir(testutil.Repo("key", "testdata", "bob"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -338,7 +337,7 @@ func setup(name upspin.UserName) (upspin.Config, upspin.Packer) {
 	if j < 0 {
 		log.Fatalf("malformed username %s", name)
 	}
-	f, err := factotum.NewFromDir(repo("key", "testdata", string(name[:j])))
+	f, err := factotum.NewFromDir(testutil.Repo("key", "testdata", string(name[:j])))
 	if err != nil {
 		log.Fatalf("unable to initialize factotum for %s", string(name[:j]))
 	}
@@ -379,15 +378,6 @@ func TestMultiBlockRoundTrip(t *testing.T) {
 	const userName = upspin.UserName("aly@upspin.io")
 	cfg, packer := setup(userName)
 	packtest.TestMultiBlockRoundTrip(t, cfg, packer, userName)
-}
-
-// repo returns the local pathname of a file in the upspin repository.
-func repo(dir ...string) string {
-	gopath := os.Getenv("GOPATH")
-	if len(gopath) == 0 {
-		log.Fatal("no GOPATH")
-	}
-	return filepath.Join(gopath, "src", "upspin.io", filepath.Join(dir...))
 }
 
 func TestConsistentKeyStream(t *testing.T) {

@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"strings"
 
 	"upspin.io/bind"
@@ -21,6 +20,7 @@ import (
 	"upspin.io/factotum"
 	"upspin.io/log"
 	"upspin.io/test/servermux"
+	"upspin.io/test/testutil"
 	"upspin.io/upspin"
 	"upspin.io/user"
 
@@ -137,7 +137,7 @@ func New(setup *Setup) (*Env, error) {
 
 		// Set up user and factotum.
 		cfg = config.SetUserName(cfg, TestServerName)
-		f, err := factotum.NewFromDir(repo("key/testdata/" + TestServerName[:strings.Index(TestServerName, "@")]))
+		f, err := factotum.NewFromDir(testutil.Repo("key", "testdata", TestServerName[:strings.Index(TestServerName, "@")]))
 		if err != nil {
 			return nil, errors.E(op, err)
 		}
@@ -257,7 +257,7 @@ func (e *Env) NewUser(userName upspin.UserName) (upspin.Config, error) {
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
-	f, err := factotum.NewFromDir(repo("key/testdata/" + string(user)))
+	f, err := factotum.NewFromDir(testutil.Repo("key", "testdata", string(user)))
 	if err != nil {
 		return nil, errors.E(op, userName, err)
 	}
@@ -308,13 +308,4 @@ func makeRootIfNotExist(cfg upspin.Config) error {
 		return err
 	}
 	return nil
-}
-
-// repo returns the local pathname of a file in the upspin repository.
-func repo(dir string) string {
-	gopath := os.Getenv("GOPATH")
-	if len(gopath) == 0 {
-		log.Fatal("test/testenv: no GOPATH")
-	}
-	return filepath.Join(gopath, "src/upspin.io/"+dir)
 }

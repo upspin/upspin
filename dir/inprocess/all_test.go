@@ -9,8 +9,6 @@ package inprocess
 import (
 	"bytes"
 	"fmt"
-	"os"
-	"path/filepath"
 	"sort"
 	"strings"
 	"sync/atomic"
@@ -22,6 +20,7 @@ import (
 	"upspin.io/factotum"
 	"upspin.io/pack"
 	"upspin.io/path"
+	"upspin.io/test/testutil"
 	"upspin.io/upspin"
 
 	_ "upspin.io/pack/ee"
@@ -57,7 +56,7 @@ func newConfigAndServices(name upspin.UserName) (cfg upspin.Config, key upspin.K
 	cfg = config.SetKeyEndpoint(cfg, endpoint)
 	cfg = config.SetStoreEndpoint(cfg, endpoint)
 	cfg = config.SetDirEndpoint(cfg, endpoint)
-	f, err := factotum.NewFromDir(repo("key/testdata/dir-server"))
+	f, err := factotum.NewFromDir(testutil.Repo("key", "testdata", "user1")) // Always use user1's keys.
 	if err != nil {
 		panic(err)
 	}
@@ -912,13 +911,4 @@ func equal(d0, d1 *upspin.DirEntry) bool {
 		panic(err)
 	}
 	return bytes.Equal(b0, b1)
-}
-
-// repo returns the local pathname of a file in the upspin repository.
-func repo(dir string) string {
-	gopath := os.Getenv("GOPATH")
-	if len(gopath) == 0 {
-		panic("no GOPATH")
-	}
-	return filepath.Join(gopath, "src/upspin.io/"+dir)
 }

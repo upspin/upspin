@@ -7,16 +7,14 @@ package clientutil
 // TODO: test with EEPack; check more error conditions.
 
 import (
-	"os"
-	"path/filepath"
 	"testing"
 
 	"upspin.io/bind"
 	"upspin.io/config"
 	"upspin.io/errors"
 	"upspin.io/factotum"
-	"upspin.io/log"
 	"upspin.io/test/testfixtures"
+	"upspin.io/test/testutil"
 	"upspin.io/upspin"
 
 	_ "upspin.io/pack/plain"
@@ -92,7 +90,7 @@ func setupTestConfig(t *testing.T) upspin.Config {
 		tLocs = append(tLocs, loc)
 	}
 
-	f, err := factotum.NewFromDir(repo("bob"))
+	f, err := factotum.NewFromDir(testutil.Repo("key", "testdata", "bob"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -119,15 +117,6 @@ func setupTestConfig(t *testing.T) upspin.Config {
 		t.Fatal(err)
 	}
 	return cfg
-}
-
-// repo returns the local pathname of a file in the upspin repository.
-func repo(dir string) string {
-	gopath := os.Getenv("GOPATH")
-	if len(gopath) == 0 {
-		log.Fatal("client/clientutil: no GOPATH")
-	}
-	return filepath.Join(gopath, "src/upspin.io/key/testdata/"+dir)
 }
 
 type mockStore struct {

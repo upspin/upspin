@@ -6,8 +6,6 @@ package server
 
 import (
 	"encoding/json"
-	"os"
-	"path/filepath"
 	"reflect"
 	"testing"
 
@@ -15,6 +13,7 @@ import (
 	"upspin.io/cloud/storage/storagetest"
 	"upspin.io/errors"
 	"upspin.io/factotum"
+	"upspin.io/test/testutil"
 	"upspin.io/upspin"
 )
 
@@ -292,7 +291,7 @@ func TestIsDomainAdminPutOther(t *testing.T) {
 	)
 
 	// Get the test key for bob.
-	f, err := factotum.NewFromDir(repo("key/testdata/bob"))
+	f, err := factotum.NewFromDir(testutil.Repo("key", "testdata", "bob"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -416,13 +415,4 @@ func newKeyServerWithMocking(user upspin.UserName, ref string, data []byte) (*se
 
 func mockLookupTXT(domain string) ([]string, error) {
 	return nil, nil
-}
-
-// repo returns the local pathname of a file in the upspin repository.
-func repo(dir string) string {
-	gopath := os.Getenv("GOPATH")
-	if len(gopath) == 0 {
-		panic("no GOPATH")
-	}
-	return filepath.Join(gopath, "src/upspin.io/"+dir)
 }

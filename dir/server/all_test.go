@@ -10,7 +10,6 @@ package server
 import (
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"sync"
 	"testing"
 	"time"
@@ -23,6 +22,7 @@ import (
 	"upspin.io/factotum"
 	"upspin.io/pack"
 	"upspin.io/path"
+	"upspin.io/test/testutil"
 	"upspin.io/upspin"
 
 	_ "upspin.io/pack/ee"
@@ -1011,7 +1011,7 @@ var generatorInstance upspin.DirServer
 
 // newDirServerForTesting returns a new server and a user config.
 func newDirServerForTesting(t *testing.T, userName upspin.UserName) (*server, upspin.Config) {
-	f, err := factotum.NewFromDir(repo("key/testdata/upspin-test"))
+	f, err := factotum.NewFromDir(testutil.Repo("key", "testdata", "upspin-test"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1051,7 +1051,7 @@ func newDirServerForTesting(t *testing.T, userName upspin.UserName) (*server, up
 	userCtx = config.SetPacking(userCtx, upspin.EEPack)
 	userCtx = config.SetDirEndpoint(userCtx, ctx.DirEndpoint())
 	userCtx = config.SetStoreEndpoint(userCtx, endpointInProcess)
-	f, err = factotum.NewFromDir(repo("key/testdata/bob"))
+	f, err = factotum.NewFromDir(testutil.Repo("key", "testdata", "bob"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1096,13 +1096,4 @@ func writeToStore(t *testing.T, ctx upspin.Config, data []byte) upspin.Location 
 		Endpoint:  store.Endpoint(),
 		Reference: refdata.Reference,
 	}
-}
-
-// repo returns the local pathname of a file in the upspin repository.
-func repo(dir string) string {
-	gopath := os.Getenv("GOPATH")
-	if len(gopath) == 0 {
-		panic("no GOPATH")
-	}
-	return filepath.Join(gopath, "src/upspin.io/"+dir)
 }

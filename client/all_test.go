@@ -14,6 +14,7 @@ import (
 	"upspin.io/config"
 	"upspin.io/factotum"
 	"upspin.io/log"
+	"upspin.io/test/testutil"
 	"upspin.io/upspin"
 
 	dirserver "upspin.io/dir/inprocess"
@@ -31,7 +32,7 @@ func init() {
 		NetAddr:   "", // ignored
 	}
 
-	f, err := factotum.NewFromDir(repo("key/testdata/user1")) // Always use user1's keys.
+	f, err := factotum.NewFromDir(testutil.Repo("key", "testdata", "user1")) // Always use user1's keys.
 	if err != nil {
 		panic("cannot initialize factotum: " + err.Error())
 	}

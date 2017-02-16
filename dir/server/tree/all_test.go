@@ -7,7 +7,6 @@ package tree
 import (
 	"io/ioutil"
 	"os"
-	"path/filepath"
 	"reflect"
 	"testing"
 
@@ -16,6 +15,7 @@ import (
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/path"
+	"upspin.io/test/testutil"
 	"upspin.io/upspin"
 
 	keyserver "upspin.io/key/inprocess"
@@ -1089,7 +1089,7 @@ func newDirEntry(name upspin.PathName, isDir bool, config upspin.Config) (path.P
 // newConfigForTesting creates the necessary items to instantiate a Tree for
 // testing.
 func newConfigForTesting(t *testing.T, userName upspin.UserName) (upspin.Config, *Log, *LogIndex) {
-	factotum, err := factotum.NewFromDir(repo("key/testdata/upspin-test"))
+	factotum, err := factotum.NewFromDir(testutil.Repo("key", "testdata", "upspin-test"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1145,15 +1145,6 @@ func newConfigForTesting(t *testing.T, userName upspin.UserName) (upspin.Config,
 		t.Fatal(err)
 	}
 	return cfg, log, logIndex
-}
-
-// repo returns the local pathname of a file in the upspin repository.
-func repo(dir string) string {
-	gopath := os.Getenv("GOPATH")
-	if len(gopath) == 0 {
-		panic("no GOPATH")
-	}
-	return filepath.Join(gopath, "src/upspin.io/"+dir)
 }
 
 func entrySize(t *testing.T, entry *upspin.DirEntry) int {
