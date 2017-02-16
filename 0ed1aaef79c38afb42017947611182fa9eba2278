@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cc673652_d12341a5",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-16T01:25:10Z",
+      "side": 1,
+      "message": "I think there should be a comment somewhere, maybe here, that describes what the directory tree of snapshots will look like.\nLooking at these constants it\u0027s hard to know which part is used where.",
+      "revId": "0ed1aaef79c38afb42017947611182fa9eba2278",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
