@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "29470de3_2b7902e8",
+        "filename": "cloud/storage/gcs/gcs_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-16T23:21:36Z",
+      "side": 1,
+      "message": "Doesn\u0027t this also require you to have done a \u0027gcloud auth login\u0027 to specify project and do oauth before you run this?",
+      "range": {
+        "startLine": 29,
+        "startChar": 1,
+        "endLine": 29,
+        "endChar": 176
+      },
+      "revId": "3c7403b26b9a6e19987d5cf13b15ffa211ade4c8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
