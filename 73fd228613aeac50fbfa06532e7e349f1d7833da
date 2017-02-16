@@ -70,6 +70,23 @@
     },
     {
       "key": {
+        "uuid": "a3193a30_537befef",
+        "filename": "dir/server/server.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-16T04:14:01Z",
+      "side": 1,
+      "message": "Upon further thought, it\u0027s quite impractical to add a specific test for this. The test that caught it is enough now that we don\u0027t have do-nothing packers anymore. I\u0027m fine deleting the TODO.\n\nAlso, for clarity, you could rename isGroup to isGroupDir. Or I could do that separately.",
+      "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "8508e69e_308692b8",
         "filename": "doc/security.md",
         "patchSetId": 7
