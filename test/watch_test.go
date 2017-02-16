@@ -16,6 +16,21 @@ import (
 	"upspin.io/upspin"
 )
 
+// watchSupported checks for an error after a call to Watch, and if
+// there is an ErrNotSupported error, returns false. It returns true
+// if there was no error; otherwise it fatals.
+func watchSupported(t *testing.T, r *testenv.Runner) bool {
+	if r.Failed() {
+		err := r.Diag()
+		if strings.Contains(err, upspin.ErrNotSupported.Error()) {
+			t.Log("Watch not supported for this DirServer.")
+			return false
+		}
+		t.Fatal(err)
+	}
+	return true
+}
+
 func testWatchCurrent(t *testing.T, r *testenv.Runner) {
 	const (
 		hasBlocks     = true
@@ -33,13 +48,8 @@ func testWatchCurrent(t *testing.T, r *testenv.Runner) {
 	}
 
 	done := r.DirWatch(base, -1)
-	if r.Failed() {
-		err := r.Diag()
-		if strings.Contains(err, upspin.ErrNotSupported.Error()) {
-			t.Logf("Watch not supported for this DirServer.")
-			return
-		}
-		t.Fatal(err)
+	if !watchSupported(t, r) {
+		return
 	}
 	r.GetNEvents(2)
 	if !r.GotEvent(base, !hasBlocks) {
@@ -94,8 +104,9 @@ func testWatchCurrent(t *testing.T, r *testenv.Runner) {
 
 func testWatchErrors(t *testing.T, r *testenv.Runner) {
 	const (
-		base = ownerName + "/watch-errors"
-		file = base + "/aFile"
+		base    = ownerName + "/watch-errors"
+		file    = base + "/aFile"
+		badFile = "nobody@x/foo"
 	)
 
 	r.As(ownerName)
@@ -105,20 +116,166 @@ func testWatchErrors(t *testing.T, r *testenv.Runner) {
 		t.Fatal(r.Diag())
 	}
 
+	r.DirWatch(base, 777)
+	if !watchSupported(t, r) {
+		return
+	}
+
+	// Should get an error for bad file syntax
+	r.DirWatch(badFile, 777)
+	if !r.Failed() {
+		t.Fatal("expected Watch error for bad file name %q", badFile)
+	}
+
 	// 777 is an implausible order number, at least in this test.
 	// TODO: Find a better way to test this.
 	r.DirWatch(base, 777)
 	if r.Failed() {
-		err := r.Diag()
-		if strings.Contains(err, upspin.ErrNotSupported.Error()) {
-			t.Logf("Watch not supported for this DirServer.")
-			return
-		}
-		t.Fatal(err)
+		t.Fatal(r.Diag())
 	}
 	if !r.GetErrorEvent(errors.E(errors.Invalid)) {
 		t.Fatal(r.Diag())
 	}
 }
 
-// TODO: Test that Watch returns error for invalid name or non-existent root.
+func testWatchNonExistentFile(t *testing.T, r *testenv.Runner) {
+	const (
+		hasBlocks = true
+		base      = ownerName + "/watch-non-existent-file"
+		file      = base + "/aFile"
+	)
+
+	r.As(ownerName)
+	r.MakeDirectory(base)
+	// Don't create the file yet.
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+
+	r.DirWatch(base, -1)
+	if !watchSupported(t, r) {
+		return
+	}
+
+	// Should see the directory.
+	if !r.GotEvent(base, !hasBlocks) {
+		t.Fatal(r.Diag())
+	}
+
+	// Now create the file. Should see it appear.
+	r.Put(file, "something")
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+	if !r.GotEvent(file, hasBlocks) {
+		t.Fatal(r.Diag())
+	}
+}
+
+func testWatchNonExistentRoot(t *testing.T, r *testenv.Runner) {
+	const (
+		hasBlocks = true
+		base      = ownerName + "/watch-non-existent-root"
+		file      = base + "/aFile"
+	)
+
+	r.As(ownerName)
+	// Don't create the root yet.
+
+	r.DirWatch(base, -1)
+	if !watchSupported(t, r) {
+		return
+	}
+
+	// Now create the root. Should see it appear.
+	r.MakeDirectory(base)
+	// Don't create the file yet.
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+
+	// Should see the directory.
+	if !r.GotEvent(base, !hasBlocks) {
+		t.Fatal(r.Diag())
+	}
+	if !r.GotEvent(file, hasBlocks) {
+		t.Fatal(r.Diag())
+	}
+}
+
+func testWatchForbiddenFile(t *testing.T, r *testenv.Runner) {
+	const (
+		hasBlocks              = true
+		base                   = ownerName + "/watch-forbidden-file"
+		file                   = base + "/aFile"
+		access                 = base + "/Access"
+		forbiddenAccessContent = "*: " + ownerName
+		allowedAccessContent   = "*: " + ownerName + " " + middleName
+	)
+
+	r.As(ownerName)
+	r.MakeDirectory(base)
+	r.Put(access, forbiddenAccessContent)
+	r.Put(file, "something")
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+
+	// Switch users. Should not see event.
+	r.As(middleName)
+	r.DirWatch(file, -1)
+	if !watchSupported(t, r) {
+		return
+	}
+	if r.GotEvent(file, hasBlocks) {
+		t.Fatal("Should not see event for forbidden file")
+	}
+
+	// Now grant permission.
+	r.As(ownerName)
+	r.Put(access, forbiddenAccessContent)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+
+	// Now should see file as other user.
+	r.As(middleName)
+	if !r.GotEvent(file, hasBlocks) {
+		t.Fatal(r.Diag())
+	}
+}
+
+func testWatchSubtree(t *testing.T, r *testenv.Runner) {
+	const (
+		hasBlocks = true
+		base      = ownerName + "/watch-subtree"
+		file      = base + "/aFile"
+		dir       = base + "/dir"
+		dirFile   = dir + "/file"
+	)
+
+	r.As(ownerName)
+	r.MakeDirectory(base)
+	r.MakeDirectory(dir)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+
+	r.DirWatch(dir, -1)
+	if !watchSupported(t, r) {
+		return
+	}
+
+	// Create file in root. Should not see event.
+	r.Put(file, "something")
+	if r.GotEvent(file, hasBlocks) {
+		t.Fatal("Should not see event for parent directory")
+	}
+
+	// Create file in subdir. Should see event.
+	r.Put(dirFile, "something")
+	if !r.GotEvent(dirFile, hasBlocks) {
+		t.Fatal(r.Diag())
+	}
+
+}
