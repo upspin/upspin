@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7163fbdf_3d50af35",
+        "filename": "test/testutil/testutil.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-16T04:46:13Z",
+      "side": 1,
+      "message": "this is a mysterious error message, can we give it some more context?",
+      "revId": "c73a12d220bb647de9a9e78191e511ff29f4e6bb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
