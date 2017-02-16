@@ -5,7 +5,6 @@
 package server
 
 import (
-	"fmt"
 	"time"
 
 	"upspin.io/dir/server/tree"
@@ -17,21 +16,22 @@ import (
 )
 
 const (
-	snapshotSuffix            = "snapshot"
-	snapshotGlob              = "*+" + snapshotSuffix + "@*"
-	snapshotControlFile       = "TakeSnapshot"
-	snapshotDefaultDateFormat = "2006/01/02"
-	snapshotDefaultInterval   = 12 * time.Hour
-	snapshotWorkerInterval    = 2 * time.Hour
+	snapshotSuffix          = "snapshot"
+	snapshotGlob            = "*+" + snapshotSuffix + "@*"
+	snapshotControlFile     = "TakeSnapshot"
+	snapshotDateFormat      = "2006/01/02/"
+	snapshotTimeFormat      = "15:04"
+	snapshotFullDateFormat  = snapshotDateFormat + snapshotTimeFormat
+	snapshotDefaultInterval = 12 * time.Hour
+	snapshotWorkerInterval  = 2 * time.Hour
 )
 
 // snapshotConfig holds the configuration for a snapshot. Users may have
 // multiple such configurations.
 type snapshotConfig struct {
-	srcDir     upspin.PathName
-	dstDir     upspin.PathName
-	dateFormat string // must be formattable by time.Format.
-	interval   time.Duration
+	srcDir   upspin.PathName
+	dstDir   upspin.PathName
+	interval time.Duration
 }
 
 // getSnapshotConfig retrieves all configured snapshots for a user and domain
@@ -50,10 +50,9 @@ func (s *server) getSnapshotConfig(userName upspin.UserName) (*snapshotConfig, e
 	uname = uname[:len(uname)-len(snapshotSuffix)-1]
 
 	return &snapshotConfig{
-		srcDir:     upspin.PathName(uname + "@" + domain + "/"),
-		dstDir:     upspin.PathName(userName),
-		dateFormat: snapshotDefaultDateFormat,
-		interval:   snapshotDefaultInterval,
+		srcDir:   upspin.PathName(uname + "@" + domain + "/"),
+		dstDir:   upspin.PathName(userName),
+		interval: snapshotDefaultInterval,
 	}, nil
 }
 
@@ -135,7 +134,7 @@ func (s *server) snapshotAll() error {
 // snapshotDir returns the destination path for a snapshot given its
 // configuration.
 func (s *server) snapshotDir(cfg *snapshotConfig) (path.Parsed, error) {
-	date := s.now().Go().UTC().Format(cfg.dateFormat)
+	date := s.now().Go().UTC().Format(snapshotDateFormat)
 	dstDir := path.Join(cfg.dstDir, date)
 
 	p, err := path.Parse(dstDir)
@@ -156,7 +155,7 @@ func (s *server) shouldSnapshot(cfg *snapshotConfig) (bool, path.Parsed, error) 
 	}
 
 	// List today's snapshot directory, including any suffixed snapshot.
-	entries, err := s.globWithoutPermissions(p.String() + "*")
+	entries, err := s.globWithoutPermissions(p.String() + "/*")
 	if err != nil {
 		if err == upspin.ErrFollowLink {
 			// We need to get the real entry and we cannot resolve links on our own.
@@ -168,14 +167,20 @@ func (s *server) shouldSnapshot(cfg *snapshotConfig) (bool, path.Parsed, error) 
 		}
 		// Ok, proceed.
 	} else {
-		var mostRecent upspin.DirEntry
+		var mostRecent time.Time
 		for _, e := range entries {
-			if e.Time > mostRecent.Time {
-				mostRecent = *e
+			parsed, _ := path.Parse(e.Name) // can't be an error.
+			t, err := time.Parse(snapshotFullDateFormat, parsed.FilePath())
+			if err != nil {
+				// Not a valid name. Ignore.
+				continue
+			}
+			if t.After(mostRecent) {
+				mostRecent = t
 			}
 		}
 		// Is the last entry so old that a new snapshot is now warranted?
-		if mostRecent.Time.Go().Add(cfg.interval).After(s.now().Go()) {
+		if mostRecent.Add(cfg.interval).After(s.now().Go()) {
 			// Not time yet. Nothing to do.
 			return false, p, nil
 		}
@@ -213,17 +218,13 @@ func (s *server) takeSnapshot(dstDir path.Parsed, srcDir upspin.PathName) error 
 		return err
 	}
 
-	dstDir, err = nextDirectoryVersion(tree, dstDir)
-	if err != nil {
-		return err
-	}
+	timeNow := s.now().Go().UTC().Format(snapshotTimeFormat)
+	dstDir, _ = path.Parse(path.Join(dstDir.Path(), timeNow))
 	err = s.makeSnapshotPath(dstDir.Path())
 	if err != nil {
 		return err
 	}
 
-	// Update time so we know when the snapshot was taken.
-	entry.Time = s.now()
 	snapEntry, err := tree.PutDir(dstDir, entry)
 	if err != nil {
 		return err
@@ -231,29 +232,6 @@ func (s *server) takeSnapshot(dstDir path.Parsed, srcDir upspin.PathName) error 
 
 	log.Printf("dir/server: Snapshotted %q into %q", entry.SignedName, snapEntry.Name)
 	return nil
-}
-
-// nextDirectoryVersion examines the tree and finds the next suitable name to
-// create, by adding a monotonically-increasing version number to the original
-// name. For example, if dir represents path "/2016/09/18" and under directory
-// "/2016/09" there exists a "18" entry, it then would return "18.1". And if
-// that exists it would return "18.2", and so on.
-func nextDirectoryVersion(tree *tree.Tree, dir path.Parsed) (path.Parsed, error) {
-	next := dir
-	for i := 1; i < 1000; i++ {
-		_, _, err := tree.Lookup(next)
-		if errors.Match(errNotExist, err) {
-			return next, nil
-		}
-		if err != nil {
-			return path.Parsed{}, err
-		}
-		next, err = path.Parse(upspin.PathName(fmt.Sprintf("%s.%d", dir, i)))
-		if err != nil {
-			return path.Parsed{}, err
-		}
-	}
-	return path.Parsed{}, errors.E(errors.Internal, errors.Str("too many attempts at creating snapshot directory"))
 }
 
 // makeSnapshotPath makes the full path name, creating any necessary
