@@ -370,6 +370,24 @@
     },
     {
       "key": {
+        "uuid": "baac49c5_36b5fb6e",
+        "filename": "pack/plain/plain.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-16T17:01:32Z",
+      "side": 1,
+      "message": "I\u0027ll add a TODO in cmd/upspin/countersign.go that the current key rotation code, written in the EE era, likely needs updating.",
+      "parentUuid": "b2b1303f_a81245c4",
+      "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "89a1f9bc_d6dcd822",
         "filename": "pack/plain/plain.go",
         "patchSetId": 7
