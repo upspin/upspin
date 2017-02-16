@@ -67,7 +67,7 @@ func TestSnapshot(t *testing.T) {
 	}
 
 	// Verify there are items under the snapshot user now.
-	ents, err = snap.Glob(snapshotUser + "/*/*/*")
+	ents, err = snap.Glob(snapshotUser + "/*/*/*/*")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -77,7 +77,7 @@ func TestSnapshot(t *testing.T) {
 	}
 	// Inside the snapshot directory, there's the entire root of userName.
 	// Check that everything is there.
-	ents, err = snap.Glob(snapshotUser + "/*/*/*/*")
+	ents, err = snap.Glob(snapshotUser + "/*/*/*/*/*")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -109,7 +109,7 @@ func TestSnapshot(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Only one entry still.
-	ents, err = snap.Glob(snapshotUser + "/*/*/*")
+	ents, err = snap.Glob(snapshotUser + "/*/*/*/*")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -126,7 +126,7 @@ func TestSnapshot(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Now two entries should exist.
-	ents, err = snap.Glob(snapshotUser + "/*/*/*")
+	ents, err = snap.Glob(snapshotUser + "/*/*/*/*")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -141,7 +141,7 @@ func TestSnapshot(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	ents, err = snap.Glob(snapshotUser + "/*/*/*")
+	ents, err = snap.Glob(snapshotUser + "/*/*/*/*")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -152,7 +152,7 @@ func TestSnapshot(t *testing.T) {
 
 func TestForceSnapshotVersioning(t *testing.T) {
 	s, _ := newDirServerForTesting(t, snapshotUser)
-	ents, err := s.Glob(snapshotUser + "/*/*/*")
+	ents, err := s.Glob(snapshotUser + "/*/*/*/*")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -167,8 +167,9 @@ func TestForceSnapshotVersioning(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	dstPath = dstPath.Drop(1)
 
-	mockTime.addSecond(1) // Pretend one second has elapsed (our time resolution).
+	mockTime.addSecond(60) // Pretend one minute has elapsed (our time resolution).
 
 	// Force two new snapshots.
 	err = s.takeSnapshot(dstPath, canonicalUser+"/")
@@ -176,7 +177,7 @@ func TestForceSnapshotVersioning(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	mockTime.addSecond(1) // Another second has elapsed.
+	mockTime.addSecond(60) // Another minute has elapsed.
 
 	err = s.takeSnapshot(dstPath, canonicalUser+"/")
 	if err != nil {
@@ -184,7 +185,7 @@ func TestForceSnapshotVersioning(t *testing.T) {
 	}
 
 	// The tree now contains three snapshotted versions.
-	ents, err = s.Glob(snapshotUser + "/*/*/*")
+	ents, err = s.Glob(snapshotUser + "/*/*/*/*")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -192,34 +193,26 @@ func TestForceSnapshotVersioning(t *testing.T) {
 	if len(ents) != 4 {
 		t.Fatalf("got = %d entries, want = 4", len(ents))
 	}
-	// Verify the last element of the second entry contains a ".2" appended
-	// to it.
-	if !strings.HasSuffix(string(ents[2].Name), ".2") {
-		t.Errorf("got %q, want suffix '.2'", ents[1].Name)
+	// Verify the last element of the second entry is at minute ":01".
+	if !strings.HasSuffix(string(ents[2].Name), ":01") {
+		t.Errorf("got %q, want suffix ':01'", ents[2].Name)
 	}
 
-	// Assert the newly-created name contains only one ".version" number.
+	// Assert the newly-created name contains only one "hh:mm" entry.
 	p, _ := path.Parse(ents[2].Name) // path is known valid.
-	if got, want := strings.Count(p.FilePath(), "."), 1; got != want {
-		t.Errorf("num .version = %d, want = %d: %s", got, want, p.FilePath())
+	if got, want := strings.Count(p.FilePath(), ":"), 1; got != want {
+		t.Errorf("num time = %d, want = %d: %s", got, want, p.FilePath())
 	}
 	p, _ = path.Parse(ents[3].Name) // path is known valid.
-	if got, want := strings.Count(p.FilePath(), "."), 1; got != want {
-		t.Errorf("num .version = %d, want = %d: %s", got, want, p.FilePath())
-	}
-	// Assert times are monotonically increasing.
-	if ents[2].Time >= ents[3].Time {
-		t.Errorf("time = %d, want < %d", ents[2].Time, ents[3].Time)
-	}
-	if ents[1].Time >= ents[2].Time {
-		t.Errorf("time = %d, want < %d", ents[1].Time, ents[2].Time)
+	if got, want := strings.Count(p.FilePath(), ":"), 1; got != want {
+		t.Errorf("num time = %d, want = %d: %s", got, want, p.FilePath())
 	}
 }
 
 func TestForceSnapshot(t *testing.T) {
 	s, _ := newDirServerForTesting(t, snapshotUser)
 
-	ents, err := s.Glob(snapshotUser + "/*/*/*")
+	ents, err := s.Glob(snapshotUser + "/*/*/*/*")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -229,13 +222,15 @@ func TestForceSnapshot(t *testing.T) {
 		t.Fatalf("got = %d pre-existing entries, want > 0", preExisting)
 	}
 
+	mockTime.addSecond(60) // A minute has elapsed.
+
 	// Force a snapshot to be taken for canonicalUser.
 	err = s.takeSnapshotFor(snapshotUser)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	ents, err = s.Glob(snapshotUser + "/*/*/*")
+	ents, err = s.Glob(snapshotUser + "/*/*/*/*")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -247,7 +242,7 @@ func TestForceSnapshot(t *testing.T) {
 func TestTriggerSnapshotWithPut(t *testing.T) {
 	s, _ := newDirServerForTesting(t, snapshotUser)
 
-	ents, err := s.Glob(snapshotUser + "/*/*/*")
+	ents, err := s.Glob(snapshotUser + "/*/*/*/*")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -256,6 +251,8 @@ func TestTriggerSnapshotWithPut(t *testing.T) {
 	if preExisting == 0 {
 		t.Fatalf("got = %d pre-existing entries, want > 0", preExisting)
 	}
+
+	mockTime.addSecond(600) // 10 minutes have elapsed.
 
 	// Put a special DirEntry to trigger the background snapshot.
 	de := &upspin.DirEntry{
@@ -275,7 +272,7 @@ func TestTriggerSnapshotWithPut(t *testing.T) {
 	var numEnts int
 	for i := 0; i < 10; i++ {
 		time.Sleep(10 * time.Millisecond)
-		ents, err := s.Glob(snapshotUser + "/*/*/*")
+		ents, err := s.Glob(snapshotUser + "/*/*/*/*")
 		if err != nil {
 			t.Fatal(err)
 		}
