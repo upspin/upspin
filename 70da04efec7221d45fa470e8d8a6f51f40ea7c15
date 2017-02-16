@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7e393402_2cbd4e69",
+        "filename": "rpc/keyserver/server.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-16T18:12:50Z",
+      "side": 1,
+      "message": "func logf(format string, args ...interface{} operation {\n   log.Printf(\"rpc/keyserver\"+format, ...)\n  return operation(s)\n}\n\n  -- name change to one in n because it\u0027s random, not one in every n.\nfunc logOnceInN(....) {\n   if ... {\n    log.Printf(\"rpc/keyserver\"+format, ...)\n  }\n  return operation(s)\n}\n\nonly one call to print in each function",
+      "revId": "70da04efec7221d45fa470e8d8a6f51f40ea7c15",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
