@@ -144,10 +144,6 @@ func (s *server) renderDoc(w http.ResponseWriter, fn string) {
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Strict-Transport-Security", "max-age=86400; includeSubDomains")
 
-	if r.URL.Path == "/favicon.ico" {
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-		return
-	}
 	if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
 		s.mux.ServeHTTP(w, r)
 		return
