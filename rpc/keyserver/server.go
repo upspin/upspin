@@ -8,6 +8,7 @@ package keyserver
 
 import (
 	"fmt"
+	"math/rand"
 	"net/http"
 
 	pb "github.com/golang/protobuf/proto"
@@ -30,6 +31,7 @@ type server struct {
 	key upspin.KeyServer
 }
 
+// New creates a new instance of the RPC key server.
 func New(cfg upspin.Config, key upspin.KeyServer, addr upspin.NetAddr) http.Handler {
 	s := &server{
 		config: cfg,
@@ -77,7 +79,7 @@ func (s *server) Lookup(session rpc.Session, reqBytes []byte) (pb.Message, error
 	if err != nil {
 		return nil, err
 	}
-	op := logf("Lookup %q", req.UserName)
+	op := logfOneInN(100, "Lookup %q", req.UserName)
 
 	user, err := key.Lookup(upspin.UserName(req.UserName))
 	if err != nil {
@@ -107,6 +109,17 @@ func (s *server) Put(session rpc.Session, reqBytes []byte) (pb.Message, error) {
 
 func putError(err error) *proto.KeyPutResponse {
 	return &proto.KeyPutResponse{Error: errors.MarshalError(err)}
+}
+
+// logOnceEveryN logs an operation probabilistically once for every n calls and
+// returns the operation which can be used for logging properly-contextualized
+// errors.
+func logfOneInN(n int, format string, args ...interface{}) operation {
+	s := fmt.Sprintf(format, args...)
+	if n <= 1 || rand.Intn(n) == 0 {
+		log.Info.Print("rpc/keyserver: " + s)
+	}
+	return operation(s)
 }
 
 func logf(format string, args ...interface{}) operation {
