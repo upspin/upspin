@@ -55,14 +55,6 @@ type LookupFunc func(upspin.PathName) (*upspin.DirEntry, error)
 // WatchFunc watches name, as defined by upspin.DirServer.
 type WatchFunc func(upspin.PathName, int64, <-chan struct{}) (<-chan upspin.Event, error)
 
-// Errors used for comparison.
-var (
-	errPrivate    = errors.E(errors.Private)
-	errPermission = errors.E(errors.Permission)
-	errNotExist   = errors.E(errors.NotExist)
-	errIO         = errors.E(errors.IO) // TODO: too wide a definition.
-)
-
 // New creates a new Perm monitoring the target user's Writers Group file, using
 // the provided Lookup function for lookups and the Watch function to watch
 // changes on the writers file. The target user is typically the user name of a
