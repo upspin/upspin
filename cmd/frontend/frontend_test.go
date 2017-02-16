@@ -126,18 +126,6 @@ func TestGoImport(t *testing.T) {
 	}
 }
 
-func TestFavicon(t *testing.T) {
-	once.Do(startServer)
-	resp, err := http.Get("http://" + addr + "/favicon.ico")
-	if err != nil {
-		t.Fatalf("expected no error, but got %v", err)
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusNotFound {
-		t.Errorf("expected status code to be %d, got %d", http.StatusNotFound, resp.StatusCode)
-	}
-}
-
 func TestDocList(t *testing.T) {
 	once.Do(startServer)
 	b := get(t, "http://"+addr+"/doc/")
