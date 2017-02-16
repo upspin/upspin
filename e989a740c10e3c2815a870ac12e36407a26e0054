@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "74aa12c2_ef580e8f",
+        "filename": "CONTRIBUTING.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-16T03:32:29Z",
+      "side": 1,
+      "message": "maybe s/This includes/That document covers/",
+      "revId": "e989a740c10e3c2815a870ac12e36407a26e0054",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
