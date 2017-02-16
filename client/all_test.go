@@ -81,6 +81,7 @@ func setup(userName upspin.UserName, publicKey upspin.PublicKey) upspin.Config {
 	name := upspin.PathName(userName) + "/"
 	entry := &upspin.DirEntry{
 		Name:       name,
+		Packing:    upspin.PlainPack,
 		SignedName: name,
 		Attr:       upspin.AttrDirectory,
 	}

@@ -393,8 +393,9 @@ func (c *Client) MakeDirectory(name upspin.PathName) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, err)
 	}
 	entry := &upspin.DirEntry{
-		Name: parsed.Path(), // SignedName is set in makeDirectoryLookupFn as it needs updating.
-		Attr: upspin.AttrDirectory,
+		Name:    parsed.Path(), // SignedName is set in makeDirectoryLookupFn as it needs updating.
+		Packing: upspin.EEPack,
+		Attr:    upspin.AttrDirectory,
 	}
 	entry, _, err = c.lookup(op, entry, makeDirectoryLookupFn, followFinalLink, s)
 	return entry, err

@@ -213,8 +213,10 @@ type Packer interface {
 }
 
 const (
+	InvalidPack Packing = 0
+
 	// PlainPack is a no-encryption, no-integrity packing. Bytes are copied untouched.
-	PlainPack Packing = 0 // TODO(edpin or ehg) change to 1
+	PlainPack Packing = 1 // TODO(edpin or ehg) change to 1
 
 	// Packings from 2 through 19 are not for production use. This region
 	// is reserved for debugging and other temporary packing implementations.
