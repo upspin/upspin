@@ -138,19 +138,17 @@ func (bp *blockPacker) Close() error {
 		return err
 	}
 
-	name := bp.entry.SignedName
-	cfg := bp.cfg
-
 	// Compute checksum of block hashes.
 	sum := internal.BlockSum(bp.entry.Blocks)
 
-	// Compute entry signature.
+	// Compute entry signature with dkey=0.
+	f := bp.cfg.Factotum()
+	e := bp.entry
 	dkey := make([]byte, aesKeyLen)
-	sig, err := cfg.Factotum().FileSign(name, bp.entry.Time, dkey, sum)
+	sig, err := f.FileSign(f.DirEntryHash(e.SignedName, e.Link, e.Attr, e.Packing, e.Time, dkey, sum))
 	if err != nil {
 		return errors.E(op, err)
 	}
-
 	return pdMarshal(&bp.entry.Packdata, sig, upspin.Signature{}, sum)
 }
 
@@ -185,14 +183,15 @@ func (ei ei) Unpack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker
 	if err != nil {
 		return nil, errors.E(op, writer, err)
 	}
-	writerPubKey, writerCurveName, err := factotum.ParsePublicKey(writerRawPubKey)
+	writerPubKey, _, err := factotum.ParsePublicKey(writerRawPubKey)
 	if err != nil {
 		return nil, errors.E(op, writer, err)
 	}
 
+	f := cfg.Factotum()
 	dkey := make([]byte, aesKeyLen)
 	// Verify that this was signed with the writer's old or new public key.
-	vhash := factotum.VerHash(writerCurveName, d.SignedName, d.Time, dkey, hash)
+	vhash := f.DirEntryHash(d.SignedName, d.Link, d.Attr, d.Packing, d.Time, dkey, hash)
 	if !ecdsa.Verify(writerPubKey, vhash, sig.R, sig.S) &&
 		!ecdsa.Verify(writerPubKey, vhash, sig2.R, sig2.S) {
 		// Check sig2 in case writerPubKey is rotating.
@@ -270,13 +269,14 @@ func (ei ei) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName
 	if err != nil {
 		return errors.E(op, d.Name, err)
 	}
-	ownerPubKey, ownerCurveName, err := factotum.ParsePublicKey(ownerRawPubKey)
+	ownerPubKey, _, err := factotum.ParsePublicKey(ownerRawPubKey)
 	if err != nil {
 		return errors.E(op, d.Name, err)
 	}
 
 	// Verify that this was signed with the owner's old or new public key.
-	vhash := factotum.VerHash(ownerCurveName, d.SignedName, d.Time, dkey, cipherSum)
+	f := cfg.Factotum()
+	vhash := f.DirEntryHash(d.SignedName, d.Link, d.Attr, d.Packing, d.Time, dkey, cipherSum)
 	if !ecdsa.Verify(ownerPubKey, vhash, sig.R, sig.S) &&
 		!ecdsa.Verify(ownerPubKey, vhash, sig2.R, sig2.S) {
 		// Check sig2 in case ownerPubKey is rotating.
@@ -291,7 +291,8 @@ func (ei ei) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName
 
 	// Compute new signature, using the new name.
 	d.SignedName = newName
-	sig, err = cfg.Factotum().FileSign(newName, d.Time, dkey, cipherSum)
+	vhash = f.DirEntryHash(d.SignedName, d.Link, d.Attr, d.Packing, d.Time, dkey, cipherSum)
+	sig, err = f.FileSign(vhash)
 	if err != nil {
 		return errors.E(op, d.Name, err)
 	}

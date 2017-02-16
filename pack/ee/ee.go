@@ -273,11 +273,12 @@ func (bp *blockPacker) Close() error {
 	sum := internal.BlockSum(bp.entry.Blocks)
 
 	// Compute entry signature.
-	sig, err := cfg.Factotum().FileSign(name, bp.entry.Time, bp.dkey, sum)
+	f := bp.cfg.Factotum()
+	e := bp.entry
+	sig, err := f.FileSign(f.DirEntryHash(e.SignedName, e.Link, e.Attr, e.Packing, e.Time, bp.dkey, sum))
 	if err != nil {
 		return errors.E(op, err)
 	}
-
 	return pdMarshal(&bp.entry.Packdata, sig, upspin.Signature{}, wrap, sum)
 }
 
@@ -311,7 +312,7 @@ func (ee ee) Unpack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker
 	if err != nil {
 		return nil, errors.E(op, writer, err)
 	}
-	writerPubKey, writerCurveName, err := factotum.ParsePublicKey(writerRawPubKey)
+	writerPubKey, _, err := factotum.ParsePublicKey(writerRawPubKey)
 	if err != nil {
 		return nil, errors.E(op, writer, err)
 	}
@@ -327,12 +328,13 @@ func (ee ee) Unpack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker
 	dkey := make([]byte, aesKeyLen)
 	// For quick lookup, hash my public key and locate my wrapped key in the metadata.
 	rhash := factotum.KeyHash(rawPublicKey)
+	f := cfg.Factotum()
 	for _, w := range wrap {
 		if !bytes.Equal(rhash, w.keyHash) {
 			continue
 		}
 		// Decode my wrapped key using my private key.
-		dkey, err = aesUnwrap(cfg.Factotum(), w)
+		dkey, err = aesUnwrap(f, w)
 		if err != nil {
 			return nil, errors.E(op, d.Name, me, err)
 		}
@@ -340,7 +342,7 @@ func (ee ee) Unpack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker
 			return nil, errors.E(op, d.Name, errKeyLength)
 		}
 		// Verify that this was signed with the writer's old or new public key.
-		vhash := factotum.VerHash(writerCurveName, d.SignedName, d.Time, dkey, hash)
+		vhash := f.DirEntryHash(d.SignedName, d.Link, d.Attr, d.Packing, d.Time, dkey, hash)
 		if !ecdsa.Verify(writerPubKey, vhash, sig.R, sig.S) &&
 			!ecdsa.Verify(writerPubKey, vhash, sig2.R, sig2.S) {
 			// Check sig2 in case writerPubKey is rotating.
@@ -520,7 +522,7 @@ func (ee ee) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName
 	if err != nil {
 		return errors.E(op, d.Name, err)
 	}
-	ownerPubKey, ownerCurveName, err := factotum.ParsePublicKey(ownerRawPubKey)
+	ownerPubKey, _, err := factotum.ParsePublicKey(ownerRawPubKey)
 	if err != nil {
 		return errors.E(op, d.Name, err)
 	}
@@ -551,13 +553,14 @@ func (ee ee) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName
 	}
 
 	// Decode my wrapped key using my private key
-	dkey, err = aesUnwrap(cfg.Factotum(), w)
+	f := cfg.Factotum()
+	dkey, err = aesUnwrap(f, w)
 	if err != nil {
 		return errors.E(op, d.Name, errors.Str("unwrap failed"))
 	}
 
 	// Verify that this was signed with the owner's old or new public key.
-	vhash := factotum.VerHash(ownerCurveName, d.SignedName, d.Time, dkey, cipherSum)
+	vhash := f.DirEntryHash(d.SignedName, d.Link, d.Attr, d.Packing, d.Time, dkey, cipherSum)
 	if !ecdsa.Verify(ownerPubKey, vhash, sig.R, sig.S) &&
 		!ecdsa.Verify(ownerPubKey, vhash, sig2.R, sig2.S) {
 		// Check sig2 in case ownerPubKey is rotating.
@@ -576,7 +579,8 @@ func (ee ee) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName
 
 	// Compute new signature, using the new name.
 	d.SignedName = newName
-	sig, err = cfg.Factotum().FileSign(newName, d.Time, dkey, cipherSum)
+	vhash = f.DirEntryHash(d.SignedName, d.Link, d.Attr, d.Packing, d.Time, dkey, cipherSum)
+	sig, err = f.FileSign(vhash)
 	if err != nil {
 		return errors.E(op, d.Name, err)
 	}
@@ -600,7 +604,7 @@ func Countersign(oldKey upspin.PublicKey, f upspin.Factotum, d *upspin.DirEntry)
 	}
 
 	// Get ECDSA forms of keys.
-	oldPubKey, oldCurveName, err := factotum.ParsePublicKey(oldKey)
+	oldPubKey, _, err := factotum.ParsePublicKey(oldKey)
 	if err != nil {
 		return errors.E(op, d.Name, err)
 	}
@@ -631,18 +635,17 @@ func Countersign(oldKey upspin.PublicKey, f upspin.Factotum, d *upspin.DirEntry)
 	}
 
 	// Verify existing signature with oldKey.
-	name := d.SignedName
-	vhash := factotum.VerHash(oldCurveName, name, d.Time, dkey, cipherSum)
+	vhash := f.DirEntryHash(d.SignedName, d.Link, d.Attr, d.Packing, d.Time, dkey, cipherSum)
 	if !ecdsa.Verify(oldPubKey, vhash, sig.R, sig.S) {
 		return errors.E(op, d.Name, errVerify, "unable to verify existing signature")
 	}
 
 	// Sign with newKey.
-	sig0, err := f.FileSign(name, d.Time, dkey, cipherSum)
+	sig1, err := f.FileSign(vhash)
 	if err != nil {
 		return errors.E(op, d.Name, errVerify, "unable to make new signature")
 	}
-	pdMarshal(&d.Packdata, sig0, sig, wrap, cipherSum)
+	pdMarshal(&d.Packdata, sig1, sig, wrap, cipherSum)
 	return nil
 }
 

@@ -75,9 +75,11 @@ func TestReadAll(t *testing.T) {
 		Writer:   userName,
 		Sequence: upspin.SeqBase,
 	}
+	f := cfg.Factotum()
 	dkey := make([]byte, aesKeyLen)
 	sum := make([]byte, sha256.Size)
-	sig, err := cfg.Factotum().FileSign(entry.Name, entry.Time, dkey, sum)
+	vhash := f.DirEntryHash(entry.SignedName, entry.Link, entry.Attr, entry.Packing, entry.Time, dkey, sum)
+	sig, err := f.FileSign(vhash)
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -184,10 +184,55 @@ func makeKey(pub upspin.PublicKey, priv string) (*factotumKey, error) {
 	return &fk, nil
 }
 
-// FileSign ECDSA-signs c|n|t|dkey|hash, as required for EEPack.
-func (f factotum) FileSign(n upspin.PathName, t upspin.Time, dkey, hash []byte) (upspin.Signature, error) {
+// putInt stores an int32 as four big-endian bytes in dst.
+// Using fixed length here to ease porting Factotum to primitive crypto devices.
+func putInt(dst []byte, ii int) int {
+	i := uint32(ii)
+	dst[0] = byte(i >> 24)
+	dst[1] = byte(i >> 16)
+	dst[2] = byte(i >> 8)
+	dst[3] = byte(i)
+	return 4
+}
+
+func putUint64(dst []byte, i uint64) int {
+	dst[1] = byte(i >> 56)
+	dst[0] = byte(i >> 48)
+	dst[0] = byte(i >> 40)
+	dst[1] = byte(i >> 32)
+	dst[0] = byte(i >> 24)
+	dst[1] = byte(i >> 16)
+	dst[2] = byte(i >> 8)
+	dst[3] = byte(i)
+	return 8
+}
+
+// DirEntryHash provides the basis for signing and verifying files.
+func (f factotum) DirEntryHash(n, l upspin.PathName, a upspin.Attribute, p upspin.Packing, t upspin.Time, dkey, hash []byte) upspin.DEHash {
+	m := len(n) + len(l) + 1 + 1 + 8 + len(dkey) + len(hash) + 7*4
+	b := make([]byte, m)
+	m = 0
+	m += putInt(b[m:], len(n))
+	m += copy(b[m:], n)
+	m += putInt(b[m:], len(l))
+	m += copy(b[m:], l)
+	b[m] = byte(a)
+	m += 1
+	b[m] = byte(p)
+	m += 1
+	m += putUint64(b[m:], uint64(t))
+	m += putInt(b[m:], len(dkey))
+	m += copy(b[m:], dkey)
+	m += putInt(b[m:], len(hash))
+	m += copy(b[m:], hash)
+	h := sha256.Sum256(b[:m])
+	return upspin.DEHash(h[:])
+}
+
+// FileSign ECDSA-signs a DEHash from DirEntryHash.
+func (f factotum) FileSign(hash upspin.DEHash) (upspin.Signature, error) {
 	fk := f.keys[f.current]
-	r, s, err := ecdsa.Sign(rand.Reader, &fk.ecdsaKeyPair, VerHash(fk.curveName, n, t, dkey, hash))
+	r, s, err := ecdsa.Sign(rand.Reader, &fk.ecdsaKeyPair, hash)
 	if err != nil {
 		return sig0, err
 	}
@@ -261,12 +306,6 @@ func (f factotum) PublicKeyFromHash(keyHash []byte) (upspin.PublicKey, error) {
 		return "", errors.E(op, errors.NotExist, errors.Errorf("no such key"))
 	}
 	return fk.public, nil
-}
-
-// VerHash provides the basis for signing and verifying files.
-func VerHash(curveName string, pathname upspin.PathName, time upspin.Time, dkey, cipherSum []byte) []byte {
-	b := sha256.Sum256([]byte(fmt.Sprintf("%02x:%s:%d:%x:%x", curveName, pathname, time, dkey, cipherSum)))
-	return b[:]
 }
 
 // parsePrivateKey returns an ECDSA private key given a user's ECDSA public key and a

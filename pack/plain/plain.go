@@ -113,17 +113,15 @@ func (bp *blockPacker) Close() error {
 		return errors.E(op, err)
 	}
 
-	name := bp.entry.SignedName
-	cfg := bp.cfg
-
-	// Compute entry signature dkey=sum=0.
+	// Compute entry signature with dkey=sum=0.
+	f := bp.cfg.Factotum()
+	e := bp.entry
 	dkey := make([]byte, aesKeyLen)
 	sum := make([]byte, sha256.Size)
-	sig, err := cfg.Factotum().FileSign(name, bp.entry.Time, dkey, sum)
+	sig, err := f.FileSign(f.DirEntryHash(e.SignedName, e.Link, e.Attr, e.Packing, e.Time, dkey, sum))
 	if err != nil {
 		return errors.E(op, err)
 	}
-
 	return pdMarshal(&bp.entry.Packdata, sig, upspin.Signature{})
 }
 
@@ -153,15 +151,16 @@ func (p plainPack) Unpack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockUn
 	if err != nil {
 		return nil, errors.E(op, writer, err)
 	}
-	writerPubKey, writerCurveName, err := factotum.ParsePublicKey(writerRawPubKey)
+	writerPubKey, _, err := factotum.ParsePublicKey(writerRawPubKey)
 	if err != nil {
 		return nil, errors.E(op, writer, err)
 	}
 
+	f := cfg.Factotum()
 	dkey := make([]byte, aesKeyLen)
 	sum := make([]byte, sha256.Size)
 	// Verify that this was signed with the writer's old or new public key.
-	vhash := factotum.VerHash(writerCurveName, d.SignedName, d.Time, dkey, sum)
+	vhash := f.DirEntryHash(d.SignedName, d.Link, d.Attr, d.Packing, d.Time, dkey, sum)
 	if !ecdsa.Verify(writerPubKey, vhash, sig.R, sig.S) &&
 		!ecdsa.Verify(writerPubKey, vhash, sig2.R, sig2.S) {
 		// Check sig2 in case writerPubKey is rotating.
