@@ -91,11 +91,16 @@ type Signature struct {
 	R, S *big.Int
 }
 
+type DEHash []byte
+
 // Factotum implements an agent, potentially remote, to handle private key operations.
 // Implementations typically provide NewFactotum() to set the key.
 type Factotum interface {
-	// FileSign ECDSA-signs p|n|t|dkey|hash, as required for EEPack and similar.
-	FileSign(n PathName, t Time, dkey, hash []byte) (Signature, error)
+	// DirEntryHash is a summary used in signing and verifying directory entries.
+	DirEntryHash(n, l PathName, a Attribute, p Packing, t Time, dkey, hash []byte) DEHash
+
+	// FileSign ECDSA-signs DirEntry fields and, in some packings, file contents.
+	FileSign(hash DEHash) (Signature, error)
 
 	// ScalarMult is the bare private key operator, used in unwrapping packed data.
 	// Each call needs security review to ensure it cannot be abused as a signing
@@ -220,8 +225,7 @@ const (
 	UnassignedPack Packing = 0
 
 	// PlainPack is a no-encryption, no-integrity packing. Bytes are copied
-	// untouched.
-	// TODO: should we add a sentence about "minimal DirEntry validation"?
+	// untouched. DirEntry fields SignedName and so on are signed.
 	PlainPack Packing = 1
 
 	// Packings from 2 through 19 are not for production use. This region
@@ -474,6 +478,8 @@ type Time int64
 type DirEntry struct {
 	// Fields contributing to the signature.
 	SignedName PathName   // The full path name of the file used for signing.
+	Link       PathName   // The link target, iff the DirEntry has Attr=AttrLink.
+	Attr       Attribute  // Attributes for the DirEntry.
 	Packing    Packing    // Packing used for every block in file.
 	Time       Time       // Time associated with file; might be when it was last written.
 	Blocks     []DirBlock // Descriptors for each block. A nil or empty slice represents an empty file.
@@ -483,10 +489,8 @@ type DirEntry struct {
 	Writer UserName // Writer of the file, often the same as owner.
 
 	// Fields not included in the signature.
-	Name     PathName  // The full path name of the file. Only the last element can be a link.
-	Link     PathName  // The link target, iff the DirEntry has Attr=AttrLink.
-	Attr     Attribute // Attributes for the DirEntry.
-	Sequence int64     // The sequence (version) number of the item.
+	Name     PathName // The full path name of the file. Only the last element can be a link.
+	Sequence int64    // The sequence (version) number of the item.
 }
 
 // BlockSize is an arbitrarily chosen size that packers use when breaking
