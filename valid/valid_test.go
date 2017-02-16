@@ -284,6 +284,19 @@ func TestDirEntry(t *testing.T) {
 		t.Fatal("no error for bad block")
 	}
 	restore()
+	entry.Packing = upspin.UnassignedPack
+	entry.Attr = upspin.AttrDirectory
+	entry.Blocks = nil
+	entry.Packdata = nil
+	if err := DirEntry(&entry); err != nil {
+		t.Fatalf("expected no error, got %s", err)
+	}
+	restore()
+	entry.Packing = upspin.UnassignedPack
+	if err := DirEntry(&entry); err == nil {
+		t.Fatal("no error for unassigned pack for a file")
+	}
+	restore()
 }
 
 func TestReference(t *testing.T) {

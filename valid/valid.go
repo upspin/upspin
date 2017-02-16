@@ -158,6 +158,12 @@ func DirEntry(entry *upspin.DirEntry) error {
 	switch entry.Packing {
 	case upspin.PlainPack, upspin.EEPack, upspin.EEIntegrityPack:
 		// OK
+	case upspin.UnassignedPack:
+		if entry.IsDir() {
+			// Okay for directory; DirServer chooses.
+			break
+		}
+		fallthrough
 	default:
 		return errors.E(op, errors.Invalid, entry.Name, errors.Errorf("invalid packing %d", entry.Packing))
 	}

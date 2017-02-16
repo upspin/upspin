@@ -20,11 +20,13 @@ var (
 
 // Register binds a Packing code to the implementation of its algorithm.
 // It must be called in the init function of a Packer implementation.
-// If called after the program is initialized, Register will panic.
 // If multiple calls have the same Packing, Register will panic.
 // TODO: One day, or in other languages, we may be able to bind lazily.
 func Register(packer upspin.Packer) error {
 	packing := packer.Packing()
+	if packing == upspin.UnassignedPack {
+		return errors.E(errors.Invalid, errors.Str("unassigned pack cannot be registered"))
+	}
 	mu.Lock()
 	defer mu.Unlock()
 	if p, present := packers[packer.Packing()]; present {

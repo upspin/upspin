@@ -213,8 +213,16 @@ type Packer interface {
 }
 
 const (
-	// PlainPack is a no-encryption, no-integrity packing. Bytes are copied untouched.
-	PlainPack Packing = 0 // TODO(edpin or ehg) change to 1
+	// UnassignedPack is not a packer, but a special value indicating no
+	// packer was chosen. It's an error to use this value in a DirEntry
+	// except when creating a directory, in which case the DirServer will
+	// assign the proper packing.
+	UnassignedPack Packing = 0
+
+	// PlainPack is a no-encryption, no-integrity packing. Bytes are copied
+	// untouched.
+	// TODO: should we add a sentence about "minimal DirEntry validation"?
+	PlainPack Packing = 1
 
 	// Packings from 2 through 19 are not for production use. This region
 	// is reserved for debugging and other temporary packing implementations.
