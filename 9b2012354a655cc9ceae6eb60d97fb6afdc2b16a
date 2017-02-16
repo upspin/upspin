@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f814fc1b_312e12f3",
+        "filename": "rpc/keyserver/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-16T17:17:28Z",
+      "side": 1,
+      "message": "two distinct functions makes it clear. this just hides the expense by wrapping the expensive one instead of having the expensive one call the cheap one. it\u0027s backwards here.",
+      "revId": "9b2012354a655cc9ceae6eb60d97fb6afdc2b16a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
