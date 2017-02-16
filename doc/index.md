@@ -1,6 +1,6 @@
 # Upspin
 
-<img src="/images/home.jpg" width="180" height="218" alt="Home"/>
+<img src="/images/augie.jpg" width="180" height="218" alt="Home"/>
 
 ## Documentation
 
