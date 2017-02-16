@@ -25,6 +25,8 @@ var (
 	testDataStr = fmt.Sprintf("This is test at %v", time.Now())
 	testData    = []byte(testDataStr)
 	fileName    = fmt.Sprintf("test-file-%d", time.Now().Second())
+
+	useGcloud = flag.Bool("use_gcloud", false, "enable to run google cloud tests; requires gcloud auth login")
 )
 
 // This is more of a regression test as it uses the running cloud
@@ -221,8 +223,15 @@ func TestDelete(t *testing.T) {
 
 func TestMain(m *testing.M) {
 	flag.Parse()
-	if testing.Short() {
-		log.Print("cloud/storage/gcs: skipping network-based tests while -test.short specified")
+	if !*useGcloud {
+		log.Printf(`
+
+cloud/storage/gcs: skipping test as it requires GCS access. To enable this test,
+ensure you are authenticated to a GCP project that has editor permissions to a
+GCS bucket called 'upspin-test-scratch' and then set this test's flag
+--i_am_a_gcp_project_owner.
+
+`)
 		os.Exit(0)
 	}
 
