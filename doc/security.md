@@ -315,7 +315,7 @@ damage of a malicious directory server returning the wrong result from
 a call to `WhichAccess`.
 A cautious owner should not place private directories inside public directories.
 
-To prevent a subverted directory server from returning entirely fraudulent
+To prevent a subverted directory server from returning fraudulent
 directory entries that would be undetectable by upspinfs,
 all the packings at a minimum include a signature by the writer
 of the path name, packing, and timestamp.

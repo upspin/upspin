@@ -66,6 +66,7 @@ func (s *State) countersignCommand(fs *flag.FlagSet) {
 
 // countersign adds a second signature using factotum.
 func (c *Countersigner) countersign(entry *upspin.DirEntry, newF upspin.Factotum) {
+	// TODO(ehg)  Handle PlainPack and EEIntegrityPack as well.
 	err := ee.Countersign(c.oldKey, newF, entry)
 	if err != nil {
 		c.state.exit(err)
