@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "934b48cf_22208fae",
+        "filename": "cmd/upspin/signup.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-16T02:24:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "22e67316_fc075452",
+      "revId": "05da69c246dd03abb194cf4d8cc5ff6130e9b0ef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4c74c6b0_8804df86",
         "filename": "cmd/upspin/signup.go",
         "patchSetId": 1
@@ -33,6 +51,24 @@
       "revId": "05da69c246dd03abb194cf4d8cc5ff6130e9b0ef",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dea05688_baab373e",
+        "filename": "cmd/upspin/signup.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-16T02:24:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4c74c6b0_8804df86",
+      "revId": "05da69c246dd03abb194cf4d8cc5ff6130e9b0ef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -64,6 +100,24 @@
       "writtenOn": "2017-02-15T06:49:53Z",
       "side": 1,
       "message": "s/Only/only/\n\ni think this is a bad name though. maybe signuponly or sendkeys or noconfig",
+      "revId": "05da69c246dd03abb194cf4d8cc5ff6130e9b0ef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f4ea74e6_a1074175",
+        "filename": "cmd/upspin/signup.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-16T02:24:55Z",
+      "side": 1,
+      "message": "went with -signuponly",
+      "parentUuid": "25ef81a4_39e3e5d6",
       "revId": "05da69c246dd03abb194cf4d8cc5ff6130e9b0ef",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
