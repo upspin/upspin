@@ -57,7 +57,6 @@ func TestNoGzip(t *testing.T) {
 	if err != nil {
 		t.Fatalf("expected no error when creating request, but got %v", err)
 	}
-	req.SetBasicAuth(username, password)
 
 	// Don’t ask for gzipped responses.
 	req.Header.Set("Accept-Encoding", "")
@@ -81,7 +80,6 @@ func get(t *testing.T, url string) []byte {
 	if err != nil {
 		t.Fatalf("expected no error, but got %v", err)
 	}
-	req.SetBasicAuth(username, password)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		t.Fatalf("expected no error, but got %v", err)
@@ -131,7 +129,6 @@ func TestDoc(t *testing.T) {
 	if err != nil {
 		t.Fatalf("expected no error, but got %v", err)
 	}
-	req.SetBasicAuth(username, password)
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		t.Fatalf("expected no error, but got %v", err)
