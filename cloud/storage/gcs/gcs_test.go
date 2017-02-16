@@ -25,6 +25,8 @@ var (
 	testDataStr = fmt.Sprintf("This is test at %v", time.Now())
 	testData    = []byte(testDataStr)
 	fileName    = fmt.Sprintf("test-file-%d", time.Now().Second())
+
+	forceRun = flag.Bool("i_am_a_gcp_project_owner", false, "Forces this test to run. The caller must be a GCP project owner and have created a bucket called upspin-test-scratch")
 )
 
 // This is more of a regression test as it uses the running cloud
@@ -221,8 +223,14 @@ func TestDelete(t *testing.T) {
 
 func TestMain(m *testing.M) {
 	flag.Parse()
-	if testing.Short() {
-		log.Print("cloud/storage/gcs: skipping network-based tests while -test.short specified")
+	if !*forceRun {
+		log.Printf(`
+
+cloud/storage/gcs: skipping test since it requires ownership of a GCP project
+and the pre-existence of a bucket name 'upspin-test-scratch'. To enable this
+test set flag --i_am_a_gcp_project_owner.
+
+`)
 		os.Exit(0)
 	}
 
