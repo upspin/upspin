@@ -258,6 +258,7 @@ func TestTriggerSnapshotWithPut(t *testing.T) {
 	de := &upspin.DirEntry{
 		Name:       snapshotUser + "/" + snapshotControlFile,
 		SignedName: snapshotUser + "/" + snapshotControlFile,
+		Packing:    upspin.PlainPack,
 	}
 
 	entry, err := s.Put(de)
@@ -404,6 +405,7 @@ func TestSnapshotIsReadOnly(t *testing.T) {
 
 		// 3) Modify a file in the snapshot.
 		de.Attr = upspin.AttrNone
+		de.Packing = upspin.PlainPack
 		_, err = s.Put(de)
 		if !errors.Match(c.err, err) {
 			t.Errorf("%s: err = %v, want = %v", c.user, err, c.err)
