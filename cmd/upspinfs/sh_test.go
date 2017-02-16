@@ -10,15 +10,14 @@ package main
 import (
 	"fmt"
 	"io/ioutil"
-	"log"
 	"os"
 	"os/exec"
-	"path/filepath"
 	"testing"
 
 	"upspin.io/bind"
 	"upspin.io/config"
 	"upspin.io/factotum"
+	"upspin.io/test/testutil"
 	"upspin.io/upspin"
 
 	dirserver "upspin.io/dir/inprocess"
@@ -42,7 +41,7 @@ func testSetup(name string) (cfg upspin.Config, err error) {
 		NetAddr:   "", // ignored
 	}
 
-	f, err := factotum.NewFromDir(repo("key/testdata/user1")) // Always use user1's keys.
+	f, err := factotum.NewFromDir(testutil.Repo("key", "testdata", "user1")) // Always use user1's keys.
 	if err != nil {
 		panic("cannot initialize factotum: " + err.Error())
 	}
@@ -134,12 +133,4 @@ func TestShell(t *testing.T) {
 	if err != nil {
 		t.Fatal(err.Error())
 	}
-}
-
-func repo(dir string) string {
-	gopath := os.Getenv("GOPATH")
-	if len(gopath) == 0 {
-		log.Fatal("no GOPATH")
-	}
-	return filepath.Join(gopath, "src/upspin.io/"+dir)
 }
