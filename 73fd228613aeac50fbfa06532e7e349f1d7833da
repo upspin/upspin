@@ -33,6 +33,40 @@
       "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "66cf7cf8_558e188b",
+        "filename": "pack/packutil/packdata.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-16T01:49:42Z",
+      "side": 1,
+      "message": "If this package is to stay around, it should have a doc comment",
+      "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "25928ee2_0ab5665b",
+        "filename": "pack/plain/plain.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-16T01:49:42Z",
+      "side": 1,
+      "message": "errors.E(op, err)",
+      "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
