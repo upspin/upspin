@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "19053b81_4acda47e",
+        "filename": "test/watch_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-16T21:35:13Z",
+      "side": 1,
+      "message": "s/ForBidden/Forbidden/",
+      "revId": "f7e9ad49bf975e1709eae9bca890fde5d2c39471",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
