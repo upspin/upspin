@@ -17,14 +17,22 @@ When filing an issue, make sure to answer these five questions:
 
 Sensitive security-related issues should be reported to [ehg@google.com](mailto:ehg@google.com).
 
+
 ## Contributing code
 
-Please read the [Contribution Guidelines](https://golang.org/doc/contribute.html)
-before sending patches.
-
-**We do not accept GitHub pull requests**
+We do not use GitHub pull requests
 (we use [an instance](https://upspin-review.googlesource.com/) of the
 [Gerrit](https://www.gerritcodereview.com/) code review system instead).
+
+Our code review process is the same as that used by the Go project.
+Please read the Code Review section of
+[Go's Contribution Guidelines](https://golang.org/doc/contribute.html#Code_review)
+to learn how to send patches to Upspin.
+This includes registering with
+[our Gerrit instance]((https://upspin-review.googlesource.com/)),
+configuring the `git-codereview` tool,
+signing a Contributor License Agreement,
+and the process of creating, reviewing, and submitting changes.
 
 Unless otherwise noted, the Upspin source files are distributed under
 the BSD-style license found in the LICENSE file.
