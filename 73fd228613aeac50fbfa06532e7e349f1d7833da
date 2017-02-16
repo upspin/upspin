@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5407ae66_128b2cf5",
+        "filename": "client/clientutil/all_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-16T05:08:13Z",
+      "side": 1,
+      "message": "I can\u0027t remember writing it and don\u0027t know specifically what it refers to, so have removed it.",
+      "parentUuid": "3e60ba24_2501faef",
+      "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "eb1d3f8e_b8320e3e",
         "filename": "client/clientutil/all_test.go",
         "patchSetId": 7
@@ -30,6 +48,24 @@
       "writtenOn": "2017-02-16T03:57:58Z",
       "side": 1,
       "message": "let\u0027s start using ann@example.com when we can, to avoid inadvertently using someone\u0027s real address",
+      "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1ece3301_0bb050de",
+        "filename": "client/clientutil/all_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-16T05:08:13Z",
+      "side": 1,
+      "message": "Sounds good to me, but is a large edit involving a lot of test files.  Leave for another CL?",
+      "parentUuid": "eb1d3f8e_b8320e3e",
       "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "06f8256d_af406cf5",
+        "filename": "client/clientutil/all_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-16T05:08:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1d70408c_1aa441a8",
+      "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6d73d253_1bd34f61",
         "filename": "client/clientutil/all_test.go",
         "patchSetId": 7
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "dd6a5ffc_aa130121",
+        "filename": "client/clientutil/all_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-16T05:08:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6d73d253_1bd34f61",
+      "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a3193a30_537befef",
         "filename": "dir/server/server.go",
         "patchSetId": 7
@@ -81,6 +153,24 @@
       "writtenOn": "2017-02-16T04:14:01Z",
       "side": 1,
       "message": "Upon further thought, it\u0027s quite impractical to add a specific test for this. The test that caught it is enough now that we don\u0027t have do-nothing packers anymore. I\u0027m fine deleting the TODO.\n\nAlso, for clarity, you could rename isGroup to isGroupDir. Or I could do that separately.",
+      "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "927304b7_e0112e16",
+        "filename": "dir/server/server.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-16T05:08:13Z",
+      "side": 1,
+      "message": "Removed TODO.\n\nI don\u0027t follow the isGroupDir suggestion, so will leave for you to do separately.",
+      "parentUuid": "a3193a30_537befef",
       "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -104,6 +194,24 @@
     },
     {
       "key": {
+        "uuid": "9d1eaf75_a9a3d408",
+        "filename": "doc/security.md",
+        "patchSetId": 7
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-16T05:08:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8508e69e_308692b8",
+      "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c50e2bf1_14a64fd1",
         "filename": "doc/security.md",
         "patchSetId": 7
@@ -118,6 +226,24 @@
       "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ee067bfa_0d047e03",
+        "filename": "doc/security.md",
+        "patchSetId": 7
+      },
+      "lineNbr": 321,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-16T05:08:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c50e2bf1_14a64fd1",
+      "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -138,6 +264,24 @@
     },
     {
       "key": {
+        "uuid": "51c6a7eb_c0f63b04",
+        "filename": "pack/packutil/packdata.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-16T05:08:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "66cf7cf8_558e188b",
+      "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "25928ee2_0ab5665b",
         "filename": "pack/plain/plain.go",
         "patchSetId": 7
@@ -155,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "1118a101_5696eaf3",
+        "filename": "pack/plain/plain.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-16T05:08:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "25928ee2_0ab5665b",
+      "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b827231e_df5bde32",
         "filename": "pack/plain/plain.go",
         "patchSetId": 7
@@ -166,6 +328,24 @@
       "writtenOn": "2017-02-16T03:57:58Z",
       "side": 1,
       "message": "won\u0027t sig2 always be zero?",
+      "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d2638176_72f96491",
+        "filename": "pack/plain/plain.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-16T05:08:13Z",
+      "side": 1,
+      "message": "sig2 is potentially used when the Writer is rotating keys.",
+      "parentUuid": "b827231e_df5bde32",
       "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -189,6 +369,24 @@
     },
     {
       "key": {
+        "uuid": "e9608058_16cde5e4",
+        "filename": "pack/plain/plain.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-16T05:08:13Z",
+      "side": 1,
+      "message": "The table in section Key Management in doc/security.md gives a bit more on the key rotation process, which requires sig2.",
+      "parentUuid": "89a1f9bc_d6dcd822",
+      "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "9da4d619_8a62520c",
         "filename": "pack/plain/plain.go",
         "patchSetId": 7
@@ -203,6 +401,24 @@
       "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5d74bdfb_c74672ab",
+        "filename": "pack/plain/plain.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-16T05:08:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9da4d619_8a62520c",
+      "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -223,6 +439,24 @@
     },
     {
       "key": {
+        "uuid": "e7ac0e32_ac86059b",
+        "filename": "pack/plain/plain.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-16T05:08:13Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "d47b49c0_76511f74",
+      "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6af45deb_5f3d623d",
         "filename": "pack/plain/plain_test.go",
         "patchSetId": 7
@@ -234,6 +468,24 @@
       "writtenOn": "2017-02-16T03:57:58Z",
       "side": 1,
       "message": "this is fine, but i\u0027d use ann@example.com anyway for all new names",
+      "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "db497483_139328c3",
+        "filename": "pack/plain/plain_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-16T05:08:13Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "6af45deb_5f3d623d",
       "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -257,6 +509,24 @@
     },
     {
       "key": {
+        "uuid": "7cc035d4_391f352e",
+        "filename": "pack/plain/plain_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-16T05:08:13Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "159b0f68_20a759b9",
+      "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "e4fdec25_d5b57c0c",
         "filename": "pack/plain/plain_test.go",
         "patchSetId": 7
@@ -274,6 +544,24 @@
     },
     {
       "key": {
+        "uuid": "54868774_e6d05329",
+        "filename": "pack/plain/plain_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-16T05:08:13Z",
+      "side": 1,
+      "message": "I just copied this mechanically from eeintegrity_test.go.\nI\u0027ve added a TODO with your suggestion so it isn\u0027t lost.\nI assume this is not launch-blocking.",
+      "parentUuid": "e4fdec25_d5b57c0c",
+      "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "2e46d108_00c372a6",
         "filename": "pack/plain/plain_test.go",
         "patchSetId": 7
@@ -285,6 +573,24 @@
       "writtenOn": "2017-02-16T03:57:58Z",
       "side": 1,
       "message": "again. might as well use the same one; it\u0027s not important to vary, and also you only need one entry in the dummy key server.",
+      "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3b560162_ee040c41",
+        "filename": "pack/plain/plain_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-16T05:08:13Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "2e46d108_00c372a6",
       "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
