@@ -2,6 +2,74 @@
   "comments": [
     {
       "key": {
+        "uuid": "3e60ba24_2501faef",
+        "filename": "client/clientutil/all_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-16T03:57:58Z",
+      "side": 1,
+      "message": "is this TODO still relevant?",
+      "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "eb1d3f8e_b8320e3e",
+        "filename": "client/clientutil/all_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-16T03:57:58Z",
+      "side": 1,
+      "message": "let\u0027s start using ann@example.com when we can, to avoid inadvertently using someone\u0027s real address",
+      "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1d70408c_1aa441a8",
+        "filename": "client/clientutil/all_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-16T03:57:58Z",
+      "side": 1,
+      "message": "s/$/./",
+      "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6d73d253_1bd34f61",
+        "filename": "client/clientutil/all_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-16T03:57:58Z",
+      "side": 1,
+      "message": "s/err/An error/\ns/$/./",
+      "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "8508e69e_308692b8",
         "filename": "doc/security.md",
         "patchSetId": 7
@@ -64,6 +132,142 @@
       "writtenOn": "2017-02-16T01:49:42Z",
       "side": 1,
       "message": "errors.E(op, err)",
+      "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b827231e_df5bde32",
+        "filename": "pack/plain/plain.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-16T03:57:58Z",
+      "side": 1,
+      "message": "won\u0027t sig2 always be zero?",
+      "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "89a1f9bc_d6dcd822",
+        "filename": "pack/plain/plain.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-16T03:57:58Z",
+      "side": 1,
+      "message": "this comment\u0027s wrong, and isn\u0027t it always empty and so not necessary to pass at all?",
+      "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9da4d619_8a62520c",
+        "filename": "pack/plain/plain.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-16T03:57:58Z",
+      "side": 1,
+      "message": "i believe you don\u0027t modify this, which means it can be a global, allocated once.",
+      "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d47b49c0_76511f74",
+        "filename": "pack/plain/plain.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-16T03:57:58Z",
+      "side": 1,
+      "message": "same as comment above. complete sentences deserve punct",
+      "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6af45deb_5f3d623d",
+        "filename": "pack/plain/plain_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-16T03:57:58Z",
+      "side": 1,
+      "message": "this is fine, but i\u0027d use ann@example.com anyway for all new names",
+      "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "159b0f68_20a759b9",
+        "filename": "pack/plain/plain_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-16T03:57:58Z",
+      "side": 1,
+      "message": "ditto. of course you could make this global if it\u0027s the same const in all tests",
+      "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e4fdec25_d5b57c0c",
+        "filename": "pack/plain/plain_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-16T03:57:58Z",
+      "side": 1,
+      "message": "this could be different.\nyou do it once, testing that it works, although it\u0027s fine to depend on  the tests running before the benchmarks and if they fail no benches run, so not even checking the results at all.\nthen you don\u0027t need any error checking in the loop, and certainly no bytes.Equal, which is expensive.\na comment is enough.",
+      "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2e46d108_00c372a6",
+        "filename": "pack/plain/plain_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-16T03:57:58Z",
+      "side": 1,
+      "message": "again. might as well use the same one; it\u0027s not important to vary, and also you only need one entry in the dummy key server.",
       "revId": "73fd228613aeac50fbfa06532e7e349f1d7833da",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
