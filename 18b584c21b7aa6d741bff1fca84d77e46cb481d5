@@ -16,6 +16,24 @@
       "revId": "18b584c21b7aa6d741bff1fca84d77e46cb481d5",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8bda09a2_79e33ffc",
+        "filename": "rpc/keyserver/server.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-16T18:03:32Z",
+      "side": 1,
+      "message": "I\u0027m not sure I follow what you want. \n\nI think this logf call might not be that interesting given it\u0027s called in 4 places and as you point out is not saving that much work.\n\nI hope this is what you meant. PTAL.",
+      "parentUuid": "96e43f76_8541d18c",
+      "revId": "18b584c21b7aa6d741bff1fca84d77e46cb481d5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
