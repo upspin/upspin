@@ -16,6 +16,24 @@
       "revId": "5ef0311b2ac3f7dd7c4b8c527ace499de3a40a6a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9e7405a9_6990cb8b",
+        "filename": "rpc/keyserver/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-16T17:13:20Z",
+      "side": 1,
+      "message": "Done. \n\nNot sure we need two calls though.",
+      "parentUuid": "4e826b9f_b932cc85",
+      "revId": "5ef0311b2ac3f7dd7c4b8c527ace499de3a40a6a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
