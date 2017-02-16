@@ -16,6 +16,24 @@
       "revId": "70da04efec7221d45fa470e8d8a6f51f40ea7c15",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f1a45e34_88ea4fdb",
+        "filename": "rpc/keyserver/server.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-16T18:18:31Z",
+      "side": 1,
+      "message": "That\u0027s what I have now, except that logOneInN does not return an operation, because it would have to compute the printf, which is expensive.\n\nRenamed the function as instructed.",
+      "parentUuid": "7e393402_2cbd4e69",
+      "revId": "70da04efec7221d45fa470e8d8a6f51f40ea7c15",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
