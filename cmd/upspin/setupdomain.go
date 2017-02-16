@@ -180,7 +180,7 @@ If any state exists at the given location (-where) then the command aborts.
 		Where:     *where,
 		Domain:    *domain,
 		Project:   flags.Project,
-		UserName:  s.config.UserName(),
+		UserName:  template.HTML(s.config.UserName()),
 		Signature: fmt.Sprintf("%x-%x", sig.R, sig.S),
 	})
 	if err != nil {
@@ -192,8 +192,12 @@ type setupDomainData struct {
 	Dir, Where string
 	Domain     string
 	Project    string
-	UserName   upspin.UserName
-	Signature  string
+	// template.HTML is used instead of upspin.UserName because html/template
+	// escapes characters like +.
+	// TODO: Figure out and document why html/template is used instead of
+	// text/template.
+	UserName  template.HTML
+	Signature string
 }
 
 var setupDomainTemplate = template.Must(template.New("setupdomain").Parse(`
@@ -287,7 +291,7 @@ func (s *State) setuphost(where, domain, curve string) {
 		Where:     where,
 		Domain:    domain,
 		Project:   flags.Project,
-		UserName:  s.config.UserName(),
+		UserName:  template.HTML(s.config.UserName()),
 		Signature: fmt.Sprintf("%x-%x", sig.R, sig.S),
 	})
 	if err != nil {
