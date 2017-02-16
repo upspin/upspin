@@ -16,6 +16,24 @@
       "revId": "5be2a30241f3faab36090be59ddaeee267151689",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ed815794_12ed7b7c",
+        "filename": "pack/packutil/packdata.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-16T02:40:54Z",
+      "side": 0,
+      "message": "In the earlier patches, this was in pack/internal but this afternoon I found I needed to use them in clientutil tests, so had to create another subdirectory.    If there is a more idiomatic way to say it in Go, I\u0027m eager to learn.",
+      "parentUuid": "a582f7a8_979534de",
+      "revId": "5be2a30241f3faab36090be59ddaeee267151689",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
