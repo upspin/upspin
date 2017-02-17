@@ -20,6 +20,7 @@ import (
 	"upspin.io/path"
 	"upspin.io/upspin"
 
+	"text/template/parse"
 	_ "upspin.io/pack/eeintegrity" // Integrity packer used for Access/Group files.
 	_ "upspin.io/pack/plain"
 )
@@ -215,9 +216,11 @@ func (c *Client) readAllOK(parsed path.Parsed) error {
 	// We check this by seeing whether the controlling Access file,
 	// which could be in this directory or a parent, already has read:all.
 	whichAccess, err := dir.WhichAccess(parsed.Path())
+	whichAccess, err = validateWhichAccess(parsed.Path(), whichAccess, err)
 	if err != nil {
 		return err
 	}
+
 	if whichAccess == nil {
 		// There is no Access file so there is no read:all set already.
 		return errReadAll
@@ -276,7 +279,29 @@ func (c *Client) pack(entry *upspin.DirEntry, data []byte, packer upspin.Packer,
 
 func whichAccessLookupFn(dir upspin.DirServer, entry *upspin.DirEntry, s *metric.Span) (*upspin.DirEntry, error) {
 	defer s.StartSpan("dir.WhichAccess").End()
-	return dir.WhichAccess(entry.Name)
+	whichEntry, err := dir.WhichAccess(entry.Name)
+	return validateWhichAccess(entry.Name, whichEntry, err)
+}
+
+// validateWhichAccess validates the DirEntry of an Access file as returned by
+// the DirServer's WhichAccess function. It ensures the DirServer did not lie.
+func validateWhichAccess(name upspin.PathName, accessEntry *upspin.DirEntry, err error) (*upspin.DirEntry, error) {
+	if err != nil && err != upspin.ErrFollowLink {
+		return nil, err
+	}
+	// The Access entry must be a prefix of the path name requested.
+	parsedName, err := path.Parse(name)
+	if err != nil {
+		return nil, err
+	}
+	parsedAccess, err := path.Parse(accessEntry.Name)
+	if err != nil {
+		return nil, err
+	}
+	if !parsedName.HasPrefix(parsedAccess) {
+		return nil, errors.E(errors.Invalid, name, errors.Errorf("access file %q is not a prefix of %q", parsedAccess.Path(), parsedName.Path()))
+	}
+	return nil, nil
 }
 
 // For EE, update the packing for the other readers as specified by the Access file.
