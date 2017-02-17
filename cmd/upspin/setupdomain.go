@@ -121,17 +121,6 @@ If any state exists at the given location (-where) then the command aborts.
 		s.exit(err)
 	}
 
-	// Generate and write symmetric key for DirServer data.
-	var symmSecret [32]byte
-	_, err = rand.Read(symmSecret[:])
-	if err != nil {
-		s.exit(err)
-	}
-	err = ioutil.WriteFile(filepath.Join(dirServerPath, "symmsecret.upspinkey"), symmSecret[:], 0400)
-	if err != nil {
-		s.exit(err)
-	}
-
 	// Generate config files for those users.
 	dirEndpoint := upspin.Endpoint{
 		Transport: upspin.Remote,
@@ -147,7 +136,7 @@ If any state exists at the given location (-where) then the command aborts.
 		Store:     &storeEndpoint,
 		Dir:       &dirEndpoint,
 		SecretDir: dirServerPath,
-		Packing:   "symm",
+		Packing:   "ee",
 	}); err != nil {
 		s.exit(err)
 	}
