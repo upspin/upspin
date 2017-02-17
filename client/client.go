@@ -215,6 +215,7 @@ func (c *Client) readAllOK(parsed path.Parsed) error {
 	// We check this by seeing whether the controlling Access file,
 	// which could be in this directory or a parent, already has read:all.
 	whichAccess, err := dir.WhichAccess(parsed.Path())
+	whichAccess, err = validateWhichAccess(parsed.Path(), whichAccess, err)
 	if err != nil {
 		return err
 	}
@@ -276,7 +277,44 @@ func (c *Client) pack(entry *upspin.DirEntry, data []byte, packer upspin.Packer,
 
 func whichAccessLookupFn(dir upspin.DirServer, entry *upspin.DirEntry, s *metric.Span) (*upspin.DirEntry, error) {
 	defer s.StartSpan("dir.WhichAccess").End()
-	return dir.WhichAccess(entry.Name)
+	whichEntry, err := dir.WhichAccess(entry.Name)
+	return validateWhichAccess(entry.Name, whichEntry, err)
+}
+
+// validateWhichAccess validates the DirEntry of an Access file as returned by
+// the DirServer's WhichAccess function. It ensures the DirServer did not lie.
+func validateWhichAccess(name upspin.PathName, accessEntry *upspin.DirEntry, err error) (*upspin.DirEntry, error) {
+	if err != nil {
+		return accessEntry, err // err could be ErrFollowLink.
+	}
+	if accessEntry == nil {
+		return nil, err
+	}
+	// The Access entry must be a prefix of the path name requested; and
+	// the signing key on the returned Access file is root of the pathname;
+	parsedName, err := path.Parse(name)
+	if err != nil {
+		return nil, err
+	}
+	if !access.IsAccessFile(accessEntry.Name) {
+		return nil, errors.E(errors.Internal, accessEntry.Name, errors.Str("not an Access file"))
+	}
+	parsedAccess, err := path.Parse(accessEntry.Name)
+	if err != nil {
+		return nil, err
+	}
+	parsedAccess = parsedAccess.Drop(1) // Remove the "/Access" part.
+	if !parsedName.HasPrefix(parsedAccess) {
+		return nil, errors.E(errors.Invalid, parsedAccess.Path(), errors.Errorf("access file is not a prefix of %q", parsedName.Path()))
+	}
+
+	// The signing key must match the user in parsedName. If the DirEntry
+	// unpacks correctly, that validates the signing key is that of Writer.
+	// So, here we validate that Writer is parsedName.User().
+	if accessEntry.Writer != parsedName.User() {
+		return nil, errors.E(errors.Invalid, parsedAccess.Path(), parsedName.User(), errors.Str("writer of Access file is the not user of the requested path"))
+	}
+	return accessEntry, nil
 }
 
 // For EE, update the packing for the other readers as specified by the Access file.
