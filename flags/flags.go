@@ -31,7 +31,7 @@ var (
 
 	// LetsEncryptCache is the location of a file in which the Let's
 	// Encrypt certificates are stored. The containing directory should
-	// user-accessible only (chmod 0700).
+	// be owner-accessible only (chmod 0700).
 	LetsEncryptCache string
 
 	// Log sets the level of logging (implements flag.Value).
