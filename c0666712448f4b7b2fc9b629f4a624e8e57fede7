@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2af73985_bbd0af3d",
+        "filename": "client/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-17T01:39:47Z",
+      "side": 1,
+      "message": "return nil, nil. the error is known to be nil.",
+      "revId": "c0666712448f4b7b2fc9b629f4a624e8e57fede7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7d6c8cfe_60684716",
+        "filename": "client/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-17T01:39:47Z",
+      "side": 1,
+      "message": "the directory of the access entry\u0027s name",
+      "revId": "c0666712448f4b7b2fc9b629f4a624e8e57fede7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "aa5a5c7b_1bd12624",
+        "filename": "client/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-17T01:39:47Z",
+      "side": 1,
+      "message": "it\u0027s not parsedAccess, it\u0027s parsedAccessDir but i\u0027d just call it accessDir. the parsed isn\u0027t adding information",
+      "revId": "c0666712448f4b7b2fc9b629f4a624e8e57fede7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
