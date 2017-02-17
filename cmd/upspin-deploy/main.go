@@ -451,7 +451,6 @@ func (c *Config) buildServer(server string) error {
 		files = []string{
 			"public.upspinkey",
 			"secret.upspinkey",
-			"symmsecret.upspinkey",
 		}
 	case "keyserver":
 		files = []string{
