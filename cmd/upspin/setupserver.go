@@ -214,5 +214,4 @@ var configureServerFiles = []string{
 	"secret.upspinkey",
 	"serverconfig.json",
 	"serviceaccount.json",
-	"symmsecret.upspinkey",
 }
