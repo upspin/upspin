@@ -218,6 +218,10 @@ func (c *Client) readAllOK(parsed path.Parsed) error {
 	if err != nil {
 		return err
 	}
+	err = validateWhichAccess(parsed.Path(), whichAccess)
+	if err != nil {
+		return err
+	}
 	if whichAccess == nil {
 		// There is no Access file so there is no read:all set already.
 		return errReadAll
@@ -276,7 +280,45 @@ func (c *Client) pack(entry *upspin.DirEntry, data []byte, packer upspin.Packer,
 
 func whichAccessLookupFn(dir upspin.DirServer, entry *upspin.DirEntry, s *metric.Span) (*upspin.DirEntry, error) {
 	defer s.StartSpan("dir.WhichAccess").End()
-	return dir.WhichAccess(entry.Name)
+	whichEntry, err := dir.WhichAccess(entry.Name)
+	if err != nil {
+		return whichEntry, err
+	}
+	return whichEntry, validateWhichAccess(entry.Name, whichEntry)
+}
+
+// validateWhichAccess validates that the DirEntry for an Access file as
+// returned by the DirServer's WhichAccess function for name is not forged.
+func validateWhichAccess(name upspin.PathName, accessEntry *upspin.DirEntry) error {
+	if accessEntry == nil {
+		return nil
+	}
+	// The directory of the Access entry must be a prefix of the path name
+	// requested; and the signing key on the returned Access file is root of
+	// the pathname;
+	namePath, err := path.Parse(name)
+	if err != nil {
+		return err
+	}
+	if !access.IsAccessFile(accessEntry.Name) {
+		return errors.E(errors.Internal, accessEntry.Name, errors.Str("not an Access file"))
+	}
+	accessPath, err := path.Parse(accessEntry.Name)
+	if err != nil {
+		return err
+	}
+	accessPath = accessPath.Drop(1) // Remove the "/Access" part.
+	if !namePath.HasPrefix(accessPath) {
+		return errors.E(errors.Invalid, accessPath.Path(), errors.Errorf("access file is not a prefix of %q", namePath.Path()))
+	}
+
+	// The signing key must match the user in parsedName. If the DirEntry
+	// unpacks correctly, that validates the signing key is that of Writer.
+	// So, here we validate that Writer is parsedName.User().
+	if accessEntry.Writer != namePath.User() {
+		return errors.E(errors.Invalid, accessPath.Path(), namePath.User(), errors.Str("writer of Access file is the not user of the requested path"))
+	}
+	return nil
 }
 
 // For EE, update the packing for the other readers as specified by the Access file.

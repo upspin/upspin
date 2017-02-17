@@ -7,9 +7,11 @@
 package clientutil
 
 import (
+	"upspin.io/access"
 	"upspin.io/bind"
 	"upspin.io/errors"
 	"upspin.io/pack"
+	"upspin.io/path"
 	"upspin.io/upspin"
 )
 
@@ -24,6 +26,13 @@ func ReadAll(cfg upspin.Config, entry *upspin.DirEntry) ([]byte, error) {
 	}
 	if entry.IsIncomplete() {
 		return nil, errors.E(op, entry.Name, errors.Permission)
+	}
+	if access.IsAccessFile(entry.Name) {
+		// Access files must be written by their owners only.
+		p, _ := path.Parse(entry.Name)
+		if p.User() != entry.Writer {
+			return nil, errors.E(errors.Invalid, p.User(), errors.Str("writer of Access file does not match owner"))
+		}
 	}
 
 	var data []byte
