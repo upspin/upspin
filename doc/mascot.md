@@ -2,7 +2,7 @@
 
 The Upspin mascot is called Augie and was designed for us by [Renee French](https://instagram.com/reneefrench).
 
-Augie represents Upspin. If you want to show your support for Upspin, feel free to use one of the images here with a link back to upspin.io <link>.
+Augie represents Upspin. If you want to show your support for Upspin, feel free to use one of the [official images](https://upspin.io/images/augie.zip) here with a link back to [upspin.io](https://upspin.io).
 
 Augie is copyrighted, so there are some rules to follow:
 
@@ -20,7 +20,7 @@ And some things to avoid:
 
 - **DO NOT** use any Augie artwork, except in relation to the Upspin project, without permission.
 
-- **DO NOT** create a modified version of the Augie artwork. This includes changing colors, dimensions, proportions or adding clothes, text or other visual elements.
+- **DO NOT** create a modified version of the Augie artwork. This includes changing colors or proportions or adding clothes, text or other visual elements.
 
 - **DO NOT** use Augie artwork to represent your products. It represents only Upspin.
 
