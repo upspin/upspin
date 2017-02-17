@@ -33,6 +33,24 @@
       "revId": "4ef0ecc9ded48f8fea7e862636ed263775bca34d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e3be6da3_971bfb14",
+        "filename": "doc/mascot.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-02-17T17:55:55Z",
+      "side": 1,
+      "message": "We have an 80-char limit on docs according to adg.",
+      "parentUuid": "295a535b_491101b2",
+      "revId": "4ef0ecc9ded48f8fea7e862636ed263775bca34d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
