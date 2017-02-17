@@ -17,14 +17,11 @@ import (
 )
 
 var (
-	// ServerConfig specifies configuration options ("key=value") for servers.
-	ServerConfig []string
+	// BlockSize is the block size used when writing large files. The default is 1MB.
+	BlockSize = 1024 * 1024 // Keep in sync with upspin.BlockSize.
 
 	// Config names the Upspin configuration file to use.
 	Config = filepath.Join(os.Getenv("HOME"), "/upspin/config")
-
-	// NetAddr is the publicly accessible network address of this server.
-	NetAddr string
 
 	// HTTPAddr is the network address on which to listen for incoming insecure network connections.
 	HTTPAddr = "localhost:80"
@@ -40,9 +37,15 @@ var (
 	// Log sets the level of logging (implements flag.Value).
 	Log logFlag
 
+	// NetAddr is the publicly accessible network address of this server.
+	NetAddr string
+
 	// Project is the project name on GCP; used by servers and
 	// cmd/upspin setupdomain.
 	Project = ""
+
+	// ServerConfig specifies configuration options ("key=value") for servers.
+	ServerConfig []string
 
 	// ServerKind is the implementation kind of this server.
 	ServerKind = "inprocess"
@@ -59,20 +62,23 @@ var (
 // flags is a map of flag registration functions keyed by flag name,
 // used by Parse to register specific (or all) flags.
 var flags = map[string]func(){
-	"serverconfig": func() {
-		flag.Var(configFlag{&ServerConfig}, "serverconfig", "comma-separated list of configuration options (key=value) for this server")
+	"addr": func() {
+		flag.StringVar(&NetAddr, "addr", NetAddr, "publicly accessible network address (`host:port`)")
+	},
+	"blocksize": func() {
+		flag.IntVar(&BlockSize, "blocksize", BlockSize, "`size` of blocks when writing large files")
 	},
 	"config": func() {
 		flag.StringVar(&Config, "config", Config, "user's configuration `file`")
-	},
-	"addr": func() {
-		flag.StringVar(&NetAddr, "addr", NetAddr, "publicly accessible network address (`host:port`)")
 	},
 	"http": func() {
 		flag.StringVar(&HTTPAddr, "http", HTTPAddr, "`address` for incoming insecure network connections")
 	},
 	"https": func() {
 		flag.StringVar(&HTTPSAddr, "https", HTTPSAddr, "`address` for incoming secure network connections")
+	},
+	"kind": func() {
+		flag.StringVar(&ServerKind, "kind", ServerKind, "server implementation `kind` (inprocess, gcp)")
 	},
 	"letscache": func() {
 		flag.StringVar(&LetsEncryptCache, "letscache", "", "Let's Encrypt cache `directory`")
@@ -84,8 +90,8 @@ var flags = map[string]func(){
 	"project": func() {
 		flag.StringVar(&Project, "project", Project, "GCP `project` name")
 	},
-	"kind": func() {
-		flag.StringVar(&ServerKind, "kind", ServerKind, "server implementation `kind` (inprocess, gcp)")
+	"serverconfig": func() {
+		flag.Var(configFlag{&ServerConfig}, "serverconfig", "comma-separated list of configuration options (key=value) for this server")
 	},
 	"storeservername": func() {
 		flag.StringVar(&StoreServerUser, "storeserveruser", StoreServerUser, "user name of the StoreServer")
