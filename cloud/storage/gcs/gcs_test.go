@@ -18,7 +18,7 @@ import (
 	"upspin.io/log"
 )
 
-const testBucketName = "upspin-test-scratch"
+const defaultTestBucketName = "upspin-test-scratch"
 
 var (
 	client      storage.Storage
@@ -26,7 +26,8 @@ var (
 	testData    = []byte(testDataStr)
 	fileName    = fmt.Sprintf("test-file-%d", time.Now().Second())
 
-	useGcloud = flag.Bool("use_gcloud", false, "enable to run google cloud tests; requires gcloud auth login")
+	testBucket = flag.String("test_bucket", defaultTestBucketName, "bucket name to use for testing")
+	useGcloud  = flag.Bool("use_gcloud", false, "enable to run google cloud tests; requires gcloud auth login")
 )
 
 // This is more of a regression test as it uses the running cloud
@@ -228,8 +229,7 @@ func TestMain(m *testing.M) {
 
 cloud/storage/gcs: skipping test as it requires GCS access. To enable this test,
 ensure you are authenticated to a GCP project that has editor permissions to a
-GCS bucket called 'upspin-test-scratch' and then set this test's flag
---use_gcloud.
+GCS bucket named by flag -test_bucket and then set this test's flag -use_gcloud.
 
 `)
 		os.Exit(0)
@@ -238,7 +238,7 @@ GCS bucket called 'upspin-test-scratch' and then set this test's flag
 	// Create client that writes to test bucket.
 	var err error
 	client, err = storage.Dial("GCS",
-		storage.WithKeyValue("gcpBucketName", testBucketName),
+		storage.WithKeyValue("gcpBucketName", *testBucket),
 		storage.WithKeyValue("defaultACL", PublicRead))
 	if err != nil {
 		log.Fatalf("cloud/storage/gcs: couldn't set up client: %v", err)
