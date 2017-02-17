@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1a6218e8_242ca2c0",
+        "filename": "client/client.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 297,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-17T02:22:11Z",
+      "side": 1,
+      "message": "s/;/,/\ns/is/must be the/",
+      "revId": "0ab9dfd58133c47358a8492337e3fd5cbf72cb7a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "05a2de64_4db17504",
+        "filename": "client/client.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-17T02:22:11Z",
+      "side": 1,
+      "message": "s/;/./",
+      "revId": "0ab9dfd58133c47358a8492337e3fd5cbf72cb7a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d8b6b48d_f16bd87e",
+        "filename": "client/client.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-17T02:22:11Z",
+      "side": 1,
+      "message": "accessPath is no longer the full path.\nuse a variable: accessDir :\u003d accessPath.Drop(1) \nand leave accessPath alone",
+      "revId": "0ab9dfd58133c47358a8492337e3fd5cbf72cb7a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f9fa1993_79f2b63a",
+        "filename": "client/client.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-17T02:22:11Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "0ab9dfd58133c47358a8492337e3fd5cbf72cb7a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
