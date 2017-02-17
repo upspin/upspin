@@ -248,6 +248,7 @@ const (
 	EEPack Packing = 20
 
 	// SymmPack stores AES-encrypted data, using a symmetric key.
+	// This is for niche applications needing deterministic encryption.
 	SymmPack Packing = 21
 
 	// EEIntegrityPack provides elliptic-curve end-to-end integrity protection,
