@@ -16,6 +16,23 @@
       "revId": "fac5f185620a0a409d9e37f10c06cf47a83e4e93",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "83aa4941_7cddbc2f",
+        "filename": "cloud/https/https.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-17T22:06:27Z",
+      "side": 1,
+      "message": "You may want to add a \n ReadHeaderTimeout: 5 * time.Second,",
+      "revId": "fac5f185620a0a409d9e37f10c06cf47a83e4e93",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
