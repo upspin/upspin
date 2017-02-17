@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 
 	"golang.org/x/crypto/acme/autocert"
 	gContext "golang.org/x/net/context"
@@ -116,10 +117,11 @@ func ListenAndServe(ready chan<- struct{}, serverName, addr string, opt *Options
 		}
 	}
 	server := &http.Server{
-		// ReadTimeout:  15 * time.Second,
-		// WriteTimeout: 15 * time.Second,
-		// IdleTimeout:  60 * time.Second,
-		TLSConfig: config,
+		ReadHeaderTimeout: 5 * time.Second,
+		ReadTimeout:       15 * time.Second,
+		WriteTimeout:      15 * time.Second,
+		IdleTimeout:       60 * time.Second,
+		TLSConfig:         config,
 	}
 	// TODO(adg): enable HTTP/2 once it's fast enough
 	//err := http2.ConfigureServer(server, nil)
