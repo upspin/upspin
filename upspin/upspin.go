@@ -497,6 +497,8 @@ type DirEntry struct {
 // BlockSize is an arbitrarily chosen size that packers use when breaking
 // data into blocks for storage. Clients are free to use any size, but this
 // value is used in various helper libraries.
+// This is also the default value for flags.BlockSize, but must be kept in
+// sync manually because flags cannot import this package.
 const BlockSize = 1024 * 1024
 
 // DirBlock describes a block of data representing a contiguous section of a file.

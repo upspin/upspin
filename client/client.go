@@ -15,6 +15,7 @@ import (
 	"upspin.io/client/clientutil"
 	"upspin.io/client/file"
 	"upspin.io/errors"
+	"upspin.io/flags"
 	"upspin.io/metric"
 	"upspin.io/pack"
 	"upspin.io/path"
@@ -30,8 +31,6 @@ type Client struct {
 }
 
 var _ upspin.Client = (*Client)(nil)
-
-var maxBlockSize = upspin.BlockSize // modified by tests
 
 const (
 	followFinalLink      = true
@@ -252,8 +251,8 @@ func (c *Client) pack(entry *upspin.DirEntry, data []byte, packer upspin.Packer,
 	}
 	for len(data) > 0 {
 		n := len(data)
-		if n > maxBlockSize {
-			n = maxBlockSize
+		if n > flags.BlockSize {
+			n = flags.BlockSize
 		}
 		ss := s.StartSpan("bp.pack")
 		cipher, err := bp.Pack(data[:n])

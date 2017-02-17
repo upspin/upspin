@@ -13,6 +13,7 @@ import (
 	"upspin.io/bind"
 	"upspin.io/config"
 	"upspin.io/factotum"
+	"upspin.io/flags"
 	"upspin.io/log"
 	"upspin.io/test/testutil"
 	"upspin.io/upspin"
@@ -189,10 +190,10 @@ func TestFileSequentialAccess(t *testing.T) {
 func TestFileRandomAccess(t *testing.T) {
 	// Use a much smaller block size for this test, and not a multiple of
 	// block cipher buffer length (512) to shake out block boundary issues.
-	oldMaxBlockSize := maxBlockSize
-	maxBlockSize = 1023
+	oldBlockSize := flags.BlockSize
+	flags.BlockSize = 1023
 	defer func() {
-		maxBlockSize = oldMaxBlockSize
+		flags.BlockSize = oldBlockSize
 	}()
 
 	const (
