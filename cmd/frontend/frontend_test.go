@@ -57,20 +57,6 @@ func TestHTTPSRedirect(t *testing.T) {
 	}
 }
 
-func TestHSTS(t *testing.T) {
-	once.Do(startServer)
-	resp, err := http.Get("http://" + addr + "/_test")
-	if err != nil {
-		t.Fatalf("expected no error when creating request, but got %v", err)
-	}
-	defer resp.Body.Close()
-	expected := "max-age=86400; includeSubDomains"
-	if resp.Header["Strict-Transport-Security"][0] != expected {
-		t.Errorf("expected Strict-Transport-Security to be set to %q, got %q",
-			expected, resp.Header["Strict-Transport-Security"][0])
-	}
-}
-
 func TestNoGzip(t *testing.T) {
 	once.Do(startServer)
 	req, err := http.NewRequest("GET", "http://"+addr+"/_test", nil)
