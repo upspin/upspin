@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0a31f49c_56c8db8b",
+        "filename": "CONDUCT.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-17T19:13:45Z",
+      "side": 1,
+      "message": "Can we just leave out this list?  I don\u0027t condone harassing anyone even outside those parameters.",
+      "range": {
+        "startLine": 7,
+        "startChar": 55,
+        "endLine": 10,
+        "endChar": 12
+      },
+      "revId": "2e15120bfd01fcd82549a364c8a0ce838aaefeef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
