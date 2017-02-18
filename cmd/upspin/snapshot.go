@@ -7,6 +7,7 @@ package main
 import (
 	"flag"
 
+	"upspin.io/errors"
 	"upspin.io/path"
 	"upspin.io/upspin"
 	"upspin.io/user"
@@ -33,6 +34,14 @@ the directory server for the user's root supports them.
 		suffixedUser = u + "+snapshot@" + domain
 	} else {
 		suffixedUser = u[:len(u)-len(suffix)-1] + "+snapshot@" + domain
+	}
+
+	// Is the root for the snapshot already created?
+	_, err = s.client.Lookup(upspin.PathName(suffixedUser), false)
+	if err != nil && errors.Match(errors.E(errors.NotExist), err) {
+		s.exitf("User %q does not have a snapshot root. To enable snapshots, do:\n\nupspin mkdir %s\n", s.config.UserName(), suffixedUser)
+	} else if err != nil {
+		s.exit(err)
 	}
 
 	// Put a new DirEntry that triggers the snapshotting process.
