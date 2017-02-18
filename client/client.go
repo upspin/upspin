@@ -455,6 +455,22 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 	if entry.IsDir() {
 		return nil, errors.E(op, name, errors.IsDir)
 	}
+
+	// TODO(ehg) issue #179  Should we believe Writer? ***********************
+	// This should also be done for file.go Open.
+	writer := entry.Writer
+	parsed, err := path.Parse(name)
+	if err != nil {
+		return nil, err
+	}
+	root := parsed.User()
+	if root != writer {
+		// TODO This is ok if writer has write permission in this directory,
+		// maybe test by borrowing from Put's Access parsing.
+		fmt.Println("lookup(", name, ")=", name, "; writer ", writer, "!=", root)
+		return nil, errors.E(op, writer, "implausible writer")
+	}
+
 	ss := s.StartSpan("ReadAll")
 	data, err := clientutil.ReadAll(c.config, entry)
 	ss.End()
@@ -533,6 +549,7 @@ func (c *Client) lookup(op string, entry *upspin.DirEntry, fn lookupFn, followFi
 			return resultEntry, nil, errors.E(op, err)
 		}
 		// We have a link.
+		// TODO(ehg) Verify resultEntry signature, so we can trust the link.
 		// First, allocate a new entry if necessary so we don't overwrite user's memory.
 		if !copied {
 			tmp := *entry

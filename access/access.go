@@ -13,7 +13,7 @@
 //
 //	Read: email@domain,com, email2@domain.com
 //	Write: writer@domain.com, writer2@domain.com, writer3@example,com
-//	Append,Write: appender@example.com # This is a comment
+//	List: lister@example.com # This is a comment
 package access
 
 import (
