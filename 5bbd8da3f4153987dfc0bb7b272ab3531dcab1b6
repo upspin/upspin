@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "16af2ad4_6a76c147",
+        "filename": "cmd/cacheserver/cacheutil/start.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-18T00:55:17Z",
+      "side": 1,
+      "message": "s/2016/2017/",
+      "revId": "5bbd8da3f4153987dfc0bb7b272ab3531dcab1b6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c028112a_3a4ac5f1",
+        "filename": "cmd/cacheserver/cacheutil/start.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-18T00:55:17Z",
+      "side": 1,
+      "message": "drop parens?",
+      "revId": "5bbd8da3f4153987dfc0bb7b272ab3531dcab1b6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
