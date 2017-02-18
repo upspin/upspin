@@ -15,6 +15,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"sync"
 	"upspin.io/errors"
 	"upspin.io/upspin"
 )
@@ -38,16 +39,20 @@ type LogEntry struct {
 // Tree (provided through its Config struct) to log changes.
 type Log struct {
 	user upspin.UserName // user for whom this log is intended.
-	file *os.File        // file descriptor for the log.
+
+	mu   *sync.Mutex // protects the file, making reads/write atomic.
+	file *os.File    // file descriptor for the log.
 }
 
 // LogIndex reads and writes from/to stable storage the log state information
 // and the user's root entry. It is used by Tree to track its progress
 // processing the log and storing the root.
 type LogIndex struct {
-	user      upspin.UserName // user for whom this logindex is intended.
-	indexFile *os.File        // file descriptor for the last index in the log.
-	rootFile  *os.File        // file descriptor for the root of the tree.
+	user upspin.UserName // user for whom this logindex is intended.
+
+	mu        *sync.Mutex // protects the files, making reads/write atomic.
+	indexFile *os.File    // file descriptor for the last index in the log.
+	rootFile  *os.File    // file descriptor for the root of the tree.
 }
 
 // NewLogs returns a new Log and a new LogIndex for a user, logging to and from
@@ -68,6 +73,7 @@ func NewLogs(user upspin.UserName, directory string) (*Log, *LogIndex, error) {
 	}
 	l := &Log{
 		user: user,
+		mu:   &sync.Mutex{},
 		file: loggerFile,
 	}
 
@@ -83,6 +89,7 @@ func NewLogs(user upspin.UserName, directory string) (*Log, *LogIndex, error) {
 	}
 	li := &LogIndex{
 		user:      user,
+		mu:        &sync.Mutex{},
 		indexFile: indexFile,
 		rootFile:  rootFile,
 	}
@@ -163,11 +170,19 @@ func (l *Log) Append(e *LogEntry) error {
 	if err != nil {
 		return err
 	}
+
+	l.mu.Lock()
+	defer l.mu.Unlock()
+
 	_, err = l.file.Seek(0, io.SeekEnd)
 	if err != nil {
 		return errors.E(op, errors.IO, err)
 	}
 	_, err = l.file.Write(buf)
+	if err != nil {
+		return errors.E(op, errors.IO, err)
+	}
+	err = l.file.Sync()
 	if err != nil {
 		return errors.E(op, errors.IO, err)
 	}
@@ -179,9 +194,11 @@ func (l *Log) Append(e *LogEntry) error {
 // error occurred after reading some entries (<n).
 func (l *Log) ReadAt(n int, offset int64) (dst []LogEntry, next int64, err error) {
 	const op = "dir/server/tree.Log.Read"
+	l.mu.Lock()
+	defer l.mu.Unlock()
 
 	// TODO: don't seek. Use file.ReadAt instead.
-	fileOffset := l.LastOffset()
+	fileOffset := l.lastOffset()
 	if offset >= fileOffset {
 		// End of file.
 		return dst, fileOffset, nil
@@ -211,6 +228,14 @@ func (l *Log) ReadAt(n int, offset int64) (dst []LogEntry, next int64, err error
 
 // LastOffset returns the offset of the end of the file or -1 on error.
 func (l *Log) LastOffset() int64 {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	return l.lastOffset()
+}
+
+// lastOffset returns the offset of the end of the file or -1 on error.
+// l.mu must be held.
+func (l *Log) lastOffset() int64 {
 	fi, err := l.file.Stat()
 	if err != nil {
 		return -1
@@ -221,6 +246,9 @@ func (l *Log) LastOffset() int64 {
 // Truncate truncates the log at offset.
 func (l *Log) Truncate(offset int64) error {
 	const op = "dir/server/tree.Log.Truncate"
+	l.mu.Lock()
+	defer l.mu.Unlock()
+
 	err := l.file.Truncate(offset)
 	if err != nil {
 		return errors.E(op, err)
@@ -231,6 +259,9 @@ func (l *Log) Truncate(offset int64) error {
 // Clone makes a read-only copy of the log.
 func (l *Log) Clone() (*Log, error) {
 	const op = "dir/server/tree.Log.Clone"
+	l.mu.Lock()
+	defer l.mu.Unlock()
+
 	f, err := os.Open(l.file.Name())
 	if err != nil {
 		return nil, errors.E(op, errors.IO, err)
@@ -249,6 +280,9 @@ func (li *LogIndex) User() upspin.UserName {
 // Root returns the user's root by retrieving it from local stable storage.
 func (li *LogIndex) Root() (*upspin.DirEntry, error) {
 	const op = "dir/server/tree.LogIndex.Root"
+	li.mu.Lock()
+	defer li.mu.Unlock()
+
 	var root upspin.DirEntry
 	buf, err := readAllFromTop(op, li.rootFile)
 	if err != nil {
@@ -274,18 +308,27 @@ func (li *LogIndex) SaveRoot(root *upspin.DirEntry) error {
 	if err != nil {
 		return errors.E(op, err)
 	}
+
+	li.mu.Lock()
+	defer li.mu.Unlock()
 	return overwriteAndSync(op, li.rootFile, buf)
 }
 
 // DeleteRoot deletes the root.
 func (li *LogIndex) DeleteRoot() error {
 	const op = "dir/server/tree.LogIndex.DeleteRoot"
+	li.mu.Lock()
+	defer li.mu.Unlock()
+
 	return overwriteAndSync(op, li.rootFile, []byte{})
 }
 
 // Clone makes a read-only copy of the log index.
 func (li *LogIndex) Clone() (*LogIndex, error) {
 	const op = "dir/server/tree.LogIndex.Clone"
+	li.mu.Lock()
+	defer li.mu.Unlock()
+
 	idx, err := os.Open(li.indexFile.Name())
 	if err != nil {
 		return nil, errors.E(op, errors.IO, err)
@@ -331,6 +374,9 @@ func readAllFromTop(op string, f *os.File) ([]byte, error) {
 // ReadOffset reads from stable storage the offset saved by SaveOffset.
 func (li *LogIndex) ReadOffset() (int64, error) {
 	const op = "dir/server/tree.LogIndex.ReadOffset"
+	li.mu.Lock()
+	defer li.mu.Unlock()
+
 	buf, err := readAllFromTop(op, li.indexFile)
 	if err != nil {
 		return 0, errors.E(op, errors.IO, err)
@@ -353,6 +399,10 @@ func (li *LogIndex) SaveOffset(offset int64) error {
 	}
 	var tmp [16]byte // For use by PutVarint.
 	n := binary.PutVarint(tmp[:], offset)
+
+	li.mu.Lock()
+	defer li.mu.Unlock()
+
 	return overwriteAndSync(op, li.indexFile, tmp[:n])
 }
 
