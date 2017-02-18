@@ -24,6 +24,7 @@ import (
 
 	"upspin.io/bind"
 	"upspin.io/client"
+	"upspin.io/cmd/cacheserver/cacheutil"
 	"upspin.io/config"
 	"upspin.io/flags"
 	"upspin.io/metric"
@@ -88,6 +89,9 @@ func main() {
 
 	state := newState(strings.ToLower(flag.Arg(0)))
 	args := flag.Args()[1:]
+
+	// Start the cache if needed.
+	cacheutil.Start(state.config)
 
 	// Shell cannot be in commands because of the initialization loop,
 	// and anyway we should avoid recursion in the interpreter.
@@ -426,4 +430,13 @@ func boolFlag(fs *flag.FlagSet, name string) bool {
 // stringFlag returns the value of the named string flag in the flag set.
 func stringFlag(fs *flag.FlagSet, name string) string {
 	return fs.Lookup(name).Value.(flag.Getter).Get().(string)
+}
+
+// defaultCacheDir returns the default directory for all cached files.
+func defaultCacheDir() string {
+	homeDir := os.Getenv("HOME")
+	if len(homeDir) == 0 {
+		homeDir = "/etc"
+	}
+	return homeDir + "/upspin"
 }
