@@ -7,6 +7,7 @@ package main
 import (
 	"flag"
 
+	"upspin.io/errors"
 	"upspin.io/path"
 	"upspin.io/upspin"
 	"upspin.io/user"
@@ -33,6 +34,17 @@ the directory server for the user's root supports them.
 		suffixedUser = u + "+snapshot@" + domain
 	} else {
 		suffixedUser = u[:len(u)-len(suffix)-1] + "+snapshot@" + domain
+	}
+
+	// Is the root for the snapshot already created?
+	_, err = s.client.Lookup(upspin.PathName(suffixedUser), false)
+	if err != nil && errors.Match(errors.E(errors.NotExist), err) {
+		_, err = s.client.MakeDirectory(upspin.PathName(suffixedUser + "/"))
+		if err != nil {
+			s.exit(err)
+		}
+	} else if err != nil {
+		s.exit(err)
 	}
 
 	// Put a new DirEntry that triggers the snapshotting process.
