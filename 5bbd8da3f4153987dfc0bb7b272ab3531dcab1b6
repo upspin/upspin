@@ -33,6 +33,40 @@
       "revId": "5bbd8da3f4153987dfc0bb7b272ab3531dcab1b6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a9ba9216_1aff356f",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 435,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-18T00:56:16Z",
+      "side": 1,
+      "message": "isn\u0027t this the flag now?",
+      "revId": "5bbd8da3f4153987dfc0bb7b272ab3531dcab1b6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5b5e94a5_f1b59f38",
+        "filename": "flags/flags.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-18T00:56:16Z",
+      "side": 1,
+      "message": "s/\u0027/`/g\n\nit\u0027s backquotes that have the magic",
+      "revId": "5bbd8da3f4153987dfc0bb7b272ab3531dcab1b6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
