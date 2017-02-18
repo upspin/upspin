@@ -16,9 +16,7 @@ import (
 // service returns data and metadata referenced by the request.
 // There is one for each Dial call.
 type service struct {
-	// userName identifies the user accessing the service. TODO: unused.
-	userName upspin.UserName
-	data     *dataService
+	data *dataService
 }
 
 var _ upspin.StoreServer = (*service)(nil)
@@ -41,8 +39,8 @@ type dataService struct {
 	endpoint upspin.Endpoint
 	// mu protects the fields of dataService.
 	mu sync.Mutex
-	// serviceOwner identifies the user running the dataService. TODO: unused.
-	serviceOwner upspin.UserName
+	// dialed reports whether anyone has dialed us.
+	dialed bool
 	// blob contains the underlying data.
 	blob map[upspin.Reference][]byte // reference is made from SHA256 hash of data.
 }
@@ -127,13 +125,11 @@ func (s *service) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service,
 	}
 	s.data.mu.Lock()
 	defer s.data.mu.Unlock()
-	if s.data.serviceOwner == "" {
-		// This is the first call; set the owner and endpoint.
+	if !s.data.dialed {
+		// This is the first call; set the endpoint.
 		s.data.endpoint = e
-		s.data.serviceOwner = config.UserName()
 	}
 	thisStore := *s // Make a copy.
-	thisStore.userName = config.UserName()
 	return &thisStore, nil
 }
 
