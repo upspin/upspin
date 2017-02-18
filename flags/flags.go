@@ -20,6 +20,9 @@ var (
 	// BlockSize is the block size used when writing large files. The default is 1MB.
 	BlockSize = 1024 * 1024 // Keep in sync with upspin.BlockSize.
 
+	// CacheDir specifies the directory for the various file caches.
+	CacheDir = filepath.Join(os.Getenv("HOME"), "/upspin")
+
 	// Config names the Upspin configuration file to use.
 	Config = filepath.Join(os.Getenv("HOME"), "/upspin/config")
 
@@ -67,6 +70,9 @@ var flags = map[string]func(){
 	},
 	"blocksize": func() {
 		flag.IntVar(&BlockSize, "blocksize", BlockSize, "`size` of blocks when writing large files")
+	},
+	"cachedir": func() {
+		flag.StringVar(&CacheDir, "cachedir", CacheDir, "`directory` containing all file caches")
 	},
 	"config": func() {
 		flag.StringVar(&Config, "config", Config, "user's configuration `file`")

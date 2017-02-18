@@ -10,7 +10,6 @@ import (
 	"flag"
 	"net"
 	"net/http"
-	"os"
 
 	"upspin.io/config"
 	"upspin.io/dir/dircache"
@@ -37,7 +36,6 @@ import (
 const serverName = "cacheserver"
 
 var (
-	cacheFlag     = flag.String("cache", defaultCacheDir(), "`directory` for cache")
 	cacheSizeFlag = flag.Int64("cachesize", 5e9, "max disk `bytes` for cache")
 	writethrough  = flag.Bool("writethrough", false, "make storage cache writethrough")
 )
@@ -70,13 +68,13 @@ func main() {
 	maxRefBytes := (9 * (*cacheSizeFlag)) / 10
 	maxLogBytes := maxRefBytes / 9
 
-	sc, blockFlusher, err := storecache.New(cfg, *cacheFlag, maxRefBytes, *writethrough)
+	sc, blockFlusher, err := storecache.New(cfg, flags.CacheDir, maxRefBytes, *writethrough)
 	if err != nil {
 		log.Fatalf("opening cache: %s", err)
 	}
 	ss := storeserver.New(cfg, sc, "")
 
-	dc, err := dircache.New(cfg, *cacheFlag, maxLogBytes, blockFlusher)
+	dc, err := dircache.New(cfg, flags.CacheDir, maxLogBytes, blockFlusher)
 	if err != nil {
 		log.Fatalf("opening cache: %s", err)
 	}
@@ -91,12 +89,4 @@ func main() {
 	http.Handle("/api/Dir/", ds)
 	err = http.Serve(ln, nil)
 	log.Fatalf("serve: %v", err)
-}
-
-func defaultCacheDir() string {
-	homeDir := os.Getenv("HOME")
-	if len(homeDir) == 0 {
-		homeDir = "/etc"
-	}
-	return homeDir + "/upspin"
 }
