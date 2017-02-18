@@ -20,6 +20,9 @@ var (
 	// ServerConfig specifies configuration options ("key=value") for servers.
 	ServerConfig []string
 
+	// CacheDir specifies the directory for the various file caches.
+	CacheDir = filepath.Join(os.Getenv("HOME"), "/upspin")
+
 	// Config names the Upspin configuration file to use.
 	Config = filepath.Join(os.Getenv("HOME"), "/upspin/config")
 
@@ -61,6 +64,9 @@ var (
 var flags = map[string]func(){
 	"serverconfig": func() {
 		flag.Var(configFlag{&ServerConfig}, "serverconfig", "comma-separated list of configuration options (key=value) for this server")
+	},
+	"cachedir": func() {
+		flag.StringVar(&CacheDir, "cachedir", CacheDir, "`directory` containing all file caches")
 	},
 	"config": func() {
 		flag.StringVar(&Config, "config", Config, "user's configuration `file`")
