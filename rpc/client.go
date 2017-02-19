@@ -256,7 +256,10 @@ func decodeStream(stream ResponseChan, r io.ReadCloser, done <-chan struct{}) {
 
 	// A stream begins with the bytes "OK".
 	var ok [2]byte
-	if _, err := readFull(r, ok[:], done); err != nil {
+	if _, err := readFull(r, ok[:], done); err == io.ErrUnexpectedEOF {
+		// Server closed the stream.
+		return
+	} else if err != nil {
 		stream.Error(errors.E(errors.IO, err))
 		return
 	}
