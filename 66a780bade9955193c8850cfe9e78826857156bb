@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f937ba94_3903b06a",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 862,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-19T22:03:47Z",
+      "side": 1,
+      "message": "really does feel like it could be a loop, though, doesn\u0027t it?",
+      "revId": "66a780bade9955193c8850cfe9e78826857156bb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
