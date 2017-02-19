@@ -175,7 +175,7 @@ func (s *State) shareCommand(fs *flag.FlagSet) {
 			// Check whether readers include "all", because we have encryption but
 			// no way to get all the world's keys. If -fix is set, we'll report below.
 			for _, user := range users {
-				if user == access.AllUsers && !s.sharer.unencryptForAll {
+				if user == access.AllUsers {
 					fmt.Fprintf(os.Stderr, "%s:\n\tWarning: file readable by \"all\" but encrypted. Cannot add keys.", entry.Name)
 					fmt.Fprintf(os.Stderr, "\n\tTo decrypt and make readable by \"all\", run share -fix -unencryptforall %q", entry.Name)
 					s.exitCode = 1
