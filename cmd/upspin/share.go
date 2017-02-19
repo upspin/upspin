@@ -33,6 +33,11 @@ to resolve any such inconsistency. Given both -fix and -force, it
 updates the keys regardless. The -d and -r flags apply to directories;
 -r states whether the share command should descend into subdirectories.
 
+For the rare case of a world-readable ("read:all") file that is encrypted,
+the -unencryptforall flag in combination with -fix will rewrite the file
+using the EEIntegrity packing, decrypting it and making its contents
+visible to anyone.
+
 See the description for rotate for information about updating keys.
 `
 	fs := flag.NewFlagSet("share", flag.ExitOnError)
@@ -40,6 +45,7 @@ See the description for rotate for information about updating keys.
 	force := fs.Bool("force", false, "replace wrapped keys regardless of current state")
 	isDir := fs.Bool("d", false, "do all files in directory; path must be a directory")
 	recur := fs.Bool("r", false, "recur into subdirectories; path must be a directory. assumes -d")
+	unencryptForAll := fs.Bool("unencryptforall", false, "for currently encrypted read:all files only, rewrite using EEIntegrity; requires -fix or -force")
 	fs.Bool("q", false, "suppress output. Default is to show state for every file")
 	s.parseFlags(fs, args, help, "share path...")
 	if fs.NArg() == 0 {
@@ -52,6 +58,9 @@ See the description for rotate for information about updating keys.
 	if *force {
 		*fix = true
 	}
+	if *unencryptForAll && !*fix {
+		s.exitf("-unencryptforall requires -fix or -force")
+	}
 	s.shareCommand(fs)
 }
 
@@ -61,11 +70,12 @@ type Sharer struct {
 	state *State
 
 	// Flags.
-	fix   bool
-	force bool
-	isDir bool
-	recur bool
-	quiet bool
+	fix             bool
+	force           bool
+	isDir           bool
+	recur           bool
+	quiet           bool
+	unencryptForAll bool
 
 	// accessFiles contains the parsed Access files, keyed by directory to which it applies.
 	accessFiles map[upspin.PathName]*access.Access
@@ -98,6 +108,7 @@ func (s *State) shareCommand(fs *flag.FlagSet) {
 	s.sharer.isDir = boolFlag(fs, "d")
 	s.sharer.recur = boolFlag(fs, "r")
 	s.sharer.quiet = boolFlag(fs, "q")
+	s.sharer.unencryptForAll = boolFlag(fs, "unencryptforall")
 	// To change things, User must be the owner of every file.
 	if s.sharer.fix {
 		for _, name := range names {
@@ -160,21 +171,18 @@ func (s *State) shareCommand(fs *flag.FlagSet) {
 			fmt.Fprintf(os.Stderr, "looking up users for %q: %s", entry.Name, err)
 			continue
 		}
-		if !s.sharer.quiet {
+		if !s.sharer.quiet && !s.sharer.fix {
 			// Check whether readers include "all", because we have encryption but
-			// no way to get all the world's keys.
-			for i, user := range users {
-				if user == access.AllUsers {
-					fmt.Fprintf(os.Stderr, "%s:\n\tWarning: file readable by \"all\" but encrypted.", entry.Name)
-					// There will always be at least one reader, the owner, so the print always looks right.
-					userList := userListToString(append(users[:i], users[i+1:]...))
-					fmt.Fprintf(os.Stderr, "\n\tSharing can be fixed only for these readers: %s", userList)
+			// no way to get all the world's keys. If -fix is set, we'll report below.
+			for _, user := range users {
+				if user == access.AllUsers && !s.sharer.unencryptForAll {
+					fmt.Fprintf(os.Stderr, "%s:\n\tWarning: file readable by \"all\" but encrypted. Cannot add keys.", entry.Name)
+					fmt.Fprintf(os.Stderr, "\n\tTo decrypt and make readable by \"all\", run share -fix -unencryptforall %q", entry.Name)
 					s.exitCode = 1
 					break
 				}
 			}
 		}
-		entriesToFix = append(entriesToFix, entry)
 		userList := userListToString(users)
 		if userList != keyUsers || self {
 			if !s.sharer.quiet {
@@ -439,6 +447,17 @@ func (s *Sharer) fixShare(name upspin.PathName, users []upspin.UserName) {
 	// Could do this more efficiently, calling Share collectively, but the Puts are sequential anyway.
 	keys := make([]upspin.PublicKey, 0, len(users))
 	for _, user := range users {
+		// If user is "all", we need to decrypt the file to make progress. We know the file is encrypted.
+		if user == access.AllUsers {
+			if !s.unencryptForAll {
+				fmt.Fprintf(os.Stderr, "Encrypted file %q has read:all access; cannot add keys.\n", name)
+				fmt.Fprintf(os.Stderr, "To fix for everyone, rerun with -unencryptforall flag.\n")
+				s.state.exitCode = 1
+				return
+			}
+			s.decrypt(entry)
+			return
+		}
 		// Erroneous or wildcard users will have empty keys here, and be ignored.
 		if k := s.lookupKey(user); len(k) > 0 {
 			// TODO: Make this general. This works now only because we are always using ee.
@@ -461,6 +480,24 @@ func (s *Sharer) fixShare(name upspin.PathName, users []upspin.UserName) {
 		// TODO: implement links.
 		fmt.Fprintf(os.Stderr, "error putting entry back for %q: %s\n", name, err)
 		s.state.exitCode = 1
+	}
+}
+
+// decrypt replaces the contents of the encrypted file with cleartext in EEIntegrityPack.
+func (s *Sharer) decrypt(entry *upspin.DirEntry) {
+	data, err := s.state.client.Get(entry.Name)
+	if err != nil {
+		s.state.failf("reading clear text: %v", err)
+		return
+	}
+	// We have the entry, with an encryption packing, and the clear text.
+	// Fix the packing and overwrite.
+	entry.Blocks = nil // Lose the old blocks.
+	entry.Packing = upspin.EEIntegrityPack
+	_, err = s.state.client.Put(entry.Name, data)
+	if err != nil {
+		s.state.failf("writing back decrypted text: %v", err)
+		return
 	}
 }
 
