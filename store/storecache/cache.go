@@ -33,13 +33,14 @@ import (
 // cachedRef represents a cached object referred to by an upspin.Reference.
 type cachedRef struct {
 	sync.Mutex
-	c     *storeCache
-	ref   upspin.Reference
-	size  int64
-	store upspin.Endpoint // Store reference belongs to (not yet used).
-	busy  bool            // True if the ref is in the process of being cached.
-	hold  *sync.Cond      // Wait here if some other func is caching the ref.
-	valid bool            // True if successfully cached.
+	c      *storeCache
+	ref    upspin.Reference
+	size   int64
+	store  upspin.Endpoint // Store reference belongs to (not yet used).
+	busy   bool            // True if the ref is in the process of being cached.
+	hold   *sync.Cond      // Wait here if some other func is caching the ref.
+	valid  bool            // True if successfully cached.
+	remove bool            // Remove when no longer busy.
 }
 
 // storeCache represents a write-through cache for references. If, upon adding to the cache,
@@ -203,6 +204,9 @@ func (c *storeCache) get(cfg upspin.Config, ref upspin.Reference, e upspin.Endpo
 	defer func() {
 		cr.busy = false
 		cr.hold.Signal()
+		if cr.remove {
+			cr.removeFile(file)
+		}
 		cr.Unlock()
 	}()
 
@@ -355,9 +359,7 @@ func (c *storeCache) delete(cfg upspin.Config, ref upspin.Reference, e upspin.En
 		return nil
 	}
 	c.lru.Remove(file)
-	if err := os.Remove(file); err != nil {
-		log.Info.Printf("removing %v: %s", ref, err)
-	}
+	cr.removeFile(file)
 	return nil
 }
 
@@ -424,6 +426,12 @@ func (cr *cachedRef) saveToCacheFile(file string, data []byte) error {
 	cr.valid = true
 	cr.busy = false
 
+	// If the file was purged from the cache during the put, remove it.
+	// Unususual but possible with a small cache and simultaneous puts.
+	if cr.remove {
+		cr.removeFile(file)
+	}
+
 	// Update the total bytes cached.
 	atomic.AddInt64(&cr.c.inUse, cr.size)
 	return nil
@@ -437,11 +445,9 @@ func (c *storeCache) enforceByteLimitByRemovingLeastRecentlyUsedFile() {
 			break
 		}
 		c.Lock()
-		key, value := c.lru.RemoveOldest()
-		atomic.AddInt64(&c.inUse, -value.(*cachedRef).size)
-		if err := os.Remove(key.(string)); err != nil {
-			log.Info.Printf("error enforcing byte limit: %s", err)
-		}
+		// RemoveOldest will call OnEviction so let it do the
+		// bookkeeping and file removal.
+		c.lru.RemoveOldest()
 		c.Unlock()
 	}
 }
@@ -452,12 +458,21 @@ func (cr *cachedRef) OnEviction(key interface{}) {
 	cr.Lock()
 	defer cr.Unlock()
 	if cr.busy {
-		// Someone is trying to read this in. Don't bother removing anything
+		// Someone is trying to read this in or put it. Don't bother removing anything
 		// but this is an odd situation so log it.
 		log.Info.Printf("cache file busy on eviction: %s", file)
+		// Remember to remove it when it is no longer busy.
+		cr.remove = true
 		return
 	}
+	cr.removeFile(file)
+}
+
+// removeFile removes a file from the cache and updates the count of bytes in use.
+// This is called with cr locked.
+func (cr *cachedRef) removeFile(file string) {
 	cr.valid = false
+	cr.remove = false
 	atomic.AddInt64(&cr.c.inUse, -cr.size)
 	if err := os.Remove(file); err != nil {
 		log.Info.Printf("can't remove file on eviction: %s", err)
