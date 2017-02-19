@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "44ee2d50_cca47c38",
+        "filename": "cmd/upspin/snapshot.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-19T23:20:06Z",
+      "side": 1,
+      "message": "We should just do the mkdir here.\nThe user is asking to create a snapshot.\nIf that involves creating the snapshot root, then why not do it?",
+      "revId": "7ad761c22433e06b5c657b5e0d4084c3e518d419",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
