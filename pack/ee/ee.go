@@ -231,7 +231,7 @@ func (bp *blockPacker) Close() error {
 	if err != nil {
 		return errors.E(op, name, err)
 	}
-	wrap[0], err = aesWrap(p, bp.dkey)
+	wrap[0], err = gcmWrap(p, bp.dkey)
 	if err != nil {
 		return errors.E(op, name, err)
 	}
@@ -262,7 +262,7 @@ func (bp *blockPacker) Close() error {
 			if err != nil {
 				return errors.E(op, name, owner, err)
 			}
-			wrap[1], err = aesWrap(p, bp.dkey)
+			wrap[1], err = gcmWrap(p, bp.dkey)
 			if err != nil {
 				return errors.E(op, name, owner, err)
 			}
@@ -474,7 +474,7 @@ func (ee ee) Share(cfg upspin.Config, readers []upspin.PublicKey, packdata []*[]
 			}
 			pw, ok := alreadyWrapped[hash[i]]
 			if !ok { // then need to wrap
-				w, err := aesWrap(pubkey[i], dkey)
+				w, err := gcmWrap(pubkey[i], dkey)
 				if err != nil {
 					continue
 				}
@@ -649,8 +649,8 @@ func Countersign(oldKey upspin.PublicKey, f upspin.Factotum, d *upspin.DirEntry)
 	return nil
 }
 
-// aesWrap implements NIST 800-56Ar2; see also RFC6637 §8.
-func aesWrap(R *ecdsa.PublicKey, dkey []byte) (w wrappedKey, err error) {
+// gcmWrap implements NIST 800-56Ar2; see also RFC6637 §8.
+func gcmWrap(R *ecdsa.PublicKey, dkey []byte) (w wrappedKey, err error) {
 	// Step 1.  Create shared Diffie-Hellman secret.
 	// v, V=vG  ephemeral key pair
 	// S = vR   shared point
@@ -856,6 +856,10 @@ func crypt(out, in []byte, blockCipher cipher.Block, offset int64) error {
 	iv[bs-2] = byte(ivStart >> 8)
 	iv[bs-3] = byte(ivStart >> 16)
 	iv[bs-4] = byte(ivStart >> 24)
+	iv[bs-5] = byte(ivStart >> 32)
+	iv[bs-6] = byte(ivStart >> 40)
+	iv[bs-7] = byte(ivStart >> 48)
+	iv[bs-8] = byte(ivStart >> 56)
 
 	ctr := cipher.NewCTR(blockCipher, iv)
 
