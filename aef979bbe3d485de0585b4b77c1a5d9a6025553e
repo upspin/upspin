@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4767d7ed_6449769a",
+        "filename": "cmd/upspin/share.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-19T22:39:04Z",
+      "side": 1,
+      "message": "From the check up top, if unencrytForAll is set so must fix.  So isn\u0027t this check always false?",
+      "range": {
+        "startLine": 178,
+        "startChar": 34,
+        "endLine": 178,
+        "endChar": 59
+      },
+      "revId": "aef979bbe3d485de0585b4b77c1a5d9a6025553e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
