@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c6f933fd_719dbd81",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-20T16:04:56Z",
+      "side": 1,
+      "message": "the parenthetical has an unclear antecedent, making it sound like Linux is a Go program\n\nYou can run `upspinserver` on any server, including Linux ....,\nas long as it ...",
+      "revId": "9126afb0313eb086401d828baed0d4ac1f924cdd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4a463e7d_7b677fb8",
+        "filename": "doc/server_setup_ubuntu.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-20T16:04:56Z",
+      "side": 1,
+      "message": "`upspin`",
+      "revId": "9126afb0313eb086401d828baed0d4ac1f924cdd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
