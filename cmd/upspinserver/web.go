@@ -60,16 +60,12 @@ func (s *web) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	des, err := s.cli.Glob(string(name))
-	if errors.Match(errors.E(errors.Private), err) || errors.Match(errors.E(errors.Permission), err) {
-		http.Error(w, "Forbidden", http.StatusForbidden)
-		return
-	} else if err != nil {
-		http.Error(w, "Glob: "+err.Error(), http.StatusInternalServerError)
+	if err != nil {
+		httpError(w, err)
 		return
 	}
 	if len(des) == 0 {
-		code := http.StatusNotFound
-		http.Error(w, http.StatusText(code), code)
+		http.Error(w, "Not found", http.StatusNotFound)
 		return
 	}
 
@@ -83,8 +79,7 @@ func (s *web) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			d.Dir = des[0]
 			d.Content, err = s.cli.Glob(string(name) + "/*")
 			if err != nil {
-				// TODO(adg): use correct status code for 'information withheld'
-				http.Error(w, "Glob: "+err.Error(), http.StatusInternalServerError)
+				httpError(w, err)
 				return
 			}
 			if p.NElem() > 0 {
@@ -100,11 +95,20 @@ func (s *web) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Serve the file.
 	data, err := s.cli.Get(name)
 	if err != nil {
-		// TODO(adg): use correct status code for 'information withheld'
-		http.Error(w, "Get: "+err.Error(), http.StatusInternalServerError)
+		httpError(w, err)
 		return
 	}
 	w.Write(data)
+}
+
+func httpError(w http.ResponseWriter, err error) {
+	switch {
+	case errors.Match(errors.E(errors.Private), err),
+		errors.Match(errors.E(errors.Permission), err):
+		http.Error(w, "Forbidden", http.StatusForbidden)
+	default:
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 type dirTemplateData struct {
