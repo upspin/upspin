@@ -15,8 +15,8 @@ import (
 // EvictionNotifier is an optional interface used by LRU entries that wish to be
 // notified when they are being deleted from the LRU. If implemented by the
 // value of an LRU entry, OnEviction is called when it's time for that
-// entry to be evicted. It is not called if the entry is removed by the LRU's
-// Remove method.
+// entry to be evicted, due to an Add. It is not called if the entry is removed
+// by the LRU's Remove or RemoveOldest methods.
 type EvictionNotifier interface {
 	// OnEviction is called on the value of an LRU entry when it's about
 	// to be evicted from the cache. This method must not call the LRU
@@ -37,6 +37,8 @@ type LRU struct {
 type entry struct {
 	key, value interface{}
 }
+
+const runEvictionNotifier = true
 
 // NewLRU returns a new cache with the provided maximum items.
 func NewLRU(maxEntries int) *LRU {
@@ -65,7 +67,7 @@ func (c *LRU) Add(key, value interface{}) {
 	c.cache[key] = ele
 
 	if c.ll.Len() > c.maxEntries {
-		c.removeOldest()
+		c.removeOldest(runEvictionNotifier)
 	}
 }
 
@@ -81,15 +83,18 @@ func (c *LRU) Get(key interface{}) (value interface{}, ok bool) {
 	return
 }
 
-// RemoveOldest removes the oldest item in the cache and returns its key and value.
-// If the cache is empty, the empty string and nil are returned.
+// RemoveOldest removes the oldest item in the cache and returns its key and
+// value. If the cache is empty, the empty string and nil are returned. The
+// value's EvictionNotifier if not run.
 func (c *LRU) RemoveOldest() (key, value interface{}) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	return c.removeOldest()
+	return c.removeOldest(!runEvictionNotifier)
 }
 
-// Remove removes a key from the cache. The return value is the value that was removed or nil if the key was not present.
+// Remove removes a key from the cache. The return value is the value that was
+// removed or nil if the key was not present. The value's EvictionNotifier is
+// not run by Remove.
 func (c *LRU) Remove(key interface{}) interface{} {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -101,15 +106,18 @@ func (c *LRU) Remove(key interface{}) interface{} {
 }
 
 // note: must hold c.mu
-func (c *LRU) removeOldest() (key, value interface{}) {
+func (c *LRU) removeOldest(runEvictionNotifier bool) (key, value interface{}) {
 	ele := c.ll.Back()
 	if ele == nil {
 		return
 	}
-	// If LRUDeleter interface is implemented on the value, call it.
-	ent := ele.Value.(*entry)
-	if notifier, ok := ent.value.(EvictionNotifier); ok {
-		notifier.OnEviction(ent.key)
+	if runEvictionNotifier {
+		// If EvictionNotifier interface is implemented on the value,
+		// run it.
+		ent := ele.Value.(*entry)
+		if notifier, ok := ent.value.(EvictionNotifier); ok {
+			notifier.OnEviction(ent.key)
+		}
 	}
 	return c.remove(ele)
 }
