@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "043bb5a7_d7e8245b",
+        "filename": "cmd/cacheserver/cacheutil/start.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-20T23:22:37Z",
+      "side": 1,
+      "message": "// Package cacheutil provides a mechanism to start the cacheserver\n// if a config requires it and it is not already running.\n// It is used by programs like upspin and upspinfs.",
+      "revId": "ee3c70b0caebd68ab0f2e2a5a061f0ac62bbb980",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "26da7dcd_64814473",
+        "filename": "cmd/cacheserver/cacheutil/start.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-20T23:22:37Z",
+      "side": 1,
+      "message": "remove blank line",
+      "revId": "ee3c70b0caebd68ab0f2e2a5a061f0ac62bbb980",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e1e1d2e1_245a5588",
+        "filename": "cmd/cacheserver/cacheutil/start.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-20T23:22:37Z",
+      "side": 1,
+      "message": "// Start starts the cacheserver if the config requires it and it is not already running.",
+      "revId": "ee3c70b0caebd68ab0f2e2a5a061f0ac62bbb980",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "aa404966_d3c5d373",
+        "filename": "cmd/cacheserver/cacheutil/start.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-20T23:22:37Z",
+      "side": 1,
+      "message": "it seems you\u0027re not sync\u0027d, the nil check should be here",
+      "revId": "ee3c70b0caebd68ab0f2e2a5a061f0ac62bbb980",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
