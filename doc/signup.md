@@ -11,11 +11,6 @@ You will need to choose an Upspin username, which is just an email address you
 own.
 Your username is how the Upspin system and its users will identify you and your
 files.
-The mail system you use must be able to sign messages with
-[DKIM](http://www.dkim.org/), which proves that the originator of an email
-message owns the email address and that the agent sending the email owns the
-domain name for that email address.
-Almost any modern mail service as Gmail, Yahoo mail and Hotmail supports DKIM.
 
 Next you need to decide whether you are going to deploy your own Upspin
 directory and store servers, or use those maintained by someone else.
