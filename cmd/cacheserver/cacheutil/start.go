@@ -2,6 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+// TODO(p): document this
+
 // +build !windows
 
 package cacheutil
@@ -22,6 +24,9 @@ import (
 var writethrough = flag.Bool("writethrough", false, "make storage cache writethrough")
 
 func Start(cfg upspin.Config) {
+	if cfg == nil {
+		return
+	}
 	ce := cfg.CacheEndpoint()
 	if ce.Transport == upspin.Unassigned {
 		return // not using a cache server
