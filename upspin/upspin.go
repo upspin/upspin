@@ -247,10 +247,6 @@ const (
 	// TODO(ehg) add "25519":  x/crypto/curve25519, github.com/agl/ed25519
 	EEPack Packing = 20
 
-	// SymmPack stores AES-encrypted data, using a symmetric key.
-	// This is for niche applications needing deterministic encryption.
-	SymmPack Packing = 21
-
 	// EEIntegrityPack provides elliptic-curve end-to-end integrity protection,
 	// like EEPack, but provides no confidentiality.
 	// It is typically used when read access is "all".

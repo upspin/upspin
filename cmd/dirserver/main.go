@@ -29,7 +29,6 @@ import (
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/eeintegrity"
 	_ "upspin.io/pack/plain"
-	_ "upspin.io/pack/symm"
 
 	// Load required transports
 	_ "upspin.io/transports"

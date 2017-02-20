@@ -19,16 +19,7 @@ import (
 
 type fakeStore map[upspin.Reference][]byte
 
-const (
-	aeadOverhead = 16
-)
-
 func TestMultiBlockRoundTrip(t *testing.T, ctx upspin.Config, packer upspin.Packer, userName upspin.UserName) {
-	var overhead int64
-	if packer.Packing() == upspin.SymmPack {
-		overhead = aeadOverhead
-	}
-
 	pathName := upspin.PathName(userName + "/file")
 
 	// Work with 1MB of random data.
@@ -59,7 +50,7 @@ func TestMultiBlockRoundTrip(t *testing.T, ctx upspin.Config, packer upspin.Pack
 	cleartextBlockOffsets := make([]int64, len(de.Blocks))
 	for i, _ := range cleartextBlockOffsets {
 		if i > 0 {
-			cleartextBlockOffsets[i] = cleartextBlockOffsets[i-1] + de.Blocks[i-1].Size - overhead
+			cleartextBlockOffsets[i] = cleartextBlockOffsets[i-1] + de.Blocks[i-1].Size
 		}
 	}
 
