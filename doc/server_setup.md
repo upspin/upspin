@@ -92,8 +92,6 @@ add the following record to example.com's DNS zone:
 
 Once the DNS change propagates the key server will use the TXT record to verify
 that you@gmail.com is authorized to register users under example.com.
-
-After that, the next step is to run 'upspin setupstorage'.
 ```
 
 Follow the instructions: place a new TXT field in the `example.com`'s DNS entry
@@ -121,10 +119,12 @@ user for you automatically.
 
 First create a Google Cloud Project and associated Billing Account by visiting the
 [Cloud Console](https://cloud.google.com/console).
-(See the corresponding documentation
+See the corresponding documentation
 [here](https://support.google.com/cloud/answer/6251787?hl=en) and
 [here]([https://support.google.com/cloud/answer/6288653?hl=en)
-for help.)
+for help.
+For the project name, we suggest you use a string similar to your domain.
+(We will use `example-com`.)
 
 Then, install the Google Cloud SDK by following
 [the official instructions](https://cloud.google.com/sdk/downloads).
@@ -134,8 +134,8 @@ Finally, use the `gcloud` tool to enable the required APIs:
 ```
 $ gcloud components install beta
 $ gcloud auth login
-$ gcloud --project <project> beta service-management enable iam.googleapis.com
-$ gcloud --project <project> beta service-management enable storage_api
+$ gcloud --project example-com beta service-management enable iam.googleapis.com
+$ gcloud --project example-com beta service-management enable storage_api
 ```
 
 ### Create a Google Cloud Storage bucket
@@ -151,17 +151,56 @@ Then use `upspin setupstorage` to create a storage bucket and an associated
 service account for accessing the bucket.
 Note that the bucket name must be globally unique among all Google Cloud
 Storage users, so it is prudent to include your domain name in the bucket name.
+(We will use `example-com-upspin`.)
 
 ```
-$ upspin -project=cloud-project-id setupstorage -domain=example.com example-com-upspin
+$ upspin -project=<project> setupstorage -domain=example.com example-com-upspin
 ```
+
+TODO: output from this command
 
 ## Set up a server and deploy `upspinserver`
 
 Now build `upspinserver` and deploy it to a publicly-accessible server.
-(TODO: note about server requirements)
-You may do this however you like, but you may wish to follow one
-of these guides:
+
+### Provision a server
+
+You can run `upspinserver` on any server, including Linux, MacOS, Windows,
+and [more](https://golang.org/doc/install#requirements), as long as it has a
+publicly-accessible IP address and can run Go programs.
+
+> Note that Upspin has been mostly developed under Linux and MacOS.
+> You may encounter issues running it on other platforms.
+
+For a personal Upspin installation, a server with 1 CPU core, 2GB of memory,
+and 20GB of disk should be sufficient.
+
+You can provision a suitable Linux VM in your Google Cloud Project by visiting
+the Compute section of the [Cloud Console](https://cloud.google.com/console)
+and clicking "Create VM".
+
+> If you're unfamiliar with Google Cloud's virtual machines, here are some sane
+> defaults: choose the `n1-standard-1` machine type, select the Ubuntu 16.04
+> boot disk image, check "Allow HTTPS traffic", and under "Networking" make
+> sure the the "External IP" is a reserved static address (rather than
+> ephemeral).
+
+Once provisioned, make a note of the server's IP address.
+
+### Create a DNS record
+
+With a server provisioned, you must create a DNS record for its host name.
+As you did earlier with the `TXT` record, visit your registrar to create an `A`
+record that points your chosen host name (`upspin.example.com`) to the server's
+IP address.
+
+### Deploy `upspinserver`
+
+Now build `upspin.io/cmd/upspinserver` and configure your server to run
+it on startup and serve on port `443`.
+
+You may do this however you like, but you may wish to follow one of these
+guides:
 
 - [Running `upspinserver` on Ubuntu 16.04](/doc/server_setup_ubuntu.md)
 - (More coming soon...)
