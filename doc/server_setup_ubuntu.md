@@ -10,12 +10,8 @@ These instructions assume you have access to an Debian or Ubuntu linux
 server, and that the server is reachable at your chosen host name.
 (`upspin.example.com`)
 
-You can create a suitable VM in your Google Cloud Project by visiting the
-Compute section of the [Cloud Console](https://cloud.google.com/console) and
-clicking 'Create VM'. (The `n1-standard-1 machine type should be sufficient.)
-
 > Note that these instructions have been verified to work against Ubuntu 16.04.
-> The exact commands may differ slightly on your system.
+> The exact commands may differ on your system.
 
 Once the server is running you should log in to it as root and configure it to
 run `upspinserver` by following these instructions.
@@ -27,6 +23,7 @@ The following commands must be executed on the server as the super user, `root`.
 Create a Unix account named `upspin`.
 For the password, use a secure password generator to create a long, unguessable
 password.
+Don't worry if it's unwieldy, you won't need to type it again.
 The rest of the questions it asks should have sane defaults, so pressing
 Enter for each should be sufficient.
 
@@ -34,7 +31,7 @@ Enter for each should be sufficient.
 $ adduser upspin
 ```
 
-Give yourself SSH access to the server (a convenience):
+Give yourself SSH access to the `upspin` account on the server (a convenience):
 
 ```
 $ su upspin
