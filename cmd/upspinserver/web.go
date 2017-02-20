@@ -16,11 +16,6 @@ import (
 	"upspin.io/log"
 	"upspin.io/path"
 	"upspin.io/upspin"
-
-	// Load useful packers
-	_ "upspin.io/pack/ee"
-	_ "upspin.io/pack/plain"
-	// Load required transports
 )
 
 type web struct {
