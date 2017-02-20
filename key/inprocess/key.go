@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// TODO(adg): rename this file to key.go and the test to key_test.go
-
 // Package inprocess implements a non-persistent, memory-resident user service.
 package inprocess
 
