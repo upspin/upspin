@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e554cda0_a21ceeea",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-20T21:31:30Z",
+      "side": 1,
+      "message": "In future, please split these unrelated changes into separate CLs.\nThanks.",
+      "revId": "0278415709426bf449dc17879ffe21bc2e33f29a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
