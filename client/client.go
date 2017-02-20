@@ -320,7 +320,7 @@ func validateWhichAccess(name upspin.PathName, accessEntry *upspin.DirEntry) err
 	return nil
 }
 
-// For EE, update the packing for the other readers as specified by the Access file.
+// For EE, update packdata for readers as specified by the Access file.
 // This call, if successful, will replace entry.Name with the value, after any
 // link evaluation, from the final call to WhichAccess. The caller may then
 // use that name or entry to avoid evaluating the links again.
@@ -331,18 +331,27 @@ func (c *Client) addReaders(op string, entry *upspin.DirEntry, packer upspin.Pac
 
 	name := entry.Name
 
-	// Add other readers to Packdata.
-	readersPublicKey := make([]upspin.PublicKey, len(readers)+1)
+	parsed, err := path.Parse(name)
+	if err != nil {
+		return err
+	}
+	owner := parsed.User()
+
+	readersPublicKey := make([]upspin.PublicKey, len(readers)+2)
 	f := c.config.Factotum()
 	if f == nil {
 		return errors.E(op, name, errors.Permission, errors.Str("no factotum available"))
 	}
+	key, err := bind.KeyServer(c.config, c.config.KeyEndpoint())
+	if err != nil {
+		return errors.E(op, err)
+	}
 	readersPublicKey[0] = f.PublicKey()
+	owner_included := false
 	n := 1
 	for _, r := range readers {
-		key, err := bind.KeyServer(c.config, c.config.KeyEndpoint())
-		if err != nil {
-			return errors.E(op, err)
+		if r == owner {
+			owner_included = true
 		}
 		u, err := key.Lookup(r)
 		if err != nil || len(u.PublicKey) == 0 {
@@ -351,6 +360,15 @@ func (c *Client) addReaders(op string, entry *upspin.DirEntry, packer upspin.Pac
 		}
 		if u.PublicKey != readersPublicKey[0] { // don't duplicate self
 			// TODO(ehg) maybe should check for other duplicates?
+			readersPublicKey[n] = u.PublicKey
+			n++
+		}
+		readersPublicKey[n] = u.PublicKey
+		n++
+	}
+	if !owner_included {
+		u, err := key.Lookup(owner)
+		if err == nil {
 			readersPublicKey[n] = u.PublicKey
 			n++
 		}
@@ -382,11 +400,6 @@ func (c *Client) getReaders(op string, name upspin.PathName, accessEntry *upspin
 			return nil, err
 		}
 		owner := parsed.User()
-		if owner == c.config.UserName() {
-			// We are the owner, but the caller always
-			// adds the us, so return an empty list.
-			return nil, nil
-		}
 		return []upspin.UserName{owner}, nil
 	} else if err != nil {
 		// We failed to fetch the Access file for some unexpected reason,

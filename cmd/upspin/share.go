@@ -424,6 +424,12 @@ func read(c upspin.Client, file upspin.PathName) ([]byte, error) {
 
 // fixShare updates the packdata of the named file to contain wrapped keys for all the users.
 func (s *Sharer) fixShare(name upspin.PathName, users []upspin.UserName) {
+	parsed, err := path.Parse(name)
+	if err != nil {
+		return
+	}
+	owner := parsed.User()
+
 	directory := s.state.DirServer()
 	entry, err := directory.Lookup(name) // Guaranteed to have no links.
 	if err != nil {
@@ -444,9 +450,14 @@ func (s *Sharer) fixShare(name upspin.PathName, users []upspin.UserName) {
 		}
 		return
 	}
+
 	// Could do this more efficiently, calling Share collectively, but the Puts are sequential anyway.
 	keys := make([]upspin.PublicKey, 0, len(users))
+	owner_included := false
 	for _, user := range users {
+		if user == owner {
+			owner_included = true
+		}
 		// If user is "all", we need to decrypt the file to make progress. We know the file is encrypted.
 		if user == access.AllUsers {
 			if !s.unencryptForAll {
@@ -467,6 +478,9 @@ func (s *Sharer) fixShare(name upspin.PathName, users []upspin.UserName) {
 		fmt.Fprintf(os.Stderr, "%q: user %q has no key for packing %s\n", entry.Name, user, packer)
 		s.state.exitCode = 1
 		return
+	}
+	if !owner_included {
+		keys = append(keys, s.lookupKey(owner))
 	}
 	packdatas := []*[]byte{&entry.Packdata}
 	packer.Share(s.state.config, keys, packdatas)
