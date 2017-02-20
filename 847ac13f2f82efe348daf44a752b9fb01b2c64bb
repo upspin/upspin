@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7923afda_ca08bc99",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-20T01:10:41Z",
+      "side": 1,
+      "message": "This CL also deletes the packer.\nPut those deletions in a separate CL.",
+      "revId": "847ac13f2f82efe348daf44a752b9fb01b2c64bb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
