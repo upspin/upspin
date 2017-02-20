@@ -147,11 +147,8 @@ somewhere.
 (It is represented as a
 [Merkle tree](https://en.wikipedia.org/wiki/Merkle_tree), a tree of hash
 values.)
-The server could use the encryption scheme described above and store its data in
-the storage server the same way a user does, but that method is cumbersome and
-cryptographically unnecessary since no sharing is involved.
-We instead use a simple symmetric key known only to the directory server and
-AEAD, specifically AES GCM.
+The server uses the encryption scheme described above to store its data in the
+storage server.
 
 ## Key Management
 
