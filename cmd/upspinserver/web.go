@@ -13,6 +13,7 @@ import (
 	"strings"
 
 	"upspin.io/client"
+	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/path"
 	"upspin.io/upspin"
@@ -59,8 +60,10 @@ func (s *web) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	des, err := s.cli.Glob(string(name))
-	if err != nil {
-		// TODO(adg): use correct status code for 'information withheld'
+	if errors.Match(errors.E(errors.Private), err) || errors.Match(errors.E(errors.Permission), err) {
+		http.Error(w, "Forbidden", http.StatusForbidden)
+		return
+	} else if err != nil {
 		http.Error(w, "Glob: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
