@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "6c8051c4_e85c95dc",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-20T21:27:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c6f933fd_719dbd81",
+      "revId": "9126afb0313eb086401d828baed0d4ac1f924cdd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c74b93f6_2782b969",
         "filename": "doc/server_setup.md",
         "patchSetId": 1
@@ -39,6 +57,30 @@
       "revId": "9126afb0313eb086401d828baed0d4ac1f924cdd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "29fdce69_2e80e9a9",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-20T21:27:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c74b93f6_2782b969",
+      "range": {
+        "startLine": 178,
+        "startChar": 8,
+        "endLine": 178,
+        "endChar": 17
+      },
+      "revId": "9126afb0313eb086401d828baed0d4ac1f924cdd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -65,6 +107,30 @@
     },
     {
       "key": {
+        "uuid": "622bc41c_a7c79c22",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-20T21:27:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a246f7eb_58a39d6c",
+      "range": {
+        "startLine": 182,
+        "startChar": 28,
+        "endLine": 182,
+        "endChar": 39
+      },
+      "revId": "9126afb0313eb086401d828baed0d4ac1f924cdd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4a463e7d_7b677fb8",
         "filename": "doc/server_setup_ubuntu.md",
         "patchSetId": 1
@@ -79,6 +145,24 @@
       "revId": "9126afb0313eb086401d828baed0d4ac1f924cdd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "85b9c6e9_f9e0ede3",
+        "filename": "doc/server_setup_ubuntu.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-20T21:27:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4a463e7d_7b677fb8",
+      "revId": "9126afb0313eb086401d828baed0d4ac1f924cdd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
