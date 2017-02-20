@@ -69,24 +69,6 @@ func NewFromDir(dir string) (upspin.Factotum, error) {
 	}
 	pubBytes = stripCR(pubBytes)
 
-	secret, err := readFile(op, dir, "symmsecret.upspinkey")
-	if err != nil && !errors.Match(errors.E(errors.NotExist), err) {
-		return nil, errors.E(op, err)
-	}
-	// TODO(ehg) symmSecret, a global, is not intended to be the final
-	// destination for this factotum's secret key.
-
-	// Currently, because it is global we do not overwrite it and warn if
-	// we're about to nil it out once it's set.
-	if secret != nil {
-		if symmSecret != nil && string(symmSecret) != string(secret) {
-			panic(op + ": Resetting symmSecret for dir  " + dir)
-		}
-		symmSecret = secret
-	} else if symmSecret != nil { // secret == nil
-		log.Debug.Printf("%s: Keeping old symmSecret, but current user has no symmSecret in %s", op, dir)
-	}
-
 	// Read older key pairs.
 	s2, err := readFile(op, dir, "secret2.upspinkey")
 	if err != nil && !errors.Match(errors.E(errors.NotExist), err) {
@@ -363,15 +345,3 @@ func readFile(op, dir, name string) ([]byte, error) {
 	}
 	return b, nil
 }
-
-// SymmSecret returns a symmetric key. This should remain undocumented because
-// the design will change as soon as a better idea surfaces.
-func SymmSecret() ([]byte, error) {
-	if len(symmSecret) == 0 {
-		return nil, errors.E("factotum.SymmSecret", errors.NotExist)
-	}
-	return symmSecret, nil
-}
-
-// TODO(ehg) Find a better way, or else make this one official by moving into NewFactotum.
-var symmSecret []byte

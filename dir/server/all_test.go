@@ -28,7 +28,6 @@ import (
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/eeintegrity"
 	_ "upspin.io/pack/plain"
-	_ "upspin.io/pack/symm"
 
 	keyserver "upspin.io/key/inprocess"
 	storeserver "upspin.io/store/inprocess"
@@ -66,7 +65,7 @@ func TestMakeRoot(t *testing.T) {
 	}
 	deExpected := *de
 	deExpected.Writer = serverName
-	deExpected.Packing = upspin.SymmPack
+	deExpected.Packing = upspin.EEIntegrityPack
 	deExpected.Sequence = upspin.SeqBase | (de.Sequence ^ upspin.SeqVersion(de.Sequence))
 	err = checkDirEntry("TestMakeRoot", deLookup, &deExpected)
 	if err != nil {
@@ -157,7 +156,7 @@ func TestMakeDirectory(t *testing.T) {
 	}
 	deExpected := *de
 	deExpected.Writer = serverName
-	deExpected.Packing = upspin.SymmPack
+	deExpected.Packing = upspin.EEIntegrityPack
 	deExpected.Sequence = upspin.SeqBase
 	err = checkDirEntry("TestMakeDirectory", de2, &deExpected)
 	if err != nil {
@@ -549,9 +548,8 @@ func TestGlob(t *testing.T) {
 		if len(e.Blocks) == 0 {
 			t.Errorf("len(e.Blocks) = %d, want > 0", len(e.Blocks))
 		}
-		// Packadata shouldn't be nil unless Packing is Plain or
-		// SymmSecret.
-		if e.Packing != upspin.PlainPack && e.Packing != upspin.SymmPack && len(e.Packdata) == 0 {
+		// Packadata shouldn't be nil unless Packing is Plain.
+		if e.Packing != upspin.PlainPack && len(e.Packdata) == 0 {
 			t.Errorf("len(e.Packdata) = %d, want > 0", len(e.Packdata))
 		}
 	}
@@ -1021,7 +1019,7 @@ func newDirServerForTesting(t *testing.T, userName upspin.UserName) (*server, up
 	}
 	ctx := config.New()
 	ctx = config.SetUserName(ctx, serverName)
-	ctx = config.SetPacking(ctx, upspin.SymmPack)
+	ctx = config.SetPacking(ctx, upspin.EEIntegrityPack)
 	ctx = config.SetFactotum(ctx, f)
 	ctx = config.SetKeyEndpoint(ctx, endpointInProcess)
 	ctx = config.SetStoreEndpoint(ctx, endpointInProcess)

@@ -6,7 +6,6 @@ package main
 
 import (
 	"bytes"
-	"crypto/rand"
 	"flag"
 	"fmt"
 	"html/template"
@@ -248,17 +247,6 @@ func (s *State) setuphost(where, domain, curve string) {
 		s.exit(err)
 	}
 	err = writeKeys(cfgPath, pub, pri)
-	if err != nil {
-		s.exit(err)
-	}
-
-	// Generate and write symmetric key for DirServer data.
-	var symmSecret [32]byte
-	_, err = rand.Read(symmSecret[:])
-	if err != nil {
-		s.exit(err)
-	}
-	err = ioutil.WriteFile(filepath.Join(cfgPath, "symmsecret.upspinkey"), symmSecret[:], 0600)
 	if err != nil {
 		s.exit(err)
 	}
