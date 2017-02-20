@@ -19,6 +19,40 @@
     },
     {
       "key": {
+        "uuid": "aad2c5f6_5a2291e4",
+        "filename": "client/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 375,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-20T21:47:24Z",
+      "side": 1,
+      "message": "this is all getting very fiddly.\ncan we please switch to using append?\n\ncreate the slice with a zero length and a reasonable capacity:\n\nreadersPublicKey :\u003d make([]upspin.PublicKey, 0, len(readers)+2)\n\nthen use append instead of inserting at an index:\n\nreadersPublicKey \u003d append(readersPublicKey, u.publicKey)",
+      "revId": "bf62361289bd84861bbf75a838c32a9302226a1b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "30ab8c94_dd2f8963",
+        "filename": "client/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-20T21:47:24Z",
+      "side": 1,
+      "message": "delete",
+      "revId": "bf62361289bd84861bbf75a838c32a9302226a1b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "9e89bedc_74499c7b",
         "filename": "cmd/upspin/share.go",
         "patchSetId": 2
@@ -30,6 +64,24 @@
       "writtenOn": "2017-02-20T17:54:16Z",
       "side": 1,
       "message": "s/; aborting//\nall the messages imply that",
+      "revId": "bf62361289bd84861bbf75a838c32a9302226a1b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a7bc73fa_14f8a14f",
+        "filename": "cmd/upspin/share.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 485,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-20T21:47:24Z",
+      "side": 1,
+      "message": "why are these call sites using fmt.Fprintf and s.state.exitCode \u003d 1 when there are helpers like s.exitf and s.failf ?",
+      "parentUuid": "9e89bedc_74499c7b",
       "revId": "bf62361289bd84861bbf75a838c32a9302226a1b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
