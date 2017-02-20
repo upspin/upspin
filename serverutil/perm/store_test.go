@@ -9,6 +9,7 @@ import (
 
 	"upspin.io/access"
 	"upspin.io/errors"
+	"upspin.io/log"
 	"upspin.io/test/testenv"
 	"upspin.io/upspin"
 )
@@ -224,6 +225,9 @@ func TestStoreIntegration(t *testing.T) {
 	ownerStore, ownerEnv, wait, cleanup := setupStoreEnv(t)
 	defer cleanup()
 
+	// Create a new user. It will end up being on a different DirServer and
+	// StoreServer instances but we're interested in the user only. We won't
+	// use writerEnv's DirServer nor StoreServer directly.
 	writerEnv, err := testenv.New(&testenv.Setup{
 		OwnerName: writer,
 		Packing:   upspin.PlainPack,
@@ -235,12 +239,11 @@ func TestStoreIntegration(t *testing.T) {
 
 	r := testenv.NewRunner()
 	r.AddUser(ownerEnv.Config)
-	r.AddUser(writerEnv.Config)
 
 	wait()
 
-	// Dial the server for writer.
-	srv, err := ownerStore.Dial(writerEnv.Config, writerEnv.Config.StoreEndpoint())
+	// Dial the same server endpoint for writer.
+	srv, err := ownerStore.Dial(writerEnv.Config, ownerEnv.Config.StoreEndpoint())
 	if err != nil {
 		t.Fatal(err)
 	}
