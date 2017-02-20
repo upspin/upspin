@@ -224,23 +224,18 @@ func TestStoreIntegration(t *testing.T) {
 	ownerStore, ownerEnv, wait, cleanup := setupStoreEnv(t)
 	defer cleanup()
 
-	writerEnv, err := testenv.New(&testenv.Setup{
-		OwnerName: writer,
-		Packing:   upspin.PlainPack,
-		Kind:      "inprocess",
-	})
+	writerConfig, err := ownerEnv.NewUser(writer)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	r := testenv.NewRunner()
 	r.AddUser(ownerEnv.Config)
-	r.AddUser(writerEnv.Config)
 
 	wait()
 
-	// Dial the server for writer.
-	srv, err := ownerStore.Dial(writerEnv.Config, writerEnv.Config.StoreEndpoint())
+	// Dial the same server endpoint for writer.
+	srv, err := ownerStore.Dial(writerConfig, ownerEnv.Config.StoreEndpoint())
 	if err != nil {
 		t.Fatal(err)
 	}
