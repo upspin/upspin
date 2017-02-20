@@ -5,4 +5,4 @@ COPY secret.upspinkey /upspin/secret.upspinkey
 COPY mailconfig /upspin/mailconfig
 COPY bin/keyserver /keyserver
 ENTRYPOINT ["/keyserver", "-config=/upspin/config", "-kind=server", "-project=PROJECT", "-mail_config=/upspin/mailconfig", "-serverconfig=gcpBucketName=BUCKET,defaultACL=projectPrivate", "-log=LOGLEVEL"]
-EXPOSE 80 443
+EXPOSE 443
