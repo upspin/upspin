@@ -31,7 +31,10 @@ var (
 func main() {
 	flags.Parse("http", "https", "letscache", "log", "tls")
 	http.Handle("/", newServer())
-	go http.ListenAndServe(flags.HTTPAddr, redirectToHTTPSHandler())
+	go func() {
+		log.Printf("Serving HTTP->HTTPS redirect on %q", flags.HTTPAddr)
+		log.Fatal(http.ListenAndServe(flags.HTTPAddr, http.HandlerFunc(redirectHTTP)))
+	}()
 	https.ListenAndServeFromFlags(nil, "frontend")
 }
 
@@ -56,10 +59,16 @@ func defaultDocPath() string {
 	return filepath.Join(os.Getenv("GOPATH"), "src/upspin.io/doc")
 }
 
-func redirectToHTTPSHandler() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		http.Redirect(w, r, "https://"+flags.HTTPSAddr+r.RequestURI, http.StatusTemporaryRedirect)
-	})
+func redirectHTTP(w http.ResponseWriter, r *http.Request) {
+	if r.TLS != nil || r.Host == "" {
+		http.NotFound(w, r)
+		return
+	}
+
+	u := r.URL
+	u.Host = r.Host
+	u.Scheme = "https"
+	http.Redirect(w, r, u.String(), http.StatusFound)
 }
 
 type server struct {
