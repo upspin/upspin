@@ -2,10 +2,11 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// TODO(p): document this
-
 // +build !windows
 
+// Package cacheutil provides a mechanism to start the cacheserver
+// if a config requires it and it is not already running.
+// It is used by programs like upspin and upspinfs.
 package cacheutil
 
 import (
@@ -23,6 +24,7 @@ import (
 
 var writethrough = flag.Bool("writethrough", false, "make storage cache writethrough")
 
+// Start starts the cacheserver if the config requires it and it is not already running.
 func Start(cfg upspin.Config) {
 	if cfg == nil {
 		return
