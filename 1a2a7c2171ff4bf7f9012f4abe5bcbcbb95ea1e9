@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ccaaf578_abf4234f",
+        "filename": "cmd/frontend/frontend.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-02-20T02:05:26Z",
+      "side": 1,
+      "message": "http.StatusTemporaryRedirect",
+      "range": {
+        "startLine": 71,
+        "startChar": 33,
+        "endLine": 71,
+        "endChar": 36
+      },
+      "revId": "1a2a7c2171ff4bf7f9012f4abe5bcbcbb95ea1e9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
