@@ -10,6 +10,7 @@ import (
 
 	"upspin.io/errors"
 	"upspin.io/key/sha256key"
+	"upspin.io/log"
 	"upspin.io/upspin"
 )
 
@@ -17,20 +18,23 @@ import (
 // There is one for each Dial call.
 type service struct {
 	data *dataService
+	user upspin.UserName
 }
 
 var _ upspin.StoreServer = (*service)(nil)
 
 func New() upspin.StoreServer {
 	return &service{
-		data: &dataService{
-			endpoint: upspin.Endpoint{
-				Transport: upspin.InProcess,
-				NetAddr:   "", // Ignored.
-			},
-			blob: make(map[upspin.Reference][]byte),
-		},
+		data: globalDataService,
 	}
+}
+
+var globalDataService = &dataService{
+	endpoint: upspin.Endpoint{
+		Transport: upspin.InProcess,
+		NetAddr:   "", // Ignored.
+	},
+	blob: make(map[upspin.Reference][]byte),
 }
 
 // A dataService is the underlying service object.
@@ -62,6 +66,7 @@ func (s *service) Put(ciphertext []byte) (*upspin.Refdata, error) {
 	s.data.mu.Lock()
 	s.data.blob[ref] = copyOf(ciphertext)
 	s.data.mu.Unlock()
+	log.Printf("=== Put(%s, %p, %p) ref: %s", s.user, s, s.data, ref)
 	refdata := &upspin.Refdata{
 		Reference: ref,
 		Volatile:  false,
@@ -77,7 +82,7 @@ func (s *service) Delete(ref upspin.Reference) error {
 	defer s.data.mu.Unlock()
 	_, ok := s.data.blob[ref]
 	if !ok {
-		return errors.E(op, errors.NotExist, "no such blob")
+		return errors.E(op, errors.NotExist, errors.Errorf("no such blob: %s", ref))
 	}
 	delete(s.data.blob, ref)
 	return nil
@@ -101,7 +106,8 @@ func (s *service) Get(ref upspin.Reference) (ciphertext []byte, refdata *upspin.
 	data, ok := s.data.blob[ref]
 	s.data.mu.Unlock()
 	if !ok {
-		return nil, nil, nil, errors.E(op, errors.NotExist, "no such blob")
+		log.Printf("Get(%s, %p, %p) error. ref %s", s.user, s, s.data, ref)
+		return nil, nil, nil, errors.E(op, errors.NotExist, errors.Errorf("no such blob: %s", ref))
 	}
 	if upspin.Reference(sha256key.Of(data).String()) != ref {
 		return nil, nil, nil, errors.E(op, errors.Invalid, "internal hash mismatch in StoreServer.Get")
@@ -130,6 +136,7 @@ func (s *service) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service,
 		s.data.endpoint = e
 	}
 	thisStore := *s // Make a copy.
+	thisStore.user = config.UserName()
 	return &thisStore, nil
 }
 

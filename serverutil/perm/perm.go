@@ -94,6 +94,7 @@ func (p *Perm) updateLoop() {
 		if events == nil {
 			// Channel is not yet open. Open now.
 			done = make(chan struct{})
+			log.Printf("=== watching: %s", p.targetUser)
 			events, err = p.watch(upspin.PathName(p.targetUser)+"/", -1, done)
 			if err != nil {
 				log.Error.Printf("%s: watch: %s", op, err)
@@ -132,6 +133,7 @@ func (p *Perm) updateLoop() {
 // writers. This is mostly only exported for testing, but servers may use it to
 // force immediate updates.
 func (p *Perm) Update() error {
+	log.Printf("perm.Update: looking up %s", p.targetFile)
 	entry, err := p.lookup(p.targetFile)
 	if err != nil {
 		// If the group file does not exist, reset writers map.

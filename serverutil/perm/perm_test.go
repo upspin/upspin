@@ -40,7 +40,7 @@ func setupEnv(t *testing.T) (ownerEnv *testenv.Env, wait, cleanup func()) {
 	updated := make(chan bool)
 	onUpdate = func() { <-updated }
 	wait = func() {
-		const timeout = 2 * time.Second
+		const timeout = 10 * time.Second
 		select {
 		case <-time.After(timeout):
 			t.Fatal("timed out waiting for update")

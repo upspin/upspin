@@ -9,6 +9,7 @@ import (
 
 	"upspin.io/access"
 	"upspin.io/errors"
+	"upspin.io/log"
 	"upspin.io/test/testenv"
 	"upspin.io/upspin"
 )
@@ -237,7 +238,9 @@ func TestStoreIntegration(t *testing.T) {
 	r.AddUser(ownerEnv.Config)
 	r.AddUser(writerEnv.Config)
 
+	log.Printf("== first wait.")
 	wait()
+	log.Printf("== first wait cleared.")
 
 	// Dial the server for writer.
 	srv, err := ownerStore.Dial(writerEnv.Config, writerEnv.Config.StoreEndpoint())
@@ -269,7 +272,9 @@ func TestStoreIntegration(t *testing.T) {
 		t.Fatal(r.Diag())
 	}
 
+	log.Printf("== second wait.")
 	wait()
+	log.Printf("== second wait cleared")
 
 	// Writing as owner succeeds.
 	ref1, err := ownerStore.Put([]byte("123"))
