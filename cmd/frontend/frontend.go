@@ -68,7 +68,7 @@ func redirectHTTP(w http.ResponseWriter, r *http.Request) {
 	u := r.URL
 	u.Host = r.Host
 	u.Scheme = "https"
-	http.Redirect(w, r, u.String(), 302)
+	http.Redirect(w, r, u.String(), http.StatusFound)
 }
 
 type server struct {

@@ -12,8 +12,6 @@ import (
 	"strings"
 	"sync"
 	"testing"
-
-	"upspin.io/flags"
 )
 
 var (
@@ -31,7 +29,7 @@ func startServer() {
 	s.mux.HandleFunc("/_test", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, testResponse)
 	})
-	s.mux.Handle("/_redirect", redirectToHTTPSHandler())
+	s.mux.HandleFunc("/_redirect", redirectHTTP)
 	testServer := httptest.NewServer(s)
 	addr = testServer.Listener.Addr().String()
 }
@@ -48,12 +46,8 @@ func TestHTTPSRedirect(t *testing.T) {
 		t.Fatalf("expected no error making request, but got %v", err)
 	}
 	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusTemporaryRedirect {
-		t.Errorf("expected status code to be %v, got %v", http.StatusTemporaryRedirect, resp.StatusCode)
-	}
-	expected := "https://" + flags.HTTPSAddr + "/_redirect"
-	if resp.Header["Location"][0] != expected {
-		t.Errorf("expected Location header to be %q, got %q", expected, resp.Header["Location"][0])
+	if resp.StatusCode != http.StatusFound {
+		t.Errorf("expected status code to be %v, got %v", http.StatusFound, resp.StatusCode)
 	}
 }
 
