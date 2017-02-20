@@ -181,6 +181,7 @@ type setupDomainData struct {
 	Domain     string
 	Project    string
 	UserName   upspin.UserName
+	Proquint   string
 	Signature  string
 }
 
@@ -238,7 +239,7 @@ func (s *State) setuphost(where, domain, curve string) {
 
 	// Generate and write keys for the server user.
 	var noProquint string
-	pub, pri, _, err := createKeys(curve, noProquint)
+	pub, pri, proquint, err := createKeys(curve, noProquint)
 	if err != nil {
 		s.exit(err)
 	}
@@ -265,6 +266,7 @@ func (s *State) setuphost(where, domain, curve string) {
 		Domain:    domain,
 		Project:   flags.Project,
 		UserName:  s.config.UserName(),
+		Proquint:  proquint,
 		Signature: fmt.Sprintf("%x-%x", sig.R, sig.S),
 	})
 	if err != nil {
@@ -277,6 +279,10 @@ Domain configuration and keys for the user
 	upspin@{{.Domain}}
 were generated and placed under the directory:
 	{{.Dir}}
+If you lose the keys you can re-create them by running this command
+	upspin keygen -secretseed {{.Proquint}}
+Write this command down and store it in a secure, private place.
+Do not share your private key or this command with anyone.
 
 To prove that {{.UserName}} is the owner of {{.Domain}},
 add the following record to {{.Domain}}'s DNS zone:
