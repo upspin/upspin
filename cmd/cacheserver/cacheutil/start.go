@@ -4,6 +4,10 @@
 
 // +build !windows
 
+// cacheutil is used by programs (like upspin and upspinfs) that
+// could use the cacheserver to start up the cacheserver if it
+// is not already running.
+
 package cacheutil
 
 import (
@@ -21,6 +25,8 @@ import (
 
 var writethrough = flag.Bool("writethrough", false, "make storage cache writethrough")
 
+// Start starts the cacheserver if it is in the configuration and is not
+// yet running.
 func Start(cfg upspin.Config) {
 	ce := cfg.CacheEndpoint()
 	if ce.Transport == upspin.Unassigned {
