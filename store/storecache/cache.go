@@ -440,15 +440,25 @@ func (cr *cachedRef) saveToCacheFile(file string, data []byte) error {
 // enforceByteLimitByRemovingLeastRecentlyUsedFile removes the oldest entries until inUse is below limit. We take a leap
 // of faith that the least recently used entry is not currently in use.
 func (c *storeCache) enforceByteLimitByRemovingLeastRecentlyUsedFile() {
+	c.Lock()
+	defer c.Unlock()
 	for {
 		if atomic.LoadInt64(&c.inUse) < c.limit {
 			break
 		}
-		c.Lock()
-		// RemoveOldest will call OnEviction so let it do the
-		// bookkeeping and file removal.
-		c.lru.RemoveOldest()
-		c.Unlock()
+		key, value := c.lru.RemoveOldest()
+		if value == nil {
+			// Nothing left.
+			log.Info.Printf("exceeding cache byte limit")
+			return
+		}
+		cr := value.(*cachedRef)
+		if cr.busy {
+			// Don't remove a file being created.
+			// Unlikely but possible.
+			continue
+		}
+		cr.removeFile(key.(string))
 	}
 }
 
