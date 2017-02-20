@@ -7,6 +7,7 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"html/template"
@@ -72,9 +73,10 @@ func redirectHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 type server struct {
-	mux          *http.ServeMux
-	doclist      []string
-	renderedDocs map[string][]byte
+	mux      *http.ServeMux
+	docList  []string
+	docHTML  map[string][]byte
+	docTitle map[string]string
 }
 
 // newServer allocates and returns a new HTTP server.
@@ -125,7 +127,11 @@ func (s *server) handleRoot(w http.ResponseWriter, r *http.Request) {
 func (s *server) handleDoc(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
 	if r.URL.Path == "/doc/" {
-		if err := doclistTmpl.Execute(w, pageData{Content: s.doclist}); err != nil {
+		d := pageData{Content: struct {
+			List  []string
+			Title map[string]string
+		}{s.docList, s.docTitle}}
+		if err := doclistTmpl.Execute(w, d); err != nil {
 			log.Error.Printf("Error executing root content template: %s", err)
 		}
 		return
@@ -134,13 +140,13 @@ func (s *server) handleDoc(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *server) renderDoc(w http.ResponseWriter, fn string) {
-	b, ok := s.renderedDocs[fn]
+	b, ok := s.docHTML[fn]
 	if !ok {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
 	if err := docTmpl.Execute(w, pageData{
-		Title:   fn + " · Upspin",
+		Title:   s.docTitle[fn] + " · Upspin",
 		Content: template.HTML(b),
 	}); err != nil {
 		log.Error.Printf("Error executing doc content template: %s", err)
@@ -170,28 +176,42 @@ func (s *server) parseDocs(path string) error {
 	if err != nil {
 		return err
 	}
-	rendered := map[string][]byte{}
-	doclist := []string{}
+	var (
+		html  = map[string][]byte{}
+		title = map[string]string{}
+		list  = []string{}
+	)
 	for _, fi := range fis {
-		if filepath.Ext(fi.Name()) != extMarkdown {
+		fn := fi.Name()
+		if filepath.Ext(fn) != extMarkdown {
 			continue
 		}
-		f, err := os.Open(filepath.Join(path, fi.Name()))
+		b, err := ioutil.ReadFile(filepath.Join(path, fn))
 		if err != nil {
 			return err
 		}
-		defer f.Close()
-		b, err := ioutil.ReadAll(f)
-		if err != nil {
-			return err
-		}
-		doclist = append(doclist, fi.Name())
-		rendered[fi.Name()] = blackfriday.MarkdownCommon(b)
+		html[fn] = blackfriday.MarkdownCommon(b)
+		title[fn] = docTitle(b)
+		list = append(list, fn)
 	}
-	s.renderedDocs = rendered
-	sort.Strings(doclist)
-	s.doclist = doclist
+	s.docHTML = html
+	s.docTitle = title
+	s.docList = list
+	sort.Strings(s.docList)
 	return nil
+}
+
+// docTitle extracts the first Markdown header in the given document body.
+// It expects the first line to be of the form
+// 	# Title string
+// If not, it will return "Untitled".
+func docTitle(b []byte) string {
+	if len(b) > 2 && b[0] == '#' {
+		if i := bytes.IndexByte(b, '\n'); i != -1 {
+			return string(b[2:i])
+		}
+	}
+	return "Untitled"
 }
 
 type goGetHandler struct {

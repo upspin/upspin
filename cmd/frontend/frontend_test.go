@@ -109,7 +109,7 @@ func TestGoImport(t *testing.T) {
 func TestDocList(t *testing.T) {
 	once.Do(startServer)
 	b := get(t, "http://"+addr+"/doc/")
-	expected := `<a href="/doc/test.md">test.md</a>`
+	expected := `<a href="/doc/test.md">Test</a>`
 	if !strings.Contains(string(b), expected) {
 		t.Errorf("expected response body to contain %q; body: %q", expected, b)
 	}
@@ -119,6 +119,10 @@ func TestDoc(t *testing.T) {
 	once.Do(startServer)
 	b := get(t, "http://"+addr+"/doc/test.md")
 	expected := `<h1>Test</h1>`
+	if !strings.Contains(string(b), expected) {
+		t.Errorf("expected response body to contain %q; body: %q", expected, b)
+	}
+	expected = `<title>Test · Upspin</title>`
 	if !strings.Contains(string(b), expected) {
 		t.Errorf("expected response body to contain %q; body: %q", expected, b)
 	}

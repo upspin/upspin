@@ -13,6 +13,6 @@ ul {
 {{define "content"}}
 <h2>Documentation</h2>
 <ul>
-{{range .Content}}<li><a href="/doc/{{.}}">{{.}}</a></li>{{end}}
+{{range $.Content.List}}<li><a href="/doc/{{.}}">{{index $.Content.Title .}}</a></li>{{end}}
 </ul>
 {{end}}
