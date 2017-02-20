@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7d979599_68e71276",
+        "filename": "client/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 334,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-20T17:54:16Z",
+      "side": 1,
+      "message": "you already have the parsed name at the call site. i\u0027d pass it in",
+      "revId": "bf62361289bd84861bbf75a838c32a9302226a1b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9e89bedc_74499c7b",
+        "filename": "cmd/upspin/share.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 485,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-20T17:54:16Z",
+      "side": 1,
+      "message": "s/; aborting//\nall the messages imply that",
+      "revId": "bf62361289bd84861bbf75a838c32a9302226a1b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
