@@ -71,6 +71,7 @@ Description=Upspin server
 ExecStart=/home/upspin/upspinserver -https=localhost:8443
 User=upspin
 Group=upspin
+Restart=on-failure
 
 [Install]
 WantedBy=multi-user.target
