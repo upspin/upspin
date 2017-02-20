@@ -25,6 +25,11 @@ type web struct {
 }
 
 func newWeb(cfg upspin.Config) http.Handler {
+	if !*enableWeb {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			http.NotFound(w, r)
+		})
+	}
 	return &web{
 		cfg: cfg,
 		cli: client.New(cfg),
