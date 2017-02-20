@@ -77,7 +77,7 @@ func (s *service) Delete(ref upspin.Reference) error {
 	defer s.data.mu.Unlock()
 	_, ok := s.data.blob[ref]
 	if !ok {
-		return errors.E(op, errors.NotExist, "no such blob")
+		return errors.E(op, errors.NotExist, errors.Errorf("no such blob: %s", ref))
 	}
 	delete(s.data.blob, ref)
 	return nil
@@ -101,7 +101,7 @@ func (s *service) Get(ref upspin.Reference) (ciphertext []byte, refdata *upspin.
 	data, ok := s.data.blob[ref]
 	s.data.mu.Unlock()
 	if !ok {
-		return nil, nil, nil, errors.E(op, errors.NotExist, "no such blob")
+		return nil, nil, nil, errors.E(op, errors.NotExist, errors.Errorf("no such blob: %s", ref))
 	}
 	if upspin.Reference(sha256key.Of(data).String()) != ref {
 		return nil, nil, nil, errors.E(op, errors.Invalid, "internal hash mismatch in StoreServer.Get")
