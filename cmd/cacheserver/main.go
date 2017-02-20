@@ -27,10 +27,6 @@ import (
 	// Load useful packers
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/plain"
-
-	// This is required for config.InitConfig to work.
-	// TODO(adg): This seems wrong; fix it.
-	_ "upspin.io/pack/plain"
 )
 
 const serverName = "cacheserver"
