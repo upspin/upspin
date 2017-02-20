@@ -13,5 +13,4 @@ spec:
       - name: PREFIXkeyserver
         image: gcr.io/PROJECT/PREFIXkeyserver
         ports:
-        - containerPort: 80
         - containerPort: 443
