@@ -49,7 +49,7 @@ file and keys and only send the signup request to the key server.
 	fs := flag.NewFlagSet("signup", flag.ExitOnError)
 	var (
 		force       = fs.Bool("force", false, "create a new user even if keys and config file exist")
-		configFile  = fs.String("config", "upspin/config", "location of the config `file`")
+		configFile  = fs.String("config", filepath.Join(os.Getenv("HOME"), "upspin", "config"), "location of the config `file`")
 		where       = fs.String("where", filepath.Join(os.Getenv("HOME"), ".ssh"), "`directory` to store keys")
 		dirServer   = fs.String("dir", "", "Directory server `address`")
 		storeServer = fs.String("store", "", "Store server `address`")
@@ -163,6 +163,7 @@ file and keys and only send the signup request to the key server.
 	s.registerUser(*configFile)
 }
 
+// registerUser reads the config file and sends its information to the key server.
 func (s *State) registerUser(configFile string) {
 	cfg, err := config.FromFile(configFile)
 	if err != nil {
