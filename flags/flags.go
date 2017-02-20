@@ -26,11 +26,13 @@ var (
 	// Config names the Upspin configuration file to use.
 	Config = filepath.Join(os.Getenv("HOME"), "/upspin/config")
 
-	// HTTPAddr is the network address on which to listen for incoming insecure network connections.
-	HTTPAddr = "localhost:80"
+	// HTTPAddr is the network address on which to listen for incoming
+	// insecure network connections.
+	HTTPAddr = ":80"
 
-	// HTTPSAddr is the network address on which to listen for incoming secure network connections.
-	HTTPSAddr = "localhost:443"
+	// HTTPSAddr is the network address on which to listen for incoming
+	// secure network connections.
+	HTTPSAddr = ":443"
 
 	// LetsEncryptCache is the location of a file in which the Let's
 	// Encrypt certificates are stored. The containing directory should
