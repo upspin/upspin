@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "aaa6a4c0_5bc36745",
+        "filename": "doc/deploying_to_google_cloud.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-21T19:07:32Z",
+      "side": 1,
+      "message": "Should be -domain\u003dexample.com.  Ditto below.",
+      "range": {
+        "startLine": 113,
+        "startChar": 68,
+        "endLine": 113,
+        "endChar": 79
+      },
+      "revId": "974b8fb7278262d19d255e452d42f44bc6f0e84e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "634dd272_7acd1cc3",
+        "filename": "doc/deploying_to_google_cloud.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-21T19:07:32Z",
+      "side": 1,
+      "message": "-domain\u003dexample.com",
+      "range": {
+        "startLine": 146,
+        "startChar": 66,
+        "endLine": 147,
+        "endChar": 3
+      },
+      "revId": "974b8fb7278262d19d255e452d42f44bc6f0e84e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
