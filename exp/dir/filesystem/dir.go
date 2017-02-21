@@ -239,7 +239,7 @@ func (s *server) Dial(cfg upspin.Config, e upspin.Endpoint) (upspin.Service, err
 
 // Methods that are not implemented.
 
-var errReadOnly = errors.Str("read-only namespace")
+var errReadOnly = errors.Str("read-only name space")
 
 func (s *server) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	const op = "dir/filesystem.Delete"

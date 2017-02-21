@@ -56,7 +56,7 @@ const (
 	otherNode
 )
 
-// node represents a node (directory or file) in the namespace tree.  All nodes
+// node represents a node (directory or file) in the name space tree.  All nodes
 // under the root are user directories.
 type node struct {
 	sync.Mutex // Protects concurrent access to the rest of this struct.
