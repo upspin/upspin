@@ -29,7 +29,7 @@ to learn about the targets of links.
 	done := map[upspin.PathName]bool{}
 	if fs.NArg() == 0 {
 		userRoot := upspin.PathName(s.config.UserName())
-		rootEntry, err := s.DirServer().Lookup(userRoot)
+		rootEntry, err := s.DirServer(userRoot).Lookup(userRoot)
 		if err != nil {
 			s.exit(err)
 		}

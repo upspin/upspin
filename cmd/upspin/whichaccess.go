@@ -36,11 +36,7 @@ that controls permissions for each of the argument paths.
 
 func (s *State) whichAccessFollowLinks(name upspin.PathName) (*upspin.DirEntry, error) {
 	for loop := 0; loop < upspin.MaxLinkHops; loop++ {
-		dir, err := s.client.DirServer(name)
-		if err != nil {
-			s.exit(err)
-		}
-		entry, err := dir.WhichAccess(name)
+		entry, err := s.DirServer(name).WhichAccess(name)
 		if err == upspin.ErrFollowLink {
 			name = entry.Link
 			continue
