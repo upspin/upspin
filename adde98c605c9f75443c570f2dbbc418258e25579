@@ -16,6 +16,24 @@
       "revId": "adde98c605c9f75443c570f2dbbc418258e25579",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "94447fed_15ded33a",
+        "filename": "cmd/upspin/gendoc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-21T02:24:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f3418c3d_5db4eeb1",
+      "revId": "adde98c605c9f75443c570f2dbbc418258e25579",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
