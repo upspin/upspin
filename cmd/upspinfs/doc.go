@@ -21,8 +21,11 @@ The flags are:
 
 	-log=level
  		Set the log level to 'level'.
-	-cache=directory
-		Cache all files being read or written in 'directory'/fscache
+	-cachedir=directory
+		Cache all files being read or written in 'directory'/fscache.
+	-writethrough
+		Make storage cache writethrough.
+
 
 Examples:
 
