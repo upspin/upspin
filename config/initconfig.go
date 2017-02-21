@@ -96,7 +96,11 @@ func FromFile(name string) (upspin.Config, error) {
 		}
 	}
 	if err != nil {
-		return nil, errors.E("config.FromFile", err)
+		const op = "config.FromFile"
+		if os.IsNotExist(err) {
+			return nil, errors.E(op, errors.NotExist, err)
+		}
+		return nil, errors.E(op, err)
 	}
 	defer f.Close()
 	return InitConfig(f)
