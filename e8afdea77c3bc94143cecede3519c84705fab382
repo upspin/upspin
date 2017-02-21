@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "e6f1cff0_fa69348b",
+        "filename": "cmd/performance/keyloadtester/main.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-21T20:28:03Z",
+      "side": 1,
+      "message": "Done.\n\nI originally had it in cmd/keyserver/internal/loadtest. That seems appropriate too, especially if we\u0027re not going to be adding any more \"performance\" tools in the future.\n\nAt least I avoided \"tools\" or \"misc\". :-)",
+      "parentUuid": "fdabf491_a134b5eb",
+      "revId": "e8afdea77c3bc94143cecede3519c84705fab382",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "46b399d6_83274529",
         "filename": "cmd/performance/keyloadtester/main.go",
         "patchSetId": 12
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "6b68c006_b4d3ef84",
+        "filename": "cmd/performance/keyloadtester/main.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-21T20:28:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "46b399d6_83274529",
+      "revId": "e8afdea77c3bc94143cecede3519c84705fab382",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c1ba8e78_9d4bbfa7",
         "filename": "cmd/performance/keyloadtester/main.go",
         "patchSetId": 12
@@ -50,6 +86,24 @@
       "revId": "e8afdea77c3bc94143cecede3519c84705fab382",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0edae1a4_8844d101",
+        "filename": "cmd/performance/keyloadtester/main.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-21T20:28:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c1ba8e78_9d4bbfa7",
+      "revId": "e8afdea77c3bc94143cecede3519c84705fab382",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
