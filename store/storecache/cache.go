@@ -235,10 +235,11 @@ func (c *storeCache) get(cfg upspin.Config, ref upspin.Reference, e upspin.Endpo
 			if isError(err) {
 				continue
 			}
-			var locs []upspin.Location
 
 			// In case of a 503 error, retry a few times.
-			data, _, locs, err = store.Get(loc.Reference) // TODO: Use refdata.
+			var locs []upspin.Location
+			var refdata *upspin.Refdata
+			data, refdata, locs, err = store.Get(loc.Reference)
 			if isError(err) {
 				if !strings.Contains(err.Error(), "503") {
 					fatal = true
@@ -247,9 +248,10 @@ func (c *storeCache) get(cfg upspin.Config, ref upspin.Reference, e upspin.Endpo
 			}
 			if locs == nil && err == nil {
 				// Success, maybe cache the data.
-				// TODO: Use refdata information to cache.
-				if err := cr.saveToCacheFile(file, data); err != nil {
-					log.Info.Printf("saving cached ref %s to %s: %s", string(ref), file, err)
+				if !refdata.Volatile {
+					if err := cr.saveToCacheFile(file, data); err != nil {
+						log.Info.Printf("saving cached ref %s to %s: %s", string(ref), file, err)
+					}
 				}
 				return data, nil, nil
 			}
