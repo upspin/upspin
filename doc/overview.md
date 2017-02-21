@@ -361,7 +361,8 @@ The source tree also includes a couple of unusual implementations that use the
 Upspin interfaces to provide access to services not usually thought of as
 "files".
 These include the snapshot mechanism, integral to the storage server and
-described in the previous section, as well as TODO.
+described in the previous section, as well as a few experimental
+components in the directory `upspin.io/exp`.
 
 Finally, the system includes a cache server that interposes between the remote
 servers and the local client.
