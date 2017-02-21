@@ -315,7 +315,7 @@ other) tools.
 It is presented by the same server and constructed automatically, and cheaply,
 by building a secondary tree of historical roots of the user's tree, named by
 date.
-It is identified by the suffix `+snapsho`t attached to the user name.
+It is identified by the suffix `+snapshot` attached to the user name.
 
 For example, `ann@example.com` would be able to access her tree from December
 3, 2016 through the Upspin tree rooted at
