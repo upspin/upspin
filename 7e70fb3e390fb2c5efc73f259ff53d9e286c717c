@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "55b84563_4934783d",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-21T02:47:40Z",
+      "side": 1,
+      "message": "not a complete sentence (the previous one of this form followed a broken sentence)\n\nIt should produce output like this:",
+      "revId": "7e70fb3e390fb2c5efc73f259ff53d9e286c717c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
