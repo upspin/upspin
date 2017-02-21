@@ -2,11 +2,8 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Upspin is a simple utility for running the Upspin client with the user's default
-// config. It also provides commands for maintaining the user's state not easily
-// done by the client, such as signing up a new user, changing keys, or updating
-// sharing information.
-// Run upspin with no arguments for more information.
+//go:generate ./mkdoc.sh
+
 package main
 
 import (
