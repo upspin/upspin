@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "40ac7ed3_d710adb3",
+        "filename": "cmd/upspin/setupwriters.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-21T06:50:01Z",
+      "side": 1,
+      "message": "why the two different formats for Join?",
+      "range": {
+        "startLine": 65,
+        "startChar": 2,
+        "endLine": 69,
+        "endChar": 75
+      },
+      "revId": "c08339ab5219cbd7d2bf05aa15d243560968b78f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
