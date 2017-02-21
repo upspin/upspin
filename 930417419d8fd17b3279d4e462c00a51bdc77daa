@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a55b495_485a3611",
+        "filename": "doc/deploying_to_google_cloud.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-21T03:13:15Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "930417419d8fd17b3279d4e462c00a51bdc77daa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a2534b23_60b51bda",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-21T03:13:15Z",
+      "side": 1,
+      "message": "```\nupspin keygen -where /home/you/upspin/deploy/example.com -secretseed \u003ca full length one here please - long but truncation is confusing\u003e\n```\n\nno indentation. be consistent with the others",
+      "revId": "930417419d8fd17b3279d4e462c00a51bdc77daa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
