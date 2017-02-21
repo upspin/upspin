@@ -81,7 +81,7 @@ Instead, the `upspin setupdomain` command will do the work for you.
 This command sets up users for our example domain:
 
 ```
-$ upspin -project=example-project setupdomain example.com
+$ upspin -project=example-project setupdomain -cluster example.com
 ```
 
 and should print something like this:
@@ -105,7 +105,7 @@ Once the DNS change propagates the key server will use the TXT record to
 verify that you@gmail.com is authorized to create users under example.com.
 To create the server users for this domain, run this command:
 
-  $ upspin -project=example-project setupdomain -put-users example.com
+  $ upspin -project=example-project setupdomain -cluster -put-users example.com
 ```
 
 ---
@@ -138,7 +138,7 @@ special variant of the `setupdomain` command with by the `-put-users` flag.
 Run this next:
 
 ```
-$ upspin -project=example-project setupdomain -put-users example.com
+$ upspin -project=example-project setupdomain -cluster -put-users example.com
 ```
 
 The command should print something like this:
