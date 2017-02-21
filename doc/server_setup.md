@@ -77,7 +77,7 @@ This command sets up users for our example domain:
 $ upspin setupdomain -domain=example.com
 ```
 
-and should print something like this:
+It should produce output like this:
 
 ```
 Domain configuration and keys for the user
