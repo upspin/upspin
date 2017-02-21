@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "af0048f3_213fd295",
+        "filename": "log/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 255,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-21T21:28:08Z",
+      "side": 1,
+      "message": "can you please put this next to the variable declaration\nwhen i see the defaultlogger the first thing i want to know is what it is\ni don\u0027t want to scroll to the bottom of the file to find out",
+      "revId": "19224a1aa6817264bcac94f6bd47bdd6e9486097",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
