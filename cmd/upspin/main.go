@@ -6,6 +6,7 @@
 // config. It also provides commands for maintaining the user's state not easily
 // done by the client, such as signing up a new user, changing keys, or updating
 // sharing information.
+// Run upspin with no arguments for more information.
 package main
 
 import (
@@ -39,6 +40,40 @@ import (
 	// Load required transports
 	"upspin.io/transports"
 )
+
+const intro = `
+The upspin command provides utilities for creating and administering
+Upspin files, users, and servers. Although Upspin data is often
+accessed through the host file system using upspinfs, the upspin
+command is necessary for other tasks, such as: changing a user's
+keys (upspin user); updating the wrapped keys after access permissions
+are changed (upspin share); or seeing all the information about an
+Upspin file beyond what is visible through the host file system
+(upspin info). It can also be used separately from upspinfs to
+create, read, and update files.
+
+Each subcommand has a -help flag that explains it in more detail.
+For instance
+
+	upspin user -help
+
+explains the purpose and usage of the user subcommand.
+
+There is a set of global flags such as -config to identify the
+configuration file to use (default $HOME/upspin/config) and -log
+to set the logging level for debugging. These flags apply across
+the subcommands.
+
+Each subcommand has its own set of flags, which if used must appear
+after the subcommand name. For example, to run the ls command with
+its -l flag and debugging enabled, run
+
+	upspin -log debug ls -l
+
+For a list of available subcommands and global flags, run
+
+	upspin -help
+`
 
 var commands = map[string]func(*State, ...string){
 	"countersign":   (*State).countersign,
@@ -84,7 +119,8 @@ func main() {
 	flags.Parse() // enable all flags
 
 	if len(flag.Args()) < 1 {
-		usage()
+		fmt.Fprintln(os.Stderr, intro)
+		os.Exit(2)
 	}
 
 	state := newState(strings.ToLower(flag.Arg(0)))
