@@ -21,10 +21,10 @@ var (
 	BlockSize = 1024 * 1024 // Keep in sync with upspin.BlockSize.
 
 	// CacheDir specifies the directory for the various file caches.
-	CacheDir = filepath.Join(os.Getenv("HOME"), "/upspin")
+	CacheDir = filepath.Join(os.Getenv("HOME"), "upspin")
 
 	// Config names the Upspin configuration file to use.
-	Config = filepath.Join(os.Getenv("HOME"), "/upspin/config")
+	Config = filepath.Join(os.Getenv("HOME"), "upspin", "config")
 
 	// HTTPAddr is the network address on which to listen for incoming
 	// insecure network connections.
