@@ -43,11 +43,10 @@ type cachedRef struct {
 	remove bool            // Remove when no longer busy.
 }
 
-// storeCache represents a write-through cache for references. If, upon adding to the cache,
+// storeCache represents a cache for references. If, upon adding to the cache,
 // we find more than limit bytes in use, we will remove the oldest entry until below
 // the limit. It is possible to push past the limit; it is a soft limit.
 //
-// TODO(p): make this a write-back cache to allow disconnected operation.
 type storeCache struct {
 	inUse int64 // Current bytes cached.
 	cfg   upspin.Config
