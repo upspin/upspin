@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "05bf6575_7aac7268",
+        "filename": "cmd/cacheserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-21T05:57:03Z",
+      "side": 1,
+      "message": "new paragraph at \"In its default\" ?",
+      "revId": "61cd13f00fe57d460c6385464ec295c252851d1c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "238493b0_0f9b738b",
+        "filename": "cmd/cacheserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-21T05:57:03Z",
+      "side": 1,
+      "message": "started by upspin and upspinfs",
+      "revId": "61cd13f00fe57d460c6385464ec295c252851d1c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1fa89c43_e48bea1a",
+        "filename": "doc/config.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-21T05:57:03Z",
+      "side": 1,
+      "message": "strictly speaking, this should be \u0027go doc upspin.io/cmd/cacheserver\u0027",
+      "revId": "61cd13f00fe57d460c6385464ec295c252851d1c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
