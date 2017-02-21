@@ -283,7 +283,8 @@ func (s *server) groupRefreshLoop() {
 			expiration := upspin.Time(lastLoaded) + upspin.Time(remoteGroupDuration.Seconds())
 			if expiration < s.now() {
 				// Remote the oldest (LRU) and calls OnEviction.
-				s.remoteGroups.RemoveOldest()
+				key, _ := s.remoteGroups.RemoveOldest()
+				lastLoaded.OnEviction(key)
 				continue // look for the next one to expire.
 			}
 			break // Oldest entry is not old enough.
