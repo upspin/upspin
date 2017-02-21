@@ -57,12 +57,5 @@ the directory server for the user's root supports them.
 		SignedName: name,
 		Packing:    upspin.PlainPack,
 	}
-	dir, err := s.client.DirServer(entry.Name)
-	if err != nil {
-		s.exit(err)
-	}
-	_, err = dir.Put(entry)
-	if err != nil {
-		s.exit(err)
-	}
+	s.DirServer(entry.Name).Put(entry)
 }
