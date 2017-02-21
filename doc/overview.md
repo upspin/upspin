@@ -315,7 +315,7 @@ other) tools.
 It is presented by the same server and constructed automatically, and cheaply,
 by building a secondary tree of historical roots of the user's tree, named by
 date.
-It is identified by the suffix `+snapsho`t attached to the user name.
+It is identified by the suffix `+snapshot` attached to the user name.
 
 For example, `ann@example.com` would be able to access her tree from December
 3, 2016 through the Upspin tree rooted at
@@ -484,4 +484,5 @@ $ go get -u upspin.io/cmd/...
 This will also install its dependencies, including libraries for the
 [Google Cloud SDK](https://cloud.google.com/sdk/).
 
-The guidelines for contributing back to the project are in a [/CONTRIBUTING.md](separate document).
+The guidelines for contributing back to the project are in a
+[separate document](https://github.com/upspin/upspin/blob/master/CONTRIBUTING.md).
