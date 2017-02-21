@@ -16,8 +16,7 @@ Next you need to decide whether you are going to deploy your own Upspin
 directory and store servers, or use those maintained by someone else.
 
 While it is straightforward to deploy one's own servers, it is a more complex
-process that is documented in
-[Deploying Upspin servers to Google Cloud](/doc/deploying_to_google_cloud.md).
+process that is documented in [Setting up `upspinserver`](/doc/server_setup.md).
 If you can use an existing service, that will save you some time and trouble.
 
 Note that there is no need for the email address and Upspin servers to be in
@@ -128,9 +127,7 @@ This will of course be done in the directory server you have registered above.
 
 If you are planning to run your own Upspin directory and store servers, you
 must deploy them now, once you are registered with the key server.
-See
-[Deploying Upspin servers to Google Cloud](/doc/deploying_to_google_cloud.md)
-for instructions to do that.
+See [Setting up `upspinserver`](/doc/server_setup.md) for instructions to do that.
 
 If you are planning to join an existing Upspin directory and store server, ask
 the administrator to add your username to the store's Writers group.
