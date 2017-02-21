@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "52cae840_36e3bf7b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-21T23:05:24Z",
+      "side": 1,
+      "message": "please make this line\n\ndoc: fix link to Google Cloud docs in server setup doc",
+      "revId": "7c42152bfaba2ae90b51f4553071a4c3f388bcd7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
