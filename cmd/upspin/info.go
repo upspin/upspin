@@ -35,8 +35,9 @@ of the link.
 		fs.Usage()
 	}
 	for _, name := range fs.Args() {
-		// We don't want to follow links, so don't use Client.
-		entries, err := s.DirServer().Glob(name)
+		// We don't want to follow links, so don't use Client for the full lookup.
+		// Talk to the dir server for the root of that path.
+		entries, err := s.DirServerForRootOf(upspin.PathName(name)).Glob(name)
 		// ErrFollowLink is OK; we still get the relevant entry.
 		if err != nil && err != upspin.ErrFollowLink {
 			s.exit(err)
@@ -246,7 +247,7 @@ func (s *State) doCheckGroupFile(parsed path.Parsed, groupSeen map[upspin.PathNa
 
 	// Get the Access file, if any, that applies.
 	// TODO: We've already got it in earlier code, so could save it.
-	whichAccess, err := s.DirServer().WhichAccess(group)
+	whichAccess, err := s.DirServer(group).WhichAccess(group)
 	if err != nil {
 		s.exitf("unexpected error finding Access file for Group file %s: %v", group, err)
 	}

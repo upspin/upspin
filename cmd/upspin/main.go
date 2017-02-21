@@ -263,12 +263,22 @@ func newState(op string) *State {
 	return s
 }
 
-func (s *State) DirServer() upspin.DirServer {
-	dir, err := bind.DirServer(s.config, s.config.DirEndpoint())
+// DirServer returns the DirServer for the name, or exits on failure.
+func (s *State) DirServer(name upspin.PathName) upspin.DirServer {
+	dir, err := s.client.DirServer(name)
 	if err != nil {
 		s.exit(err)
 	}
 	return dir
+}
+
+// DirServerForRootOf returns the DirServer for the root of the name, or exits on failure.
+func (s *State) DirServerForRootOf(name upspin.PathName) upspin.DirServer {
+	parsed, err := path.Parse(name)
+	if err != nil {
+		s.exit(err)
+	}
+	return s.DirServer(upspin.PathName(parsed.User()))
 }
 
 func (s *State) KeyServer() upspin.KeyServer {
@@ -371,7 +381,8 @@ func (s *State) globOneUpspinPath(pattern string) upspin.PathName {
 // single Upspin path. The result must not be a link, but it's OK if it does not
 // exist at all.
 func (s *State) globOneUpspinNoLinks(pattern string) upspin.PathName {
-	entries, err := s.DirServer().Glob(pattern) // Use Dir not Client to catch links.
+	// Use Dir not Client to catch links.
+	entries, err := s.DirServer(upspin.PathName(pattern)).Glob(pattern)
 	if err == upspin.ErrFollowLink {
 		s.exitf("%s is a link", entries[0].Name)
 	}
