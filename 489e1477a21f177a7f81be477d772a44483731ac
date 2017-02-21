@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "33ac2c52_a1540491",
+        "filename": "log/log.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-21T21:19:41Z",
+      "side": 1,
+      "message": "i don\u0027t understand this comment, sorry.\nabove we have a \"set of default loggers\" but here we have a \"pre-instantiated logger\".\n\ncan you explain this better?",
+      "revId": "489e1477a21f177a7f81be477d772a44483731ac",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
