@@ -66,6 +66,57 @@ func TestLookup(t *testing.T) {
 	}
 }
 
+func BenchmarkLookup(b *testing.B) {
+	b.StopTimer()
+	k := benchKeyServer()
+	b.StartTimer()
+	for i := 0; i < b.N; i++ {
+		_, err := k.Lookup("other@domain.org")
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
+// benchKeyServer creates a server bound to user@example.com that can lookup an
+// existing user named "other@domain.org",
+func benchKeyServer() *server {
+	const (
+		myName    = "user@example.com"
+		otherUser = "other@domain.org"
+	)
+
+	user := &upspin.User{
+		Name: otherUser,
+		Dirs: []upspin.Endpoint{
+			{
+				Transport: upspin.Remote,
+				NetAddr:   upspin.NetAddr("there.co.uk"),
+			},
+		},
+		Stores: []upspin.Endpoint{
+			{
+				Transport: upspin.Remote,
+				NetAddr:   upspin.NetAddr("down-under.au"),
+			},
+		},
+		PublicKey: upspin.PublicKey("my key"),
+	}
+	ue := userEntry{
+		User:    *user,
+		IsAdmin: isAdmin,
+	}
+	buf, err := json.Marshal(ue)
+	if err != nil {
+		panic(err)
+	}
+
+	// Create a server authenticated with myName and with a pre-existing User entry for myName.
+	u, _ := newKeyServerWithMocking(myName, otherUser, buf)
+
+	return u
+}
+
 func TestNotAdminPutOther(t *testing.T) {
 	const (
 		myName    = "cool@dude.com"
