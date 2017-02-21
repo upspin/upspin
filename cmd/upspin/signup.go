@@ -18,6 +18,7 @@ import (
 	"text/template"
 
 	"upspin.io/config"
+	"upspin.io/flags"
 	"upspin.io/upspin"
 	"upspin.io/user"
 )
@@ -32,7 +33,7 @@ the given email address (or "username").
 Signup writes a the configuration file to $HOME/upspin/config, holding the
 username and the location of the directory and store servers. It writes the
 public and private keys to $HOME/.ssh. These locations may be set using the
--config and -where flags.
+global -config and signup-specific -where flags.
 
 The -dir and -store flags specify the network addresses of the Store and
 Directory servers that the Upspin user will use. The -server flag may be used
@@ -49,7 +50,6 @@ file and keys and only send the signup request to the key server.
 	fs := flag.NewFlagSet("signup", flag.ExitOnError)
 	var (
 		force       = fs.Bool("force", false, "create a new user even if keys and config file exist")
-		configFile  = fs.String("config", filepath.Join(os.Getenv("HOME"), "upspin", "config"), "location of the config `file`")
 		where       = fs.String("where", filepath.Join(os.Getenv("HOME"), ".ssh"), "`directory` to store keys")
 		dirServer   = fs.String("dir", "", "Directory server `address`")
 		storeServer = fs.String("store", "", "Store server `address`")
@@ -60,21 +60,21 @@ file and keys and only send the signup request to the key server.
 	fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
 	fs.String("secretseed", "", "128 bit secret `seed` in proquint format")
 
-	s.parseFlags(fs, args, help, "signup [flags] <username>")
+	s.parseFlags(fs, args, help, "[-config=<file>] signup [flags] <username>")
 
 	// Determine config file location.
-	if !filepath.IsAbs(*configFile) {
+	if !filepath.IsAbs(flags.Config) {
 		// User must have a home dir in the local OS.
 		homedir, err := config.Homedir()
 		if err != nil {
 			s.exit(err)
 		}
-		*configFile = filepath.Join(homedir, *configFile)
+		flags.Config = filepath.Join(homedir, flags.Config)
 	}
 
 	if *signupOnly {
 		// Don't generate; just send the signup request to the key server.
-		s.registerUser(*configFile)
+		s.registerUser(flags.Config)
 		return
 	}
 
@@ -117,9 +117,9 @@ file and keys and only send the signup request to the key server.
 	defer restoreEnvironment(env)
 
 	// Verify if we have a config file.
-	_, err = config.FromFile(*configFile)
+	_, err = config.FromFile(flags.Config)
 	if err == nil && !*force {
-		s.exitf("%s already exists", *configFile)
+		s.exitf("%s already exists", flags.Config)
 	}
 
 	// Write the config file.
@@ -134,33 +134,33 @@ file and keys and only send the signup request to the key server.
 	if err != nil {
 		s.exit(err)
 	}
-	err = ioutil.WriteFile(*configFile, configContents.Bytes(), 0640)
+	err = ioutil.WriteFile(flags.Config, configContents.Bytes(), 0640)
 	if err != nil {
 		// Directory doesn't exist, perhaps.
 		if !os.IsNotExist(err) {
-			s.exitf("cannot create %s: %v", *configFile, err)
+			s.exitf("cannot create %s: %v", flags.Config, err)
 		}
-		dir := filepath.Dir(*configFile)
+		dir := filepath.Dir(flags.Config)
 		if _, statErr := os.Stat(dir); !os.IsNotExist(statErr) {
 			// Looks like the directory exists, so stop now and report original error.
-			s.exitf("cannot create %s: %v", *configFile, err)
+			s.exitf("cannot create %s: %v", flags.Config, err)
 		}
 		if mkdirErr := os.Mkdir(dir, 0700); mkdirErr != nil {
 			s.exitf("cannot make directory %s: %v", dir, mkdirErr)
 		}
-		err = ioutil.WriteFile(*configFile, configContents.Bytes(), 0640)
+		err = ioutil.WriteFile(flags.Config, configContents.Bytes(), 0640)
 		if err != nil {
 			s.exit(err)
 		}
 	}
 	fmt.Println("Configuration file written to:")
-	fmt.Printf("\t%s\n\n", *configFile)
+	fmt.Printf("\t%s\n\n", flags.Config)
 
 	// Generate a new key.
 	s.keygenCommand(fs)
 
 	// Send the signup request to the key server.
-	s.registerUser(*configFile)
+	s.registerUser(flags.Config)
 }
 
 // registerUser reads the config file and sends its information to the key server.
