@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "442845fd_ba40d281",
+        "filename": "cmd/keyserver/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-21T20:56:37Z",
+      "side": 1,
+      "message": "say why",
+      "revId": "724e5d7588045305d98f350bc3e947d16bff8085",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c9ccf55c_d82e70f8",
+        "filename": "log/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-21T20:56:37Z",
+      "side": 1,
+      "message": "Call this\n\n\"The set of default loggers for each log level.\"\n\nthen you can refer to them as \"default loggers\" throughout.",
+      "revId": "724e5d7588045305d98f350bc3e947d16bff8085",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "412ba756_c7890cd0",
+        "filename": "log/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-21T20:56:37Z",
+      "side": 1,
+      "message": "What are you trying to say here?\n\nWhy not just\n\n\"Register connects an ExternalLogger to the default logger.\"",
+      "revId": "724e5d7588045305d98f350bc3e947d16bff8085",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "43a74940_f15a8ed5",
+        "filename": "log/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-21T20:56:37Z",
+      "side": 1,
+      "message": "SetOutput sets the default logger output to w.",
+      "revId": "724e5d7588045305d98f350bc3e947d16bff8085",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
