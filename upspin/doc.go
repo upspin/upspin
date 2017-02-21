@@ -43,10 +43,21 @@ Finally, the Client interface provides a coherent high-level file-like API
 that, internally, calls upon the other services to access and manage the data.
 Most applications using Upspin will talk to the Client interface alone.
 
+Most users of Upspin will use the public KeyServer at key.upspin.io
+to hold their public keys, but run private DirServers and StoreServers.
+The shared key server combined with uniform interfaces provide a
+consistent public view of the system.
+
 Many of the methods of the types in this package accept or return slices or
 pointers to data structures. It is a requirement that all implementations of
 these methods do not share data with the caller, that is, that data passed can
 be modified safely by the method or the caller without affecting the memory of
 the caller or the method, respectively.
+
+For more information about the overall system see
+
+	upspin.io/doc/overview.md
+
+and other documents in that directory.
 */
 package upspin
