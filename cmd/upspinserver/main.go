@@ -54,7 +54,7 @@ var (
 func main() {
 	flags.Parse("https", "log")
 
-	server, cfg, err := initServer()
+	server, cfg, err := initServer(startup)
 	if err == noConfig {
 		log.Print("Configuration file not found. Running in setup mode.")
 		http.Handle("/", &setupHandler{})
@@ -82,7 +82,14 @@ func main() {
 
 var noConfig = errors.Str("no configuration")
 
-func initServer() (*ServerConfig, upspin.Config, error) {
+type initMode int
+
+const (
+	startup initMode = iota
+	setupServer
+)
+
+func initServer(mode initMode) (*ServerConfig, upspin.Config, error) {
 	serverConfig, err := readServerConfig()
 	if os.IsNotExist(err) {
 		return nil, nil, noConfig
@@ -143,11 +150,14 @@ func initServer() (*ServerConfig, upspin.Config, error) {
 
 	log.Println("Store and Directory servers initialized.")
 
-	go func() {
-		if err := setupWriters(storeCfg); err != nil {
-			log.Printf("Error creating Writers file: %v", err)
-		}
-	}()
+	if mode == setupServer {
+		// Create Writers file if this was triggered by 'upspin setupserver'.
+		go func() {
+			if err := setupWriters(storeCfg); err != nil {
+				log.Printf("Error creating Writers file: %v", err)
+			}
+		}()
+	}
 	return serverConfig, cfg, nil
 }
 
@@ -210,7 +220,7 @@ func (h *setupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	_, cfg, err := initServer()
+	_, cfg, err := initServer(setupServer)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
