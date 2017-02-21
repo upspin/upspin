@@ -54,6 +54,7 @@ The calling user must be the same one that ran 'upspin setupdomain'.
 	cfgPath := filepath.Join(*where, *domain)
 	cfg := s.readServerConfig(cfgPath)
 
+	// Stash the provided host name in the server config file.
 	if !strings.Contains(*host, ":") {
 		*host += ":443"
 	}
@@ -62,8 +63,12 @@ The calling user must be the same one that ran 'upspin setupdomain'.
 		s.exitf("invalid -host argument %q: %v", *host, err)
 	}
 	cfg.Addr = upspin.NetAddr(*host)
-
 	s.writeServerConfig(cfgPath, cfg)
+
+	ep := upspin.Endpoint{
+		Transport: upspin.Remote,
+		NetAddr:   cfg.Addr,
+	}
 
 	// Put the server user to the key server.
 	key, err := bind.KeyServer(s.config, s.config.KeyEndpoint())
@@ -102,16 +107,29 @@ The calling user must be the same one that ran 'upspin setupdomain'.
 		s.exit(err)
 	}
 
+	// Write Upspin config file for the server user,
+	// for convenience when acting as the server user.
+	configFile := filepath.Join(cfgPath, "config")
+	configBody := new(bytes.Buffer)
+	if err := configTemplate.Execute(configBody, configData{
+		UserName:  upspin.UserName("upspin@" + *domain),
+		Store:     &ep,
+		Dir:       &ep,
+		SecretDir: cfgPath,
+		Packing:   "ee",
+	}); err != nil {
+		s.exit(err)
+	}
+	if err := ioutil.WriteFile(configFile, configBody.Bytes(), 0644); err != nil {
+		s.exit(err)
+	}
+
 	// Put server config to the remote upspinserver.
 	s.configureServer(cfgPath, cfg)
 	fmt.Printf("Configured upspinserver at %q.\n", cfg.Addr)
 
 	// Check that the current configuration points to our new server.
 	// If not, ask the user to change it and update the key server.
-	ep := upspin.Endpoint{
-		Transport: upspin.Remote,
-		NetAddr:   cfg.Addr,
-	}
 	if s.config.DirEndpoint() != ep || s.config.StoreEndpoint() != ep {
 		fmt.Printf("Your current configuration in %q has these values:\n", flags.Config)
 		fmt.Printf("\tdirserver: %v\n\tstoreserver: %v\n\n", s.config.DirEndpoint(), s.config.StoreEndpoint())
