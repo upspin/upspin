@@ -41,9 +41,8 @@ func TestDisable(t *testing.T) {
 }
 
 func TestFatal(t *testing.T) {
-	const (
-		msg = "will abort anyway"
-	)
+	const msg = "will abort anyway"
+
 	setMockLogger(msg, true)
 
 	SetLevel("error")
@@ -61,6 +60,28 @@ func TestAt(t *testing.T) {
 	if !At("error") {
 		t.Errorf("Error is expected to be enabled when level is info")
 	}
+}
+
+func TestRemoteLogging(t *testing.T) {
+	const (
+		msg           = "hi, hello, how are you?"
+		fatalExpected = true
+	)
+	mockExternal := &mockLogger{
+		expected: msg,
+	}
+	Register(mockExternal)
+	setMockLogger(msg, !fatalExpected)
+
+	Print(msg)
+
+	mockExternal.Verify(t)
+	defaultLogger.(*mockLogger).Verify(t)
+}
+
+func TestDisableLocal(t *testing.T) {
+	SetWriter(nil) // disable local logging.
+	Print("not printed")
 }
 
 func setMockLogger(expected string, fatalExpected bool) {
@@ -106,4 +127,11 @@ func (ml *mockLogger) Verify(t *testing.T) {
 	if ml.fatal != ml.fatalExpected {
 		t.Errorf("Expected fatal %v, got %v", ml.fatalExpected, ml.fatal)
 	}
+}
+
+// mockLogger is also an ExternalLogger.
+func (ml *mockLogger) Flush() {
+}
+func (ml *mockLogger) Log(l Level, s string) {
+	ml.Print(s)
 }
