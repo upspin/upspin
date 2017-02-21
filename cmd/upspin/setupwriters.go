@@ -28,13 +28,11 @@ A wildcard permits access to all users of a domain ("*@example.com").
 
 The user name of the project's directory server is automatically included in
 the list, so the directory server can use the store for its own data storage.
-
-This command is designed to operate on projects created by setupdomain -cluster.
 `
 	fs := flag.NewFlagSet("setupwriters", flag.ExitOnError)
 	where := fs.String("where", filepath.Join(os.Getenv("HOME"), "upspin", "deploy"), "`directory` containing private configuration files")
 	domain := fs.String("domain", "", "domain `name` for this Upspin installation")
-	s.parseFlags(fs, args, help, "[-project=<gcp_project_name>] setupwriters [-where=$HOME/upspin/deploy] -domain=<domain> <user names>")
+	s.parseFlags(fs, args, help, "setupwriters [-where=$HOME/upspin/deploy] -domain=<domain> <user names>")
 
 	if *where == "" {
 		s.failf("the -where flag must not be empty")
@@ -61,17 +59,26 @@ This command is designed to operate on projects created by setupdomain -cluster.
 		s.exitf("specified location is not a directory: %v", cfgDir)
 	}
 
-	storeCfg, err := config.FromFile(filepath.Join(cfgDir, "storeserver/config"))
-	if err != nil {
+	var dirUser upspin.UserName
+	storeCfg, err := config.FromFile(filepath.Join(cfgDir, "config"))
+	if errors.Match(errors.E(errors.NotExist), err) {
+		storeCfg, err = config.FromFile(filepath.Join(cfgDir, "storeserver", "config"))
+		if err != nil {
+			s.exit(err)
+		}
+		dirCfg, err := config.FromFile(filepath.Join(cfgDir, "dirserver/config"))
+		if err != nil {
+			s.exit(err)
+		}
+		// Created by setupdomain -cluster, separate users for dir and store.
+		dirUser = dirCfg.UserName()
+	} else if err != nil {
 		s.exit(err)
+	} else {
+		// Created by setupdomain -cluster=false, one user for dir and store.
+		dirUser = storeCfg.UserName()
 	}
-	dirCfg, err := config.FromFile(filepath.Join(cfgDir, "dirserver/config"))
-	if err != nil {
-		s.exit(err)
-	}
-
 	storeUser := storeCfg.UserName()
-	dirUser := dirCfg.UserName()
 
 	// Act as the store user.
 	c := client.New(storeCfg)
@@ -90,7 +97,9 @@ This command is designed to operate on projects created by setupdomain -cluster.
 	// Prepare Access file and put it to the server.
 	buf := new(bytes.Buffer)
 	fmt.Fprintf(buf, "*:%v\n", storeUser)
-	fmt.Fprintf(buf, "l,r:%v\n", dirUser)
+	if dirUser != storeUser {
+		fmt.Fprintf(buf, "l,r:%v\n", dirUser)
+	}
 	_, err = c.Put(upspin.PathName(storeUser)+"/Access", buf.Bytes())
 	if err != nil {
 		s.exit(err)
@@ -98,7 +107,10 @@ This command is designed to operate on projects created by setupdomain -cluster.
 
 	// Prepare Writers file and put it to the server.
 	buf.Reset()
-	fmt.Fprintln(buf, dirUser) // Always include the directory server's user.
+	fmt.Fprintln(buf, storeUser)
+	if dirUser != storeUser {
+		fmt.Fprintln(buf, dirUser)
+	}
 	for _, u := range users {
 		fmt.Fprintln(buf, u)
 	}
