@@ -2,14 +2,27 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Storecache is a wrapper for a storage cache implementation that presents
-// itself as an HTTP interface.
+// Cacheserver implements a directory and storage cache for Upspin. It is a
+// long-lived process that interposes itself between the client and the remote
+// services, presenting itself as a local HTTP server that behaves just like the
+// remote ones. In its default mode, it runs in writeback mode, which means the
+// writes are asynchronous and appear to complete quickly, but may take longer to
+// propagate to the servers. A flag sets writethrough mode instead, which operates
+// synchronously and more slowly, but also more safely. Cacheserver uses local disk
+// to store data it has read or written. The size of the local disk area is
+// configurable with a flag.
+//
+// The "cache:" key should be set in the config file to enable the cacheserver. It
+// will be started automatically if it is not already running, and continues to run
+// once the program that started it has exited.
 package main
 
 import (
 	"flag"
+	"fmt"
 	"net"
 	"net/http"
+	"os"
 
 	"upspin.io/config"
 	"upspin.io/dir/dircache"
@@ -37,6 +50,7 @@ var (
 )
 
 func main() {
+	flag.Usage = usage
 	flags.Parse()
 
 	// Load configuration and keys for this server. It needn't have a real username.
@@ -85,4 +99,12 @@ func main() {
 	http.Handle("/api/Dir/", ds)
 	err = http.Serve(ln, nil)
 	log.Fatalf("serve: %v", err)
+}
+
+func usage() {
+	fmt.Fprintln(os.Stderr, "Usage: cacheserver [flags]")
+	fmt.Fprintln(os.Stderr, "For more information about cacheserver, run")
+	fmt.Fprintln(os.Stderr, "\tgo doc upspin.io/cmd/cacheserver\n")
+	flag.PrintDefaults()
+	os.Exit(2)
 }
