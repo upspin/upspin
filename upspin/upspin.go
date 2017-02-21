@@ -28,18 +28,19 @@ type PathName string
 type Transport uint8
 
 const (
-	// Unassigned indicates a connection to a service that returns an error
+	// Unassigned denotes a connection to a service that returns an error
 	// from every method call. It is useful when a component wants to
 	// guarantee it does not access another service.
 	// It is also the zero value for Transport.
 	Unassigned Transport = iota
 
-	// InProcess indicates that contents are located in the current process,
+	// InProcess denotes that contents are located in the current process,
 	// typically in memory.
 	InProcess
 
-	// Remote indicates a connection to a remote server through RPC.
-	// The Endpoint's NetAddr contains the HTTP address of the remote server.
+	// Remote denotes a connection to a remote server through RPC.
+	// (Although called remote, the service may be running on the same machine.)
+	// The Endpoint's NetAddr contains the HTTP address of the server.
 	Remote
 )
 
@@ -91,10 +92,13 @@ type Signature struct {
 	R, S *big.Int
 }
 
+// DEHash is a hash of the Name, Link, Attribute, Packing, and Time
+// fields of a DirEntry. When using EE or EEIntegrity, the hash also includes the
+// encryption key, and when using EE, it includes the block checksums.
 type DEHash []byte
 
 // Factotum implements an agent, potentially remote, to handle private key operations.
-// Implementations typically provide NewFactotum() to set the key.
+// Implementations typically provide a NewFactotum() function to set the key.
 type Factotum interface {
 	// DirEntryHash is a summary used in signing and verifying directory entries.
 	DirEntryHash(n, l PathName, a Attribute, p Packing, t Time, dkey, hash []byte) DEHash
@@ -219,7 +223,7 @@ type Packer interface {
 
 const (
 	// UnassignedPack is not a packer, but a special value indicating no
-	// packer was chosen. It's an error to use this value in a DirEntry
+	// packer was chosen. It is an error to use this value in a DirEntry
 	// except when creating a directory, in which case the DirServer will
 	// assign the proper packing.
 	UnassignedPack Packing = 0
@@ -255,7 +259,7 @@ const (
 
 // User represents all the public information about an Upspin user as returned by KeyServer.
 type User struct {
-	// Name represents the user's name as an e-mail address, such as joe@smith.com.
+	// Name represents the user's name as an e-mail address, such as ann@example.com.
 	Name UserName
 
 	// Dirs is a slice of DirServer endpoints where the user's root directory may be located,
@@ -287,7 +291,7 @@ type KeyServer interface {
 	Put(user *User) error
 }
 
-// A PublicKey can be given to anyone and used for authenticating a user.
+// A PublicKey can be seen by anyone and is used for authenticating a user.
 type PublicKey string
 
 var (
@@ -415,8 +419,8 @@ type DirServer interface {
 	//
 	// If order is -1, the server first sends a sequence of events describing
 	// the entire tree rooted at name. The Events are sent in sequence
-	// such that a directory is sent before its contents. After that,
-	// the operation proceeds as normal.
+	// such that a directory is sent before its contents. After the full
+	// tree has been sent, the operation proceeds as normal.
 	//
 	// If the order is otherwise invalid, this is reported by the
 	// server sending a single event with a non-nil Error field with
@@ -494,7 +498,7 @@ type DirEntry struct {
 // data into blocks for storage. Clients are free to use any size, but this
 // value is used in various helper libraries.
 // This is also the default value for flags.BlockSize, but must be kept in
-// sync manually because flags cannot import this package.
+// sync manually because the flags package cannot import this package.
 const BlockSize = 1024 * 1024
 
 // DirBlock describes a block of data representing a contiguous section of a file.
@@ -567,16 +571,19 @@ type StoreServer interface {
 	// Delete permanently removes all storage space associated
 	// with the reference. After a successful Delete, calls to Get with the
 	// same reference will fail. If the reference is not found, an error is
-	// returned.
+	// returned. Implementations may disable this method except for
+	// privileged users.
 	Delete(ref Reference) error
 }
 
 // Client API.
 
 // The Client interface provides a higher-level API suitable for applications
-// that wish to access Upspin's name space. When Client evaluates a path
-// name and encounters a link, it evaluates the link, iteratively if necessary,
-// until it reaches an item that is not a link.
+// that wish to access Upspin's name space. Most Upspin programs should
+// use the Client interface to talk to Upspin services.
+//
+// When Client evaluates a path name and encounters a link, it evaluates the
+// link, iteratively if necessary, until it reaches an item that is not a link.
 // (The DirServer interface does not evaluate links.)
 //
 // In methods where a name is evaluated and a DirEntry returned,
@@ -586,8 +593,8 @@ type StoreServer interface {
 type Client interface {
 	// Get returns the clear, decrypted data stored under the given name.
 	// It is intended only for special purposes, since it will allocate memory
-	// for the entire "blob" to return. Most access will use the file-like
-	// API below.
+	// for the entire "blob" to return. The file-like API below can be less
+	//  memory-intensive.
 	Get(name PathName) ([]byte, error)
 
 	// Lookup returns the directory entry for the named file. The
@@ -629,7 +636,7 @@ type Client interface {
 	Rename(oldName, newName PathName) error
 
 	// Delete deletes the DirEntry associated with the name. The
-	// storage referenced by the DirEntry is not explicitly deleted,
+	// storage referenced by the DirEntry is not deleted,
 	// although the storage server may garbage collect unreferenced
 	// data independently. If the final element of the path name is a
 	// link, Delete will delete the link itself, not the link target.
@@ -641,11 +648,11 @@ type Client interface {
 	// Matching is done using Go's path.Match elementwise. The user
 	// name must be present in the pattern and is treated as a literal
 	// even if it contains metacharacters. Note that if links are
-	// evaulated while executing Glob, the Name fields of the returned
+	// evaluated while executing Glob, the Name fields of the returned
 	// DirEntries might not match the original argument pattern.
 	Glob(pattern string) ([]*DirEntry, error)
 
-	// File-like methods similar to Go's os.File API.
+	// Open and Create are file-like methods similar to Go's os.File API.
 	// The name, however, is a fully-qualified upspin PathName.
 	Create(name PathName) (File, error)
 	Open(name PathName) (File, error)
@@ -654,8 +661,8 @@ type Client interface {
 	DirServer(name PathName) (DirServer, error)
 }
 
-// The File interface has semantics and API that parallels a subset
-// of Go's os.File's. The main semantic difference, besides the limited
+// The File interface has semantics and an API that parallels a subset
+// of Go's os.File. The main semantic difference, besides the limited
 // method set, is that a Read will only return once the entire contents
 // have been decrypted and verified.
 type File interface {
@@ -670,7 +677,7 @@ type File interface {
 
 	// Read, ReadAt, Write, WriteAt and Seek implement
 	// the standard Go interfaces io.Reader, etc.
-	// Because of the nature of upsin storage, the entire
+	// Because of the nature of Upspin storage, the entire
 	// item might need to be read into memory by the
 	// implementation before Read can return any data.
 	// Similarly, Write might accumulate all data and only
@@ -691,9 +698,9 @@ type Config interface {
 	// Factotum holds the user's cryptographic keys and encapsulates crypto operations.
 	Factotum() Factotum
 
-	// Packing is the default Packing to use when creating new data items.
-	// It may be overridden by circumstances such as preferences related
-	// to the directory.
+	// Packing is the Packing to use when creating new data items, although
+	// it may be overridden by the implementation, such as to use a cleartext
+	// packing for a globally readable ("read:all")  file.
 	Packing() Packing
 
 	// KeyEndpoint is the endpoint of the KeyServer to contact to retrieve keys.
