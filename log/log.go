@@ -2,11 +2,13 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package log exports logging primitives that log to stderr and also to Google Cloud Logging.
+// Package log exports logging primitives that log to stderr and also to Google
+// Cloud Logging.
 package log
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"os"
 )
@@ -46,7 +48,7 @@ type ExternalLogger interface {
 	Flush()
 }
 
-// Pre-allocated Loggers at each logging level.
+// The set of default loggers for each log level.
 var (
 	Debug = &logger{DebugLevel}
 	Info  = &logger{InfoLevel}
@@ -55,18 +57,27 @@ var (
 
 var (
 	currentLevel         = InfoLevel
-	defaultLogger Logger = log.New(os.Stderr, "", log.Ldate|log.Ltime|log.LUTC|log.Lmicroseconds)
+	defaultLogger Logger = newDefaultLogger(os.Stderr)
 	external      ExternalLogger
 )
 
-// Register connects an ExternalLogger to the default logger and turns off
-// non-fatal local logs. This may only be called once.
+// Register connects an ExternalLogger to the default logger. This may only be
+// called once.
 func Register(e ExternalLogger) {
 	if external != nil {
 		panic("cannot register second external logger")
 	}
 	external = e
-	Info.Println("External logger is on. Local logging is turned off.")
+}
+
+// SetOutput sets the default logger (the one that is pre-instantiated) to w.
+// If w is nil, the default logger is disabled.
+func SetOutput(w io.Writer) {
+	if w == nil {
+		defaultLogger = nil
+	} else {
+		defaultLogger = newDefaultLogger(w)
+	}
 }
 
 type logger struct {
@@ -82,7 +93,8 @@ func (l *logger) Printf(format string, v ...interface{}) {
 	}
 	if external != nil {
 		external.Log(l.level, fmt.Sprintf(format, v...))
-	} else {
+	}
+	if defaultLogger != nil {
 		defaultLogger.Printf(format, v...)
 	}
 }
@@ -94,7 +106,8 @@ func (l *logger) Print(v ...interface{}) {
 	}
 	if external != nil {
 		external.Log(l.level, fmt.Sprint(v...))
-	} else {
+	}
+	if defaultLogger != nil {
 		defaultLogger.Print(v...)
 	}
 }
@@ -106,7 +119,8 @@ func (l *logger) Println(v ...interface{}) {
 	}
 	if external != nil {
 		external.Log(l.level, fmt.Sprintln(v...))
-	} else {
+	}
+	if defaultLogger != nil {
 		defaultLogger.Println(v...)
 	}
 }
@@ -119,7 +133,11 @@ func (l *logger) Fatal(v ...interface{}) {
 		external.Flush()
 		// Fall through to ensure we record it locally too.
 	}
-	defaultLogger.Fatal(v...)
+	if defaultLogger != nil {
+		defaultLogger.Fatal(v...)
+	} else {
+		log.Fatal(v...)
+	}
 }
 
 // Fatalf writes a formated message to the log and aborts, regardless of the current log level.
@@ -130,7 +148,11 @@ func (l *logger) Fatalf(format string, v ...interface{}) {
 		external.Flush()
 		// Fall through to ensure we record it locally too.
 	}
-	defaultLogger.Fatalf(format, v...)
+	if defaultLogger != nil {
+		defaultLogger.Fatalf(format, v...)
+	} else {
+		log.Fatalf(format, v...)
+	}
 }
 
 // Flush implements ExternalLogger.
@@ -227,4 +249,8 @@ func Flush() {
 	if external != nil {
 		external.Flush()
 	}
+}
+
+func newDefaultLogger(w io.Writer) Logger {
+	return log.New(w, "", log.Ldate|log.Ltime|log.LUTC|log.Lmicroseconds)
 }
