@@ -53,6 +53,7 @@ func main() {
 
 	if flags.Project != "" {
 		cloudLog.Connect(flags.Project, serverName)
+		log.SetOutput(nil) // Disable logging locally.
 		svr, err := metric.NewGCPSaver(flags.Project, metricSampleSize, metricMaxQPS, "serverName", serverName)
 		if err != nil {
 			log.Fatalf("Can't start a metric saver for GCP project %q: %s", flags.Project, err)
