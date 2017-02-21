@@ -4,9 +4,8 @@
 
 // Package transports is a helper package that aggregates
 // the key, store, and directory imports.
-// It should be imported by client programs as a convenient
+// It can be imported by Upspin programs as a convenient
 // way to link with all the transport implementations.
-// It should not be imported by server programs.
 package transports
 
 import (
