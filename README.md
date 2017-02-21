@@ -1,5 +1,7 @@
 # Upspin
 
+<img src="/images/augie.jpg" width="180" height="218" alt="Home"/>
+
 Documentation: [upspin.io](https://upspin.io/)
 
 ## About the project
@@ -24,8 +26,15 @@ Upspin has rough edges, and is not yet suitable for non-technical users.
 
 ## Contributing
 
+The code repository lives at
+[https://upspin-review.googlesource.com](upspin-review.googlesource.com)
+and is mirrored to [https://github.com/upspin/upspin](GitHub).
+
+Note that the Upspin project does not use GitHub pull requests, and
+that we use the issue tracker for bug reports and proposals only.
+
 See the [Contribution Guidelines](CONTRIBUTING.md)
-for information on contributing to the project.
+for more information on contributing to the project.
 
 
 ### Reporting issues
