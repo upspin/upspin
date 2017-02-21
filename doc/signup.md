@@ -82,6 +82,13 @@ servers:
 $ upspin signup -dir=dir.example.com -store=store.example.com you@gmail.com
 ```
 
+Or, if the directory and store servers run on the same host, specify
+that host name with the `-server` flag:
+
+```
+$ upspin signup -server=upspin.example.com you@gmail.com
+```
+
 The output of the command will look like this:
 
 ---
