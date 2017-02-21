@@ -297,7 +297,7 @@ func (s *Sharer) allEntries(names []upspin.PathName) []*upspin.DirEntry {
 	var entries []*upspin.DirEntry
 	// We will not follow links; don't use Client. Use the directory server directly.
 	for _, name := range names {
-		entry, err := s.state.DirServer().Lookup(name)
+		entry, err := s.state.DirServer(name).Lookup(name)
 		if err != nil {
 			s.state.exitf("lookup %q: %s", name, err)
 		}
@@ -322,7 +322,7 @@ func (s *Sharer) allEntries(names []upspin.PathName) []*upspin.DirEntry {
 // entriesFromDirectory returns the list of all entries in the directory, recursively if required.
 func (s *Sharer) entriesFromDirectory(dir upspin.PathName) []*upspin.DirEntry {
 	// Get list of files for this directory. See comment in allEntries about links.
-	thisDir, err := s.state.DirServer().Glob(upspin.AllFilesGlob(dir))
+	thisDir, err := s.state.DirServer(dir).Glob(upspin.AllFilesGlob(dir))
 	if err != nil {
 		s.state.exitf("globbing %q: %s", dir, err)
 	}
@@ -370,7 +370,7 @@ func (s *Sharer) addAccess(entry *upspin.DirEntry) {
 	if _, ok := s.accessFiles[name]; ok {
 		return
 	}
-	which, err := s.state.DirServer().WhichAccess(name) // Guaranteed to have no links.
+	which, err := s.state.DirServer(name).WhichAccess(name) // Guaranteed to have no links.
 	if err != nil {
 		s.state.exitf("looking up access file %q: %s", name, err)
 	}
@@ -424,7 +424,7 @@ func read(c upspin.Client, file upspin.PathName) ([]byte, error) {
 
 // fixShare updates the packdata of the named file to contain wrapped keys for all the users.
 func (s *Sharer) fixShare(name upspin.PathName, users []upspin.UserName) {
-	directory := s.state.DirServer()
+	directory := s.state.DirServer(name)
 	entry, err := directory.Lookup(name) // Guaranteed to have no links.
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "looking up %q: %s", name, err)
