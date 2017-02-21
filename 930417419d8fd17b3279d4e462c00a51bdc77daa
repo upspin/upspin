@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "400f7697_591b57a2",
+        "filename": "doc/deploying_to_google_cloud.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-21T03:42:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5a55b495_485a3611",
+      "revId": "930417419d8fd17b3279d4e462c00a51bdc77daa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a2534b23_60b51bda",
         "filename": "doc/server_setup.md",
         "patchSetId": 2
@@ -33,6 +51,24 @@
       "revId": "930417419d8fd17b3279d4e462c00a51bdc77daa",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2b555eb2_ea144a6c",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-21T03:42:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a2534b23_60b51bda",
+      "revId": "930417419d8fd17b3279d4e462c00a51bdc77daa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
