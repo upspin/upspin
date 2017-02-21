@@ -5,8 +5,8 @@
 This document describes how to run one's own Upspin servers, which includes
 deploying binaries for the Upspin servers to Google Cloud Platform and using
 them to serve user data.
-It assumes you already have the Upspin software installed.
-[TODO LINK]
+It assumes you already have the Upspin software installed,
+as described at the bottom of the [/doc/overview.md](overview document).
 
 The server binaries are built from the source in the directories
 `cmd/dirserver` and `cmd/storeserver` in the repository stored at
