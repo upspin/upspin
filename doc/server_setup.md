@@ -56,6 +56,7 @@ $ upspin signup -server=upspin.example.com you@gmail.com
 
 The [Signing up a new user](/doc/signup.md) document describes this process in
 detail.
+If you change your mind about the host name, you can update with `upspin user -put`.
 
 ## Set up your domain
 
@@ -133,9 +134,10 @@ Finally, use the `gcloud` tool to enable the required APIs:
 
 ```
 $ gcloud components install beta
+$ gcloud config set project example-com
 $ gcloud auth login
-$ gcloud --project example-com beta service-management enable iam.googleapis.com
-$ gcloud --project example-com beta service-management enable storage_api
+$ gcloud beta service-management enable iam.googleapis.com
+$ gcloud beta service-management enable storage_api
 ```
 
 ### Create a Google Cloud Storage bucket
