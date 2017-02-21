@@ -56,6 +56,7 @@ $ upspin signup -server=upspin.example.com you@gmail.com
 
 The [Signing up a new user](/doc/signup.md) document describes this process in
 detail.
+If you change your mind about the host name, you can update with `upspin user -put`.
 
 ## Set up your domain
 
