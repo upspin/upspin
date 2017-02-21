@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fdabf491_a134b5eb",
+        "filename": "cmd/performance/keyloadtester/main.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-21T19:40:19Z",
+      "side": 1,
+      "message": "not sure i\u0027d put this here. not sure i wouldn\u0027t. it could go in cmd/keyserver with a build tag.\n\nlet\u0027s let adg weigh in.\n\nin any case it should be build ignore. we don\u0027t want everyone to install this.",
+      "revId": "e8afdea77c3bc94143cecede3519c84705fab382",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "46b399d6_83274529",
+        "filename": "cmd/performance/keyloadtester/main.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-21T19:40:19Z",
+      "side": 1,
+      "message": "s/ file//",
+      "revId": "e8afdea77c3bc94143cecede3519c84705fab382",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c1ba8e78_9d4bbfa7",
+        "filename": "cmd/performance/keyloadtester/main.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-21T19:40:19Z",
+      "side": 1,
+      "message": "drop the OrDie please. that usage has always irked me. it doesn\u0027t return an error; that\u0027s signal enough",
+      "revId": "e8afdea77c3bc94143cecede3519c84705fab382",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8961acc6_1a0363e1",
+        "filename": "cmd/performance/keyloadtester/main.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-21T19:40:19Z",
+      "side": 1,
+      "message": "s/makeR/r/",
+      "revId": "e8afdea77c3bc94143cecede3519c84705fab382",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "503c12a8_425b3000",
+        "filename": "key/server/server_test.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 5005
+      },
+      "writtenOn": "2017-02-21T19:40:19Z",
+      "side": 1,
+      "message": "// comment",
+      "revId": "e8afdea77c3bc94143cecede3519c84705fab382",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
