@@ -162,7 +162,7 @@ This is done with the `upspin-deploy` command.
 
 Before issuing the command, however, one must have installed gcloud and
 kubectl, as part of setting up an account with Google Cloud Platform (GCP).
-The steps for that are covered by GCP documentation [TODO: link].
+The steps for that are covered by [GCP documentation](https://cloud.google.com/sdk/).
 
 Install the Google Cloud SDK by following
 [these instructions](https://cloud.google.com/sdk/downloads).
