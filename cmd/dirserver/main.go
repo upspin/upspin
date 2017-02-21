@@ -79,7 +79,7 @@ func main() {
 	// Wrap with permission checks, if requested.
 	var ready chan struct{}
 	if flags.StoreServerUser != "" {
-		ready := make(chan struct{})
+		ready = make(chan struct{})
 		dir, err = perm.WrapDir(cfg, ready, upspin.UserName(flags.StoreServerUser), dir)
 		if err != nil {
 			log.Fatalf("Can't wrap DirServer monitoring %s: %s", flags.StoreServerUser, err)
