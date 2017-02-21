@@ -55,4 +55,4 @@ Please note that this project is released with a [Contributor Code of Conduct](C
 By participating in this project you agree to abide by its terms.
 
 
-The Upspin mascot is Copyright 2017 Renee French. [doc/mascot.md](All Rights Reserved).
+The Upspin mascot is Copyright 2017 Renee French. [All Rights Reserved](doc/mascot.md).

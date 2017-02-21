@@ -107,7 +107,7 @@ administrator of Upspin's use of `example.com`.
 
 As a guide, here's what the DNS record looks like in Google Domains:
 
-![DNS Entries](/images/txt_dns.png)
+![DNS Entries](https://upspin.io/images/txt_dns.png)
 
 Consult your registrar's documentation if it is not clear how to add a TXT
 record to your domain.
