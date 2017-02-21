@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9d5ae670_4dcb1fa3",
+        "filename": "README.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-21T21:32:35Z",
+      "side": 1,
+      "message": "Are brackets and parens reversed here?",
+      "revId": "1c76a26181c25720ac4305e43ca84dae428ff961",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
