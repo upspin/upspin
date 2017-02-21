@@ -67,6 +67,8 @@ sends the user details and the public key to the key server.
 It also creates a local copy of the information called an "`config`" file that
 it stores in a local directory, typically `$HOME/upspin`.
 Config files are discussed in detail in [Upspin configuration](/doc/config.md).
+You should read that document to see how to set up your Upspin environment,
+including things like local caches.
 
 The second step is to receive an email message from the key server and to click
 the confirmation link that it contains.
@@ -185,5 +187,14 @@ $ upspin cp -help
 
 Although the upspin command supports all the functionality of the system, for
 smoother operation you'll want to install the FUSE daemon, `upspinfs`, and a
-cache server that improves performance.
-See TODO for details.
+cache server that improves performance. The cache server is particularly
+important, and the setup instructions are in the [Upspin configuration](/doc/config.md)
+document.
+
+For details about `upspinfs`, run
+
+```
+$ go doc upspinfs
+```
+
+TODO: There should be more about `upspinfs`.
