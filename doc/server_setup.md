@@ -1,4 +1,4 @@
-# Setting up `upspinserver`
+# Setting up upspinserver
 
 ## Introduction
 
