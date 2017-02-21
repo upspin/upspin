@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 /*
-Package upspin contains global interface and other definitions for the
+Package upspin contains global interfaces and other definitions for the
 components of the system.
 
 Upspin provides a global hierarchical name space for accessing arbitrary

@@ -327,7 +327,7 @@ as a social circle.
 ## Errors and discoverability
 
 One goal of the design of access controls in Upspin is that a user cannot
-easily discover valid names in the Upspin namespace unless granted permission
+easily discover valid names in the Upspin name space unless granted permission
 to do so.
 As a result, under some circumstances operations return "private" errors rather
 than "permission denied" errors if the operation fails.

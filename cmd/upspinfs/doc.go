@@ -15,7 +15,7 @@ to cacheserver both its -log and -cache flags.
 Usage:
 	upspinfs [flags] mountpoint
 
-	where 'mountpoint' is an existing directory upon which to mount the Upspin namespace.
+	where 'mountpoint' is an existing directory upon which to mount the Upspin name space.
 
 The flags are:
 
