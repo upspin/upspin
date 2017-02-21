@@ -1,5 +1,7 @@
 # Upspin
 
+![Augie](cmd/frontend/images/augie.jpg)
+
 Documentation: [upspin.io](https://upspin.io/)
 
 ## About the project
@@ -24,8 +26,15 @@ Upspin has rough edges, and is not yet suitable for non-technical users.
 
 ## Contributing
 
+The code repository lives at
+[upspin.googlesource.com](https://upspin.googlesource.com)
+and is mirrored to [GitHub](https://github.com/upspin/upspin).
+
+Note that the Upspin project does not use GitHub pull requests, and
+that we use the issue tracker for bug reports and proposals only.
+
 See the [Contribution Guidelines](CONTRIBUTING.md)
-for information on contributing to the project.
+for more information on contributing to the project.
 
 
 ### Reporting issues
@@ -45,3 +54,5 @@ for discussion about Upspin use and development.
 Please note that this project is released with a [Contributor Code of Conduct](CONDUCT.md).
 By participating in this project you agree to abide by its terms.
 
+
+The Upspin mascot is Copyright 2017 Renee French. [doc/mascot.md](All Rights Reserved).
