@@ -484,5 +484,4 @@ $ go get -u upspin.io/cmd/...
 This will also install its dependencies, including libraries for the
 [Google Cloud SDK](https://cloud.google.com/sdk/).
 
-The guidelines for contributing back to the project are in a separate document,
-"TODO".
+The guidelines for contributing back to the project are in a [/CONTRIBUTING.md](separate document).
