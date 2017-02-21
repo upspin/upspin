@@ -77,7 +77,7 @@ This command sets up users for our example domain:
 $ upspin setupdomain -domain=example.com
 ```
 
-and should print something like this:
+It should produce output like this:
 
 ```
 Domain configuration and keys for the user
@@ -159,7 +159,7 @@ Storage users, so it is prudent to include your domain name in the bucket name.
 $ upspin -project=<project> setupstorage -domain=example.com example-com-upspin
 ```
 
-will print something like
+It should produce output like this:
 
 ```
 Service account "upspinstorage@example-com.iam.gserviceaccount.com" created.
