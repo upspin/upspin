@@ -83,6 +83,10 @@ Domain configuration and keys for the user
   upspin@example.com
 were generated and placed under the directory:
   /home/you/upspin/deploy/example.com
+If you lose the keys you can re-create them by running this command
+  upspin keygen -where /home/you/upspin/deploy/example.com -secretseed zapal-zuhiv-visop-gagil
+Write this command down and store it in a secure, private place.
+Do not share your private key or this command with anyone.
 
 To prove that `you@gmail.com` is the owner of `example.com`,
 add the following record to example.com's DNS zone:

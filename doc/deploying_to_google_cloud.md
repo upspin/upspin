@@ -94,6 +94,11 @@ Keys and config files for the server users
   upspin-store@example.com
 were generated and placed under the directory:
   /home/you/upspin/deploy/example-project
+If you lose the keys you can re-create them by running these commands
+  upspin keygen -where /home/you/upspin/deploy/example.com/dirserver -secretseed dadij-lnjul-takiv-fomin
+  upspin keygen -where /home/you/upspin/deploy/example.com/storeserver -secretseed zapal-zuhiv-visop-gagil
+Write them down and store them in a secure, private place.
+Do not share your private keys or these commands with anyone.
 
 To prove that you@gmail.com is the owner of example.com,
 add the following record to example.com's DNS zone:

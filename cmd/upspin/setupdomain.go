@@ -73,8 +73,9 @@ If any state exists at the given location (-where) then the command aborts.
 	}
 
 	var (
-		dirServerPath   = filepath.Join(*where, *domain, "dirserver")
-		storeServerPath = filepath.Join(*where, *domain, "storeserver")
+		baseDir         = filepath.Join(*where, *domain)
+		dirServerPath   = filepath.Join(baseDir, "dirserver")
+		storeServerPath = filepath.Join(baseDir, "storeserver")
 		dirConfig       = filepath.Join(dirServerPath, "config")
 		storeConfig     = filepath.Join(storeServerPath, "config")
 	)
@@ -103,11 +104,11 @@ If any state exists at the given location (-where) then the command aborts.
 
 	// Generate keys for the dirserver and the storeserver.
 	var noProquint string
-	dirPublic, dirPrivate, _, err := createKeys(*curveName, noProquint)
+	dirPublic, dirPrivate, dirProquint, err := createKeys(*curveName, noProquint)
 	if err != nil {
 		s.exit(err)
 	}
-	storePublic, storePrivate, _, err := createKeys(*curveName, noProquint)
+	storePublic, storePrivate, storeProquint, err := createKeys(*curveName, noProquint)
 	if err != nil {
 		s.exit(err)
 	}
@@ -164,12 +165,17 @@ If any state exists at the given location (-where) then the command aborts.
 	}
 
 	err = setupDomainTemplate.Execute(os.Stdout, setupDomainData{
-		Dir:       filepath.Join(*where, flags.Project),
+		Dir:       baseDir,
 		Where:     *where,
 		Domain:    *domain,
 		Project:   flags.Project,
 		UserName:  s.config.UserName(),
 		Signature: fmt.Sprintf("%x-%x", sig.R, sig.S),
+
+		DirProquint:     dirProquint,
+		StoreProquint:   storeProquint,
+		DirServerPath:   dirServerPath,
+		StoreServerPath: storeServerPath,
 	})
 	if err != nil {
 		s.exit(err)
@@ -181,8 +187,16 @@ type setupDomainData struct {
 	Domain     string
 	Project    string
 	UserName   upspin.UserName
-	Proquint   string
 	Signature  string
+
+	// Used by setupDomain.
+	DirProquint     string
+	StoreProquint   string
+	DirServerPath   string
+	StoreServerPath string
+
+	// Used by setupHost.
+	Proquint string
 }
 
 var setupDomainTemplate = template.Must(template.New("setupdomain").Parse(`
@@ -191,6 +205,11 @@ Keys and config files for the users
 	upspin-store@{{.Domain}}
 were generated and placed under the directory:
 	{{.Dir}}
+If you lose the keys you can re-create them by running these commands
+	upspin keygen -where {{.DirServerPath}} -secretseed {{.DirProquint}}
+	upspin keygen -where {{.StoreServerPath}} -secretseed {{.StoreProquint}}
+Write them down and store them in a secure, private place.
+Do not share your private keys or these commands with anyone.
 
 To prove that {{.UserName}} is the owner of {{.Domain}},
 add the following record to {{.Domain}}'s DNS zone:
@@ -266,8 +285,9 @@ func (s *State) setuphost(where, domain, curve string) {
 		Domain:    domain,
 		Project:   flags.Project,
 		UserName:  s.config.UserName(),
-		Proquint:  proquint,
 		Signature: fmt.Sprintf("%x-%x", sig.R, sig.S),
+
+		Proquint: proquint,
 	})
 	if err != nil {
 		s.exit(err)
@@ -280,7 +300,7 @@ Domain configuration and keys for the user
 were generated and placed under the directory:
 	{{.Dir}}
 If you lose the keys you can re-create them by running this command
-	upspin keygen -secretseed {{.Proquint}}
+	upspin keygen -where {{.Dir}} -secretseed {{.Proquint}}
 Write this command down and store it in a secure, private place.
 Do not share your private key or this command with anyone.
 
