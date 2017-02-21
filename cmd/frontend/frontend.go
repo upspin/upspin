@@ -157,7 +157,7 @@ func (s *server) renderDoc(w http.ResponseWriter, fn string) {
 // ServeHTTP satisfies the http.Handler interface for a server. It
 // will compress all responses if the appropriate request headers are set.
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Scheme == "https" {
+	if r.TLS != nil {
 		w.Header().Set("Strict-Transport-Security", "max-age=86400; includeSubDomains")
 	}
 
