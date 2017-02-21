@@ -18,7 +18,8 @@ run `upspinserver` by following these instructions.
 
 ## Create a user for `upspinserver`
 
-The following commands must be executed on the server as the super user, `root`.
+The following commands must be executed on the server as the super user, `root`,
+perhaps via `sudo sh`.
 
 Create a Unix account named `upspin`.
 For the password, use a secure password generator to create a long, unguessable

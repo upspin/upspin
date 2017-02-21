@@ -9,12 +9,6 @@ In particular, all the information necessary to decide the accessibility of an
 item in the tree under user U's root is available to the Directory server
 holding U's root.
 
-Authentication is a different topic not covered here.
-If U says V can access an item named in U's tree, how V proves to U's Directory
-server that the requester really is V is left for a
-[different discussion](https://www.google.com/url?q=https://docs.google.com/document/d/1XY3eK_dDBWJhqzSCMEjDcqbmjomiZwsR376jPAXFLhI/edit%23heading%3Dh.899pjm5iyda8&sa=D&ust=1456964725916000&usg=AFQjCNGWkyr1F_uLDg1cBhvLZIp8AFtt4A).
-TODO MOVE THIS INTO DOCS? SECURITY?
-
 Despite the length of this document, the general model is very simple.
 Plain text files describe what rights are granted, saying for instance that a
 given user may read files.
@@ -28,6 +22,9 @@ By user, we mean an account known to the Upspin Key service, identified by an
 e-mail-like name: `ann@example.com`.
 Each valid user has a *user* *root* directory held on at least one Directory
 server.
+Each user proves identity to Directory servers,
+their own and others',
+using the user's key pair registered in the central Key server.
 
 ## Groups
 
