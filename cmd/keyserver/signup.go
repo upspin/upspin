@@ -88,7 +88,7 @@ func (m *signupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		PublicKey: upspin.PublicKey(v("key")),
 	}
 	if err := valid.UserName(u.Name); err != nil {
-		errorf(http.StatusBadRequest, "invalid user name")
+		errorf(http.StatusBadRequest, "invalid user name: %s", u.Name)
 		return
 	}
 	sigR, sigS, nowS := v("sigR"), v("sigS"), v("now")
@@ -97,7 +97,7 @@ func (m *signupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Lookup userName. It must not exist yet.
 	_, err := m.key.Lookup(u.Name)
 	if err == nil {
-		errorf(http.StatusBadRequest, "user already exists on key server")
+		errorf(http.StatusBadRequest, "user already exists on key server: %s", u.Name)
 		return
 	} else if !errors.Match(errors.E(errors.NotExist), err) {
 		errorf(http.StatusInternalServerError, "error looking up user: %v", err)
