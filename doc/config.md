@@ -126,7 +126,11 @@ interactions with Upspin by caching directories and storage blocks.
 It is usually run as a service on the local machine at some convenient address
 such as `localhost:8888`.
 If the cache is not set by the config file, none is used.
-For more information about the cache server, run `go doc cacheserver`.
+For more information about the cache server, run
+
+```
+go doc upspin.io/cmd/cacheserver
+```
 
 * The **`secrets`** setting identifies a directory in which the user's public
 and private keys are stored.
