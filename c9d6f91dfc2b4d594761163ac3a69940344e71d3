@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bf979503_55164a3f",
+        "filename": "doc/access_control.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-21T19:35:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3298ccf9_f5515a79",
+      "revId": "c9d6f91dfc2b4d594761163ac3a69940344e71d3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "47b78e62_5c8d780b",
         "filename": "doc/server_setup_ubuntu.md",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2017-02-21T19:30:36Z",
       "side": 1,
       "message": "sudo su \n\nis probably what you want",
+      "revId": "c9d6f91dfc2b4d594761163ac3a69940344e71d3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c0ec32fb_4cdb9d39",
+        "filename": "doc/server_setup_ubuntu.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5025
+      },
+      "writtenOn": "2017-02-21T19:35:42Z",
+      "side": 1,
+      "message": "Done.\n\nI don\u0027t fully appreciate the difference, but happy to go with your version.",
+      "parentUuid": "47b78e62_5c8d780b",
       "revId": "c9d6f91dfc2b4d594761163ac3a69940344e71d3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
