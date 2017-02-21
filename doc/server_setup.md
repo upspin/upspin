@@ -126,7 +126,7 @@ First create a Google Cloud Project and associated Billing Account by visiting t
 [Cloud Console](https://cloud.google.com/console).
 See the corresponding documentation
 [here](https://support.google.com/cloud/answer/6251787?hl=en) and
-[here]([https://support.google.com/cloud/answer/6288653?hl=en)
+[here](https://support.google.com/cloud/answer/6288653?hl=en)
 for help.
 For the project name, we suggest you use a string similar to your domain.
 (We will use `example-com`.)
