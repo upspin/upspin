@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "8919fd3d_4f9ea3c0",
+        "filename": "serverutil/ratecounter.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-22T17:27:18Z",
+      "side": 1,
+      "message": "Its really a sampling rate and averaging period.  Perhaps we should just call them that.\n\nAn alternative would be to always assign a lot of buckets and specify the averaging period as a param to rate and have it return the avg rate over that period.",
+      "parentUuid": "4635eb6b_5b8d4fea",
+      "revId": "c63f3c1164da87637e97b0ed9680743c6018f4f8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "e9e5250d_bfd76939",
         "filename": "serverutil/ratecounter.go",
         "patchSetId": 1
@@ -47,6 +65,29 @@
       "writtenOn": "2017-02-22T17:12:27Z",
       "side": 1,
       "message": "don\u0027t mix math and prose.\n\ns/\u003e 0/positive/",
+      "revId": "c63f3c1164da87637e97b0ed9680743c6018f4f8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8a66eda5_4389095f",
+        "filename": "serverutil/ratecounter.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-22T17:27:18Z",
+      "side": 1,
+      "message": "If Adding happens a lot, a more efficient version would always just have a \u0027sum\u0027 field and add to that.  Moving it to a bucket could happen in loop(), i.e., instead of just incrementing r.b there, increment r.b and copy r.sum to r.buckets[r.b].  Tradeoff depends on which you expect to be more frequent.\n\nOf course, if you expect Add to be not too frequent, there\u0027s no reason for loop().  You can just grab the time.Now() and figure out which bucket to increment.\n\nJust suggestions, the current implementation is fine by me.",
+      "range": {
+        "startLine": 49,
+        "startChar": 22,
+        "endLine": 49,
+        "endChar": 36
+      },
       "revId": "c63f3c1164da87637e97b0ed9680743c6018f4f8",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
