@@ -15,7 +15,7 @@ When filing an issue, make sure to answer these five questions:
 4. What did you expect to see?
 5. What did you see instead?
 
-Sensitive security-related issues should be reported to [ehg@google.com](mailto:ehg@google.com).
+Sensitive security-related issues should be reported to [grosse@gmail.com](mailto:grosse@gmail.com).
 
 
 ## Contributing code
