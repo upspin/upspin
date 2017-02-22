@@ -336,8 +336,8 @@ func isSnapshotControlFile(p path.Parsed) bool {
 // isValidSnapshotControlEntry reports whether an entry correctly represents the
 // control entry we expect in order to start a new snapshot.
 func isValidSnapshotControlEntry(entry *upspin.DirEntry) error {
-	if len(entry.Blocks) != 0 || entry.Packing != upspin.PlainPack || entry.IsLink() || entry.IsDir() {
-		return errors.E(errors.Invalid, entry.Name, errors.Str("snapshot control entry must be an empty plain-packed file"))
+	if len(entry.Blocks) != 0 || entry.IsLink() || entry.IsDir() {
+		return errors.E(errors.Invalid, entry.Name, errors.Str("snapshot control entry must be an empty file"))
 	}
 	return nil
 }
