@@ -297,7 +297,7 @@ func (s *server) putUserEntry(op string, entry *userEntry) error {
 	if err != nil {
 		return errors.E(op, errors.Invalid, err)
 	}
-	if _, err = s.storage.Put(string(entry.User.Name), b); err != nil {
+	if err = s.storage.Put(string(entry.User.Name), b); err != nil {
 		return errors.E(op, errors.IO, err)
 	}
 	return nil

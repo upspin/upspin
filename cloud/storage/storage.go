@@ -17,12 +17,6 @@ import (
 // Storage is a low-level storage interface for services to store their data
 // permanently. Storage implementations must be safe for concurrent use.
 type Storage interface {
-	// Get returns a link for downloading ref from the storage backend,
-	// if the ref is publicly readable and the backend offers direct links.
-	// If the backend does not offer direct links it returns
-	// upspin.ErrNotSupported.
-	Get(ref string) (link string, err error)
-
 	// LinkBase returns the base URL from which any ref may be downloaded.
 	// If the backend does not offer direct links it returns
 	// upspin.ErrNotSupported.
@@ -34,7 +28,7 @@ type Storage interface {
 	// Put stores the contents given as ref on the storage backend.
 	// It may return a direct link for retrieving data directly from
 	// the backend, if it provides direct links.
-	Put(ref string, contents []byte) (refLink string, err error)
+	Put(ref string, contents []byte) error
 
 	// ListPrefix lists all files that match a given prefix, up to a
 	// certain depth, counting from the prefix, not absolute
