@@ -13,9 +13,7 @@ Your username is how the Upspin system and its users will identify you and your
 files.
 
 Next you need to decide whether you are going to deploy your own Upspin
-directory and store servers (currently this requires you to use Google Cloud
-Storage, a limitation that will be lifted soon), or use those maintained by
-someone else.
+directory and store servers, or use those maintained by someone else.
 
 While it is straightforward to deploy one's own servers, it is a more complex
 process that is documented in [Setting up `upspinserver`](/doc/server_setup.md).
