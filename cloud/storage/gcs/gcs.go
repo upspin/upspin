@@ -139,56 +139,6 @@ func (gcs *gcsImpl) Put(ref string, contents []byte) error {
 	}
 }
 
-// ListPrefilx implements Storage.
-func (gcs *gcsImpl) ListPrefix(prefix string, depth int) ([]string, error) {
-	var names []string
-	pageToken := ""
-	prefixDepth := strings.Count(prefix, "/")
-	for {
-		objs, err := gcs.service.Objects.List(gcs.bucketName).Prefix(prefix).Fields("items(name),nextPageToken").PageToken(pageToken).Do()
-		if err != nil {
-			return nil, err
-		}
-		for _, o := range objs.Items {
-			// Only append o.Name if it doesn't violate depth.
-			objDepth := strings.Count(o.Name, "/")
-			netDepth := objDepth - prefixDepth
-			if netDepth < 0 {
-				log.Error.Printf("cloud/storage/gcs: WARNING: negative depth should never happen.")
-				continue
-			}
-			if netDepth <= depth {
-				names = append(names, o.Name)
-			}
-		}
-		if objs.NextPageToken == "" {
-			break
-		}
-		pageToken = objs.NextPageToken
-	}
-	return names, nil
-}
-
-// ListDir implements Storage.
-func (gcs *gcsImpl) ListDir(dir string) ([]string, error) {
-	var names []string
-	pageToken := ""
-	for {
-		objs, err := gcs.service.Objects.List(gcs.bucketName).Prefix(dir).Delimiter("/").Fields("items(name),nextPageToken").PageToken(pageToken).Do()
-		if err != nil {
-			return nil, err
-		}
-		for _, o := range objs.Items {
-			names = append(names, o.Name)
-		}
-		if objs.NextPageToken == "" {
-			break
-		}
-		pageToken = objs.NextPageToken
-	}
-	return names, nil
-}
-
 // Delete implements Storage.
 func (gcs *gcsImpl) Delete(ref string) error {
 	err := gcs.service.Objects.Delete(gcs.bucketName, ref).Do()
