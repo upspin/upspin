@@ -439,7 +439,8 @@ func unmarshalUser(t *testing.T, buf []byte) (*upspin.User, bool) {
 
 // newDummyKeyServer creates a new keyserver.
 func newDummyKeyServer() *server {
-	return &server{storage: &storagetest.DummyStorage{}}
+	dummy, _ := storagetest.DummyStorage(nil)
+	return &server{storage: dummy}
 }
 
 // newKeyServerWithMocking sets up a mock GCP client for a user and expects a
