@@ -26,8 +26,6 @@ type Storage interface {
 	Download(ref string) ([]byte, error)
 
 	// Put stores the contents given as ref on the storage backend.
-	// It may return a direct link for retrieving data directly from
-	// the backend, if it provides direct links.
 	Put(ref string, contents []byte) error
 
 	// Delete permanently removes all storage space associated
