@@ -30,6 +30,7 @@ const (
 	hasLocation         = true
 	ownerName           = "upspin-test@google.com"
 	readerName          = "upspin-friend-test@google.com"
+	snapshotUser        = "upspin-test+snapshot@google.com"
 )
 
 var (
@@ -308,6 +309,7 @@ var integrationTests = []struct {
 	{"WatchForbiddenFile", testWatchForbiddenFile},
 	{"WatchSubtree", testWatchSubtree},
 	{"CopyEntries", testCopyEntries},
+	{"Snapshot", testSnapshot},
 
 	// Each of these tests depend on the output of the previous one.
 	{"NoReadersAllowed", testNoReadersAllowed},
@@ -335,10 +337,15 @@ func testSelectedOnePacking(t *testing.T, setup testenv.Setup) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	snapshotConfig, err := env.NewUser(snapshotUser)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	r := testenv.NewRunner()
 	r.AddUser(env.Config)
 	r.AddUser(readerConfig)
+	r.AddUser(snapshotConfig)
 
 	// Build the test tree (for the tests in this file).
 	makeIntegrationTestTree(t, r)
