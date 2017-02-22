@@ -95,8 +95,7 @@ func (l *loggerImpl) put(kind string, actor upspin.UserName, u *upspin.User) err
 	l.log = append(l.log, record...)
 	l.log = append(l.log, fmt.Sprintf("%s%x\n", hashPrefix, h.Sum(nil))...)
 
-	_, err = l.storage.Put(logRef, l.log)
-	return err
+	return l.storage.Put(logRef, l.log)
 }
 
 // ReadAll returns the log bytes.
