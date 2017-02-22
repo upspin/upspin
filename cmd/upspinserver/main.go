@@ -119,7 +119,7 @@ func initServer(mode initMode) (*ServerConfig, upspin.Config, error) {
 	dirCfg := config.SetPacking(cfg, upspin.EEPack)
 
 	// Set up StoreServer.
-	store, err := storeServer.New("gcpBucketName="+serverConfig.Bucket, "defaultACL=publicRead")
+	store, err := storeServer.New("backend=GCS", "gcpBucketName="+serverConfig.Bucket, "defaultACL=publicRead")
 	if err != nil {
 		return nil, nil, err
 	}
