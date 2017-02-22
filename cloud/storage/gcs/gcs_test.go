@@ -73,79 +73,6 @@ func setupDirectoryTree(t *testing.T) {
 	put(t, "a/b/c/d2/e23")
 }
 
-func TestList(t *testing.T) {
-	setupDirectoryTree(t)
-	type testResult struct {
-		prefix   string
-		depth    int
-		expected []string
-	}
-
-	tests := []testResult{
-		testResult{
-			prefix: "a/b",
-			depth:  0,
-			expected: []string{
-				"a/b",
-			},
-		},
-		testResult{
-			prefix: "a/b",
-			depth:  1,
-			expected: []string{
-				"a/b",
-				"a/b/c",
-			},
-		},
-		testResult{
-			prefix: "a/b",
-			depth:  2,
-			expected: []string{
-				"a/b",
-				"a/b/c",
-				"a/b/c/d1",
-				"a/b/c/d2",
-			},
-		},
-		testResult{
-			prefix: "a/b",
-			depth:  3,
-			expected: []string{
-				"a/b",
-				"a/b/c",
-				"a/b/c/d1",
-				"a/b/c/d1/e11",
-				"a/b/c/d1/e12",
-				"a/b/c/d1/e13",
-				"a/b/c/d2",
-				"a/b/c/d2/e21",
-				"a/b/c/d2/e22",
-				"a/b/c/d2/e23",
-			},
-		},
-		testResult{
-			prefix: "a",
-			depth:  4,
-			expected: []string{
-				"a",
-				"a/b",
-				"a/b/c",
-				"a/b/c/d1",
-				"a/b/c/d1/e11",
-				"a/b/c/d1/e12",
-				"a/b/c/d1/e13",
-				"a/b/c/d2",
-				"a/b/c/d2/e21",
-				"a/b/c/d2/e22",
-				"a/b/c/d2/e23",
-			},
-		},
-	}
-	for i := range tests {
-		testListPrefix(t, tests[i].prefix, tests[i].depth, tests[i].expected)
-	}
-}
-
 func contains(needle string, haystack []string) bool {
 	for _, elem := range haystack {
 		if elem == needle {
@@ -155,23 +82,8 @@ func contains(needle string, haystack []string) bool {
 	return false
 }
 
-func testListPrefix(t *testing.T, prefix string, depth int, expected []string) {
-	names, err := client.ListPrefix(prefix, depth)
-	if err != nil {
-		t.Fatalf("Error in client.List: %v", err)
-	}
-	t.Logf("Prefix: got: %+v", names)
-	if len(names) != len(expected) {
-		t.Fatalf("Expected %d results, got %d", len(expected), len(names))
-	}
-	for _, e := range expected {
-		if !contains(e, names) {
-			t.Errorf("%s %d: %q not found", prefix, depth, e)
-		}
-	}
-}
-
 func TestListDir(t *testing.T) {
+	setupDirectoryTree(t)
 	prefix := "a/b/c/d1/"
 	names, err := client.ListDir(prefix)
 	if err != nil {
