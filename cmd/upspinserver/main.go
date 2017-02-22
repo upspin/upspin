@@ -119,7 +119,16 @@ func initServer(mode initMode) (*ServerConfig, upspin.Config, error) {
 	dirCfg := config.SetPacking(cfg, upspin.EEPack)
 
 	// Set up StoreServer.
-	store, err := storeServer.New("backend=GCS", "gcpBucketName="+serverConfig.Bucket, "defaultACL=publicRead")
+	var storeServerConfig []string
+	storagePath := filepath.Join(*cfgPath, "storage")
+	if serverConfig.Bucket != "" {
+		// Bucket configured, use Google Cloud Storage.
+		storeServerConfig = []string{"backend=GCS", "gcpBucketName=" + serverConfig.Bucket, "defaultACL=publicRead"}
+	} else {
+		// No bucket configured, use simple on-disk store.
+		storeServerConfig = []string{"backend=Disk", "basePath=" + storagePath}
+	}
+	store, err := storeServer.New(storeServerConfig...)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -149,6 +158,12 @@ func initServer(mode initMode) (*ServerConfig, upspin.Config, error) {
 	http.Handle("/api/Dir/", httpDir)
 
 	log.Println("Store and Directory servers initialized.")
+
+	if b := serverConfig.Bucket; b != "" {
+		log.Printf("Storing data in the Google Cloud Storage bucket %q", b)
+	} else {
+		log.Printf("Storing data under %s", storagePath)
+	}
 
 	if mode == setupServer {
 		// Create Writers file if this was triggered by 'upspin setupserver'.
