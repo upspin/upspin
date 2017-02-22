@@ -16,11 +16,11 @@ import (
 )
 
 func TestRegister(t *testing.T) {
-	err := storage.Register("dummy", &storagetest.DummyStorage{})
+	err := storage.Register("dummy", storagetest.DummyStorage)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = storage.Register("dummy", &storagetest.DummyStorage{})
+	err = storage.Register("dummy", storagetest.DummyStorage)
 	if err == nil {
 		t.Fatalf("Duplicate registration should fail.")
 	}
@@ -34,12 +34,11 @@ func TestRegister(t *testing.T) {
 }
 
 type dialingStorage struct {
-	storagetest.DummyStorage
 	t            *testing.T
 	expectedOpts storage.Opts
 }
 
-func (d *dialingStorage) Dial(opts *storage.Opts) error {
+func (d *dialingStorage) new(opts *storage.Opts) (storage.Storage, error) {
 	if len(opts.Addrs) != len(d.expectedOpts.Addrs) {
 		d.t.Fatalf("Expected %d addrs, got %d", len(d.expectedOpts.Addrs), len(opts.Addrs))
 	}
@@ -57,23 +56,16 @@ func (d *dialingStorage) Dial(opts *storage.Opts) error {
 	if !reflect.DeepEqual(opts.Opts, d.expectedOpts.Opts) {
 		d.t.Errorf("key-value pairs mismatch. Expected %v got %v", d.expectedOpts.Opts, opts.Opts)
 	}
-	return errors.Str("dummy error so we know this was called")
+	return nil, errors.Str("dummy error so we know this was called")
 }
 
 func TestDial(t *testing.T) {
-	expectedOpts := storage.Opts{
+	d := dialingStorage{t, storage.Opts{
 		Timeout: 17 * time.Second,
 		Addrs:   []upspin.NetAddr{"foo.com:1234", "bla.org:9999"},
 		Opts:    map[string]string{"key1": "val1", "key2": "val2", "key3": "val3"},
-	}
-
-	d := &dialingStorage{
-		DummyStorage: storagetest.DummyStorage{},
-		t:            t,
-		expectedOpts: expectedOpts,
-	}
-
-	err := storage.Register("dialTest", d)
+	}}
+	err := storage.Register("dialTest", d.new)
 	if err != nil {
 		t.Fatal(err)
 	}
