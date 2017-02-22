@@ -7,7 +7,7 @@
 // followed by a slash and a possibly empty path name that follows. Thus the root of
 // user@google.com's name space is "user@google.com/". But Parse also allows
 // "user@google.com" to refer to the user's root directory.
-package path
+package path // import "upspin.io/path"
 
 import (
 	"encoding/json"

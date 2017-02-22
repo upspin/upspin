@@ -4,7 +4,7 @@
 
 // Package storagetest implements simple types and utility functions to help test
 // implementations of storage.S.
-package storagetest
+package storagetest // import "upspin.io/cloud/storage/storagetest"
 
 import (
 	"upspin.io/cloud/storage"

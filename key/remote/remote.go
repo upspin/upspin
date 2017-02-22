@@ -4,7 +4,7 @@
 
 // Package remote implements an inprocess key server that uses RPC to
 // connect to a remote key server.
-package remote
+package remote // import "upspin.io/key/remote"
 
 import (
 	"fmt"

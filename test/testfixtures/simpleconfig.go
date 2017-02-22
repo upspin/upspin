@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package testfixtures
+package testfixtures // import "upspin.io/test/testfixtures"
 
 import (
 	"crypto/x509"

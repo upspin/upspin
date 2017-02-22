@@ -7,7 +7,7 @@
 // Package cacheutil provides a mechanism to start the cacheserver
 // if a config requires it and it is not already running.
 // It is used by programs like upspin and upspinfs.
-package cacheutil
+package cacheutil // import "upspin.io/cmd/cacheserver/cacheutil"
 
 import (
 	"flag"

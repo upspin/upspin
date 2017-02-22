@@ -4,7 +4,7 @@
 
 // Package clientutil implements common utilities shared by clients and those
 // who act as clients, such as a DirServer being a client of a StoreServer.
-package clientutil
+package clientutil // import "upspin.io/client/clientutil"
 
 import (
 	"upspin.io/access"

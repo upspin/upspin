@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // Package file implements the File interface used in client.Open and client.Create.
-package file
+package file // import "upspin.io/client/file"
 
 import (
 	"io"

@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // Package unassigned implements a store server that errors out all its requests.
-package unassigned
+package unassigned // import "upspin.io/key/unassigned"
 
 import (
 	"upspin.io/bind"

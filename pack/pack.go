@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // Package pack provides the registry for implementations of Packing algorithms.
-package pack
+package pack // import "upspin.io/pack"
 
 import (
 	"fmt"

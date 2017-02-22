@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package tree
+package tree // import "upspin.io/dir/server/tree"
 
 // This file implements block reading and writing.
 

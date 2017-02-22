@@ -4,7 +4,7 @@
 
 // Package flags defines command-line flags to make them consistent between binaries.
 // Not all flags make sense for all binaries.
-package flags
+package flags // import "upspin.io/flags"
 
 import (
 	"flag"

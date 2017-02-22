@@ -21,7 +21,7 @@
 // and unmarshaled using the MarshalError and UnmarshalError routines in the
 // errors package. This technique preserves the properties of the Go type across
 // the network.
-package proto
+package proto // import "upspin.io/upspin/proto"
 
 import (
 	"time"

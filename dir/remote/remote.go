@@ -4,7 +4,7 @@
 
 // Package remote implements an inprocess directory server that uses RPC to
 // connect to a remote directory server.
-package remote
+package remote // import "upspin.io/dir/remote"
 
 import (
 	"fmt"

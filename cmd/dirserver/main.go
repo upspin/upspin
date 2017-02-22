@@ -4,7 +4,7 @@
 
 // Dirserver is a wrapper for a directory implementation that presents it as an
 // HTTP interface.
-package main
+package main // import "upspin.io/cmd/dirserver"
 
 import (
 	"net/http"

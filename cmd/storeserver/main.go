@@ -4,7 +4,7 @@
 
 // Storeserver is a wrapper for a store implementation that presents it as an
 // HTTP interface.
-package main
+package main // import "upspin.io/cmd/storeserver"
 
 import (
 	"net/http"
