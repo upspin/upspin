@@ -11,25 +11,28 @@ import (
 	"upspin.io/errors"
 )
 
-// DummyStorage implements storage.Storage, but does nothing.
-type DummyStorage struct{}
+// DummyStorage returns a storage.Storage that does nothing.
+func DummyStorage(*storage.Opts) (storage.Storage, error) {
+	return &dummyStorage{}, nil
+}
 
-var _ storage.Storage = (*DummyStorage)(nil)
+type dummyStorage struct{}
 
-func (m *DummyStorage) LinkBase() (base string, err error)                    { return "", nil }
-func (m *DummyStorage) Download(ref string) ([]byte, error)                   { return nil, nil }
-func (m *DummyStorage) Put(ref string, contents []byte) error                 { return nil }
-func (m *DummyStorage) ListPrefix(prefix string, depth int) ([]string, error) { return []string{}, nil }
-func (m *DummyStorage) ListDir(dir string) ([]string, error)                  { return []string{}, nil }
-func (m *DummyStorage) Delete(ref string) error                               { return nil }
-func (m *DummyStorage) Dial(opts *storage.Opts) error                         { return nil }
-func (m *DummyStorage) Close()                                                {}
+var _ storage.Storage = (*dummyStorage)(nil)
+
+func (m *dummyStorage) LinkBase() (base string, err error)                    { return "", nil }
+func (m *dummyStorage) Download(ref string) ([]byte, error)                   { return nil, nil }
+func (m *dummyStorage) Put(ref string, contents []byte) error                 { return nil }
+func (m *dummyStorage) ListPrefix(prefix string, depth int) ([]string, error) { return []string{}, nil }
+func (m *dummyStorage) ListDir(dir string) ([]string, error)                  { return []string{}, nil }
+func (m *dummyStorage) Delete(ref string) error                               { return nil }
+func (m *dummyStorage) Close()                                                {}
 
 // ExpectDownloadCapturePut inspects all calls to Download with the
 // given Ref and if it matches, it returns Data. Ref matches are strictly sequential.
 // It also captures all Put requests.
 type ExpectDownloadCapturePut struct {
-	DummyStorage
+	dummyStorage
 	// Expectations for calls to Download
 	Ref  []string
 	Data [][]byte

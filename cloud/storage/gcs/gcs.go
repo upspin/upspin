@@ -56,6 +56,42 @@ type gcsImpl struct {
 	defaultWriteACL string
 }
 
+// New initializes a Storage implementation that stores data to Google Cloud Storage.
+func New(opts *storage.Opts) (storage.Storage, error) {
+	const op = "cloud/storage/gcs.New"
+
+	bucket, ok := opts.Opts[bucketName]
+	if !ok {
+		return nil, errors.E(op, errors.Invalid, errors.Errorf("%q option is required", bucketName))
+	}
+	acl, ok := opts.Opts[defaultACL]
+	if !ok {
+		return nil, errors.E(op, errors.Invalid, errors.Errorf("%q option is required", bucketName))
+	}
+
+	// Authentication is provided by the gcloud tool when running locally, and
+	// by the associated service account when running on Compute Engine.
+	client, err := google.DefaultClient(gContext.Background(), scope)
+	if err != nil {
+		return nil, errors.E(op, errors.IO, errors.Errorf("Unable to get default client: %s", err))
+	}
+	service, err := gcsBE.New(client)
+	if err != nil {
+		return nil, errors.E(op, errors.IO, errors.Errorf("Unable to create storage service: %s", err))
+	}
+
+	return &gcsImpl{
+		client:          client,
+		service:         service,
+		bucketName:      bucket,
+		defaultWriteACL: acl,
+	}, nil
+}
+
+func init() {
+	storage.Register("GCS", New)
+}
+
 // Guarantee we implement the Storage interface.
 var _ storage.Storage = (*gcsImpl)(nil)
 
@@ -206,44 +242,9 @@ func (gcs *gcsImpl) EmptyBucket(verbose bool) error {
 	return firstErr
 }
 
-// Dial implements storage.Storage.
-func (gcs *gcsImpl) Dial(opts *storage.Opts) error {
-	const op = "cloud/storage/gcs.Dial"
-
-	if v, ok := opts.Opts[bucketName]; ok {
-		gcs.bucketName = v
-	} else {
-		return errors.E(op, errors.Invalid, errors.Str("Bucket name argument is required"))
-	}
-	if v, ok := opts.Opts[defaultACL]; ok {
-		gcs.defaultWriteACL = v
-	} else {
-		return errors.E(op, errors.Invalid, errors.Str("Default ACL argument is required"))
-	}
-
-	// Authentication is provided by the gcloud tool when running locally, and
-	// by the associated service account when running on Compute Engine.
-	client, err := google.DefaultClient(gContext.Background(), scope)
-	if err != nil {
-		return errors.E(op, errors.IO, errors.Errorf("Unable to get default client: %s", err))
-	}
-	service, err := gcsBE.New(client)
-	if err != nil {
-		errors.E(op, errors.IO, errors.Errorf("Unable to create storage service: %s", err))
-	}
-	// Initialize the object
-	gcs.client = client
-	gcs.service = service
-	return nil
-}
-
 // Close implements Storage.
 func (gcs *gcsImpl) Close() {
 	// Not much to do, the GCS interface is pretty stateless (HTTP client).
 	gcs.client = nil
 	gcs.service = nil
-}
-
-func init() {
-	storage.Register("GCS", &gcsImpl{})
 }

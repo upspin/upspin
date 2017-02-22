@@ -42,16 +42,16 @@ type Storage interface {
 	// with a ref.
 	Delete(ref string) error
 
-	// Dial dials the storage backend with servers and options as given by opts.
-	// It is called only once, but not directly, use storage.Dial instead.
-	Dial(opts *Opts) error
-
 	// Close closes the the connection to the storage backend and releases all resources used.
 	// It must be called only once and only after storage.Dial has succeeded.
 	Close()
 }
 
-var registration = make(map[string]Storage)
+// StorageConstructor is a function that initializes and returns a Storage
+// implementation with the given options.
+type StorageConstructor func(*Opts) (Storage, error)
+
+var registration = make(map[string]StorageConstructor)
 
 // Opts holds configuration options for the storage backend.
 // It is meant to be used by implementations of Storage.
@@ -65,12 +65,12 @@ type Opts struct {
 type DialOpts func(*Opts) error
 
 // Register registers a new Storage under a name. It is typically used in init functions.
-func Register(name string, storage Storage) error {
+func Register(name string, fn StorageConstructor) error {
 	const op = "cloud/storage.Register"
 	if _, exists := registration[name]; exists {
 		return errors.E(op, errors.Exist)
 	}
-	registration[name] = storage
+	registration[name] = fn
 	return nil
 }
 
@@ -120,13 +120,11 @@ func WithKeyValue(key, value string) DialOpts {
 // Dial dials the named storage backend using the dial options opts.
 func Dial(name string, opts ...DialOpts) (Storage, error) {
 	const op = "cloud/storage.Dial"
-	s, found := registration[name]
+	fn, found := registration[name]
 	if !found {
-		return nil, errors.E(op, errors.NotExist, errors.Str("storage backend type not registered"))
+		return nil, errors.E(op, errors.NotExist, errors.Errorf("unknown storage backend type %q", name))
 	}
-	dOpts := &Opts{
-		Opts: make(map[string]string),
-	}
+	dOpts := &Opts{Opts: make(map[string]string)}
 	var err error
 	for _, o := range opts {
 		if o != nil {
@@ -136,5 +134,5 @@ func Dial(name string, opts ...DialOpts) (Storage, error) {
 			}
 		}
 	}
-	return s, s.Dial(dOpts)
+	return fn(dOpts)
 }
