@@ -8,15 +8,13 @@ a Linux-based machine.
 The installation will use the central Upspin Key server (`key.upspin.io`) for
 authentication, which permits inter-operation with other Upspin servers.
 
-It assumes that you will be storing your data in Google Cloud Storage,
-a restriction that may be relaxed in time.
-
 The process follows these steps:
 
 - sign up for an Upspin user account, registering your public key with the
   central server `key.upspin.io`,
 - configure a domain name and create an Upspin user for the server,
-- create a Google Cloud Project and set up a Google Cloud Storage bucket,
+- create a Google Cloud Project and set up a Google Cloud Storage bucket (this
+  step may be skipped if you wish to store data on your server's local disk),
 - deploy `upspinserver` to a Linux-based server,
 - configure `upspinserver`.
 
@@ -118,7 +116,13 @@ any other users you may choose to give Upspin user names within `example.com`).
 At a later step, the `upspin setupserver` command will register your server
 user for you automatically.
 
-## Set up Google Cloud services
+## Set up the Google Cloud Storage service
+
+**Note**: if you do not wish to store your data in Google Cloud Storage you may
+skip this section (move on to "Set up a server"), in which case data will be
+stored on the local disk of your chosen server.
+**If you choose to store your Upspin data on the your server's local disk then
+in the event of a disk failure all your Upspin data will be lost.**
 
 ### Create a Google Cloud Project
 
