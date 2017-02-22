@@ -7,10 +7,7 @@ package gcs
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
-	"net/http"
 	"os"
-	"strings"
 	"testing"
 	"time"
 
@@ -34,28 +31,13 @@ var (
 // storage in prod. However, since GCP is always available, we accept
 // to rely on it.
 func TestPutGetAndDownload(t *testing.T) {
-	link, err := client.Put(fileName, testData)
+	err := client.Put(fileName, testData)
 	if err != nil {
 		t.Fatalf("Can't put: %v", err)
 	}
-	if !strings.HasPrefix(link, "https://") {
-		t.Errorf("Link is not HTTPS")
-	}
-	retLink, err := client.Get(fileName)
+	data, err := client.Download(fileName)
 	if err != nil {
-		t.Fatalf("Can't get: %v", err)
-	}
-	if retLink != link {
-		t.Errorf("Not the same link as stored: %v vs received: %v", link, retLink)
-	}
-	resp, err := http.Get(retLink)
-	if err != nil {
-		t.Errorf("Couldn't get link: %v", err)
-	}
-	defer resp.Body.Close()
-	data, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		t.Fatalf("Can't read HTTP body: %v", err)
+		t.Fatalf("Can't Download: %v", err)
 	}
 	if string(data) != testDataStr {
 		t.Errorf("Expected %q got %q", testDataStr, string(data))
@@ -70,25 +52,25 @@ func TestPutGetAndDownload(t *testing.T) {
 	}
 }
 
-func Put(t *testing.T, path string) {
-	_, err := client.Put(path, testData)
+func put(t *testing.T, path string) {
+	err := client.Put(path, testData)
 	if err != nil {
 		t.Fatal(err)
 	}
 }
 
 func setupDirectoryTree(t *testing.T) {
-	Put(t, "a")
-	Put(t, "a/b")
-	Put(t, "a/b/c")
-	Put(t, "a/b/c/d1")
-	Put(t, "a/b/c/d2")
-	Put(t, "a/b/c/d1/e11")
-	Put(t, "a/b/c/d1/e12")
-	Put(t, "a/b/c/d1/e13")
-	Put(t, "a/b/c/d2/e21")
-	Put(t, "a/b/c/d2/e22")
-	Put(t, "a/b/c/d2/e23")
+	put(t, "a")
+	put(t, "a/b")
+	put(t, "a/b/c")
+	put(t, "a/b/c/d1")
+	put(t, "a/b/c/d2")
+	put(t, "a/b/c/d1/e11")
+	put(t, "a/b/c/d1/e12")
+	put(t, "a/b/c/d1/e13")
+	put(t, "a/b/c/d2/e21")
+	put(t, "a/b/c/d2/e22")
+	put(t, "a/b/c/d2/e23")
 }
 
 func TestList(t *testing.T) {
@@ -207,7 +189,7 @@ func TestListDir(t *testing.T) {
 }
 
 func TestDelete(t *testing.T) {
-	_, err := client.Put(fileName, testData)
+	err := client.Put(fileName, testData)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -216,7 +198,7 @@ func TestDelete(t *testing.T) {
 		t.Fatalf("Expected no errors, got %v", err)
 	}
 	// Test the side effect after Delete.
-	_, err = client.Get(fileName)
+	_, err = client.Download(fileName)
 	if err == nil {
 		t.Fatal("Expected an error, but got none")
 	}

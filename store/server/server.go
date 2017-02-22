@@ -61,7 +61,7 @@ func (s *server) Put(data []byte) (*upspin.Refdata, error) {
 	defer sp.End()
 
 	ref := sha256key.Of(data).String()
-	if _, err := s.storage.Put(ref, data); err != nil {
+	if err := s.storage.Put(ref, data); err != nil {
 		return nil, errors.E(op, err)
 	}
 
