@@ -59,20 +59,7 @@ type gcsImpl struct {
 // Guarantee we implement the Storage interface.
 var _ storage.Storage = (*gcsImpl)(nil)
 
-// Get implements Storage.
-func (gcs *gcsImpl) Get(ref string) (link string, err error) {
-	const op = "cloud/storage/gcs.Get"
-	// Get the link of the blob
-	res, err := gcs.service.Objects.Get(gcs.bucketName, ref).Do()
-	if err != nil {
-		if gcsErr, ok := err.(*googleapi.Error); ok && gcsErr.Code == 404 {
-			return "", errors.E(op, errors.NotExist, err)
-		}
-		return "", errors.E(op, err)
-	}
-	return res.MediaLink, nil
-}
-
+// LinkBase implements Storage.
 func (gcs *gcsImpl) LinkBase() (base string, err error) {
 	const op = "cloud/storage/gcs.LinkBase"
 
@@ -98,18 +85,18 @@ func (gcs *gcsImpl) Download(ref string) ([]byte, error) {
 }
 
 // Put implements Storage.
-func (gcs *gcsImpl) Put(ref string, contents []byte) (refLink string, error error) {
+func (gcs *gcsImpl) Put(ref string, contents []byte) error {
 	const op = "cloud/storage/gcs.Put"
 	buf := bytes.NewBuffer(contents)
 	acl := string(gcs.defaultWriteACL)
 	object := &gcsBE.Object{Name: ref}
 	for tries := 0; ; tries++ {
-		res, err := gcs.service.Objects.Insert(gcs.bucketName, object).Media(buf).PredefinedAcl(acl).Do()
+		_, err := gcs.service.Objects.Insert(gcs.bucketName, object).Media(buf).PredefinedAcl(acl).Do()
 		if err == nil {
-			return res.MediaLink, err
+			return nil
 		}
 		if !strings.Contains(err.Error(), "503") || tries > 4 {
-			return "", errors.E(op, errors.Transient, err)
+			return errors.E(op, errors.Transient, err)
 		}
 		log.Info.Printf("cloud/storage/gcs: WARNING: retrying Insert(%s): %s", ref, err)
 		time.Sleep(time.Duration(100*(tries+1)) * time.Millisecond)
