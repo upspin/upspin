@@ -5,7 +5,7 @@
 // Copied from github.com/broady/cdbuild.
 // TODO(adg): clean this up.
 
-package main
+package main // import "upspin.io/cmd/upspin-deploy"
 
 import (
 	"archive/tar"

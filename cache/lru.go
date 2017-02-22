@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // Package cache implements various caching strategies.
-package cache
+package cache // import "upspin.io/cache"
 
 // This is mostly copied from https://github.com/golang/build/blob/master/internal/lru/cache.go
 

@@ -7,7 +7,7 @@
 // multiple concrete instances/implementations.
 // They are muxed by the NetAddr in the Endpoint,
 // which can be an arbitrary string.
-package servermux
+package servermux // import "upspin.io/test/servermux"
 
 import (
 	"fmt"

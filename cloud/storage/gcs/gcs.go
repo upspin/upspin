@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // Package gcs implements a storage backend that saves data to Google Cloud Storage.
-package gcs
+package gcs // import "upspin.io/cloud/storage/gcs"
 
 import (
 	"bytes"

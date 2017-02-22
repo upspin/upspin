@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // Package https provides a helper for starting an HTTPS server.
-package https
+package https // import "upspin.io/cloud/https"
 
 import (
 	"crypto/tls"

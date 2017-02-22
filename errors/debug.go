@@ -4,7 +4,7 @@
 
 // +build debug
 
-package errors
+package errors // import "upspin.io/errors"
 
 import (
 	"bytes"

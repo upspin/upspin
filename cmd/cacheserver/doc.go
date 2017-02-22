@@ -38,4 +38,4 @@ Example $HOME/upspin/config entry:
 
 	cache: localhost:9999
 */
-package main
+package main // import "upspin.io/cmd/cacheserver"

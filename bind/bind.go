@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // Package bind contains the global binding switch and its methods.
-package bind
+package bind // import "upspin.io/bind"
 
 import (
 	"sync"

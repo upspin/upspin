@@ -4,7 +4,7 @@
 
 // Package plain is a simple Packing that passes the data untouched.
 // The pathname, packing, and time are signed.
-package plain
+package plain // import "upspin.io/pack/plain"
 
 import (
 	"crypto/ecdsa"

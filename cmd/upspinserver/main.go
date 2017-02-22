@@ -7,7 +7,7 @@
 // Command upspinserver is a combined DirServer and StoreServer for use on
 // stand-alone machines. It provides only the production implementations of the
 // dir and store servers (dir/server and store/gcp).
-package main
+package main // import "upspin.io/cmd/upspinserver"
 
 import (
 	"encoding/json"

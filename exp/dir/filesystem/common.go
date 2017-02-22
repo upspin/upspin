@@ -5,7 +5,7 @@
 // This file is identical to upspin.io/store/filesystem/common.go
 // Please keep them in sync.
 
-package filesystem
+package filesystem // import "upspin.io/exp/dir/filesystem"
 
 import (
 	"io/ioutil"

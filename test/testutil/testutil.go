@@ -7,7 +7,7 @@
 // it cannot import any Upspin packages.
 
 // Package testutil includes utility functions for Upspin tests.
-package testutil
+package testutil // import "upspin.io/test/testutil"
 
 import (
 	"log"

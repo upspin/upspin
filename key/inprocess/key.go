@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // Package inprocess implements a non-persistent, memory-resident user service.
-package inprocess
+package inprocess // import "upspin.io/key/inprocess"
 
 import (
 	"sync"

@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // Package user provides tools for parsing and validating user names.
-package user
+package user // import "upspin.io/user"
 
 import (
 	"strings"

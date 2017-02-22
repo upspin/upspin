@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // Package factotum encapsulates crypto operations on user's public/private keys.
-package factotum
+package factotum // import "upspin.io/factotum"
 
 import (
 	"bytes"

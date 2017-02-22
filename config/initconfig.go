@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // Package config creates a client configuration from various sources.
-package config
+package config // import "upspin.io/config"
 
 import (
 	"crypto/x509"

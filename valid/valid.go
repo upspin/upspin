@@ -5,7 +5,7 @@
 // Package valid does validation of various data types.
 // For the most part, its functions are used by servers and enforce
 // stronger constraints than client code needs to follow.
-package valid
+package valid // import "upspin.io/valid"
 
 import (
 	"strconv"

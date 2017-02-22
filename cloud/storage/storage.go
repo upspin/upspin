@@ -4,7 +4,7 @@
 
 // Package storage implements a low-level interface for storing blobs in
 // stable storage such as a database.
-package storage
+package storage // import "upspin.io/cloud/storage"
 
 import (
 	"strings"

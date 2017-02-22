@@ -4,7 +4,7 @@
 
 // Package keyserver is a wrapper for an upspin.KeyServer implementation
 // that presents it as an authenticated service.
-package keyserver
+package keyserver // import "upspin.io/rpc/keyserver"
 
 import (
 	"fmt"

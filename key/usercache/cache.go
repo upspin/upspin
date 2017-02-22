@@ -9,7 +9,7 @@
 // a request to the underlying server.
 // The caching KeyServer will defer Dialing the underlying service
 // until a Lookup or Put request needs to access that service.
-package usercache
+package usercache // import "upspin.io/key/usercache"
 
 import (
 	"sync"
