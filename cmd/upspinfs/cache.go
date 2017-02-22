@@ -4,7 +4,7 @@
 
 // +build !windows
 
-package main
+package main // import "upspin.io/cmd/upspinfs"
 
 import (
 	"crypto/sha256"

@@ -4,7 +4,7 @@
 
 // A web server that serves documentation and meta tags to instruct "go get"
 // where to find the upspin source repository.
-package main
+package main // import "upspin.io/cmd/frontend"
 
 import (
 	"bytes"

@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package dircache
+package dircache // import "upspin.io/dir/dircache"
 
 // This file defines and implements a replayable log for the directory cache.
 //

@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // Package serverutil provides helper functions for Upspin servers.
-package serverutil
+package serverutil // import "upspin.io/serverutil"
 
 import (
 	goPath "path"

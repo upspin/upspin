@@ -4,7 +4,7 @@
 
 // Package server implements upspin.StoreServer using storage.Storage as its
 // storage back end.
-package server
+package server // import "upspin.io/store/server"
 
 import (
 	"fmt"

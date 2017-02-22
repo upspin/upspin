@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // Package packtest provides common functionality used by packer tests.
-package packtest
+package packtest // import "upspin.io/pack/internal/packtest"
 
 import (
 	"bytes"

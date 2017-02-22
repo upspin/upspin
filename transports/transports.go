@@ -6,7 +6,7 @@
 // the key, store, and directory imports.
 // It can be imported by Upspin programs as a convenient
 // way to link with all the transport implementations.
-package transports
+package transports // import "upspin.io/transports"
 
 import (
 	"sync"

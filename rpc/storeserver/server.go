@@ -4,7 +4,7 @@
 
 // Package storeserver is a wrapper for an upspin.StoreServer implementation
 // that presents it as an authenticated service.
-package storeserver
+package storeserver // import "upspin.io/rpc/storeserver"
 
 import (
 	"fmt"

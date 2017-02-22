@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // Package inprocess implements a simple, non-persistent, in-memory directory service.
-package inprocess
+package inprocess // import "upspin.io/dir/inprocess"
 
 // The implementation uses a Merkle tree to represent the directory tree.
 // For simplicity, a directory's data is always stored as a single block.

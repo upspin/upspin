@@ -4,7 +4,7 @@
 
 // Package client implements a simple client service talking to services
 // running anywhere (GCP, InProcess, etc).
-package client
+package client // import "upspin.io/client"
 
 import (
 	"fmt"

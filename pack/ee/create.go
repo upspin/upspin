@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package ee
+package ee // import "upspin.io/pack/ee"
 
 import (
 	"crypto/aes"

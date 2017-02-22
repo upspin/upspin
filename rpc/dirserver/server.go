@@ -4,7 +4,7 @@
 
 // Package dirserver provides a wrapper for an upspin.DirServer implementation
 // that presents it as an authenticated service.
-package dirserver
+package dirserver // import "upspin.io/rpc/dirserver"
 
 import (
 	"fmt"

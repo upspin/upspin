@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // Package packutil provides helper functions for DirEntry Packdata computation.
-package packutil
+package packutil // import "upspin.io/pack/packutil"
 
 import (
 	"encoding/binary"

@@ -4,7 +4,7 @@
 
 // Package log provides an implemention of upspin.io/log.ExternalLogger that
 // sends logs to the Google Cloud Logging service.
-package log
+package log // import "upspin.io/cloud/log"
 
 import (
 	"context"

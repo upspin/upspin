@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // Package ei implements an elliptic-curve end-to-end integrity-checked packer.
-package ei
+package ei // import "upspin.io/pack/eeintegrity"
 
 // This is a copy of pack/ee/ee.go, with the encryption removed.
 

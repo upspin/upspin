@@ -4,7 +4,7 @@
 
 // Package remote implements an inprocess store server that uses RPC to
 // connect to a remote store server.
-package remote
+package remote // import "upspin.io/store/remote"
 
 import (
 	"fmt"
