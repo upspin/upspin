@@ -165,6 +165,9 @@ func (s *State) configureServer(cfgPath string, cfg *ServerConfig) {
 	files := map[string][]byte{}
 	for _, name := range configureServerFiles {
 		b, err := ioutil.ReadFile(filepath.Join(cfgPath, name))
+		if os.IsNotExist(err) && optionalConfigureServerFiles[name] {
+			continue
+		}
 		if err != nil {
 			s.exit(err)
 		}
@@ -230,6 +233,10 @@ var configureServerFiles = []string{
 	"Writers",
 	"public.upspinkey",
 	"secret.upspinkey",
-	"serverconfig.json",
 	"serviceaccount.json",
+	serverConfigFile,
+}
+
+var optionalConfigureServerFiles = map[string]bool{
+	"serviceaccount.json": true,
 }
