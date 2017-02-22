@@ -8,6 +8,7 @@ package server // import "upspin.io/store/server"
 
 import (
 	"fmt"
+	"strings"
 	"sync"
 
 	"upspin.io/cloud/storage"
@@ -17,7 +18,7 @@ import (
 	"upspin.io/metric"
 	"upspin.io/upspin"
 
-	// We use GCS as the backing for our data.
+	_ "upspin.io/cloud/storage/disk"
 	_ "upspin.io/cloud/storage/gcs"
 )
 
@@ -36,13 +37,19 @@ var _ upspin.StoreServer = (*server)(nil)
 func New(options ...string) (upspin.StoreServer, error) {
 	const op = "store/server.New"
 
-	// Pass options to the storage backend.
+	var backend string
 	var dialOpts []storage.DialOpts
 	for _, option := range options {
+		const prefix = "backend="
+		if strings.HasPrefix(option, prefix) {
+			backend = option[len(prefix):]
+			continue
+		}
+		// Pass other options to the storage backend.
 		dialOpts = append(dialOpts, storage.WithOptions(option))
 	}
 
-	s, err := storage.Dial("GCS", dialOpts...)
+	s, err := storage.Dial(backend, dialOpts...)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
