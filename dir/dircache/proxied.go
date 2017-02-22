@@ -140,6 +140,8 @@ func (d *proxiedDir) watcher() {
 	if d.order == 0 {
 		d.order = -1
 	}
+	lastErr := ""
+	seen := 0
 	for {
 		err := d.watch()
 		if err == nil {
@@ -157,11 +159,21 @@ func (d *proxiedDir) watcher() {
 			// Reread current state.
 			d.order = -1
 		}
-		if time.Now().After(nextLogTime) {
-			log.Info.Printf("rpc/dircache.watcher: %s: %s", d.user, err)
-			nextLogTime = time.Now().Add(time.Hour)
+		// Rate limit repeat messages. Otherwise the log will get pretty
+		// full when disconnected.
+		newErr := err.Error()
+		if lastErr == newErr {
+			seen++
+			if seen > 10 && !time.Now().After(nextLogTime) {
+				continue
+			}
+		} else {
+			seen = 0
 		}
-		time.Sleep(10 * time.Second)
+		log.Info.Printf("rpc/dircache.watcher: %s: %s", d.user, err)
+		nextLogTime = time.Now().Add(time.Minute)
+		lastErr = newErr
+		time.Sleep(time.Second)
 	}
 }
 

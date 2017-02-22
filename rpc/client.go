@@ -273,7 +273,7 @@ func decodeStream(stream ResponseChan, r io.ReadCloser, done <-chan struct{}) {
 		// Messages are of the form
 		// [length, 4 byte, big-endian-encoded int32]
 		// [length bytes of encoded protobuf message]
-		if _, err := readFull(r, msgLen[:], done); err == io.EOF {
+		if _, err := readFull(r, msgLen[:], done); err == io.ErrUnexpectedEOF {
 			return
 		} else if err != nil {
 			stream.Error(errors.E(errors.IO, err))
