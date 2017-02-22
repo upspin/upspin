@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e8fcdc26_056ba09b",
+        "filename": "cloud/storage/storage.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-22T05:49:52Z",
+      "side": 1,
+      "message": "remove.",
+      "revId": "9f35394827d4a95e86bf174438ff95f7f5b527cd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
