@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "55e4263c_4a0a4608",
+        "filename": "serverutil/ratecounter.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-22T17:12:27Z",
+      "side": 1,
+      "message": "s/Added/added/",
+      "revId": "c63f3c1164da87637e97b0ed9680743c6018f4f8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4635eb6b_5b8d4fea",
+        "filename": "serverutil/ratecounter.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-22T17:12:27Z",
+      "side": 1,
+      "message": "that\u0027s really confusing. 60 and second together look related, but they\u0027re not except in the way the API binds them. from the user\u0027s point of view, the word \u0027buckets\u0027 isn\u0027t helpful either.\n\nwhy do we need the buckets to be exposed?\n\ni have a feeling the API isn\u0027t quite right yet, or at least the commentary.",
+      "revId": "c63f3c1164da87637e97b0ed9680743c6018f4f8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e9e5250d_bfd76939",
+        "filename": "serverutil/ratecounter.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-22T17:12:27Z",
+      "side": 1,
+      "message": "don\u0027t mix math and prose.\n\ns/\u003e 0/positive/",
+      "revId": "c63f3c1164da87637e97b0ed9680743c6018f4f8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
