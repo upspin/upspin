@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "d3d3c6b4_9d5e334d",
+        "filename": "serverutil/ratecounter.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-22T17:37:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "55e4263c_4a0a4608",
+      "revId": "c63f3c1164da87637e97b0ed9680743c6018f4f8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4635eb6b_5b8d4fea",
         "filename": "serverutil/ratecounter.go",
         "patchSetId": 1
@@ -54,6 +72,24 @@
     },
     {
       "key": {
+        "uuid": "36a0c71d_d509f94b",
+        "filename": "serverutil/ratecounter.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-22T17:37:06Z",
+      "side": 1,
+      "message": "Dave is correct. \n\nAs I mentioned in the CL description, I want to expose a rate for the last 1 second, 10 seconds, 1 minute, 5 minute, etc. So I\u0027d use different bucket counts. \n\nThe averaging when we call Rate would be okay too, but then we\u0027d lose the ability to configure for an expvar. But I can solve that by creating \"derived\" expvars from Rate(1), Rate(60), etc.\n\nIt seems we\u0027d always want a maxBuckets though in the construction, even if we adopt Dave\u0027s suggestion.",
+      "parentUuid": "8919fd3d_4f9ea3c0",
+      "revId": "c63f3c1164da87637e97b0ed9680743c6018f4f8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "e9e5250d_bfd76939",
         "filename": "serverutil/ratecounter.go",
         "patchSetId": 1
@@ -71,6 +107,24 @@
     },
     {
       "key": {
+        "uuid": "8aa77738_cee8e85e",
+        "filename": "serverutil/ratecounter.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-22T17:37:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e9e5250d_bfd76939",
+      "revId": "c63f3c1164da87637e97b0ed9680743c6018f4f8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8a66eda5_4389095f",
         "filename": "serverutil/ratecounter.go",
         "patchSetId": 1
@@ -82,6 +136,30 @@
       "writtenOn": "2017-02-22T17:27:18Z",
       "side": 1,
       "message": "If Adding happens a lot, a more efficient version would always just have a \u0027sum\u0027 field and add to that.  Moving it to a bucket could happen in loop(), i.e., instead of just incrementing r.b there, increment r.b and copy r.sum to r.buckets[r.b].  Tradeoff depends on which you expect to be more frequent.\n\nOf course, if you expect Add to be not too frequent, there\u0027s no reason for loop().  You can just grab the time.Now() and figure out which bucket to increment.\n\nJust suggestions, the current implementation is fine by me.",
+      "range": {
+        "startLine": 49,
+        "startChar": 22,
+        "endLine": 49,
+        "endChar": 36
+      },
+      "revId": "c63f3c1164da87637e97b0ed9680743c6018f4f8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "264efd88_9aec60c6",
+        "filename": "serverutil/ratecounter.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-22T17:37:06Z",
+      "side": 1,
+      "message": "Cool. Yeah, I\u0027d expect Add to be more common in busy servers and if it\u0027s not busy, the work doesn\u0027t matter that much unless your frequency is in microseconds or so.\n\nAnother way I saw that is elegant but puts a lot of strain on the GC is to schedule a time.AfterFunc after each Add to remove it from the bucket. That\u0027s a lot of allocations and an implicit linked list in the form of delayed funcs.\n\nThanks.",
+      "parentUuid": "8a66eda5_4389095f",
       "range": {
         "startLine": 49,
         "startChar": 22,
