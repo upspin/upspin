@@ -217,6 +217,8 @@ add the following record to {{.Domain}}'s DNS zone:
 	NAME	TYPE	TTL	DATA
 	@	TXT	15m	upspin:{{.Signature}}
 
+(Note that '@' here means root, not a literal '@' subdomain).
+
 Once the DNS change propagates the key server will use the TXT record to verify
 that {{.UserName}} is authorized to register users under {{.Domain}}.
 To register the users listed above, run this command:
@@ -309,6 +311,8 @@ add the following record to {{.Domain}}'s DNS zone:
 
 	NAME	TYPE	TTL	DATA
 	@	TXT	15m	upspin:{{.Signature}}
+
+(Note that '@' here means root, not a literal '@' subdomain).
 
 Once the DNS change propagates the key server will use the TXT record to verify
 that {{.UserName}} is authorized to register users under {{.Domain}}.
