@@ -75,7 +75,7 @@ func (s *storageImpl) Put(ref string, contents []byte) error {
 
 // Delete implements Storage.
 func (s *storageImpl) Delete(ref string) error {
-	const op = "cloud/storage/disk.Put"
+	const op = "cloud/storage/disk.Delete"
 	if err := os.Remove(s.path(ref)); os.IsNotExist(err) {
 		return errors.E(op, errors.NotExist, errors.Str(ref))
 	} else if err != nil {
