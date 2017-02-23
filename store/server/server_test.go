@@ -87,10 +87,19 @@ func TestNew(t *testing.T) {
 		t.Errorf("Expected %q, got %q", expected, err)
 	}
 
+	_, err = New("backend=disk,dance=the macarena")
+	if err == nil {
+		t.Fatalf("Expected error")
+	}
+	expected = "invalid operation"
+	if !strings.Contains(err.Error(), expected) {
+		t.Errorf("Expected %q, got %q", expected, err)
+	}
+
 	if testing.Short() {
 		t.Skip("skipping part of test when network unavailable; depends on credential availability")
 	}
-	_, err = New("defaultACL=publicRead", "gcpBucketName=zee bucket")
+	_, err = New("backend=GCS", "defaultACL=publicRead", "gcpBucketName=zee bucket")
 	if err != nil {
 		t.Fatal(err)
 	}

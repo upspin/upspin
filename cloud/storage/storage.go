@@ -112,7 +112,7 @@ func Dial(name string, opts ...DialOpts) (Storage, error) {
 	const op = "cloud/storage.Dial"
 	fn, found := registration[name]
 	if !found {
-		return nil, errors.E(op, errors.NotExist, errors.Errorf("unknown storage backend type %q", name))
+		return nil, errors.E(op, errors.Invalid, errors.Errorf("unknown storage backend type %q", name))
 	}
 	dOpts := &Opts{Opts: make(map[string]string)}
 	var err error
