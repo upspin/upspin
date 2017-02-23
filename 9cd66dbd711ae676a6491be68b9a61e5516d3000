@@ -34,6 +34,24 @@
       "revId": "9cd66dbd711ae676a6491be68b9a61e5516d3000",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "07f97bd9_42eb46ea",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 7
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-23T00:53:15Z",
+      "side": 1,
+      "message": "maybe \"20GB of available disk space\" ?  It reads to me like you\u0027re advocating a 2005-era disk.",
+      "parentUuid": "313b84f0_96503f88",
+      "revId": "9cd66dbd711ae676a6491be68b9a61e5516d3000",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
