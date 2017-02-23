@@ -23,11 +23,21 @@ User prints in YAML format the user record stored in the key server
 for the specified user, by default the current user.
 
 With the -put flag, user writes or replaces the information stored
-for the current user. It can be used to update keys for the user;
-for new users see the signup command. The information is read
-from standard input or from the file provided with the -in flag.
-It must be the complete record for the user, and must be in the
-same YAML format printed by the command without the -put flag.
+for the current user, such as to update keys or server information.
+The information is read from standard input or from the file provided
+with the -in flag. The input must provide the complete record for
+the user, and must be in the same YAML format printed by the command
+without the -put flag.
+
+When using -put, the command does takes no arguments. The name of
+the user whose record is to be updated must be provided in the input
+record and must either be the current user or the name of another
+user whose domain is administered by the current user.
+
+A handy way to use the command is to edit the config file and run
+	upspin user | upspin user -put
+
+To install new users see the signup command.
 `
 	fs := flag.NewFlagSet("user", flag.ExitOnError)
 	put := fs.Bool("put", false, "write new user record")
