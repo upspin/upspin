@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "d272c5b7_e265a2f1",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 5361
+      },
+      "writtenOn": "2017-02-23T23:01:58Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "14f125d1_a0a20aa4",
+      "range": {
+        "startLine": 263,
+        "startChar": 53,
+        "endLine": 263,
+        "endChar": 65
+      },
+      "revId": "b3cf6c6d8b4c4551684c75abaada2fd4769adbf7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "732a69d2_ed0d1737",
         "filename": "doc/server_setup.md",
         "patchSetId": 4
@@ -39,6 +63,24 @@
       "revId": "b3cf6c6d8b4c4551684c75abaada2fd4769adbf7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ebeb06b4_1369fca6",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 5361
+      },
+      "writtenOn": "2017-02-23T23:01:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "732a69d2_ed0d1737",
+      "revId": "b3cf6c6d8b4c4551684c75abaada2fd4769adbf7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
