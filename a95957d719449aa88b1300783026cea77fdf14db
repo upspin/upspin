@@ -90,6 +90,24 @@
     },
     {
       "key": {
+        "uuid": "38650e0b_0b597fae",
+        "filename": "test/snapshot_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-02-23T23:01:00Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "8492d634_097f6ac8",
+      "revId": "a95957d719449aa88b1300783026cea77fdf14db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ca5ef5ae_87a6cb0e",
         "filename": "test/snapshot_test.go",
         "patchSetId": 2
@@ -175,6 +193,24 @@
       "revId": "a95957d719449aa88b1300783026cea77fdf14db",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f30a6642_93e55314",
+        "filename": "test/snapshot_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-02-23T23:01:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "150b66dc_4f30dde7",
+      "revId": "a95957d719449aa88b1300783026cea77fdf14db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -330,6 +366,24 @@
       "side": 1,
       "message": "well actually *every* variable is data, so \"data\" is essentially meaningless in this case\n\nI suggested randomString because at the call site it\u0027s not clear that you\u0027re getting a string.\nIf it returned a []byte I\u0027d suggest randomBytes.",
       "parentUuid": "c854e725_85b75cec",
+      "revId": "a95957d719449aa88b1300783026cea77fdf14db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "7bb56df7_33825994",
+        "filename": "test/snapshot_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-02-23T23:01:00Z",
+      "side": 1,
+      "message": "I didn\u0027t call it data, I called it random, but back to randomString now.",
+      "parentUuid": "2bde273a_24d80efc",
       "revId": "a95957d719449aa88b1300783026cea77fdf14db",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
