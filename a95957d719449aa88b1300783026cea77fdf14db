@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "6b26b62c_a49ee151",
+        "filename": "test/snapshot_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-02-23T22:49:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "43be55ff_2ab73c5b",
+      "revId": "a95957d719449aa88b1300783026cea77fdf14db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d6d9c360_29d87513",
         "filename": "test/snapshot_test.go",
         "patchSetId": 2
@@ -68,6 +86,24 @@
       "revId": "a95957d719449aa88b1300783026cea77fdf14db",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "17f82e70_c893b862",
+        "filename": "test/snapshot_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-02-23T22:49:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ca5ef5ae_87a6cb0e",
+      "revId": "a95957d719449aa88b1300783026cea77fdf14db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -123,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "fd698fa4_e8f40126",
+        "filename": "test/snapshot_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-02-23T22:49:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "549ecebe_b40ccca8",
+      "revId": "a95957d719449aa88b1300783026cea77fdf14db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cfc783f4_44c32026",
         "filename": "test/snapshot_test.go",
         "patchSetId": 2
@@ -137,6 +191,24 @@
       "revId": "a95957d719449aa88b1300783026cea77fdf14db",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ff1bb08a_b9ba00ac",
+        "filename": "test/snapshot_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-02-23T22:49:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cfc783f4_44c32026",
+      "revId": "a95957d719449aa88b1300783026cea77fdf14db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -157,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "97aff78d_1bacf63b",
+        "filename": "test/snapshot_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-02-23T22:49:04Z",
+      "side": 1,
+      "message": "Actually, I was being a bit too careful when this is run on a test server. But even then, this shouldn\u0027t happen. If it does, the test server is busy or corrupted and it should fail.\n\nFixed.",
+      "parentUuid": "d79d7eca_493abc25",
+      "revId": "a95957d719449aa88b1300783026cea77fdf14db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cde42484_9b3d9cb5",
         "filename": "test/snapshot_test.go",
         "patchSetId": 2
@@ -171,6 +261,24 @@
       "revId": "a95957d719449aa88b1300783026cea77fdf14db",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c854e725_85b75cec",
+        "filename": "test/snapshot_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-02-23T22:49:04Z",
+      "side": 1,
+      "message": "Done (but only random, since string is the type already, let\u0027s be fully pedantic :-))",
+      "parentUuid": "cde42484_9b3d9cb5",
+      "revId": "a95957d719449aa88b1300783026cea77fdf14db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
