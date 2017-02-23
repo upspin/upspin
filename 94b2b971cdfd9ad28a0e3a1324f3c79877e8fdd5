@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0cf98af8_804255a4",
+        "filename": "cmd/upspinfs/fs.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 907,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-23T23:35:03Z",
+      "side": 1,
+      "message": "You could just add syscall.SIGTERM to the list of arguments to signal.Notify in main.go to achieve the same result.\nIt\u0027d be nice to contain this shutdown logic in one place.",
+      "revId": "94b2b971cdfd9ad28a0e3a1324f3c79877e8fdd5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
