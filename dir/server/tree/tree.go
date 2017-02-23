@@ -243,13 +243,14 @@ func (t *Tree) PutDir(dstDir path.Parsed, de *upspin.DirEntry) (*upspin.DirEntry
 	}
 
 	// Put the synthetic node into the tree at dst.
-	n, _, err := t.put(dstDir, &existingEntryNode.entry)
+	n, watchers, err := t.put(dstDir, &existingEntryNode.entry)
 	if err == upspin.ErrFollowLink {
 		return nil, errors.E(op, errors.Invalid, dstDir.Path(), errors.Str("path cannot contain a link"))
 	}
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
+	notifyWatchers(watchers)
 	// Flush now to create a new version of the root.
 	err = t.flush() // TODO: avoid this. Create a log operation PutDir.
 	if err != nil {
