@@ -157,6 +157,7 @@ func testWatchNonExistentFile(t *testing.T, r *testenv.Runner) {
 		return
 	}
 
+	r.GetNEvents(1)
 	// Should see the directory.
 	if !r.GotEvent(base, !hasBlocks) {
 		t.Fatal(r.Diag())
@@ -167,27 +168,28 @@ func testWatchNonExistentFile(t *testing.T, r *testenv.Runner) {
 	if r.Failed() {
 		t.Fatal(r.Diag())
 	}
+	r.GetNEvents(1)
 	if !r.GotEvent(file, hasBlocks) {
 		t.Fatal(r.Diag())
 	}
 }
 
-func testWatchNonExistentRoot(t *testing.T, r *testenv.Runner) {
+func testWatchNonExistentDir(t *testing.T, r *testenv.Runner) {
 	const (
 		hasBlocks = true
-		base      = ownerName + "/watch-non-existent-root"
+		base      = ownerName + "/watch-non-existent-dir"
 		file      = base + "/aFile"
 	)
 
 	r.As(ownerName)
-	// Don't create the root yet.
+	// Don't create the dir yet.
 
 	r.DirWatch(base, -1)
 	if !watchSupported(t, r) {
 		return
 	}
 
-	// Now create the root. Should see it appear.
+	// Now create the dir. Should see it appear.
 	r.MakeDirectory(base)
 	// Don't create the file yet.
 	if r.Failed() {
@@ -195,9 +197,16 @@ func testWatchNonExistentRoot(t *testing.T, r *testenv.Runner) {
 	}
 
 	// Should see the directory.
+	r.GetNEvents(1)
 	if !r.GotEvent(base, !hasBlocks) {
 		t.Fatal(r.Diag())
 	}
+	// Now create the file. Should see it appear.
+	r.Put(file, "something")
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+	r.GetNEvents(1)
 	if !r.GotEvent(file, hasBlocks) {
 		t.Fatal(r.Diag())
 	}
@@ -210,7 +219,7 @@ func testWatchForbiddenFile(t *testing.T, r *testenv.Runner) {
 		file                   = base + "/aFile"
 		access                 = base + "/Access"
 		forbiddenAccessContent = "*: " + ownerName
-		allowedAccessContent   = "*: " + ownerName + " " + middleName
+		allowedAccessContent   = "*: " + ownerName + " " + readerName
 	)
 
 	r.As(ownerName)
@@ -222,24 +231,27 @@ func testWatchForbiddenFile(t *testing.T, r *testenv.Runner) {
 	}
 
 	// Switch users. Should not see event.
-	r.As(middleName)
+	r.As(readerName)
 	r.DirWatch(file, -1)
 	if !watchSupported(t, r) {
 		return
 	}
+	r.GetNEvents(1)
 	if r.GotEvent(file, hasBlocks) {
 		t.Fatal("Should not see event for forbidden file")
 	}
 
 	// Now grant permission.
 	r.As(ownerName)
-	r.Put(access, forbiddenAccessContent)
+	r.Put(access, allowedAccessContent)
 	if r.Failed() {
 		t.Fatal(r.Diag())
 	}
 
 	// Now should see file as other user.
-	r.As(middleName)
+	r.As(readerName)
+	r.DirWatch(file, -1)
+	r.GetNEvents(1)
 	if !r.GotEvent(file, hasBlocks) {
 		t.Fatal(r.Diag())
 	}
@@ -268,14 +280,15 @@ func testWatchSubtree(t *testing.T, r *testenv.Runner) {
 
 	// Create file in root. Should not see event.
 	r.Put(file, "something")
+	r.GetNEvents(1)
 	if r.GotEvent(file, hasBlocks) {
 		t.Fatal("Should not see event for parent directory")
 	}
 
 	// Create file in subdir. Should see event.
 	r.Put(dirFile, "something")
+	r.GetNEvents(1)
 	if !r.GotEvent(dirFile, hasBlocks) {
 		t.Fatal(r.Diag())
 	}
-
 }

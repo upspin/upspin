@@ -401,7 +401,7 @@ func (r *Runner) GotEvent(p upspin.PathName, withBlocks bool) bool {
 		}
 		return true
 	}
-	r.lastErr = errors.Errorf("expected Event for for %q", p)
+	r.lastErr = errors.Errorf("expected Event for %q", p)
 	_, r.errFile, r.errLine, _ = runtime.Caller(1)
 	return false
 }
