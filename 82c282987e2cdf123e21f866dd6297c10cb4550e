@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "f7310c9e_c3ec3a39",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 738,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-02-23T05:14:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2576a73a_738d9919",
+      "revId": "82c282987e2cdf123e21f866dd6297c10cb4550e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0bf36cec_7c443cf3",
         "filename": "dir/server/server.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2017-02-23T03:57:48Z",
       "side": 1,
       "message": "shouldn\u0027t hasRight grant these privileges? seems like a strange special case to call out here.",
+      "revId": "82c282987e2cdf123e21f866dd6297c10cb4550e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4de2ce16_fd9786b7",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 760,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-02-23T05:14:42Z",
+      "side": 1,
+      "message": "That\u0027s how Put works too. We can refactor both later.",
+      "parentUuid": "0bf36cec_7c443cf3",
       "revId": "82c282987e2cdf123e21f866dd6297c10cb4550e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
