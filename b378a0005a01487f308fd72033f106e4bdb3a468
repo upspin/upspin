@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4903d694_db6d36a0",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-23T23:57:13Z",
+      "side": 1,
+      "message": "Please new sentences on a new line. Makes for easier edits and diffs.\n\nalso s/root/the root/",
+      "revId": "b378a0005a01487f308fd72033f106e4bdb3a468",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c93fb786_55e3ec74",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-23T23:57:13Z",
+      "side": 1,
+      "message": "newline",
+      "revId": "b378a0005a01487f308fd72033f106e4bdb3a468",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "714f55aa_5a475354",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-23T23:57:13Z",
+      "side": 1,
+      "message": "maybe say On a Unix machine, you...",
+      "revId": "b378a0005a01487f308fd72033f106e4bdb3a468",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
