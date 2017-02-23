@@ -259,7 +259,10 @@ Created root "you@gmail.com".
 
 To reconfigure the `upspinserver` you can delete its state in
 `$HOME/upspin/server`, restart the `upspinserver`,
-and re-run `upspin setupserver`.
+and re-run `upspin setupserver`. Be advised that performing a reconfiguration
+will render any data you have written to the Upspin tree up to this point
+unaccessible. Although you can no longer interact with the data, the blobs
+might still claim space in your storeserver.
 
 ## Use your server
 
