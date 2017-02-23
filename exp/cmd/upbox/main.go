@@ -68,7 +68,7 @@ is used.
 
 Domain specifies a domain that is appended to any user names that do
 not include a domain component.
-Domain must be specified if any domain suffixes are ommited from
+Domain must be specified if any domain suffixes are omitted from
 User Names or if a Servers is specified with an empty User field.
 
 Default configuration

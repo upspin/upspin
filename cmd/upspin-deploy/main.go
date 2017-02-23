@@ -362,7 +362,7 @@ func (c *Config) checkCredentials() error {
 	cmd = exec.Command("gcloud", "projects", "describe", c.Project)
 	cmd.Stderr = os.Stderr
 	if err := cmd.Run(); err != nil {
-		return fmt.Errorf(`Credentails not available; try "gcloud auth login".`)
+		return fmt.Errorf(`Credentials not available; try "gcloud auth login".`)
 	}
 
 	return nil

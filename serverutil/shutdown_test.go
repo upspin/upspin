@@ -125,7 +125,7 @@ func testShutdown(t *testing.T, clean bool) {
 		if err != nil && clean {
 			t.Fatalf("child process exited with non-zero status: %v", err)
 		} else if err == nil && !clean {
-			t.Fatal("child proces exited cleanly, want non-zero status")
+			t.Fatal("child process exited cleanly, want non-zero status")
 		}
 	case <-time.After(2 * time.Second):
 		cmd.Process.Kill()

@@ -4,7 +4,7 @@
 
 // Package filesystem provides an upspin.DirServer
 // that serves files from a local file system.
-// It must be used in conjuction with the upspin.StoreServer
+// It must be used in conjunction with the upspin.StoreServer
 // implementation in package upspin.io/store/filesystem.
 package filesystem
 
