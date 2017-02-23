@@ -52,7 +52,7 @@ var (
 )
 
 func main() {
-	flags.Parse("https", "log")
+	flags.Parse("https", "tls", "log")
 
 	server, cfg, err := initServer(startup)
 	if err == noConfig {
@@ -67,6 +67,8 @@ func main() {
 	// Set up HTTPS server.
 	opt := &https.Options{
 		LetsEncryptCache: *letsPath,
+		CertFile:         flags.TLSCertFile,
+		KeyFile:          flags.TLSKeyFile,
 	}
 	if server != nil {
 		host, _, err := net.SplitHostPort(string(server.Addr))
