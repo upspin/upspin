@@ -279,6 +279,24 @@
       "revId": "a95957d719449aa88b1300783026cea77fdf14db",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2bde273a_24d80efc",
+        "filename": "test/snapshot_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-23T22:54:55Z",
+      "side": 1,
+      "message": "well actually *every* variable is data, so \"data\" is essentially meaningless in this case\n\nI suggested randomString because at the call site it\u0027s not clear that you\u0027re getting a string.\nIf it returned a []byte I\u0027d suggest randomBytes.",
+      "parentUuid": "c854e725_85b75cec",
+      "revId": "a95957d719449aa88b1300783026cea77fdf14db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
