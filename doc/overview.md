@@ -375,9 +375,9 @@ We encourage anyone interested in using the system to register.
 
 For the `DirServer` and `StoreServer`, you will need to deploy your own
 instances.
-If you build the reference implementations, you can use the deploy scripts
-provided to launch your own server pair on Google Cloud, or you could just run
-them on your local machine if you prefer.
+If you want to use the reference implementations, you can run your own instance
+of `upspinserver` by following
+[the server setup instructions](/doc/server_setup.md).
 Or you could write your own (and we encourage you to think about doing so).
 It's up to you.
 Upspin is just a way to access things; what and where those things are is your
