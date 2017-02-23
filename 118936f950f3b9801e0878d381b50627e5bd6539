@@ -16,6 +16,24 @@
       "revId": "118936f950f3b9801e0878d381b50627e5bd6539",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3bf598ae_6d6aa76f",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 5361
+      },
+      "writtenOn": "2017-02-23T22:34:46Z",
+      "side": 1,
+      "message": "Done, I changed the wording.",
+      "parentUuid": "e0e267ca_63919387",
+      "revId": "118936f950f3b9801e0878d381b50627e5bd6539",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
