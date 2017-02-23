@@ -10,7 +10,10 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"os/signal"
 	"path/filepath"
+
+	"bazil.org/fuse"
 
 	"upspin.io/cmd/cacheserver/cacheutil"
 	"upspin.io/config"
@@ -54,5 +57,11 @@ func main() {
 		log.Fatalf("can't determine absolute path to mount point %s: %s", flag.Arg(0), err)
 	}
 	done := do(cfg, mountpoint, flags.CacheDir)
-	<-done
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, os.Interrupt)
+	select {
+	case <-c:
+	case <-done:
+	}
+	fuse.Unmount(mountpoint)
 }
