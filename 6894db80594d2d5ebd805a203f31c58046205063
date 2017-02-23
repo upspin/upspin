@@ -33,6 +33,24 @@
       "revId": "6894db80594d2d5ebd805a203f31c58046205063",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a07d0c29_91192b4a",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 5361
+      },
+      "writtenOn": "2017-02-23T23:14:02Z",
+      "side": 1,
+      "message": "How about \"...deletes all data you have put into Upspin.\" All your Upspin data would sound to me as if the public/private key pair and the $HOME/upspin/config would be lost, too, and that\u0027s not the case here.",
+      "parentUuid": "3317d170_839bb957",
+      "revId": "6894db80594d2d5ebd805a203f31c58046205063",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
