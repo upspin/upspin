@@ -30,4 +30,11 @@ Performance is not a primary goal. Uniformity and security are.
 - The [Mascot](/doc/mascot.md) document introduces our mascot, Augie,
   including downloadable images and usage information.
 
-<center><h3>[View on GitHub](https://github.com/upspin/upspin)</h3></center>
+## Community
+
+- [View on GitHub](https://github.com/upspin/upspin)
+- [Issue tracker](https://github.com/upspin/upspin/issues)
+- [Contribution guidelines](https://github.com/upspin/upspin/blob/master/CONTRIBUTING.md)
+- [Mailing list](https://groups.google.com/forum/#!forum/upspin) at [upspin@googlegroups.com](mailto:upspin@googlegroups.com)
+- [Code review](https://upspin-review.googlesource.com)
+- [@UpspinProject](https://twitter.com/UpspinProject) on Twitter
