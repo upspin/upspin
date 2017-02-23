@@ -112,7 +112,7 @@ The calling user must be the same one that ran 'upspin setupdomain'.
 	configFile := filepath.Join(cfgPath, "config")
 	configBody := new(bytes.Buffer)
 	if err := configTemplate.Execute(configBody, configData{
-		UserName:  upspin.UserName("upspin@" + *domain),
+		UserName:  cfg.User,
 		Store:     &ep,
 		Dir:       &ep,
 		SecretDir: cfgPath,
