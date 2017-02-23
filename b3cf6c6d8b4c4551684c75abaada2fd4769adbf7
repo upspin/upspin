@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "14f125d1_a0a20aa4",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-23T22:52:58Z",
+      "side": 1,
+      "message": "inaccessible\nand please start each sentence on a new line; it makes later edits cleaner",
+      "range": {
+        "startLine": 263,
+        "startChar": 53,
+        "endLine": 263,
+        "endChar": 65
+      },
+      "revId": "b3cf6c6d8b4c4551684c75abaada2fd4769adbf7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "732a69d2_ed0d1737",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-23T22:52:58Z",
+      "side": 1,
+      "message": "we already told them to delete upspin/server, this is redundant\n\nHere\u0027s my attempt at rewriting this paragraph.\n\nIf you make a mistake configuring `upspinserver` you can start over by\nby removing `$HOME/upspin/server` and re-running `upspin setupserver`.\nNote that the `upspin/server` directory contains your directory server data\nand—if you are using the local disk for storage—any store server objects.\nIf you are using Google Cloud Storage you may want to delete the contents\nof your storage bucket before running `upspin setupserver` again to avoid\npaying to store orphaned objects.",
+      "revId": "b3cf6c6d8b4c4551684c75abaada2fd4769adbf7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
