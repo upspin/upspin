@@ -287,14 +287,7 @@ func TestTriggerSnapshotWithPut(t *testing.T) {
 	}
 
 	// Check some errors.
-
-	// Wrong packing
-	de.Packing = upspin.EEPack
-	_, err = s.Put(de)
 	expectedErr := errors.E(errors.Invalid, errors.E(de.Name))
-	if !errors.Match(expectedErr, err) {
-		t.Errorf("err = %v, want = %v", err, expectedErr)
-	}
 
 	// Empty blocks.
 	de.Packing = upspin.PlainPack
