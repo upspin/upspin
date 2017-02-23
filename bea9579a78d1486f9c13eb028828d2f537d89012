@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e25fb625_1f8d5a78",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-23T01:47:26Z",
+      "side": 1,
+      "message": "I agree we don\u0027t need this in the commit logs.",
+      "revId": "bea9579a78d1486f9c13eb028828d2f537d89012",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c1880a09_f91eaff3",
+        "filename": "serverutil/ratecounter.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-23T01:47:26Z",
+      "side": 1,
+      "message": "much better.",
+      "revId": "bea9579a78d1486f9c13eb028828d2f537d89012",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
