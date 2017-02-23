@@ -1,0 +1,208 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "40451b7d_dc848aac",
+        "filename": "doc/index.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-23T23:53:59Z",
+      "side": 1,
+      "message": "How about,\n\nThe [Usage Examples] ( ... ) document demonstrates some common usage scenarios.",
+      "revId": "85f19dfd321a88357c6dc11d9092b58b2586b217",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "04acb9e4_2d1851e9",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-23T23:53:59Z",
+      "side": 1,
+      "message": "you don\u0027t really address a scenario. maybe\n\nThis document illustrates how to use the Upspin and the `upspin` command\nto do some common Upspin tasks.",
+      "revId": "85f19dfd321a88357c6dc11d9092b58b2586b217",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "64dffdac_1e01dbaa",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-23T23:53:59Z",
+      "side": 1,
+      "message": "many trailing spaces on the ends of lines 6, 15, etc.. please delete them all.",
+      "revId": "85f19dfd321a88357c6dc11d9092b58b2586b217",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6d69a94f_267a2cb2",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-23T23:53:59Z",
+      "side": 1,
+      "message": "please use ann@example.com, as in the other documents.",
+      "revId": "85f19dfd321a88357c6dc11d9092b58b2586b217",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5ead9309_0ab44290",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-23T23:53:59Z",
+      "side": 1,
+      "message": "Substitute your own user and domain names in the examples that follow.",
+      "revId": "85f19dfd321a88357c6dc11d9092b58b2586b217",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d3a9101a_3076fb02",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-23T23:53:59Z",
+      "side": 1,
+      "message": "## Allowing a family member to share your Upspin installation.",
+      "revId": "85f19dfd321a88357c6dc11d9092b58b2586b217",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f716660e_9149a933",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-23T23:53:59Z",
+      "side": 1,
+      "message": "s/dir/directory/",
+      "revId": "85f19dfd321a88357c6dc11d9092b58b2586b217",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "112c1257_81953d55",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-23T23:53:59Z",
+      "side": 1,
+      "message": "Well, if they followed the instructions they will have done this already.\n\nMaybe recast this as a way to update the list rather than create it initially.",
+      "revId": "85f19dfd321a88357c6dc11d9092b58b2586b217",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8cdf1a52_73b053fe",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-23T23:53:59Z",
+      "side": 1,
+      "message": "You don\u0027t need to folder, just the config file. Rephrase so it\u0027s clear.",
+      "revId": "85f19dfd321a88357c6dc11d9092b58b2586b217",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "36e2effd_3d17e010",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-23T23:53:59Z",
+      "side": 1,
+      "message": "This is one of those odd English things where I think \u0027pair\u0027 is singular. s/are/is/\nAlso s/user which/user, which/",
+      "revId": "85f19dfd321a88357c6dc11d9092b58b2586b217",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ab4d4298_016f130e",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-23T23:53:59Z",
+      "side": 1,
+      "message": "s/than/as/",
+      "revId": "85f19dfd321a88357c6dc11d9092b58b2586b217",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5f9256e8_b1d4d365",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-23T23:53:59Z",
+      "side": 1,
+      "message": "s/viscerally //\n\nNo adverbs please :)",
+      "revId": "85f19dfd321a88357c6dc11d9092b58b2586b217",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
