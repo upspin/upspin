@@ -124,7 +124,7 @@ func testWatchErrors(t *testing.T, r *testenv.Runner) {
 	// Should get an error for bad file syntax
 	r.DirWatch(badFile, 777)
 	if !r.Failed() {
-		t.Fatal("expected Watch error for bad file name %q", badFile)
+		t.Fatalf("expected Watch error for bad file name %q", badFile)
 	}
 
 	// 777 is an implausible order number, at least in this test.
