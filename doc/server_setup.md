@@ -258,8 +258,16 @@ Created root "you@gmail.com".
 ```
 
 To reconfigure the `upspinserver` you can delete its state in
-`$HOME/upspin/server`, restart the `upspinserver`,
-and re-run `upspin setupserver`.
+`$HOME/upspin/server`, restart the `upspinserver`, and re-run `upspin
+setupserver`. Be advised that performing a reconfiguration will render any data
+you have written to the Upspin tree up to this point unaccessible. Although you
+can no longer interact with the data, the blobs might still claim space in your
+storeserver. In case you are using the localdisk store server, you should
+delete the blob folder (`$HOME/upspin/server/storage`) prior to calling `upspin
+setupserver` and restarting `uspinserver` to actually erase the blobs.  For GCS
+you would empty and delete the bucket with the Google Cloud Developer Console
+to achieve that.
+
 
 ## Use your server
 
