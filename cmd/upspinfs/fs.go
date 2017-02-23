@@ -24,6 +24,7 @@ import (
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/path"
+	"upspin.io/serverutil"
 	"upspin.io/upspin"
 )
 
@@ -902,6 +903,10 @@ func do(cfg upspin.Config, mountpoint string, cacheDir string) chan bool {
 		}
 	case <-time.After(500 * time.Millisecond):
 	}
+
+	serverutil.RegisterShutdown(func() {
+		fuse.Unmount(mountpoint)
+	})
 
 	// Serve in a go routine.
 	done := make(chan bool)

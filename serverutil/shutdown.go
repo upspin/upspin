@@ -75,7 +75,7 @@ var shutdown struct {
 func init() {
 	// Close the listener when a shutdown event happens.
 	c := make(chan os.Signal, 1)
-	signal.Notify(c, syscall.SIGTERM)
+	signal.Notify(c, syscall.SIGTERM, os.Interrupt)
 	go func() {
 		<-c
 		Shutdown()
