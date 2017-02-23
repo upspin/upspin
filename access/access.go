@@ -311,7 +311,7 @@ func isSeparator(b byte) bool {
 }
 
 // clean takes a line of text and removes comments and starting and leading space.
-// It returns an emtpy slice if nothing is left.
+// It returns an empty slice if nothing is left.
 func clean(line []byte) []byte {
 	// Remove comments.
 	if index := bytes.IndexByte(line, '#'); index >= 0 {

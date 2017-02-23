@@ -77,7 +77,7 @@ type writebackQueue struct {
 	// Closing die signals all go routines to exit.
 	die chan bool
 
-	// Writers adn scheduler send to terminated on exit.
+	// Writers and scheduler send to terminated on exit.
 	terminated chan bool
 }
 
