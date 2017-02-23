@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "77202217_3c5c780a",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-23T23:03:59Z",
+      "side": 1,
+      "message": "should probably be `$HOME/upspin/server`",
+      "revId": "6894db80594d2d5ebd805a203f31c58046205063",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3317d170_839bb957",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-23T23:03:59Z",
+      "side": 1,
+      "message": ", and so deleting these files effectively deletes all your Upspin data.",
+      "revId": "6894db80594d2d5ebd805a203f31c58046205063",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
