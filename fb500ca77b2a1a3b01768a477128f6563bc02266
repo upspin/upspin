@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "182fab5b_7c30167d",
+        "filename": "cmd/upspin/user.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-23T22:21:25Z",
+      "side": 1,
+      "message": "not true. domain administrators can add records under the domains they control",
+      "revId": "fb500ca77b2a1a3b01768a477128f6563bc02266",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
