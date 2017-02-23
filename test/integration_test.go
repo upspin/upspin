@@ -303,6 +303,10 @@ var integrationTests = []struct {
 	{"GroupAccess", testGroupAccess},
 	{"Watch", testWatchCurrent},
 	{"WatchErrors", testWatchErrors},
+	{"WatchNonExistentFile", testWatchNonExistentFile},
+	{"WatchNonExistentDir", testWatchNonExistentDir},
+	{"WatchForbiddenFile", testWatchForbiddenFile},
+	{"WatchSubtree", testWatchSubtree},
 	{"CopyEntries", testCopyEntries},
 
 	// Each of these tests depend on the output of the previous one.
