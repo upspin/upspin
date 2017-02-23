@@ -72,6 +72,24 @@
     },
     {
       "key": {
+        "uuid": "8492d634_097f6ac8",
+        "filename": "test/snapshot_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-23T22:55:23Z",
+      "side": 1,
+      "message": "Never mind, you\u0027re right. I was thinking there was an easier way to find out rather than doing all this, but this is fine.",
+      "parentUuid": "b483cddd_e7fe296d",
+      "revId": "a95957d719449aa88b1300783026cea77fdf14db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "ca5ef5ae_87a6cb0e",
         "filename": "test/snapshot_test.go",
         "patchSetId": 2
@@ -136,6 +154,24 @@
       "side": 1,
       "message": "If it\u0027s important I could, but it\u0027s tricky.\n\nReason: I don\u0027t know the exact name to look for. I mean, I sort of do, but it could open us up to races. The snapshot has a timestamp and I don\u0027t know how fast the server will take it. So, if we\u0027re about to go from minute 17 to minute 18, I will get this wrong.\n\nI could try both, ignore one, but I thought this was an acceptable method.\n\nLet me know what you think.",
       "parentUuid": "3e3f2fd6_a68ab99f",
+      "revId": "a95957d719449aa88b1300783026cea77fdf14db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "150b66dc_4f30dde7",
+        "filename": "test/snapshot_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-23T22:55:23Z",
+      "side": 1,
+      "message": "If it\u0027s hard, stick with GotNEvents but add a comment saying why.",
+      "parentUuid": "8166ab7f_ba13d007",
       "revId": "a95957d719449aa88b1300783026cea77fdf14db",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
