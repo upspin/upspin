@@ -7,9 +7,11 @@
 package keyserver // import "upspin.io/rpc/keyserver"
 
 import (
+	"expvar"
 	"fmt"
 	"math/rand"
 	"net/http"
+	"time"
 
 	pb "github.com/golang/protobuf/proto"
 
@@ -17,6 +19,7 @@ import (
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/rpc"
+	"upspin.io/serverutil"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
 )
@@ -29,7 +32,16 @@ type server struct {
 
 	// The underlying keyserver implementation.
 	key upspin.KeyServer
+
+	// Counters for tracking Lookup load.
+	lookupCounter [3]*serverutil.RateCounter
+
+	// Counters for tracking Put load.
+	putCounter [3]*serverutil.RateCounter
 }
+
+// How often to sample, where each sample is a second.
+var defaultSampling = []int{10, 60, 300}
 
 // New creates a new instance of the RPC key server.
 func New(cfg upspin.Config, key upspin.KeyServer, addr upspin.NetAddr) http.Handler {
@@ -41,6 +53,7 @@ func New(cfg upspin.Config, key upspin.KeyServer, addr upspin.NetAddr) http.Hand
 		},
 		key: key,
 	}
+	s.registerCounters()
 	return rpc.NewServer(cfg, &rpc.ServerConfig{
 		Lookup: func(userName upspin.UserName) (upspin.PublicKey, error) {
 			user, err := key.Lookup(userName)
@@ -57,6 +70,34 @@ func New(cfg upspin.Config, key upspin.KeyServer, addr upspin.NetAddr) http.Hand
 			},
 		},
 	})
+}
+
+func (s *server) registerCounters() {
+	var err error
+	for i, samples := range defaultSampling {
+		s.lookupCounter[i], err = serverutil.NewRateCounter(samples, time.Second)
+		if err != nil {
+			panic(err)
+		}
+		expvar.Publish(fmt.Sprintf("lookup-%ds", samples), s.lookupCounter[i])
+		s.putCounter[i], err = serverutil.NewRateCounter(samples, time.Second)
+		if err != nil {
+			panic(err)
+		}
+		expvar.Publish(fmt.Sprintf("put-%ds", samples), s.putCounter[i])
+	}
+}
+
+func (s *server) incLookupCounters() {
+	for i := 0; i < len(s.lookupCounter); i++ {
+		s.lookupCounter[i].Add(1)
+	}
+}
+
+func (s *server) incPutCounters() {
+	for i := 0; i < len(s.putCounter); i++ {
+		s.putCounter[i].Add(1)
+	}
 }
 
 func (s *server) serverFor(session rpc.Session, reqBytes []byte, req pb.Message) (upspin.KeyServer, error) {
@@ -80,6 +121,7 @@ func (s *server) Lookup(session rpc.Session, reqBytes []byte) (pb.Message, error
 		return nil, err
 	}
 	logfOnceInN(100, "Lookup %q", req.UserName)
+	s.incLookupCounters()
 
 	user, err := key.Lookup(upspin.UserName(req.UserName))
 	if err != nil {
@@ -97,6 +139,7 @@ func (s *server) Put(session rpc.Session, reqBytes []byte) (pb.Message, error) {
 		return nil, err
 	}
 	op := logf("Put %v", req)
+	s.incPutCounters()
 
 	user := proto.UpspinUser(req.User)
 	err = key.Put(user)
