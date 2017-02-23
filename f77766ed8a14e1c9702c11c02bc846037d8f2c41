@@ -16,6 +16,24 @@
       "revId": "f77766ed8a14e1c9702c11c02bc846037d8f2c41",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7edd1c8d_18bd24d4",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 5361
+      },
+      "writtenOn": "2017-02-23T22:43:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6b05c99f_0e04fe57",
+      "revId": "f77766ed8a14e1c9702c11c02bc846037d8f2c41",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
