@@ -108,7 +108,15 @@ As a guide, here's what the DNS record looks like in Google Domains:
 ![DNS Entries](https://upspin.io/images/txt_dns.png)
 
 Consult your registrar's documentation if it is not clear how to add a TXT
-record to your domain.
+record to your domain. Note that some registrars will display root subdomain
+name as `@`. You should not type in the `@` character.
+
+You can verify that your record is in place (it may take a few minutes to
+propagate) by running:
+
+```
+host -t TXT example.com
+```
 
 Once the TXT record is in place, the key server will permit you to register the
 newly-created users that will identify the servers you will deploy (as well as
