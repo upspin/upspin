@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "43be55ff_2ab73c5b",
+        "filename": "test/snapshot_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-23T21:52:08Z",
+      "side": 1,
+      "message": "[S] i\u0027d be inclined to drop this comment; the function call says it all",
+      "revId": "a95957d719449aa88b1300783026cea77fdf14db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "d6d9c360_29d87513",
         "filename": "test/snapshot_test.go",
         "patchSetId": 2
@@ -19,6 +36,23 @@
     },
     {
       "key": {
+        "uuid": "ca5ef5ae_87a6cb0e",
+        "filename": "test/snapshot_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-23T21:52:08Z",
+      "side": 1,
+      "message": "maybe name this \u0027found\u0027 ?",
+      "revId": "a95957d719449aa88b1300783026cea77fdf14db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "3e3f2fd6_a68ab99f",
         "filename": "test/snapshot_test.go",
         "patchSetId": 2
@@ -30,6 +64,74 @@
       "writtenOn": "2017-02-23T17:52:35Z",
       "side": 1,
       "message": "can you use r.GotEvent?",
+      "revId": "a95957d719449aa88b1300783026cea77fdf14db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "549ecebe_b40ccca8",
+        "filename": "test/snapshot_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-23T21:52:08Z",
+      "side": 1,
+      "message": "// Check  entry contents and name.\n\n?",
+      "revId": "a95957d719449aa88b1300783026cea77fdf14db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cfc783f4_44c32026",
+        "filename": "test/snapshot_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-23T21:52:08Z",
+      "side": 1,
+      "message": "seems like an obvious comment",
+      "revId": "a95957d719449aa88b1300783026cea77fdf14db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d79d7eca_493abc25",
+        "filename": "test/snapshot_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-23T21:52:08Z",
+      "side": 1,
+      "message": "can you say why this failure is okay? i\u0027m not following",
+      "revId": "a95957d719449aa88b1300783026cea77fdf14db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cde42484_9b3d9cb5",
+        "filename": "test/snapshot_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-23T21:52:08Z",
+      "side": 1,
+      "message": "randomString (it\u0027s not unique, if we\u0027re being pedantic, and I am ;-)",
       "revId": "a95957d719449aa88b1300783026cea77fdf14db",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
