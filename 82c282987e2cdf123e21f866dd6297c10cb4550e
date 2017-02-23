@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2576a73a_738d9919",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 738,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-23T03:57:48Z",
+      "side": 1,
+      "message": "move the return true up into the select?\nfor symmetry\u0027s sake",
+      "revId": "82c282987e2cdf123e21f866dd6297c10cb4550e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0bf36cec_7c443cf3",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 760,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-23T03:57:48Z",
+      "side": 1,
+      "message": "shouldn\u0027t hasRight grant these privileges? seems like a strange special case to call out here.",
+      "revId": "82c282987e2cdf123e21f866dd6297c10cb4550e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
