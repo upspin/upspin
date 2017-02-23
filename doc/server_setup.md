@@ -257,9 +257,14 @@ Configured upspinserver at "upspin.example.com:443".
 Created root "you@gmail.com".
 ```
 
-To reconfigure the `upspinserver` you can delete its state in
-`$HOME/upspin/server`, restart the `upspinserver`,
-and re-run `upspin setupserver`.
+If you make a mistake configuring `upspinserver` you can start over by
+removing `$HOME/upspin/server` and re-running `upspin setupserver`. 
+Note that the `upspin/server` directory contains your directory server data
+and—if you are using the local disk for storage—any store server objects. 
+If you are using Google Cloud Storage you may want to delete the contents of
+your storage bucket before running `upspin setupserver` again to avoid paying
+to store orphaned objects.
+
 
 ## Use your server
 
