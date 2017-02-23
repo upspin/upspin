@@ -387,6 +387,24 @@
       "revId": "a95957d719449aa88b1300783026cea77fdf14db",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "662f6605_a3fb3c85",
+        "filename": "test/snapshot_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-23T23:02:25Z",
+      "side": 1,
+      "message": "oh sorry I didn\u0027t see the change",
+      "parentUuid": "7bb56df7_33825994",
+      "revId": "a95957d719449aa88b1300783026cea77fdf14db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
