@@ -16,6 +16,24 @@
       "revId": "9cd66dbd711ae676a6491be68b9a61e5516d3000",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "313b84f0_96503f88",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 7
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-23T00:49:13Z",
+      "side": 1,
+      "message": "Does it really read weirdly? It seems still accurate to me",
+      "parentUuid": "98a25afd_f831f8ca",
+      "revId": "9cd66dbd711ae676a6491be68b9a61e5516d3000",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
