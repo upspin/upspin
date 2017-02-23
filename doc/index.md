@@ -27,6 +27,8 @@ Performance is not a primary goal. Uniformity and security are.
   configuration file format and settings.
 - The [Setting up `upspinserver`](/doc/server_setup.md) document explains how
   to set up your own Upspin installation on a Linux server.
+- The [Usage Examples](/doc/usage_examples.md) document demonstrates some
+  common usage scenarios.
 - The [Mascot](/doc/mascot.md) document introduces our mascot, Augie,
   including downloadable images and usage information.
 
