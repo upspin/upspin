@@ -24,6 +24,8 @@ import (
 	"upspin.io/valid"
 )
 
+// TODO(edpin): move the the special-casing about snapshots into hasRight.
+
 // common error values.
 var (
 	errNotExist = errors.E(errors.NotExist)
@@ -721,6 +723,23 @@ func (s *server) watch(op string, treeEvents <-chan *upspin.Event, outEvents cha
 	defer close(outEvents)
 	defer t.Stop()
 
+	sendEvent := func(e *upspin.Event) bool {
+		// Send e on outEvents, with a timeout.
+		if !t.Stop() {
+			<-t.C
+		}
+		t.Reset(sendTimeout)
+		select {
+		case outEvents <- *e:
+			// OK, sent.
+			return true
+		case <-t.C:
+			// Timed out.
+			log.Printf("%s: timeout sending event for %s", op, s.userName)
+			return false
+		}
+	}
+
 	for {
 		e, ok := <-treeEvents
 		if !ok {
@@ -735,15 +754,21 @@ func (s *server) watch(op string, treeEvents <-chan *upspin.Event, outEvents cha
 		}
 
 		// Check permissions on e.Entry.
-
 		p, err := path.Parse(e.Entry.Name)
 		if err != nil {
-			outEvents <- upspin.Event{Error: errors.E(op, err)}
+			sendEvent(&upspin.Event{Error: errors.E(op, err)})
 			return
+		}
+		if isSnapshotUser(p.User()) && isSnapshotOwner(s.userName, p.User()) {
+			// Okay to watch.
+			if !sendEvent(e) {
+				return
+			}
+			continue
 		}
 		hasAny, _, err := s.hasRight(access.AnyRight, p)
 		if err != nil {
-			outEvents <- upspin.Event{Error: errors.E(op, err)}
+			sendEvent(&upspin.Event{Error: errors.E(op, err)})
 			return
 		}
 		if !hasAny {
@@ -751,23 +776,13 @@ func (s *server) watch(op string, treeEvents <-chan *upspin.Event, outEvents cha
 		}
 		hasRead, _, err := s.hasRight(access.Read, p)
 		if err != nil {
-			outEvents <- upspin.Event{Error: errors.E(op, err)}
+			sendEvent(&upspin.Event{Error: errors.E(op, err)})
 			return
 		}
 		if !hasRead {
 			e.Entry.MarkIncomplete()
 		}
-		// Send e on outEvents, with a timeout.
-		if !t.Stop() {
-			<-t.C
-		}
-		t.Reset(sendTimeout)
-		select {
-		case outEvents <- *e:
-			// OK, sent.
-		case <-t.C:
-			// Timed out.
-			log.Printf("%s: timeout sending event for %s", op, s.userName)
+		if !sendEvent(e) {
 			return
 		}
 	}
