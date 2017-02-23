@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "d622e271_353d7f86",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5020
+      },
+      "writtenOn": "2017-02-23T01:07:50Z",
+      "side": 1,
+      "message": "Yeah, but how often do you update a change after you type it? ;-)",
+      "parentUuid": "927507cb_0d743e0a",
+      "revId": "97ef81d38eea444964393afaa547dfcad50c2eff",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "5ea72aa6_48709761",
         "filename": "serverutil/ratecounter.go",
         "patchSetId": 2
