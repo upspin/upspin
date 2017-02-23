@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "927507cb_0d743e0a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-23T01:06:33Z",
+      "side": 1,
+      "message": "It\u0027s always true when I type it. It\u0027s not added automatically.",
+      "parentUuid": "5cc2c216_9501b7b7",
+      "revId": "97ef81d38eea444964393afaa547dfcad50c2eff",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "5ea72aa6_48709761",
         "filename": "serverutil/ratecounter.go",
         "patchSetId": 2
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "e3a553e4_5a67769f",
+        "filename": "serverutil/ratecounter.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-23T01:06:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5ea72aa6_48709761",
+      "revId": "97ef81d38eea444964393afaa547dfcad50c2eff",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cb1757b9_2a0dcd67",
         "filename": "serverutil/ratecounter.go",
         "patchSetId": 2
@@ -50,6 +86,24 @@
       "revId": "97ef81d38eea444964393afaa547dfcad50c2eff",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a358e5fe_d11e7e20",
+        "filename": "serverutil/ratecounter.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-23T01:06:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cb1757b9_2a0dcd67",
+      "revId": "97ef81d38eea444964393afaa547dfcad50c2eff",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
