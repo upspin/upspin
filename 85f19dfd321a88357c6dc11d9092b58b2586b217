@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "ba0dfc72_dd1b1f60",
+        "filename": "doc/index.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5361
+      },
+      "writtenOn": "2017-02-24T11:41:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "40451b7d_dc848aac",
+      "revId": "85f19dfd321a88357c6dc11d9092b58b2586b217",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "04acb9e4_2d1851e9",
         "filename": "doc/usage_examples.md",
         "patchSetId": 4
@@ -33,6 +51,24 @@
       "revId": "85f19dfd321a88357c6dc11d9092b58b2586b217",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4478367d_48ecdada",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5361
+      },
+      "writtenOn": "2017-02-24T11:41:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "04acb9e4_2d1851e9",
+      "revId": "85f19dfd321a88357c6dc11d9092b58b2586b217",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "1743eea6_d463de06",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 5361
+      },
+      "writtenOn": "2017-02-24T11:41:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "64dffdac_1e01dbaa",
+      "revId": "85f19dfd321a88357c6dc11d9092b58b2586b217",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6d69a94f_267a2cb2",
         "filename": "doc/usage_examples.md",
         "patchSetId": 4
@@ -67,6 +121,24 @@
       "revId": "85f19dfd321a88357c6dc11d9092b58b2586b217",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bf036f85_f8ca14e2",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5361
+      },
+      "writtenOn": "2017-02-24T11:41:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6d69a94f_267a2cb2",
+      "revId": "85f19dfd321a88357c6dc11d9092b58b2586b217",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "06618bd8_2f4880f2",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5361
+      },
+      "writtenOn": "2017-02-24T11:41:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5ead9309_0ab44290",
+      "revId": "85f19dfd321a88357c6dc11d9092b58b2586b217",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d3a9101a_3076fb02",
         "filename": "doc/usage_examples.md",
         "patchSetId": 4
@@ -101,6 +191,24 @@
       "revId": "85f19dfd321a88357c6dc11d9092b58b2586b217",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6e777d64_6744cd5c",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 5361
+      },
+      "writtenOn": "2017-02-24T11:41:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d3a9101a_3076fb02",
+      "revId": "85f19dfd321a88357c6dc11d9092b58b2586b217",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "6079fd80_0707a869",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5361
+      },
+      "writtenOn": "2017-02-24T11:41:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f716660e_9149a933",
+      "revId": "85f19dfd321a88357c6dc11d9092b58b2586b217",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "112c1257_81953d55",
         "filename": "doc/usage_examples.md",
         "patchSetId": 4
@@ -132,6 +258,24 @@
       "writtenOn": "2017-02-23T23:53:59Z",
       "side": 1,
       "message": "Well, if they followed the instructions they will have done this already.\n\nMaybe recast this as a way to update the list rather than create it initially.",
+      "revId": "85f19dfd321a88357c6dc11d9092b58b2586b217",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "09255015_cd335b6c",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5361
+      },
+      "writtenOn": "2017-02-24T11:41:45Z",
+      "side": 1,
+      "message": "The only place in the docs where I saw this mentioned at the moment is deploying_to_google_cloud.md which is not linked to from any other Markdown doc, so I assumed that most users will not notice or read it. In fact I copied this paragraph from there so that this piece of information is no longer overlooked so easily.\n\nI make clear that upspin setupwriters does this behind the curtains.",
+      "parentUuid": "112c1257_81953d55",
       "revId": "85f19dfd321a88357c6dc11d9092b58b2586b217",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -155,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "8cf66dd0_3db7862d",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 5361
+      },
+      "writtenOn": "2017-02-24T11:41:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8cdf1a52_73b053fe",
+      "revId": "85f19dfd321a88357c6dc11d9092b58b2586b217",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "36e2effd_3d17e010",
         "filename": "doc/usage_examples.md",
         "patchSetId": 4
@@ -169,6 +331,24 @@
       "revId": "85f19dfd321a88357c6dc11d9092b58b2586b217",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b6e34b16_662b8e12",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5361
+      },
+      "writtenOn": "2017-02-24T11:41:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "36e2effd_3d17e010",
+      "revId": "85f19dfd321a88357c6dc11d9092b58b2586b217",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -189,6 +369,24 @@
     },
     {
       "key": {
+        "uuid": "54ecda1b_635f1326",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 5361
+      },
+      "writtenOn": "2017-02-24T11:41:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ab4d4298_016f130e",
+      "revId": "85f19dfd321a88357c6dc11d9092b58b2586b217",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f9256e8_b1d4d365",
         "filename": "doc/usage_examples.md",
         "patchSetId": 4
@@ -203,6 +401,24 @@
       "revId": "85f19dfd321a88357c6dc11d9092b58b2586b217",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ae3b4cd7_950eb569",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 5361
+      },
+      "writtenOn": "2017-02-24T11:41:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f9256e8_b1d4d365",
+      "revId": "85f19dfd321a88357c6dc11d9092b58b2586b217",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
