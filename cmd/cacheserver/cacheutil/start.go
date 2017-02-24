@@ -47,8 +47,8 @@ func Start(cfg upspin.Config) {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 		if err := cmd.Run(); err != nil {
-			log.Info.Printf("upspinfs: starting cacheserver: %s", err)
-			fmt.Fprintf(os.Stderr, "Upspinfs failed to start cacheserver, continuing without.\n")
+			log.Info.Printf("Starting cacheserver: %s", err)
+			fmt.Fprintf(os.Stderr, "Failed to start cacheserver; continuing without.\n")
 			close(cacheErrorChan)
 		}
 	}()
@@ -66,7 +66,7 @@ func Start(cfg upspin.Config) {
 		}
 	}
 
-	fmt.Fprintf(os.Stderr, "Upspinfs timed out waiting for cacheserver to start.\n")
+	fmt.Fprintf(os.Stderr, "Timed out waiting for cacheserver to start.\n")
 }
 
 // ping determines if the cacheserver is functioning.
@@ -77,7 +77,7 @@ func ping(cfg upspin.Config, ce upspin.Endpoint) error {
 	}
 	msg, _, _, err := store.Get(upspin.HealthMetadata)
 	if err == nil {
-		log.Debug.Printf("upspinfs: cacheserver said %q", string(msg))
+		log.Debug.Printf("Cacheserver said %q", string(msg))
 	}
 	return err
 }
