@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5b173b25_209c4406",
+        "filename": "cloud/https/https.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-02-24T04:54:48Z",
+      "side": 1,
+      "message": "It is the time to receive the request.  It will kill off connections thast are just hanging. If writetimeout didn\u0027t apply to streaming, I\u0027d happily leave it set.",
+      "parentUuid": "a38aeaf6_405c8888",
+      "revId": "e41006da8abe35850ea3d971e15304a8647d2ced",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "2f7b57c4_38c9db2f",
         "filename": "cloud/https/https.go",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2017-02-24T04:22:44Z",
       "side": 1,
       "message": "Or just don\u0027t set it? The default is zero.",
+      "revId": "e41006da8abe35850ea3d971e15304a8647d2ced",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9b420786_fee6090a",
+        "filename": "cloud/https/https.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-02-24T04:54:48Z",
+      "side": 1,
+      "message": "I want it very explicit that we are zeroing it as opposed to just forgetting it.",
+      "parentUuid": "2f7b57c4_38c9db2f",
       "revId": "e41006da8abe35850ea3d971e15304a8647d2ced",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
