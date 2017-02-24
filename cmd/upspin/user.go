@@ -29,8 +29,8 @@ with the -in flag. The input must provide the complete record for
 the user, and must be in the same YAML format printed by the command
 without the -put flag.
 
-When using -put, the command does takes no arguments. The name of
-the user whose record is to be updated must be provided in the input
+When using -put, the command takes no arguments. The name of the
+user whose record is to be updated must be provided in the input
 record and must either be the current user or the name of another
 user whose domain is administered by the current user.
 
