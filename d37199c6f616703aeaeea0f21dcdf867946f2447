@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "301fe7f6_7edc5a39",
+        "filename": "rpc/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 374,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-24T20:37:50Z",
+      "side": 1,
+      "message": "well, fuck",
+      "revId": "d37199c6f616703aeaeea0f21dcdf867946f2447",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
