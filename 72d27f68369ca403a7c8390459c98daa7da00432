@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7b84793a_c21fcae8",
+        "filename": "rpc/keyserver/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-24T00:28:53Z",
+      "side": 1,
+      "message": "make these sample ranges a global var with documentation?\nbeside the server struct, so that the 3 in the array field decls mirrors the 3 elements of the slice",
+      "revId": "72d27f68369ca403a7c8390459c98daa7da00432",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9b3e442b_97355994",
+        "filename": "rpc/keyserver/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-24T00:28:53Z",
+      "side": 1,
+      "message": "I think you should just panic here. If this fails then the code is wrong.",
+      "revId": "72d27f68369ca403a7c8390459c98daa7da00432",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "95677e3b_ed7f36e4",
+        "filename": "rpc/keyserver/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-24T00:28:53Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "72d27f68369ca403a7c8390459c98daa7da00432",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
