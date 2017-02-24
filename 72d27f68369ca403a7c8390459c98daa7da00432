@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "056adf5f_d5821f9e",
+        "filename": "rpc/keyserver/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-24T00:43:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7b84793a_c21fcae8",
+      "revId": "72d27f68369ca403a7c8390459c98daa7da00432",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9b3e442b_97355994",
         "filename": "rpc/keyserver/server.go",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "f5d20bb5_6ce73462",
+        "filename": "rpc/keyserver/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-24T00:43:10Z",
+      "side": 1,
+      "message": "I had that at first, then thought panics in libraries were evil. But yeah, this is different and should never fail.\n\nDone.",
+      "parentUuid": "9b3e442b_97355994",
+      "revId": "72d27f68369ca403a7c8390459c98daa7da00432",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "95677e3b_ed7f36e4",
         "filename": "rpc/keyserver/server.go",
         "patchSetId": 1
@@ -50,6 +86,24 @@
       "revId": "72d27f68369ca403a7c8390459c98daa7da00432",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1d4bb756_f0bd315e",
+        "filename": "rpc/keyserver/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-24T00:43:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "95677e3b_ed7f36e4",
+      "revId": "72d27f68369ca403a7c8390459c98daa7da00432",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
