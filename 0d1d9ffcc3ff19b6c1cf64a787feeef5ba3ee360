@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "47a08431_939a5934",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-24T21:10:13Z",
+      "side": 1,
+      "message": "`Group`",
+      "revId": "0d1d9ffcc3ff19b6c1cf64a787feeef5ba3ee360",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
