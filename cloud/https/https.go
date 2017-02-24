@@ -116,10 +116,12 @@ func ListenAndServe(ready chan<- struct{}, serverName, addr string, opt *Options
 			log.Fatalf("https: setting up TLS config: %v", err)
 		}
 	}
+	// WriteTimeout is set to 0 because it also pertains to streaming
+	// replies, e.g., the DirServer.Watch interface.
 	server := &http.Server{
 		ReadHeaderTimeout: 5 * time.Second,
 		ReadTimeout:       15 * time.Second,
-		WriteTimeout:      15 * time.Second,
+		WriteTimeout:      0,
 		IdleTimeout:       60 * time.Second,
 		TLSConfig:         config,
 	}
