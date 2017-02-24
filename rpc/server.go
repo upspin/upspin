@@ -367,10 +367,13 @@ func verifyUser(key upspin.PublicKey, msg []string, magic string, now time.Time)
 	}
 
 	// Validate signature.
+	// TODO: this really should be a hash.
 	hash := []byte(msg[0] + magic + msg[1])
 	err = factotum.Verify(hash, upspin.Signature{R: &rs, S: &ss}, key)
 	if err != nil {
-		errors.Errorf("signature fails to validate using the provided key: %s", err)
+		err = errors.Errorf("signature fails to validate using the provided key: %s", err)
+		log.Debug.Printf("rpc/server: verifyUser: %s", err)
+		return err
 	}
 	return nil
 }
@@ -388,6 +391,7 @@ func signUser(cfg upspin.Config, magic string) ([]string, error) {
 	// Discourage replay attacks.
 	now := time.Now().UTC().Format(time.ANSIC)
 	userString := string(cfg.UserName())
+	// TODO: this should be a hash, matching verifyUser.
 	sig, err := f.Sign([]byte(userString + magic + now))
 	if err != nil {
 		log.Error.Printf("proxyRequest signing server user: %v", err)
