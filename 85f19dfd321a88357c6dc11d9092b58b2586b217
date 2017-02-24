@@ -282,6 +282,24 @@
     },
     {
       "key": {
+        "uuid": "3d6ad827_b88c3217",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-24T21:08:59Z",
+      "side": 1,
+      "message": "It\u0027s not mentioned as clearly as it should and we should fix that, but your claim that the initial state is unsafe is misleading. If you do what the setup doc says, the Writers file is there, and my point is that this text should start from that supposition.\n\"Here\u0027s how to add more writers\" not \"Here\u0027s how to fix your insecure system\"",
+      "parentUuid": "09255015_cd335b6c",
+      "revId": "85f19dfd321a88357c6dc11d9092b58b2586b217",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "8cdf1a52_73b053fe",
         "filename": "doc/usage_examples.md",
         "patchSetId": 4
