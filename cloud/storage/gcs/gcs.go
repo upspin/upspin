@@ -66,18 +66,18 @@ func New(opts *storage.Opts) (storage.Storage, error) {
 	}
 	acl, ok := opts.Opts[defaultACL]
 	if !ok {
-		return nil, errors.E(op, errors.Invalid, errors.Errorf("%q option is required", bucketName))
+		return nil, errors.E(op, errors.Invalid, errors.Errorf("%q option is required", defaultACL))
 	}
 
 	// Authentication is provided by the gcloud tool when running locally, and
 	// by the associated service account when running on Compute Engine.
 	client, err := google.DefaultClient(gContext.Background(), scope)
 	if err != nil {
-		return nil, errors.E(op, errors.IO, errors.Errorf("Unable to get default client: %s", err))
+		return nil, errors.E(op, errors.IO, errors.Errorf("unable to get default client: %s", err))
 	}
 	service, err := gcsBE.New(client)
 	if err != nil {
-		return nil, errors.E(op, errors.IO, errors.Errorf("Unable to create storage service: %s", err))
+		return nil, errors.E(op, errors.IO, errors.Errorf("unable to create storage service: %s", err))
 	}
 
 	return &gcsImpl{
@@ -97,8 +97,6 @@ var _ storage.Storage = (*gcsImpl)(nil)
 
 // LinkBase implements Storage.
 func (gcs *gcsImpl) LinkBase() (base string, err error) {
-	const op = "cloud/storage/gcs.LinkBase"
-
 	return "https://storage.googleapis.com/" + gcs.bucketName + "/", nil
 }
 
