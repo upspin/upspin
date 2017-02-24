@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a28a47f_4d8def21",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 6
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-24T21:08:59Z",
+      "side": 1,
+      "message": "Substitute.",
+      "revId": "dffb0db5366210c64aaf22666bee52564719aaab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "013b67ba_2f1909fd",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 6
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-24T21:08:59Z",
+      "side": 1,
+      "message": "installation",
+      "revId": "dffb0db5366210c64aaf22666bee52564719aaab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4238d5af_8ed50fe7",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 6
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-24T21:08:59Z",
+      "side": 1,
+      "message": "see other comment.\n\nI have sent a CL to update the setup doc to be clearer about this, but your text is misleading.",
+      "revId": "dffb0db5366210c64aaf22666bee52564719aaab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4bbdd6c6_b0f6ac80",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 6
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-24T21:08:59Z",
+      "side": 1,
+      "message": "It is easy to ...\n\nNo adverbs please; luck doesn\u0027t enter into it :)",
+      "revId": "dffb0db5366210c64aaf22666bee52564719aaab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "553143e9_9c2cd09e",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 6
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-24T21:08:59Z",
+      "side": 1,
+      "message": "explicitly",
+      "revId": "dffb0db5366210c64aaf22666bee52564719aaab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "72437411_96f70314",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 6
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-24T21:08:59Z",
+      "side": 1,
+      "message": "the `-config` flag, pointing it to the config file for the server\u0027s user `upspin@example.com`",
+      "revId": "dffb0db5366210c64aaf22666bee52564719aaab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "181ddd7e_e145f689",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 6
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-24T21:08:59Z",
+      "side": 1,
+      "message": "I would drop this paragraph. One way is sufficient, and starting upspinfs as the server user could be trouble.",
+      "revId": "dffb0db5366210c64aaf22666bee52564719aaab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b30e648c_49b76908",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 6
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-24T21:08:59Z",
+      "side": 1,
+      "message": "## Using your Upspin configuration and keys on another machine",
+      "revId": "dffb0db5366210c64aaf22666bee52564719aaab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e447524c_36ea6971",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 6
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-24T21:08:59Z",
+      "side": 1,
+      "message": "Why do you say this? It seems irrelevant.",
+      "revId": "dffb0db5366210c64aaf22666bee52564719aaab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
