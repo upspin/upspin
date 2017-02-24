@@ -30,7 +30,7 @@ stores them locally, and sends a signup request to the public Upspin key server
 at key.upspin.io. The server will respond by sending a confirmation email to
 the given email address (or "username").
 
-Signup writes a the configuration file to $HOME/upspin/config, holding the
+Signup writes a configuration file to $HOME/upspin/config, holding the
 username and the location of the directory and store servers. It writes the
 public and private keys to $HOME/.ssh. These locations may be set using the
 global -config and signup-specific -where flags.
