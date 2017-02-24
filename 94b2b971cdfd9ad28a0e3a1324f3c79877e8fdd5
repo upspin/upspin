@@ -16,6 +16,29 @@
       "revId": "94b2b971cdfd9ad28a0e3a1324f3c79877e8fdd5",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5aa8ec77_cdc73e78",
+        "filename": "cmd/upspinfs/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-02-24T04:25:38Z",
+      "side": 1,
+      "message": "Why don\u0027t we just add os.Interrupt to serverutil.init().  I like adding the unmount but if we did that we\u0027d just need your other change.",
+      "range": {
+        "startLine": 61,
+        "startChar": 21,
+        "endLine": 61,
+        "endChar": 30
+      },
+      "revId": "94b2b971cdfd9ad28a0e3a1324f3c79877e8fdd5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
