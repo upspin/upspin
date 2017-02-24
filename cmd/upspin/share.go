@@ -370,10 +370,11 @@ func (s *Sharer) addAccess(entry *upspin.DirEntry) {
 	if _, ok := s.accessFiles[name]; ok {
 		return
 	}
-	which, err := s.state.DirServer(name).WhichAccess(name) // Guaranteed to have no links.
+	which, err := s.state.DirServer(name).WhichAccess(entry.Name) // Guaranteed to have no links.
 	if err != nil {
 		s.state.exitf("looking up access file %q: %s", name, err)
 	}
+	log.Printf("whichaccess(%s) == %v", name, which)
 	var a *access.Access
 	if which == nil {
 		a, err = access.New(name)
