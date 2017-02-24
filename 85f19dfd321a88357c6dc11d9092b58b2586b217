@@ -300,6 +300,24 @@
     },
     {
       "key": {
+        "uuid": "9c71718c_108b3a01",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5361
+      },
+      "writtenOn": "2017-02-24T21:40:49Z",
+      "side": 1,
+      "message": "Ack, Done, thanks for making this clear to me",
+      "parentUuid": "3d6ad827_b88c3217",
+      "revId": "85f19dfd321a88357c6dc11d9092b58b2586b217",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8cdf1a52_73b053fe",
         "filename": "doc/usage_examples.md",
         "patchSetId": 4
