@@ -684,6 +684,13 @@ func TestWhichAccess(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	accessEntry, err = dir.WhichAccess(dir1Name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if accessEntry == nil || accessEntry.Name != accessFileName {
+		t.Errorf("expected %q, got %q", accessFileName, accessEntry.Name)
+	}
 	accessEntry, err = dir.WhichAccess(fileName)
 	if err != nil {
 		t.Fatal(err)
