@@ -26,6 +26,7 @@ func testReadAccess(t *testing.T, r *testenv.Runner) {
 		publicDir         = base + "public"
 		privateDir        = base + "private"
 		publicFile        = publicDir + "/public.txt"
+		publicAccessFile  = publicDir + "/Access"
 		privateFile       = privateDir + "/private.txt"
 		contentsOfPublic  = "public file"
 		contentsOfPrivate = "private file"
@@ -82,13 +83,18 @@ func testReadAccess(t *testing.T, r *testenv.Runner) {
 	}
 
 	// Add /public/Access, granting Read to user and write to owner.
-	const accessFile = publicDir + "/Access"
 	var (
 		accessText = fmt.Sprintf("r:%s\nw:%s", user, owner)
 	)
 	r.As(owner)
-	r.Put(accessFile, accessText)
+	r.Put(publicAccessFile, accessText)
 	r.Put(publicFile, contentsOfPublic) // Put again to ensure re-wrapping of keys.
+
+	// Access file for that directory is now the one in the directory.
+	r.DirWhichAccess(publicDir)
+	if !r.GotEntry(publicAccessFile) {
+		t.Fatal(r.Diag())
+	}
 
 	// With Access file, every item is still readable by owner.
 	r.Get(privateFile)
@@ -128,7 +134,7 @@ func testReadAccess(t *testing.T, r *testenv.Runner) {
 		noUserAccessText = "r: someoneElse@test.com\n"
 	)
 	r.As(owner)
-	r.Put(accessFile, noUserAccessText)
+	r.Put(publicAccessFile, noUserAccessText)
 	if r.Failed() {
 		t.Fatal(r.Diag())
 	}
@@ -168,7 +174,7 @@ func testReadAccess(t *testing.T, r *testenv.Runner) {
 
 	r.As(owner)
 	r.Put(groupFile, groupText)
-	r.Put(accessFile, groupAccessText)
+	r.Put(publicAccessFile, groupAccessText)
 	r.Put(publicFile, contentsOfPublic) // Put file again to trigger sharing.
 	if r.Failed() {
 		t.Fatal(r.Diag())
@@ -248,11 +254,11 @@ func testReadAccess(t *testing.T, r *testenv.Runner) {
 		wildcardDomain = "l: *@google.com\n"
 	)
 	r.As(owner)
-	r.Put(accessFile, wildcardDomain)
+	r.Put(publicAccessFile, wildcardDomain)
 
 	r.As(user)
 	r.DirWhichAccess(publicFile)
-	if !r.GotEntry(accessFile) {
+	if !r.GotEntry(publicAccessFile) {
 		t.Fatal(r.Diag())
 	}
 	r.Glob(publicFile)
