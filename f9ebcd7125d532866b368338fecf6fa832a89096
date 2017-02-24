@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "18877e01_f9e7d2ac",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 7
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-24T21:51:02Z",
+      "side": 1,
+      "message": "s/has //\n(English verb tenses are too complicated!)",
+      "revId": "f9ebcd7125d532866b368338fecf6fa832a89096",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "32cdfbdd_845bc7de",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 7
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-24T21:51:02Z",
+      "side": 1,
+      "message": "I like to make sure sentences start capitalized and write around that problem when it arises.\nHow about\n\nRun `upspin get` to store its contents on your local machine...",
+      "revId": "f9ebcd7125d532866b368338fecf6fa832a89096",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "01aa81fc_8b1069cb",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 7
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-24T21:51:02Z",
+      "side": 1,
+      "message": "# Modify Writers with your text editor of choice.",
+      "revId": "f9ebcd7125d532866b368338fecf6fa832a89096",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "33b60f5d_8d970ed5",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 7
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-24T21:51:02Z",
+      "side": 1,
+      "message": "s/.$//\n\nfor consistency",
+      "revId": "f9ebcd7125d532866b368338fecf6fa832a89096",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "567beca0_cd2f7c9a",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 7
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-24T21:51:02Z",
+      "side": 1,
+      "message": "s/.$/,/\nassuming it is a Unix machine:",
+      "revId": "f9ebcd7125d532866b368338fecf6fa832a89096",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ef4ee2af_46064264",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 7
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-24T21:51:02Z",
+      "side": 1,
+      "message": "Does this \u0027bash\u0027 change the formatting somehow?\nIs it necessary to do so?",
+      "revId": "f9ebcd7125d532866b368338fecf6fa832a89096",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
