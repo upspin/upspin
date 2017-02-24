@@ -91,7 +91,8 @@ func main() {
 func usage() {
 	fmt.Fprintln(os.Stderr, "Usage: cacheserver [flags]")
 	fmt.Fprintln(os.Stderr, "For more information about cacheserver, run")
-	fmt.Fprintln(os.Stderr, "\tgo doc upspin.io/cmd/cacheserver\n")
+	fmt.Fprintln(os.Stderr, "\tgo doc upspin.io/cmd/cacheserver")
+	fmt.Fprintln(os.Stderr, "")
 	flag.PrintDefaults()
 	os.Exit(2)
 }
