@@ -152,6 +152,24 @@
       "revId": "dffb0db5366210c64aaf22666bee52564719aaab",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "284ca0a7_464ddd4b",
+        "filename": "doc/usage_examples.md",
+        "patchSetId": 6
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-02-24T21:20:35Z",
+      "side": 1,
+      "message": "Mea culpa.  He was copying my words from elsewhere.   (But I\u0027m fine with Rob\u0027s editing for this context, which is more about a guide and less about the reasons why.)",
+      "parentUuid": "e447524c_36ea6971",
+      "revId": "dffb0db5366210c64aaf22666bee52564719aaab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
