@@ -82,6 +82,8 @@ WantedBy=multi-user.target
 > don't want to run upspinserver as the super user.
 > In the next section of this document we will configure the server to redirect
 > requests to port `443` to `localhost:8443`.
+> Alternatively, we can use `setcap` to allow the `upspinserver` binary to bind
+> port `443`.
 
 Use `systemctl` to enable the service:
 
@@ -105,9 +107,15 @@ $ journalctl -f -u upspinserver.service
 
 ```
 
-## Redirect port `443` to `localhost:8443`
+## Accepting connections on port `443`
 
-The following commands must be executed on the server as the super user, `root`.
+All commands in this section must be executed on the server as the super user,
+`root`.
+
+### Redirect port `443` to `localhost:8443`
+
+One solution to exposing upspinserver on port `443` is to use a separate
+service to redirect traffic.
 
 Install the `xinetd` server, which will run as `root` listening on port `443`
 and redirecting requests to our `upspinserver` on `localhost:8443`.
@@ -150,6 +158,33 @@ Finally, restart `xinetd` to enable this configuration:
 
 ```
 $ systemctl restart xinetd.service
+```
+
+### Using `setcap`
+
+An alternative solution for exposing `upspinserver` on port `443` is using
+`setcap`.
+
+`setcap` grants extra permissions to the binary that are otherwise only
+available when running as `root` user.
+
+Note that `setcap` needs to be re-ran every time the `upspinserver` binary is
+updated.
+
+First, run:
+
+```
+$ setcap cap_net_bind_service=+ep /home/upspin/upspinserver
+```
+
+Next, update `/etc/systemd/system/upspinserver.service` and replace
+`localhost:8443` with `:443` (make sure you remove `localhost` too).
+
+Finally, for `systemd` config change to take effect, run:
+
+```
+$ systemctl daemon-reload
+$ systemctl restart upspinserver.service
 ```
 
 ## Continue
