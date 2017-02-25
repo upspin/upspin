@@ -66,7 +66,7 @@ the following service definition.
 Description=Upspin server
 
 [Service]
-ExecStart=/home/upspin/upspinserver -https=localhost:8443
+ExecStart=/home/upspin/upspinserver -https=:443
 User=upspin
 Group=upspin
 Restart=on-failure
@@ -75,13 +75,25 @@ Restart=on-failure
 WantedBy=multi-user.target
 ```
 
-> Note that here we pass the flag `-https=localhost:8443` to the server,
-> instructing it to listen on a high port on `localhost`.
-> While we do want our `upspinserver` to serve requests port `443` on our
-> public IP address, only the `root` user can bind to ports below `1024` and we
-> don't want to run upspinserver as the super user.
-> In the next section of this document we will configure the server to redirect
-> requests to port `443` to `localhost:8443`.
+### Allow `upspinserver` to listen on port `443`
+
+`upspinserver` needs to listen on port `443` in order to obtain LetsEncrypt
+certificates.
+
+Normally only user `root` can bind ports below `1024`.
+
+Instead of running `upspinserver` as `root` (which is generally discouraged),
+we will grant the `upspinserver` binary this capability by using `setcap` (as
+`root`):
+
+```
+$ setcap cap_net_bind_service=+ep /home/upspin/upspinserver
+```
+
+Note that you need to run this `setcap` command whenever the `upspinserver`
+binary is updated.
+
+### Start the service
 
 Use `systemctl` to enable the service:
 
@@ -103,53 +115,6 @@ You can use `journalctl` to see the log output of the server:
 ```
 $ journalctl -f -u upspinserver.service
 
-```
-
-## Redirect port `443` to `localhost:8443`
-
-The following commands must be executed on the server as the super user, `root`.
-
-Install the `xinetd` server, which will run as `root` listening on port `443`
-and redirecting requests to our `upspinserver` on `localhost:8443`.
-
-```
-$ apt-get install xinetd
-```
-
-Create a file `/etc/xinetd.d/upspinserver` with this contents:
-
-```
-service upspinserver
-{
-        disable         = no
-        flags           = REUSE
-        wait            = no
-        user            = root
-        socket_type     = stream
-        protocol        = tcp
-        port            = 443
-        redirect        = localhost 8443
-        log_on_success  -= PID HOST DURATION EXIT
-}
-```
-
-Open `/etc/services` and find the line for the `https` service.
-It should look something like this:
-
-```
-https	443/tcp
-```
-
-Then append the string `upspinserver` to that line, so it looks like this:
-
-```
-https	443/tcp	upspinserver
-```
-
-Finally, restart `xinetd` to enable this configuration:
-
-```
-$ systemctl restart xinetd.service
 ```
 
 ## Continue
