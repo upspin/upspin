@@ -155,7 +155,7 @@ func (s *server) Close() {
 	defer s.mu.Unlock()
 
 	if s.refCount == 0 {
-		log.Error.Printf("store/gcp: closing store that was not dialed")
+		log.Error.Printf("store/server: closing store that was not dialed")
 		return
 	}
 	s.refCount--
