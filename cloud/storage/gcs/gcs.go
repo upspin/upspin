@@ -139,18 +139,14 @@ func (gcs *gcsImpl) Put(ref string, contents []byte) error {
 
 // Delete implements Storage.
 func (gcs *gcsImpl) Delete(ref string) error {
-	err := gcs.service.Objects.Delete(gcs.bucketName, ref).Do()
-	if err != nil {
-		return err
-	}
-	return nil
+	return gcs.service.Objects.Delete(gcs.bucketName, ref).Do()
 }
 
-// EmptyBucket completely removes all files in a bucket permanently.
+// emptyBucket completely removes all files in a bucket permanently.
 // If verbose is true, every attempt to delete a file is logged to the standard logger.
 // This is an expensive operation. It is also dangerous, so use with care.
-// Exported, but not part of the GCP interface. Use for testing only.
-func (gcs *gcsImpl) EmptyBucket(verbose bool) error {
+// Use for testing only.
+func (gcs *gcsImpl) emptyBucket(verbose bool) error {
 	const maxParallelDeletes = 10
 	pageToken := ""
 	var firstErr error
@@ -166,7 +162,7 @@ func (gcs *gcsImpl) EmptyBucket(verbose bool) error {
 	for {
 		objs, err := gcs.service.Objects.List(gcs.bucketName).MaxResults(maxParallelDeletes).Fields("items(name),nextPageToken").PageToken(pageToken).Do()
 		if recordErr(err) {
-			log.Error.Printf("EmptyBucket: List(%q): %v", gcs.bucketName, err)
+			log.Error.Printf("emptyBucket: List(%q): %v", gcs.bucketName, err)
 			break
 		}
 		if verbose {
@@ -178,7 +174,7 @@ func (gcs *gcsImpl) EmptyBucket(verbose bool) error {
 			}
 			err = gcs.Delete(o.Name)
 			if recordErr(err) {
-				log.Error.Printf("EmptyBucket: Delete(%q): %v", o.Name, err)
+				log.Error.Printf("emptyBucket: Delete(%q): %v", o.Name, err)
 				continue
 			}
 		}

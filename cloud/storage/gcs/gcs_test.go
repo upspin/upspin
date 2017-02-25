@@ -94,8 +94,8 @@ GCS bucket named by flag -test_bucket and then set this test's flag -use_gcloud.
 
 	// Clean up.
 	const verbose = true
-	if err := client.(*gcsImpl).EmptyBucket(verbose); err != nil {
-		log.Printf("cloud/storage/gcs: EmptyBucket failed: %v", err)
+	if err := client.(*gcsImpl).emptyBucket(verbose); err != nil {
+		log.Printf("cloud/storage/gcs: emptyBucket failed: %v", err)
 	}
 
 	os.Exit(code)
