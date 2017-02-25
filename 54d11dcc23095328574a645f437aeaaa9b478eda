@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c0e4f872_f5146ca7",
+        "filename": "doc/server_setup_ubuntu.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-25T23:56:16Z",
+      "side": 1,
+      "message": "we will grant the `upspinserver` binary this capability by using `setcap` (as root):",
+      "revId": "54d11dcc23095328574a645f437aeaaa9b478eda",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9ae953e7_46ad0319",
+        "filename": "doc/server_setup_ubuntu.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-25T23:56:16Z",
+      "side": 1,
+      "message": "delete",
+      "revId": "54d11dcc23095328574a645f437aeaaa9b478eda",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "360a3455_96e1ecc6",
+        "filename": "doc/server_setup_ubuntu.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-25T23:56:16Z",
+      "side": 1,
+      "message": "run this `setcap` command",
+      "revId": "54d11dcc23095328574a645f437aeaaa9b478eda",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
