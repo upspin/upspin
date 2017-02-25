@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "121424c1_2889869d",
+        "filename": "doc/server_setup_ubuntu.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 5427
+      },
+      "writtenOn": "2017-02-25T23:47:00Z",
+      "side": 1,
+      "message": "Yeah, that makes things much simpler. Done.",
+      "parentUuid": "8cc8ffb5_d7653a29",
+      "revId": "8c6f2d58e8e5ed37cb171f92f5330b235d6c3c8b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f15258ea_8fd10c0d",
         "filename": "doc/server_setup_ubuntu.md",
         "patchSetId": 2
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "6b9353c5_c850debb",
+        "filename": "doc/server_setup_ubuntu.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 5427
+      },
+      "writtenOn": "2017-02-25T23:47:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f15258ea_8fd10c0d",
+      "revId": "8c6f2d58e8e5ed37cb171f92f5330b235d6c3c8b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2a88f12b_bcc5a5d4",
         "filename": "doc/server_setup_ubuntu.md",
         "patchSetId": 2
@@ -50,6 +86,24 @@
       "revId": "8c6f2d58e8e5ed37cb171f92f5330b235d6c3c8b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b418c534_c069805e",
+        "filename": "doc/server_setup_ubuntu.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 5427
+      },
+      "writtenOn": "2017-02-25T23:47:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2a88f12b_bcc5a5d4",
+      "revId": "8c6f2d58e8e5ed37cb171f92f5330b235d6c3c8b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
