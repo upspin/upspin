@@ -114,7 +114,7 @@ func newFactotum(op string, public, private, archived []byte) (upspin.Factotum, 
 		if len(lines) < 5 {
 			break // This is not enough for a complete key pair.
 		}
-		if lines[0] != "# EE " {
+		if strings.TrimSpace(lines[0]) != "# EE" {
 			break // This is not a kind of key we recognize.
 		}
 		// lines[0] "# EE "     Joe's key
@@ -122,7 +122,7 @@ func newFactotum(op string, public, private, archived []byte) (upspin.Factotum, 
 		// lines[2] "1042...6334" public X
 		// lines[3] "2694...192"  public Y
 		// lines[4] "8220...5934" private D
-		pfk, err := makeKey(upspin.PublicKey(lines[1]+"\n"+lines[2]+"\n"+lines[3]+"\n"), lines[4])
+		pfk, err := makeKey(upspin.PublicKey(lines[1]+"\n"+lines[2]+"\n"+lines[3]+"\n"), lines[4]+"\n")
 		lines = lines[5:]
 		if err != nil {
 			return f, errors.E(op, err)
