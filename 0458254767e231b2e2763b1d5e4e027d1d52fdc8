@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f486e310_bf713337",
+        "filename": "cloud/storage/amazons3/amazons3.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-25T23:54:24Z",
+      "side": 1,
+      "message": "How big are these dependencies?",
+      "revId": "0458254767e231b2e2763b1d5e4e027d1d52fdc8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2ba6c242_e3270d10",
+        "filename": "cloud/storage/amazons3/amazons3_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-25T23:54:24Z",
+      "side": 1,
+      "message": "see comments from Fabian\u0027s CL :)",
+      "revId": "0458254767e231b2e2763b1d5e4e027d1d52fdc8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
