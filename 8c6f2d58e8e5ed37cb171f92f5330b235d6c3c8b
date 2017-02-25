@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8cc8ffb5_d7653a29",
+        "filename": "doc/server_setup_ubuntu.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-25T23:32:41Z",
+      "side": 1,
+      "message": "I\u0027d prefer to just delete this section entirely.\nLet\u0027s recommend just one way of doing this.",
+      "revId": "8c6f2d58e8e5ed37cb171f92f5330b235d6c3c8b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f15258ea_8fd10c0d",
+        "filename": "doc/server_setup_ubuntu.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-25T23:32:41Z",
+      "side": 1,
+      "message": "Note that you need to run `setcap` whenever the `upspinserver` binary is updated.",
+      "revId": "8c6f2d58e8e5ed37cb171f92f5330b235d6c3c8b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2a88f12b_bcc5a5d4",
+        "filename": "doc/server_setup_ubuntu.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-25T23:32:41Z",
+      "side": 1,
+      "message": "Let\u0027s just put the right value in here in the first place.",
+      "revId": "8c6f2d58e8e5ed37cb171f92f5330b235d6c3c8b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
