@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "44831981_ae806099",
+        "filename": "rpc/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 404,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-26T00:42:08Z",
+      "side": 1,
+      "message": "if strings.HasPrefix(c.baseURL, \"https://\") {",
+      "revId": "ad676a920081053a67a818a3c5ff3ed5b9cae300",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "442b2e77_300b7f71",
+        "filename": "rpc/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 407,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-26T00:42:08Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "ad676a920081053a67a818a3c5ff3ed5b9cae300",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "343b9402_b1e7c829",
+        "filename": "rpc/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 410,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-26T00:42:08Z",
+      "side": 1,
+      "message": "if it can\u0027t happen then panic, otherwise mysterious things *will* happen",
+      "revId": "ad676a920081053a67a818a3c5ff3ed5b9cae300",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4378be7a_dac09698",
+        "filename": "rpc/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 415,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-26T00:42:08Z",
+      "side": 1,
+      "message": "h :\u003d sha256.New()\nh.Write([]byte(magic))\n\nw :\u003d func(s string) {\n  var l [4]byte\n  binary.BigEndian.PutUint32(l[:], uint32(len(s)))\n  h.Write(l[:])\n  h.Write([]byte(s))\n}\nw(user)\nw(host)\nw(now)\n\nreturn h.Sum(nil)",
+      "revId": "ad676a920081053a67a818a3c5ff3ed5b9cae300",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
