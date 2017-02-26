@@ -16,6 +16,24 @@
       "revId": "3dc66e5d4203b29e394913bc4c54321b17956485",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "458c1c26_4dd81612",
+        "filename": "bind/bind.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-02-26T23:04:05Z",
+      "side": 1,
+      "message": "Not that disconnected behaviour currently works, but I would like it to eventually, and this fix will prevent it from happening.  I wouldn\u0027t mind a warning though it could become painful over time.",
+      "parentUuid": "cf47b56e_75a034e4",
+      "revId": "3dc66e5d4203b29e394913bc4c54321b17956485",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
