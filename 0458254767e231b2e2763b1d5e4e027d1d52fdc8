@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "2f75a1df_bfd52ea3",
+        "filename": "cloud/storage/amazons3/amazons3.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-26T00:18:01Z",
+      "side": 1,
+      "message": "I don\u0027t understand the first remark. Some of those vendored packages are huge.",
+      "parentUuid": "f7e7969b_7e46f8b3",
+      "revId": "0458254767e231b2e2763b1d5e4e027d1d52fdc8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "2ba6c242_e3270d10",
         "filename": "cloud/storage/amazons3/amazons3_test.go",
         "patchSetId": 3
