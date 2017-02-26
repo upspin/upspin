@@ -113,6 +113,8 @@ type Factotum interface {
 	ScalarMult(keyHash []byte, c elliptic.Curve, x, y *big.Int) (sx, sy *big.Int, err error)
 
 	// Sign signs a slice of bytes with the factotum's private key.
+	// The argument hash should be a cryptographic hash of the message you want to sign,
+	// no longer than your key's curve order. Don't use without a security consult.
 	Sign(hash []byte) (Signature, error)
 
 	// Pop derives a Factotum that defaults to the previous key.
