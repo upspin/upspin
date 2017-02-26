@@ -310,6 +310,24 @@
       "revId": "703d7f774190eed4e65b30120c5ee8a9b74366d0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ff8cfaf0_5607c62d",
+        "filename": "cloud/storage/b2cs/b2cs_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-26T15:24:32Z",
+      "side": 1,
+      "message": "Of course you\u0027re right here.\n\nWe are thinking carefully about the best way to support the flurry of implementations we hope to see and should have an answer this week. My main concern is the profusion of dependencies. No individual part will bring in too much, but they will add up.\n\nStay tuned. In the meantime we\u0027ll leave this CL on deck. I\u0027ll mark it -1 so it\u0027s held off until that\u0027s resolved, but the code looks pretty good. Thanks for doing this.",
+      "parentUuid": "f73ac8d0_d0f9047f",
+      "revId": "703d7f774190eed4e65b30120c5ee8a9b74366d0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
