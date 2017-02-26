@@ -28,9 +28,9 @@ const (
 	contentsOfFile3     = "===PDF PDF PDF=="
 	genericFileContents = "contents"
 	hasLocation         = true
-	ownerName           = "upspin-test@google.com"
-	readerName          = "upspin-friend-test@google.com"
-	snapshotUser        = "upspin-test+snapshot@google.com"
+	ownerName           = "test@upspin.io"
+	snapshotUser        = "test+snapshot@upspin.io"
+	readerName          = "test-friend@upspin.io"
 )
 
 var (
