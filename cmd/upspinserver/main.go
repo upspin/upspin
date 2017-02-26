@@ -65,21 +65,23 @@ func main() {
 	}
 
 	// Set up HTTPS server.
-	opt := &https.Options{
-		LetsEncryptCache: *letsPath,
-		CertFile:         flags.TLSCertFile,
-		KeyFile:          flags.TLSKeyFile,
-	}
-	if server != nil {
-		host, _, err := net.SplitHostPort(string(server.Addr))
-		if err != nil {
-			log.Printf("Error parsing addr from config %q: %v", server.Addr, err)
-			log.Printf("Warning: Let's Encrypt certificates will be fetched for any host.")
-		} else {
-			opt.LetsEncryptHosts = []string{host}
+	var opt https.Options
+	if flags.TLSCertFile != "" && flags.TLSKeyFile != "" {
+		opt.CertFile = flags.TLSCertFile
+		opt.KeyFile = flags.TLSKeyFile
+	} else {
+		opt.LetsEncryptCache = *letsPath
+		if server != nil {
+			host, _, err := net.SplitHostPort(string(server.Addr))
+			if err != nil {
+				log.Printf("Error parsing addr from config %q: %v", server.Addr, err)
+				log.Printf("Warning: Let's Encrypt certificates will be fetched for any host.")
+			} else {
+				opt.LetsEncryptHosts = []string{host}
+			}
 		}
 	}
-	https.ListenAndServe(ready, "upspinserver", flags.HTTPSAddr, opt)
+	https.ListenAndServe(ready, "upspinserver", flags.HTTPSAddr, &opt)
 }
 
 var noConfig = errors.Str("no configuration")
