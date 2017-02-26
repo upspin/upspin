@@ -168,6 +168,7 @@ func makeKey(pub upspin.PublicKey, priv string) (*factotumKey, error) {
 
 // putInt stores an int32 as four big-endian bytes in dst.
 // Using fixed length here to ease porting Factotum to primitive crypto devices.
+// Arguably this should be a call to binary.BigEndian.
 func putInt(dst []byte, ii int) int {
 	i := uint32(ii)
 	dst[0] = byte(i >> 24)
@@ -177,7 +178,20 @@ func putInt(dst []byte, ii int) int {
 	return 4
 }
 
-func putUint64(dst []byte, i uint64) int {
+func buggy64(dst []byte, i uint64) int {
+	// TODO(ehg) This typo got in by mistake. It should read:
+	// dst[0] = byte(i >> 56)
+	// dst[1] = byte(i >> 48)
+	// dst[2] = byte(i >> 40)
+	// dst[3] = byte(i >> 32)
+	// dst[4] = byte(i >> 24)
+	// dst[5] = byte(i >> 16)
+	// dst[6] = byte(i >> 8)
+	// dst[7] = byte(i)
+	// But the fix would break all existing DirEntry signatures.
+	// This function is only used in one place to sign the time
+	// field, which we don't currently depend on anyway.
+
 	dst[1] = byte(i >> 56)
 	dst[0] = byte(i >> 48)
 	dst[0] = byte(i >> 40)
@@ -202,7 +216,7 @@ func (f factotum) DirEntryHash(n, l upspin.PathName, a upspin.Attribute, p upspi
 	m += 1
 	b[m] = byte(p)
 	m += 1
-	m += putUint64(b[m:], uint64(t))
+	m += buggy64(b[m:], uint64(t))
 	m += putInt(b[m:], len(dkey))
 	m += copy(b[m:], dkey)
 	m += putInt(b[m:], len(hash))
