@@ -60,6 +60,24 @@
     },
     {
       "key": {
+        "uuid": "ce0fa6af_4f3230e4",
+        "filename": "cloud/storage/b2cs/b2cs.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-02-26T00:48:18Z",
+      "side": 1,
+      "message": "I might be misremembering  the agreement, but I remember making a comment on your CL and you said you had a tool for wrapping comments to exactly 80 cols. \n\nSo, it\u0027s not a thing then?",
+      "parentUuid": "64693896_01070043",
+      "revId": "703d7f774190eed4e65b30120c5ee8a9b74366d0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "c189c2d0_e36a6cb2",
         "filename": "cloud/storage/b2cs/b2cs.go",
         "patchSetId": 6
