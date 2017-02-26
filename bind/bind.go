@@ -200,18 +200,16 @@ func DirServerFor(cc upspin.Config, userName upspin.UserName) (upspin.DirServer,
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
-	var endpoints []upspin.Endpoint
-	if userName == cc.UserName() {
-		endpoints = append(endpoints, cc.DirEndpoint())
-	}
 	key, err := KeyServer(cc, cc.KeyEndpoint())
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
 	u, err := key.Lookup(userName)
-	if err == nil {
-		endpoints = append(endpoints, u.Dirs...)
+	if err != nil {
+		return nil, errors.E(op, err)
 	}
+	var endpoints []upspin.Endpoint
+	endpoints = append(endpoints, u.Dirs...)
 	var firstErr error
 	for _, e := range endpoints {
 		d, err := DirServer(cc, e)
