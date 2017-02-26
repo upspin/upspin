@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "291741c9_2d141617",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 5361
+      },
+      "writtenOn": "2017-02-26T10:01:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "466220b1_bb5139f2",
+      "range": {
+        "startLine": 12,
+        "startChar": 8,
+        "endLine": 12,
+        "endChar": 12
+      },
+      "revId": "703d7f774190eed4e65b30120c5ee8a9b74366d0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1e717851_cfec3978",
         "filename": "cloud/storage/b2cs/b2cs.go",
         "patchSetId": 6
@@ -96,6 +120,24 @@
     },
     {
       "key": {
+        "uuid": "6589c4b2_dd174757",
+        "filename": "cloud/storage/b2cs/b2cs.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5361
+      },
+      "writtenOn": "2017-02-26T10:01:33Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "64609fd9_1ce5c9af",
+      "revId": "703d7f774190eed4e65b30120c5ee8a9b74366d0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c189c2d0_e36a6cb2",
         "filename": "cloud/storage/b2cs/b2cs.go",
         "patchSetId": 6
@@ -110,6 +152,24 @@
       "revId": "703d7f774190eed4e65b30120c5ee8a9b74366d0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2e9c82dd_3a5bff4f",
+        "filename": "cloud/storage/b2cs/b2cs.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5361
+      },
+      "writtenOn": "2017-02-26T10:01:33Z",
+      "side": 1,
+      "message": "Done, thanks!",
+      "parentUuid": "c189c2d0_e36a6cb2",
+      "revId": "703d7f774190eed4e65b30120c5ee8a9b74366d0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -130,6 +190,24 @@
     },
     {
       "key": {
+        "uuid": "cb3a48f1_4b9025d9",
+        "filename": "cloud/storage/b2cs/b2cs.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 5361
+      },
+      "writtenOn": "2017-02-26T10:01:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9be29a15_75db88dd",
+      "revId": "703d7f774190eed4e65b30120c5ee8a9b74366d0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "223932e3_5e077a4b",
         "filename": "cloud/storage/b2cs/b2cs_test.go",
         "patchSetId": 6
@@ -141,6 +219,24 @@
       "writtenOn": "2017-02-25T23:52:57Z",
       "side": 1,
       "message": "// relying on it.\n\nHowever this seems unwise to me as it generates garbage and doesn\u0027t clean it up.",
+      "revId": "703d7f774190eed4e65b30120c5ee8a9b74366d0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "654d64df_8fad8d11",
+        "filename": "cloud/storage/b2cs/b2cs_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5361
+      },
+      "writtenOn": "2017-02-26T10:01:33Z",
+      "side": 1,
+      "message": "The test bucket is deleted in TestMain when the tests ran.",
+      "parentUuid": "223932e3_5e077a4b",
       "revId": "703d7f774190eed4e65b30120c5ee8a9b74366d0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -164,6 +260,24 @@
     },
     {
       "key": {
+        "uuid": "fb842b0d_5237d6ad",
+        "filename": "cloud/storage/b2cs/b2cs_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5361
+      },
+      "writtenOn": "2017-02-26T10:01:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f9322858_4e1dcb4f",
+      "revId": "703d7f774190eed4e65b30120c5ee8a9b74366d0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "116ad8a6_ca3e2814",
         "filename": "cloud/storage/b2cs/b2cs_test.go",
         "patchSetId": 6
@@ -175,6 +289,24 @@
       "writtenOn": "2017-02-25T23:52:57Z",
       "side": 1,
       "message": "The other tests will run regardless, though. Should they be protected too?",
+      "revId": "703d7f774190eed4e65b30120c5ee8a9b74366d0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f73ac8d0_d0f9047f",
+        "filename": "cloud/storage/b2cs/b2cs_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 5361
+      },
+      "writtenOn": "2017-02-26T10:01:33Z",
+      "side": 1,
+      "message": "I followed the precedent of the tests in upspin.io/cloud/storage/gcs. What do you mean with \"run regardless\"? My understanding was that the test functions will not run unless m.Run is called in TestMain. Is this not the case?",
+      "parentUuid": "116ad8a6_ca3e2814",
       "revId": "703d7f774190eed4e65b30120c5ee8a9b74366d0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
