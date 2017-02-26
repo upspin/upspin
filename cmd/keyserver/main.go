@@ -103,6 +103,8 @@ func main() {
 			log.Fatal(err)
 		}
 		http.Handle("/signup", h)
+	} else {
+		log.Println("-mail_config not set, /signup deactivated")
 	}
 
 	https.ListenAndServeFromFlags(nil, "keyserver")
