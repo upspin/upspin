@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "f23833c8_b62da97e",
+        "filename": "rpc/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 404,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-02-26T01:06:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "44831981_ae806099",
+      "revId": "ad676a920081053a67a818a3c5ff3ed5b9cae300",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "442b2e77_300b7f71",
         "filename": "rpc/client.go",
         "patchSetId": 1
@@ -33,6 +51,24 @@
       "revId": "ad676a920081053a67a818a3c5ff3ed5b9cae300",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "866ffcd7_582c742a",
+        "filename": "rpc/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 407,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-02-26T01:06:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "442b2e77_300b7f71",
+      "revId": "ad676a920081053a67a818a3c5ff3ed5b9cae300",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "48c24758_481281f2",
+        "filename": "rpc/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 410,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-02-26T01:06:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "343b9402_b1e7c829",
+      "revId": "ad676a920081053a67a818a3c5ff3ed5b9cae300",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4378be7a_dac09698",
         "filename": "rpc/server.go",
         "patchSetId": 1
@@ -64,6 +118,24 @@
       "writtenOn": "2017-02-26T00:42:08Z",
       "side": 1,
       "message": "h :\u003d sha256.New()\nh.Write([]byte(magic))\n\nw :\u003d func(s string) {\n  var l [4]byte\n  binary.BigEndian.PutUint32(l[:], uint32(len(s)))\n  h.Write(l[:])\n  h.Write([]byte(s))\n}\nw(user)\nw(host)\nw(now)\n\nreturn h.Sum(nil)",
+      "revId": "ad676a920081053a67a818a3c5ff3ed5b9cae300",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2e58c2c2_b93ed906",
+        "filename": "rpc/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 415,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-02-26T01:06:24Z",
+      "side": 1,
+      "message": "Thanks, much better.",
+      "parentUuid": "4378be7a_dac09698",
       "revId": "ad676a920081053a67a818a3c5ff3ed5b9cae300",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
