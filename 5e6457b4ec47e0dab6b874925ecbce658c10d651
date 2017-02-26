@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c26967e7_7cd424b4",
+        "filename": "doc/server_setup_ubuntu.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-26T00:06:59Z",
+      "side": 1,
+      "message": "The `upspinserver` \n\n(It\u0027s awkward to start paragraphs with a lowercase letter)",
+      "revId": "5e6457b4ec47e0dab6b874925ecbce658c10d651",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
