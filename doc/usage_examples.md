@@ -48,7 +48,7 @@ For this to work, explicitly make `upspin` use the server user config with the
 
 ```
 upspin -config=$HOME/upspin/deploy/example.com/config get upspin@example.com/Group/Writers > Writers
-# Modify Writers with your a text editor of your choice
+# Modify Writers with your text editor of choice
 upspin -config=$HOME/upspin/deploy/example.com/config put upspin@example.com/Group/Writers < Writers
 ```
 
