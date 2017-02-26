@@ -146,8 +146,7 @@ retryAuth:
 		header.Set(authTokenHeader, token)
 	} else {
 		// Otherwise prepare an auth request.
-		// Authenticate client's user name. reqNow discourages signature replay.
-		authMsg, err := signUser(c.config, clientAuthMagic)
+		authMsg, err := signUser(c.config, clientAuthMagic, serverAddr(c))
 		if err != nil {
 			log.Error.Printf("%s: signUser: %s", op, err)
 			return errors.E(op, err)
@@ -398,6 +397,19 @@ func (ca *clientAuth) setAuthToken(token string) {
 	ca.lastRefresh = time.Now()
 }
 
+func serverAddr(c *httpClient) string {
+	if c.isProxy() {
+		return string(c.proxyFor.NetAddr)
+	}
+	if c.baseURL[:8] == "https://" {
+		return c.baseURL[8:]
+	}
+	if c.baseURL[:7] == "http://" {
+		return c.baseURL[7:]
+	}
+	return "" // can't happen
+}
+
 // verifyServerUser ensures server is running as the same user.
 // It assumes that msg[0] is the user name.
 func (ca *clientAuth) verifyServerUser(msg []string) error {
@@ -417,7 +429,7 @@ func (ca *clientAuth) verifyServerUser(msg []string) error {
 	}
 
 	// Validate signature.
-	err = verifyUser(key.PublicKey, msg, serverAuthMagic, time.Now())
+	err = verifyUser(key.PublicKey, msg, serverAuthMagic, "[localproxy]", time.Now())
 	if err != nil {
 		return err
 	}
