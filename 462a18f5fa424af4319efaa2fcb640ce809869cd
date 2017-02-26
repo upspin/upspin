@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "be57385a_54c24e9b",
+        "filename": "cmd/cacheserver/cacheutil/detach_posix.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-02-26T22:35:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "301abba8_ba889a87",
+      "revId": "462a18f5fa424af4319efaa2fcb640ce809869cd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "7107a9ac_a3d07d4c",
         "filename": "cmd/cacheserver/cacheutil/detach_posix.go",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "a431e29a_0571fe73",
+        "filename": "cmd/cacheserver/cacheutil/detach_posix.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-02-26T22:35:39Z",
+      "side": 1,
+      "message": "Commented out on purpose.  I\u0027ll just remove it.  Was leaving it as a note to myself and forgot to remove it.",
+      "parentUuid": "7107a9ac_a3d07d4c",
+      "revId": "462a18f5fa424af4319efaa2fcb640ce809869cd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "855de8ca_24795e7b",
         "filename": "cmd/cacheserver/cacheutil/detach_windows.go",
         "patchSetId": 1
@@ -47,6 +83,24 @@
       "writtenOn": "2017-02-26T21:31:06Z",
       "side": 1,
       "message": "You can avoid the need for this file entirely if you put this declaration in start.go\n\n// detach detaches a process from the parent process group,\n// on platforms that support it.\nvar detach \u003d func(*exec.Cmd) {}\n\nThen in detach_posix.go you can write\n\nfunc init() {\n  detach \u003d func(cmd *exec.Cmd) {\n    // implementation\n  }\n}",
+      "revId": "462a18f5fa424af4319efaa2fcb640ce809869cd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1b1ab55f_26c268f1",
+        "filename": "cmd/cacheserver/cacheutil/detach_windows.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-02-26T22:35:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "855de8ca_24795e7b",
       "revId": "462a18f5fa424af4319efaa2fcb640ce809869cd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
