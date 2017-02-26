@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5f2b87ec_5cd3a775",
+        "filename": "cloud/storage/amazons3/amazons3.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-02-26T00:12:44Z",
+      "side": 1,
+      "message": "so stripping out std lib, the s3 package has the following deps: \ngithub.com/aws/aws-sdk-go/aws\ngithub.com/aws/aws-sdk-go/aws/awserr\ngithub.com/aws/aws-sdk-go/aws/awsutil\ngithub.com/aws/aws-sdk-go/aws/client\ngithub.com/aws/aws-sdk-go/aws/client/metadata\ngithub.com/aws/aws-sdk-go/aws/corehandlers\ngithub.com/aws/aws-sdk-go/aws/credentials\ngithub.com/aws/aws-sdk-go/aws/credentials/ec2rolecreds\ngithub.com/aws/aws-sdk-go/aws/credentials/endpointcreds\ngithub.com/aws/aws-sdk-go/aws/credentials/stscreds\ngithub.com/aws/aws-sdk-go/aws/defaults\ngithub.com/aws/aws-sdk-go/aws/ec2metadata\ngithub.com/aws/aws-sdk-go/aws/endpoints\ngithub.com/aws/aws-sdk-go/aws/request\ngithub.com/aws/aws-sdk-go/aws/session\ngithub.com/aws/aws-sdk-go/aws/signer/v4\ngithub.com/aws/aws-sdk-go/private/protocol\ngithub.com/aws/aws-sdk-go/private/protocol/query\ngithub.com/aws/aws-sdk-go/private/protocol/query/queryutil\ngithub.com/aws/aws-sdk-go/private/protocol/rest\ngithub.com/aws/aws-sdk-go/private/protocol/restxml\ngithub.com/aws/aws-sdk-go/private/protocol/xml/xmlutil\ngithub.com/aws/aws-sdk-go/private/waiter\ngithub.com/aws/aws-sdk-go/service/s3\ngithub.com/aws/aws-sdk-go/service/s3/s3iface\ngithub.com/aws/aws-sdk-go/service/s3/s3manager\ngithub.com/aws/aws-sdk-go/service/sts\ngithub.com/aws/aws-sdk-go/vendor/github.com/go-ini/ini\ngithub.com/aws/aws-sdk-go/vendor/github.com/jmespath/go-jmespath\nvendor/golang_org/x/crypto/chacha20poly1305\nvendor/golang_org/x/crypto/chacha20poly1305/internal/chacha20\nvendor/golang_org/x/crypto/curve25519\nvendor/golang_org/x/crypto/poly1305\nvendor/golang_org/x/net/http2/hpack\nvendor/golang_org/x/net/idna\nvendor/golang_org/x/net/lex/httplex\nvendor/golang_org/x/net/route\nvendor/golang_org/x/text/transform\nvendor/golang_org/x/text/unicode/norm\nvendor/golang_org/x/text/width",
+      "parentUuid": "f486e310_bf713337",
+      "revId": "0458254767e231b2e2763b1d5e4e027d1d52fdc8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "2ba6c242_e3270d10",
         "filename": "cloud/storage/amazons3/amazons3_test.go",
         "patchSetId": 3
@@ -33,6 +51,24 @@
       "revId": "0458254767e231b2e2763b1d5e4e027d1d52fdc8",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b35ec333_b105c7d2",
+        "filename": "cloud/storage/amazons3/amazons3_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-02-26T00:12:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2ba6c242_e3270d10",
+      "revId": "0458254767e231b2e2763b1d5e4e027d1d52fdc8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
