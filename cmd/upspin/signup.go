@@ -179,7 +179,7 @@ func (s *State) registerUser(configFile string) {
 	}
 	signupURL := (&url.URL{
 		Scheme:   "https",
-		Host:     "key.upspin.io",
+		Host:     string(cfg.KeyEndpoint().NetAddr),
 		Path:     "/signup",
 		RawQuery: vals.Encode(),
 	}).String()
