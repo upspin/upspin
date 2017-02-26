@@ -2,6 +2,46 @@
   "comments": [
     {
       "key": {
+        "uuid": "b668ddd2_f6e06bbc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-26T23:06:54Z",
+      "side": 1,
+      "message": "this is a change to bind, so it should be\n\nbind: ...",
+      "revId": "3dc66e5d4203b29e394913bc4c54321b17956485",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "423f2afb_f8619b1c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-26T23:06:54Z",
+      "side": 1,
+      "message": "localhost",
+      "range": {
+        "startLine": 16,
+        "startChar": 48,
+        "endLine": 16,
+        "endChar": 56
+      },
+      "revId": "3dc66e5d4203b29e394913bc4c54321b17956485",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "cf47b56e_75a034e4",
         "filename": "bind/bind.go",
         "patchSetId": 1
