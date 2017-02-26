@@ -158,6 +158,7 @@ If any state exists at the given location (-where) then the command aborts.
 	}
 
 	// Generate signature.
+	// TODO This should use sha256.
 	msg := "upspin-domain:" + *domain + "-" + string(s.config.UserName())
 	sig, err := s.config.Factotum().Sign([]byte(msg))
 	if err != nil {
@@ -270,6 +271,7 @@ func (s *State) setuphost(where, domain, curve string) {
 	}
 
 	// Generate signature.
+	// TODO This should use sha256.
 	msg := "upspin-domain:" + domain + "-" + string(s.config.UserName())
 	sig, err := s.config.Factotum().Sign([]byte(msg))
 	if err != nil {
