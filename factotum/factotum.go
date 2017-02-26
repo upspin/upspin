@@ -255,7 +255,6 @@ func (f factotum) ScalarMult(keyHash []byte, curve elliptic.Curve, x, y *big.Int
 
 // Sign signs a slice of bytes with the factotum's private key.
 func (f factotum) Sign(hash []byte) (upspin.Signature, error) {
-	// no logging or constraining hash, because will change to TokenBinding anyway
 	fk := f.keys[f.current]
 	r, s, err := ecdsa.Sign(rand.Reader, &fk.ecdsaKeyPair, hash)
 	if err != nil {
