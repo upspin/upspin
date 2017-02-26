@@ -78,6 +78,24 @@
     },
     {
       "key": {
+        "uuid": "64609fd9_1ce5c9af",
+        "filename": "cloud/storage/b2cs/b2cs.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-26T01:19:29Z",
+      "side": 1,
+      "message": "I have a tool for wrapping ragged comments so they look nice.\nFor a simple, well-written single-line comment like this I see no need to fold it.",
+      "parentUuid": "ce0fa6af_4f3230e4",
+      "revId": "703d7f774190eed4e65b30120c5ee8a9b74366d0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "c189c2d0_e36a6cb2",
         "filename": "cloud/storage/b2cs/b2cs.go",
         "patchSetId": 6
