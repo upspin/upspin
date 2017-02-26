@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// +build !windows
-
 // Package cacheutil provides a mechanism to start the cacheserver
 // if a config requires it and it is not already running.
 // It is used by programs like upspin and upspinfs.
@@ -22,7 +20,14 @@ import (
 	"upspin.io/upspin"
 )
 
-var writethrough = flag.Bool("writethrough", false, "make storage cache writethrough")
+var (
+	writethrough = flag.Bool("writethrough", false, "make storage cache writethrough")
+	cacheSize    = flag.Int64("cachesize", 5e9, "max disk `bytes` for cache")
+)
+
+// detach detaches a process from the parent process group,
+// on platforms that support it.
+var detach = func(*exec.Cmd) {}
 
 // Start starts the cacheserver if the config requires it and it is not already running.
 func Start(cfg upspin.Config) {
@@ -41,9 +46,16 @@ func Start(cfg upspin.Config) {
 
 	// Start a cache server.
 	cacheErrorChan := make(chan bool)
-	wb := fmt.Sprintf("-writethrough=%v", *writethrough)
 	go func() {
-		cmd := exec.Command("cacheserver", "-cachedir="+flags.CacheDir, "-log="+log.GetLevel(), wb)
+		cmd := exec.Command(
+			"cacheserver",
+			"-cachedir="+flags.CacheDir,
+			"-log="+log.GetLevel(),
+			fmt.Sprintf("-writethrough=%v", *writethrough),
+			fmt.Sprintf("-cachesize=%d", *cacheSize),
+			"-config="+flags.Config,
+			"-addr="+flags.NetAddr)
+		detach(cmd)
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 		if err := cmd.Run(); err != nil {
