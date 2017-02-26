@@ -73,6 +73,24 @@
     },
     {
       "key": {
+        "uuid": "fe06eea7_8fcee0ad",
+        "filename": "cloud/storage/amazons3/amazons3.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-26T00:19:30Z",
+      "side": 1,
+      "message": "What I mean is that we\u0027re likely importing them already in other places, as they\u0027re probably part of http2.",
+      "parentUuid": "2f75a1df_bfd52ea3",
+      "revId": "0458254767e231b2e2763b1d5e4e027d1d52fdc8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "2ba6c242_e3270d10",
         "filename": "cloud/storage/amazons3/amazons3_test.go",
         "patchSetId": 3
