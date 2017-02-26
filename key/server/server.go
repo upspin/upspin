@@ -387,9 +387,6 @@ func (s *server) Close() {
 	s.refCount.count--
 
 	if s.refCount.count == 0 {
-		if s.storage != nil {
-			s.storage.Close()
-		}
 		s.storage = nil
 	}
 }
