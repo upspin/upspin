@@ -28,9 +28,9 @@ const (
 	contentsOfFile3     = "===PDF PDF PDF=="
 	genericFileContents = "contents"
 	hasLocation         = true
-	ownerName           = "upspin-test@google.com"
-	readerName          = "upspin-friend-test@google.com"
-	snapshotUser        = "upspin-test+snapshot@google.com"
+	ownerName           = "test@upspin.io"
+	snapshotUser        = "test+snapshot@upspin.io"
+	readerName          = "test-friend@upspin.io"
 )
 
 var (
@@ -321,10 +321,22 @@ var integrationTests = []struct {
 	{"Delete", testDelete},
 }
 
+const remoteTestMessage = `
+error: cannot find keys for remote test users.
+
+These tests are designed to be run against the test.upspin.io cluster,
+which is only accessible by the Upspin core team at Google.
+
+Run the test suite with -short to skip these tests.
+`
+
 func testSelectedOnePacking(t *testing.T, setup testenv.Setup) {
 	usercache.ResetGlobal()
 
 	env, err := testenv.New(&setup)
+	if errors.Match(errors.E(errors.NotExist), err) && setup.Kind == "remote" {
+		t.Fatal(remoteTestMessage)
+	}
 	if err != nil {
 		t.Fatal(err)
 	}
