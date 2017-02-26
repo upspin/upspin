@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1d659daa_b00a1222",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 6
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-26T23:57:01Z",
+      "side": 1,
+      "message": "remove trailing space",
+      "revId": "ae454bed727ffb108c5c3556e65387e60e0dabf8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2c08746f_6a97e1cb",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 6
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-26T23:57:01Z",
+      "side": 1,
+      "message": "make this the end of the sentence.",
+      "revId": "ae454bed727ffb108c5c3556e65387e60e0dabf8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5ed067c9_0fb8fa27",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 6
+      },
+      "lineNbr": 264,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-26T23:57:01Z",
+      "side": 1,
+      "message": "Deleting these files...",
+      "revId": "ae454bed727ffb108c5c3556e65387e60e0dabf8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
