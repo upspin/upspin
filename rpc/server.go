@@ -6,6 +6,7 @@ package rpc
 
 import (
 	"crypto/rand"
+	"crypto/sha256"
 	"encoding/binary"
 	"fmt"
 	"io/ioutil"
@@ -254,14 +255,14 @@ func (s *serverImpl) SessionForRequest(w http.ResponseWriter, r *http.Request) (
 		return nil, errors.E(errors.Invalid, errors.Str("invalid proxy request in header"))
 	}
 	authRequest, ok := r.Header[authRequestHeader]
-	if ok && len(authRequest) != 4 {
+	if ok && len(authRequest) != 5 {
 		return nil, errors.E(errors.Invalid, errors.Str("invalid auth request in header"))
 	}
 	if authRequest == nil {
 		log.Printf("%#v", r.Header)
 		return nil, errors.E(errors.Invalid, errors.Str("no auth token or request in header"))
 	}
-	return s.handleSessionRequest(w, authRequest, proxyRequest)
+	return s.handleSessionRequest(w, authRequest, proxyRequest, r.Host)
 }
 
 // Ping implements Pinger.
@@ -292,7 +293,7 @@ func (s *serverImpl) validateToken(authToken string) (Session, error) {
 	return session, nil
 }
 
-func (s *serverImpl) handleSessionRequest(w http.ResponseWriter, authRequest []string, proxyRequest []string) (Session, error) {
+func (s *serverImpl) handleSessionRequest(w http.ResponseWriter, authRequest []string, proxyRequest []string, host string) (Session, error) {
 	// Validate the username.
 	user := upspin.UserName(authRequest[0])
 	if err := valid.UserName(user); err != nil {
@@ -308,7 +309,7 @@ func (s *serverImpl) handleSessionRequest(w http.ResponseWriter, authRequest []s
 	now := time.Now()
 
 	// Validate signature.
-	if err := verifyUser(key, authRequest, clientAuthMagic, now); err != nil {
+	if err := verifyUser(key, authRequest, clientAuthMagic, host, now); err != nil {
 		return nil, errors.E(errors.Permission, user, errors.Errorf("invalid signature: %v", err))
 	}
 
@@ -323,12 +324,15 @@ func (s *serverImpl) handleSessionRequest(w http.ResponseWriter, authRequest []s
 	// If there is a proxy request, remember the proxy's endpoint and authenticate server to client.
 	ep := &upspin.Endpoint{}
 	if len(proxyRequest) == 1 {
+		if user != s.config.UserName() {
+			return nil, errors.E(errors.Permission, "client and proxy user must match")
+		}
 		ep, err = upspin.ParseEndpoint(proxyRequest[0])
 		if err != nil {
 			return nil, errors.E(errors.Invalid, errors.Errorf("invalid proxy endpoint: %v", err))
 		}
 		// Authenticate the server to the user.
-		authMsg, err := signUser(s.config, serverAuthMagic)
+		authMsg, err := signUser(s.config, serverAuthMagic, "[localproxy]")
 		if err != nil {
 			return nil, errors.E(errors.Permission, err)
 		}
@@ -339,15 +343,18 @@ func (s *serverImpl) handleSessionRequest(w http.ResponseWriter, authRequest []s
 }
 
 // verifyUser authenticates the remote user.
-//
-// The message is a slice of strings of the form: user, time, sig.R, sig.S
-func verifyUser(key upspin.PublicKey, msg []string, magic string, now time.Time) error {
-	if len(msg) != 4 {
+// msg is a slice of strings: user, host, time, sig.R, sig.S
+func verifyUser(key upspin.PublicKey, msg []string, magic, host string, now time.Time) error {
+	if len(msg) != 5 {
 		return errors.Str("bad header")
 	}
 
+	if host != msg[1] || len(host) == 0 {
+		return errors.Errorf("signature was for host %q but this is %q", msg[1], host)
+	}
+
 	// Make sure the challenge time is sane.
-	msgNow, err := time.Parse(time.ANSIC, msg[1])
+	msgNow, err := time.Parse(time.ANSIC, msg[2])
 	if err != nil {
 		return err
 	}
@@ -359,16 +366,15 @@ func verifyUser(key upspin.PublicKey, msg []string, magic string, now time.Time)
 
 	// Parse signature
 	var rs, ss big.Int
-	if _, ok := rs.SetString(msg[2], 10); !ok {
+	if _, ok := rs.SetString(msg[3], 10); !ok {
 		return errMissingSignature
 	}
-	if _, ok := ss.SetString(msg[3], 10); !ok {
+	if _, ok := ss.SetString(msg[4], 10); !ok {
 		return errMissingSignature
 	}
 
 	// Validate signature.
-	// TODO: this really should be a hash.
-	hash := []byte(msg[0] + magic + msg[1])
+	hash := hashUser(magic, msg[0], msg[1], msg[2])
 	err = factotum.Verify(hash, upspin.Signature{R: &rs, S: &ss}, key)
 	if err != nil {
 		err = errors.Errorf("signature fails to validate using the provided key: %s", err)
@@ -379,7 +385,7 @@ func verifyUser(key upspin.PublicKey, msg []string, magic string, now time.Time)
 }
 
 // signUser creates a header authenticating the local user.
-func signUser(cfg upspin.Config, magic string) ([]string, error) {
+func signUser(cfg upspin.Config, magic, host string) ([]string, error) {
 	if cfg == nil {
 		return nil, errors.Str("nil config")
 	}
@@ -388,19 +394,36 @@ func signUser(cfg upspin.Config, magic string) ([]string, error) {
 		return nil, errors.Str("no factotum available")
 	}
 
-	// Discourage replay attacks.
+	user := string(cfg.UserName())
+	if len(host) == 0 {
+		return nil, errors.Str("unset host")
+	}
 	now := time.Now().UTC().Format(time.ANSIC)
-	userString := string(cfg.UserName())
-	// TODO: this should be a hash, matching verifyUser.
-	sig, err := f.Sign([]byte(userString + magic + now))
+	sig, err := f.Sign(hashUser(magic, user, host, now))
 	if err != nil {
 		log.Error.Printf("proxyRequest signing server user: %v", err)
 		return nil, err
 	}
 	return []string{
-		userString,
+		user,
+		host,
 		now,
 		sig.R.String(),
 		sig.S.String(),
 	}, nil
+}
+
+func hashUser(magic, user, host, now string) []byte {
+	h := sha256.New()
+	h.Write([]byte(magic))
+	w := func(s string) {
+		var l [4]byte
+		binary.BigEndian.PutUint32(l[:], uint32(len(s)))
+		h.Write(l[:])
+		h.Write([]byte(s))
+	}
+	w(user)
+	w(host)
+	w(now)
+	return h.Sum(nil)
 }
