@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "f7e7969b_7e46f8b3",
+        "filename": "cloud/storage/amazons3/amazons3.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-26T00:14:37Z",
+      "side": 1,
+      "message": "those final vendor/ imports are actually in the standard library and can be ignored in this analysis\n\nso really it only brings in the aws-sdk-go repository, which seems ok",
+      "parentUuid": "5f2b87ec_5cd3a775",
+      "revId": "0458254767e231b2e2763b1d5e4e027d1d52fdc8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "2ba6c242_e3270d10",
         "filename": "cloud/storage/amazons3/amazons3_test.go",
         "patchSetId": 3
