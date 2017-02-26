@@ -38,10 +38,16 @@ TODO: Rotate and countersign are terms of art, not clear to users.
 		fs.Usage()
 	}
 
-	f := s.config.Factotum() // save latest factotum
+	f := s.config.Factotum()
 	if f == nil {
 		s.exitf("no factotum available")
 	}
+	if f.Pop().PublicKey() == f.PublicKey() {
+		s.exitf("no previous key to rotate (missing or bad secret2.upspinkey?)")
+	}
+
+	// Update the current config to use the previous key, in order to
+	// authenticate with the key server (it still has the old key).
 	lastCfg := s.config
 	s.config = config.SetFactotum(s.config, f.Pop()) // config now defaults to old key
 	defer func() { s.config = lastCfg }()
