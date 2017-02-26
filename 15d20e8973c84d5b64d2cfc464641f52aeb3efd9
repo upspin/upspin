@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f7e0790f_ab00368b",
+        "filename": "rpc/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 346,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-26T18:28:44Z",
+      "side": 1,
+      "message": "Given that Endpoint is type in upspin used extensively in this , perhaps host name might be better.",
+      "range": {
+        "startLine": 346,
+        "startChar": 36,
+        "endLine": 346,
+        "endChar": 44
+      },
+      "revId": "15d20e8973c84d5b64d2cfc464641f52aeb3efd9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
