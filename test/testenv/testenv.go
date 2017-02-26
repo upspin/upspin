@@ -32,11 +32,13 @@ import (
 
 	// Transports that are selected implicitly by bind.
 	_ "upspin.io/dir/remote"
+	_ "upspin.io/key/remote"
 	_ "upspin.io/store/remote"
 )
 
 // The servers that "remote" tests will work against.
 const (
+	TestKeyServer   = "key.test.upspin.io:443"
 	TestStoreServer = "store.test.upspin.io:443"
 	TestDirServer   = "dir.test.upspin.io:443"
 	TestServerName  = "dir-server@upspin.io"
@@ -163,6 +165,10 @@ func New(setup *Setup) (*Env, error) {
 		dirServerMux.Register(dirEndpoint, env.DirServer)
 
 	case "remote":
+		cfg = config.SetKeyEndpoint(cfg, upspin.Endpoint{
+			Transport: upspin.Remote,
+			NetAddr:   TestKeyServer,
+		})
 		cfg = config.SetStoreEndpoint(cfg, upspin.Endpoint{
 			Transport: upspin.Remote,
 			NetAddr:   TestStoreServer,
@@ -257,7 +263,13 @@ func (e *Env) NewUser(userName upspin.UserName) (upspin.Config, error) {
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
-	f, err := factotum.NewFromDir(testutil.Repo("key", "testdata", string(user)))
+	var secrets string
+	if e.Setup.Kind == "remote" {
+		secrets = testutil.Repo("key", "testdata", "remote", string(user))
+	} else {
+		secrets = testutil.Repo("key", "testdata", string(user))
+	}
+	f, err := factotum.NewFromDir(secrets)
 	if err != nil {
 		return nil, errors.E(op, userName, err)
 	}
