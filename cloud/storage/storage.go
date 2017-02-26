@@ -31,10 +31,6 @@ type Storage interface {
 	// Delete permanently removes all storage space associated
 	// with a ref.
 	Delete(ref string) error
-
-	// Close closes the the connection to the storage backend and releases all resources used.
-	// It must be called only once and only after storage.Dial has succeeded.
-	Close()
 }
 
 // StorageConstructor is a function that initializes and returns a Storage

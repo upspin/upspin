@@ -185,10 +185,3 @@ func (gcs *gcsImpl) emptyBucket(verbose bool) error {
 	}
 	return firstErr
 }
-
-// Close implements Storage.
-func (gcs *gcsImpl) Close() {
-	// Not much to do, the GCS interface is pretty stateless (HTTP client).
-	gcs.client = nil
-	gcs.service = nil
-}

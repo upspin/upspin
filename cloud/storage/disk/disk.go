@@ -94,8 +94,3 @@ func (s *storageImpl) path(ref string) string {
 	}
 	return filepath.Join(s.base, sub, enc)
 }
-
-// Close implements Storage.
-func (s *storageImpl) Close() {
-	// Nothing to do.
-}

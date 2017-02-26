@@ -24,7 +24,6 @@ func (m *dummyStorage) LinkBase() (base string, err error)    { return "", nil }
 func (m *dummyStorage) Download(ref string) ([]byte, error)   { return nil, nil }
 func (m *dummyStorage) Put(ref string, contents []byte) error { return nil }
 func (m *dummyStorage) Delete(ref string) error               { return nil }
-func (m *dummyStorage) Close()                                {}
 
 // ExpectDownloadCapturePut inspects all calls to Download with the
 // given Ref and if it matches, it returns Data. Ref matches are strictly sequential.
