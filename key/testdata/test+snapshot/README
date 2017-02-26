@@ -1,0 +1,7 @@
+The keys in this directory should be generated from a secret seed known to the
+Upspin core team using this command:
+
+	$ upspin keygen -where=$GOPATH/src/upspin.io/key/testdata/test+snpashot -secretseed <seed>
+
+The keys are secret and must not be checked in to the repository.
+A .gitignore file in this directory guards against this mistake.
