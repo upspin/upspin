@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cf47b56e_75a034e4",
+        "filename": "bind/bind.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-02-26T18:07:27Z",
+      "side": 1,
+      "message": "This is subtle, but I think the original code might actually be correct. Here\u0027s why: the Config passed in cc is what the user specified in its ~/upspin/config file and it contains a directory server, which is one of the endpoints in  `endpoints`. If the keyserver errors out, it is likely because the user was not found, so we contact the endpoint we know of from the user\u0027s config file.\n\nPerhaps a better check would be:\n\n if err !\u003d nil \u0026\u0026 !errors.Match(errors.E(errors.NotExist, err)) {\n         return nil, errors.E(op, err)\n }\n\nMeaning: if there was any error other than user not found then  the keyserver is likely bad or unreachable. Even then, we may still want to contact the DirServer we know of from the static config file. \n\nSorry for the verbose commentary.\n\nI don\u0027t think this needs to be changed. What do you think?",
+      "revId": "3dc66e5d4203b29e394913bc4c54321b17956485",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
