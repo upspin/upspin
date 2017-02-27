@@ -27,7 +27,7 @@ func (s *State) setupserver(args ...string) {
 	const (
 		help = `
 Setupserver is the final step of setting up an upspinserver.
-It assumes that you have run 'setupdomain' and 'setupstorage'.
+It assumes that you have run 'setupdomain' and (optionally) 'setupstorage'.
 
 It registers the user created by 'setupdomain' domain with the key server,
 copies the configuration files from $where/$domain to the upspinserver and

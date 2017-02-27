@@ -26,8 +26,9 @@ import (
 func (s *State) setupdomain(args ...string) {
 	const (
 		help = `
-Setupdomain is the first step in setting up an upspinserver.
-The next steps are 'setupstorage' and 'setupserver'.
+Setupdomain is the first step in setting up an upspinserver or Upspin
+Kubernetes cluster. If setting up an upspinserver, the next steps are
+'setupstorage' (optionally) and 'setupserver'.
 
 It generates keys and config files for Upspin server users, placing them in
 $where/$domain (the values of the -where and -domain flags substitute for
@@ -319,6 +320,10 @@ add the following record to {{.Domain}}'s DNS zone:
 
 Once the DNS change propagates the key server will use the TXT record to verify
 that {{.UserName}} is authorized to register users under {{.Domain}}.
+At a later step, the 'upspin setupserver' command will register your server
+user for you automatically.
 
-After that, the next step is to run 'upspin setupstorage'.
+After that, the next step is to run 'upspin setupstorage' (to configure a cloud
+storage provider) or 'uppsin setupserver' (if you want to store Upspin data on
+your server's local disk).
 `))
