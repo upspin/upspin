@@ -65,7 +65,7 @@ Copy `~/upspin` and `~/.ssh/*.upspinkey` to the second device into the same
 paths under `$HOME` and make sure that they have the same restrictive
 permissions as on the source machine.
 One way to do that is to use the following commands on the destination machine,
-assmuming it is a Unix machine:
+assuming it is a Unix machine:
 
 ```
 $ test -d ~/upspin || (mkdir ~/upspin && chmod 0700 ~/upspin)
