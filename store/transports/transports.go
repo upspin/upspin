@@ -17,5 +17,9 @@ import (
 )
 
 func init() {
-	bind.RegisterStoreServer(upspin.InProcess, inprocess.New())
+	store, err := inprocess.New()
+	if err != nil {
+		panic(err)
+	}
+	bind.RegisterStoreServer(upspin.InProcess, store)
 }

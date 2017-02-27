@@ -134,7 +134,11 @@ func New(setup *Setup) (*Env, error) {
 		// Set up a StoreServer instance. Just use the inprocess
 		// version for offline tests; the store/server implementation
 		// isn't interesting when run offline.
-		env.StoreServer = storeserver.New()
+		var err error
+		env.StoreServer, err = storeserver.New()
+		if err != nil {
+			return nil, errors.E(op, err)
+		}
 		storeServerMux.Register(storeEndpoint, env.StoreServer)
 
 		// Set up user and factotum.
