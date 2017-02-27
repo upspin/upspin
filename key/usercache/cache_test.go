@@ -68,10 +68,10 @@ func setup(t *testing.T, user string) (uncached, cached upspin.KeyServer) {
 		},
 	}
 
-	if user == "upspin-test@google.com" {
+	if user == "test@upspin.io" {
 		c = config.SetDirEndpoint(c, testDirEndpoint)
 		c = config.SetStoreEndpoint(c, testStoreEndpoint)
-		f, err := factotum.NewFromDir(testutil.Repo("key", "testdata", "upspin-test"))
+		f, err := factotum.NewFromDir(testutil.Repo("key", "testdata", "test"))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -91,7 +91,7 @@ func setup(t *testing.T, user string) (uncached, cached upspin.KeyServer) {
 // Dialed config, and that we dial just once for
 // Lookups of other users.
 func TestDial(t *testing.T) {
-	const name = "upspin-test@google.com"
+	const name = "test@upspin.io"
 	_, svc := setup(t, name)
 
 	keyService.dials = 0
