@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "79442dfa_8b4e58e0",
+        "filename": "cmd/upspin/user.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-02-27T23:25:21Z",
+      "side": 1,
+      "message": "This is being changed here too. It\u0027s now optional.",
+      "parentUuid": "d61816a2_9301e6c8",
+      "revId": "302473341355a1e00fa5b03b0025383350f37168",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "3681f211_8d55497f",
         "filename": "cmd/upspin/user.go",
         "patchSetId": 4
@@ -33,6 +51,24 @@
       "revId": "302473341355a1e00fa5b03b0025383350f37168",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "84f426d1_cabd1e2c",
+        "filename": "cmd/upspin/user.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-02-27T23:25:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3681f211_8d55497f",
+      "revId": "302473341355a1e00fa5b03b0025383350f37168",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
