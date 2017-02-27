@@ -16,6 +16,24 @@
       "revId": "b23a4e1dd5a7672c0dea8153480ed89fd499d904",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cae566a4_4e43114d",
+        "filename": "cmd/upspin/user.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-02-27T20:43:18Z",
+      "side": 1,
+      "message": "Done.\n\nThis check is not exactly right though. I could be the admin for my domain trying to create a user or the non-suffixed user trying to create a suffixed user.\n\nThe right check would be to read the contents of *inFile and see if userName matches the given argument. \n\nThere\u0027s a TODO on line 48 for this. I added a comment.",
+      "parentUuid": "3c885370_d15a2fd3",
+      "revId": "b23a4e1dd5a7672c0dea8153480ed89fd499d904",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
