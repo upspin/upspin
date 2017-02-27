@@ -218,12 +218,13 @@ retryAuth:
 	token = httpResp.Header.Get(authTokenHeader)
 	if len(token) == 0 {
 		authErr := httpResp.Header.Get(authErrorHeader)
-		if len(authErr) == 0 {
+		if len(authErr) > 0 {
 			body.Close()
-			return errors.E(op, errors.Invalid, errors.Str("server did not respond to our authentication request"))
+			return errors.E(op, errors.Permission, errors.Str(authErr))
 		}
-		body.Close()
-		return errors.E(op, errors.Permission, errors.Str(authErr))
+		// No authentication token returned, but no error either.
+		// The server doesn't care about authenticating this request.
+		// Proceed.
 	}
 
 	// If talking to a proxy, make sure it is running as the same user.
@@ -239,7 +240,9 @@ retryAuth:
 		}
 	}
 
-	c.setAuthToken(token)
+	if len(token) > 0 {
+		c.setAuthToken(token)
+	}
 
 	if stream != nil {
 		go decodeStream(stream, body, done)
