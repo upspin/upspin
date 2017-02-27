@@ -18,6 +18,7 @@ import (
 type dialKey struct {
 	user     upspin.UserName
 	endpoint upspin.Endpoint
+	dialer   upspin.Dialer
 }
 
 // dialedService holds a dialed service and its last ping time.
@@ -258,6 +259,7 @@ func reachableService(cc upspin.Config, op string, e upspin.Endpoint, cache dial
 	key := dialKey{
 		user:     cc.UserName(),
 		endpoint: e,
+		dialer:   dialer,
 	}
 
 	var (

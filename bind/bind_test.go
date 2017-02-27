@@ -119,9 +119,16 @@ func TestConcurrency(t *testing.T) {
 	store := func(release bool) {
 		defer wg.Done()
 		for i := 0; i < nRuns; i++ {
-			s, err := StoreServer(cfg, e)
+			var s upspin.Service
+			var err error
+			if i&1 == 0 { // alternate between store and keyservers
+				s, err = StoreServer(cfg, e)
+			} else {
+				s, err = KeyServer(cfg, e)
+			}
+
 			if err != nil {
-				t.Error("StoreServer:", err)
+				t.Error("dialer", err)
 				return
 			}
 			time.Sleep(time.Duration(rand.Intn(20)) * time.Millisecond)
@@ -191,6 +198,8 @@ func (d *dummyStoreServer) Endpoint() upspin.Endpoint {
 }
 
 func (d *dummyStoreServer) Dial(cc upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
+	// Add some random delays, in order to trigger concurrent dials
+	time.Sleep(time.Duration(rand.Int31n(100)) * time.Millisecond)
 	store := &dummyStoreServer{endpoint: e}
 	return store, nil
 }
