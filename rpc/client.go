@@ -152,6 +152,7 @@ retryAuth:
 			log.Error.Printf("%s: signUser: %s", op, err)
 			return errors.E(op, err)
 		}
+		header.Del(authTokenHeader)
 		header[authRequestHeader] = authMsg
 		if c.isProxy() {
 			header.Set(proxyRequestHeader, c.proxyFor.String())
