@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3f861734_ab7c3c4f",
+        "filename": "cmd/upspin/user.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-27T20:47:36Z",
+      "side": 1,
+      "message": "Let\u0027s get this right now, rather than add another TODO. It\u0027s not hard.\n\ns.parseFlags(fs, args, help, \"user [username...]\\nuser -put [-in\u003dinputfile [-force]\")\n\nthen do the real test.",
+      "revId": "c916bbde784da6b2c9902ef526ea3fe018796035",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
