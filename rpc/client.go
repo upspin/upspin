@@ -137,10 +137,10 @@ func (c *httpClient) Invoke(method string, req, resp pb.Message, stream Response
 		return errors.E(op, errors.Str("exactly one of resp and stream must be nil"))
 	}
 
-	header := make(http.Header)
-
 	token, haveToken := c.authToken()
+
 retryAuth:
+	header := make(http.Header)
 	if haveToken {
 		// If we have a token already, supply it.
 		header.Set(authTokenHeader, token)
@@ -152,7 +152,6 @@ retryAuth:
 			log.Error.Printf("%s: signUser: %s", op, err)
 			return errors.E(op, err)
 		}
-		header.Del(authTokenHeader)
 		header[authRequestHeader] = authMsg
 		if c.isProxy() {
 			header.Set(proxyRequestHeader, c.proxyFor.String())
