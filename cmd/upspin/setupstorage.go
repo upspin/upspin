@@ -31,6 +31,9 @@ accessing that bucket. It then writes the service account private key to
 $where/$domain/serviceaccount.json and updates the server
 configuration files in that directory to use the specified bucket.
 
+Note that you may skip this step, in which case your upspinserver will
+store its data on the server's local disk.
+
 Before running this command, you must create a Google Cloud Project and
 associated Billing Account using the Cloud Console:
 	https://cloud.google.com/console
