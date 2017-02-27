@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f4ad4d31_8c77d00e",
+        "filename": "rpc/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-27T23:10:29Z",
+      "side": 1,
+      "message": "s/server/serve/",
+      "revId": "55f987863269bc6825f223153636a0b8907f315d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ad7098d0_9b0ea5f7",
+        "filename": "rpc/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-27T23:10:29Z",
+      "side": 1,
+      "message": "\"an *authenticated* RPC method\"? (to better differentiate it from the one below)",
+      "revId": "55f987863269bc6825f223153636a0b8907f315d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
