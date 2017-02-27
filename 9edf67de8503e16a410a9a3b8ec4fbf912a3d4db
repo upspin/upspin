@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c7afa202_ea8d6de5",
+        "filename": "rpc/client.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-27T21:00:54Z",
+      "side": 1,
+      "message": "how is it even possible for this key to be in the header?\nthe header is created a few lines earlier, and there are no writes to it between there and here\nrevert this cl?",
+      "revId": "9edf67de8503e16a410a9a3b8ec4fbf912a3d4db",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
