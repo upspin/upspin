@@ -11,6 +11,8 @@ import (
 
 	yaml "gopkg.in/yaml.v2"
 
+	"os"
+	"strings"
 	"upspin.io/factotum"
 	"upspin.io/key/usercache"
 	"upspin.io/upspin"
@@ -48,6 +50,11 @@ To install new users see the signup command.
 	keyServer := s.KeyServer()
 	if *put {
 		if fs.NArg() != 0 {
+			// Warn if a username is given.
+			// TODO: Allow it if it's the same as in inFile when we address TODO above.
+			if strings.Contains(fs.Arg(0), "@") {
+				fmt.Fprintf(os.Stderr, "NOTE: With the -put flag, the user name comes from the input. Do not provide it on the command line.\n\n")
+			}
 			fs.Usage()
 		}
 		s.putUser(keyServer, s.globOneLocal(*inFile), *force)
