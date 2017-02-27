@@ -2,18 +2,18 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package access parses access control files.
+// Package access parses Access files.
 //
 // Access files have the following format:
-// <access type>[, <access type]: <email>[, <email>, ...]
+// 	<right>[, <right>]: <user/group>[, <user/group>, ...]
 //
-// Anything after a '#' character is ignored
+// Anything after a '#' character is ignored.
 //
 // Example:
+//	Read,List: user@domain,com, friends
+//	Write: user@domain.com, joe@domain.com
+//	Delete: user@domain.com # This is a comment
 //
-//	Read: email@domain,com, email2@domain.com
-//	Write: writer@domain.com, writer2@domain.com, writer3@example,com
-//	Append,Write: appender@example.com # This is a comment
 package access // import "upspin.io/access"
 
 import (
