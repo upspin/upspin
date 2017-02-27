@@ -9,7 +9,6 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
-	"os"
 	"testing"
 	"time"
 
@@ -28,16 +27,23 @@ import (
 
 var (
 	joePublic = upspin.PublicKey("p256\n104278369061367353805983276707664349405797936579880352274235000127123465616334\n26941412685198548642075210264642864401950753555952207894712845271039438170192\n")
-	user      = upspin.UserName("joe@blow.com")
+	joeUser   = upspin.UserName("joe@blow.com")
 	srv       *server
 	cli       *client
 )
 
-func lookup(userName upspin.UserName) (upspin.PublicKey, error) {
-	if userName == user {
+var payloads = []string{
+	"The wren",
+	"Earns his living",
+	"Noiselessly.",
+	// - Kobayahsi Issa
+}
+
+func lookup(user upspin.UserName) (upspin.PublicKey, error) {
+	if user == joeUser {
 		return upspin.PublicKey(joePublic), nil
 	}
-	return "", errors.Str("No user here")
+	return "", errors.E(errors.NotExist, errors.Str("No user here"))
 }
 
 func pickPort() (port string) {
@@ -53,11 +59,16 @@ func pickPort() (port string) {
 	return port
 }
 
-func startServer() (port string) {
-	srv = &server{}
+type server struct {
+	t         *testing.T
+	iteration int
+}
+
+func startServer(t *testing.T) (port string) {
+	srv = &server{t: t}
 	port = pickPort()
 
-	cfg := config.SetUserName(config.New(), user)
+	cfg := config.SetUserName(config.New(), "server@upspin.io")
 	cfg = config.SetKeyEndpoint(cfg, upspin.Endpoint{Transport: upspin.InProcess})
 	http.Handle("/api/Server/", NewServer(cfg, &ServerConfig{
 		Lookup: lookup,
@@ -65,6 +76,9 @@ func startServer() (port string) {
 			Name: "Server",
 			Methods: map[string]Method{
 				"Echo": srv.Echo,
+			},
+			UnauthenticatedMethods: map[string]UnauthenticatedMethod{
+				"UnauthenticatedEcho": srv.UnauthenticatedEcho,
 			},
 			Streams: map[string]Stream{
 				"Count": srv.Count,
@@ -78,9 +92,21 @@ func startServer() (port string) {
 	return port
 }
 
-type server struct {
-	t         *testing.T
-	iteration int
+func (s *server) UnauthenticatedEcho(reqBytes []byte) (pb.Message, error) {
+	var req prototest.EchoRequest
+	if err := pb.Unmarshal(reqBytes, &req); err != nil {
+		return nil, err
+	}
+	if req.Payload == payloads[s.iteration] {
+		resp := &prototest.EchoResponse{
+			Payload: payloads[s.iteration],
+		}
+		log.Printf("Server: UnauthenticatedEcho response: %q", resp.Payload)
+		s.iteration++
+		return resp, nil
+	}
+	s.t.Fatalf("iteration %d: invalid request %q", s.iteration, req.Payload)
+	return nil, nil // not reached
 }
 
 func (s *server) Echo(session Session, reqBytes []byte) (pb.Message, error) {
@@ -88,8 +114,8 @@ func (s *server) Echo(session Session, reqBytes []byte) (pb.Message, error) {
 	if err := pb.Unmarshal(reqBytes, &req); err != nil {
 		return nil, err
 	}
-	if session.User() != user {
-		s.t.Fatalf("Expected user %q, got %q", user, session.User())
+	if session.User() != joeUser {
+		s.t.Fatalf("Expected user %q, got %q", joeUser, session.User())
 	}
 	if req.Payload == payloads[s.iteration] {
 		resp := &prototest.EchoResponse{
@@ -130,6 +156,19 @@ func (s *server) Count(session Session, reqBytes []byte, done <-chan struct{}) (
 type client struct {
 	Client   // For sessions, Ping, and Close.
 	reqCount int
+}
+
+func (c *client) UnauthenticatedEcho(t *testing.T, payload string) (response string) {
+	req := &prototest.EchoRequest{
+		Payload: payload,
+	}
+	resp := new(prototest.EchoResponse)
+	log.Printf("Client: UnauthenticatedEcho request: %q", req.Payload)
+	if err := c.Invoke("Server/UnauthenticatedEcho", req, resp, nil, nil); err != nil {
+		t.Fatal(err)
+	}
+	c.reqCount++
+	return resp.Payload
 }
 
 func (c *client) Echo(t *testing.T, payload string) (response string) {
@@ -194,10 +233,14 @@ func (s countStream) Close() {
 func (s countStream) Error(err error) {
 }
 
-func startClient(port string) {
+func startClient(port string, user upspin.UserName) {
 	cfg := config.SetUserName(config.New(), user)
 
-	f, err := factotum.NewFromDir(testutil.Repo("key", "testdata", "joe"))
+	userDir := "test"
+	if user == joeUser {
+		userDir = "joe"
+	}
+	f, err := factotum.NewFromDir(testutil.Repo("key", "testdata", userDir))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -231,20 +274,21 @@ func startClient(port string) {
 }
 
 func TestAll(t *testing.T) {
+	port := startServer(t)
+	startClient(port, joeUser)
+
 	// Inject testing into the server.
 	srv.t = t
 
-	if len(payloads) < 1 {
-		t.Fatalf("Programmer error. Make at least one demand!")
-	}
+	// Test authenticated method.
+	srv.iteration = 0
+	cli.reqCount = 0
 	for i := range payloads {
 		response := cli.Echo(t, payloads[i])
 		if response != payloads[i] {
 			t.Errorf("Payload %d: Expected response %q, got %q", i, payloads[i], response)
 		}
 	}
-
-	// Verify server and client changed state.
 	if srv.iteration != len(payloads) {
 		t.Errorf("Expected server to be on iteration %d, was on %d", len(payloads), srv.iteration)
 	}
@@ -252,51 +296,39 @@ func TestAll(t *testing.T) {
 		t.Errorf("Expected client to be on iteration %d, was on %d", srv.iteration, cli.reqCount)
 	}
 
+	// Test authenticated stream.
 	cli.Count(t, 0, 5)
-}
 
-func TestServerForgetsToken(t *testing.T) {
-	srv.t = t
+	// Test that the client retries authentication properly
+	// when the server forgets the auth token.
 	srv.iteration = 0
-
 	// Ensure we have an auth token.
 	response := cli.Echo(t, payloads[0])
 	if response != payloads[0] {
 		t.Errorf("Payload %d: Expected response %q, got %q", 0, payloads[0], response)
 	}
-
 	// Server forgets all auth tokens.
 	sessionCache = cache.NewLRU(100)
-
 	// Try again and it works.
 	response = cli.Echo(t, payloads[1])
 	if response != payloads[1] {
 		t.Errorf("Payload %d: Expected response %q, got %q", 1, payloads[1], response)
 	}
 
-}
-
-var (
-	payloads = []string{
-		"The wren",
-		"Earns his living",
-		"Noiselessly.",
-		// - Kobayahsi Issa
+	// Test unauthenticated method.
+	startClient(port, "unknown@user.com")
+	srv.iteration = 0
+	cli.reqCount = 0
+	for i := range payloads {
+		response := cli.UnauthenticatedEcho(t, payloads[i])
+		if response != payloads[i] {
+			t.Errorf("Payload %d: Expected response %q, got %q", i, payloads[i], response)
+		}
 	}
-)
-
-func TestMain(m *testing.M) {
-	port := startServer()
-	startClient(port) // Blocks until it's connected to the server.
-
-	// Start testing.
-	code := m.Run()
-
-	// Terminate cleanly.
-	log.Printf("Finishing...")
-	cli.Close()
-
-	// Report test results.
-	log.Printf("Finishing e2e tests: %d", code)
-	os.Exit(code)
+	if srv.iteration != len(payloads) {
+		t.Errorf("Expected server to be on iteration %d, was on %d", len(payloads), srv.iteration)
+	}
+	if cli.reqCount != srv.iteration {
+		t.Errorf("Expected client to be on iteration %d, was on %d", srv.iteration, cli.reqCount)
+	}
 }
