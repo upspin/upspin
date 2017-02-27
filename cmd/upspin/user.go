@@ -43,14 +43,10 @@ To install new users see the signup command.
 	put := fs.Bool("put", false, "write new user record")
 	inFile := fs.String("in", "", "input file (default standard input)")
 	force := fs.Bool("force", false, "force writing user record even if key is empty")
-	// TODO: the username is not accepted with -put. We may need two lines to fix this (like 'man printf').
-	s.parseFlags(fs, args, help, "user [-put [-in=inputfile] [-force]] [username...]")
+	s.parseFlags(fs, args, help, "user [username...]\n              user -put [-in=inputfile] [-force] [username]")
 	keyServer := s.KeyServer()
 	if *put {
-		if fs.NArg() != 0 {
-			fs.Usage()
-		}
-		s.putUser(keyServer, s.globOneLocal(*inFile), *force)
+		s.putUser(fs, keyServer, s.globOneLocal(*inFile), *force)
 		return
 	}
 	if *inFile != "" {
@@ -132,7 +128,7 @@ func equalEndpoints(a, b []upspin.Endpoint) bool {
 	return true
 }
 
-func (s *State) putUser(keyServer upspin.KeyServer, inFile string, force bool) {
+func (s *State) putUser(fs *flag.FlagSet, keyServer upspin.KeyServer, inFile string, force bool) {
 	data := s.readAll(inFile)
 	userStruct := new(upspin.User)
 	err := yaml.Unmarshal(data, userStruct)
@@ -140,6 +136,10 @@ func (s *State) putUser(keyServer upspin.KeyServer, inFile string, force bool) {
 		// TODO(adg): better error message?
 		s.exit(err)
 	}
+	if fs.NArg() != 0 && upspin.UserName(fs.Arg(0)) != userStruct.Name {
+		s.exitf("User name provided does not match the one read from the input file.")
+	}
+
 	// Validate public key.
 	if userStruct.PublicKey == "" && !force {
 		s.exitf("An empty public key will prevent user from accessing services. To override use -force.")
