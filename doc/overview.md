@@ -474,7 +474,7 @@ The source for Upspin is hosted on Gerrit
 and mirrored to GitHub
 ([https://github.com/upspin/upspin](https://github.com/upspin/upspin)).
 However, the repository is bound to the domain [upspin.io](http://upspin.io)
-for easy reference, so to install Upspin first install Go if you haven't
+for easy reference, so to install Upspin first install Go 1.8 or higher if you haven't
 already ([https://golang.org/dl/](https://golang.org/dl/)) and then run
 
 ```
