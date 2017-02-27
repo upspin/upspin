@@ -30,13 +30,15 @@ type state struct {
 }
 
 const help = `
-Setupstorage is the second step in establishing an upspinserver.
+Setupstorage is the second step in establishing an upspinserver,
+It sets up cloud storage for your Upspin installation. You may skip this step
+if you wish to store Upspin data on your server's local disk.
 The first step is 'setupdomain' and the final step is 'setupserver'.
 
-It creates a Google Cloud Storage bucket and a service account for
+Setupstorage creates a Google Cloud Storage bucket and a service account for
 accessing that bucket. It then writes the service account private key to
-$where/$domain/serviceaccount.json and updates the server
-configuration files in that directory to use the specified bucket.
+$where/$domain/serviceaccount.json and updates the server configuration files
+in that directory to use the specified bucket.
 
 Before running this command, you must create a Google Cloud Project and
 associated Billing Account using the Cloud Console:
