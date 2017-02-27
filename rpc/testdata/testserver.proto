@@ -22,7 +22,7 @@ message CountResponse {
 }
 
 service TestService {
-    rpc Ping (proto.PingRequest) returns (proto.PingResponse) {}
+    rpc UnauthenticatedEcho (EchoRequest) returns (EchoResponse) {}
     rpc Echo (EchoRequest) returns (EchoResponse) {}
     rpc Count (CountRequest) returns (stream CountResponse) {}
 }
