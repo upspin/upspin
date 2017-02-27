@@ -251,7 +251,7 @@ func testReadAccess(t *testing.T, r *testenv.Runner) {
 
 	// Test *@domain permission.
 	const (
-		wildcardDomain = "l: *@google.com\n"
+		wildcardDomain = "l: *@upspin.io\n"
 	)
 	r.As(owner)
 	r.Put(publicAccessFile, wildcardDomain)
