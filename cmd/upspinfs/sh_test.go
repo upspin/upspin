@@ -55,7 +55,11 @@ func testSetup(name string) (cfg upspin.Config, err error) {
 	cfg = config.SetFactotum(cfg, f)
 
 	bind.RegisterKeyServer(upspin.InProcess, keyserver.New())
-	bind.RegisterStoreServer(upspin.InProcess, storeserver.New())
+	store, err := storeserver.New()
+	if err != nil {
+		return nil, err
+	}
+	bind.RegisterStoreServer(upspin.InProcess, store)
 	bind.RegisterDirServer(upspin.InProcess, dirserver.New(cfg))
 
 	publicKey := upspin.PublicKey(fmt.Sprintf("key for %s", name))

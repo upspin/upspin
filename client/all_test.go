@@ -45,8 +45,12 @@ func init() {
 	baseCfg = config.SetDirEndpoint(baseCfg, inProcess)
 	baseCfg = config.SetFactotum(baseCfg, f)
 
+	store, err := storeserver.New()
+	if err != nil {
+		panic(err)
+	}
 	bind.RegisterKeyServer(upspin.InProcess, keyserver.New())
-	bind.RegisterStoreServer(upspin.InProcess, storeserver.New())
+	bind.RegisterStoreServer(upspin.InProcess, store)
 	bind.RegisterDirServer(upspin.InProcess, dirserver.New(baseCfg))
 }
 

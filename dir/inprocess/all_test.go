@@ -33,7 +33,11 @@ import (
 
 func init() {
 	bind.RegisterKeyServer(upspin.InProcess, keyserver.New())
-	bind.RegisterStoreServer(upspin.InProcess, storeserver.New())
+	store, err := storeserver.New()
+	if err != nil {
+		panic(err)
+	}
+	bind.RegisterStoreServer(upspin.InProcess, store)
 }
 
 var (

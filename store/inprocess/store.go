@@ -8,6 +8,9 @@ package inprocess // import "upspin.io/store/inprocess"
 import (
 	"sync"
 
+	"strconv"
+	"strings"
+	"upspin.io/cache"
 	"upspin.io/errors"
 	"upspin.io/key/sha256key"
 	"upspin.io/upspin"
@@ -21,16 +24,38 @@ type service struct {
 
 var _ upspin.StoreServer = (*service)(nil)
 
-func New() upspin.StoreServer {
+const maxInt = int(^uint(0) >> 1)
+
+var errStorageFull = errors.E(errors.IO, errors.Str("storage full"))
+
+func New(options ...string) (upspin.StoreServer, error) {
+	const op = "store/inprocess.New"
+	capacity := int64(100 * 1024 * 1024) // 100 MB by default
+	var err error
+	for _, optPair := range options {
+		opt := strings.Split(optPair, "=")
+		if len(opt) != 2 {
+			return nil, errors.E(op, errors.Invalid, errors.Errorf("invalid option format: %q", opt))
+		}
+		k, v := opt[0], opt[1]
+		switch k {
+		case "capacity":
+			capacity, err = strconv.ParseInt(v, 10, 64)
+			if err != nil {
+				return nil, errors.E(op, errors.Invalid, errors.Errorf("invalid capacity %q: %s", v, err))
+			}
+		}
+	}
 	return &service{
 		data: &dataService{
 			endpoint: upspin.Endpoint{
 				Transport: upspin.InProcess,
 				NetAddr:   "", // Ignored.
 			},
-			blob: make(map[upspin.Reference][]byte),
+			blob:     cache.NewLRU(maxInt),
+			capacity: capacity,
 		},
-	}
+	}, nil
 }
 
 // A dataService is the underlying service object.
@@ -41,8 +66,14 @@ type dataService struct {
 	mu sync.Mutex
 	// dialed reports whether anyone has dialed us.
 	dialed bool
-	// blob contains the underlying data.
-	blob map[upspin.Reference][]byte // reference is made from SHA256 hash of data.
+	// blob contains the underlying data for a reference.
+	// key is a reference, made from SHA256 hash of data.
+	// value is the data, in bytes.
+	blob *cache.LRU
+	// capacity is the maximum number of bytes this service can store.
+	capacity int64
+	// usage is how much this service is currently storing.
+	usage int64
 }
 
 func copyOf(in []byte) (out []byte) {
@@ -58,10 +89,15 @@ func (s *service) Endpoint() upspin.Endpoint {
 
 // Put implements upspin.StoreServer
 func (s *service) Put(ciphertext []byte) (*upspin.Refdata, error) {
+	const op = "store/inprocess.Put"
 	ref := upspin.Reference(sha256key.Of(ciphertext).String())
 	s.data.mu.Lock()
-	s.data.blob[ref] = copyOf(ciphertext)
-	s.data.mu.Unlock()
+	defer s.data.mu.Unlock()
+	if s.data.usage+int64(len(ciphertext)) > s.data.capacity {
+		return nil, errors.E(op, errStorageFull)
+	}
+	s.data.usage += int64(len(ciphertext))
+	s.data.blob.Add(ref, copyOf(ciphertext))
 	refdata := &upspin.Refdata{
 		Reference: ref,
 		Volatile:  false,
@@ -75,18 +111,19 @@ func (s *service) Delete(ref upspin.Reference) error {
 	const op = "store/inprocess.Delete"
 	s.data.mu.Lock()
 	defer s.data.mu.Unlock()
-	_, ok := s.data.blob[ref]
-	if !ok {
+	data := s.data.blob.Remove(ref)
+	if data == nil {
 		return errors.E(op, errors.NotExist, errors.Errorf("no such blob: %s", ref))
 	}
-	delete(s.data.blob, ref)
+	s.data.usage -= int64(len(data.([]byte)))
 	return nil
 }
 
 // DeleteAll deletes all data from memory.
 func (s *service) DeleteAll() {
 	s.data.mu.Lock()
-	s.data.blob = make(map[upspin.Reference][]byte)
+	s.data.blob = cache.NewLRU(maxInt)
+	s.data.usage = 0
 	s.data.mu.Unlock()
 }
 
@@ -98,11 +135,12 @@ func (s *service) Get(ref upspin.Reference) (ciphertext []byte, refdata *upspin.
 		return nil, nil, nil, errors.E(op, errors.Invalid, errors.Str("empty reference"))
 	}
 	s.data.mu.Lock()
-	data, ok := s.data.blob[ref]
+	dataBlob, ok := s.data.blob.Get(ref)
 	s.data.mu.Unlock()
 	if !ok {
 		return nil, nil, nil, errors.E(op, errors.NotExist, errors.Errorf("no such blob: %s", ref))
 	}
+	data := dataBlob.([]byte)
 	if upspin.Reference(sha256key.Of(data).String()) != ref {
 		return nil, nil, nil, errors.E(op, errors.Invalid, "internal hash mismatch in StoreServer.Get")
 	}
