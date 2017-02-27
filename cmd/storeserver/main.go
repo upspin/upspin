@@ -61,7 +61,7 @@ func main() {
 	err = nil
 	switch flags.ServerKind {
 	case "inprocess":
-		store = inprocess.New()
+		store, err = inprocess.New(flags.ServerConfig...)
 	case "server":
 		store, err = server.New(flags.ServerConfig...)
 	case "filesystem":
