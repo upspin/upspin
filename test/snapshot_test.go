@@ -73,11 +73,12 @@ func testSnapshot(t *testing.T, r *testenv.Runner) {
 	var found upspin.PathName
 	for {
 		// We use GetNEvents because we don't have a fixed name to use
-		// with r.GotEvent(name).
-		if !r.GetNEvents(1) {
+		// with r.GotEvent(name). We need two entries, the top directory
+		// with the date and the sub directory with the time.
+		if !r.GetNEvents(2) {
 			t.Fatal(r.Diag())
 		}
-		entry := r.Events[0].Entry
+		entry := r.Events[1].Entry
 
 		// Check  entry contents and name.
 		file := path.Join(entry.Name, "snapshot-test", "dir", "file")
