@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "199c04fb_9597acfa",
+        "filename": "rpc/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-02-27T23:51:32Z",
+      "side": 1,
+      "message": "Not necessary to fix now but these 3 parallel maps are setting us up for a future error where the same named entry exists in more than one.",
+      "range": {
+        "startLine": 176,
+        "startChar": 1,
+        "endLine": 187,
+        "endChar": 2
+      },
+      "revId": "e199e4b45ea1d7626e2436a3c1a8a7cbee15ddc3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
