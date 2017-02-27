@@ -56,8 +56,9 @@ in the next section, when `ann@machine.com` wants to identify this group, it
 will usually be in the context of her own directory tree, and just the final
 component, `family`, is sufficient to identify it.
 
-`Group` files are always readable and writable by the owner, but otherwise act
-as regular items within the Upspin name space as far as client I/O is concerned.
+`Group` files are always readable and writable by the owner, and only the owner
+can create and edit them, but otherwise they act as regular items within the
+Upspin name space as far as client I/O is concerned.
 
 `Group` files can be placed directly in the `Group` directory of the user's
 root, or in subdirectories of that `Group` directory.
