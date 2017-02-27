@@ -15,6 +15,7 @@ import (
 
 	pb "github.com/golang/protobuf/proto"
 
+	"upspin.io/cache"
 	"upspin.io/cloud/https"
 	"upspin.io/config"
 	"upspin.io/errors"
@@ -252,6 +253,27 @@ func TestAll(t *testing.T) {
 	}
 
 	cli.Count(t, 0, 5)
+}
+
+func TestServerForgetsToken(t *testing.T) {
+	srv.t = t
+	srv.iteration = 0
+
+	// Ensure we have an auth token.
+	response := cli.Echo(t, payloads[0])
+	if response != payloads[0] {
+		t.Errorf("Payload %d: Expected response %q, got %q", 0, payloads[0], response)
+	}
+
+	// Server forgets all auth tokens.
+	sessionCache = cache.NewLRU(100)
+
+	// Try again and it works.
+	response = cli.Echo(t, payloads[1])
+	if response != payloads[1] {
+		t.Errorf("Payload %d: Expected response %q, got %q", 1, payloads[1], response)
+	}
+
 }
 
 var (
