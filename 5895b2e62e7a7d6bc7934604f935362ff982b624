@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4365c7de_242b38c4",
+        "filename": "rpc/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-02-27T23:13:40Z",
+      "side": 1,
+      "message": "I\u0027m not a security expert, but I wonder if you should panic if method and umethod both are non-nil. Actually, in the registration of NewServer it should fail, to prevent tricks or accidents, like downgrading a session to unauthenticated somehow.",
+      "revId": "5895b2e62e7a7d6bc7934604f935362ff982b624",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
