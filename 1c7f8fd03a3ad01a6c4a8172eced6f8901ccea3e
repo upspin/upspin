@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "622bd76f_b7ff0c57",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-27T23:34:41Z",
+      "side": 1,
+      "message": "Please update this commit message.",
+      "revId": "1c7f8fd03a3ad01a6c4a8172eced6f8901ccea3e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
