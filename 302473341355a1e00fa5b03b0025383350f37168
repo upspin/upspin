@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d61816a2_9301e6c8",
+        "filename": "cmd/upspin/user.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-02-27T21:44:20Z",
+      "side": 1,
+      "message": "Likely I\u0027m still confused.   I thought in the second case, [username] is never needed so shouldn\u0027t be part of the help line.\nWe only want to quietly allow it if it matched the file contents.",
+      "revId": "302473341355a1e00fa5b03b0025383350f37168",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
