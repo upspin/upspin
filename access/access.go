@@ -2,18 +2,27 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package access parses access control files.
+// Package access parses Access and Group files.
 //
-// Access files have the following format:
-// <access type>[, <access type]: <email>[, <email>, ...]
+// If a '#' character is present in a Group or Access file
+// the remainder of that line is ignored.
 //
-// Anything after a '#' character is ignored
-//
+// Each line of an Access file specifies a set of rights
+// and the users and/or groups to be granted those rights:
+// 	<right>[, <right>]: <user/group>[, <user/group>, ...]
 // Example:
+//	Read,List: user@domain,com, friends
+//	Write: user@domain.com, joe@domain.com
+//	Delete: user@domain.com # This is a comment.
 //
-//	Read: email@domain,com, email2@domain.com
-//	Write: writer@domain.com, writer2@domain.com, writer3@example,com
-//	Append,Write: appender@example.com # This is a comment
+// Each line of a Group file specifies a user or group
+// to be included in the group:
+// 	<user/group>
+// Example:
+//	anne@domain.com # A user.
+// 	joe@domain.com
+// 	admins # A group.
+//
 package access // import "upspin.io/access"
 
 import (
