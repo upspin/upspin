@@ -35,6 +35,7 @@ var _ upspin.KeyServer = (*remote)(nil)
 // Lookup implements upspin.Key.Lookup.
 func (r *remote) Lookup(name upspin.UserName) (*upspin.User, error) {
 	op := r.opf("Lookup", "%q", name)
+	// TODO(adg): don't send auth requests when performing lookups.
 
 	req := &proto.KeyLookupRequest{
 		UserName: string(name),

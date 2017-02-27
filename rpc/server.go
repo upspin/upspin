@@ -66,12 +66,18 @@ type Service struct {
 	// The RPC methods to serve.
 	Methods map[string]Method
 
+	// The RPC methods to server without validating sessions.
+	UnauthenticatedMethods map[string]UnauthenticatedMethod
+
 	// The streaming RPC methods to serve.
 	Streams map[string]Stream
 }
 
 // Method describes an RPC method.
 type Method func(s Session, reqBytes []byte) (pb.Message, error)
+
+// UnauthenticatedMethod describes an RPC method.
+type UnauthenticatedMethod func(reqBytes []byte) (pb.Message, error)
 
 // Stream describes a streaming RPC method.
 type Stream func(s Session, reqBytes []byte, done <-chan struct{}) (<-chan pb.Message, error)
@@ -142,16 +148,21 @@ func (s *serverImpl) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	name := strings.TrimPrefix(r.URL.Path, prefix)
 
 	method := d.Methods[name]
+	umethod := d.UnauthenticatedMethods[name]
 	stream := d.Streams[name]
-	if method == nil && stream == nil {
+	if method == nil && umethod == nil && stream == nil {
 		http.NotFound(w, r)
 		return
 	}
 
-	session, err := s.SessionForRequest(w, r)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusUnauthorized)
-		return
+	var session Session
+	if umethod == nil {
+		var err error
+		session, err = s.SessionForRequest(w, r)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
 	}
 
 	body, err := ioutil.ReadAll(r.Body)
@@ -161,20 +172,25 @@ func (s *serverImpl) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if method != nil {
-		serveMethod(method, session, w, body)
-		return
+	switch {
+	case method != nil:
+		resp, err := method(session, body)
+		sendResponse(w, resp, err)
+	case umethod != nil:
+		resp, err := umethod(body)
+		sendResponse(w, resp, err)
+	case stream != nil:
+		serveStream(stream, session, w, body)
+	default:
+		panic("this should never happen")
 	}
-	serveStream(stream, session, w, body)
 }
 
-func serveMethod(m Method, sess Session, w http.ResponseWriter, body []byte) {
-	resp, err := m(sess, body)
+func sendResponse(w http.ResponseWriter, resp pb.Message, err error) {
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
 	payload, err := pb.Marshal(resp)
 	if err != nil {
 		log.Error.Printf("error encoding response: %v", err)
