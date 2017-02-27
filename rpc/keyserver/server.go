@@ -65,8 +65,10 @@ func New(cfg upspin.Config, key upspin.KeyServer, addr upspin.NetAddr) http.Hand
 		Service: rpc.Service{
 			Name: "Key",
 			Methods: map[string]rpc.Method{
+				"Put": s.Put,
+			},
+			UnauthenticatedMethods: map[string]rpc.UnauthenticatedMethod{
 				"Lookup": s.Lookup,
-				"Put":    s.Put,
 			},
 		},
 	})
@@ -112,18 +114,15 @@ func (s *server) serverFor(session rpc.Session, reqBytes []byte, req pb.Message)
 }
 
 // Lookup implements proto.KeyServer, and does not do any authentication.
-func (s *server) Lookup(session rpc.Session, reqBytes []byte) (pb.Message, error) {
-	// TODO(adg): Lookup should be accessible even to unauthenticated users.
-
+func (s *server) Lookup(reqBytes []byte) (pb.Message, error) {
 	var req proto.KeyLookupRequest
-	key, err := s.serverFor(session, reqBytes, &req)
-	if err != nil {
+	if err := pb.Unmarshal(reqBytes, &req); err != nil {
 		return nil, err
 	}
 	logfOnceInN(100, "Lookup %q", req.UserName)
 	s.incLookupCounters()
 
-	user, err := key.Lookup(upspin.UserName(req.UserName))
+	user, err := s.key.Lookup(upspin.UserName(req.UserName))
 	if err != nil {
 		logf("Lookup %q failed: %s", req.UserName, err)
 		return &proto.KeyLookupResponse{Error: errors.MarshalError(err)}, nil
