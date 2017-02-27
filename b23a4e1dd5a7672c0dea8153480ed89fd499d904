@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3c885370_d15a2fd3",
+        "filename": "cmd/upspin/user.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-02-27T20:31:48Z",
+      "side": 1,
+      "message": "maybe,\n\nWith the -put flag, the user name comes from the input. Do not provide it on the command line.\n\nbut also don\u0027t complain if it\u0027s harmless, which is to say if it\u0027s \u003d\u003d s.state.config.UserName()",
+      "revId": "b23a4e1dd5a7672c0dea8153480ed89fd499d904",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
