@@ -15,7 +15,7 @@ Substitute your own user and domain names in the examples that follow.
 When you followed [the server setup instructions](/doc/server_setup_md),
 `upspin setupserver` created an initial version of the access controls
 files for your Upspin installation that allows access for `ann@example.com` and
-the server user `user@example.com`.
+the server user `upspin@example.com`.
 
 The easiest way to modify the access control file is to use the `upspin
 setupwriters` command. The arguments list the users (or wildcards) to be
