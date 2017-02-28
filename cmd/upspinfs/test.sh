@@ -66,4 +66,31 @@ then
 fi
 cmp ./test.sh $USERROOT/cow.sh
 
+# Test access control.  Put a file in a new directory
+# and then cut off create and write access.
+mkdir $USERROOT/limited
+cp ./test.sh $USERROOT/limited/test.sh
+echo "r,l: $USER" > $USERROOT/limited/Access
+
+# Create should fail.
+if echo > $USERROOT/limited/failedcreate
+then
+	echo "echo > $USERROOT/limited/failedcreate" should have failed
+	exit 1
+fi
+
+# Rewrite should fail.
+if echo > $USERROOT/limited/test.sh
+then
+	echo "echo > $USERROOT/limited/test.sh" should have failed
+	exit 1
+fi
+
+#  Append should fail.
+if echo >> $USERROOT/limited/test.sh
+then
+	echo "echo >> $USERROOT/limited/test.sh" should have failed
+	exit 1
+fi
+
 exit 0
