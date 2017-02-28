@@ -306,6 +306,20 @@ func (s *serverImpl) handleSessionRequest(w http.ResponseWriter, authRequest []s
 		return nil, errors.E(user, err)
 	}
 
+	// If this is a proxy request, extract the endpoint and
+	// set the signed host to that endpoint.
+	ep := &upspin.Endpoint{}
+	if len(proxyRequest) == 1 {
+		if user != s.config.UserName() {
+			return nil, errors.E(errors.Permission, "client and proxy user must match")
+		}
+		ep, err = upspin.ParseEndpoint(proxyRequest[0])
+		if err != nil {
+			return nil, errors.E(errors.Invalid, errors.Errorf("invalid proxy endpoint: %v", err))
+		}
+		host = string(ep.NetAddr)
+	}
+
 	now := time.Now()
 
 	// Validate signature.
@@ -321,16 +335,8 @@ func (s *serverImpl) handleSessionRequest(w http.ResponseWriter, authRequest []s
 	}
 	w.Header().Set(authTokenHeader, authToken)
 
-	// If there is a proxy request, remember the proxy's endpoint and authenticate server to client.
-	ep := &upspin.Endpoint{}
+	// If there is a proxy request, authenticate server to client.
 	if len(proxyRequest) == 1 {
-		if user != s.config.UserName() {
-			return nil, errors.E(errors.Permission, "client and proxy user must match")
-		}
-		ep, err = upspin.ParseEndpoint(proxyRequest[0])
-		if err != nil {
-			return nil, errors.E(errors.Invalid, errors.Errorf("invalid proxy endpoint: %v", err))
-		}
 		// Authenticate the server to the user.
 		authMsg, err := signUser(s.config, serverAuthMagic, "[localproxy]")
 		if err != nil {
