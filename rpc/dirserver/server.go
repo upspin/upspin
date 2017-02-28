@@ -40,19 +40,17 @@ func New(cfg upspin.Config, dir upspin.DirServer, addr upspin.NetAddr) http.Hand
 		dir: dir,
 	}
 
-	return rpc.NewServer(cfg, &rpc.ServerConfig{
-		Service: rpc.Service{
-			Name: "Dir",
-			Methods: map[string]rpc.Method{
-				"Delete":      s.Delete,
-				"Glob":        s.Glob,
-				"Lookup":      s.Lookup,
-				"Put":         s.Put,
-				"WhichAccess": s.WhichAccess,
-			},
-			Streams: map[string]rpc.Stream{
-				"Watch": s.Watch,
-			},
+	return rpc.NewServer(cfg, rpc.Service{
+		Name: "Dir",
+		Methods: map[string]rpc.Method{
+			"Delete":      s.Delete,
+			"Glob":        s.Glob,
+			"Lookup":      s.Lookup,
+			"Put":         s.Put,
+			"WhichAccess": s.WhichAccess,
+		},
+		Streams: map[string]rpc.Stream{
+			"Watch": s.Watch,
 		},
 	})
 }
