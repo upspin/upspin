@@ -22,6 +22,30 @@
       "revId": "e199e4b45ea1d7626e2436a3c1a8a7cbee15ddc3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bb81c5b2_77741835",
+        "filename": "rpc/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-28T00:04:58Z",
+      "side": 1,
+      "message": "Sent a change",
+      "parentUuid": "199c04fb_9597acfa",
+      "range": {
+        "startLine": 176,
+        "startChar": 1,
+        "endLine": 187,
+        "endChar": 2
+      },
+      "revId": "e199e4b45ea1d7626e2436a3c1a8a7cbee15ddc3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
