@@ -34,6 +34,24 @@
       "revId": "d37199c6f616703aeaeea0f21dcdf867946f2447",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f8869ed0_98757859",
+        "filename": "rpc/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 374,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-02-28T04:05:42Z",
+      "side": 1,
+      "message": "vet doesn\u0027t include our errors.Errorf in its list of functions whose results must be used (-unusedfuncs), so that wouldn\u0027t have caught this, but maybe we should be running a custom invocation of \u0027go vet\u0027 over our codebase with some regularity",
+      "parentUuid": "e2d277e6_0b4bd968",
+      "revId": "d37199c6f616703aeaeea0f21dcdf867946f2447",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
