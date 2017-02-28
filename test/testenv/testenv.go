@@ -275,10 +275,12 @@ func (e *Env) NewUser(userName upspin.UserName) (upspin.Config, error) {
 	}
 	cfg = config.SetFactotum(cfg, f)
 
-	// Register the user with the key server.
-	err = registerUserWithKeyServer(cfg, cfg.UserName())
-	if err != nil {
-		return nil, errors.E(op, err)
+	if e.Setup.Kind != "remote" {
+		// Register the user with the key server.
+		err = registerUserWithKeyServer(cfg, cfg.UserName())
+		if err != nil {
+			return nil, errors.E(op, err)
+		}
 	}
 
 	return cfg, nil
