@@ -55,7 +55,6 @@ func New(cfg upspin.Config, dir upspin.DirServer, addr upspin.NetAddr) http.Hand
 			},
 		},
 	})
-
 }
 
 func (s *server) serverFor(session rpc.Session, reqBytes []byte, req pb.Message) (upspin.DirServer, error) {

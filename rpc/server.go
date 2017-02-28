@@ -94,9 +94,35 @@ type ServerConfig struct {
 	Service Service
 }
 
-// NewServer returns a new Server that uses the given config.
-// If a nil config is provided the defaults are used.
+// NewServer returns a new Server that uses the given ServerConfig.
 func NewServer(cfg upspin.Config, scfg *ServerConfig) http.Handler {
+	// Validate ServerConfig.
+	if scfg == nil {
+		panic("nil ServerConfig provided")
+	}
+	if scfg.Service.Name == "" {
+		panic("ServerConfig provided with empty Name")
+	}
+	methods := map[string]bool{}
+	umethods := map[string]bool{}
+	for name := range scfg.Service.Methods {
+		methods[name] = true
+	}
+	for name := range scfg.Service.UnauthenticatedMethods {
+		if methods[name] {
+			panic(fmt.Sprintf("UnauthenticatedMethod %q also specified as Method", name))
+		}
+		umethods[name] = true
+	}
+	for name := range scfg.Service.Streams {
+		if methods[name] {
+			panic(fmt.Sprintf("Stream %q also specified as Method", name))
+		}
+		if umethods[name] {
+			panic(fmt.Sprintf("Stream %q also specified as UnauthenticatedMethod", name))
+		}
+	}
+
 	return &serverImpl{
 		config:       cfg,
 		serverconfig: scfg,
