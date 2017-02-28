@@ -275,10 +275,14 @@ func (e *Env) NewUser(userName upspin.UserName) (upspin.Config, error) {
 	}
 	cfg = config.SetFactotum(cfg, f)
 
-	// Register the user with the key server.
-	err = registerUserWithKeyServer(cfg, cfg.UserName())
-	if err != nil {
-		return nil, errors.E(op, err)
+	// Don't register users with the test cluster key server;
+	// our test users should be already registered there.
+	if e.Setup.Kind != "remote" {
+		// Register the user with the key server.
+		err = registerUserWithKeyServer(cfg, cfg.UserName())
+		if err != nil {
+			return nil, errors.E(op, err)
+		}
 	}
 
 	return cfg, nil
