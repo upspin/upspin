@@ -70,20 +70,18 @@ func startServer(t *testing.T) (port string) {
 
 	cfg := config.SetUserName(config.New(), "server@upspin.io")
 	cfg = config.SetKeyEndpoint(cfg, upspin.Endpoint{Transport: upspin.InProcess})
-	http.Handle("/api/Server/", NewServer(cfg, &ServerConfig{
-		Lookup: lookup,
-		Service: Service{
-			Name: "Server",
-			Methods: map[string]Method{
-				"Echo": srv.Echo,
-			},
-			UnauthenticatedMethods: map[string]UnauthenticatedMethod{
-				"UnauthenticatedEcho": srv.UnauthenticatedEcho,
-			},
-			Streams: map[string]Stream{
-				"Count": srv.Count,
-			},
+	http.Handle("/api/Server/", NewServer(cfg, Service{
+		Name: "Server",
+		Methods: map[string]Method{
+			"Echo": srv.Echo,
 		},
+		UnauthenticatedMethods: map[string]UnauthenticatedMethod{
+			"UnauthenticatedEcho": srv.UnauthenticatedEcho,
+		},
+		Streams: map[string]Stream{
+			"Count": srv.Count,
+		},
+		Lookup: lookup,
 	}))
 
 	ready := make(chan struct{})

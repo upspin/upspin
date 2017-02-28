@@ -34,14 +34,12 @@ func New(cfg upspin.Config, store upspin.StoreServer, _ upspin.NetAddr) http.Han
 		store:  store,
 	}
 
-	return rpc.NewServer(cfg, &rpc.ServerConfig{
-		Service: rpc.Service{
-			Name: "Store",
-			Methods: map[string]rpc.Method{
-				"Get":    s.Get,
-				"Put":    s.Put,
-				"Delete": s.Delete,
-			},
+	return rpc.NewServer(cfg, rpc.Service{
+		Name: "Store",
+		Methods: map[string]rpc.Method{
+			"Get":    s.Get,
+			"Put":    s.Put,
+			"Delete": s.Delete,
 		},
 	})
 }

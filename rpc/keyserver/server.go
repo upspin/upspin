@@ -54,22 +54,20 @@ func New(cfg upspin.Config, key upspin.KeyServer, addr upspin.NetAddr) http.Hand
 		key: key,
 	}
 	s.registerCounters()
-	return rpc.NewServer(cfg, &rpc.ServerConfig{
+	return rpc.NewServer(cfg, rpc.Service{
+		Name: "Key",
+		Methods: map[string]rpc.Method{
+			"Put": s.Put,
+		},
+		UnauthenticatedMethods: map[string]rpc.UnauthenticatedMethod{
+			"Lookup": s.Lookup,
+		},
 		Lookup: func(userName upspin.UserName) (upspin.PublicKey, error) {
 			user, err := key.Lookup(userName)
 			if err != nil {
 				return "", err
 			}
 			return user.PublicKey, nil
-		},
-		Service: rpc.Service{
-			Name: "Key",
-			Methods: map[string]rpc.Method{
-				"Put": s.Put,
-			},
-			UnauthenticatedMethods: map[string]rpc.UnauthenticatedMethod{
-				"Lookup": s.Lookup,
-			},
 		},
 	})
 }

@@ -72,6 +72,11 @@ type Service struct {
 
 	// The streaming RPC methods to serve.
 	Streams map[string]Stream
+
+	// Lookup is KeyServer.Lookup function that should be used for key
+	// lookups during authentication.
+	// If nil, PublicUserKeyService will be used.
+	Lookup func(userName upspin.UserName) (upspin.PublicKey, error)
 }
 
 // Method describes an authenticated RPC method.
@@ -84,23 +89,9 @@ type UnauthenticatedMethod func(reqBytes []byte) (pb.Message, error)
 // Stream describes an authenticated streaming RPC method.
 type Stream func(s Session, reqBytes []byte, done <-chan struct{}) (<-chan pb.Message, error)
 
-// ServerConfig holds the configuration for instantiating a Server.
-type ServerConfig struct {
-	// Lookup looks up user keys.
-	// If nil, PublicUserKeyService will be used.
-	Lookup func(userName upspin.UserName) (upspin.PublicKey, error)
-
-	// Service provides the service to serve by HTTP.
-	Service Service
-}
-
 // NewServer returns a new Server that uses the given ServerConfig.
-func NewServer(cfg upspin.Config, scfg *ServerConfig) http.Handler {
-	// Validate ServerConfig.
-	if scfg == nil {
-		panic("nil ServerConfig provided")
-	}
-	svc := &scfg.Service
+func NewServer(cfg upspin.Config, svc Service) http.Handler {
+	// Validate Service.
 	if svc.Name == "" {
 		panic("ServerConfig provided with empty Name")
 	}
@@ -119,28 +110,21 @@ func NewServer(cfg upspin.Config, scfg *ServerConfig) http.Handler {
 	}
 
 	return &serverImpl{
-		config:       cfg,
-		serverconfig: scfg,
+		config:  cfg,
+		service: svc,
 	}
 }
 
 type serverImpl struct {
-	config       upspin.Config
-	serverconfig *ServerConfig
+	config  upspin.Config
+	service Service
 }
 
 func (s *serverImpl) lookup(u upspin.UserName) (upspin.PublicKey, error) {
-	if s.serverconfig == nil || s.serverconfig.Lookup == nil {
+	if s.service.Lookup == nil {
 		return PublicUserKeyService(s.config)(u)
 	}
-	return s.serverconfig.Lookup(u)
-}
-
-func (s *serverImpl) service() *Service {
-	if s.config == nil {
-		return nil
-	}
-	return &s.serverconfig.Service
+	return s.service.Lookup(u)
 }
 
 func generateRandomToken() (string, error) {
@@ -157,12 +141,7 @@ func generateRandomToken() (string, error) {
 
 // ServeHTTP exposes the configured Service as an HTTP API.
 func (s *serverImpl) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	d := s.service()
-	if d == nil {
-		http.NotFound(w, r)
-		return
-	}
-
+	d := &s.service
 	prefix := "/api/" + d.Name + "/"
 	if !strings.HasPrefix(r.URL.Path, prefix) {
 		http.NotFound(w, r)
