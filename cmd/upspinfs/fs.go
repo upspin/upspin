@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	ospath "path"
 	"strings"
 	"sync"
 	"time"
@@ -19,6 +20,7 @@ import (
 	"bazil.org/fuse"
 	"bazil.org/fuse/fs"
 
+	"upspin.io/access"
 	"upspin.io/bind"
 	"upspin.io/client"
 	"upspin.io/errors"
@@ -26,6 +28,7 @@ import (
 	"upspin.io/path"
 	"upspin.io/serverutil"
 	"upspin.io/upspin"
+	"upspin.io/user"
 )
 
 const (
@@ -244,17 +247,16 @@ func (n *node) Create(context gContext.Context, req *fuse.CreateRequest, resp *f
 	nn.attr.Uid = req.Header.Uid
 	nn.attr.Gid = req.Header.Gid
 
+	// Make sure we can actually create this node.
+	if err := nn.f.checkAccess(nn.uname, nn.user, access.Create); err != nil {
+		return nil, nil, e2e(errors.E(op, err))
+	}
+
 	// Open it.
 	nn.Lock()
 	defer nn.Unlock()
 	h := allocHandle(nn)
 	if err := f.cache.create(h); err != nil {
-		return nil, nil, e2e(errors.E(op, err))
-	}
-
-	// Make sure we can actually create this node.
-	// TODO(p): this creates trash objects in a immutable store. Must be a better way.
-	if err := nn.cf.writeback(h); err != nil {
 		return nil, nil, e2e(errors.E(op, err))
 	}
 
@@ -350,6 +352,13 @@ func (n *node) openFile(context gContext.Context, req *fuse.OpenRequest, resp *f
 	defer n.Unlock()
 	if n.attr.Mode&os.ModeDir != 0 {
 		return nil, e2e(errors.E(op, errors.IsDir, n.uname))
+	}
+
+	// Make sure we can actually write this node if requested.
+	if req.Flags.IsWriteOnly() || req.Flags.IsReadWrite() {
+		if err := n.f.checkAccess(n.uname, n.user, access.Write); err != nil {
+			return nil, e2e(errors.E(op, err))
+		}
 	}
 
 	h := allocHandle(n)
@@ -919,5 +928,53 @@ func do(cfg upspin.Config, mountpoint string, cacheDir string) chan bool {
 	}()
 
 	// At this point the file system is mounted.
+	// Preload the user's root.
+	go func(owner upspin.UserName) {
+		os.Stat(ospath.Join(mountpoint, string(owner)))
+		if name, suffix, domain, err := user.Parse(owner); suffix == "" && err == nil {
+			snapUser := name + "+snapshot@" + domain
+			os.Stat(ospath.Join(mountpoint, string(snapUser)))
+		}
+	}(cfg.UserName())
 	return done
+}
+
+// checkAccess determines if upspinfs has access rights to a file.
+// No locking needed.
+func (fs *upspinFS) checkAccess(name upspin.PathName, owner upspin.UserName, right access.Right) error {
+	// Read and parse the access file.
+	dir, err := fs.client.DirServer(name)
+	if err != nil {
+		return err
+	}
+	whichAccess, err := dir.WhichAccess(name)
+	if err != nil {
+		return err
+	}
+	if whichAccess == nil {
+		// With no access file, the owner can do anything.
+		if owner == fs.config.UserName() {
+			return nil
+		}
+		// Everyone else can do nothing.
+		return errors.E(errors.Permission, name)
+	}
+	accessData, err := fs.client.Get(whichAccess.Name)
+	if err != nil {
+		return err
+	}
+	acc, err := access.Parse(whichAccess.Name, accessData)
+	if err != nil {
+		return err
+	}
+
+	// Check the access.
+	ok, err := acc.Can(fs.config.UserName(), right, name, fs.client.Get)
+	if err != nil {
+		return err
+	}
+	if !ok {
+		return errors.E(errors.Permission, name)
+	}
+	return nil
 }
