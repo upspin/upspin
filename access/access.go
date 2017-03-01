@@ -60,9 +60,10 @@ const (
 	// All is not allowed to be present in Group files.
 	All = "all" // Case is ignored, so "All", "ALL", etc. also work.
 
-	// AllUsers is a reserved Upspin user name. Its appearance in a user list
-	// grants access to everyone who can authenticate to the Upspin system.
-	// It is the user name that is substituted for the shorthand "all" in a user
+	// AllUsers is a reserved Upspin user name and thus is not a valid user
+	// input except in Access files. Its appearance in a user list grants
+	// access to everyone who can authenticate to the Upspin system. It is
+	// the user name that is substituted for the shorthand "all" in a user
 	// list. See the comment about All for more details.
 	AllUsers upspin.UserName = "all@upspin.io"
 )
