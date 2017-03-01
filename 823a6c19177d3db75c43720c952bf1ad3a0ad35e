@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "f1c780dd_b01b8744",
+        "filename": "cloud/gcpsaver/gcpsaver_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-03-01T21:06:28Z",
+      "side": 0,
+      "message": "There is a way, but it involves a refactor of RegisterSaver to not check if a saver has been registered already. If the check is removed, you can call RegisterSaver(saver) here.\n\nIf that\u0027s too much, I\u0027m not as concerned about this test and I could be convinced to drop this one. The next one I feel is more important.",
+      "parentUuid": "e60b4d93_a7803e20",
+      "revId": "823a6c19177d3db75c43720c952bf1ad3a0ad35e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "490e8244_b4ee3aba",
         "filename": "cloud/gcpsaver/gcpsaver_test.go",
         "patchSetId": 2
