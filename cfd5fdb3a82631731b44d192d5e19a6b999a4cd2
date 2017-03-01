@@ -16,6 +16,23 @@
       "revId": "cfd5fdb3a82631731b44d192d5e19a6b999a4cd2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7ac1414b_e4d5bb1d",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-01T16:18:48Z",
+      "side": 1,
+      "message": "Curious as to why this is here. We don\u0027t have a \"gendoc\" in commands.",
+      "revId": "cfd5fdb3a82631731b44d192d5e19a6b999a4cd2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
