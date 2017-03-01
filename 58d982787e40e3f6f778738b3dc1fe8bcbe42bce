@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "b5c6aa34_429cc7f0",
+        "filename": "access/access.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-01T21:12:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "558d0155_6b7fd3ef",
+      "revId": "58d982787e40e3f6f778738b3dc1fe8bcbe42bce",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "88d94653_ae0d75ab",
         "filename": "access/access.go",
         "patchSetId": 4
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "d44f4fb7_5ad81121",
+        "filename": "access/access.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-01T21:12:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "88d94653_ae0d75ab",
+      "revId": "58d982787e40e3f6f778738b3dc1fe8bcbe42bce",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c90c4e62_22d28c66",
         "filename": "access/access.go",
         "patchSetId": 4
@@ -50,6 +86,24 @@
       "revId": "58d982787e40e3f6f778738b3dc1fe8bcbe42bce",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b8a4be7b_e8d533c7",
+        "filename": "access/access.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 341,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-01T21:12:17Z",
+      "side": 1,
+      "message": "Done (been to In \u0026 Out lately for double-doubles :-))\n\nAlso fixed isAll to isAllUsers in comment.",
+      "parentUuid": "c90c4e62_22d28c66",
+      "revId": "58d982787e40e3f6f778738b3dc1fe8bcbe42bce",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
