@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -132,12 +133,7 @@ func main() {
 		state.shell(args...)
 		return
 	}
-	fn := commands[state.op]
-	if fn == nil {
-		fmt.Fprintf(os.Stderr, "upspin: no such command %q\n", flag.Arg(0))
-		usage()
-	}
-	fn(state, args...)
+	state.getCommand(state.op)(state, args...)
 	state.cleanup()
 	os.Exit(state.exitCode)
 }
@@ -145,7 +141,16 @@ func main() {
 func usage() {
 	fmt.Fprintf(os.Stderr, "Usage of upspin:\n")
 	fmt.Fprintf(os.Stderr, "\tupspin [globalflags] <command> [flags] <path>\n")
-	fmt.Fprintf(os.Stderr, "Commands:\n")
+	printCommands()
+	fmt.Fprintf(os.Stderr, "Global flags:\n")
+	flag.PrintDefaults()
+	os.Exit(2)
+}
+
+// printCommands shows the available commands, including those installed
+// as separate binaries called "upspin-foo".
+func printCommands() {
+	fmt.Fprintf(os.Stderr, "Upspin commands:\n")
 	var cmdStrs []string
 	for cmd := range commands {
 		if cmd == "gendoc" {
@@ -153,14 +158,19 @@ func usage() {
 		}
 		cmdStrs = append(cmdStrs, cmd)
 	}
+	// Now find all the binaries in the $PATH.
+	cmdStrs = append(cmdStrs, findUpspinBinaries()...)
 	sort.Strings(cmdStrs)
 	fmt.Fprintf(os.Stderr, "\tshell (Interactive mode)\n")
+	// There may be dups; filter them.
+	prev := ""
 	for _, cmd := range cmdStrs {
+		if cmd == prev {
+			continue
+		}
+		prev = cmd
 		fmt.Fprintf(os.Stderr, "\t%s\n", cmd)
 	}
-	fmt.Fprintf(os.Stderr, "Global flags:\n")
-	flag.PrintDefaults()
-	os.Exit(2)
 }
 
 // exitf prints the error and exits the program.
@@ -192,6 +202,41 @@ func (s *State) failf(format string, args ...interface{}) {
 // fail calls s.failf with the error.
 func (s *State) fail(err error) {
 	s.failf("%v", err)
+}
+
+// getCommand looks up the command named by op.
+// If it's in the commands tables, we're done.
+// If not, it looks for a binary with the equivalent name
+// (upspin foo is implemented by upspin-foo).
+// If the command still can't be found, it exits after listing the
+// commands that do exist.
+func (s *State) getCommand(op string) func(*State, ...string) {
+	fn := commands[op]
+	if fn != nil {
+		return fn
+	}
+	path, err := exec.LookPath("upspin-" + op)
+	if err == nil {
+		return func(s *State, args ...string) {
+			s.runCommand(path, args...)
+		}
+	}
+	fmt.Fprintf(os.Stderr, "upspin: no such command %q\n", op)
+	printCommands()
+	os.Exit(2)
+	return nil
+}
+
+func (s *State) runCommand(path string, args ...string) {
+	cmd := exec.Command(path, args...)
+	cmd.Stdin = os.Stdin
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	err := cmd.Run()
+	if err != nil {
+		s.exit(err)
+	}
+	os.Exit(0)
 }
 
 func (s *State) parseFlags(fs *flag.FlagSet, args []string, help, usage string) {
