@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1b9fbf5b_2a26e20a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-01T21:31:29Z",
+      "side": 1,
+      "message": "This CL description does not explain how it breaks backward compatibility.",
+      "revId": "934898c61d412af3d8830be05e2ce47301b3eeff",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
