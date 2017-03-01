@@ -7,7 +7,6 @@ package access
 import (
 	"reflect"
 	"sort"
-	"strings"
 	"testing"
 
 	"upspin.io/errors"
@@ -140,11 +139,19 @@ func TestParseAllUsers(t *testing.T) {
 func TestParseAllUsersBad(t *testing.T) {
 	// Here we have "all" with another explicit reader, and should see an error.
 	// "ALL@UPSPIN.IO" will be canonicalized when parsed.
-	allUsersAccessTextBad := []byte("r : foo@bob.com ALL@UPSPIN.IO")
+	allUsersAccessTextBad := []byte("r : foo@bob.com ALL")
 	_, err := Parse(testFile, allUsersAccessTextBad)
-	expectedErr := errors.E(errors.Invalid, errors.Str(`"ALL@UPSPIN.IO" cannot appear with other users`))
+	expectedErr := errors.E(errors.Invalid, errors.Str(`"ALL" cannot appear with other users`))
 	if !errors.Match(expectedErr, err) {
 		t.Fatalf(`unexpected error for "all" not alone: %v`, err)
+	}
+}
+
+func TestCannotUseReservedUser(t *testing.T) {
+	allUsersAccessText := []byte("r:all@upspin.IO")
+	_, err := Parse(testFile, allUsersAccessText)
+	if !errors.Match(errors.E(errors.Invalid, errors.Str(`reserved user name "all@upspin.IO"`)), err) {
+		t.Fatal(err)
 	}
 }
 
@@ -500,7 +507,7 @@ func TestGroupDisallowsAll(t *testing.T) {
 			continue
 		}
 		expectedErr := errors.E(parsed.Path(), errors.Invalid)
-		if !errors.Match(expectedErr, err) || !strings.Contains(err.Error(), "in group file") {
+		if !errors.Match(expectedErr, err) {
 			t.Errorf(`unexpected error %v in: %s`, err, test)
 		}
 	}
