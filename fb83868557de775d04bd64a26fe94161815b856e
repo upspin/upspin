@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5332e252_4058e8c5",
+        "filename": "bind/bind.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-01T01:19:32Z",
+      "side": 1,
+      "message": "you can delete this if statement now",
+      "revId": "fb83868557de775d04bd64a26fe94161815b856e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
