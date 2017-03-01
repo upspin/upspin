@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "41365054_ac2b8008",
+        "filename": "metric/metric.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-03-01T21:42:40Z",
+      "side": 1,
+      "message": "var AllowReregistration \u003d false  // used in testing only.",
+      "revId": "7877b7a93ddcb972d7a9fd4b3e2630d493dc4b36",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "23d0e39d_67d7a455",
+        "filename": "metric/metric.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-03-01T21:42:40Z",
+      "side": 1,
+      "message": "if !AllowReregistration \u0026\u0026 !atomic... {",
+      "revId": "7877b7a93ddcb972d7a9fd4b3e2630d493dc4b36",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
