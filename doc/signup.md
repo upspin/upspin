@@ -11,6 +11,8 @@ You will need to choose an Upspin username, which is just an email address you
 own.
 Your username is how the Upspin system and its users will identify you and your
 files.
+Note that your chosen username will become a matter of public record in our
+[key server log](https://key.upspin.io/log).
 
 Next you need to decide whether you are going to deploy your own Upspin
 directory and store servers, or use those maintained by someone else.
