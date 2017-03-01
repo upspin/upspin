@@ -44,11 +44,13 @@ For a list of available subcommands and global flags, run
 
 Usage of upspin:
 	upspin [globalflags] <command> [flags] <path>
-Commands:
+Upspin commands:
 	shell (Interactive mode)
 	countersign
 	cp
 	deletestorage
+	deploy
+	foo
 	get
 	getref
 	info
@@ -76,9 +78,11 @@ Global flags:
   -blocksize size
     	size of blocks when writing large files (default 1048576)
   -cachedir directory
-    	directory containing all file caches (default "/Users/adg/upspin")
+    	directory containing all file caches (default "/Users/r/upspin")
+  -cachesize bytes
+    	max disk bytes for cache (default 5000000000)
   -config file
-    	user's configuration file (default "/Users/adg/upspin/config")
+    	user's configuration file (default "/Users/r/upspin/config")
   -http address
     	address for incoming insecure network connections (default ":80")
   -https address
@@ -249,7 +253,7 @@ Flags:
   -secretseed seed
     	128 bit secret seed in proquint format
   -where directory
-    	directory to store keys (default "/Users/adg/.ssh")
+    	directory to store keys (default "/Users/r/.ssh")
 
 
 
@@ -418,7 +422,7 @@ Flags:
   -put-users
     	put server users to the key server
   -where directory
-    	directory to store private configuration files (default "/Users/adg/upspin/deploy")
+    	directory to store private configuration files (default "/Users/r/upspin/deploy")
 
 
 
@@ -448,7 +452,7 @@ Flags:
   -host name
     	host name of upspinserver (empty implies the cluster dir.domain and store.domain)
   -where directory
-    	directory to store private configuration files (default "/Users/adg/upspin/deploy")
+    	directory to store private configuration files (default "/Users/r/upspin/deploy")
   -writers users
     	additional users to be given write access to this server
 
@@ -486,13 +490,13 @@ Flags:
   -help
     	print more information about the command
   -where directory
-    	directory to store private configuration files (default "/Users/adg/upspin/deploy")
+    	directory to store private configuration files (default "/Users/r/upspin/deploy")
 
 
 
 Sub-command setupwriters
 
-Usage: upspin [-project=<gcp_project_name>] setupwriters [-where=$HOME/upspin/deploy] -domain=<domain> <user names>
+Usage: upspin setupwriters [-where=$HOME/upspin/deploy] -domain=<domain> <user names>
 
 Setupwriters creates or updates the Writers file for the given domain.
 The file lists the names of users granted access to write to the domain's
@@ -503,15 +507,13 @@ A wildcard permits access to all users of a domain ("*@example.com").
 The user name of the project's directory server is automatically included in
 the list, so the directory server can use the store for its own data storage.
 
-This command is designed to operate on projects created by setupdomain -cluster.
-
 Flags:
   -domain name
     	domain name for this Upspin installation
   -help
     	print more information about the command
   -where directory
-    	directory containing private configuration files (default "/Users/adg/upspin/deploy")
+    	directory containing private configuration files (default "/Users/r/upspin/deploy")
 
 
 
@@ -551,17 +553,17 @@ Flags:
 
 Sub-command signup
 
-Usage: upspin signup [flags] <username>
+Usage: upspin [-config=<file>] signup [flags] <username>
 
 Signup generates an Upspin configuration file and private/public key pair,
 stores them locally, and sends a signup request to the public Upspin key server
 at key.upspin.io. The server will respond by sending a confirmation email to
 the given email address (or "username").
 
-Signup writes a the configuration file to $HOME/upspin/config, holding the
+Signup writes a configuration file to $HOME/upspin/config, holding the
 username and the location of the directory and store servers. It writes the
 public and private keys to $HOME/.ssh. These locations may be set using the
--config and -where flags.
+global -config and signup-specific -where flags.
 
 The -dir and -store flags specify the network addresses of the Store and
 Directory servers that the Upspin user will use. The -server flag may be used
@@ -576,8 +578,6 @@ The -signuponly flag tells signup to skip the generation of the configuration
 file and keys and only send the signup request to the key server.
 
 Flags:
-  -config file
-    	location of the config file (default "/Users/adg/upspin/config")
   -curve name
     	cryptographic curve name: p256, p384, or p521 (default "p256")
   -dir address
@@ -595,7 +595,7 @@ Flags:
   -store address
     	Store server address
   -where directory
-    	directory to store keys (default "/Users/adg/.ssh")
+    	directory to store keys (default "/Users/r/.ssh")
 
 
 
@@ -640,17 +640,28 @@ Flags:
 
 Sub-command user
 
-Usage: upspin user [-put [-in=inputfile] [-force]] [username...]
+Usage: upspin user [username...]
+              user -put [-in=inputfile] [-force] [username]
 
 User prints in YAML format the user record stored in the key server
 for the specified user, by default the current user.
 
 With the -put flag, user writes or replaces the information stored
-for the current user. It can be used to update keys for the user;
-for new users see the signup command. The information is read
-from standard input or from the file provided with the -in flag.
-It must be the complete record for the user, and must be in the
-same YAML format printed by the command without the -put flag.
+for the current user, such as to update keys or server information.
+The information is read from standard input or from the file provided
+with the -in flag. The input must provide the complete record for
+the user, and must be in the same YAML format printed by the command
+without the -put flag.
+
+When using -put, the command takes no arguments. The name of the
+user whose record is to be updated must be provided in the input
+record and must either be the current user or the name of another
+user whose domain is administered by the current user.
+
+A handy way to use the command is to edit the config file and run
+	upspin user | upspin user -put
+
+To install new users see the signup command.
 
 Flags:
   -force
