@@ -45,6 +45,10 @@ Please report issues through
 
 ## Community
 
+All Upspin users should subscribe to the
+[Upspin Announcements mailing list](https://groups.google.com/forum/#!forum/upspin-announce)
+to receive critical information about the project.
+
 Use the [Upspin mailing list](https://groups.google.com/forum/#!forum/upspin)
 for discussion about Upspin use and development.
 
