@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "b98d2f9b_04d9de3e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-01T18:30:15Z",
+      "side": 1,
+      "message": "Of course yes, but to do that right requires a simple change to the flags package. The next CL will do that.",
+      "parentUuid": "8c19f5b1_87399a41",
+      "revId": "cfd5fdb3a82631731b44d192d5e19a6b999a4cd2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "7ac1414b_e4d5bb1d",
         "filename": "cmd/upspin/main.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2017-03-01T16:18:48Z",
       "side": 1,
       "message": "Curious as to why this is here. We don\u0027t have a \"gendoc\" in commands.",
+      "revId": "cfd5fdb3a82631731b44d192d5e19a6b999a4cd2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b554ba36_a1617305",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-01T18:30:15Z",
+      "side": 1,
+      "message": "It\u0027s there for document generation. see gendoc.go.\n\nbut that reminds me i need to refresh doc.go. i can do that in this CL.",
+      "parentUuid": "7ac1414b_e4d5bb1d",
       "revId": "cfd5fdb3a82631731b44d192d5e19a6b999a4cd2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
