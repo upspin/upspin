@@ -1042,3 +1042,89 @@ func testGlobLinkErrors(t *testing.T, r *testenv.Runner) {
 		t.Fatalf("entry 1 (%q) has %d blocks, want 0", e1.Name, len(e1.Blocks))
 	}
 }
+
+// TODO: delete through links.
+func testDeleteErrors(t *testing.T, r *testenv.Runner) {
+	const (
+		base                    = ownerName + "/delete-errors"
+		file                    = base + "/file"
+		dir                     = base + "/dir"
+		fileInDir               = dir + "fileInDir"
+		accessFile              = base + "/Access"
+		accessContent           = "r,l:" + ownerName + "," + readerName
+		permissiveAccessContent = "d:" + ownerName + "," + readerName
+	)
+
+	r.As(ownerName)
+	r.MakeDirectory(base)
+	r.Put(file, "something")
+	r.MakeDirectory(dir)
+	r.Put(fileInDir, "in dir")
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+
+	// Reader has no right to see the file or the dir.
+	r.As(readerName)
+	r.Delete(file)
+	if !r.Match(errPrivate) {
+		t.Fatal(r.Diag())
+	}
+	r.Delete(dir)
+	if !r.Match(errPrivate) {
+		t.Fatal(r.Diag())
+	}
+
+	// Owner permits reader to see everything, but not delete.
+	r.As(ownerName)
+	r.Put(accessFile, accessContent)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+	r.As(readerName)
+	r.Delete(file)
+	if !r.Match(errPermission) {
+		t.Fatal(r.Diag())
+	}
+	r.Delete(dir)
+	if !r.Match(errPermission) {
+		t.Fatal(r.Diag())
+	}
+
+	// Owner grants delete right to reader.
+	r.As(ownerName)
+	r.Put(accessFile, permissiveAccessContent)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+	r.As(readerName)
+	r.Delete(file)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+
+	// But reader cannot delete an Access file
+	r.Delete(accessFile)
+	if !r.Match(errPermission) {
+		t.Fatal(r.Diag())
+	}
+
+	// No one can delete a non-empty dir.
+	r.Delete(dir)
+	if !r.Match(errors.E(errors.NotEmpty, dir)) {
+		t.Fatal(r.Diag())
+	}
+	r.As(ownerName)
+	r.Delete(dir)
+	if !r.Match(errors.E(errors.NotEmpty, dir)) {
+		t.Fatal(r.Diag())
+	}
+
+	// Owner can delete his own Access file and remaining entries.
+	r.Delete(accessFile)
+	r.Delete(fileInDir)
+	r.Delete(dir)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+}

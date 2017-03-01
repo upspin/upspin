@@ -618,7 +618,7 @@ func (s *server) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
 		return nil, errors.E(op, err)
 	}
 	if !canDelete {
-		return nil, errors.E(op, name, access.ErrPermissionDenied)
+		return nil, s.errPerm(op, p, o)
 	}
 
 	// Load the tree for this user.
