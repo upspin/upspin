@@ -16,6 +16,24 @@
       "revId": "5eef9484db2a95e66c1a2048ba254f50188970c3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2807c657_34e2ad05",
+        "filename": "cloud/gcpsaver/gcpsaver.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-01T22:12:12Z",
+      "side": 1,
+      "message": "package gcpmetric?\ngcpmetric.NewSaver?",
+      "parentUuid": "5cdf227a_9c28a011",
+      "revId": "5eef9484db2a95e66c1a2048ba254f50188970c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
