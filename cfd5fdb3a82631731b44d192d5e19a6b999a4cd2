@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8c19f5b1_87399a41",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5361
+      },
+      "writtenOn": "2017-03-01T11:18:30Z",
+      "side": 1,
+      "message": "It would be nice to always hand over the value of the global flag \"-config\", too, and require external binaries to at least consume that one. Otherwise every external command would need to register a local flag for that again.",
+      "revId": "cfd5fdb3a82631731b44d192d5e19a6b999a4cd2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
