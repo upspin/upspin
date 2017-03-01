@@ -34,6 +34,24 @@
       "revId": "5eef9484db2a95e66c1a2048ba254f50188970c3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7fb9acd8_28c9592a",
+        "filename": "cloud/gcpsaver/gcpsaver.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-01T22:35:23Z",
+      "side": 1,
+      "message": "yeah, that works",
+      "parentUuid": "2807c657_34e2ad05",
+      "revId": "5eef9484db2a95e66c1a2048ba254f50188970c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
