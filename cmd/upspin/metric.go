@@ -8,6 +8,3 @@ package main
 
 func (s *State) enableMetrics() {
 }
-
-func (s *State) finishMetrics() {
-}
