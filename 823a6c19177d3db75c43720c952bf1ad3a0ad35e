@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "abeb0184_7938cdce",
+        "filename": "cloud/gcpsaver/gcpsaver.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-01T16:13:32Z",
+      "side": 0,
+      "message": "If you bring this back as an unexported function numProcessed() then the tests you dropped would just work.",
+      "revId": "823a6c19177d3db75c43720c952bf1ad3a0ad35e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "490e8244_b4ee3aba",
+        "filename": "cloud/gcpsaver/gcpsaver_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-01T16:13:32Z",
+      "side": 0,
+      "message": "I think this test is reasonably important because the sampling code was relevant for performance of the keyserver.",
+      "revId": "823a6c19177d3db75c43720c952bf1ad3a0ad35e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
