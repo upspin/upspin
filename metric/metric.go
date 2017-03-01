@@ -2,8 +2,9 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package metric implements routines for generating and saving metrics associated with servers and clients.
-package metric
+// Package metric implements routines for generating and saving metrics
+// associated with servers and clients.
+package metric // import "upspin.io/metric"
 
 import (
 	"sync"
@@ -16,20 +17,29 @@ import (
 // Metric is a named collection of spans. A span measures time from the beginning of an event
 // (for example, an RPC request) until its completion.
 type Metric struct {
-	name  string
+	Name string
+
 	mu    sync.Mutex // protects all fields below
 	spans []*Span
 }
 
+// Spans returns the Spans recorded under this Metric.
+// The returned slice must not be modified.
+func (m *Metric) Spans() []*Span {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	return m.spans
+}
+
 // A Span measures time from the beginning of an event (for example, an RPC request) until its completion.
 type Span struct {
-	name       string
-	startTime  time.Time
-	endTime    time.Time
-	kind       Kind    // Server, Client or Other kind of metric span.
-	metric     *Metric // parent of this span; may be nil.
-	parentSpan *Span   // may be nil.
-	annotation string  // optional.
+	Name       string
+	StartTime  time.Time
+	EndTime    time.Time
+	Kind       Kind    // Server, Client or Other kind of metric span.
+	Parent     *Metric // parent of this span; may be nil.
+	ParentSpan *Span   // may be nil.
+	Annotation string  // optional.
 }
 
 // Saver is the common interface that all implementation-specific backends must implement
@@ -38,9 +48,6 @@ type Span struct {
 type Saver interface {
 	// Register informs the Saver that new Metrics will be added to queue.
 	Register(queue chan *Metric)
-
-	// NumProcessed returns the number of metrics processed by the saver.
-	NumProcessed() int32
 }
 
 // Kind represents where the trace was taken: Server, Client or Other.
@@ -53,18 +60,19 @@ const (
 	Other
 )
 
-// saveQueueLength is the size of the saveQueue. Too large a queue might be wasteful and too
-// little means metrics start to take time in the critical path of instrumented services.
-const saveQueueLength = 1024
+// SaveQueueLength is the size of the queue of metrics to be saved.
+// Too large a queue might be wasteful and too little means metrics start to
+// take time in the critical path of instrumented services.
+const SaveQueueLength = 1024
 
 // saveQueue buffers metrics to be saved to the backend.
-var saveQueue = make(chan *Metric, saveQueueLength)
+var saveQueue = make(chan *Metric, SaveQueueLength)
 
 // New creates a new named metric. If name is non-empty, it will prefix every
 // descendant's Span name.
 func New(name string) *Metric {
 	return &Metric{
-		name: name,
+		Name: name,
 	}
 }
 
@@ -76,11 +84,10 @@ func NewSpan(name string) (*Metric, *Span) {
 
 var (
 	registered int32 // read/written atomically
-	processed  int32
 )
 
-// RegisterSaver registers a Saver for storing Metrics onto a backend. Only one Saver may exist or it panics.
-// Hence, RegisterSaver is not concurrency-safe.
+// RegisterSaver registers a Saver for storing Metrics onto a backend.
+// Only one Saver may exist or it panics.
 func RegisterSaver(saver Saver) {
 	if !atomic.CompareAndSwapInt32(&registered, 0, 1) {
 		panic("already registered.")
@@ -98,10 +105,10 @@ func (m *Metric) StartSpan(name string) *Span {
 		m.spans = make([]*Span, 0, 16)
 	}
 	s := &Span{
-		name:      name,
-		startTime: time.Now(),
-		metric:    m,
-		kind:      Server,
+		Name:      name,
+		StartTime: time.Now(),
+		Parent:    m,
+		Kind:      Server,
 	}
 	m.spans = append(m.spans, s)
 	return s
@@ -114,7 +121,7 @@ func (m *Metric) Done() {
 	m.mu.Lock() // Lock protects the slice of spans changing size.
 	var zeroTime time.Time
 	for _, s := range m.spans {
-		if s.endTime == zeroTime {
+		if s.EndTime == zeroTime {
 			s.End()
 		}
 	}
@@ -129,51 +136,45 @@ func (m *Metric) Done() {
 	select {
 	case saveQueue <- m:
 		// Sent
-		atomic.AddInt32(&processed, 1)
 	default:
 		// Warn if channel is full.
-		log.Error.Printf("metric: channel is full. Dropping metric %q.", m.name)
+		log.Error.Printf("metric: channel is full. Dropping metric %q.", m.Name)
 	}
 }
 
 // End marks the end time of the span as the current time. It returns the parent metric for convenience which
 // may be nil if the metric is Done.
 func (s *Span) End() *Metric {
-	s.endTime = time.Now()
-	return s.metric
+	s.EndTime = time.Now()
+	return s.Parent
 }
 
 // StartSpan starts a new span as a child of s with start time set to the current time.
 // It may return nil if the parent Metric of s is Done.
 func (s *Span) StartSpan(name string) *Span {
-	if s.metric == nil {
-		log.Error.Printf("metric: parent metric of span %q is nil", s.name)
+	if s.Parent == nil {
+		log.Error.Printf("metric: parent metric of span %q is nil", s.Name)
 		return nil
 	}
-	subSpan := s.metric.StartSpan(name)
-	subSpan.parentSpan = s
+	subSpan := s.Parent.StartSpan(name)
+	subSpan.ParentSpan = s
 	return subSpan
 }
 
 // Metric returns the parent metric of the span. It may be nil if the metric is Done.
 func (s *Span) Metric() *Metric {
-	return s.metric
+	return s.Parent
 }
 
 // SetKind sets the kind of the span s and returns it.
 func (s *Span) SetKind(kind Kind) *Span {
-	s.kind = kind
+	s.Kind = kind
 	return s
 }
 
 // SetAnnotation sets a custom annotation to the span s and returns it.
 // If multiple annotations are set, the last one wins.
 func (s *Span) SetAnnotation(annotation string) *Span {
-	s.annotation = annotation
+	s.Annotation = annotation
 	return s
-}
-
-// NumProcessed returns the number of metrics sent to the saver for storage.
-func NumProcessed() int32 {
-	return atomic.LoadInt32(&processed)
 }
