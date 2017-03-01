@@ -60,10 +60,11 @@ const (
 	// All is not allowed to be present in Group files.
 	All = "all" // Case is ignored, so "All", "ALL", etc. also work.
 
-	// AllUsers is a reserved Upspin user name. Its appearance in a user list
-	// grants access to everyone who can authenticate to the Upspin system.
-	// It is the user name that is substituted for the shorthand "all" in a user
-	// list. See the comment about All for more details.
+	// AllUsers is a reserved Upspin user name and thus is not a valid user
+	// input. Its appearance in a user list grants access to everyone who
+	// can authenticate to the Upspin system. It is the user name that is
+	// substituted for the shorthand "all" in a user list. See the comment
+	// about All for more details.
 	AllUsers upspin.UserName = "all@upspin.io"
 )
 
@@ -331,16 +332,16 @@ func clean(line []byte) []byte {
 	return bytes.TrimSpace(line)
 }
 
-// isAll is a case-insensitive check for "all" or "all@upspin.io"
+// isAll is a case-insensitive check for "all".
 func isAll(user []byte) bool {
-	// Check for length to be fast. Safe because "all" and "all@upspin.io" are ASCII.
-	if len(user) == len(allBytes) && bytes.EqualFold(user, allBytes) {
-		return true
-	}
-	if len(user) == len(allUsersBytes) && bytes.EqualFold(user, allUsersBytes) {
-		return true
-	}
-	return false
+	// Check for length to be fast. Safe because "all" is ASCII.
+	return len(user) == len(allBytes) && bytes.EqualFold(user, allBytes)
+}
+
+// // isAll is a case-insensitive check "all@upspin.io".
+func isAllUsers(user []byte) bool {
+	// Check for length to be fast. Safe because "all@upspin.io" is ASCII.
+	return len(user) == len(allUsersBytes) && bytes.EqualFold(user, allUsersBytes)
 }
 
 // parsedAppend parses the users (as path.Parse values) and appends them to the list.
@@ -350,7 +351,11 @@ func isAll(user []byte) bool {
 func parsedAppend(list []path.Parsed, owner upspin.UserName, users ...[]byte) ([]path.Parsed, []byte, error) {
 	var all []byte
 	for _, user := range users {
-		// Case-insensitive check for the "all" or "all@upspin.io", which we canonicalize to "all@upspin.io".
+		// Reject "all@upspin.io" as user input.
+		if isAllUsers(user) {
+			return nil, nil, errors.Errorf("reserved user name %q", user)
+		}
+		// Case-insensitive check for "all" which we canonicalize to "all@upspin.io".
 		// We require it to be the only item on the line.
 		if isAll(user) {
 			all = user
