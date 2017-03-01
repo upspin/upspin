@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "50e2d21f_ff30ac3f",
+        "filename": "cmd/upspin/doc.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5428
+      },
+      "writtenOn": "2017-03-01T20:39:55Z",
+      "side": 1,
+      "message": "foo?",
+      "revId": "b1a101d5677f8dd18bacea9a8290b19227fa4ecd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
