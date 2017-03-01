@@ -218,7 +218,7 @@ func (s *State) getCommand(op string) func(*State, ...string) {
 	path, err := exec.LookPath("upspin-" + op)
 	if err == nil {
 		return func(s *State, args ...string) {
-			s.runCommand(path, args...)
+			s.runCommand(path, append(flags.Args(), args...)...)
 		}
 	}
 	fmt.Fprintf(os.Stderr, "upspin: no such command %q\n", op)
