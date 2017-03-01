@@ -37,6 +37,9 @@ Performance is not a primary goal. Uniformity and security are.
 - [The Upspin project on GitHub](https://github.com/upspin/upspin)
 - [Issue tracker](https://github.com/upspin/upspin/issues)
 - [Contribution guidelines](https://github.com/upspin/upspin/blob/master/CONTRIBUTING.md)
-- [Mailing list](https://groups.google.com/forum/#!forum/upspin) at [upspin@googlegroups.com](mailto:upspin@googlegroups.com)
+- [Upspin mailing list](https://groups.google.com/forum/#!forum/upspin)
+  at [upspin@googlegroups.com](mailto:upspin@googlegroups.com)
+- The [Upspin Announcements mailing list](https://groups.google.com/forum/#!forum/upspin-announce),
+  to which all Upspin users should subscribe.
 - [Code review](https://upspin-review.googlesource.com)
 - [@UpspinProject](https://twitter.com/UpspinProject) on Twitter
