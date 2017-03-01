@@ -310,6 +310,7 @@ var integrationTests = []struct {
 	{"WatchSubtree", testWatchSubtree},
 	{"CopyEntries", testCopyEntries},
 	{"Snapshot", testSnapshot},
+	{"DeleteErrors", testDeleteErrors},
 
 	// Each of these tests depend on the output of the previous one.
 	{"NoReadersAllowed", testNoReadersAllowed},

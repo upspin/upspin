@@ -692,6 +692,48 @@ func TestGlob(t *testing.T) {
 	}
 }
 
+func TestDeletePermission(t *testing.T) {
+	s, userCtx := newDirServerForTesting(t, userName)
+	sOther, _ := newDirServerForTesting(t, otherUser)
+
+	// Only owner has any right.
+	_, err := putAccessOrGroupFile(t, s, userCtx, userName+"/Access", "*:"+userName)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	fileName := upspin.PathName(userName + "/file1.txt")
+	_, err = sOther.Delete(fileName)
+	expectedErr := errPrivate
+	if !errors.Match(expectedErr, err) {
+		t.Fatalf("err = %v, want = %v", err, expectedErr)
+	}
+
+	// Owner allows other to see file.
+	_, err = putAccessOrGroupFile(t, s, userCtx, userName+"/Access", "*:"+userName+"\nl:"+otherUser)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = sOther.Delete(fileName)
+	expectedErr = errors.E(errors.Permission, fileName)
+	if !errors.Match(expectedErr, err) {
+		t.Fatalf("err = %v, want = %v", err, expectedErr)
+	}
+
+	// Owner allows other to delete the file.
+	_, err = putAccessOrGroupFile(t, s, userCtx, userName+"/Access", "*:"+userName+"\nd:"+otherUser)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = sOther.Delete(fileName)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Owner can delete too (tested elsewhere).
+}
+
 func TestDelete(t *testing.T) {
 	s, _ := newDirServerForTesting(t, userName)
 
@@ -715,7 +757,6 @@ func TestDelete(t *testing.T) {
 		"/dir/bar",
 		"/dir", // Deleting dir now works.
 		"/Access",
-		"/file1.txt",
 		"/mylink", // Deleting the link works.
 	} {
 		_, err = s.Delete(userName + dir)
