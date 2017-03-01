@@ -7,6 +7,7 @@ package valid
 import (
 	"testing"
 
+	"upspin.io/access"
 	"upspin.io/upspin"
 )
 
@@ -28,6 +29,7 @@ func TestUserName(t *testing.T) {
 		{"a@c.%.com", false},
 		{"a@CC.com", false}, // Domain must be lower case (this package only).
 		{"a@cc.x", false},   // Final domain name must be >= 2 bytes.
+		{access.AllUsers, false},
 	}
 	for _, test := range tests {
 		err := UserName(test.name)

@@ -10,6 +10,7 @@ package valid // import "upspin.io/valid"
 import (
 	"strconv"
 
+	"upspin.io/access"
 	"upspin.io/errors"
 	"upspin.io/path"
 	"upspin.io/upspin"
@@ -26,6 +27,9 @@ func UserName(userName upspin.UserName) error {
 	}
 	if string(userName) != u+"@"+d {
 		return errors.E(op, errors.Invalid, userName, "not canonically formatted")
+	}
+	if userName == access.AllUsers {
+		return errors.E(op, errors.Invalid, userName, "reserved user name")
 	}
 	return nil
 }
