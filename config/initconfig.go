@@ -40,17 +40,7 @@ func (base) KeyEndpoint() upspin.Endpoint   { return defaultKeyEndpoint }
 func (base) DirEndpoint() upspin.Endpoint   { return upspin.Endpoint{} }
 func (base) StoreEndpoint() upspin.Endpoint { return upspin.Endpoint{} }
 func (base) CacheEndpoint() upspin.Endpoint { return upspin.Endpoint{} }
-func (base) CertPool() *x509.CertPool       { return systemCertPool }
-
-var systemCertPool *x509.CertPool
-
-func init() {
-	var err error
-	systemCertPool, err = x509.SystemCertPool()
-	if err != nil {
-		panic(err)
-	}
-}
+func (base) CertPool() *x509.CertPool       { return nil }
 
 // New returns a config with all fields set as defaults.
 func New() upspin.Config {

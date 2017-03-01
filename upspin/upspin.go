@@ -718,8 +718,9 @@ type Config interface {
 	// CacheEndpoint is the endpoint of the store and directory cache server.
 	CacheEndpoint() Endpoint
 
-	// CertPool returns the x509 certificate pool
-	// used to validate client TLS connections.
+	// CertPool returns the x509 certificate pool used to validate client TLS
+	// connections. If the returned pointer is nil then the default system root
+	// certificates should be used.
 	CertPool() *x509.CertPool
 }
 
