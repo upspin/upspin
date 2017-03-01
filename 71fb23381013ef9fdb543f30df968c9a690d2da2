@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df582a68_2152d832",
+        "filename": "doc/index.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-01T19:17:18Z",
+      "side": 1,
+      "message": "You might say what goes to this list to distinguish it from announce.",
+      "range": {
+        "startLine": 40,
+        "startChar": 0,
+        "endLine": 40,
+        "endChar": 71
+      },
+      "revId": "71fb23381013ef9fdb543f30df968c9a690d2da2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
