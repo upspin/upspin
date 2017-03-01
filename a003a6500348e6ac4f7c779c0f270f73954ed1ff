@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "114c47bd_5d0bd1ef",
+        "filename": "access/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-01T18:08:20Z",
+      "side": 1,
+      "message": "this is wrong. it\u0027s now only valid as a name within the user list of a parsed Access file. it is not valid in access files.\nat least, that\u0027s what should be the case.",
+      "revId": "a003a6500348e6ac4f7c779c0f270f73954ed1ff",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5bff61ff_b5b400c9",
+        "filename": "access/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 355,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-01T18:08:20Z",
+      "side": 1,
+      "message": "here you must  check that it is not already all@upspin.io,\nperhaps by refactoring isAll()",
+      "revId": "a003a6500348e6ac4f7c779c0f270f73954ed1ff",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
