@@ -11,6 +11,7 @@ import (
 	"net"
 	"net/http"
 
+	"upspin.io/cloud/gcpsaver"
 	"upspin.io/cloud/https"
 	cloudLog "upspin.io/cloud/log"
 	"upspin.io/config"
@@ -56,7 +57,7 @@ func main() {
 		// Disable logging locally so we don't pay the price of local
 		// unbuffered writes on a busy server.
 		log.SetOutput(nil)
-		svr, err := metric.NewGCPSaver(flags.Project, metricSampleSize, metricMaxQPS, "serverName", serverName)
+		svr, err := gcpsaver.New(flags.Project, metricSampleSize, metricMaxQPS, "serverName", serverName)
 		if err != nil {
 			log.Fatalf("Can't start a metric saver for GCP project %q: %s", flags.Project, err)
 		} else {
