@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8c4d82a7_12ed5765",
+        "filename": "cloud/gcpsaver/gcpsaver_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-03-01T22:35:00Z",
+      "side": 1,
+      "message": "You just did. :-)",
+      "revId": "27b79f0013dc5acd41bab719f6e67b8d1d482b90",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
