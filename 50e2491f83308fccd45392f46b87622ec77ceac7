@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da5a1d6d_b60f4abc",
+        "filename": "bind/bind.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2017-03-01T17:59:48Z",
+      "side": 1,
+      "message": "Thought I had responded earlier but perhaps not.  My problem is what happens when we start doing disconnected operation?  I\u0027m happy to error out if we get to the keyserver and it says no such user.  I\u0027m less happy if we have an endpoint from the config and can\u0027t reach the keyserver.\n\nI guess I can always change this once we get there...",
+      "range": {
+        "startLine": 212,
+        "startChar": 1,
+        "endLine": 214,
+        "endChar": 2
+      },
+      "revId": "50e2491f83308fccd45392f46b87622ec77ceac7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
