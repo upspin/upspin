@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cca853c9_3b78e030",
+        "filename": "doc/index.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-01T23:33:00Z",
+      "side": 1,
+      "message": "ambiguous.\n\na low-traffic list for important announcements about the project; all Upspin users should subscribe",
+      "revId": "c5ed6277df5c0bb34647cbd7b69e0f44ca2f181f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
