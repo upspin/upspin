@@ -10,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	"upspin.io/access"
 	"upspin.io/errors"
 	"upspin.io/path"
 	"upspin.io/upspin"
@@ -335,9 +336,8 @@ func TestOnlyOwnerCanLookup(t *testing.T) {
 	// no one else can.
 	s, _ = newDirServerForTesting(t, "spy@nsa.gov")
 	_, err = s.Lookup(snapshotUser + "/")
-	expectedErr := errors.E(upspin.PathName(snapshotUser+"/"), errPrivate)
-	if !errors.Match(expectedErr, err) {
-		t.Fatalf("err = %v, want = %v", err, expectedErr)
+	if !errors.Match(errPrivate, err) {
+		t.Fatalf("err = %v, want = %v", err, errPrivate)
 	}
 }
 
@@ -370,8 +370,8 @@ func TestSnapshotIsReadOnly(t *testing.T) {
 		user upspin.UserName
 		err  error
 	}{
-		{snapshotUser, errReadOnly},
-		{canonicalUser, errReadOnly},
+		{snapshotUser, access.ErrPermissionDenied},
+		{canonicalUser, access.ErrPermissionDenied},
 		{"spy@kgb.ru", errPrivate},
 	} {
 		s, _ := newDirServerForTesting(t, c.user)

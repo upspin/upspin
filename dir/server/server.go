@@ -21,16 +21,14 @@ import (
 	"upspin.io/path"
 	"upspin.io/serverutil"
 	"upspin.io/upspin"
+	"upspin.io/user"
 	"upspin.io/valid"
 )
-
-// TODO(edpin): move the the special-casing about snapshots into hasRight.
 
 // common error values.
 var (
 	errNotExist = errors.E(errors.NotExist)
 	errPrivate  = errors.E(errors.Private)
-	errReadOnly = errors.E(errors.Permission, errors.Str("tree is read only"))
 )
 
 const (
@@ -50,6 +48,10 @@ type server struct {
 	// userName is the name of the user on behalf of whom this
 	// server is serving.
 	userName upspin.UserName
+
+	// baseUser, suffix and domain are the components of userName as parsed
+	// by user.Parse.
+	baseUser, suffix, domain string
 
 	// logDir is the directory path accessible through the local file system
 	// where user logs are stored.
@@ -199,14 +201,6 @@ func (s *server) lookupWithPermissions(op string, name upspin.PathName, opts ...
 		return nil, errors.E(op, name, err)
 	}
 
-	if isSnapshotUser(p.User()) {
-		if isSnapshotOwner(s.userName, p.User()) {
-			return s.lookup(op, p, entryMustBeClean, opts...)
-		}
-		// Non-owners cannot see other people's snapshots.
-		return nil, errors.E(op, name, errPrivate)
-	}
-
 	entry, err := s.lookup(op, p, entryMustBeClean, opts...)
 
 	// Check if the user can know about the file at all. If not, to prevent
@@ -296,30 +290,17 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	if err != nil {
 		return nil, errors.E(op, entry.Name, err)
 	}
-	ownerCreatingSnapshotRoot := false
-	// TODO: isSnapshotUser and isSnapshotOwner are calling parse
-	// repeatedly. Clean up.
-	if isSnapshotUser(p.User()) {
-		if !isSnapshotOwner(s.userName, p.User()) {
-			// Non-owners can't even see the snapshot.
-			return nil, errors.E(op, entry.Name, errPrivate)
+
+	// Special check for the magic file that trigger a snapshot operation.
+	// Only the snapshot owner can do it.
+	if isSnapshotUser(p.User()) && s.isSnapshotOwner(p.User()) && isSnapshotControlFile(p) {
+		err = isValidSnapshotControlEntry(entry)
+		if err != nil {
+			return nil, errors.E(op, err)
 		}
-		if isSnapshotControlFile(p) {
-			err = isValidSnapshotControlEntry(entry)
-			if err != nil {
-				return nil, errors.E(op, err)
-			}
-			// Start a snapshot for this user.
-			s.snapshotControl <- p.User()
-			return entry, nil // Confirm snapshot has been started.
-		}
-		if !p.IsRoot() {
-			// Not root: owner can't mutate anything else.
-			return nil, errors.E(op, entry.Name, errReadOnly)
-		}
-		// Else: isOwner && putting the root -> OK, if root does not
-		// exist yet.
-		ownerCreatingSnapshotRoot = true
+		// Start a snapshot for this user.
+		s.snapshotControl <- p.User()
+		return entry, nil // Confirm snapshot has been started.
 	}
 
 	isAccess := access.IsAccessFile(p.Path())
@@ -366,20 +347,17 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 
 	if errors.Match(errNotExist, err) {
 		// OK; entry not found as expected. Can we create it?
-		if ownerCreatingSnapshotRoot {
-			// OK, can create.
-		} else {
-			canCreate, _, err := s.hasRight(access.Create, p, o)
-			if err == upspin.ErrFollowLink {
-				return nil, errors.E(op, p.Path(), errors.Internal, errors.Str("unexpected ErrFollowLink"))
-			}
-			if err != nil {
-				return nil, errors.E(op, err)
-			}
-			if !canCreate {
-				return nil, s.errPerm(op, p, o)
-			}
+		canCreate, _, err := s.hasRight(access.Create, p, o)
+		if err == upspin.ErrFollowLink {
+			return nil, errors.E(op, p.Path(), errors.Internal, errors.Str("unexpected ErrFollowLink"))
 		}
+		if err != nil {
+			return nil, errors.E(op, err)
+		}
+		if !canCreate {
+			return nil, s.errPerm(op, p, o)
+		}
+
 		// New file should have a valid sequence number, if user didn't pick one already.
 		if entry.Sequence == upspin.SeqNotExist || entry.Sequence == upspin.SeqIgnore && !entry.IsDir() {
 			entry.Sequence = upspin.NewSequence()
@@ -547,25 +525,16 @@ func (s *server) listDir(op string, dirName upspin.PathName, opts ...options) ([
 	}
 
 	canList, canRead := false, false
-	if isSnapshotUser(parsed.User()) {
-		if !isSnapshotOwner(s.userName, parsed.User()) {
-			// Non-owners can't see snapshots.
-			return nil, errors.E(op, dirName, errNotExist)
-		}
-		// Owner can always see everything, regardless of access files.
-		canList, canRead = true, true
-	} else {
-		// Check that we have list rights for any file in the directory.
-		canList, _, err = s.hasRight(access.List, parsed, opts...)
-		if err != nil {
-			// TODO(adg): this error needs sanitizing
-			return nil, errors.E(op, dirName, err)
-		}
-		if !canList {
-			return nil, errors.E(op, dirName, errors.Private)
-		}
-		canRead, _, _ = s.hasRight(access.Read, parsed, opts...)
+	// Check that we have list rights for any file in the directory.
+	canList, _, err = s.hasRight(access.List, parsed, opts...)
+	if err != nil {
+		// TODO(adg): this error needs sanitizing
+		return nil, errors.E(op, dirName, err)
 	}
+	if !canList {
+		return nil, errors.E(op, dirName, errors.Private)
+	}
+	canRead, _, _ = s.hasRight(access.Read, parsed, opts...)
 
 	if canRead {
 		// User wants DirEntries with valid blocks, so we must flush
@@ -600,14 +569,6 @@ func (s *server) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
 	p, err := path.Parse(name)
 	if err != nil {
 		return nil, errors.E(op, name, err)
-	}
-	if isSnapshotUser(p.User()) {
-		if isSnapshotOwner(s.userName, p.User()) {
-			// Owner can't mutate.
-			return nil, errors.E(op, name, errReadOnly)
-		}
-		// Everyone else can't even see it.
-		return nil, errors.E(op, name, errPrivate)
 	}
 
 	canDelete, link, err := s.hasRight(access.Delete, p, o)
@@ -759,13 +720,6 @@ func (s *server) watch(op string, treeEvents <-chan *upspin.Event, outEvents cha
 			sendEvent(&upspin.Event{Error: errors.E(op, err)})
 			return
 		}
-		if isSnapshotUser(p.User()) && isSnapshotOwner(s.userName, p.User()) {
-			// Okay to watch.
-			if !sendEvent(e) {
-				return
-			}
-			continue
-		}
 		hasAny, _, err := s.hasRight(access.AnyRight, p)
 		if err != nil {
 			sendEvent(&upspin.Event{Error: errors.E(op, err)})
@@ -799,8 +753,14 @@ func (s *server) Dial(ctx upspin.Config, e upspin.Endpoint) (upspin.Service, err
 	}
 
 	cp := *s // copy of the generator instance.
-	// Override userName (rest is "global").
+	// Overwrite the userName and its sub-components (base, suffix, domain).
 	cp.userName = ctx.UserName()
+	var err error
+	cp.baseUser, cp.suffix, cp.domain, err = user.Parse(cp.userName)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+
 	// create a default Access file for this user and cache it.
 	defaultAccess, err := access.New(upspin.PathName(cp.userName + "/"))
 	if err != nil {
@@ -914,7 +874,7 @@ func (s *server) canCreateRoot(user upspin.UserName) bool {
 	if s.userName == user {
 		return true
 	}
-	if isSnapshotUser(user) && isSnapshotOwner(s.userName, user) {
+	if isSnapshotUser(user) && s.isSnapshotOwner(user) {
 		return true
 	}
 	return false
