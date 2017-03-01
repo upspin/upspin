@@ -24,19 +24,19 @@ func TestAll(t *testing.T) {
 		t.Fatalf("Expected 3 spans, got %d", len(m.spans))
 	}
 	expected := "getRoot"
-	if m.spans[0].name != expected {
-		t.Errorf("Expected span named %q, got %q", expected, m.spans[0].name)
+	if m.spans[0].Name != expected {
+		t.Errorf("Expected span named %q, got %q", expected, m.spans[0].Name)
 	}
 	expected = "getInnerRoot"
-	if m.spans[1].name != expected {
-		t.Errorf("Expected span named %q, got %q", expected, m.spans[1].name)
+	if m.spans[1].Name != expected {
+		t.Errorf("Expected span named %q, got %q", expected, m.spans[1].Name)
 	}
-	if m.spans[1].parentSpan != m.spans[0] {
-		t.Errorf("Expected parent span to be %q, got %v", m.spans[0].name, m.spans[1].parentSpan)
+	if m.spans[1].ParentSpan != m.spans[0] {
+		t.Errorf("Expected parent span to be %q, got %v", m.spans[0].Name, m.spans[1].ParentSpan)
 	}
 	expected = "getCloudBytes"
-	if m.spans[2].name != expected {
-		t.Errorf("Expected span named %q, got %q", expected, m.spans[2].name)
+	if m.spans[2].Name != expected {
+		t.Errorf("Expected span named %q, got %q", expected, m.spans[2].Name)
 	}
 
 	// Save one more metric.
@@ -62,33 +62,33 @@ func TestAll(t *testing.T) {
 	}
 
 	expected = "hello"
-	if saver.metricsReceived[0].spans[2].annotation != expected {
-		t.Errorf("Expected annotation %q, got %q", expected, saver.metricsReceived[0].spans[2].annotation)
+	if saver.metricsReceived[0].spans[2].Annotation != expected {
+		t.Errorf("Expected annotation %q, got %q", expected, saver.metricsReceived[0].spans[2].Annotation)
 	}
 }
 
 func TestFullChannel(t *testing.T) {
-	for i := 0; i < saveQueueLength+3; i++ {
+	for i := 0; i < SaveQueueLength+3; i++ {
 		New("MkDir").StartSpan("putBytes").End().Done()
 	}
 	// If we block, this test will never finish.
 }
 
 func verifyMetric(t *testing.T, m *Metric, expectedName string, expectedSpanNames ...string) error {
-	if m.name != expectedName {
-		return fmt.Errorf("Expected %q, got %q", expectedName, m.name)
+	if m.Name != expectedName {
+		return fmt.Errorf("Expected %q, got %q", expectedName, m.Name)
 	}
 	if len(m.spans) != len(expectedSpanNames) {
 		return fmt.Errorf("Expected %d spans, got %d", len(expectedSpanNames), len(m.spans))
 	}
 	for i, s := range m.spans {
 		exp := expectedSpanNames[i]
-		if s.name != exp {
-			return fmt.Errorf("Expected span %d of metric %q to be named %q, got %q", i, m.name, exp, s.name)
+		if s.Name != exp {
+			return fmt.Errorf("Expected span %d of metric %q to be named %q, got %q", i, m.Name, exp, s.Name)
 		}
-		if s.endTime.IsZero() {
+		if s.EndTime.IsZero() {
 			// using %v because s.name may be nil.
-			return fmt.Errorf("Span %d (%v) of metric %q has zero time", i, s.name, m.name)
+			return fmt.Errorf("Span %d (%v) of metric %q has zero time", i, s.Name, m.Name)
 		}
 	}
 	return nil
@@ -112,8 +112,4 @@ func (d *dummySaver) Register(queue chan *Metric) {
 			}
 		}
 	}()
-}
-
-func (d *dummySaver) NumProcessed() int32 {
-	return 0
 }
