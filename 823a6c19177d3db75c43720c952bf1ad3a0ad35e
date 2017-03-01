@@ -86,6 +86,40 @@
       "revId": "823a6c19177d3db75c43720c952bf1ad3a0ad35e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b6a3044f_83a09390",
+        "filename": "cloud/gcpsaver/gcpsaver_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-03-01T21:42:40Z",
+      "side": 0,
+      "message": "delete to above. Replace with:\n\nmetric.AllowReregistration \u003d true\nRegisterSaver(saver)",
+      "revId": "823a6c19177d3db75c43720c952bf1ad3a0ad35e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2effeb9d_80899250",
+        "filename": "cloud/gcpsaver/gcpsaver_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-03-01T21:42:40Z",
+      "side": 0,
+      "message": "Similar here.",
+      "revId": "823a6c19177d3db75c43720c952bf1ad3a0ad35e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
