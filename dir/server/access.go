@@ -151,6 +151,20 @@ func (s *server) hasRight(right access.Right, p path.Parsed, opts ...options) (b
 	o, ss := subspan("hasRight", opts)
 	defer ss.End()
 
+	// The owner of a snapshot has r,l rights over it and can create the
+	// root, but nothing else. No one else has any rights.
+	if isSnapshotUser(p.User()) {
+		if s.isSnapshotOwner(p.User()) {
+			switch right {
+			case access.Read, access.List, access.AnyRight:
+				return true, nil, nil
+			case access.Create:
+				return p.IsRoot(), nil, nil
+			}
+		}
+		return false, nil, nil
+	}
+
 	entry, err := s.whichAccess(p, o)
 	if err == upspin.ErrFollowLink {
 		// If we need to follow a link to get to p
