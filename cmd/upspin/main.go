@@ -138,7 +138,6 @@ func main() {
 		usage()
 	}
 	fn(state, args...)
-	state.cleanup()
 	os.Exit(state.exitCode)
 }
 
@@ -173,7 +172,6 @@ func (s *State) exitf(format string, args ...interface{}) {
 	if s.interactive {
 		panic("exit")
 	}
-	s.cleanup()
 	os.Exit(1)
 }
 
@@ -278,11 +276,6 @@ func (s *State) KeyServer() upspin.KeyServer {
 		s.exit(err)
 	}
 	return key
-}
-
-// end terminates any necessary state.
-func (s *State) cleanup() {
-	s.finishMetrics()
 }
 
 // hasGlobChar reports whether the string contains a Glob metacharacter.

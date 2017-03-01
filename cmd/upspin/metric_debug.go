@@ -10,8 +10,8 @@ import (
 	"log"
 	"os"
 	"strings"
-	"time"
 
+	"upspin.io/cloud/gcpsaver"
 	"upspin.io/metric"
 )
 
@@ -28,19 +28,9 @@ func (s *State) enableMetrics() {
 		return
 	}
 	var err error
-	if s.metricsSaver, err = metric.NewGCPSaver(gcloudProject, "app", "cmd/upspin"); err == nil {
+	if s.metricsSaver, err = gcpsaver.New(gcloudProject, "app", "cmd/upspin"); err == nil {
 		metric.RegisterSaver(s.metricsSaver)
 	} else {
-		log.Printf("saving metrics: %q", err)
-	}
-}
-
-func (s *State) finishMetrics() {
-	if s.metricsSaver == nil {
-		return
-	}
-	// Allow time for metrics to propagate.
-	for i := 0; metric.NumProcessed() > s.metricsSaver.NumProcessed() && i < 10; i++ {
-		time.Sleep(100 * time.Millisecond)
+		log.Printf("error setting up metrics: %q", err)
 	}
 }
