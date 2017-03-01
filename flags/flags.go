@@ -16,97 +16,161 @@ import (
 	"upspin.io/log"
 )
 
+// flagVar represents a flag in this package.
+type flagVar struct {
+	set  func()        // Set the value at parse time.
+	arg  func() string // Return the argument to set the flag.
+	arg2 func() string // Return the argument to set the second flag; usually nil.
+}
+
+const (
+	defaultBlockSize  = 1024 * 1024 // Keep in sync with upspin.BlockSize.]
+	defaultHTTPAddr   = ":80"
+	defaultHTTPSAddr  = ":443"
+	defaultLog        = "info"
+	defaultServerKind = "inprocess"
+)
+
 var (
 	// BlockSize is the block size used when writing large files. The default is 1MB.
-	BlockSize = 1024 * 1024 // Keep in sync with upspin.BlockSize.
+	BlockSize = defaultBlockSize
 
 	// CacheDir specifies the directory for the various file caches.
-	CacheDir = filepath.Join(os.Getenv("HOME"), "upspin")
+	defaultCacheDir = filepath.Join(os.Getenv("HOME"), "upspin")
+	CacheDir        = defaultCacheDir
 
 	// Config names the Upspin configuration file to use.
-	Config = filepath.Join(os.Getenv("HOME"), "upspin", "config")
+	defaultConfig = filepath.Join(os.Getenv("HOME"), "upspin", "config")
+	Config        = defaultConfig
 
 	// HTTPAddr is the network address on which to listen for incoming
 	// insecure network connections.
-	HTTPAddr = ":80"
+	HTTPAddr = defaultHTTPAddr
 
 	// HTTPSAddr is the network address on which to listen for incoming
 	// secure network connections.
-	HTTPSAddr = ":443"
+	HTTPSAddr = defaultHTTPSAddr
 
 	// LetsEncryptCache is the location of a file in which the Let's
 	// Encrypt certificates are stored. The containing directory should
 	// be owner-accessible only (chmod 0700).
-	LetsEncryptCache string
+	LetsEncryptCache = ""
 
 	// Log sets the level of logging (implements flag.Value).
 	Log logFlag
 
 	// NetAddr is the publicly accessible network address of this server.
-	NetAddr string
+	NetAddr = ""
 
-	// Project is the project name on GCP; used by servers and
-	// cmd/upspin setupdomain.
+	// Project is the project name on GCP; used by servers, upspin-deploy,
+	// and cmd/upspin setupdomain.
 	Project = ""
 
 	// ServerConfig specifies configuration options ("key=value") for servers.
 	ServerConfig []string
 
 	// ServerKind is the implementation kind of this server.
-	ServerKind = "inprocess"
+	ServerKind = defaultServerKind
 
 	// StoreServerName is the Upspin user name of the StoreServer.
 	StoreServerUser = ""
 
 	// TLSCertFile and TLSKeyFile specify the location of a TLS
 	// certificate/key pair used for serving TLS (HTTPS).
-	TLSCertFile string
-	TLSKeyFile  string
+	TLSCertFile = ""
+	TLSKeyFile  = ""
 )
 
 // flags is a map of flag registration functions keyed by flag name,
 // used by Parse to register specific (or all) flags.
-var flags = map[string]func(){
-	"addr": func() {
-		flag.StringVar(&NetAddr, "addr", NetAddr, "publicly accessible network address (`host:port`)")
+var flags = map[string]*flagVar{
+	"addr": &flagVar{
+		set: func() {
+			flag.StringVar(&NetAddr, "addr", "", "publicly accessible network address (`host:port`)")
+		},
+		arg: func() string { return strArg("addr", NetAddr, "") },
 	},
-	"blocksize": func() {
-		flag.IntVar(&BlockSize, "blocksize", BlockSize, "`size` of blocks when writing large files")
+	"blocksize": &flagVar{
+		set: func() {
+			flag.IntVar(&BlockSize, "blocksize", BlockSize, "`size` of blocks when writing larg:e files")
+		},
+		arg: func() string {
+			if BlockSize == defaultBlockSize {
+				return ""
+			}
+			return fmt.Sprintf("-blocksize=%d", BlockSize)
+		},
 	},
-	"cachedir": func() {
-		flag.StringVar(&CacheDir, "cachedir", CacheDir, "`directory` containing all file caches")
+	"cachedir": &flagVar{
+		set: func() {
+			flag.StringVar(&CacheDir, "cachedir", CacheDir, "`directory` containing all file caches")
+		},
+		arg: func() string {
+			return strArg("cachedir", CacheDir, defaultCacheDir)
+		},
 	},
-	"config": func() {
-		flag.StringVar(&Config, "config", Config, "user's configuration `file`")
+	"config": &flagVar{
+		set: func() {
+			flag.StringVar(&Config, "config", Config, "user's configuration `file`")
+		},
+		arg: func() string { return strArg("config", Config, defaultConfig) },
 	},
-	"http": func() {
-		flag.StringVar(&HTTPAddr, "http", HTTPAddr, "`address` for incoming insecure network connections")
+	"http": &flagVar{
+		set: func() {
+			flag.StringVar(&HTTPAddr, "http", HTTPAddr, "`address` for incoming insecure network connections")
+		},
+		arg: func() string { return strArg("http", HTTPAddr, defaultHTTPAddr) },
 	},
-	"https": func() {
-		flag.StringVar(&HTTPSAddr, "https", HTTPSAddr, "`address` for incoming secure network connections")
+	"https": &flagVar{
+		set: func() {
+			flag.StringVar(&HTTPSAddr, "https", HTTPSAddr, "`address` for incoming secure network connections")
+		},
+		arg: func() string { return strArg("https", HTTPSAddr, defaultHTTPSAddr) },
 	},
-	"kind": func() {
-		flag.StringVar(&ServerKind, "kind", ServerKind, "server implementation `kind` (inprocess, gcp)")
+	"kind": &flagVar{
+		set: func() {
+			flag.StringVar(&ServerKind, "kind", ServerKind, "server implementation `kind` (inprocess, gcp)")
+		},
+		arg: func() string { return strArg("kind", ServerKind, defaultServerKind) },
 	},
-	"letscache": func() {
-		flag.StringVar(&LetsEncryptCache, "letscache", "", "Let's Encrypt cache `directory`")
+	"letscache": &flagVar{
+		set: func() {
+			flag.StringVar(&LetsEncryptCache, "letscache", "", "Let's Encrypt cache `directory`")
+		},
+		arg: func() string { return strArg("letscache", LetsEncryptCache, "") },
 	},
-	"log": func() {
-		Log.Set("info")
-		flag.Var(&Log, "log", "`level` of logging: debug, info, error, disabled")
+	"log": &flagVar{
+		set: func() {
+			Log.Set("info")
+			flag.Var(&Log, "log", "`level` of logging: debug, info, error, disabled")
+		},
+		arg: func() string { return strArg("log", Log.String(), defaultLog) },
 	},
-	"project": func() {
-		flag.StringVar(&Project, "project", Project, "GCP `project` name")
+	"project": &flagVar{
+		set: func() {
+			flag.StringVar(&Project, "project", Project, "GCP `project` name")
+		},
+		arg: func() string { return strArg("-project=", Project, "") },
 	},
-	"serverconfig": func() {
-		flag.Var(configFlag{&ServerConfig}, "serverconfig", "comma-separated list of configuration options (key=value) for this server")
+	"serverconfig": &flagVar{
+		set: func() {
+			flag.Var(configFlag{&ServerConfig}, "serverconfig", "comma-separated list of configuration options (key=value) for this server")
+		},
+		arg: func() string { return strArg("-serverconfig=", configFlag{&ServerConfig}.String(), "") },
 	},
-	"storeservername": func() {
-		flag.StringVar(&StoreServerUser, "storeserveruser", StoreServerUser, "user name of the StoreServer")
+	"storeserveruser": &flagVar{
+		set: func() {
+			flag.StringVar(&StoreServerUser, "storeserveruser", "", "user name of the StoreServer")
+		},
+		arg: func() string { return strArg("storeserveruser", StoreServerUser, "") },
 	},
-	"tls": func() {
-		flag.StringVar(&TLSCertFile, "tls_cert", TLSCertFile, "TLS Certificate `file` in PEM format")
-		flag.StringVar(&TLSKeyFile, "tls_key", TLSKeyFile, "TLS Key `file` in PEM format")
+	"tls": &flagVar{
+		set: func() {
+			flag.StringVar(&TLSCertFile, "tls_cert", "", "TLS Certificate `file` in PEM format")
+			flag.StringVar(&TLSKeyFile, "tls_key", "", "TLS Key `file` in PEM format")
+		},
+		arg:  func() string { return strArg("tls_cert", TLSCertFile, "") },
+		arg2: func() string { return strArg("tls_key", TLSKeyFile, "") },
 	},
 }
 
@@ -121,19 +185,45 @@ var flags = map[string]func(){
 func Parse(names ...string) {
 	if len(names) == 0 {
 		// Register all flags if no names provided.
-		for _, fn := range flags {
-			fn()
+		for _, flag := range flags {
+			flag.set()
 		}
 	} else {
 		for _, n := range names {
-			fn, ok := flags[n]
+			flag, ok := flags[n]
 			if !ok {
 				panic(fmt.Sprintf("unknown flag %q", n))
 			}
-			fn()
+			flag.set()
 		}
 	}
 	flag.Parse()
+}
+
+// Args returns a slice of -flag=value strings that will recreate
+// the state of the flags. Flags set to their default value are elided.
+func Args() []string {
+	var args []string
+	for _, flag := range flags {
+		arg := flag.arg()
+		if arg == "" {
+			continue
+		}
+		args = append(args, arg)
+		if flag.arg2 != nil {
+			args = append(args, flag.arg2())
+		}
+	}
+	return args
+}
+
+// strArg returns a command-line argument that will recreate the flag,
+// or the empty string if the value is the default.
+func strArg(name, value, _default string) string {
+	if value == _default {
+		return ""
+	}
+	return "-" + name + "=" + value
 }
 
 type logFlag string
