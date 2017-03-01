@@ -2,21 +2,25 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package metric
+package gcpsaver
 
 import (
 	"math/rand"
 	"reflect"
 	"testing"
 
+	"upspin.io/metric"
+
 	trace "google.golang.org/api/cloudtrace/v1"
 )
+
+// TODO(edpin): implement test of sampling behavior
 
 func TestLabelsAndAnnotations(t *testing.T) {
 	sink := new(sinkTraces)
 	saver := newDummyGCPSaver(sink, 1, 1000, "static label", "static value")
 
-	m := New("metric1").StartSpan("Span1").SetAnnotation("comment1").SetAnnotation("comment2").End()
+	m := metric.New("metric1").StartSpan("Span1").SetAnnotation("comment1").SetAnnotation("comment2").End()
 	m.StartSpan("Span2").End()
 	m.Done()
 
@@ -57,7 +61,7 @@ func TestNoLabelsAndAnnotation(t *testing.T) {
 	sink := new(sinkTraces)
 	saver := newDummyGCPSaver(sink, 1, 1000)
 
-	m := New("metric1").StartSpan("Span1").SetAnnotation("comment17").End()
+	m := metric.New("metric1").StartSpan("Span1").SetAnnotation("comment17").End()
 	m.StartSpan("Span2").End()
 	m.Done()
 
@@ -85,46 +89,20 @@ func TestNoLabelsAndAnnotation(t *testing.T) {
 		t.Errorf("Expected s2.Labels to match %v, got %v", zeroMap, s2.Labels)
 	}
 }
-
-func TestBatchesMultipleMetrics(t *testing.T) {
-	sink := new(sinkTraces)
-	saver := newDummyGCPSaver(sink, 1, 1000)
-
-	done := make(chan bool)
-	onFlush = func() {
-		done <- true
-	}
-	defer func() {
-		onFlush = func() {}
-	}()
-
-	saveQueue = make(chan *Metric, 10)
-	saver.Register(saveQueue)
-
-	initialCount := NumProcessed()
-
-	m1 := New("metric1").StartSpan("Span1").SetAnnotation("comment17").End()
-	m1.Done()
-	m2 := New("metric2").StartSpan("Span2").End()
-	m2.Done()
-
-	for i := 0; saver.NumProcessed() < 2 && i < 2; i++ {
-		<-done
-	}
-	if NumProcessed() != initialCount+saver.NumProcessed() {
-		t.Fatalf("Metrics saved = %d, want = %d", saver.NumProcessed(), NumProcessed())
-	}
-}
-
 func TestSampling(t *testing.T) {
+	// We know the sequence with this random seed, so test is deterministic.
+	rand.Seed(1234)
+
 	sink := new(sinkTraces)
 	saver := newDummyGCPSaver(sink, 10, 1000)
 
-	saveQueue = make(chan *Metric, 100)
-	registered = 0
-	// We know the sequence with this random seed, so test is deterministic.
-	rand.Seed(1234)
-	RegisterSaver(saver)
+	queue := make(chan *metric.Metric, 100)
+	defer close(queue)
+	go func() {
+		for _ = range queue {
+		}
+	}()
+	saver.Register(queue)
 
 	done := make(chan bool)
 	onFlush = func() {
@@ -135,7 +113,7 @@ func TestSampling(t *testing.T) {
 	}()
 
 	for i := 0; i < 100; i++ {
-		m, _ := NewSpan("sampling")
+		m, _ := metric.NewSpan("sampling")
 		m.Done()
 	}
 
@@ -143,8 +121,8 @@ func TestSampling(t *testing.T) {
 
 	// We expect about 1/10th were sampled, which is 10, but it's
 	// probabilistic. 14 is what we get with the rand seed above.
-	if saver.NumProcessed() != 14 {
-		t.Errorf("saved = %d, want = 14 ", saver.NumProcessed())
+	if len(sink.traces) != 14 {
+		t.Errorf("saved = %d, want = 14 ", len(sink.traces))
 	}
 }
 
