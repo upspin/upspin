@@ -7,6 +7,7 @@ package server
 import (
 	"time"
 
+	"strings"
 	"upspin.io/dir/server/tree"
 	"upspin.io/errors"
 	"upspin.io/log"
@@ -291,11 +292,13 @@ func (s *server) mkDirIfNotExist(name path.Parsed) error {
 	return err
 }
 
-// TODO: isSnapshotUser and isSnapshotOwner should be combined and simplified to
-// avoid calling parse every time.
-
 // isSnapshotUser reports whether the userName contains the snapshot suffix.
 func isSnapshotUser(userName upspin.UserName) bool {
+	// Check if the suffix is present as a way to avoid the more costly
+	// user.Parse below.
+	if !strings.Contains(string(userName), snapshotSuffix) {
+		return false
+	}
 	_, suffix, _, err := user.Parse(userName)
 	if err != nil {
 		log.Error.Printf("dir/server.isSnapshotUser: error parsing user name %q: %s", userName, err)
@@ -304,27 +307,21 @@ func isSnapshotUser(userName upspin.UserName) bool {
 	return suffix == snapshotSuffix
 }
 
-// isSnapshotOwner reports whether username is the base user name (without the
-// "+snapshot" suffix) of snapshotUser or the snapshotUser itself.
-func isSnapshotOwner(userName upspin.UserName, snapshotUser upspin.UserName) bool {
-	u, suffix, domain, err := user.Parse(userName)
-	if err != nil {
-		// This should not happen. Log the error.
-		log.Error.Printf("dir/server.isSnapshotOwner: error parsing %q: %s", userName, err)
-		return false
-	}
-	if suffix != "" && suffix != snapshotSuffix {
+// isSnapshotOwner reports whether the dialed user is the base user name
+// (without the "+snapshot" suffix) of snapshotUser or the snapshotUser itself.
+func (s *server) isSnapshotOwner(snapshotUser upspin.UserName) bool {
+	if s.userSuffix != "" && s.userSuffix != snapshotSuffix {
 		// Some other suffix. Definitely not the base user nor the
 		// snapshotUser.
 		return false
 	}
-	if suffix == snapshotSuffix {
+	if s.userSuffix == snapshotSuffix {
 		// userName is snapshotUser or it's another snapshot user.
-		return snapshotUser == userName
+		return snapshotUser == s.userName
 	}
 	// userName is the owner if and only if adding the snapshot suffix makes
 	// it the snapshotUser.
-	return u+"+"+snapshotSuffix+"@"+domain == string(snapshotUser)
+	return s.userBase+"+"+snapshotSuffix+"@"+s.userDomain == string(snapshotUser)
 }
 
 // isSnapshotControlFile reports whether the path name is for an entry in the
