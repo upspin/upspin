@@ -19,6 +19,23 @@
     },
     {
       "key": {
+        "uuid": "e60b4d93_a7803e20",
+        "filename": "cloud/gcpsaver/gcpsaver_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-01T20:57:44Z",
+      "side": 0,
+      "message": "This is the tests trying to reach into package metric to replace the saveQueue channel.\nAny ideas how to work around this?",
+      "revId": "823a6c19177d3db75c43720c952bf1ad3a0ad35e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "490e8244_b4ee3aba",
         "filename": "cloud/gcpsaver/gcpsaver_test.go",
         "patchSetId": 2
