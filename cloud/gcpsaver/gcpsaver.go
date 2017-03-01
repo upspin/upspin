@@ -2,12 +2,13 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package metric // import "upspin.io/metric"
+// Package gcpsaver implements a metric.Saver that records metrics with
+// Google's Cloud Trace API.
+package gcpsaver // import "upspin.io/cloud/gcpsaver"
 
 import (
 	"fmt"
 	"math/rand"
-	"sync/atomic"
 	"time"
 
 	"golang.org/x/net/context"
@@ -16,6 +17,7 @@ import (
 
 	"upspin.io/errors"
 	"upspin.io/log"
+	"upspin.io/metric"
 	"upspin.io/serverutil"
 )
 
@@ -29,24 +31,23 @@ type traceSaver interface {
 type gcpSaver struct {
 	projectID    string
 	api          traceSaver
-	saverQueue   chan *Metric
+	saverQueue   chan *metric.Metric
 	staticLabels map[string]string
-	processed    int32
 	n            int // sampling 1 out of every n metrics.
 	rate         *serverutil.RateLimiter
 }
 
-var _ Saver = (*gcpSaver)(nil)
+var _ metric.Saver = (*gcpSaver)(nil)
 
 // onFlush is called when data is saved to the backend. It's used in tests only.
 var onFlush = func() {}
 
-// NewGCPSaver returns a Saver that saves metrics to GCP Traces for a GCP
-// projectID. The caller must have enabled the StackDriver Traces API for the
+// New returns a metric.Saver that saves metrics to GCP Traces for a GCP
+// projectID.  The caller must have enabled the StackDriver Traces API for the
 // projectID and have sufficient permission to use the scope "cloud-platform".
 //
-// A random sampling ratio of 1-to-n is taken. Setting n to 1 reports every
-// event.
+// A random sampling ratio of 1-to-n is taken.
+// Setting n to 1 reports every event.
 //
 // A maximum number of outbound network requests per second (maxQPS) when
 // uploading metrics to the GCP backend is enforced. Values equal to or larger
@@ -55,8 +56,8 @@ var onFlush = func() {}
 // An optional set of string key-value pairs can be given and they will be saved
 // as labels on GCP. They are useful, for example, in the case of
 // differentiating a metric coming from a test instance versus production.
-func NewGCPSaver(projectID string, n, maxQPS int, labels ...string) (Saver, error) {
-	const op = "metric.NewGCPSaver"
+func New(projectID string, n, maxQPS int, labels ...string) (metric.Saver, error) {
+	const op = "gcpsaver.New"
 	// Authentication is provided by the gcloud tool when running locally, and
 	// by the associated service account when running on Compute Engine.
 	client, err := google.DefaultClient(context.Background(), trace.CloudPlatformScope)
@@ -97,13 +98,9 @@ func NewGCPSaver(projectID string, n, maxQPS int, labels ...string) (Saver, erro
 	}, nil
 }
 
-func (g *gcpSaver) Register(queue chan *Metric) {
+func (g *gcpSaver) Register(queue chan *metric.Metric) {
 	g.saverQueue = queue
 	go g.saverLoop()
-}
-
-func (g *gcpSaver) NumProcessed() int32 {
-	return atomic.LoadInt32(&g.processed)
 }
 
 func (g *gcpSaver) saverLoop() {
@@ -130,8 +127,8 @@ func (g *gcpSaver) saverLoop() {
 	timer := time.NewTimer(idleTimeout)
 	for {
 		select {
-		case metric := <-g.saverQueue:
-			if len(traces) >= saveQueueLength/2 {
+		case m := <-g.saverQueue:
+			if len(traces) >= metric.SaveQueueLength/2 {
 				// Buffer is half full. Start trying to save.
 				maybeSave()
 			}
@@ -142,7 +139,7 @@ func (g *gcpSaver) saverLoop() {
 				}
 			}
 			// Buffer metric for later.
-			traces = append(traces, g.prepareToSave(metric))
+			traces = append(traces, g.prepareToSave(m))
 			// While we're getting new metrics, reset the timer so
 			// we have time to fill the buffer.
 			if !timer.Stop() {
@@ -166,24 +163,25 @@ func (g *gcpSaver) saverLoop() {
 
 // save serializes the metric in a GCP-friendly way and saves it to the
 // specific GCP backend configured when the Saver was created.
-func (g *gcpSaver) prepareToSave(m *Metric) *trace.Trace {
-	traceSpans := make([]*trace.TraceSpan, len(m.spans))
-	for i, s := range m.spans {
+func (g *gcpSaver) prepareToSave(m *metric.Metric) *trace.Trace {
+	spans := m.Spans()
+	traceSpans := make([]*trace.TraceSpan, len(spans))
+	for i, s := range spans {
 		var annotation map[string]string
-		if s.annotation != "" {
-			annotation = map[string]string{"txt": s.annotation}
+		if s.Annotation != "" {
+			annotation = map[string]string{"txt": s.Annotation}
 		}
 		traceSpans[i] = &trace.TraceSpan{
 			SpanId:    uint64(i + 1),
-			Name:      s.name,
-			StartTime: formatTime(s.startTime),
-			EndTime:   formatTime(s.endTime),
-			Kind:      toKindString(s.kind),
+			Name:      s.Name,
+			StartTime: formatTime(s.StartTime),
+			EndTime:   formatTime(s.EndTime),
+			Kind:      toKindString(s.Kind),
 			Labels:    mergeMaps(g.staticLabels, annotation),
 		}
-		if s.parentSpan != nil {
+		if s.ParentSpan != nil {
 			// This can be N^2 if every span has a parent. But we should not have zillions of spans, so ok.
-			r := findSpanRank(s.parentSpan, m)
+			r := findSpanRank(s.ParentSpan, m)
 			if r != -1 {
 				traceSpans[i].ParentSpanId = uint64(r + 1)
 			}
@@ -204,15 +202,14 @@ func (g *gcpSaver) save(traces []*trace.Trace) {
 	if err != nil {
 		log.Error.Printf("metric: error saving to GCP: %v", err)
 	}
-	atomic.AddInt32(&g.processed, int32(len(traces)))
 	onFlush()
 }
 
-func toKindString(k Kind) string {
+func toKindString(k metric.Kind) string {
 	switch k {
-	case Server:
+	case metric.Server:
 		return "RPC_SERVER"
-	case Client:
+	case metric.Client:
 		return "RPC_CLIENT"
 	default:
 		return "SPAN_KIND_UNSPECIFIED"
@@ -221,8 +218,8 @@ func toKindString(k Kind) string {
 
 // findSpanRank returns the position (rank) of a span within a metric.
 // If not found -1 is returned.
-func findSpanRank(s *Span, m *Metric) int {
-	for i, span := range m.spans {
+func findSpanRank(s *metric.Span, m *metric.Metric) int {
+	for i, span := range m.Spans() {
 		if s == span {
 			return i
 		}
