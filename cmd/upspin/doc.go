@@ -50,7 +50,6 @@ Upspin commands:
 	cp
 	deletestorage
 	deploy
-	foo
 	get
 	getref
 	info
