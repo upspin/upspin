@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1b5b8d14_cbd170ed",
+        "filename": "access/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-01T19:08:53Z",
+      "side": 1,
+      "message": "I concur with Rob.    I hear others are also finding this confusing, so we probably need to strengthen this somewhere in docs.",
+      "parentUuid": "114c47bd_5d0bd1ef",
+      "revId": "a003a6500348e6ac4f7c779c0f270f73954ed1ff",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "5bff61ff_b5b400c9",
         "filename": "access/access.go",
         "patchSetId": 3
