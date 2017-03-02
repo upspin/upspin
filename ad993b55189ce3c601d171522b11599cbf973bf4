@@ -16,6 +16,24 @@
       "revId": "ad993b55189ce3c601d171522b11599cbf973bf4",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "39116709_e274644b",
+        "filename": "flags/flags.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-02T01:30:07Z",
+      "side": 1,
+      "message": "no you can\u0027t, that binds NetAddr at the wrong time.",
+      "parentUuid": "30800258_904e95be",
+      "revId": "ad993b55189ce3c601d171522b11599cbf973bf4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
