@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "2b690a5e_e6367fd0",
+        "filename": "cmd/upspin/windows.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5361
+      },
+      "writtenOn": "2017-03-02T18:49:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c2effa9c_1ee997bd",
+      "revId": "05c847b02fa9f8bac52eebf34302b717b7258847",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da0a1b72_86abd74e",
         "filename": "cmd/upspin/windows.go",
         "patchSetId": 6
@@ -33,6 +51,24 @@
       "revId": "05c847b02fa9f8bac52eebf34302b717b7258847",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e08347c1_a4e4a164",
+        "filename": "cmd/upspin/windows.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5361
+      },
+      "writtenOn": "2017-03-02T18:49:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da0a1b72_86abd74e",
+      "revId": "05c847b02fa9f8bac52eebf34302b717b7258847",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "129322b7_b571da4f",
+        "filename": "cmd/upspin/windows_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5361
+      },
+      "writtenOn": "2017-03-02T18:49:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d61fc84f_39cb8117",
+      "revId": "05c847b02fa9f8bac52eebf34302b717b7258847",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "366249f6_bd2e6a7d",
         "filename": "cmd/upspin/windows_test.go",
         "patchSetId": 6
@@ -67,6 +121,24 @@
       "revId": "05c847b02fa9f8bac52eebf34302b717b7258847",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7a5ee639_57067d75",
+        "filename": "cmd/upspin/windows_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 5361
+      },
+      "writtenOn": "2017-03-02T18:49:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "366249f6_bd2e6a7d",
+      "revId": "05c847b02fa9f8bac52eebf34302b717b7258847",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
