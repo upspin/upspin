@@ -86,13 +86,13 @@ var (
 var flags = map[string]*flagVar{
 	"addr": &flagVar{
 		set: func() {
-			flag.StringVar(&NetAddr, "addr", "", "publicly accessible network address (`host:port`)")
+			stringVar(&NetAddr, "addr", "", "publicly accessible network address (`host:port`)")
 		},
 		arg: func() string { return strArg("addr", NetAddr, "") },
 	},
 	"blocksize": &flagVar{
 		set: func() {
-			flag.IntVar(&BlockSize, "blocksize", BlockSize, "`size` of blocks when writing larg:e files")
+			intVar(&BlockSize, "blocksize", BlockSize, "`size` of blocks when writing large files")
 		},
 		arg: func() string {
 			if BlockSize == defaultBlockSize {
@@ -103,7 +103,7 @@ var flags = map[string]*flagVar{
 	},
 	"cachedir": &flagVar{
 		set: func() {
-			flag.StringVar(&CacheDir, "cachedir", CacheDir, "`directory` containing all file caches")
+			stringVar(&CacheDir, "cachedir", CacheDir, "`directory` containing all file caches")
 		},
 		arg: func() string {
 			return strArg("cachedir", CacheDir, defaultCacheDir)
@@ -111,67 +111,84 @@ var flags = map[string]*flagVar{
 	},
 	"config": &flagVar{
 		set: func() {
-			flag.StringVar(&Config, "config", Config, "user's configuration `file`")
+			stringVar(&Config, "config", Config, "user's configuration `file`")
 		},
 		arg: func() string { return strArg("config", Config, defaultConfig) },
 	},
 	"http": &flagVar{
 		set: func() {
-			flag.StringVar(&HTTPAddr, "http", HTTPAddr, "`address` for incoming insecure network connections")
+			stringVar(&HTTPAddr, "http", HTTPAddr, "`address` for incoming insecure network connections")
 		},
 		arg: func() string { return strArg("http", HTTPAddr, defaultHTTPAddr) },
 	},
 	"https": &flagVar{
 		set: func() {
-			flag.StringVar(&HTTPSAddr, "https", HTTPSAddr, "`address` for incoming secure network connections")
+			stringVar(&HTTPSAddr, "https", HTTPSAddr, "`address` for incoming secure network connections")
 		},
 		arg: func() string { return strArg("https", HTTPSAddr, defaultHTTPSAddr) },
 	},
 	"kind": &flagVar{
 		set: func() {
-			flag.StringVar(&ServerKind, "kind", ServerKind, "server implementation `kind` (inprocess, gcp)")
+			stringVar(&ServerKind, "kind", ServerKind, "server implementation `kind` (inprocess, gcp)")
 		},
 		arg: func() string { return strArg("kind", ServerKind, defaultServerKind) },
 	},
 	"letscache": &flagVar{
 		set: func() {
-			flag.StringVar(&LetsEncryptCache, "letscache", "", "Let's Encrypt cache `directory`")
+			stringVar(&LetsEncryptCache, "letscache", "", "Let's Encrypt cache `directory`")
 		},
 		arg: func() string { return strArg("letscache", LetsEncryptCache, "") },
 	},
 	"log": &flagVar{
 		set: func() {
 			Log.Set("info")
-			flag.Var(&Log, "log", "`level` of logging: debug, info, error, disabled")
+			genVar(&Log, "log", "`level` of logging: debug, info, error, disabled")
 		},
 		arg: func() string { return strArg("log", Log.String(), defaultLog) },
 	},
 	"project": &flagVar{
 		set: func() {
-			flag.StringVar(&Project, "project", Project, "GCP `project` name")
+			stringVar(&Project, "project", Project, "GCP `project` name")
 		},
 		arg: func() string { return strArg("project", Project, "") },
 	},
 	"serverconfig": &flagVar{
 		set: func() {
-			flag.Var(configFlag{&ServerConfig}, "serverconfig", "comma-separated list of configuration options (key=value) for this server")
+			genVar(configFlag{&ServerConfig}, "serverconfig", "comma-separated list of configuration options (key=value) for this server")
 		},
 		arg: func() string { return strArg("serverconfig", configFlag{&ServerConfig}.String(), "") },
 	},
 	"storeserveruser": &flagVar{
 		set: func() {
-			flag.StringVar(&StoreServerUser, "storeserveruser", "", "user name of the StoreServer")
+			stringVar(&StoreServerUser, "storeserveruser", "", "user name of the StoreServer")
 		},
 		arg: func() string { return strArg("storeserveruser", StoreServerUser, "") },
 	},
 	"tls": &flagVar{
 		set: func() {
-			flag.StringVar(&TLSCertFile, "tls_cert", "", "TLS Certificate `file` in PEM format")
-			flag.StringVar(&TLSKeyFile, "tls_key", "", "TLS Key `file` in PEM format")
+			stringVar(&TLSCertFile, "tls_cert", "", "TLS Certificate `file` in PEM format")
+			stringVar(&TLSKeyFile, "tls_key", "", "TLS Key `file` in PEM format")
 		},
 		arg:  func() string { return strArg("tls_cert", TLSCertFile, "") },
 		arg2: func() string { return strArg("tls_key", TLSKeyFile, "") },
 	},
+}
+
+var all = flag.NewFlagSet("globals", flag.ExitOnError)
+
+func stringVar(variable *string, name, value, usage string) {
+	flag.StringVar(variable, name, value, usage)
+	all.StringVar(variable, name, value, usage)
+}
+
+func intVar(variable *int, name string, value int, usage string) {
+	flag.IntVar(variable, name, value, usage)
+	all.IntVar(variable, name, value, usage)
+}
+
+func genVar(variable flag.Value, name string, usage string) {
+	flag.Var(variable, name, usage)
+	all.Var(variable, name, usage)
 }
 
 // Parse registers the command-line flags for the given flag names
@@ -215,6 +232,18 @@ func Args() []string {
 		}
 	}
 	return args
+}
+
+// Globals returns a flag set with the global variables declared within.
+// The error handling is set to flag.ExitOnError, which works well within
+// the upspin command's structure.
+func Globals(name string) *flag.FlagSet {
+	globals := flag.NewFlagSet(name, flag.ExitOnError)
+	// The FlagSet type has no copy method, but we can manage.
+	all.VisitAll(func(f *flag.Flag) {
+		globals.Var(f.Value, f.Name, f.Usage)
+	})
+	return globals
 }
 
 // strArg returns a command-line argument that will recreate the flag,
