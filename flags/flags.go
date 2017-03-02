@@ -9,6 +9,7 @@ package flags // import "upspin.io/flags"
 import (
 	"flag"
 	"fmt"
+	"path/filepath"
 	"strings"
 
 	"upspin.io/log"
@@ -34,10 +35,12 @@ var (
 	BlockSize = defaultBlockSize
 
 	// CacheDir specifies the directory for the various file caches.
-	CacheDir = defaultCacheDir
+	defaultCacheDir = JoinWithHome("upspin")
+	CacheDir        = defaultCacheDir
 
 	// Config names the Upspin configuration file to use.
-	Config = defaultConfig
+	defaultConfig = JoinWithHome("upspin", "config")
+	Config        = defaultConfig
 
 	// HTTPAddr is the network address on which to listen for incoming
 	// insecure network connections.
@@ -275,4 +278,12 @@ func (f configFlag) Get() interface{} {
 		return ""
 	}
 	return *f.s
+}
+
+// JoinWithHome joins any number of path elements with the home directory of
+// the logged in user, adding a Separator if neccessary. The function is
+// intented for initializing variable with package flag.
+func JoinWithHome(elem ...string) string {
+	elem = append([]string{homedir()}, elem...)
+	return filepath.Join(elem...)
 }

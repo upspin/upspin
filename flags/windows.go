@@ -8,13 +8,9 @@ package flags
 
 import (
 	"os"
-	"path/filepath"
 )
 
-var (
-	// defaultCacheDir specifies the default directory for the various file caches.
-	defaultCacheDir = filepath.Join(os.Getenv("USERPROFILE"), "upspin")
-
-	// defaultConfig names the default Upspin configuration file to use.
-	defaultConfig = filepath.Join(os.Getenv("USERPROFILE"), "upspin", "config")
-)
+// homedir returns the value of the USERPROFILE environment variable on Windows.
+func homedir() string {
+	return os.Getenv("USERPROFILE")
+}
