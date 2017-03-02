@@ -42,7 +42,7 @@ const (
 )
 
 func main() {
-	flags.Parse("addr", "config", "https", "kind", "storeservername", "letscache", "log", "project", "serverconfig", "tls")
+	flags.Parse("addr", "config", "https", "kind", "storeserveruser", "letscache", "log", "project", "serverconfig", "tls")
 
 	if flags.Project != "" {
 		cloudLog.Connect(flags.Project, serverName)
