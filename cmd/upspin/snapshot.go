@@ -29,11 +29,35 @@ the directory server for the user's root supports them.
 	if err != nil {
 		s.Exit(err)
 	}
-	var suffixedUser string
+	var snapshotUser upspin.UserName
 	if suffix == "" {
-		suffixedUser = u + "+snapshot@" + domain
+		snapshotUser = upspin.UserName(u + "+snapshot@" + domain)
+	} else if suffix == "snapshot" {
+		// Okay -- snapshot user is allowed to trigger snapshots.
 	} else {
-		suffixedUser = u[:len(u)-len(suffix)-1] + "+snapshot@" + domain
+		s.Exitf("Only the snapshot user or the canonical user %q can trigger a snapshot", u+"@"+domain)
+	}
+
+	// Does the snapshot user exist? If not, create it.
+	keyServer := s.KeyServer()
+	_, err = keyServer.Lookup(snapshotUser)
+	switch {
+	case err == nil:
+		// Okay -- user exists.
+	case errors.Match(errors.E(errors.NotExist), err):
+		// User must be created. This should succeed because the current
+		// user is either the canonical user or the snapshot user.
+		err = keyServer.Put(&upspin.User{
+			Name:      snapshotUser,
+			Dirs:      []upspin.Endpoint{s.Config.DirEndpoint()},
+			Stores:    []upspin.Endpoint{s.Config.StoreEndpoint()},
+			PublicKey: s.Config.Factotum().PublicKey(),
+		})
+		if err != nil {
+			s.Exit(err)
+		}
+	default:
+		s.Exit(err)
 	}
 
 	// Is the root for the snapshot already created?
@@ -51,7 +75,7 @@ the directory server for the user's root supports them.
 	// Note: This is a hack, but it works. See dir/server/snapshot.go for
 	// the mechanism.
 	// TODO: Find a cleaner mechanism?
-	name := path.Join(upspin.PathName(suffixedUser), "TakeSnapshot")
+	name := path.Join(upspin.PathName(snapshotUser), "TakeSnapshot")
 	entry := &upspin.DirEntry{
 		Name:       name,
 		SignedName: name,
