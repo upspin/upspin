@@ -103,6 +103,14 @@ func testSnapshot(t *testing.T, r *testenv.Runner) {
 	if !r.Match(errors.E(errors.Private)) {
 		t.Fatal(r.Diag())
 	}
+
+	// WhichAccess for a snapshotted name returns nothing, even if the
+	// Access file exists in the path, which is the case here.
+	r.As(ownerName)
+	r.DirWhichAccess(found)
+	if !r.GotNilEntry() {
+		t.Fatal(r.Diag())
+	}
 }
 
 func randomString(t *testing.T, size int) string {

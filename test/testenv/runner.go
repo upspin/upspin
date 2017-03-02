@@ -244,6 +244,20 @@ func (r *Runner) GotIncompleteEntry(p upspin.PathName) bool {
 	return false
 }
 
+// GotNilEntry reports whether the Entry is nil and if not notes this fact as
+// the last error state.
+func (r *Runner) GotNilEntry() bool {
+	if r.Failed() {
+		return false
+	}
+	if r.Entry == nil {
+		return true
+	}
+	r.lastErr = errors.Errorf("got entry %q, want nil", r.Entry.Name)
+	_, r.errFile, r.errLine, _ = runtime.Caller(1)
+	return false
+}
+
 // GotEntryWithSequence reports whether the Entry has the given name
 // and sequence number and if not notes the discrepancy as the last error state.
 func (r *Runner) GotEntryWithSequence(p upspin.PathName, seq int64) bool {

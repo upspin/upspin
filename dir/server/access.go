@@ -34,6 +34,10 @@ func (s *server) whichAccess(p path.Parsed, opts ...options) (*upspin.DirEntry, 
 	o, ss := subspan("whichAccess", opts)
 	defer ss.End()
 
+	if isSnapshotUser(p.User()) {
+		return nil, nil
+	}
+
 	tree, err := s.loadTreeFor(p.User(), o)
 	if err != nil {
 		return nil, errors.E(err)
