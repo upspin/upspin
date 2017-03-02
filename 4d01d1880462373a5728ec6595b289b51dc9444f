@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6aabd632_1299d35d",
+        "filename": "flags/flags.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-02T03:00:58Z",
+      "side": 1,
+      "message": "doesn\u0027t stArg add the - and \u003d?  Same comment all the way down.",
+      "range": {
+        "startLine": 153,
+        "startChar": 39,
+        "endLine": 153,
+        "endChar": 46
+      },
+      "revId": "4d01d1880462373a5728ec6595b289b51dc9444f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
