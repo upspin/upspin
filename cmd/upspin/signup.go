@@ -60,14 +60,14 @@ file and keys and only send the signup request to the key server.
 	fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
 	fs.String("secretseed", "", "128 bit secret `seed` in proquint format")
 
-	s.parseFlags(fs, args, help, "[-config=<file>] signup [flags] <username>")
+	s.ParseFlags(fs, args, help, "[-config=<file>] signup [flags] <username>")
 
 	// Determine config file location.
 	if !filepath.IsAbs(flags.Config) {
 		// User must have a home dir in the local OS.
 		homedir, err := config.Homedir()
 		if err != nil {
-			s.exit(err)
+			s.Exit(err)
 		}
 		flags.Config = filepath.Join(homedir, flags.Config)
 	}
@@ -84,31 +84,31 @@ file and keys and only send the signup request to the key server.
 	}
 	if *bothServer != "" {
 		if *dirServer != "" || *storeServer != "" {
-			s.failf("if -server provided -dir and -store must not be set")
+			s.Failf("if -server provided -dir and -store must not be set")
 			fs.Usage()
 		}
 		*dirServer = *bothServer
 		*storeServer = *bothServer
 	}
 	if *dirServer == "" || *storeServer == "" {
-		s.failf("-dir and -store must both be provided")
+		s.Failf("-dir and -store must both be provided")
 		fs.Usage()
 	}
 
 	// Parse -dir and -store flags as addresses and construct remote endpoints.
 	dirEndpoint, err := parseAddress(*dirServer)
 	if err != nil {
-		s.exitf("error parsing -dir=%q: %v", dirServer, err)
+		s.Exitf("error parsing -dir=%q: %v", dirServer, err)
 	}
 	storeEndpoint, err := parseAddress(*storeServer)
 	if err != nil {
-		s.exitf("error parsing -store=%q: %v", storeServer, err)
+		s.Exitf("error parsing -store=%q: %v", storeServer, err)
 	}
 
 	// Parse user name.
 	uname, _, domain, err := user.Parse(upspin.UserName(fs.Arg(0)))
 	if err != nil {
-		s.exitf("invalid user name %q: %v", fs.Arg(0), err)
+		s.Exitf("invalid user name %q: %v", fs.Arg(0), err)
 	}
 	userName := upspin.UserName(uname + "@" + domain)
 
@@ -119,7 +119,7 @@ file and keys and only send the signup request to the key server.
 	// Verify if we have a config file.
 	_, err = config.FromFile(flags.Config)
 	if err == nil && !*force {
-		s.exitf("%s already exists", flags.Config)
+		s.Exitf("%s already exists", flags.Config)
 	}
 
 	// Write the config file.
@@ -132,25 +132,25 @@ file and keys and only send the signup request to the key server.
 		Packing:   "ee",
 	})
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 	err = ioutil.WriteFile(flags.Config, configContents.Bytes(), 0640)
 	if err != nil {
 		// Directory doesn't exist, perhaps.
 		if !os.IsNotExist(err) {
-			s.exitf("cannot create %s: %v", flags.Config, err)
+			s.Exitf("cannot create %s: %v", flags.Config, err)
 		}
 		dir := filepath.Dir(flags.Config)
 		if _, statErr := os.Stat(dir); !os.IsNotExist(statErr) {
 			// Looks like the directory exists, so stop now and report original error.
-			s.exitf("cannot create %s: %v", flags.Config, err)
+			s.Exitf("cannot create %s: %v", flags.Config, err)
 		}
 		if mkdirErr := os.Mkdir(dir, 0700); mkdirErr != nil {
-			s.exitf("cannot make directory %s: %v", dir, mkdirErr)
+			s.Exitf("cannot make directory %s: %v", dir, mkdirErr)
 		}
 		err = ioutil.WriteFile(flags.Config, configContents.Bytes(), 0640)
 		if err != nil {
-			s.exit(err)
+			s.Exit(err)
 		}
 	}
 	fmt.Println("Configuration file written to:")
@@ -167,7 +167,7 @@ file and keys and only send the signup request to the key server.
 func (s *State) registerUser(configFile string) {
 	cfg, err := config.FromFile(configFile)
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 
 	// Make signup request.
@@ -186,15 +186,15 @@ func (s *State) registerUser(configFile string) {
 
 	r, err := http.Post(signupURL, "text/plain", nil)
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 	b, err := ioutil.ReadAll(r.Body)
 	r.Body.Close()
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 	if r.StatusCode != http.StatusOK {
-		s.exitf("key server error: %s", b)
+		s.Exitf("key server error: %s", b)
 	}
 	fmt.Printf("A signup email has been sent to %q,\n", cfg.UserName())
 	fmt.Println("please read it for further instructions.")

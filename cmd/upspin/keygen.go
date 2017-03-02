@@ -18,6 +18,7 @@ import (
 	"upspin.io/errors"
 	"upspin.io/key/proquint"
 	"upspin.io/pack/ee"
+	"upspin.io/subcmd"
 )
 
 func (s *State) keygen(args ...string) {
@@ -37,15 +38,14 @@ See the description for rotate for information about updating keys.
 	fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
 	fs.String("secretseed", "", "128 bit secret `seed` in proquint format")
 	fs.String("where", filepath.Join(os.Getenv("HOME"), ".ssh"), "`directory` to store keys")
-	s.parseFlags(fs, args, help, "keygen [-curve=256] [-secretseed=seed] [-where=$HOME/.ssh]")
+	s.ParseFlags(fs, args, help, "keygen [-curve=256] [-secretseed=seed] [-where=$HOME/.ssh]")
 	if fs.NArg() != 0 {
 		fs.Usage()
 	}
-	s.keygenCommand(fs)
 }
 
 func (s *State) keygenCommand(fs *flag.FlagSet) {
-	curve := stringFlag(fs, "curve")
+	curve := subcmd.StringFlag(fs, "curve")
 	switch curve {
 	case "p256", "p384", "p521":
 		// ok
@@ -54,22 +54,22 @@ func (s *State) keygenCommand(fs *flag.FlagSet) {
 		fs.Usage()
 	}
 
-	public, private, proquintStr, err := createKeys(curve, stringFlag(fs, "secretseed"))
+	public, private, proquintStr, err := createKeys(curve, subcmd.StringFlag(fs, "secretseed"))
 	if err != nil {
-		s.exitf("creating keys: %v", err)
+		s.Exitf("creating keys: %v", err)
 	}
 
-	where := stringFlag(fs, "where")
+	where := subcmd.StringFlag(fs, "where")
 	if where == "" {
-		s.exitf("-where must not be empty")
+		s.Exitf("-where must not be empty")
 	}
 	err = saveKeys(where)
 	if err != nil {
-		s.exitf("saving previous keys failed(%v); keys not generated", err)
+		s.Exitf("saving previous keys failed(%v); keys not generated", err)
 	}
 	err = writeKeys(where, public, private)
 	if err != nil {
-		s.exitf("writing keys: %v", err)
+		s.Exitf("writing keys: %v", err)
 	}
 	fmt.Println("Upspin private/public key pair written to:")
 	fmt.Printf("\t%s\n", filepath.Join(where, "public.upspinkey"))

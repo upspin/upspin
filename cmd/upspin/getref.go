@@ -20,22 +20,22 @@ the user's default store server. It does not resolve redirections.
 `
 	fs := flag.NewFlagSet("getref", flag.ExitOnError)
 	outFile := fs.String("out", "", "output file (default standard output)")
-	s.parseFlags(fs, args, help, "getref [-out=outputfile] ref")
+	s.ParseFlags(fs, args, help, "getref [-out=outputfile] ref")
 
 	if fs.NArg() != 1 {
 		fs.Usage()
 	}
 	ref := fs.Arg(0)
 
-	store, err := bind.StoreServer(s.config, s.config.StoreEndpoint())
+	store, err := bind.StoreServer(s.Config, s.Config.StoreEndpoint())
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
-	fmt.Fprintf(os.Stderr, "Using store server at %s\n", s.config.StoreEndpoint())
+	fmt.Fprintf(os.Stderr, "Using store server at %s\n", s.Config.StoreEndpoint())
 
 	data, _, locs, err := store.Get(upspin.Reference(ref))
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 	if len(locs) > 0 {
 		fmt.Fprintf(os.Stderr, "Redirection detected:\n")
@@ -52,12 +52,12 @@ the user's default store server. It does not resolve redirections.
 	} else {
 		output, err = os.Create(*outFile)
 		if err != nil {
-			s.exit(err)
+			s.Exit(err)
 		}
 		defer output.Close()
 	}
 	_, err = output.Write(data)
 	if err != nil {
-		s.exitf("Copying to output failed: %v", err)
+		s.Exitf("Copying to output failed: %v", err)
 	}
 }

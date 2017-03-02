@@ -21,7 +21,7 @@ When running the shell, the leading "upspin" is assumed on each command.
 	fs := flag.NewFlagSet("shell", flag.ExitOnError)
 	promptFlag := fs.String("prompt", promptPlaceholder, "interactive `prompt`")
 	verbose := fs.Bool("v", false, "verbose; print to stderr each command before execution")
-	s.parseFlags(fs, args, help, "shell [-v] [-prompt=<prompt_string>]")
+	s.ParseFlags(fs, args, help, "shell [-v] [-prompt=<prompt_string>]")
 	if fs.NArg() != 0 {
 		fs.Usage()
 	}
@@ -31,16 +31,16 @@ When running the shell, the leading "upspin" is assumed on each command.
 		}
 	}
 	if *promptFlag == promptPlaceholder {
-		*promptFlag = string(s.config.UserName()) + ">"
+		*promptFlag = string(s.Config.UserName()) + ">"
 	}
-	s.interactive = true
-	defer func() { s.interactive = false }()
+	s.Interactive = true
+	defer func() { s.Interactive = false }()
 	scanner := bufio.NewScanner(os.Stdin)
 	for prompt(); scanner.Scan(); prompt() {
 		s.exec(scanner.Text(), *verbose)
 	}
 	if scanner.Err() != nil {
-		s.exit(scanner.Err())
+		s.Exit(scanner.Err())
 	}
 }
 
@@ -73,5 +73,6 @@ func (s *State) exec(line string, verbose bool) {
 	if verbose {
 		fmt.Println(" + " + strings.Join(words, " "))
 	}
+	s.Name = words[0]
 	fn(s, words[1:]...)
 }
