@@ -15,6 +15,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"upspin.io/config"
 	"upspin.io/errors"
 	"upspin.io/key/proquint"
 	"upspin.io/pack/ee"
@@ -37,7 +38,7 @@ See the description for rotate for information about updating keys.
 	fs := flag.NewFlagSet("keygen", flag.ExitOnError)
 	fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
 	fs.String("secretseed", "", "128 bit secret `seed` in proquint format")
-	fs.String("where", filepath.Join(os.Getenv("HOME"), ".ssh"), "`directory` to store keys")
+	fs.String("where", filepath.Join(config.Home(), ".ssh"), "`directory` to store keys")
 	s.ParseFlags(fs, args, help, "keygen [-curve=256] [-secretseed=seed] [-where=$HOME/.ssh]")
 	if fs.NArg() != 0 {
 		fs.Usage()
