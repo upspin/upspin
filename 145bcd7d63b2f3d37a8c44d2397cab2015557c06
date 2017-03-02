@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba896412_22687b51",
+        "filename": "subcmd/io.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-02T05:22:40Z",
+      "side": 1,
+      "message": "s/MkdirLocal/MkdirAllLocal/",
+      "revId": "145bcd7d63b2f3d37a8c44d2397cab2015557c06",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
