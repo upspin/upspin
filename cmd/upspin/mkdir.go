@@ -11,14 +11,14 @@ func (s *State) mkdir(args ...string) {
 Mkdir creates Upspin directories.
 `
 	fs := flag.NewFlagSet("mkdir", flag.ExitOnError)
-	s.parseFlags(fs, args, help, "mkdir directory...")
+	s.ParseFlags(fs, args, help, "mkdir directory...")
 	if fs.NArg() == 0 {
 		fs.Usage()
 	}
-	for _, name := range s.globAllUpspinPath(fs.Args()) {
-		_, err := s.client.MakeDirectory(name)
+	for _, name := range s.GlobAllUpspinPath(fs.Args()) {
+		_, err := s.Client.MakeDirectory(name)
 		if err != nil {
-			s.exit(err)
+			s.Exit(err)
 		}
 	}
 }

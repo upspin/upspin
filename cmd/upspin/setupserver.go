@@ -45,9 +45,9 @@ The calling user must be the same one that ran 'upspin setupdomain'.
 	domain := fs.String("domain", "", "domain `name` for this Upspin installation")
 	host := fs.String("host", "", "host `name` of upspinserver (empty implies the cluster dir.domain and store.domain)")
 	writers := fs.String("writers", "", "additional `users` to be given write access to this server")
-	s.parseFlags(fs, args, help, "setupserver -domain=<domain> -host=<host> [-where=$HOME/upspin/deploy] [-writers=user,...]")
+	s.ParseFlags(fs, args, help, "setupserver -domain=<domain> -host=<host> [-where=$HOME/upspin/deploy] [-writers=user,...]")
 	if *domain == "" || *host == "" {
-		s.failf("the -domain and -host flags must be provided")
+		s.Failf("the -domain and -host flags must be provided")
 		fs.Usage()
 	}
 
@@ -60,7 +60,7 @@ The calling user must be the same one that ran 'upspin setupdomain'.
 	}
 	_, _, err := net.SplitHostPort(*host)
 	if err != nil {
-		s.exitf("invalid -host argument %q: %v", *host, err)
+		s.Exitf("invalid -host argument %q: %v", *host, err)
 	}
 	cfg.Addr = upspin.NetAddr(*host)
 	s.writeServerConfig(cfgPath, cfg)
@@ -71,13 +71,13 @@ The calling user must be the same one that ran 'upspin setupdomain'.
 	}
 
 	// Put the server user to the key server.
-	key, err := bind.KeyServer(s.config, s.config.KeyEndpoint())
+	key, err := bind.KeyServer(s.Config, s.Config.KeyEndpoint())
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 	local, err := userFor(cfgPath, cfg)
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 	remote, err := key.Lookup(cfg.User)
 	if err == nil {
@@ -88,14 +88,14 @@ The calling user must be the same one that ran 'upspin setupdomain'.
 		if err := key.Put(local); err != nil {
 			// TODO(adg): Check whether the TXT record for this
 			// domain is in place.
-			s.exit(err)
+			s.Exit(err)
 		}
 		fmt.Printf("Successfully put %q to the key server.\n", cfg.User)
 	}
 
 	// Create Writers file.
 	var buf bytes.Buffer
-	fmt.Fprintf(&buf, "%s\n%s\n", s.config.UserName(), cfg.User)
+	fmt.Fprintf(&buf, "%s\n%s\n", s.Config.UserName(), cfg.User)
 	for _, user := range strings.Split(*writers, ",") {
 		user = strings.TrimSpace(user)
 		if user == "" {
@@ -104,7 +104,7 @@ The calling user must be the same one that ran 'upspin setupdomain'.
 		fmt.Fprintf(&buf, "%s\n", user)
 	}
 	if err := ioutil.WriteFile(filepath.Join(cfgPath, "Writers"), buf.Bytes(), 0644); err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 
 	// Write Upspin config file for the server user,
@@ -118,10 +118,10 @@ The calling user must be the same one that ran 'upspin setupdomain'.
 		SecretDir: cfgPath,
 		Packing:   "ee",
 	}); err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 	if err := ioutil.WriteFile(configFile, configBody.Bytes(), 0644); err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 
 	// Put server config to the remote upspinserver.
@@ -130,16 +130,16 @@ The calling user must be the same one that ran 'upspin setupdomain'.
 
 	// Check that the current configuration points to our new server.
 	// If not, ask the user to change it and update the key server.
-	if s.config.DirEndpoint() != ep || s.config.StoreEndpoint() != ep {
+	if s.Config.DirEndpoint() != ep || s.Config.StoreEndpoint() != ep {
 		fmt.Printf("Your current configuration in %q has these values:\n", flags.Config)
-		fmt.Printf("\tdirserver: %v\n\tstoreserver: %v\n\n", s.config.DirEndpoint(), s.config.StoreEndpoint())
+		fmt.Printf("\tdirserver: %v\n\tstoreserver: %v\n\n", s.Config.DirEndpoint(), s.Config.StoreEndpoint())
 		fmt.Printf("To use the server we are setting up now, these values should be\n")
 		fmt.Printf("\tdirserver: %v\n\tstoreserver: %v\n\n", ep, ep)
 		return
 	}
 
 	// Make the current user root.
-	root := string(s.config.UserName())
+	root := string(s.Config.UserName())
 	s.mkdir(root)
 	fmt.Printf("Created root %q.\n", root)
 }
@@ -169,24 +169,24 @@ func (s *State) configureServer(cfgPath string, cfg *ServerConfig) {
 			continue
 		}
 		if err != nil {
-			s.exit(err)
+			s.Exit(err)
 		}
 		files[name] = b
 	}
 	b, err := json.Marshal(files)
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 
 	u := "https://" + string(cfg.Addr) + "/setupserver"
 	resp, err := http.Post(u, "application/octet-stream", bytes.NewReader(b))
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 	b, _ = ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		s.exitf("upspinserver returned status %v:\n%s", resp.Status, b)
+		s.Exitf("upspinserver returned status %v:\n%s", resp.Status, b)
 	}
 }
 
@@ -195,13 +195,13 @@ func (s *State) readServerConfig(cfgPath string) *ServerConfig {
 	b, err := ioutil.ReadFile(cfgFile)
 	if err != nil {
 		if os.IsNotExist(err) {
-			s.exitf("No server config file found at %q.\nRun 'upspin setupdomain' first.", cfgFile)
+			s.Exitf("No server config file found at %q.\nRun 'upspin setupdomain' first.", cfgFile)
 		}
-		s.exit(err)
+		s.Exit(err)
 	}
 	cfg := &ServerConfig{}
 	if err := json.Unmarshal(b, cfg); err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 	return cfg
 }
@@ -210,11 +210,11 @@ func (s *State) writeServerConfig(cfgPath string, cfg *ServerConfig) {
 	cfgFile := filepath.Join(cfgPath, serverConfigFile)
 	b, err := json.Marshal(cfg)
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 	err = ioutil.WriteFile(cfgFile, b, 0644)
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 }
 

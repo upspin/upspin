@@ -33,33 +33,33 @@ makes it easier to recover if a step fails.
 TODO: Rotate and countersign are terms of art, not clear to users.
 `
 	fs := flag.NewFlagSet("rotate", flag.ExitOnError)
-	s.parseFlags(fs, args, help, "rotate")
+	s.ParseFlags(fs, args, help, "rotate")
 	if fs.NArg() != 0 {
 		fs.Usage()
 	}
 
-	f := s.config.Factotum()
+	f := s.Config.Factotum()
 	if f == nil {
-		s.exitf("no factotum available")
+		s.Exitf("no factotum available")
 	}
 	if f.Pop().PublicKey() == f.PublicKey() {
-		s.exitf("no previous key to rotate (missing or bad secret2.upspinkey?)")
+		s.Exitf("no previous key to rotate (missing or bad secret2.upspinkey?)")
 	}
 
 	// Update the current config to use the previous key, in order to
 	// authenticate with the key server (it still has the old key).
-	lastCfg := s.config
-	s.config = config.SetFactotum(s.config, f.Pop()) // config now defaults to old key
-	defer func() { s.config = lastCfg }()
+	lastCfg := s.Config
+	s.Config = config.SetFactotum(s.Config, f.Pop()) // config now defaults to old key
+	defer func() { s.Config = lastCfg }()
 
 	keyServer := s.KeyServer()
-	u, err := keyServer.Lookup(s.config.UserName())
+	u, err := keyServer.Lookup(s.Config.UserName())
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 	u.PublicKey = f.PublicKey()
 	err = keyServer.Put(u)
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 }

@@ -61,10 +61,10 @@ func (s *State) gendoc(args ...string) {
 
 	out, err := format.Source(b.Bytes())
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 	err = ioutil.WriteFile("doc.go", out, 0644)
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 }

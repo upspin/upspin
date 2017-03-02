@@ -12,6 +12,7 @@ import (
 	"upspin.io/client"
 	"upspin.io/config"
 	"upspin.io/pack"
+	"upspin.io/subcmd"
 	"upspin.io/upspin"
 )
 
@@ -31,7 +32,7 @@ for more information.
 	fs.String("pack", "ee", "packing to use when rewriting")
 	fs.Bool("r", false, "recur into subdirectories")
 	fs.Bool("v", false, "verbose: log progress")
-	s.parseFlags(fs, args, help, "repack [-pack ee] [flags] path...")
+	s.ParseFlags(fs, args, help, "repack [-pack ee] [flags] path...")
 	if fs.NArg() == 0 {
 		fs.Usage()
 	}
@@ -42,17 +43,17 @@ for more information.
 // repackCommand implements the repack command. It builds a temporary client
 // with the new packing and iterates over the files.
 func (s *State) repackCommand(fs *flag.FlagSet) {
-	packer := pack.LookupByName(stringFlag(fs, "pack"))
+	packer := pack.LookupByName(subcmd.StringFlag(fs, "pack"))
 	if packer == nil {
-		s.exitf("no such packing %q", stringFlag(fs, "pack"))
+		s.Exitf("no such packing %q", subcmd.StringFlag(fs, "pack"))
 	}
 
-	prevClient := s.client
-	s.client = client.New(config.SetPacking(s.config, packer.Packing()))
-	defer func() { s.client = prevClient }()
+	prevClient := s.Client
+	s.Client = client.New(config.SetPacking(s.Config, packer.Packing()))
+	defer func() { s.Client = prevClient }()
 
-	for _, entry := range s.globAllUpspin(fs.Args()) {
-		s.repackFileOrDir(entry, packer, boolFlag(fs, "f"), boolFlag(fs, "r"), boolFlag(fs, "v"))
+	for _, entry := range s.GlobAllUpspin(fs.Args()) {
+		s.repackFileOrDir(entry, packer, subcmd.BoolFlag(fs, "f"), subcmd.BoolFlag(fs, "r"), subcmd.BoolFlag(fs, "v"))
 	}
 }
 
@@ -66,11 +67,11 @@ func (s *State) repackFileOrDir(entry *upspin.DirEntry, packer upspin.Packer, fo
 	}
 	if entry.IsDir() {
 		if !recur {
-			s.exitf("%q is a directory", name)
+			s.Exitf("%q is a directory", name)
 		}
-		entries, err := s.client.Glob(upspin.AllFilesGlob(name))
+		entries, err := s.Client.Glob(upspin.AllFilesGlob(name))
 		if err != nil {
-			s.exit(err)
+			s.Exit(err)
 		}
 		for _, entry := range entries {
 			s.repackFileOrDir(entry, packer, force, true, verbose)
@@ -87,37 +88,37 @@ func (s *State) repackFileOrDir(entry *upspin.DirEntry, packer upspin.Packer, fo
 	// renames, so if there is an error we don't lose the original.
 	// This requires create permission but does not require the
 	// whole file be in memory. TODO rewrite in place?
-	old, err := s.client.Open(entry.Name)
+	old, err := s.Client.Open(entry.Name)
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
-	new, err := s.client.Create(entry.Name + "._rename")
+	new, err := s.Client.Create(entry.Name + "._rename")
 	if err != nil {
 		old.Close()
-		s.exit(err)
+		s.Exit(err)
 	}
 	// Will close by hand - no defer - so renames happens with no I/O open.
 	_, err = io.Copy(new, old)
 	old.Close()
 	if err != nil {
 		new.Close()
-		s.exit(err)
+		s.Exit(err)
 	}
 	err = new.Close()
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 	// New file exists. Delete the old one.
-	err = s.client.Delete(old.Name())
+	err = s.Client.Delete(old.Name())
 	if err != nil {
 		// Failure. The old file exists, so delete the new one if we can.
-		s.client.Delete(new.Name())
-		s.exit(err)
+		s.Client.Delete(new.Name())
+		s.Exit(err)
 	}
 	// Scary moment!
-	err = s.client.Rename(new.Name(), old.Name())
+	err = s.Client.Rename(new.Name(), old.Name())
 	if err != nil {
 		log.Printf("rename failed, but repacked contents are now in %q", new.Name())
-		s.exit(err)
+		s.Exit(err)
 	}
 }

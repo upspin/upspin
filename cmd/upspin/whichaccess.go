@@ -17,14 +17,14 @@ Whichaccess reports the Upspin path of the Access file
 that controls permissions for each of the argument paths.
 `
 	fs := flag.NewFlagSet("whichaccess", flag.ExitOnError)
-	s.parseFlags(fs, args, help, "whichaccess path...")
+	s.ParseFlags(fs, args, help, "whichaccess path...")
 	if fs.NArg() == 0 {
 		fs.Usage()
 	}
-	for _, name := range s.globAllUpspinPath(fs.Args()) {
+	for _, name := range s.GlobAllUpspinPath(fs.Args()) {
 		acc, err := s.whichAccessFollowLinks(name)
 		if err != nil {
-			s.exit(err)
+			s.Exit(err)
 		}
 		if acc == nil {
 			fmt.Printf("%s: owner only\n", name)
@@ -46,6 +46,6 @@ func (s *State) whichAccessFollowLinks(name upspin.PathName) (*upspin.DirEntry, 
 		}
 		return entry, nil
 	}
-	s.exitf("%s: link loop", name)
+	s.Exitf("%s: link loop", name)
 	return nil, nil
 }

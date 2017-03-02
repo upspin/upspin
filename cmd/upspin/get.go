@@ -15,16 +15,16 @@ Get writes to standard output the contents identified by the Upspin path.
 `
 	fs := flag.NewFlagSet("get", flag.ExitOnError)
 	outFile := fs.String("out", "", "output file (default standard output)")
-	s.parseFlags(fs, args, help, "get [-out=outputfile] path")
+	s.ParseFlags(fs, args, help, "get [-out=outputfile] path")
 
-	names := s.globAllUpspinPath(fs.Args())
+	names := s.GlobAllUpspinPath(fs.Args())
 	if len(names) != 1 {
 		fs.Usage()
 	}
 
-	data, err := s.client.Get(names[0])
+	data, err := s.Client.Get(names[0])
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 	// Write to outfile or to stdout if none set
 	var output *os.File
@@ -33,12 +33,12 @@ Get writes to standard output the contents identified by the Upspin path.
 	} else {
 		output, err = os.Create(*outFile)
 		if err != nil {
-			s.exit(err)
+			s.Exit(err)
 		}
 		defer output.Close()
 	}
 	_, err = output.Write(data)
 	if err != nil {
-		s.exitf("Copying to output failed: %v", err)
+		s.Exitf("Copying to output failed: %v", err)
 	}
 }

@@ -48,25 +48,25 @@ If any state exists at the given location (-where) then the command aborts.
 	curveName := fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
 	putUsers := fs.Bool("put-users", false, "put server users to the key server")
 	cluster := fs.Bool("cluster", false, "generate keys for upspin-dir@domain and upspin-store@domain (default is upspin@domain only)")
-	s.parseFlags(fs, args, help, "setupdomain [-where=$HOME/upspin/deploy] [-cluster] -domain=<name>")
+	s.ParseFlags(fs, args, help, "setupdomain [-where=$HOME/upspin/deploy] [-cluster] -domain=<name>")
 	if *where == "" {
-		s.failf("the -where flag must not be empty")
+		s.Failf("the -where flag must not be empty")
 		fs.Usage()
 	}
 	if *domain == "" {
-		s.failf("the -domain flag must be provided")
+		s.Failf("the -domain flag must be provided")
 		fs.Usage()
 	}
 	switch *curveName {
 	case "p256", "p384", "p521":
 		// OK
 	default:
-		s.exitf("no such curve %q", *curveName)
+		s.Exitf("no such curve %q", *curveName)
 	}
 
 	if !*cluster {
 		if *putUsers {
-			s.exitf("the -put-users flag requires -cluster")
+			s.Exitf("the -put-users flag requires -cluster")
 		}
 		s.setuphost(*where, *domain, *curveName)
 		return
@@ -83,11 +83,11 @@ If any state exists at the given location (-where) then the command aborts.
 	if *putUsers {
 		dirFile, dirUser, err := writeUserFile(dirConfig)
 		if err != nil {
-			s.exit(err)
+			s.Exit(err)
 		}
 		storeFile, storeUser, err := writeUserFile(storeConfig)
 		if err != nil {
-			s.exit(err)
+			s.Exit(err)
 		}
 		s.user("-put", "-in", dirFile)
 		os.Remove(dirFile)
@@ -97,28 +97,28 @@ If any state exists at the given location (-where) then the command aborts.
 		return
 	}
 
-	s.shouldNotExist(dirServerPath)
-	s.shouldNotExist(storeServerPath)
-	s.mkdirAllLocal(dirServerPath)
-	s.mkdirAllLocal(storeServerPath)
+	s.ShouldNotExist(dirServerPath)
+	s.ShouldNotExist(storeServerPath)
+	s.MkdirAllLocal(dirServerPath)
+	s.MkdirAllLocal(storeServerPath)
 
 	// Generate keys for the dirserver and the storeserver.
 	var noProquint string
 	dirPublic, dirPrivate, dirProquint, err := createKeys(*curveName, noProquint)
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 	storePublic, storePrivate, storeProquint, err := createKeys(*curveName, noProquint)
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 	err = writeKeys(dirServerPath, dirPublic, dirPrivate)
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 	err = writeKeys(storeServerPath, storePublic, storePrivate)
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 
 	// Generate config files for those users.
@@ -138,10 +138,10 @@ If any state exists at the given location (-where) then the command aborts.
 		SecretDir: dirServerPath,
 		Packing:   "ee",
 	}); err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 	if err := ioutil.WriteFile(dirConfig, dirBody.Bytes(), 0644); err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 	var storeBody bytes.Buffer
 	if err := configTemplate.Execute(&storeBody, configData{
@@ -151,18 +151,18 @@ If any state exists at the given location (-where) then the command aborts.
 		SecretDir: storeServerPath,
 		Packing:   "plain",
 	}); err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 	if err := ioutil.WriteFile(storeConfig, storeBody.Bytes(), 0644); err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 
 	// Generate signature.
 	// TODO This should use sha256.
-	msg := "upspin-domain:" + *domain + "-" + string(s.config.UserName())
-	sig, err := s.config.Factotum().Sign([]byte(msg))
+	msg := "upspin-domain:" + *domain + "-" + string(s.Config.UserName())
+	sig, err := s.Config.Factotum().Sign([]byte(msg))
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 
 	err = setupDomainTemplate.Execute(os.Stdout, setupDomainData{
@@ -170,7 +170,7 @@ If any state exists at the given location (-where) then the command aborts.
 		Where:     *where,
 		Domain:    *domain,
 		Project:   flags.Project,
-		UserName:  s.config.UserName(),
+		UserName:  s.Config.UserName(),
 		Signature: fmt.Sprintf("%x-%x", sig.R, sig.S),
 
 		DirProquint:     dirProquint,
@@ -179,7 +179,7 @@ If any state exists at the given location (-where) then the command aborts.
 		StoreServerPath: storeServerPath,
 	})
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 }
 
@@ -256,26 +256,26 @@ func writeUserFile(configFile string) (userFile string, u upspin.UserName, err e
 
 func (s *State) setuphost(where, domain, curve string) {
 	cfgPath := filepath.Join(where, domain)
-	s.shouldNotExist(cfgPath)
-	s.mkdirAllLocal(cfgPath)
+	s.ShouldNotExist(cfgPath)
+	s.MkdirAllLocal(cfgPath)
 
 	// Generate and write keys for the server user.
 	var noProquint string
 	pub, pri, proquint, err := createKeys(curve, noProquint)
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 	err = writeKeys(cfgPath, pub, pri)
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 
 	// Generate signature.
 	// TODO This should use sha256.
-	msg := "upspin-domain:" + domain + "-" + string(s.config.UserName())
-	sig, err := s.config.Factotum().Sign([]byte(msg))
+	msg := "upspin-domain:" + domain + "-" + string(s.Config.UserName())
+	sig, err := s.Config.Factotum().Sign([]byte(msg))
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 
 	// Write server config file.
@@ -288,13 +288,13 @@ func (s *State) setuphost(where, domain, curve string) {
 		Where:     where,
 		Domain:    domain,
 		Project:   flags.Project,
-		UserName:  s.config.UserName(),
+		UserName:  s.Config.UserName(),
 		Signature: fmt.Sprintf("%x-%x", sig.R, sig.S),
 
 		Proquint: proquint,
 	})
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 }
 
