@@ -50,7 +50,7 @@ file and keys and only send the signup request to the key server.
 	fs := flag.NewFlagSet("signup", flag.ExitOnError)
 	var (
 		force       = fs.Bool("force", false, "create a new user even if keys and config file exist")
-		where       = fs.String("where", filepath.Join(os.Getenv("HOME"), ".ssh"), "`directory` to store keys")
+		where       = fs.String("where", filepath.Join(config.Home(), ".ssh"), "`directory` to store keys")
 		dirServer   = fs.String("dir", "", "Directory server `address`")
 		storeServer = fs.String("store", "", "Store server `address`")
 		bothServer  = fs.String("server", "", "Store and Directory server `address` (if combined)")

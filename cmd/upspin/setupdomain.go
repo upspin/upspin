@@ -45,7 +45,7 @@ If any state exists at the given location (-where) then the command aborts.
 `
 	)
 	fs := flag.NewFlagSet("setupdomain", flag.ExitOnError)
-	where := fs.String("where", filepath.Join(os.Getenv("HOME"), "upspin", "deploy"), "`directory` to store private configuration files")
+	where := fs.String("where", filepath.Join(config.Home(), "upspin", "deploy"), "`directory` to store private configuration files")
 	domain := fs.String("domain", "", "domain `name` for this Upspin installation")
 	curveName := fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
 	putUsers := fs.Bool("put-users", false, "put server users to the key server")
