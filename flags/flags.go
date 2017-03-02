@@ -80,12 +80,7 @@ var (
 // flags is a map of flag registration functions keyed by flag name,
 // used by Parse to register specific (or all) flags.
 var flags = map[string]*flagVar{
-	"addr": &flagVar{
-		set: func() {
-			flag.StringVar(&NetAddr, "addr", "", "publicly accessible network address (`host:port`)")
-		},
-		arg: func() string { return strArg("addr", NetAddr, "") },
-	},
+	"addr": strVar(&NetAddr, "addr", NetAddr, "publicly accessible network address (`host:port`)"),
 	"blocksize": &flagVar{
 		set: func() {
 			flag.IntVar(&BlockSize, "blocksize", BlockSize, "`size` of blocks when writing large files")
@@ -97,44 +92,12 @@ var flags = map[string]*flagVar{
 			return fmt.Sprintf("-blocksize=%d", BlockSize)
 		},
 	},
-	"cachedir": &flagVar{
-		set: func() {
-			flag.StringVar(&CacheDir, "cachedir", CacheDir, "`directory` containing all file caches")
-		},
-		arg: func() string {
-			return strArg("cachedir", CacheDir, defaultCacheDir)
-		},
-	},
-	"config": &flagVar{
-		set: func() {
-			flag.StringVar(&Config, "config", Config, "user's configuration `file`")
-		},
-		arg: func() string { return strArg("config", Config, defaultConfig) },
-	},
-	"http": &flagVar{
-		set: func() {
-			flag.StringVar(&HTTPAddr, "http", HTTPAddr, "`address` for incoming insecure network connections")
-		},
-		arg: func() string { return strArg("http", HTTPAddr, defaultHTTPAddr) },
-	},
-	"https": &flagVar{
-		set: func() {
-			flag.StringVar(&HTTPSAddr, "https", HTTPSAddr, "`address` for incoming secure network connections")
-		},
-		arg: func() string { return strArg("https", HTTPSAddr, defaultHTTPSAddr) },
-	},
-	"kind": &flagVar{
-		set: func() {
-			flag.StringVar(&ServerKind, "kind", ServerKind, "server implementation `kind` (inprocess, gcp)")
-		},
-		arg: func() string { return strArg("kind", ServerKind, defaultServerKind) },
-	},
-	"letscache": &flagVar{
-		set: func() {
-			flag.StringVar(&LetsEncryptCache, "letscache", "", "Let's Encrypt cache `directory`")
-		},
-		arg: func() string { return strArg("letscache", LetsEncryptCache, "") },
-	},
+	"cachedir":  strVar(&CacheDir, "cachedir", CacheDir, "`directory` containing all file caches"),
+	"config":    strVar(&Config, "config", Config, "user's configuration `file`"),
+	"http":      strVar(&HTTPAddr, "http", HTTPAddr, "`address` for incoming insecure network connections"),
+	"https":     strVar(&HTTPSAddr, "https", HTTPSAddr, "`address` for incoming secure network connections"),
+	"kind":      strVar(&ServerKind, "kind", ServerKind, "server implementation `kind` (inprocess, gcp)"),
+	"letscache": strVar(&LetsEncryptCache, "letscache", "", "Let's Encrypt cache `directory`"),
 	"log": &flagVar{
 		set: func() {
 			Log.Set("info")
@@ -142,24 +105,14 @@ var flags = map[string]*flagVar{
 		},
 		arg: func() string { return strArg("log", Log.String(), defaultLog) },
 	},
-	"project": &flagVar{
-		set: func() {
-			flag.StringVar(&Project, "project", Project, "GCP `project` name")
-		},
-		arg: func() string { return strArg("project", Project, "") },
-	},
+	"project": strVar(&Project, "project", Project, "GCP `project` name"),
 	"serverconfig": &flagVar{
 		set: func() {
 			flag.Var(configFlag{&ServerConfig}, "serverconfig", "comma-separated list of configuration options (key=value) for this server")
 		},
 		arg: func() string { return strArg("serverconfig", configFlag{&ServerConfig}.String(), "") },
 	},
-	"storeserveruser": &flagVar{
-		set: func() {
-			flag.StringVar(&StoreServerUser, "storeserveruser", "", "user name of the StoreServer")
-		},
-		arg: func() string { return strArg("storeserveruser", StoreServerUser, "") },
-	},
+	"storeserveruser": strVar(&StoreServerUser, "storeserveruser", "", "user name of the StoreServer"),
 	"tls": &flagVar{
 		set: func() {
 			flag.StringVar(&TLSCertFile, "tls_cert", "", "TLS Certificate `file` in PEM format")
@@ -223,6 +176,18 @@ func Args() []string {
 		}
 	}
 	return args
+}
+
+// strVar returns a flagVar for the given string flag.
+func strVar(value *string, name, _default, usage string) *flagVar {
+	return &flagVar{
+		set: func() {
+			flag.StringVar(value, name, _default, usage)
+		},
+		arg: func() string {
+			return strArg(name, *value, _default)
+		},
+	}
 }
 
 // strArg returns a command-line argument that will recreate the flag,
