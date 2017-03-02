@@ -510,6 +510,15 @@ func Homedir() (string, error) {
 	return h, nil
 }
 
+// Home returns the home directory of the user, or panics if it cannot find one.
+func Home() string {
+	home, err := Homedir()
+	if err != nil {
+		panic(err)
+	}
+	return home
+}
+
 func sshdir() (string, error) {
 	h, err := Homedir()
 	if err != nil {
