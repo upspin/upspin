@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cc3bd6af_2a5e30c4",
+        "filename": "cmd/upspin/signup.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-02T05:14:06Z",
+      "side": 1,
+      "message": "this doesn\u0027t say much more. you need to mention upspin user -put here.",
+      "revId": "e13c94897381cd57526509eb3ecf0c0cb57f2982",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
