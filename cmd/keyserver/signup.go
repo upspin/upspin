@@ -91,6 +91,12 @@ func (m *signupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		errorf(http.StatusBadRequest, "invalid user name: %s", u.Name)
 		return
 	}
+	_, suffix, _, _ := user.Parse(u.Name) // valid already checked the error.
+	if suffix != "" {
+		errorf(http.StatusBadRequest, "user name must not be suffixed: %s", u.Name)
+		return
+	}
+
 	sigR, sigS, nowS := v("sigR"), v("sigS"), v("now")
 	create := sigR+sigS+nowS != ""
 
@@ -220,6 +226,7 @@ func (m *signupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (m *signupHandler) createUser(u *upspin.User) error {
+
 	key, err := m.dialForUser(u.Name)
 	if err != nil {
 		return err
