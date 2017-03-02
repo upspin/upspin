@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "36c82325_b543891c",
+        "filename": "cmd/upspinfs/test.sh",
+        "patchSetId": 7
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-02T20:51:12Z",
+      "side": 1,
+      "message": "i would like all the echoes to have 1\u003e\u00262\nlike the first one",
+      "revId": "9e1d0887569f1874bf2f9f5eda3cf833d61c170d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
