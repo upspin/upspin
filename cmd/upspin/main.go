@@ -121,7 +121,8 @@ func main() {
 		os.Exit(2)
 	}
 
-	state := newState(strings.ToLower(flag.Arg(0)))
+	op := strings.ToLower(flag.Arg(0))
+	state := newState(op)
 	args := flag.Args()[1:]
 
 	// Start the cache if needed.
@@ -134,6 +135,7 @@ func main() {
 		return
 	}
 	state.getCommand(state.op)(state, args...)
+	state.cleanup()
 	os.Exit(state.exitCode)
 }
 
@@ -182,6 +184,7 @@ func (s *State) exitf(format string, args ...interface{}) {
 	if s.interactive {
 		panic("exit")
 	}
+	s.cleanup()
 	os.Exit(1)
 }
 
@@ -234,7 +237,6 @@ func (s *State) runCommand(path string, args ...string) {
 	if err != nil {
 		s.exit(err)
 	}
-	os.Exit(0)
 }
 
 func (s *State) parseFlags(fs *flag.FlagSet, args []string, help, usage string) {
@@ -321,6 +323,11 @@ func (s *State) KeyServer() upspin.KeyServer {
 		s.exit(err)
 	}
 	return key
+}
+
+// cleanup terminates any necessary state.
+// Keep around because there might be some one day.
+func (s *State) cleanup() {
 }
 
 // hasGlobChar reports whether the string contains a Glob metacharacter.

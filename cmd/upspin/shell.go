@@ -65,7 +65,7 @@ func (s *State) exec(line string, verbose bool) {
 	if len(words) == 0 {
 		return
 	}
-	fn := commands[strings.ToLower(words[0])]
+	fn := s.getCommand(strings.ToLower(words[0]))
 	if fn == nil {
 		fmt.Fprintf(os.Stderr, "upspin: no such command %q\n", words[0])
 		return
