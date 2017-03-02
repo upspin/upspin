@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4871cd4c_8ad7f2d0",
+        "filename": "cmd/upspin/windows_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-02T18:13:51Z",
+      "side": 1,
+      "message": "Copyright notice.",
+      "revId": "77135779ab3e67ff5b3fd835bc4c865e4499a1c4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
