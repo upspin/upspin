@@ -17,6 +17,7 @@ import (
 	"strings"
 
 	"upspin.io/bind"
+	"upspin.io/config"
 	"upspin.io/factotum"
 	"upspin.io/flags"
 	"upspin.io/subcmd"
@@ -42,7 +43,7 @@ The calling user must be the same one that ran 'upspin setupdomain'.
 `
 	)
 	fs := flag.NewFlagSet("setupserver", flag.ExitOnError)
-	where := fs.String("where", filepath.Join(os.Getenv("HOME"), "upspin", "deploy"), "`directory` to store private configuration files")
+	where := fs.String("where", filepath.Join(config.Home(), "upspin", "deploy"), "`directory` to store private configuration files")
 	domain := fs.String("domain", "", "domain `name` for this Upspin installation")
 	host := fs.String("host", "", "host `name` of upspinserver (empty implies the cluster dir.domain and store.domain)")
 	writers := fs.String("writers", "", "additional `users` to be given write access to this server")

@@ -30,7 +30,7 @@ The user name of the project's directory server is automatically included in
 the list, so the directory server can use the store for its own data storage.
 `
 	fs := flag.NewFlagSet("setupwriters", flag.ExitOnError)
-	where := fs.String("where", filepath.Join(os.Getenv("HOME"), "upspin", "deploy"), "`directory` containing private configuration files")
+	where := fs.String("where", filepath.Join(config.Home(), "upspin", "deploy"), "`directory` containing private configuration files")
 	domain := fs.String("domain", "", "domain `name` for this Upspin installation")
 	s.ParseFlags(fs, args, help, "setupwriters [-where=$HOME/upspin/deploy] -domain=<domain> <user names>")
 
