@@ -14,16 +14,16 @@ argument and points to the second path argument.
 	fs := flag.NewFlagSet("link", flag.ExitOnError)
 	// This is the same order as in the Unix ln command. It sorta feels
 	// backwards, but it's also the same as in cp, with the new name second.
-	s.parseFlags(fs, args, help, "link original_path link_path")
+	s.ParseFlags(fs, args, help, "link original_path link_path")
 	if fs.NArg() != 2 {
 		fs.Usage()
 	}
 
-	originalPath := s.globOneUpspinNoLinks(fs.Arg(0))
-	linkPath := s.globOneUpspinNoLinks(fs.Arg(1))
+	originalPath := s.GlobOneUpspinNoLinks(fs.Arg(0))
+	linkPath := s.GlobOneUpspinNoLinks(fs.Arg(1))
 
-	_, err := s.client.PutLink(originalPath, linkPath)
+	_, err := s.Client.PutLink(originalPath, linkPath)
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 }

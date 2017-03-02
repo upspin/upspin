@@ -20,14 +20,14 @@ directory tree as soon as possible. Snapshots are created only if
 the directory server for the user's root supports them.
 `
 	fs := flag.NewFlagSet("snapshot", flag.ExitOnError)
-	s.parseFlags(fs, args, help, "snapshot")
+	s.ParseFlags(fs, args, help, "snapshot")
 	if fs.NArg() > 0 {
 		fs.Usage()
 	}
 
-	u, suffix, domain, err := user.Parse(s.config.UserName())
+	u, suffix, domain, err := user.Parse(s.Config.UserName())
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 	var suffixedUser string
 	if suffix == "" {
@@ -37,14 +37,14 @@ the directory server for the user's root supports them.
 	}
 
 	// Is the root for the snapshot already created?
-	_, err = s.client.Lookup(upspin.PathName(suffixedUser), false)
+	_, err = s.Client.Lookup(upspin.PathName(suffixedUser), false)
 	if err != nil && errors.Match(errors.E(errors.NotExist), err) {
-		_, err = s.client.MakeDirectory(upspin.PathName(suffixedUser + "/"))
+		_, err = s.Client.MakeDirectory(upspin.PathName(suffixedUser + "/"))
 		if err != nil {
-			s.exit(err)
+			s.Exit(err)
 		}
 	} else if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 
 	// Put a new DirEntry that triggers the snapshotting process.

@@ -32,14 +32,14 @@ the list, so the directory server can use the store for its own data storage.
 	fs := flag.NewFlagSet("setupwriters", flag.ExitOnError)
 	where := fs.String("where", filepath.Join(os.Getenv("HOME"), "upspin", "deploy"), "`directory` containing private configuration files")
 	domain := fs.String("domain", "", "domain `name` for this Upspin installation")
-	s.parseFlags(fs, args, help, "setupwriters [-where=$HOME/upspin/deploy] -domain=<domain> <user names>")
+	s.ParseFlags(fs, args, help, "setupwriters [-where=$HOME/upspin/deploy] -domain=<domain> <user names>")
 
 	if *where == "" {
-		s.failf("the -where flag must not be empty")
+		s.Failf("the -where flag must not be empty")
 		fs.Usage()
 	}
 	if *domain == "" {
-		s.failf("the -domain must not be empty")
+		s.Failf("the -domain must not be empty")
 		fs.Usage()
 	}
 
@@ -47,16 +47,16 @@ the list, so the directory server can use the store for its own data storage.
 	for _, arg := range fs.Args() {
 		u, err := user.Clean(upspin.UserName(arg))
 		if err != nil {
-			s.exit(err)
+			s.Exit(err)
 		}
 		users = append(users, u)
 	}
 
 	cfgDir := filepath.Join(*where, *domain)
 	if fi, err := os.Stat(cfgDir); err != nil {
-		s.exitf("error reading configuration directory: %v", err)
+		s.Exitf("error reading configuration directory: %v", err)
 	} else if !fi.IsDir() {
-		s.exitf("specified location is not a directory: %v", cfgDir)
+		s.Exitf("specified location is not a directory: %v", cfgDir)
 	}
 
 	var dirUser upspin.UserName
@@ -64,16 +64,16 @@ the list, so the directory server can use the store for its own data storage.
 	if errors.Match(errors.E(errors.NotExist), err) {
 		storeCfg, err = config.FromFile(filepath.Join(cfgDir, "storeserver", "config"))
 		if err != nil {
-			s.exit(err)
+			s.Exit(err)
 		}
 		dirCfg, err := config.FromFile(filepath.Join(cfgDir, "dirserver", "config"))
 		if err != nil {
-			s.exit(err)
+			s.Exit(err)
 		}
 		// Created by setupdomain -cluster, separate users for dir and store.
 		dirUser = dirCfg.UserName()
 	} else if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	} else {
 		// Created by setupdomain -cluster=false, one user for dir and store.
 		dirUser = storeCfg.UserName()
@@ -86,12 +86,12 @@ the list, so the directory server can use the store for its own data storage.
 	// Make the store root.
 	_, err = c.MakeDirectory(upspin.PathName(storeUser) + "/")
 	if err != nil && !errors.Match(errors.E(errors.Exist), err) {
-		s.exit(err)
+		s.Exit(err)
 	}
 	// Make the Group directory.
 	_, err = c.MakeDirectory(upspin.PathName(storeUser) + "/Group")
 	if err != nil && !errors.Match(errors.E(errors.Exist), err) {
-		s.exit(err)
+		s.Exit(err)
 	}
 
 	// Prepare Access file and put it to the server.
@@ -102,7 +102,7 @@ the list, so the directory server can use the store for its own data storage.
 	}
 	_, err = c.Put(upspin.PathName(storeUser)+"/Access", buf.Bytes())
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 
 	// Prepare Writers file and put it to the server.
@@ -116,6 +116,6 @@ the list, so the directory server can use the store for its own data storage.
 	}
 	_, err = c.Put(upspin.PathName(storeUser)+"/Group/Writers", buf.Bytes())
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 }

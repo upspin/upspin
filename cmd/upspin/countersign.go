@@ -25,7 +25,7 @@ keys.
 See the description for rotate for information about updating keys.
 `
 	fs := flag.NewFlagSet("countersign", flag.ExitOnError)
-	s.parseFlags(fs, args, help, "countersign")
+	s.ParseFlags(fs, args, help, "countersign")
 	if fs.NArg() != 0 {
 		fs.Usage()
 	}
@@ -40,24 +40,24 @@ type Countersigner struct {
 
 // countersignCommand is the main function for the countersign subcommand.
 func (s *State) countersignCommand(fs *flag.FlagSet) {
-	u, err := s.KeyServer().Lookup(s.config.UserName())
+	u, err := s.KeyServer().Lookup(s.Config.UserName())
 	if err != nil || len(u.PublicKey) == 0 {
-		s.exitf("can't find old key for %q: %s\n", s.config.UserName(), err)
+		s.Exitf("can't find old key for %q: %s\n", s.Config.UserName(), err)
 	}
 	c := &Countersigner{
 		state:  s,
 		oldKey: u.PublicKey,
 	}
-	newF := s.config.Factotum()
+	newF := s.Config.Factotum()
 	if newF == nil {
-		s.exitf("no factotum available")
+		s.Exitf("no factotum available")
 	}
 
-	lastCfg := s.config
-	s.config = config.SetFactotum(s.config, s.config.Factotum().Pop())
-	defer func() { s.config = lastCfg }()
+	lastCfg := s.Config
+	s.Config = config.SetFactotum(s.Config, s.Config.Factotum().Pop())
+	defer func() { s.Config = lastCfg }()
 
-	root := upspin.PathName(string(s.config.UserName()) + "/")
+	root := upspin.PathName(string(s.Config.UserName()) + "/")
 	entries := c.entriesFromDirectory(root)
 	for _, e := range entries {
 		c.countersign(e, newF)
@@ -69,14 +69,14 @@ func (c *Countersigner) countersign(entry *upspin.DirEntry, newF upspin.Factotum
 	// TODO(ehg)  Handle PlainPack and EEIntegrityPack as well.
 	err := ee.Countersign(c.oldKey, newF, entry)
 	if err != nil {
-		c.state.exit(err)
+		c.state.Exit(err)
 	}
 	_, err = c.state.DirServer(entry.Name).Put(entry)
 	if err != nil {
 		// If we get ErrFollowLink, the item changed underfoot, so reporting
 		// an error in that case is OK.
 		fmt.Fprintf(os.Stderr, "error putting entry back for %q: %s\n", entry.Name, err)
-		c.state.exitCode = 1
+		c.state.ExitCode = 1
 	}
 }
 
@@ -85,14 +85,14 @@ func (c *Countersigner) entriesFromDirectory(dir upspin.PathName) []*upspin.DirE
 	// Get list of files for this directory.
 	thisDir, err := c.state.DirServer(dir).Glob(upspin.AllFilesGlob(dir)) // Do not want to follow links.
 	if err != nil {
-		c.state.exitf("globbing %q: %s", dir, err)
+		c.state.Exitf("globbing %q: %s", dir, err)
 	}
 	entries := make([]*upspin.DirEntry, 0, len(thisDir))
 	// Add plain files that have signatures by self.
 	for _, e := range thisDir {
 		if !e.IsDir() && !e.IsLink() &&
 			e.Packing == upspin.EEPack &&
-			string(e.Writer) == string(c.state.config.UserName()) {
+			string(e.Writer) == string(c.state.Config.UserName()) {
 			entries = append(entries, e)
 		}
 	}

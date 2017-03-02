@@ -18,14 +18,14 @@ See the deletestorage command for more information about deleting
 storage.
 `
 	fs := flag.NewFlagSet("rm", flag.ExitOnError)
-	s.parseFlags(fs, args, help, "rm path...")
+	s.ParseFlags(fs, args, help, "rm path...")
 	if fs.NArg() == 0 {
 		fs.Usage()
 	}
-	for _, name := range s.globAllUpspinPath(fs.Args()) {
-		err := s.client.Delete(name)
+	for _, name := range s.GlobAllUpspinPath(fs.Args()) {
+		err := s.Client.Delete(name)
 		if err != nil {
-			s.exit(err)
+			s.Exit(err)
 		}
 	}
 }

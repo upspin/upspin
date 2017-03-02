@@ -24,21 +24,21 @@ to learn about the targets of links.
 	longFormat := fs.Bool("l", false, "long format")
 	followLinks := fs.Bool("L", false, "follow links")
 	recur := fs.Bool("R", false, "recur into subdirectories")
-	s.parseFlags(fs, args, help, "ls [-l] [path...]")
+	s.ParseFlags(fs, args, help, "ls [-l] [path...]")
 
 	done := map[upspin.PathName]bool{}
 	if fs.NArg() == 0 {
-		userRoot := upspin.PathName(s.config.UserName())
+		userRoot := upspin.PathName(s.Config.UserName())
 		rootEntry, err := s.DirServer(userRoot).Lookup(userRoot)
 		if err != nil {
-			s.exit(err)
+			s.Exit(err)
 		}
 		s.list(rootEntry, done, *longFormat, *followLinks, *recur)
 		return
 	}
 	// The done map marks a directory we have listed, so we don't recur endlessly
 	// when given a chain of links with -L.
-	for _, entry := range s.globAllUpspin(fs.Args()) {
+	for _, entry := range s.GlobAllUpspin(fs.Args()) {
 		s.list(entry, done, *longFormat, *followLinks, *recur)
 	}
 }
@@ -49,9 +49,9 @@ func (s *State) list(entry *upspin.DirEntry, done map[upspin.PathName]bool, long
 	var dirContents []*upspin.DirEntry
 	var err error
 	if entry.IsDir() {
-		dirContents, err = s.client.Glob(upspin.AllFilesGlob(entry.Name))
+		dirContents, err = s.Client.Glob(upspin.AllFilesGlob(entry.Name))
 		if err != nil {
-			s.exit(err)
+			s.Exit(err)
 		}
 	} else {
 		dirContents = []*upspin.DirEntry{entry}

@@ -49,13 +49,13 @@ And, finally, authenticate again in a different way:
 	fs := flag.NewFlagSet("setupstorage", flag.ExitOnError)
 	where := fs.String("where", filepath.Join(os.Getenv("HOME"), "upspin", "deploy"), "`directory` to store private configuration files")
 	domain := fs.String("domain", "", "domain `name` for this Upspin installation")
-	s.parseFlags(fs, args, help, "-project=<gcp_project_name> setupstorage -domain=<name> <bucket_name>")
+	s.ParseFlags(fs, args, help, "-project=<gcp_project_name> setupstorage -domain=<name> <bucket_name>")
 	if *domain == "" || flags.Project == "" {
-		s.failf("the -domain and -project flags must be provided")
+		s.Failf("the -domain and -project flags must be provided")
 		fs.Usage()
 	}
 	if fs.NArg() != 1 {
-		s.failf("a bucket name must be provided")
+		s.Failf("a bucket name must be provided")
 		fs.Usage()
 	}
 	bucket := fs.Arg(0)
@@ -80,11 +80,11 @@ func (s *State) createServiceAccount(cfgPath string) (email string) {
 	client, err := google.DefaultClient(context.Background(), iam.CloudPlatformScope)
 	if err != nil {
 		// TODO: ask the user to run 'gcloud auth application-default login'
-		s.exit(err)
+		s.Exit(err)
 	}
 	svc, err := iam.New(client)
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 
 	// TODO(adg): detect that the account exists
@@ -98,23 +98,23 @@ func (s *State) createServiceAccount(cfgPath string) (email string) {
 	}
 	acct, err := svc.Projects.ServiceAccounts.Create(name, req).Do()
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 
 	name += "/serviceAccounts/" + acct.Email
 	req2 := &iam.CreateServiceAccountKeyRequest{}
 	key, err := svc.Projects.ServiceAccounts.Keys.Create(name, req2).Do()
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 
 	b, err := base64.StdEncoding.DecodeString(key.PrivateKeyData)
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 	err = ioutil.WriteFile(filepath.Join(cfgPath, "serviceaccount.json"), b, 0600)
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 
 	return acct.Email
@@ -124,11 +124,11 @@ func (s *State) createBucket(email, bucket string) {
 	client, err := google.DefaultClient(context.Background(), storage.DevstorageFullControlScope)
 	if err != nil {
 		// TODO: ask the user to run 'gcloud auth application-default login'
-		s.exit(err)
+		s.Exit(err)
 	}
 	svc, err := storage.New(client)
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 
 	_, err = svc.Buckets.Insert(flags.Project, &storage.Bucket{
@@ -142,6 +142,6 @@ func (s *State) createBucket(email, bucket string) {
 		// TODO(adg): flag for location
 	}).Do()
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 }

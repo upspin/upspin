@@ -43,26 +43,26 @@ To install new users see the signup command.
 	put := fs.Bool("put", false, "write new user record")
 	inFile := fs.String("in", "", "input file (default standard input)")
 	force := fs.Bool("force", false, "force writing user record even if key is empty")
-	s.parseFlags(fs, args, help, "user [username...]\n              user -put [-in=inputfile] [-force] [username]")
+	s.ParseFlags(fs, args, help, "user [username...]\n              user -put [-in=inputfile] [-force] [username]")
 	keyServer := s.KeyServer()
 	if *put {
-		s.putUser(fs, keyServer, s.globOneLocal(*inFile), *force)
+		s.putUser(fs, keyServer, s.GlobOneLocal(*inFile), *force)
 		return
 	}
 	if *inFile != "" {
-		s.exitf("-in only available with -put")
+		s.Exitf("-in only available with -put")
 	}
 	if *force {
-		s.exitf("-force only available with -put")
+		s.Exitf("-force only available with -put")
 	}
 	var userNames []upspin.UserName
 	if fs.NArg() == 0 {
-		userNames = append(userNames, s.config.UserName())
+		userNames = append(userNames, s.Config.UserName())
 	} else {
 		for i := 0; i < fs.NArg(); i++ {
 			userName, err := user.Clean(upspin.UserName(fs.Arg(i)))
 			if err != nil {
-				s.exit(err)
+				s.Exit(err)
 			}
 			userNames = append(userNames, userName)
 		}
@@ -70,15 +70,15 @@ To install new users see the signup command.
 	for _, name := range userNames {
 		u, err := keyServer.Lookup(name)
 		if err != nil {
-			s.exit(err)
+			s.Exit(err)
 		}
 		blob, err := yaml.Marshal(u)
 		if err != nil {
 			// TODO(adg): better error message?
-			s.exit(err)
+			s.Exit(err)
 		}
 		fmt.Printf("%s\n", blob)
-		if name != s.config.UserName() {
+		if name != s.Config.UserName() {
 			continue
 		}
 		// When it's the user asking about herself, the result comes
@@ -90,7 +90,7 @@ To install new users see the signup command.
 		usercache.ResetGlobal()
 		keyU, err := keyServer.Lookup(name)
 		if err != nil {
-			s.exit(err)
+			s.Exit(err)
 		}
 		var buf bytes.Buffer
 		if keyU.Name != u.Name {
@@ -111,7 +111,7 @@ To install new users see the signup command.
 			fmt.Fprintf(&buf, "stores in key server: %s\n", keyU.Stores)
 		}
 		if buf.Len() > 0 {
-			s.exitf("local configuration differs from public record in key server:\n%s", &buf)
+			s.Exitf("local configuration differs from public record in key server:\n%s", &buf)
 		}
 	}
 }
@@ -129,32 +129,32 @@ func equalEndpoints(a, b []upspin.Endpoint) bool {
 }
 
 func (s *State) putUser(fs *flag.FlagSet, keyServer upspin.KeyServer, inFile string, force bool) {
-	data := s.readAll(inFile)
+	data := s.ReadAll(inFile)
 	userStruct := new(upspin.User)
 	err := yaml.Unmarshal(data, userStruct)
 	if err != nil {
 		// TODO(adg): better error message?
-		s.exit(err)
+		s.Exit(err)
 	}
 	if fs.NArg() != 0 && upspin.UserName(fs.Arg(0)) != userStruct.Name {
-		s.exitf("User name provided does not match the one read from the input file.")
+		s.Exitf("User name provided does not match the one read from the input file.")
 	}
 
 	// Validate public key.
 	if userStruct.PublicKey == "" && !force {
-		s.exitf("An empty public key will prevent user from accessing services. To override use -force.")
+		s.Exitf("An empty public key will prevent user from accessing services. To override use -force.")
 	}
 	_, _, err = factotum.ParsePublicKey(userStruct.PublicKey)
 	if err != nil && !force {
-		s.exitf("invalid public key, to override use -force: %s", err.Error())
+		s.Exitf("invalid public key, to override use -force: %s", err.Error())
 	}
 	// Clean the username.
 	userStruct.Name, err = user.Clean(userStruct.Name)
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 	err = keyServer.Put(userStruct)
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 }

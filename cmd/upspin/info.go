@@ -29,7 +29,7 @@ validity. If it is a link, the command attempts to access the target
 of the link.
 `
 	fs := flag.NewFlagSet("info", flag.ExitOnError)
-	s.parseFlags(fs, args, help, "info path...")
+	s.ParseFlags(fs, args, help, "info path...")
 
 	if fs.NArg() == 0 {
 		fs.Usage()
@@ -38,7 +38,7 @@ of the link.
 		entries, err := s.DirServer(upspin.PathName(name)).Glob(name)
 		// ErrFollowLink is OK; we still get the relevant entry.
 		if err != nil && err != upspin.ErrFollowLink {
-			s.exit(err)
+			s.Exit(err)
 		}
 		for _, entry := range entries {
 			s.printInfo(entry)
@@ -112,7 +112,7 @@ func (d *infoDirEntry) Hashes() string {
 }
 
 func (d *infoDirEntry) Users(right access.Right) string {
-	users := userListToString(d.state.usersWithAccess(d.state.client, d.access, right))
+	users := userListToString(d.state.usersWithAccess(d.state.Client, d.access, right))
 	if users == d.lastUsers {
 		return "(same)"
 	}
@@ -132,11 +132,11 @@ func (d *infoDirEntry) WhichAccess() string {
 		acc, err = access.New(d.Name)
 		if err != nil {
 			// Can't happen, since the name must be valid.
-			d.state.exitf("%q: %s", d.Name, err)
+			d.state.Exitf("%q: %s", d.Name, err)
 		}
 	} else {
 		accFile = string(accEntry.Name)
-		data, err := read(d.state.client, accEntry.Name)
+		data, err := read(d.state.Client, accEntry.Name)
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "cannot open access file %q: %s\n", accFile, err)
 		}
@@ -161,20 +161,20 @@ func (s *State) printInfo(entry *upspin.DirEntry) {
 	writer := tabwriter.NewWriter(os.Stdout, 4, 4, 1, ' ', 0)
 	err := infoTmpl.Execute(writer, infoDir)
 	if err != nil {
-		s.exitf("executing info template: %v", err)
+		s.Exitf("executing info template: %v", err)
 	}
 	err = writer.Flush()
 	if err != nil {
-		s.exitf("flushing template output: %v", err)
+		s.Exitf("flushing template output: %v", err)
 	}
 	if !entry.IsLink() {
 		return
 	}
 	// Check and print information about the link target.
-	target, err := s.client.Lookup(entry.Link, true)
+	target, err := s.Client.Lookup(entry.Link, true)
 	if err != nil {
 		// Print the whole error indented, starting on the next line. This helps it stand out.
-		s.exitf("Error: link %s has invalid target %s:\n\t%v", entry.Name, entry.Link, err)
+		s.Exitf("Error: link %s has invalid target %s:\n\t%v", entry.Name, entry.Link, err)
 	}
 	fmt.Printf("Target of link %s:\n", entry.Name)
 	s.printInfo(target)
@@ -224,7 +224,7 @@ const infoText = `{{.Name}}
 func (s *State) checkGroupFile(name upspin.PathName) {
 	parsed, err := path.Parse(name)
 	if err != nil {
-		s.exit(err) // Should never happen.
+		s.Exit(err) // Should never happen.
 	}
 	groupSeen := make(map[upspin.PathName]bool)
 	userSeen := make(map[upspin.UserName]bool)
@@ -238,60 +238,60 @@ func (s *State) doCheckGroupFile(parsed path.Parsed, groupSeen map[upspin.PathNa
 		return
 	}
 	groupSeen[group] = true
-	data, err := s.client.Get(group)
+	data, err := s.Client.Get(group)
 	if err != nil {
-		s.exitf("cannot read Group file: %v", err)
+		s.Exitf("cannot read Group file: %v", err)
 	}
 
 	// Get the Access file, if any, that applies.
 	// TODO: We've already got it in earlier code, so could save it.
 	whichAccess, err := s.DirServer(group).WhichAccess(group)
 	if err != nil {
-		s.exitf("unexpected error finding Access file for Group file %s: %v", group, err)
+		s.Exitf("unexpected error finding Access file for Group file %s: %v", group, err)
 	}
 	var accessFile *access.Access
 	if whichAccess == nil {
 		accessFile, err = access.New(group)
 		if err != nil {
-			s.exitf("cannot create default Access file: %v", err)
+			s.Exitf("cannot create default Access file: %v", err)
 		}
 	} else {
-		data, err := s.client.Get(whichAccess.Name)
+		data, err := s.Client.Get(whichAccess.Name)
 		if err != nil {
-			s.exitf("cannot get Access file: %v", err)
+			s.Exitf("cannot get Access file: %v", err)
 		}
 		accessFile, err = access.Parse(whichAccess.Name, data)
 		if err != nil {
-			s.exitf("cannot parse Access file: %v", err)
+			s.Exitf("cannot parse Access file: %v", err)
 		}
 	}
 
 	// Each member should be either a plain user or a group and be able to access the Group file.
 	members, err := access.ParseGroup(parsed, data)
 	if err != nil {
-		s.exitf("error parsing Group file %s: %v", group, err)
+		s.Exitf("error parsing Group file %s: %v", group, err)
 	}
 	for _, member := range members {
 		if member.IsRoot() {
 			// Normal user.
 			user := member.User()
 			if !s.userExists(user, userSeen) {
-				s.failf("user %s in Group file %s not found in key server", user, group)
+				s.Failf("user %s in Group file %s not found in key server", user, group)
 				continue
 			}
 			// Member must be able to read the Group file.
-			canRead, err := accessFile.Can(user, access.Read, group, s.client.Get)
+			canRead, err := accessFile.Can(user, access.Read, group, s.Client.Get)
 			if err != nil {
-				s.exitf("error checking permissions in Group file %s for user %s: %v", group, user, err)
+				s.Exitf("error checking permissions in Group file %s for user %s: %v", group, user, err)
 				continue
 			}
 			if !canRead {
-				s.failf("user %s is missing read access for group %s", user, group)
+				s.Failf("user %s is missing read access for group %s", user, group)
 			}
 			continue
 		}
 		if !access.IsGroupFile(member.Path()) {
-			s.failf("do not understand member %s of Group file %s", member, parsed) // Should never happen.
+			s.Failf("do not understand member %s of Group file %s", member, parsed) // Should never happen.
 			continue
 		}
 		// Member is a group. Recur using Group file.
@@ -300,13 +300,13 @@ func (s *State) doCheckGroupFile(parsed path.Parsed, groupSeen map[upspin.PathNa
 }
 
 func (s *State) checkAccessFile(name upspin.PathName) {
-	data, err := s.client.Get(name)
+	data, err := s.Client.Get(name)
 	if err != nil {
-		s.exitf("cannot get Access file: %v", err)
+		s.Exitf("cannot get Access file: %v", err)
 	}
 	accessFile, err := access.Parse(name, data)
 	if err != nil {
-		s.exitf("cannot parse Access file: %v", err)
+		s.Exitf("cannot parse Access file: %v", err)
 	}
 	users := accessFile.List(access.AnyRight)
 
@@ -316,7 +316,7 @@ func (s *State) checkAccessFile(name upspin.PathName) {
 		if user.IsRoot() {
 			// Normal user.
 			if !s.userExists(user.User(), userSeen) {
-				s.failf("user %s in Access file %s not found in key server", user.User(), name)
+				s.Failf("user %s in Access file %s not found in key server", user.User(), name)
 			}
 			continue
 		}

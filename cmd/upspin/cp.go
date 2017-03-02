@@ -13,6 +13,7 @@ import (
 
 	"upspin.io/errors"
 	"upspin.io/path"
+	"upspin.io/subcmd"
 	"upspin.io/upspin"
 )
 
@@ -33,13 +34,13 @@ the data itself.
 	fs := flag.NewFlagSet("cp", flag.ExitOnError)
 	fs.Bool("v", false, "log each file as it is copied")
 	fs.Bool("R", false, "recursively copy directories")
-	s.parseFlags(fs, args, help, "cp [opts] file... file or cp [opts] file... directory")
+	s.ParseFlags(fs, args, help, "cp [opts] file... file or cp [opts] file... directory")
 
 	cs := &copyState{
 		state:   s,
 		flagSet: fs,
-		recur:   boolFlag(fs, "R"),
-		verbose: boolFlag(fs, "v"),
+		recur:   subcmd.BoolFlag(fs, "R"),
+		verbose: subcmd.BoolFlag(fs, "v"),
 	}
 
 	// Do all the glob processing here.
@@ -91,16 +92,16 @@ func (s *State) copyCommand(cs *copyState, srcFiles []cpFile, dstFile cpFile) {
 		return
 	}
 	if len(srcFiles) != 1 {
-		s.failf("copying multiple files but %s is not a directory", dstFile.path)
+		s.Failf("copying multiple files but %s is not a directory", dstFile.path)
 		cs.flagSet.Usage()
 	}
 	if cs.recur {
-		s.failf("recursive copy requires that final argument (%s) be an existing directory", dstFile.path)
+		s.Failf("recursive copy requires that final argument (%s) be an existing directory", dstFile.path)
 		cs.flagSet.Usage()
 	}
 	reader, err := s.open(srcFiles[0])
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 	s.copyToFile(cs, reader, srcFiles[0], dstFile)
 }
@@ -109,7 +110,7 @@ func (s *State) copyCommand(cs *copyState, srcFiles []cpFile, dstFile cpFile) {
 // or in the local file system.
 func (s *State) isDir(cf cpFile) bool {
 	if cf.isUpspin {
-		entry, err := s.client.Lookup(upspin.PathName(cf.path), true)
+		entry, err := s.Client.Lookup(upspin.PathName(cf.path), true)
 		// Report the error here if it's anything odd, because otherwise
 		// we'll report "not a directory" misleadingly.
 		if err != nil && !errors.Match(errNotExist, err) {
@@ -128,7 +129,7 @@ func (s *State) open(file cpFile) (io.ReadCloser, error) {
 		return nil, errors.E(upspin.PathName(file.path), errors.IsDir)
 	}
 	if file.isUpspin {
-		return s.client.Open(upspin.PathName(file.path))
+		return s.Client.Open(upspin.PathName(file.path))
 	}
 	return os.Open(file.path)
 }
@@ -136,7 +137,7 @@ func (s *State) open(file cpFile) (io.ReadCloser, error) {
 // create creates the file regardless of its location.
 func (s *State) create(file cpFile) (io.WriteCloser, error) {
 	if file.isUpspin {
-		fd, err := s.client.Create(upspin.PathName(file.path))
+		fd, err := s.Client.Create(upspin.PathName(file.path))
 		return fd, err
 	}
 	fd, err := os.Create(file.path)
@@ -169,16 +170,16 @@ func (s *State) copyToDir(cs *copyState, src []cpFile, dir cpFile) {
 			if dir.isUpspin {
 				// Rather than use the libraries and a lot of casting, it's easiest just to cat the strings here.
 				subDir.path = subDir.path + "/" + filepath.Base(from.path) // TODO: is filepath.Base OK?
-				_, err := s.client.MakeDirectory(upspin.PathName(subDir.path))
+				_, err := s.Client.MakeDirectory(upspin.PathName(subDir.path))
 				if err != nil && !errors.Match(errExist, err) {
-					s.fail(err)
+					s.Fail(err)
 					continue
 				}
 			} else {
 				subDir.path = filepath.Join(subDir.path, filepath.Base(from.path))
 				err := os.Mkdir(subDir.path, 0755) // TODO: Mode.
 				if err != nil && !os.IsExist(err) {
-					s.fail(err)
+					s.Fail(err)
 					continue
 				}
 			}
@@ -186,7 +187,7 @@ func (s *State) copyToDir(cs *copyState, src []cpFile, dir cpFile) {
 			continue
 		}
 		if err != nil {
-			s.fail(err)
+			s.Fail(err)
 			continue
 		}
 		dst := cpFile{
@@ -212,7 +213,7 @@ func (s *State) copyToFile(cs *copyState, reader io.ReadCloser, src, dst cpFile)
 	}
 	writer, err := s.create(dst)
 	if err != nil {
-		s.fail(err)
+		s.Fail(err)
 		reader.Close()
 		return
 	}
@@ -224,7 +225,7 @@ func (s *State) copyToFile(cs *copyState, reader io.ReadCloser, src, dst cpFile)
 // (Any other error is unexpected and exits the copy command.)
 // The caller may be able to retry with a regular copy.
 func (s *State) fastCopy(src, dst upspin.PathName) error {
-	_, err := s.client.PutDuplicate(src, dst)
+	_, err := s.Client.PutDuplicate(src, dst)
 	if err == nil {
 		return nil
 	}
@@ -239,7 +240,7 @@ func (s *State) fastCopy(src, dst upspin.PathName) error {
 		return err
 	}
 	// Unexpected error. Die.
-	s.fail(err)
+	s.Fail(err)
 	return nil
 }
 
@@ -248,12 +249,12 @@ func (cs *copyState) doCopy(reader io.ReadCloser, writer io.WriteCloser) {
 		reader.Close()
 		err := writer.Close()
 		if err != nil {
-			cs.state.fail(err)
+			cs.state.Fail(err)
 		}
 	}()
 	_, err := io.Copy(writer, reader)
 	if err != nil {
-		cs.state.fail(err)
+		cs.state.Fail(err)
 	}
 }
 
@@ -263,7 +264,7 @@ func (cs *copyState) glob(pattern string) (files []cpFile) {
 	parsed, err := path.Parse(upspin.PathName(pattern))
 	if err == nil {
 		// It's an Upspin path.
-		for _, path := range cs.state.globUpspinPath(parsed.String()) {
+		for _, path := range cs.state.GlobUpspinPath(parsed.String()) {
 			files = append(files, cpFile{
 				path:     string(path),
 				isUpspin: true,
@@ -272,7 +273,7 @@ func (cs *copyState) glob(pattern string) (files []cpFile) {
 		return files
 	}
 	// It's a local path.
-	for _, path := range cs.state.globLocal(pattern) {
+	for _, path := range cs.state.GlobLocal(pattern) {
 		files = append(files, cpFile{
 			path:     path,
 			isUpspin: false,
@@ -284,9 +285,9 @@ func (cs *copyState) glob(pattern string) (files []cpFile) {
 // contents return the top-level contents of dir as a slice of cpFiles.
 func (s *State) contents(cs *copyState, dir cpFile) ([]cpFile, error) {
 	if dir.isUpspin {
-		entries, err := s.client.Glob(upspin.AllFilesGlob(upspin.PathName(dir.path)))
+		entries, err := s.Client.Glob(upspin.AllFilesGlob(upspin.PathName(dir.path)))
 		if err != nil {
-			s.fail(err)
+			s.Fail(err)
 			// OK to continue; there may still be files.
 		}
 		files := make([]cpFile, len(entries))
@@ -301,13 +302,13 @@ func (s *State) contents(cs *copyState, dir cpFile) ([]cpFile, error) {
 	// Local directory.
 	fd, err := os.Open(dir.path)
 	if err != nil {
-		s.fail(err)
+		s.Fail(err)
 		return nil, err
 	}
 	defer fd.Close()
 	names, err := fd.Readdirnames(0)
 	if err != nil {
-		s.fail(err)
+		s.Fail(err)
 		// OK to continue; there may still be files.
 	}
 	files := make([]cpFile, len(names))

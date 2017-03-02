@@ -37,7 +37,7 @@ assumed to refer to the store defined in the user's configuration.
 	fs := flag.NewFlagSet("deletestorage", flag.ExitOnError)
 	byPath := fs.Bool("path", false, "delete all blocks referenced by the path names")
 	byRef := fs.Bool("ref", false, "delete individual blocks with the specified references")
-	s.parseFlags(fs, args, help, "deletestorage [-path path... | -ref reference...]")
+	s.ParseFlags(fs, args, help, "deletestorage [-path path... | -ref reference...]")
 	if fs.NArg() == 0 {
 		fs.Usage()
 	}
@@ -47,15 +47,15 @@ assumed to refer to the store defined in the user's configuration.
 
 	if *byRef {
 		// All references refer to this store.
-		store, err := bind.StoreServer(s.config, s.config.StoreEndpoint())
+		store, err := bind.StoreServer(s.Config, s.Config.StoreEndpoint())
 		if err != nil {
-			s.exit(err)
+			s.Exit(err)
 		}
 		for _, arg := range fs.Args() {
 			err := store.Delete(upspin.Reference(arg))
 			if err != nil {
 				// Keep going, for consistency with loop below.
-				s.fail(err)
+				s.Fail(err)
 			}
 		}
 		return
@@ -63,24 +63,24 @@ assumed to refer to the store defined in the user's configuration.
 
 	var prevEndpoint upspin.Endpoint
 	var store upspin.StoreServer
-	for _, entry := range s.globAllUpspin(fs.Args()) {
+	for _, entry := range s.GlobAllUpspin(fs.Args()) {
 		if !entry.IsRegular() {
-			s.exitf("%s is not a plain file", entry.Name)
+			s.Exitf("%s is not a plain file", entry.Name)
 		}
 		for _, block := range entry.Blocks {
 			if block.Location.Endpoint != prevEndpoint {
 				prevEndpoint = block.Location.Endpoint
 				var err error
-				store, err = bind.StoreServer(s.config, prevEndpoint)
+				store, err = bind.StoreServer(s.Config, prevEndpoint)
 				if err != nil {
-					s.exit(err) // Not much to do now.
+					s.Exit(err) // Not much to do now.
 				}
 			}
 			err := store.Delete(block.Location.Reference)
 			if err != nil {
 				// Here we keep going, to keep it possible to delete
 				// other existing references.
-				s.fail(err)
+				s.Fail(err)
 			}
 		}
 	}

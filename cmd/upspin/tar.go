@@ -23,6 +23,7 @@ import (
 	"upspin.io/access"
 	"upspin.io/errors"
 	"upspin.io/path"
+	"upspin.io/subcmd"
 	"upspin.io/upspin"
 )
 
@@ -41,7 +42,7 @@ always be in Upspin.
 	match := fs.String("match", "", "extract from the archive only those pathnames that match the `prefix`")
 	replace := fs.String("replace", "", "replace -match prefix with the replacement `text`")
 	fs.Bool("v", false, "verbose output")
-	s.parseFlags(fs, args, help, "tar [-extract [-match prefix -replace substitution] ] upspin_directory local_file")
+	s.ParseFlags(fs, args, help, "tar [-extract [-match prefix -replace substitution] ] upspin_directory local_file")
 	if !*extract {
 		if *match != "" || *replace != "" {
 			fs.Usage()
@@ -71,15 +72,15 @@ func (s *State) tarCommand(fs *flag.FlagSet) {
 	if fs.NArg() != 2 {
 		fs.Usage()
 	}
-	a, err := s.newArchiver(boolFlag(fs, "v"))
+	a, err := s.newArchiver(subcmd.BoolFlag(fs, "v"))
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
-	dir := s.globOneUpspinPath(fs.Arg(0))
-	file := s.globOneLocal(fs.Arg(1))
-	err = a.archive(dir, s.createLocal(file))
+	dir := s.GlobOneUpspinPath(fs.Arg(0))
+	file := s.GlobOneLocal(fs.Arg(1))
+	err = a.archive(dir, s.CreateLocal(file))
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 }
 
@@ -87,20 +88,20 @@ func (s *State) untarCommand(fs *flag.FlagSet) {
 	if fs.NArg() != 1 {
 		fs.Usage()
 	}
-	a, err := s.newArchiver(boolFlag(fs, "v"))
+	a, err := s.newArchiver(subcmd.BoolFlag(fs, "v"))
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
-	a.matchReplace(stringFlag(fs, "match"), stringFlag(fs, "replace"))
-	err = a.unarchive(s.openLocal(s.globOneLocal(fs.Arg(0))))
+	a.matchReplace(subcmd.StringFlag(fs, "match"), subcmd.StringFlag(fs, "replace"))
+	err = a.unarchive(s.OpenLocal(s.GlobOneLocal(fs.Arg(0))))
 	if err != nil {
-		s.exit(err)
+		s.Exit(err)
 	}
 }
 
 func (s *State) newArchiver(verbose bool) (*archiver, error) {
 	return &archiver{
-		client:  s.client,
+		client:  s.Client,
 		verbose: verbose,
 	}, nil
 }
