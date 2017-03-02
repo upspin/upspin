@@ -106,10 +106,14 @@ file and keys and only send the signup request to the key server.
 	}
 
 	// Parse user name.
-	uname, _, domain, err := user.Parse(upspin.UserName(fs.Arg(0)))
+	uname, suffix, domain, err := user.Parse(upspin.UserName(fs.Arg(0)))
 	if err != nil {
 		s.exitf("invalid user name %q: %v", fs.Arg(0), err)
 	}
+	if suffix != "" {
+		s.exitf("user name must not contain a suffix: %q", fs.Arg(0))
+	}
+
 	userName := upspin.UserName(uname + "@" + domain)
 
 	env := os.Environ()
