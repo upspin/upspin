@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "30800258_904e95be",
+        "filename": "flags/flags.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-02T00:09:58Z",
+      "side": 1,
+      "message": "you could make strArg a function that returns \"func() string\" and actually invoke it here, just to make these call sites tidier",
+      "revId": "ad993b55189ce3c601d171522b11599cbf973bf4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
