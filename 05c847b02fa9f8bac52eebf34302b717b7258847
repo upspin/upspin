@@ -33,6 +33,40 @@
       "revId": "05c847b02fa9f8bac52eebf34302b717b7258847",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d61fc84f_39cb8117",
+        "filename": "cmd/upspin/windows_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-02T18:36:11Z",
+      "side": 1,
+      "message": "these two Errorfs should be fatals.\nif you can\u0027t construct the state for the test, there\u0027s no point in continuing",
+      "revId": "05c847b02fa9f8bac52eebf34302b717b7258847",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "366249f6_bd2e6a7d",
+        "filename": "cmd/upspin/windows_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-02T18:36:11Z",
+      "side": 1,
+      "message": "\"expected %q, got %q\" is sufficient.",
+      "revId": "05c847b02fa9f8bac52eebf34302b717b7258847",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
