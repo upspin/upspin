@@ -111,7 +111,7 @@ file and keys and only send the signup request to the key server.
 		s.Exitf("invalid user name %q: %v", fs.Arg(0), err)
 	}
 	if suffix != "" {
-		s.exitf("invalid user name %q: name must not include a +suffix; for a suffixed user, use upspin user -put", fs.Arg(0))
+		s.Exitf("invalid user name %q: name must not include a +suffix; for a suffixed user, use upspin user -put", fs.Arg(0))
 	}
 
 	userName := upspin.UserName(uname + "@" + domain)
