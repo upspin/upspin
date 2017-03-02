@@ -16,6 +16,24 @@
       "revId": "77135779ab3e67ff5b3fd835bc4c865e4499a1c4",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5297fa9e_4b7d032d",
+        "filename": "cmd/upspin/windows_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5361
+      },
+      "writtenOn": "2017-03-02T18:17:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4871cd4c_8ad7f2d0",
+      "revId": "77135779ab3e67ff5b3fd835bc4c865e4499a1c4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
