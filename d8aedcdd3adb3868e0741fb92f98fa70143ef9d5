@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "48a4e783_cd410561",
+        "filename": "cmd/upspin/signup.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-02T03:47:09Z",
+      "side": 1,
+      "message": "we might need a more informative error message here\n\ninvalid user name %q: name must not include a +suffix\n\n?",
+      "revId": "d8aedcdd3adb3868e0741fb92f98fa70143ef9d5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
