@@ -112,7 +112,14 @@ func (d *infoDirEntry) Hashes() string {
 }
 
 func (d *infoDirEntry) Users(right access.Right) string {
-	users := userListToString(d.state.usersWithAccess(d.state.Client, d.access, right))
+	userList := d.state.usersWithAccess(d.state.Client, d.access, right)
+	// Change "all@upspin.io" back to "All".
+	for i, user := range userList {
+		if user == access.AllUsers {
+			userList[i] = "All" // Capitalize it here for clarity.
+		}
+	}
+	users := userListToString(userList)
 	if users == d.lastUsers {
 		return "(same)"
 	}
