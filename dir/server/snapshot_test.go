@@ -406,6 +406,17 @@ func TestSnapshotIsReadOnly(t *testing.T) {
 	}
 }
 
+func TestSnapshotWhichAccessIsNil(t *testing.T) {
+	s, _ := newDirServerForTesting(t, canonicalUser)
+	entry, err := s.WhichAccess(snapshotUser + "/*")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if entry != nil {
+		t.Fatalf("expected nil entry, got = %v", entry)
+	}
+}
+
 func TestSnapshotUserCanCreateSnapshotRoot(t *testing.T) {
 	s, _ := newDirServerForTesting(t, "user+snapshot@example.com")
 	create(t, s, "user+snapshot@example.com/", isDir)

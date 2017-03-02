@@ -315,7 +315,7 @@ func validateWhichAccess(name upspin.PathName, accessEntry *upspin.DirEntry) err
 	// unpacks correctly, that validates the signing key is that of Writer.
 	// So, here we validate that Writer is parsedName.User().
 	if accessEntry.Writer != namePath.User() {
-		return errors.E(errors.Invalid, accessPath.Path(), namePath.User(), errors.Str("writer of Access file is the not user of the requested path"))
+		return errors.E(errors.Invalid, accessPath.Path(), namePath.User(), errors.Str("writer of Access file is not the user of the requested path"))
 	}
 	return nil
 }
