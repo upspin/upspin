@@ -150,13 +150,13 @@ var flags = map[string]*flagVar{
 		set: func() {
 			flag.StringVar(&Project, "project", Project, "GCP `project` name")
 		},
-		arg: func() string { return strArg("-project=", Project, "") },
+		arg: func() string { return strArg("project", Project, "") },
 	},
 	"serverconfig": &flagVar{
 		set: func() {
 			flag.Var(configFlag{&ServerConfig}, "serverconfig", "comma-separated list of configuration options (key=value) for this server")
 		},
-		arg: func() string { return strArg("-serverconfig=", configFlag{&ServerConfig}.String(), "") },
+		arg: func() string { return strArg("serverconfig", configFlag{&ServerConfig}.String(), "") },
 	},
 	"storeserveruser": &flagVar{
 		set: func() {
