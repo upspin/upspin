@@ -28,6 +28,8 @@ import (
 	"strings"
 	"time"
 
+	"upspin.io/config"
+
 	"cloud.google.com/go/storage"
 	"golang.org/x/oauth2/google"
 	cloudtrace "google.golang.org/api/cloudtrace/v1"
@@ -464,7 +466,11 @@ func (c *Config) buildServer(server string) error {
 			"secret.upspinkey",
 		}
 	}
-	base := filepath.Join(os.Getenv("HOME"), "upspin/deploy", c.Project, server)
+	home, err := config.Homedir()
+	if err != nil {
+		return err
+	}
+	base := filepath.Join(home, "upspin", "deploy", c.Project, server)
 	for _, f := range files {
 		if err := cp(filepath.Join(dir, f), filepath.Join(base, f)); err != nil {
 			return fmt.Errorf("error copying %q for %v: %v", f, server, err)
