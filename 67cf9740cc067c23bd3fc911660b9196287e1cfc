@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f197c609_9264bbdd",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-02T00:50:25Z",
+      "side": 1,
+      "message": "it\u0027s not really clear at the call sites that suffix and domain are parts of the user name.\nuserBase, userSuffix, userDomain ?",
+      "revId": "67cf9740cc067c23bd3fc911660b9196287e1cfc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
