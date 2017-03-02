@@ -14,7 +14,6 @@ import (
 
 // ParseFlags parses the flags in the command line arguments,
 // according to those set in the flag set.
-// TODO: Need help getting global flags installed.
 func (s *State) ParseFlags(fs *flag.FlagSet, args []string, help, usage string) {
 	helpFlag := fs.Bool("help", false, "print more information about the command")
 	usageFn := func() {
