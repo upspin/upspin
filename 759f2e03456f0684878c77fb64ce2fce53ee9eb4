@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d802b88a_d7971292",
+        "filename": "test/testenv/testenv.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-02T04:08:26Z",
+      "side": 1,
+      "message": "Ha, I ran into this yesterday when trying to write a caheserver test and wanted to ask you hw this was supposed to work.",
+      "revId": "759f2e03456f0684878c77fb64ce2fce53ee9eb4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
