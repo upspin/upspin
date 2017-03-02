@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c2effa9c_1ee997bd",
+        "filename": "cmd/upspin/windows.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-02T18:34:17Z",
+      "side": 1,
+      "message": "flip the else around. the short one first is nicer to read, plus you get to say \u003d\u003d instead of !\u003d",
+      "revId": "05c847b02fa9f8bac52eebf34302b717b7258847",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "da0a1b72_86abd74e",
+        "filename": "cmd/upspin/windows.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-02T18:34:17Z",
+      "side": 1,
+      "message": "s/EXT//",
+      "revId": "05c847b02fa9f8bac52eebf34302b717b7258847",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
