@@ -9,8 +9,6 @@ package flags // import "upspin.io/flags"
 import (
 	"flag"
 	"fmt"
-	"os"
-	"path/filepath"
 	"strings"
 
 	"upspin.io/log"
@@ -36,12 +34,10 @@ var (
 	BlockSize = defaultBlockSize
 
 	// CacheDir specifies the directory for the various file caches.
-	defaultCacheDir = filepath.Join(os.Getenv("HOME"), "upspin")
-	CacheDir        = defaultCacheDir
+	CacheDir = defaultCacheDir
 
 	// Config names the Upspin configuration file to use.
-	defaultConfig = filepath.Join(os.Getenv("HOME"), "upspin", "config")
-	Config        = defaultConfig
+	Config = defaultConfig
 
 	// HTTPAddr is the network address on which to listen for incoming
 	// insecure network connections.
