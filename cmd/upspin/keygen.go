@@ -42,6 +42,7 @@ See the description for rotate for information about updating keys.
 	if fs.NArg() != 0 {
 		fs.Usage()
 	}
+	s.keygenCommand(fs)
 }
 
 func (s *State) keygenCommand(fs *flag.FlagSet) {
