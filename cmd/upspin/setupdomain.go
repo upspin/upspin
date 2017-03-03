@@ -17,6 +17,7 @@ import (
 
 	"upspin.io/config"
 	"upspin.io/flags"
+	"upspin.io/subcmd"
 	"upspin.io/upspin"
 )
 
@@ -279,7 +280,7 @@ func (s *State) setuphost(where, domain, curve string) {
 	}
 
 	// Write server config file.
-	s.writeServerConfig(cfgPath, &ServerConfig{
+	s.WriteServerConfig(cfgPath, &subcmd.ServerConfig{
 		User: upspin.UserName("upspin@" + domain),
 	})
 
