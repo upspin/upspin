@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3b1183f9_23e85111",
+        "filename": "cmd/upspin/setupstorage.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-03T01:30:32Z",
+      "side": 1,
+      "message": "this side-eye remark should be much clearer and is in the wrong place.\nsay up top that it is for setting up a cloud store, and if you\u0027re using local\ndisk you dont\u0027 need to use it",
+      "revId": "608ba10c1948cacc8e79dd420021fca0a8b4fed4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
