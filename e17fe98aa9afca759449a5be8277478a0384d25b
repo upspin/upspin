@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e5d92de4_7f3e2e02",
+        "filename": "flags/flags.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-03T05:44:52Z",
+      "side": 1,
+      "message": "I dinna see a flag.Parse",
+      "range": {
+        "startLine": 187,
+        "startChar": 3,
+        "endLine": 187,
+        "endChar": 23
+      },
+      "revId": "e17fe98aa9afca759449a5be8277478a0384d25b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
