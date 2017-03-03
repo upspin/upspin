@@ -251,6 +251,8 @@ func EventProto(event *upspin.Event) (*Event, error) {
 	if event == nil {
 		// A nil proto is likely to cause GRPC to crash, according to
 		// https://github.com/grpc/grpc-go/issues/532.
+		// We don't GRPC now for this protocol but we might again,
+		// so play it safe.
 		return &Event{}, nil
 	}
 	var b []byte
