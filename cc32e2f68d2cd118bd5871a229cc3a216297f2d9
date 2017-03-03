@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "686fb6eb_6fc54cfe",
+        "filename": "cmd/upspin/keygen.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-03T05:59:57Z",
+      "side": 1,
+      "message": "is that indeed the only possibility?",
+      "range": {
+        "startLine": 42,
+        "startChar": 46,
+        "endLine": 42,
+        "endChar": 49
+      },
+      "revId": "cc32e2f68d2cd118bd5871a229cc3a216297f2d9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2d385981_6aac6a37",
         "filename": "cmd/upspin/keygen.go",
         "patchSetId": 1
@@ -30,6 +53,24 @@
       "writtenOn": "2017-03-03T00:49:56Z",
       "side": 1,
       "message": "we should error out if they try to rotate and there are no keys to be rotated.\nmaybe they gave the wrong -where or -config\neither way, it\u0027s not what the user expects",
+      "revId": "cc32e2f68d2cd118bd5871a229cc3a216297f2d9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "628176de_4e5ef726",
+        "filename": "cmd/upspin/keygen.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-03T05:59:57Z",
+      "side": 1,
+      "message": "or call the flag something else...",
+      "parentUuid": "d9843afa_c9e05e78",
       "revId": "cc32e2f68d2cd118bd5871a229cc3a216297f2d9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
