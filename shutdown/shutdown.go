@@ -37,7 +37,7 @@ func Handle(onShutdown func()) {
 // Exit may be called concurrently.
 func Exit(code int) {
 	shutdown.once.Do(func() {
-		log.Info.Printf("shutdown: status code %d", code)
+		log.Debug.Printf("shutdown: status code %d", code)
 
 		// Ensure we terminate after a fixed amount of time.
 		go func() {
