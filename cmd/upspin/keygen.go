@@ -39,6 +39,7 @@ See the description for rotate for information about updating keys.
 	fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
 	fs.String("secretseed", "", "128 bit secret `seed` in proquint format")
 	fs.String("where", filepath.Join(config.Home(), ".ssh"), "`directory` to store keys")
+	fs.Bool("rotate", false, "rotate existing keys and replace them with new ones")
 	s.ParseFlags(fs, args, help, "keygen [-curve=256] [-secretseed=seed] [-where=$HOME/.ssh]")
 	if fs.NArg() != 0 {
 		fs.Usage()
@@ -65,9 +66,10 @@ func (s *State) keygenCommand(fs *flag.FlagSet) {
 	if where == "" {
 		s.Exitf("-where must not be empty")
 	}
-	err = saveKeys(where)
+	rotate := subcmd.BoolFlag(fs, "rotate")
+	err = s.saveKeys(where, rotate)
 	if err != nil {
-		s.Exitf("saving previous keys failed(%v); keys not generated", err)
+		s.Exitf("saving previous keys failed, keys not generated: %s", err)
 	}
 	err = writeKeys(where, public, private)
 	if err != nil {
@@ -84,6 +86,9 @@ func (s *State) keygenCommand(fs *flag.FlagSet) {
 		fmt.Println("Do not share your private key or this command with anyone.")
 	} else {
 		fmt.Println("Do not share your private key with anyone.")
+	}
+	if rotate {
+		fmt.Println("\nTo install new keys in the key server, see 'upspin rotate -help'.")
 	}
 	fmt.Println()
 }
@@ -150,7 +155,7 @@ func writeKeys(where, publicKey, privateKey string) error {
 	return nil
 }
 
-func saveKeys(where string) error {
+func (s *State) saveKeys(where string, rotate bool) error {
 	var (
 		publicFile  = filepath.Join(where, "public.upspinkey")
 		privateFile = filepath.Join(where, "secret.upspinkey")
@@ -160,10 +165,17 @@ func saveKeys(where string) error {
 	// Read existing key pair.
 	private, err := ioutil.ReadFile(privateFile)
 	if os.IsNotExist(err) {
-		return nil // There is nothing we need to save.
+		// There is nothing to save. Did we expect there to be?
+		if rotate {
+			s.Exitf("no prior keys exist; cannot rotate keys")
+		}
+		return nil
 	}
 	if err != nil {
 		return err
+	}
+	if !rotate {
+		s.Exitf("prior keys exist; rerun with -rotate to update keys")
 	}
 	public, err := ioutil.ReadFile(publicFile)
 	if err != nil {
@@ -180,5 +192,10 @@ func saveKeys(where string) error {
 	if err != nil {
 		return err
 	}
-	return archive.Close()
+	err = archive.Close()
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Saved previous key pair to:\n\t%s\n", archiveFile)
+	return nil
 }
