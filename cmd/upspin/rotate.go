@@ -16,10 +16,10 @@ Rotate pushes an updated key to the key server.
 
 To update an Upspin key, the sequence is:
 
-  upspin keygen            # Create new key.
+  upspin keygen -rotate    # Create new key.
   upspin countersign       # Update file signatures to use new key.
   upspin rotate            # Save new key to key server.
-  upspin share -r -fix me@example.com/  # Update keys in file metadata. 
+  upspin share -r -fix me@example.com/  # Update keys in file metadata.
 
 Keygen creates a new key and saves the old one. Countersign walks
 the file tree and adds signatures with the new key alongside those
