@@ -796,7 +796,7 @@ func (dir *node) unixPathToUpspinPath(unixpath string) (upspin.PathName, error) 
 		return path.Join(dir.uname, unixpath), nil
 	}
 	upspinpath := strings.TrimPrefix(unixpath, dir.f.mountpoint)
-	if unixpath != upspinpath {
+	if unixpath == upspinpath {
 		return upspin.PathName(unixpath), errors.Str("symlink outside of upspin")
 	}
 	return upspin.PathName(upspinpath), nil
@@ -822,16 +822,42 @@ func (n *node) Symlink(ctx gContext.Context, req *fuse.SymlinkRequest) (fs.Node,
 	return nn, nil
 }
 
-func (n *node) upspinPathToUnixPath(path upspin.PathName) string {
-	// All upspin paths are absolute.
-	return n.f.mountpoint + string(path)
+// upspinPathToUnixPath takes an Upspin path, target, and turns it into one relative
+// to link. If target is in not in the same upspin tree as link, just return the absolute
+// path in the user's file system.
+func (link *node) upspinPathToUnixPath(target upspin.PathName) (string, error) {
+	parsedLink, err := path.Parse(link.uname)
+	if err != nil {
+		return "", e2e(err)
+	}
+	parsedTarget, err := path.Parse(target)
+	if err != nil {
+		return "", e2e(err)
+	}
+
+	// Create relative path.
+	nl := parsedLink.NElem()
+	nt := parsedTarget.NElem()
+	relpath := ""
+	for i := -1; ; i++ {
+		if i >= nl || i >= nt || parsedTarget.Elem(i) != parsedLink.Elem(i) {
+			for j := i; j < nl-1; j++ {
+				relpath = ospath.Join(relpath, "..")
+			}
+			for j := i; j < nt; j++ {
+				relpath = ospath.Join(relpath, parsedTarget.Elem(j))
+			}
+			break
+		}
+	}
+	return relpath, nil
 }
 
-// Symlink implements fs.NodeReadlinker.Readlink.
+// Readlink implements fs.NodeReadlinker.Readlink.
 func (n *node) Readlink(ctx gContext.Context, req *fuse.ReadlinkRequest) (string, error) {
 	const op = "upspinfs/fs.Readlink"
 	log.Debug.Printf("Readlink %q -> %q", n, n.link)
-	return n.upspinPathToUnixPath(n.link), nil
+	return n.upspinPathToUnixPath(n.link)
 }
 
 // isEnoent returns true if we already know this path name doesn't exist.
