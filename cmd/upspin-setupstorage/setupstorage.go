@@ -96,7 +96,7 @@ func main() {
 
 	fmt.Printf("You should now deploy the upspinserver binary and run 'upspin setupserver'.\n")
 
-	s.Cleanup()
+	s.ExitNow()
 }
 
 func (s *state) createServiceAccount(cfgPath string) (email string) {
