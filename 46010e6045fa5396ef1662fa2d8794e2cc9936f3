@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1e1e691c_3c761907",
+        "filename": "cmd/upspin/keygen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-03T17:32:29Z",
+      "side": 1,
+      "message": "I agree that we should remind the user \"upspin keygen -rotate\" is rarely enough by itself.  But I expect they usually need to run countersign before \"upspin rotate\".   So rather than this message, maybe we should be suggesting the read the output of \"upspin rotate -help\" or some such.  Otherwise we\u0027re giving conflicting advice, which will confuse people on this rather subtle and infrequent dance.",
+      "revId": "46010e6045fa5396ef1662fa2d8794e2cc9936f3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "596d7cec_046aeebe",
+        "filename": "cmd/upspin/keygen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-03T17:32:29Z",
+      "side": 1,
+      "message": "s/exists/exist/",
+      "revId": "46010e6045fa5396ef1662fa2d8794e2cc9936f3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
