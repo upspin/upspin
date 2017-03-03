@@ -122,13 +122,13 @@ func main() {
 		state.init()
 		cacheutil.Start(state.Config)
 		state.shell(args...)
+		state.ExitNow()
 		return
 	}
 	cmd := state.getCommand(state.Name)
 	state.init()
 	cmd(state, args...)
-	state.Cleanup()
-	os.Exit(state.ExitCode)
+	state.ExitNow()
 }
 
 func usage() {
