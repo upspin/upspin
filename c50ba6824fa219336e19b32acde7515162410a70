@@ -16,6 +16,24 @@
       "revId": "c50ba6824fa219336e19b32acde7515162410a70",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f9ca31ce_f9e395d2",
+        "filename": "cmd/upspin/rotate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-03T17:19:34Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "37acecab_1517bc87",
+      "revId": "c50ba6824fa219336e19b32acde7515162410a70",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }

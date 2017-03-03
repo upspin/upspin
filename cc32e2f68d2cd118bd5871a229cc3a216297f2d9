@@ -42,6 +42,24 @@
     },
     {
       "key": {
+        "uuid": "a598c206_482220aa",
+        "filename": "cmd/upspin/keygen.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-03T17:19:34Z",
+      "side": 1,
+      "message": "upspin user talks about installing new users:\n\n\"To install new users see the signup command.\"\n\nI could use \"put\" here, but in upspin user -put it does not flow well to replace put for write in \"with the -put flag, user writes or replaces...\"\n\nSo, I think install is fine in this context.",
+      "parentUuid": "2d385981_6aac6a37",
+      "revId": "cc32e2f68d2cd118bd5871a229cc3a216297f2d9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "d9843afa_c9e05e78",
         "filename": "cmd/upspin/keygen.go",
         "patchSetId": 1
@@ -77,6 +95,24 @@
     },
     {
       "key": {
+        "uuid": "0e0b2aa6_febbe4be",
+        "filename": "cmd/upspin/keygen.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-03T17:19:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "628176de_4e5ef726",
+      "revId": "cc32e2f68d2cd118bd5871a229cc3a216297f2d9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "84b6db98_fc8f3120",
         "filename": "cmd/upspin/keygen.go",
         "patchSetId": 1
@@ -91,6 +127,24 @@
       "revId": "cc32e2f68d2cd118bd5871a229cc3a216297f2d9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8e83e2d7_82597854",
+        "filename": "cmd/upspin/keygen.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-03T17:19:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "84b6db98_fc8f3120",
+      "revId": "cc32e2f68d2cd118bd5871a229cc3a216297f2d9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
