@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f107bdf4_1e7aba9c",
+        "filename": "flags/flags.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-03T01:01:12Z",
+      "side": 1,
+      "message": "installs",
+      "revId": "885809be3ac6420751918fc9926ad80182dca12f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6d1888d3_08c3895e",
+        "filename": "flags/flags.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-03T01:01:12Z",
+      "side": 1,
+      "message": "why install and not Register?",
+      "revId": "885809be3ac6420751918fc9926ad80182dca12f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
