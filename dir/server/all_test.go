@@ -1049,7 +1049,13 @@ func (m *mockClock) set(t time.Time) {
 var generatorInstance upspin.DirServer
 
 // newDirServerForTesting returns a new server and a user config.
-func newDirServerForTesting(t *testing.T, userName upspin.UserName) (*server, upspin.Config) {
+func newDirServerForTesting(t testing.TB, userName upspin.UserName) (*server, upspin.Config) {
+	return newDirServerForTestingWithTestDir(t, userName, testDir)
+}
+
+// newDirServerForTestingWithTestDir returns a new server using testDir for its
+// logs and a user config for a user.
+func newDirServerForTestingWithTestDir(t testing.TB, userName upspin.UserName, testDir string) (*server, upspin.Config) {
 	f, err := factotum.NewFromDir(testutil.Repo("key", "testdata", "test"))
 	if err != nil {
 		t.Fatal(err)
