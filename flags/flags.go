@@ -140,8 +140,8 @@ func Parse(names ...string) {
 	flag.Parse()
 }
 
-// Register registers the command-line flags for the given flag names
-// and calls flag.Parse. Passing zero names install all flags.
+// Register registers the command-line flags for the given flag names.
+// Passing zero names install all flags.
 // Passing an unknown name triggers a panic.
 //
 // For example:
