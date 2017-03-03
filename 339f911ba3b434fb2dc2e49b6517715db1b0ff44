@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "175b184e_92a99de1",
+        "filename": "shutdown/shutdown.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-03T06:13:38Z",
+      "side": 1,
+      "message": "Thanks, I was tired of seeing it in upspinfs.",
+      "range": {
+        "startLine": 40,
+        "startChar": 6,
+        "endLine": 40,
+        "endChar": 11
+      },
+      "revId": "339f911ba3b434fb2dc2e49b6517715db1b0ff44",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
