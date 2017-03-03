@@ -16,21 +16,21 @@ import (
 	"upspin.io/log"
 )
 
-// RegisterShutdown registers the onShutdown function to be run when the system
-// is being shut down. On shutdown, registered functions are run in LIFO order.
-// RegisterShutdown may be called concurrently.
-func RegisterShutdown(onShutdown func()) {
+// Handle registers the onShutdown function to be run when the system is being
+// shut down. On shutdown, registered functions are run in LIFO order.
+// Handle may be called concurrently.
+func Handle(onShutdown func()) {
 	shutdown.mu.Lock()
 	defer shutdown.mu.Unlock()
 
 	shutdown.sequence = append(shutdown.sequence, onShutdown)
 }
 
-// Shutdown calls all registered shutdown closures in their priority order and
-// terminates. It only executes once and guarantees termination within a
-// bounded amount of time. It's safe for many goroutines to call Shutdown.
-func Shutdown() {
-	const op = "shutdown.Shutdown"
+// Exit calls all registered shutdown closures in last-in-first-out order
+// and terminates. It only executes once and guarantees termination within a
+// bounded amount of time. It's safe for many goroutines to call Exit.
+func Exit() {
+	const op = "shutdown.Exit"
 
 	shutdown.once.Do(func() {
 		log.Info.Printf("%s: Shutdown requested", op)
@@ -80,10 +80,10 @@ func init() {
 	signal.Notify(c, syscall.SIGTERM, os.Interrupt)
 	go func() {
 		<-c
-		Shutdown()
+		Exit()
 	}()
 
 	// Register the log shutdown routine here, to avoid an import cycle.
 	// Shutting down the logger is the last thing we do.
-	RegisterShutdown(log.Flush)
+	Handle(log.Flush)
 }

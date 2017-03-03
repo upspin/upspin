@@ -138,7 +138,7 @@ func ListenAndServe(ready chan<- struct{}, serverName, addr string, opt *Options
 	if ready != nil {
 		close(ready)
 	}
-	shutdown.RegisterShutdown(func() {
+	shutdown.Handle(func() {
 		// Stop accepting connections and forces the server to stop
 		// its serving loop.
 		ln.Close()
@@ -148,7 +148,7 @@ func ListenAndServe(ready chan<- struct{}, serverName, addr string, opt *Options
 		log.Printf("https: %v", err)
 	}
 	// Ensure we terminate cleanly.
-	shutdown.Shutdown()
+	shutdown.Exit()
 }
 
 // ListenAndServeFromFlags is the same as ListenAndServe, but it determines the

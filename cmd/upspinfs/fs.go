@@ -913,7 +913,7 @@ func do(cfg upspin.Config, mountpoint string, cacheDir string) chan bool {
 	case <-time.After(500 * time.Millisecond):
 	}
 
-	shutdown.RegisterShutdown(func() {
+	shutdown.Handle(func() {
 		fuse.Unmount(mountpoint)
 	})
 
