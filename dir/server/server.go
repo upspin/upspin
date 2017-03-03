@@ -181,7 +181,7 @@ func New(cfg upspin.Config, options ...string) (upspin.DirServer, error) {
 		userLocks:     make([]sync.Mutex, numUserLocks),
 		now:           upspin.Now,
 	}
-	shutdown.RegisterShutdown(s.shutdown)
+	shutdown.Handle(s.shutdown)
 	// Start background services.
 	s.startSnapshotLoop()
 	go s.groupRefreshLoop()
