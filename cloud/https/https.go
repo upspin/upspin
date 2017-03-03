@@ -144,11 +144,8 @@ func ListenAndServe(ready chan<- struct{}, serverName, addr string, opt *Options
 		ln.Close()
 	})
 	err = server.Serve(tls.NewListener(ln, config))
-	if err != nil {
-		log.Printf("https: %v", err)
-	}
-	// Ensure we terminate cleanly.
-	shutdown.Now()
+	log.Printf("https: %v", err)
+	shutdown.Now(1)
 }
 
 // ListenAndServeFromFlags is the same as ListenAndServe, but it determines the
