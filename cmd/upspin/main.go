@@ -115,16 +115,18 @@ func main() {
 	state := newState(op)
 	args := flag.Args()[1:]
 
-	// Start the cache if needed.
-	cacheutil.Start(state.Config)
-
 	// Shell cannot be in commands because of the initialization loop,
 	// and anyway we should avoid recursion in the interpreter.
 	if state.Name == "shell" {
+		// Start the cache if needed.
+		state.init()
+		cacheutil.Start(state.Config)
 		state.shell(args...)
 		return
 	}
-	state.getCommand(state.Name)(state, args...)
+	cmd := state.getCommand(state.Name)
+	state.init()
+	cmd(state, args...)
 	state.Cleanup()
 	os.Exit(state.ExitCode)
 }
@@ -198,22 +200,29 @@ func (s *State) runCommand(path string, args ...string) {
 	}
 }
 
+// newState returns a State with enough initialized to run exit, etc.
+// It does not contain a Config.
 func newState(name string) *State {
 	s := &State{
 		State: subcmd.NewState(name),
 	}
-	if name == "signup" || name == "keygen" {
-		// signup is special since there is no user yet.
-		// keygen simply does not require a config or anything else.
-		return s
-	}
-	cfg, err := config.FromFile(flags.Config)
-	if err != nil && err != config.ErrNoFactotum {
-		s.Exit(err)
-	}
-	transports.Init(cfg)
-	s.State.Init(cfg)
-	s.sharer = newSharer(s)
-	s.enableMetrics()
 	return s
+}
+
+// init initializes the State with what is required to run the subcommand,
+// usually including setting up a Config.
+func (s *State) init() {
+	// signup is special since there is no user yet.
+	// keygen simply does not require a config or anything else.
+	if s.Name != "signup" && s.Name != "keygen" {
+		cfg, err := config.FromFile(flags.Config)
+		if err != nil && err != config.ErrNoFactotum {
+			s.Exit(err)
+		}
+		transports.Init(cfg)
+		s.State.Init(cfg)
+		s.sharer = newSharer(s)
+	}
+	s.enableMetrics()
+	return
 }
