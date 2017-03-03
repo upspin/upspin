@@ -20,6 +20,7 @@ import (
 	"upspin.io/metric"
 	"upspin.io/path"
 	"upspin.io/serverutil"
+	"upspin.io/shutdown"
 	"upspin.io/upspin"
 	"upspin.io/user"
 	"upspin.io/valid"
@@ -180,7 +181,7 @@ func New(cfg upspin.Config, options ...string) (upspin.DirServer, error) {
 		userLocks:     make([]sync.Mutex, numUserLocks),
 		now:           upspin.Now,
 	}
-	serverutil.RegisterShutdown(s.shutdown)
+	shutdown.RegisterShutdown(s.shutdown)
 	// Start background services.
 	s.startSnapshotLoop()
 	go s.groupRefreshLoop()

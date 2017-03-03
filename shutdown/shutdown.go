@@ -2,7 +2,9 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package serverutil
+// Package shutdown provides a mechanism for registering handlers to be called
+// on process shutdown.
+package shutdown // import "upspin.io/shutdown"
 
 import (
 	"os"
@@ -28,7 +30,7 @@ func RegisterShutdown(onShutdown func()) {
 // terminates. It only executes once and guarantees termination within a
 // bounded amount of time. It's safe for many goroutines to call Shutdown.
 func Shutdown() {
-	const op = "serverutil.Shutdown"
+	const op = "shutdown.Shutdown"
 
 	shutdown.once.Do(func() {
 		log.Info.Printf("%s: Shutdown requested", op)
