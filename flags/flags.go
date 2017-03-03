@@ -88,7 +88,7 @@ var flags = map[string]*flagVar{
 	},
 	"blocksize": &flagVar{
 		set: func() {
-			flag.IntVar(&BlockSize, "blocksize", BlockSize, "`size` of blocks when writing larg:e files")
+			flag.IntVar(&BlockSize, "blocksize", BlockSize, "`size` of blocks when writing large files")
 		},
 		arg: func() string {
 			if BlockSize == defaultBlockSize {
@@ -179,6 +179,19 @@ var flags = map[string]*flagVar{
 // or
 // 	flags.Parse() // Register all flags.
 func Parse(names ...string) {
+	Register(names...)
+	flag.Parse()
+}
+
+// Register registers the command-line flags for the given flag names
+// and calls flag.Parse. Passing zero names install all flags.
+// Passing an unknown name triggers a panic.
+//
+// For example:
+// 	flags.Register("config", "endpoint") // Register Config and Endpoint.
+// or
+// 	flags.Register() // Register all flags.
+func Register(names ...string) {
 	if len(names) == 0 {
 		// Register all flags if no names provided.
 		for _, flag := range flags {
@@ -193,7 +206,6 @@ func Parse(names ...string) {
 			flag.set()
 		}
 	}
-	flag.Parse()
 }
 
 // Args returns a slice of -flag=value strings that will recreate
