@@ -19,6 +19,7 @@ import (
 	"upspin.io/bind"
 	"upspin.io/factotum"
 	"upspin.io/flags"
+	"upspin.io/subcmd"
 	"upspin.io/upspin"
 )
 
@@ -52,7 +53,7 @@ The calling user must be the same one that ran 'upspin setupdomain'.
 	}
 
 	cfgPath := filepath.Join(*where, *domain)
-	cfg := s.readServerConfig(cfgPath)
+	cfg := s.ReadServerConfig(cfgPath)
 
 	// Stash the provided host name in the server config file.
 	if !strings.Contains(*host, ":") {
@@ -63,7 +64,7 @@ The calling user must be the same one that ran 'upspin setupdomain'.
 		s.Exitf("invalid -host argument %q: %v", *host, err)
 	}
 	cfg.Addr = upspin.NetAddr(*host)
-	s.writeServerConfig(cfgPath, cfg)
+	s.WriteServerConfig(cfgPath, cfg)
 
 	ep := upspin.Endpoint{
 		Transport: upspin.Remote,
@@ -144,7 +145,7 @@ The calling user must be the same one that ran 'upspin setupdomain'.
 	fmt.Printf("Created root %q.\n", root)
 }
 
-func userFor(cfgPath string, cfg *ServerConfig) (*upspin.User, error) {
+func userFor(cfgPath string, cfg *subcmd.ServerConfig) (*upspin.User, error) {
 	ep := []upspin.Endpoint{{
 		Transport: upspin.Remote,
 		NetAddr:   cfg.Addr,
@@ -161,11 +162,11 @@ func userFor(cfgPath string, cfg *ServerConfig) (*upspin.User, error) {
 	}, nil
 }
 
-func (s *State) configureServer(cfgPath string, cfg *ServerConfig) {
+func (s *State) configureServer(cfgPath string, cfg *subcmd.ServerConfig) {
 	files := map[string][]byte{}
-	for _, name := range configureServerFiles {
+	for _, name := range subcmd.ConfigureServerFiles {
 		b, err := ioutil.ReadFile(filepath.Join(cfgPath, name))
-		if os.IsNotExist(err) && optionalConfigureServerFiles[name] {
+		if os.IsNotExist(err) && subcmd.OptionalConfigureServerFiles[name] {
 			continue
 		}
 		if err != nil {
@@ -188,55 +189,4 @@ func (s *State) configureServer(cfgPath string, cfg *ServerConfig) {
 	if resp.StatusCode != http.StatusOK {
 		s.Exitf("upspinserver returned status %v:\n%s", resp.Status, b)
 	}
-}
-
-func (s *State) readServerConfig(cfgPath string) *ServerConfig {
-	cfgFile := filepath.Join(cfgPath, serverConfigFile)
-	b, err := ioutil.ReadFile(cfgFile)
-	if err != nil {
-		if os.IsNotExist(err) {
-			s.Exitf("No server config file found at %q.\nRun 'upspin setupdomain' first.", cfgFile)
-		}
-		s.Exit(err)
-	}
-	cfg := &ServerConfig{}
-	if err := json.Unmarshal(b, cfg); err != nil {
-		s.Exit(err)
-	}
-	return cfg
-}
-
-func (s *State) writeServerConfig(cfgPath string, cfg *ServerConfig) {
-	cfgFile := filepath.Join(cfgPath, serverConfigFile)
-	b, err := json.Marshal(cfg)
-	if err != nil {
-		s.Exit(err)
-	}
-	err = ioutil.WriteFile(cfgFile, b, 0644)
-	if err != nil {
-		s.Exit(err)
-	}
-}
-
-// Keep the following declarations in sync with cmd/upspinserver/main.go.
-// TODO(adg): move these to their own package if/when there are more users.
-
-type ServerConfig struct {
-	Addr   upspin.NetAddr
-	User   upspin.UserName
-	Bucket string
-}
-
-const serverConfigFile = "serverconfig.json"
-
-var configureServerFiles = []string{
-	"Writers",
-	"public.upspinkey",
-	"secret.upspinkey",
-	"serviceaccount.json",
-	serverConfigFile,
-}
-
-var optionalConfigureServerFiles = map[string]bool{
-	"serviceaccount.json": true,
 }
