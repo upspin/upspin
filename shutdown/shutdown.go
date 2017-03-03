@@ -50,14 +50,6 @@ func Now() {
 		}
 		shutdown.mu.Unlock()
 
-		log.Debug.Printf("%s: Shutting down in 1 second", op)
-
-		// Allow time for any other indirectly affected goroutines to
-		// exit, since os.Exit is ruthless and ends immediately. This is
-		// not strictly required, but nice when debugging and catching
-		// logs on cloud.
-		time.Sleep(1 * time.Second)
-
 		// TODO: pass a reason to Shutdown and print it here and exit
 		// with an error code if not cleanly.
 		os.Exit(0)
