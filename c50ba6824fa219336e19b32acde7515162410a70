@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "37acecab_1517bc87",
+        "filename": "cmd/upspin/rotate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-03T00:49:56Z",
+      "side": 0,
+      "message": "while you\u0027re here, remove the trailing space?",
+      "revId": "c50ba6824fa219336e19b32acde7515162410a70",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
