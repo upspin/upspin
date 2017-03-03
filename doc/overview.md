@@ -106,6 +106,18 @@ Upspin uses this technique to allow a user to own multiple Upspin services.
 For example, `ann+camera@example.com` might be the Upspin user name for an
 Internet-connected video camera owned by `ann@example.com`.
 
+Plus-suffixed users belong to their canonical user (the one without the
+suffix).
+Hence, canonical users can make changes to a plus-suffixed user's entry
+in the key server.
+For example, `ann@example.com` may change `ann+camera@example.com` keys, store
+and directory endpoints.
+The converse, however, is not allowed: `ann+camera@example.com` cannot make
+changes to `ann@example.com`.
+
+Plus-suffixed users can be created only by their owners.
+For this reason, they do not require a working email address.
+
 ## Naming
 
 Every Upspin file name has the same basic structure.
