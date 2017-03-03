@@ -45,8 +45,8 @@ import (
 )
 
 var (
-	cfgPath   = flag.String("serverconfig", filepath.Join(os.Getenv("HOME"), "upspin/server"), "server configuration `directory`")
-	letsPath  = flag.String("letscache", filepath.Join(os.Getenv("HOME"), "upspin/letsencrypt"), "Let's Encrypt cache `directory`")
+	cfgPath   = flag.String("serverconfig", filepath.Join(config.Home(), "upspin/server"), "server configuration `directory`")
+	letsPath  = flag.String("letscache", filepath.Join(config.Home(), "upspin/letsencrypt"), "Let's Encrypt cache `directory`")
 	enableWeb = flag.Bool("web", false, "enable Upspin web interface")
 	ready     = make(chan struct{})
 )
