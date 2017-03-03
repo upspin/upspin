@@ -122,11 +122,11 @@ func main() {
 	// and anyway we should avoid recursion in the interpreter.
 	if state.Name == "shell" {
 		state.shell(args...)
+		state.ExitNow()
 		return
 	}
 	state.getCommand(state.Name)(state, args...)
-	state.Cleanup()
-	os.Exit(state.ExitCode)
+	state.ExitNow()
 }
 
 func usage() {

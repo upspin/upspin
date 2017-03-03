@@ -10,6 +10,7 @@ import (
 
 	"upspin.io/bind"
 	"upspin.io/client"
+	"upspin.io/shutdown"
 	"upspin.io/upspin"
 )
 
@@ -50,13 +51,18 @@ func (s *State) Exitf(format string, args ...interface{}) {
 	if s.Interactive {
 		panic("exit")
 	}
-	s.Cleanup()
-	os.Exit(1)
+	s.ExitCode = 1
+	s.ExitNow()
 }
 
 // Exit calls s.Exitf with the error.
 func (s *State) Exit(err error) {
 	s.Exitf("%s", err)
+}
+
+// ExitNow terminates the process with the current ExitCode.
+func (s *State) ExitNow() {
+	shutdown.Exit(s.ExitCode)
 }
 
 // Failf logs the error and sets the exit code. It does not exit the program.
@@ -69,11 +75,6 @@ func (s *State) Failf(format string, args ...interface{}) {
 // Fail calls s.Failf with the error.
 func (s *State) Fail(err error) {
 	s.Failf("%v", err)
-}
-
-// Cleanup terminates any necessary state.
-// Keep this around because there might be some one day.
-func (s *State) Cleanup() {
 }
 
 // KeyServer returns the KeyServer for the root of the name, or exits on failure.
