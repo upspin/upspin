@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "6c4f2db3_1ffa05b8",
+        "filename": "cmd/upspin-setupstorage/setupstorage.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-03T00:56:36Z",
+      "side": 1,
+      "message": "English sentences start with capital letters, but I can rephrase.",
+      "parentUuid": "16d27834_b4dde120",
+      "revId": "a99319e1f9dad8ba7b9ba24c9064d24765fa804d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "01cdf4ca_f2bdcbe8",
         "filename": "cmd/upspin-setupstorage/setupstorage.go",
         "patchSetId": 1
@@ -48,6 +66,24 @@
       "side": 1,
       "message": "Oh, I guess the CL description says this is temporary... ok.",
       "parentUuid": "01cdf4ca_f2bdcbe8",
+      "revId": "a99319e1f9dad8ba7b9ba24c9064d24765fa804d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "f14e7b39_2148f952",
+        "filename": "cmd/upspin-setupstorage/setupstorage.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-03T00:56:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "99f0c018_0bd63183",
       "revId": "a99319e1f9dad8ba7b9ba24c9064d24765fa804d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
