@@ -8,6 +8,7 @@ package server
 // by using testenv or something similar.
 
 import (
+	"flag"
 	"io/ioutil"
 	"os"
 	"sync"
@@ -45,6 +46,7 @@ const (
 )
 
 var (
+	tmpDir   = flag.String("tmpdir", "", "where to write temporary data")
 	testDir  string
 	mockTime *mockClock
 )
@@ -927,8 +929,10 @@ func TestPutBadGroup(t *testing.T) {
 }
 
 func TestMain(m *testing.M) {
+	flag.Parse()
+
 	var err error
-	testDir, err = ioutil.TempDir("", "DirServer")
+	testDir, err = ioutil.TempDir(*tmpDir, "DirServer")
 	if err != nil {
 		panic(err)
 	}
@@ -1048,8 +1052,14 @@ func (m *mockClock) set(t time.Time) {
 
 var generatorInstance upspin.DirServer
 
-// newDirServerForTesting returns a new server and a user config.
-func newDirServerForTesting(t *testing.T, userName upspin.UserName) (*server, upspin.Config) {
+// newDirServerForTesting creates a new test setup.
+func newDirServerForTesting(t testing.TB, userName upspin.UserName) (*server, upspin.Config) {
+	return newDirServerForTestingWithDir(t, userName, testDir)
+}
+
+// newDirServerForTestingWithDir creates a new test setup where the server
+// writes logs to testDir.
+func newDirServerForTestingWithDir(t testing.TB, userName upspin.UserName, testDir string) (*server, upspin.Config) {
 	f, err := factotum.NewFromDir(testutil.Repo("key", "testdata", "test"))
 	if err != nil {
 		t.Fatal(err)
