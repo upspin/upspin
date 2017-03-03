@@ -144,11 +144,11 @@ func testShutdownChildProcess() {
 
 	fmt.Println(shutdownMessages[0])
 
-	RegisterShutdown(func() {
+	Handle(func() {
 		fmt.Println(shutdownMessages[2])
 	})
 
-	RegisterShutdown(func() {
+	Handle(func() {
 		fmt.Println(shutdownMessages[1])
 		if kill != nil {
 			kill <- true
@@ -156,7 +156,7 @@ func testShutdownChildProcess() {
 		}
 	})
 
-	Shutdown()
+	Now()
 
 	// If for some reason Shutdown returns the test must time out.
 	select {}
