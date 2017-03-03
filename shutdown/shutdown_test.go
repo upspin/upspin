@@ -156,7 +156,7 @@ func testShutdownChildProcess() {
 		}
 	})
 
-	Exit()
+	Exit(0)
 
 	// If for some reason Shutdown returns the test must time out.
 	select {}

@@ -7,6 +7,7 @@
 package shutdown // import "upspin.io/shutdown"
 
 import (
+	"fmt"
 	"os"
 	"os/signal"
 	"sync"
@@ -16,9 +17,13 @@ import (
 	"upspin.io/log"
 )
 
+// GracePeriod specifies the maximum amount of time during which all shutdown
+// handlers must complete before the process forcibly exits.
+const GracePeriod = 1 * time.Minute
+
 // Handle registers the onShutdown function to be run when the system is being
-// shut down. On shutdown, registered functions are run in LIFO order.
-// Handle may be called concurrently.
+// shut down. On shutdown, registered functions are run in last-in-first-out
+// order. Handle may be called concurrently.
 func Handle(onShutdown func()) {
 	shutdown.mu.Lock()
 	defer shutdown.mu.Unlock()
@@ -26,33 +31,28 @@ func Handle(onShutdown func()) {
 	shutdown.sequence = append(shutdown.sequence, onShutdown)
 }
 
-// Exit calls all registered shutdown closures in last-in-first-out order
-// and terminates. It only executes once and guarantees termination within a
-// bounded amount of time. It's safe for many goroutines to call Exit.
-func Exit() {
-	const op = "shutdown.Exit"
-
+// Exit calls all registered shutdown closures in last-in-first-out order and
+// terminates the process with the given status code.
+// It only executes once and guarantees termination within GracePeriod.
+// Exit may be called concurrently.
+func Exit(code int) {
 	shutdown.once.Do(func() {
-		log.Info.Printf("%s: Shutdown requested", op)
-
-		shutdown.mu.Lock()
+		log.Info.Printf("shutdown: status code %d", code)
 
 		// Ensure we terminate after a fixed amount of time.
 		go func() {
-			killSleep(1 * time.Minute)
-			log.Error.Printf("%s: Clean shutdown stalled; forcing shutdown", op)
+			killSleep(GracePeriod)
+			// Don't use log package here; it may have been flushed already.
+			fmt.Fprintf(os.Stderr, "shutdown: %v elapsed since shutdown requested; exiting forcefully", GracePeriod)
 			os.Exit(1)
 		}()
 
+		shutdown.mu.Lock() // No need to ever unlock.
 		for i := len(shutdown.sequence) - 1; i >= 0; i-- {
-			log.Debug.Printf("%s: Running shutdown function", op)
 			shutdown.sequence[i]()
 		}
-		shutdown.mu.Unlock()
 
-		// TODO: pass a reason to Shutdown and print it here and exit
-		// with an error code if not cleanly.
-		os.Exit(0)
+		os.Exit(code)
 	})
 }
 
@@ -71,8 +71,9 @@ func init() {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGTERM, os.Interrupt)
 	go func() {
-		<-c
-		Exit()
+		sig := <-c
+		log.Error.Printf("shutdown: process received signal %v", sig)
+		Exit(1)
 	}()
 
 	// Register the log shutdown routine here, to avoid an import cycle.

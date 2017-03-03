@@ -147,8 +147,7 @@ func ListenAndServe(ready chan<- struct{}, serverName, addr string, opt *Options
 	if err != nil {
 		log.Printf("https: %v", err)
 	}
-	// Ensure we terminate cleanly.
-	shutdown.Exit()
+	shutdown.Exit(1)
 }
 
 // ListenAndServeFromFlags is the same as ListenAndServe, but it determines the
