@@ -11,6 +11,7 @@ import (
 	"io"
 	"os"
 	ospath "path"
+	"path/filepath"
 	"strings"
 	"sync"
 	"time"
@@ -42,7 +43,7 @@ type upspinFS struct {
 	mountpoint string                        // Absolute Unix path to mountpoint.
 	config     upspin.Config                 // Upspin config used for all requests.
 	client     upspin.Client                 // A client to use for client methods.
-	root       *node                         // The root of the upspin file system.
+	root       *node                         // The root of the Upspin file system.
 	uid        int                           // OS user id of this process' owner.
 	gid        int                           // OS group id of this process' owner.
 	lastID     fuse.NodeID                   // The last node ID created and assigned to a file.
@@ -67,8 +68,8 @@ type node struct {
 	t          nodeType
 	id         fuse.NodeID      // See the explanation on upspinFS.
 	f          *upspinFS        // File system this node belongs to.
-	uname      upspin.PathName  // The complete upspin path name of the node.
-	user       upspin.UserName  // The upspin user whose directory tree contains this node.
+	uname      upspin.PathName  // The complete Upspin path name of the node.
+	user       upspin.UserName  // The Upspin user whose directory tree contains this node.
 	attr       fuse.Attr        // Attributes of this node, e.g. POSIX mode bits.
 	handles    map[*handle]bool // Handles (open instances) of this node.
 	link       upspin.PathName  // If this is a symlink, the target.
@@ -94,10 +95,11 @@ func (h *handle) String() string {
 	return fmt.Sprintf("%s %#x", h.n, h.id)
 }
 
-// newUpspinFS creates a new upspin file system.
+// newUpspinFS creates a new Upspin file system.
 func newUpspinFS(config upspin.Config, mountpoint string, cacheDir string) *upspinFS {
-	if !strings.HasSuffix(mountpoint, "/") {
-		mountpoint = mountpoint + "/"
+	sep := string(filepath.Separator)
+	if !strings.HasSuffix(mountpoint, sep) {
+		mountpoint = mountpoint + sep
 	}
 	f := &upspinFS{
 		mountpoint: mountpoint,
@@ -230,7 +232,7 @@ func (n *node) Access(context gContext.Context, req *fuse.AccessRequest) error {
 
 // Create implements fs.NodeCreator.Create. Creates and opens a file.
 // Every created file is initially backed by a clear text local file which is
-// Put in an upspin DirServer on close.  It is assumed that 'n' is a directory.
+// Put in an Upspin DirServer on close.  It is assumed that 'n' is a directory.
 func (n *node) Create(context gContext.Context, req *fuse.CreateRequest, resp *fuse.CreateResponse) (fs.Node, fs.Handle, error) {
 	const op = "upspinfs/fs.Create"
 	n.Lock()
@@ -484,7 +486,7 @@ func (n *node) Lookup(context gContext.Context, name string) (fs.Node, error) {
 	f.Unlock()
 
 	// Hack to avoid bothering the keyserver. Extended attributes for
-	// file "<name>" is implemented as an upspin file named "._<name>".
+	// file "<name>" is implemented as an Upspin file named "._<name>".
 	// Because a user's root is represented as a file, this often
 	// results in lookups of "._<user name>" . We short circuit these
 	// requests here. Hopefully no user valid name starts with "._".
@@ -791,15 +793,31 @@ func (n *node) Removexattr(ctx gContext.Context, req *fuse.RemovexattrRequest) e
 	return nil
 }
 
-func (dir *node) unixPathToUpspinPath(unixpath string) (upspin.PathName, error) {
-	if unixpath[0] != '/' {
-		return path.Join(dir.uname, unixpath), nil
+// convertRelPath converts a host relative path into an Upspin one. It assumes
+// that the only difference is the separators. This will work with
+// windows and *nix. Not sure about other systems.
+func convertRelPath(path string) string {
+	if filepath.Separator == '/' {
+		return path
 	}
-	upspinpath := strings.TrimPrefix(unixpath, dir.f.mountpoint)
-	if unixpath != upspinpath {
-		return upspin.PathName(unixpath), errors.Str("symlink outside of upspin")
+	return strings.Replace(path, string(filepath.Separator), "/", -1)
+}
+
+// hostPathToUpspinPath takes a hostpath and returns an Upspin path.
+func (dir *node) hostPathToUpspinPath(hostpath string) (upspin.PathName, error) {
+	mountrel := strings.TrimPrefix(hostpath, dir.f.mountpoint)
+	if hostpath != mountrel {
+		// We have a path that is relative to the mount point.
+		// Convert the separator if necessary and return it as an
+		// Upspin path.
+		return upspin.PathName(convertRelPath(mountrel)), nil
 	}
-	return upspin.PathName(upspinpath), nil
+	// Not relative to the mountpoint. If it is rooted, it is outside Upspin.
+	if filepath.IsAbs(hostpath) {
+		return upspin.PathName(hostpath), errors.Str("symlink outside of upspin")
+	}
+	// This is relative to dir. Convert the separators and append to dir.
+	return path.Join(dir.uname, convertRelPath(hostpath)), nil
 }
 
 // Symlink implements fs.Symlink.
@@ -807,7 +825,7 @@ func (n *node) Symlink(ctx gContext.Context, req *fuse.SymlinkRequest) (fs.Node,
 	const op = "upspinfs/fs.Symlink"
 	n.Lock()
 	defer n.Unlock()
-	target, err := n.unixPathToUpspinPath(req.Target)
+	target, err := n.hostPathToUpspinPath(req.Target)
 	if err != nil {
 		return nil, e2e(errors.E(op, n.uname, err))
 	}
@@ -822,16 +840,41 @@ func (n *node) Symlink(ctx gContext.Context, req *fuse.SymlinkRequest) (fs.Node,
 	return nn, nil
 }
 
-func (n *node) upspinPathToUnixPath(path upspin.PathName) string {
-	// All upspin paths are absolute.
-	return n.f.mountpoint + string(path)
+// upspinPathToHostPath takes an Upspin path, target, and turns it into a host path relative
+// to the Upspin path, link.
+func (link *node) upspinPathToHostPath(target upspin.PathName) (string, error) {
+	parsedLink, err := path.Parse(link.uname)
+	if err != nil {
+		return "", e2e(err)
+	}
+	parsedTarget, err := path.Parse(target)
+	if err != nil {
+		return "", e2e(err)
+	}
+
+	// Create relative path.
+	nl := parsedLink.NElem()
+	nt := parsedTarget.NElem()
+	relPath := make([]string, 0, nl+nt)
+	for i := -1; ; i++ {
+		if i >= nl || i >= nt || parsedTarget.Elem(i) != parsedLink.Elem(i) {
+			for j := i; j < nl-1; j++ {
+				relPath = append(relPath, "..")
+			}
+			for j := i; j < nt; j++ {
+				relPath = append(relPath, parsedTarget.Elem(j))
+			}
+			break
+		}
+	}
+	return ospath.Join(relPath...), nil
 }
 
 // Symlink implements fs.NodeReadlinker.Readlink.
 func (n *node) Readlink(ctx gContext.Context, req *fuse.ReadlinkRequest) (string, error) {
 	const op = "upspinfs/fs.Readlink"
 	log.Debug.Printf("Readlink %q -> %q", n, n.link)
-	return n.upspinPathToUnixPath(n.link), nil
+	return n.upspinPathToHostPath(n.link)
 }
 
 // isEnoent returns true if we already know this path name doesn't exist.
