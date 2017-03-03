@@ -2,6 +2,9 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+// Upspin-setupstorage is an external upspin subcommand that
+// executes the second step in establishing an upspinserver.
+// Run upspin setupstorage -help for more information.
 package main
 
 import (
@@ -10,6 +13,7 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -18,12 +22,15 @@ import (
 	storage "google.golang.org/api/storage/v1"
 
 	"upspin.io/flags"
+	"upspin.io/subcmd"
 )
 
-func (s *State) setupstorage(args ...string) {
-	const (
-		help = `
-Setupstorage is the second step in setting up an upspinserver.
+type state struct {
+	*subcmd.State
+}
+
+const help = `
+Setupstorage is the second step in establishing an upspinserver.
 The first step is 'setupdomain' and the final step is 'setupserver'.
 
 It creates a Google Cloud Storage bucket and a service account for
@@ -45,23 +52,38 @@ Authenticate and enable the necessary APIs:
 And, finally, authenticate again in a different way:
 	$ gcloud auth application-default login
 `
-	)
-	fs := flag.NewFlagSet("setupstorage", flag.ExitOnError)
-	where := fs.String("where", filepath.Join(os.Getenv("HOME"), "upspin", "deploy"), "`directory` to store private configuration files")
-	domain := fs.String("domain", "", "domain `name` for this Upspin installation")
-	s.ParseFlags(fs, args, help, "-project=<gcp_project_name> setupstorage -domain=<name> <bucket_name>")
+
+func main() {
+	fmt.Printf("%q\n", os.Args)
+	const name = "setupstorage"
+
+	log.SetFlags(0)
+	log.SetPrefix("upspin setupstorage: ")
+
+	s := &state{
+		State: subcmd.NewState(name),
+	}
+
+	where := flag.String("where", filepath.Join(os.Getenv("HOME"), "upspin", "deploy"), "`directory` to store private configuration files")
+	domain := flag.String("domain", "", "domain `name` for this Upspin installation")
+
+	flags.Install() // enable all global flags
+
+	s.ParseFlags(flag.CommandLine, os.Args[1:], help,
+		"-project=<gcp_project_name> setupstorage -domain=<name> <bucket_name>")
+	if flag.NArg() != 1 {
+		s.Exitf("a single bucket name must be provided")
+	}
 	if *domain == "" || flags.Project == "" {
-		s.Failf("the -domain and -project flags must be provided")
-		fs.Usage()
+		s.Exitf("the -domain and -project flags must be provided")
 	}
-	if fs.NArg() != 1 {
-		s.Failf("a bucket name must be provided")
-		fs.Usage()
-	}
-	bucket := fs.Arg(0)
+
+	bucket := flag.Arg(0)
 
 	cfgPath := filepath.Join(*where, *domain)
-	cfg := s.readServerConfig(cfgPath)
+	fmt.Println(cfgPath)
+	return // TODO
+	cfg := s.ReadServerConfig(cfgPath)
 
 	email := s.createServiceAccount(cfgPath)
 	fmt.Printf("Service account %q created.\n", email)
@@ -70,12 +92,14 @@ And, finally, authenticate again in a different way:
 	fmt.Printf("Bucket %q created.\n", bucket)
 
 	cfg.Bucket = bucket
-	s.writeServerConfig(cfgPath, cfg)
+	s.WriteServerConfig(cfgPath, cfg)
 
 	fmt.Printf("You should now deploy the upspinserver binary and run 'upspin setupserver'.\n")
+
+	s.Cleanup()
 }
 
-func (s *State) createServiceAccount(cfgPath string) (email string) {
+func (s *state) createServiceAccount(cfgPath string) (email string) {
 	// TODO(adg): detect that key exists and re-use it
 	client, err := google.DefaultClient(context.Background(), iam.CloudPlatformScope)
 	if err != nil {
@@ -120,7 +144,7 @@ func (s *State) createServiceAccount(cfgPath string) (email string) {
 	return acct.Email
 }
 
-func (s *State) createBucket(email, bucket string) {
+func (s *state) createBucket(email, bucket string) {
 	client, err := google.DefaultClient(context.Background(), storage.DevstorageFullControlScope)
 	if err != nil {
 		// TODO: ask the user to run 'gcloud auth application-default login'
