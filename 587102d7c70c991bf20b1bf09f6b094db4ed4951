@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fa48e4a0_e0f6423c",
+        "filename": "flags/flags.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-03T19:24:05Z",
+      "side": 1,
+      "message": "this is an important new dependency. it means config cannot import flags, which it does not, and should never need to. if it does we\u0027ll need to rethink, but it\u0027s OK for now.",
+      "revId": "587102d7c70c991bf20b1bf09f6b094db4ed4951",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
