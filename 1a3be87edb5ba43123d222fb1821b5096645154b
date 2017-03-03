@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9485fe8a_3998a292",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-03T06:15:35Z",
+      "side": 1,
+      "message": "fine buy me as is.  defer might have been nicer...",
+      "range": {
+        "startLine": 125,
+        "startChar": 8,
+        "endLine": 125,
+        "endChar": 15
+      },
+      "revId": "1a3be87edb5ba43123d222fb1821b5096645154b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
