@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "22d1a89b_e8cd4be1",
+        "filename": "upspin/proto/proto.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-03T21:04:33Z",
+      "side": 1,
+      "message": "We don\u0027t *use*?",
+      "revId": "6d3378690abb404fbe0c93ad984ff385686e289d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
