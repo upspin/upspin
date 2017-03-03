@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0add45cc_5466c6b6",
+        "filename": "cmd/upspin/keygen.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-03T18:31:00Z",
+      "side": 1,
+      "message": "s/whether to//\n\nbooleans always are a decision",
+      "revId": "1b0f29eee525d2eb0e93850f6a3e4939a1d6660c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f80875f2_cd610b57",
+        "filename": "cmd/upspin/keygen.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-03T18:31:00Z",
+      "side": 1,
+      "message": "\"no prior keys exist; cannot rotate keys\"",
+      "revId": "1b0f29eee525d2eb0e93850f6a3e4939a1d6660c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "df2f372f_5fc009ea",
+        "filename": "cmd/upspin/keygen.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-03T18:31:00Z",
+      "side": 1,
+      "message": "I would have 169 and this line exit instead of return because they represent problems of a different nature than simple I/O.\n\n\"prior keys exist; rerun with -rotate to update keys\"",
+      "revId": "1b0f29eee525d2eb0e93850f6a3e4939a1d6660c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
