@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "16d27834_b4dde120",
+        "filename": "cmd/upspin-setupstorage/setupstorage.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-03T00:25:24Z",
+      "side": 1,
+      "message": "s/U/u/? Since it\u0027s a command line tool?",
+      "revId": "a99319e1f9dad8ba7b9ba24c9064d24765fa804d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "01cdf4ca_f2bdcbe8",
+        "filename": "cmd/upspin-setupstorage/setupstorage.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-03T00:25:24Z",
+      "side": 1,
+      "message": "Remove these 2 lines?",
+      "revId": "a99319e1f9dad8ba7b9ba24c9064d24765fa804d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ed839152_2ed55772",
+        "filename": "subcmd/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-03T00:25:24Z",
+      "side": 1,
+      "message": "Missing godoc comments here and below.",
+      "revId": "a99319e1f9dad8ba7b9ba24c9064d24765fa804d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
