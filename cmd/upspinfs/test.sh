@@ -24,8 +24,15 @@ cp ./test.sh $USERROOT/dir/test.sh
 cmp ./test.sh $USERROOT/dir/test.sh
 
 # Sym links.
+# sym link using relative target name.
 ln -s test.sh $USERROOT/sym.sh
 cmp $USERROOT/test.sh $USERROOT/sym.sh
+# sym link using rooted target name.
+mkdir symlinkdir
+ln -s $USERROOT/test.sh symlinkdir/test.sh
+cmp $USERROOT/test.sh symlinkdir/test.sh
+# sym link from another user's tree
+ln -s $ROOT/augie@upspin.io/file symlinkdir/augiefile
 
 # Remove the target and the symlink no longer works.
 rm $USERROOT/test.sh
