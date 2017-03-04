@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "4d9c26dd_f025ecc6",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 935,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-04T01:21:34Z",
+      "side": 1,
+      "message": "The default value (\"\") is fine because ioutil.TempDir assumes \"/tmp\" or whatever is in $TMPDIR.",
+      "parentUuid": "a8f42789_d6591c91",
+      "revId": "4b943dfc53bbc9859f1a9d7a24208225c644c639",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "9e43a643_1ff25585",
         "filename": "dir/server/bench_test.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2017-03-04T01:10:11Z",
       "side": 1,
       "message": "stop the clock until you get to this loop.\nyou\u0027re looking at n^2 behavior in this loop, surely. not sure a benchmark will tell you anything meaningful unless you remove it too.\n\nno need for random names. you can just use a simple counter and avoid the overhead of rand.",
+      "revId": "4b943dfc53bbc9859f1a9d7a24208225c644c639",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d5aef059_52af8879",
+        "filename": "dir/server/bench_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-04T01:21:34Z",
+      "side": 1,
+      "message": "- stopped the clock.\n- removed rand.\n- not sure where the n^2 is here?",
+      "parentUuid": "9e43a643_1ff25585",
       "revId": "4b943dfc53bbc9859f1a9d7a24208225c644c639",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
