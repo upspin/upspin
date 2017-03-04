@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7d3694b5_a010fe24",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5428
+      },
+      "writtenOn": "2017-03-04T06:49:15Z",
+      "side": 1,
+      "message": "Sentence ends without making much sense. Lost a line?",
+      "revId": "112582a022d5fe0a6b63b3873af4fca2a2a1f955",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
