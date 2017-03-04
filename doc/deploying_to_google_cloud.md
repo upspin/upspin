@@ -81,7 +81,7 @@ Instead, the `upspin setupdomain` command will do the work for you.
 This command sets up users for our example domain:
 
 ```
-$ upspin -project=example-project setupdomain -cluster example.com
+$ upspin -project=example-project setupdomain -cluster -domain=example.com
 ```
 
 and should print something like this:
@@ -243,7 +243,7 @@ create an Upspin tree in the directory server.
 Of course, the command you run should list the users of your own servers.
 
 ```
-$ upspin -project=example-project setupwriters you@gmail.com *@example.com
+$ upspin -project=example-project setupwriters -domain=example.com you@gmail.com
 ```
 
 The servers are now available for general use.
