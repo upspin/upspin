@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "83adcae8_88df1c01",
+        "filename": "doc/overview.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-04T01:11:45Z",
+      "side": 1,
+      "message": "may change the keys and the store and directory endpoints for `.....`.",
+      "revId": "3cf6de7fb5afa7817efd9f4f57bcef63993a6318",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
