@@ -69,6 +69,24 @@
       "revId": "4b943dfc53bbc9859f1a9d7a24208225c644c639",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ab16c664_0c111d7e",
+        "filename": "dir/server/bench_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-04T01:24:12Z",
+      "side": 1,
+      "message": "you are adding files repeatedly to the same directory, right? unless there\u0027s a clever algorithm in directory search and update, which i don\u0027t remember, it\u0027s n^2 to do that, and that means the benchmark algorithm, which assumes O(N), will give misleading and unpredictable results.",
+      "parentUuid": "d5aef059_52af8879",
+      "revId": "4b943dfc53bbc9859f1a9d7a24208225c644c639",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
