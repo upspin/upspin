@@ -37,6 +37,42 @@
     },
     {
       "key": {
+        "uuid": "59e90c28_2f95693f",
+        "filename": "cmd/upspinfs/fs.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 825,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-04T05:27:11Z",
+      "side": 1,
+      "message": "I changed [uU]nix to [hH]ost.  I also changed the places where I really expected a \u0027/\u0027 tp be the path element separator to filepath.Separator.\n\nHowever, I\u0027ve left the !windows pragma at the top of the file since I have no idea if it will actually work on non *nix systems.  If nothing else, we\u0027ll need a different FUSE library and I don\u0027t expect it to be compatible with the Bazil one.",
+      "parentUuid": "0dee4e33_8c405342",
+      "revId": "cef89d343410ac6ae5a252f8ef2358b971948f47",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "efd8def8_4c4b0410",
+        "filename": "cmd/upspinfs/fs.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 825,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-04T05:27:11Z",
+      "side": 1,
+      "message": "By using ospath.Join and now filepath.Separator in the one place I need to know, I\u0027m trying to be system agnostic in these manipulations so I\u0027ll not break it out into a umix file.",
+      "parentUuid": "f6555efd_d09f36ad",
+      "revId": "cef89d343410ac6ae5a252f8ef2358b971948f47",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "0554bd05_5cb2c802",
         "filename": "cmd/upspinfs/fs.go",
         "patchSetId": 1
@@ -66,6 +102,24 @@
       "side": 1,
       "message": "that might even make it portable, so it wouldn\u0027t need to move to unix.go\nit should still be renamed.",
       "parentUuid": "0554bd05_5cb2c802",
+      "revId": "cef89d343410ac6ae5a252f8ef2358b971948f47",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7b465505_5ed42d06",
+        "filename": "cmd/upspinfs/fs.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 842,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-04T05:27:11Z",
+      "side": 1,
+      "message": "Unfortunately, it does the opposite.  If I use the Rel function to create relative paths, I am presupposing that the path separator in upspin (n.uname is an upspin path) matches that in the underlying OS (target).  I cannot assume that.\n\nTherefore, to make my current manipulations system agmnostic, I must assume forward slash in n.uname (an upspin path) and filepath.Separator in target (a host path).\n\nI\u0027ll rewrite the code to do that.  Messier but more general.  Not sure it\u0027s worth it but as a tour de force, what the heck.",
+      "parentUuid": "c725f021_ab7dd67b",
       "revId": "cef89d343410ac6ae5a252f8ef2358b971948f47",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
