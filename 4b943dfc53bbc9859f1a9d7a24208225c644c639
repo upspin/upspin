@@ -87,6 +87,24 @@
       "revId": "4b943dfc53bbc9859f1a9d7a24208225c644c639",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3beb7686_9baf15ce",
+        "filename": "dir/server/bench_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-04T01:37:19Z",
+      "side": 1,
+      "message": "Yes. I\u0027m adding directories 1/, 2/, 3/, 4/ ... under ann@example.com/\n\nInternally, each Put will walk the path from the root to where it should be Put. So, in this way, it\u0027s two loops. But N here is one thing and the depth of the path that Put needs to walk (k) is fixed for each N.\n\nSo, I\u0027m doing O(b.N * (k+1)), where k\u003d0,1,2,4 in the 4 benchmarks I wrote above.\n\nI think this is fine, no?",
+      "parentUuid": "ab16c664_0c111d7e",
+      "revId": "4b943dfc53bbc9859f1a9d7a24208225c644c639",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
