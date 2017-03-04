@@ -470,7 +470,7 @@ func (c *Config) buildServer(server string) error {
 	if err != nil {
 		return err
 	}
-	base := filepath.Join(home, "upspin", "deploy", c.Project, server)
+	base := filepath.Join(home, "upspin", "deploy", c.Domain, server)
 	for _, f := range files {
 		if err := cp(filepath.Join(dir, f), filepath.Join(base, f)); err != nil {
 			return fmt.Errorf("error copying %q for %v: %v", f, server, err)
