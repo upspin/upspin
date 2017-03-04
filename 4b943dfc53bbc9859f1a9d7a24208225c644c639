@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a8f42789_d6591c91",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 935,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-04T01:10:11Z",
+      "side": 1,
+      "message": "you should either check tmpdir has been set or set it to a safe value. this panic will be inscrutable.",
+      "revId": "4b943dfc53bbc9859f1a9d7a24208225c644c639",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9e43a643_1ff25585",
+        "filename": "dir/server/bench_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-04T01:10:11Z",
+      "side": 1,
+      "message": "stop the clock until you get to this loop.\nyou\u0027re looking at n^2 behavior in this loop, surely. not sure a benchmark will tell you anything meaningful unless you remove it too.\n\nno need for random names. you can just use a simple counter and avoid the overhead of rand.",
+      "revId": "4b943dfc53bbc9859f1a9d7a24208225c644c639",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
