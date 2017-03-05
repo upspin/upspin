@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "61b976c9_9fb520e3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-05T22:01:00Z",
+      "side": 1,
+      "message": "1 of many? what\u0027s the plan?",
+      "revId": "9572f0cabda16bcb1e37c7299abb4ebf8164cd92",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "02e50fcc_be6e5de7",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-05T22:01:00Z",
+      "side": 1,
+      "message": "the environment variable TMPDIR also does exactly this. why the flag?",
+      "revId": "9572f0cabda16bcb1e37c7299abb4ebf8164cd92",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "143c4f62_acdd860f",
+        "filename": "dir/server/bench_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-05T22:01:00Z",
+      "side": 1,
+      "message": "it\u0027s the common idiom to put the *testing.B (or *testing.T) argument first",
+      "revId": "9572f0cabda16bcb1e37c7299abb4ebf8164cd92",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d86d777b_718e2e69",
+        "filename": "dir/server/bench_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-05T22:01:00Z",
+      "side": 1,
+      "message": "this is never restored after the benchmarks run\n\nmaybe this function should return a \"cleanup func()\" that does the os.RemoveAll of the directory and re-sets the log output",
+      "revId": "9572f0cabda16bcb1e37c7299abb4ebf8164cd92",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
