@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d1fe02a9_9471e117",
+        "filename": "doc/overview.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-05T17:12:56Z",
+      "side": 1,
+      "message": "s/canonical/primary/ here and below. i think it\u0027s a better term.",
+      "revId": "295785de893fdb722a086148440366c918fb6466",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "84da66db_63cdfb3a",
+        "filename": "doc/overview.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-05T17:12:56Z",
+      "side": 1,
+      "message": "Primary users can therefore make changes to entries on the key server for their name with a suffix.",
+      "revId": "295785de893fdb722a086148440366c918fb6466",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3080dfd6_be052931",
+        "filename": "doc/overview.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-05T17:12:56Z",
+      "side": 1,
+      "message": "s/Plus-//",
+      "revId": "295785de893fdb722a086148440366c918fb6466",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
