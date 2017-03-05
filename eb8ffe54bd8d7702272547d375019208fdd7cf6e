@@ -52,6 +52,24 @@
       "revId": "eb8ffe54bd8d7702272547d375019208fdd7cf6e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8de8e351_f170db15",
+        "filename": "config/initconfig.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-05T23:45:03Z",
+      "side": 1,
+      "message": "How about s/panic/log.Debug.Println\n\nThat is, on Windows we will proceed with a nil systemCertPool.   If the config specifies tlscerts, all is well;  if not, then the connection will fail for lack of a verifiable certificate.\n\nI\u0027m somewhat confused about why we have systemCertPool at all;  the documented behavior of tls.Config.RootCAs\u003d\u003dnil is to use the host\u0027s root CA set.   Andrew, adg@google.com, do you remember?",
+      "parentUuid": "ce1914ee_6cd6ff65",
+      "revId": "eb8ffe54bd8d7702272547d375019208fdd7cf6e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
