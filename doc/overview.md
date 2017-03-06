@@ -106,7 +106,7 @@ Upspin uses this technique to allow a user to own multiple Upspin services.
 For example, `ann+camera@example.com` might be the Upspin user name for an
 Internet-connected video camera owned by `ann@example.com`.
 
-Suffixed users belong to their primary user (the one without the
+User names with suffixes belong to their primary user (the one without the
 suffix).
 Primary users can therefore make changes to entries on the key server for their
 name with a suffix.
@@ -115,7 +115,7 @@ endpoints for`ann+camera@example.com`.
 The converse, however, is not allowed: `ann+camera@example.com` cannot make
 changes to `ann@example.com`.
 
-Suffixed users can be created only by their owners.
+User names with suffixes can be created only by their owners.
 For this reason, they do not require a working email address.
 
 ## Naming
