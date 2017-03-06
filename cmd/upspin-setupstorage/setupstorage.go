@@ -56,7 +56,6 @@ And, finally, authenticate again in a different way:
 `
 
 func main() {
-	fmt.Printf("%q\n", os.Args)
 	const name = "setupstorage"
 
 	log.SetFlags(0)
