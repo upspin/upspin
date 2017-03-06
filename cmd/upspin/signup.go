@@ -60,7 +60,7 @@ file and keys and only send the signup request to the key server.
 	fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
 	fs.String("secretseed", "", "128 bit secret `seed` in proquint format")
 
-	s.ParseFlags(fs, args, help, "[-config=<file>] signup [flags] <username>")
+	s.ParseFlags(fs, args, help, "[-config=<file>] signup -dir=<addr> -store=<addr> [flags] <username>\n       upspin [-config=<file>] signup -server=<addr> [flags] <username>")
 
 	// Determine config file location.
 	if !filepath.IsAbs(flags.Config) {
