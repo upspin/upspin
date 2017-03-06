@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "57bdd2f4_ff734cb3",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1052,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-06T03:13:19Z",
+      "side": 1,
+      "message": "I still think it\u0027s a good idea to do what you did, which is have a separate function that takes a dir, otherwise the overloading of testDir is pretty subtle",
+      "revId": "78bfb051a6b658e4ed4be97aa78d202312fdab92",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
