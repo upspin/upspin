@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "50ababde_f94c4f2b",
+        "filename": "cmd/upspin/keygen.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-06T03:15:13Z",
+      "side": 1,
+      "message": "there",
+      "range": {
+        "startLine": 168,
+        "startChar": 53,
+        "endLine": 168,
+        "endChar": 55
+      },
+      "revId": "d19ac655bab9752d2268973b091c6230db02368e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
