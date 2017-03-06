@@ -1,0 +1,209 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c0bb5721_ae289e7c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-06T02:38:09Z",
+      "side": 1,
+      "message": "Upspin\n\u003c/pedant\u003e",
+      "range": {
+        "startLine": 9,
+        "startChar": 4,
+        "endLine": 9,
+        "endChar": 10
+      },
+      "revId": "6513ccdc39c90fe0ca064d9537e14b12c263248f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "732fba18_18ef40fb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-06T02:38:09Z",
+      "side": 1,
+      "message": "#291\nto make this auto-link in gerrit and github",
+      "revId": "6513ccdc39c90fe0ca064d9537e14b12c263248f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "90054c85_7f992f9e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-06T02:38:09Z",
+      "side": 1,
+      "message": "the upspinfs mount point",
+      "range": {
+        "startLine": 14,
+        "startChar": 32,
+        "endLine": 14,
+        "endChar": 51
+      },
+      "revId": "6513ccdc39c90fe0ca064d9537e14b12c263248f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a3cead44_68deaebe",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-06T02:38:09Z",
+      "side": 1,
+      "message": "can",
+      "revId": "6513ccdc39c90fe0ca064d9537e14b12c263248f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9b69a65a_7c357124",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-06T02:38:09Z",
+      "side": 1,
+      "message": "build tag",
+      "range": {
+        "startLine": 31,
+        "startChar": 9,
+        "endLine": 31,
+        "endChar": 15
+      },
+      "revId": "6513ccdc39c90fe0ca064d9537e14b12c263248f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7fc5f7f1_9e0cca10",
+        "filename": "cmd/upspinfs/upspinfs_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-06T02:38:09Z",
+      "side": 1,
+      "message": "could just call it umount",
+      "revId": "6513ccdc39c90fe0ca064d9537e14b12c263248f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cb053a5b_f39e0623",
+        "filename": "cmd/upspinfs/upspinfs_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-06T02:38:09Z",
+      "side": 1,
+      "message": "naming these return values buys us nothing, remove the names?",
+      "revId": "6513ccdc39c90fe0ca064d9537e14b12c263248f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e16835e7_9c5792b3",
+        "filename": "cmd/upspinfs/upspinfs_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-06T02:38:09Z",
+      "side": 1,
+      "message": "return the error",
+      "revId": "6513ccdc39c90fe0ca064d9537e14b12c263248f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2c1f0334_dd7ce62c",
+        "filename": "cmd/upspinfs/upspinfs_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-06T02:38:09Z",
+      "side": 1,
+      "message": "print to stderr",
+      "revId": "6513ccdc39c90fe0ca064d9537e14b12c263248f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9c64a853_d85e6c8d",
+        "filename": "cmd/upspinfs/upspinfs_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-06T02:38:09Z",
+      "side": 1,
+      "message": "rather than passing in t, you can get better test failure messages by returning an error here and calling t.Fatal at the call site",
+      "revId": "6513ccdc39c90fe0ca064d9537e14b12c263248f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d2df2041_c7294986",
+        "filename": "cmd/upspinfs/upspinfs_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-06T02:38:09Z",
+      "side": 1,
+      "message": "and the same applies to these other funcs. they seem like they\u0027re worth it until you\u0027re debugging a failure and need to add more wrapping code. try to call the t.Fatal etc in the tests themselves wherever possible, so you get good line numbers",
+      "revId": "6513ccdc39c90fe0ca064d9537e14b12c263248f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
