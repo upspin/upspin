@@ -40,8 +40,6 @@ For a list of available subcommands and global flags, run
 
 	upspin -help
 
-
-
 Usage of upspin:
 	upspin [globalflags] <command> [flags] <path>
 Upspin commands:
@@ -104,7 +102,6 @@ Global flags:
     	TLS Key file in PEM format
   -writethrough
     	make storage cache writethrough
-
 
 
 Sub-command countersign
@@ -249,6 +246,8 @@ Flags:
     	cryptographic curve name: p256, p384, or p521 (default "p256")
   -help
     	print more information about the command
+  -rotate
+    	rotate existing keys and replace them with new ones
   -secretseed seed
     	128 bit secret seed in proquint format
   -where directory
@@ -367,7 +366,7 @@ Rotate pushes an updated key to the key server.
 
 To update an Upspin key, the sequence is:
 
-  upspin keygen            # Create new key.
+  upspin keygen -rotate    # Create new key.
   upspin countersign       # Update file signatures to use new key.
   upspin rotate            # Save new key to key server.
   upspin share -r -fix me@example.com/  # Update keys in file metadata.
@@ -393,8 +392,9 @@ Sub-command setupdomain
 
 Usage: upspin setupdomain [-where=$HOME/upspin/deploy] [-cluster] -domain=<name>
 
-Setupdomain is the first step in setting up an upspinserver.
-The next steps are 'setupstorage' and 'setupserver'.
+Setupdomain is the first step in setting up an upspinserver or Upspin
+Kubernetes cluster. If setting up an upspinserver, the next steps are
+'setupstorage' (optionally) and 'setupserver'.
 
 It generates keys and config files for Upspin server users, placing them in
 $where/$domain (the values of the -where and -domain flags substitute for
@@ -430,7 +430,7 @@ Sub-command setupserver
 Usage: upspin setupserver -domain=<domain> -host=<host> [-where=$HOME/upspin/deploy] [-writers=user,...]
 
 Setupserver is the final step of setting up an upspinserver.
-It assumes that you have run 'setupdomain' and 'setupstorage'.
+It assumes that you have run 'setupdomain' and (optionally) 'setupstorage'.
 
 It registers the user created by 'setupdomain' domain with the key server,
 copies the configuration files from $where/$domain to the upspinserver and
@@ -461,13 +461,15 @@ Sub-command setupstorage
 
 Usage: upspin -project=<gcp_project_name> setupstorage -domain=<name> <bucket_name>
 
-Setupstorage is the second step in setting up an upspinserver.
+Setupstorage is the second step in establishing an upspinserver,
+It sets up cloud storage for your Upspin installation. You may skip this step
+if you wish to store Upspin data on your server's local disk.
 The first step is 'setupdomain' and the final step is 'setupserver'.
 
-It creates a Google Cloud Storage bucket and a service account for
+Setupstorage creates a Google Cloud Storage bucket and a service account for
 accessing that bucket. It then writes the service account private key to
-$where/$domain/serviceaccount.json and updates the server
-configuration files in that directory to use the specified bucket.
+$where/$domain/serviceaccount.json and updates the server configuration files
+in that directory to use the specified bucket.
 
 Before running this command, you must create a Google Cloud Project and
 associated Billing Account using the Cloud Console:
@@ -684,7 +686,6 @@ that controls permissions for each of the argument paths.
 Flags:
   -help
     	print more information about the command
-
 
 */
 package main
