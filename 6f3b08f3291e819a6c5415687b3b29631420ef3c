@@ -46,6 +46,30 @@
       "revId": "6f3b08f3291e819a6c5415687b3b29631420ef3c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4b3362af_75bb5855",
+        "filename": "cmd/upspin/keygen.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-06T03:10:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ea897375_0084d33a",
+      "range": {
+        "startLine": 198,
+        "startChar": 13,
+        "endLine": 198,
+        "endChar": 25
+      },
+      "revId": "6f3b08f3291e819a6c5415687b3b29631420ef3c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
