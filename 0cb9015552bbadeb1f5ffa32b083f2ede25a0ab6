@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c3ed7ea3_340395a9",
+        "filename": "config/initconfig.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-06T21:55:58Z",
+      "side": 1,
+      "message": "You also need to change the doc in package upspin, which reads\n\n\t// CertPool returns the x509 certificate pool\n\t// used to validate client TLS connections.\n\tCertPool() *x509.CertPool\n\nThe docs should make it clear that if CertPool returns nil then the default system roots should be used.",
+      "revId": "0cb9015552bbadeb1f5ffa32b083f2ede25a0ab6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
