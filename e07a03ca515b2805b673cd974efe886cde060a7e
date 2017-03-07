@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "69043ed5_90acf6ce",
+        "filename": "errors/debug.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-07T19:02:18Z",
+      "side": 1,
+      "message": "please spell out TOS. To me, it\u0027s Terms Of Service.",
+      "revId": "e07a03ca515b2805b673cd974efe886cde060a7e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
