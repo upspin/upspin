@@ -55,6 +55,7 @@ file and keys and only send the signup request to the key server.
 		storeServer = fs.String("store", "", "Store server `address`")
 		bothServer  = fs.String("server", "", "Store and Directory server `address` (if combined)")
 		signupOnly  = fs.Bool("signuponly", false, "only send signup request to key server; do not generate config or keys")
+		_           = fs.Bool("rotate", false, "always false during sign up")
 	)
 	// Used only in keygen.
 	fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
