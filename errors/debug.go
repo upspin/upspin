@@ -55,6 +55,20 @@ func (e *Error) populateStack() {
 	}
 }
 
+// frame returns the nth frame, with the frame at top of stack being 0.
+func frame(callers []uintptr, n int) *runtime.Frame {
+	frames := runtime.CallersFrames(callers)
+	var f runtime.Frame
+	for i := len(callers) - 1; i >= n; i-- {
+		var ok bool
+		f, ok = frames.Next()
+		if !ok {
+			break // Should never happen, and this is just debugging.
+		}
+	}
+	return &f
+}
+
 // printStack formats and prints the stack for this Error to the given buffer.
 // It should be called from the Error's Error method.
 func (e *Error) printStack(b *bytes.Buffer) {
@@ -67,14 +81,11 @@ func (e *Error) printStack(b *bytes.Buffer) {
 	var prev string // the name of the last-seen function
 	var diff bool   // do the print and error call stacks differ now?
 	for i := 0; i < len(e.callers); i++ {
-		pc := e.callers[len(e.callers)-1-i]
-		fn := runtime.FuncForPC(pc)
-		name := fn.Name()
+		thisFrame := frame(e.callers, i)
+		name := thisFrame.Func.Name()
 
 		if !diff && i < len(printCallers) {
-			ppc := printCallers[len(printCallers)-1-i]
-			pname := runtime.FuncForPC(ppc).Name()
-			if name == pname {
+			if name == frame(printCallers, i).Func.Name() {
 				// both stacks share this PC, skip it.
 				continue
 			}
@@ -104,8 +115,7 @@ func (e *Error) printStack(b *bytes.Buffer) {
 
 		// Do the printing.
 		pad(b, Separator)
-		file, line := fn.FileLine(pc)
-		fmt.Fprintf(b, "%v:%d: ", file, line)
+		fmt.Fprintf(b, "%v:%d: ", thisFrame.File, thisFrame.Line)
 		if trim > 0 {
 			b.WriteString("...")
 		}
