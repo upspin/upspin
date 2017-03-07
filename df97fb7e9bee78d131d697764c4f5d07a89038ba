@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "0a75c776_b9efc74e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-07T03:57:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2d3feeff_7ecd6652",
+      "range": {
+        "startLine": 9,
+        "startChar": 36,
+        "endLine": 9,
+        "endChar": 50
+      },
+      "revId": "df97fb7e9bee78d131d697764c4f5d07a89038ba",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "09820ad7_3c63016c",
         "filename": "/COMMIT_MSG",
         "patchSetId": 2
@@ -42,6 +66,24 @@
     },
     {
       "key": {
+        "uuid": "e9089d68_c492cb52",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-07T03:57:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "09820ad7_3c63016c",
+      "revId": "df97fb7e9bee78d131d697764c4f5d07a89038ba",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2bec1578_fa37507a",
         "filename": "cmd/upspin/gendoc.go",
         "patchSetId": 2
@@ -53,6 +95,24 @@
       "writtenOn": "2017-03-07T02:37:57Z",
       "side": 1,
       "message": "instead, we could capture this exit status and exit the upspin binary with that same status, rather than printing the string",
+      "revId": "df97fb7e9bee78d131d697764c4f5d07a89038ba",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2bf43050_40d6f43b",
+        "filename": "cmd/upspin/gendoc.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-07T03:57:22Z",
+      "side": 1,
+      "message": "Believe me, I tried. It\u0027s really not easy because of portability between operating systems.\nThis method is much simpler.\n\nIf you have a portable solution, please let me know or make a CL.",
+      "parentUuid": "2bec1578_fa37507a",
       "revId": "df97fb7e9bee78d131d697764c4f5d07a89038ba",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
