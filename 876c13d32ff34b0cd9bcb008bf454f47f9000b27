@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2c651b9e_5cc1eaa4",
+        "filename": "cmd/upspin/signup.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-07T19:42:25Z",
+      "side": 1,
+      "message": "comment please.",
+      "revId": "876c13d32ff34b0cd9bcb008bf454f47f9000b27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
