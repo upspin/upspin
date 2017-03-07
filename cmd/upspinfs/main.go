@@ -32,7 +32,7 @@ func usage() {
 
 func main() {
 	flag.Usage = usage
-	flags.Parse("config", "log")
+	flags.Parse("cachedir", "config", "log")
 
 	if flag.NArg() != 1 {
 		usage()
