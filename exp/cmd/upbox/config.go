@@ -113,7 +113,7 @@ func ConfigFromFile(name string) (*Config, error) {
 			u.Name += "@" + cfg.Domain
 		}
 		if u.Packing == "" {
-			u.Packing = "plain"
+			u.Packing = "ee"
 		}
 
 		// Add to map only after name has been normalized.
@@ -184,11 +184,11 @@ func newUserFor(s *Server) *User {
 	u := &User{Name: s.User}
 	switch s.Name {
 	case "keyserver":
-		u.Packing = "plain"
+		u.Packing = "ee"
 		u.StoreServer = "unassigned,"
 		u.DirServer = "unassigned,"
 	case "storeserver":
-		u.Packing = "plain"
+		u.Packing = "ee"
 		u.StoreServer = "inprocess,"
 		u.DirServer = "unassigned,"
 	default:
