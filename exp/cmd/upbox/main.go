@@ -41,7 +41,7 @@ respectively. If they are of the form "$servername" then the address of the
 server "servername" is used.
 
 Packing specifies the packing method for this user.
-If empty, it defaults to "plain".
+If empty, it defaults to "ee".
 
 Servers
 
@@ -187,6 +187,7 @@ func (cfg *Config) Run() error {
 
 		configContent := []string{
 			"username: " + u.Name,
+			"secrets: " + userDir(user),
 			"tlscerts: " + tmpDir,
 			"packing: " + u.Packing,
 			"storeserver: " + u.StoreServer,
@@ -196,12 +197,10 @@ func (cfg *Config) Run() error {
 		case "keyserver":
 			configContent = append(configContent,
 				"keyserver: inprocess,",
-				"secrets: none",
 			)
 		default:
 			configContent = append(configContent,
 				"keyserver: remote,"+cfg.KeyServer,
-				"secrets: "+userDir(user),
 			)
 		}
 		configFile := filepath.Join(tmpDir, "config."+server)
