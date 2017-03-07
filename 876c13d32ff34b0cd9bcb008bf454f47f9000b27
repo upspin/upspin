@@ -16,6 +16,24 @@
       "revId": "876c13d32ff34b0cd9bcb008bf454f47f9000b27",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "69fc453a_35941d99",
+        "filename": "cmd/upspin/signup.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-07T19:47:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2c651b9e_5cc1eaa4",
+      "revId": "876c13d32ff34b0cd9bcb008bf454f47f9000b27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
