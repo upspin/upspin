@@ -35,6 +35,8 @@ first key. Keygen can be used to create new keys.
 
 See the description for rotate for information about updating keys.
 `
+	// Keep flags in sync with signup.go. New flags here should appear
+	// there as well.
 	fs := flag.NewFlagSet("keygen", flag.ExitOnError)
 	fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
 	fs.String("secretseed", "", "128 bit secret `seed` in proquint format")
