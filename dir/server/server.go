@@ -659,6 +659,7 @@ func (s *server) Watch(name upspin.PathName, order int64, done <-chan struct{}) 
 
 	tree, err := s.loadTreeFor(p.User(), o)
 	if err != nil {
+		log.Printf("=== no tree for user %s: %s", p.User(), err)
 		return nil, errors.E(op, err)
 	}
 

@@ -106,7 +106,10 @@ func NewClient(cfg upspin.Config, netAddr upspin.NetAddr, security SecurityLevel
 		}
 		c.baseURL = "http://" + string(netAddr)
 	case Secure:
-		tlsConfig = &tls.Config{RootCAs: cfg.CertPool()}
+		tlsConfig = &tls.Config{
+			RootCAs:            cfg.CertPool(),
+			InsecureSkipVerify: true,
+		}
 		c.baseURL = "https://" + string(netAddr)
 	default:
 		return nil, errors.E(op, errors.Invalid, errors.Errorf("invalid security level to NewClient: %v", security))
@@ -138,6 +141,7 @@ func NewClient(cfg upspin.Config, netAddr upspin.NetAddr, security SecurityLevel
 func (c *httpClient) Invoke(method string, req, resp pb.Message, stream ResponseChan, done <-chan struct{}) error {
 	const op = "rpc.Invoke"
 
+	log.Printf("=== rpc.Invoke: %s", method)
 	if (resp == nil) == (stream == nil) {
 		return errors.E(op, errors.Str("exactly one of resp and stream must be nil"))
 	}
@@ -199,6 +203,7 @@ retryAuth:
 			haveToken = false // Retry exactly once.
 			goto retryAuth
 		}
+		log.Printf("=== Failed: %s", msg)
 		return errors.E(op, errors.IO, errors.Errorf("%s: %s", httpResp.Status, msg))
 	}
 
@@ -217,6 +222,19 @@ retryAuth:
 	if haveToken {
 		// If we already had a token, we're done.
 		if stream != nil {
+			// A stream begins with the bytes "OK".
+			var ok [2]byte
+			if _, err := readFull(body, ok[:], done); err == io.ErrUnexpectedEOF {
+				// Server closed the stream.
+				return nil
+			} else if err != nil {
+				log.Printf("==X first readfull ERROR: %s", err)
+				return err
+			}
+			if ok[0] != 'O' || ok[1] != 'K' {
+				return errors.E(errors.IO, errors.Str("unexpected stream preamble"))
+			}
+
 			go decodeStream(stream, body, done)
 		}
 		return nil
@@ -254,6 +272,18 @@ retryAuth:
 	}
 
 	if stream != nil {
+		// A stream begins with the bytes "OK".
+		var ok [2]byte
+		if _, err := readFull(body, ok[:], done); err == io.ErrUnexpectedEOF {
+			// Server closed the stream.
+			return nil
+		} else if err != nil {
+			log.Printf("== first readfull ERROR: %s", err)
+			return err
+		}
+		if ok[0] != 'O' || ok[1] != 'K' {
+			return errors.E(errors.IO, errors.Str("unexpected stream preamble"))
+		}
 		go decodeStream(stream, body, done)
 	}
 	return nil
@@ -266,19 +296,6 @@ func decodeStream(stream ResponseChan, r io.ReadCloser, done <-chan struct{}) {
 	defer stream.Close()
 	defer r.Close()
 
-	// A stream begins with the bytes "OK".
-	var ok [2]byte
-	if _, err := readFull(r, ok[:], done); err == io.ErrUnexpectedEOF {
-		// Server closed the stream.
-		return
-	} else if err != nil {
-		stream.Error(errors.E(errors.IO, err))
-		return
-	}
-	if ok[0] != 'O' || ok[1] != 'K' {
-		stream.Error(errors.E(errors.IO, errors.Str("unexpected stream preamble")))
-	}
-
 	var msgLen [4]byte
 	var buf []byte
 	for {
@@ -288,6 +305,7 @@ func decodeStream(stream ResponseChan, r io.ReadCloser, done <-chan struct{}) {
 		if _, err := readFull(r, msgLen[:], done); err == io.ErrUnexpectedEOF {
 			return
 		} else if err != nil {
+			log.Printf("== stream ERROR: %s", err)
 			stream.Error(errors.E(errors.IO, err))
 			return
 		}
@@ -300,11 +318,13 @@ func decodeStream(stream ResponseChan, r io.ReadCloser, done <-chan struct{}) {
 			buf = buf[:l]
 		}
 		if _, err := readFull(r, buf, done); err != nil {
+			log.Printf("== readfull: ERROR: %s", err)
 			stream.Error(errors.E(errors.IO, err))
 			return
 		}
 
 		if err := stream.Send(buf, done); err != nil {
+			log.Printf("== send ERROR: %s", err)
 			stream.Error(errors.E(errors.IO, err))
 			return
 		}

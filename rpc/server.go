@@ -206,6 +206,7 @@ func serveStream(s Stream, sess Session, w http.ResponseWriter, body []byte) {
 	done := make(chan struct{})
 	msgs, err := s(sess, body, done)
 	if err != nil {
+		log.Printf("=== ServeStream: internal error: %s", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
