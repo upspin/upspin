@@ -102,7 +102,10 @@ func NewClient(cfg upspin.Config, netAddr upspin.NetAddr, security SecurityLevel
 		}
 		c.baseURL = "http://" + string(netAddr)
 	case Secure:
-		tlsConfig = &tls.Config{RootCAs: cfg.CertPool()}
+		tlsConfig = &tls.Config{
+			RootCAs:            cfg.CertPool(),
+			InsecureSkipVerify: true,
+		}
 		c.baseURL = "https://" + string(netAddr)
 	default:
 		return nil, errors.E(op, errors.Invalid, errors.Errorf("invalid security level to NewClient: %v", security))
@@ -263,6 +266,7 @@ func decodeStream(stream ResponseChan, r io.ReadCloser, done <-chan struct{}) {
 		// Server closed the stream.
 		return
 	} else if err != nil {
+		log.Printf("== first readfull ERROR: %s", err)
 		stream.Error(errors.E(errors.IO, err))
 		return
 	}
@@ -279,6 +283,7 @@ func decodeStream(stream ResponseChan, r io.ReadCloser, done <-chan struct{}) {
 		if _, err := readFull(r, msgLen[:], done); err == io.ErrUnexpectedEOF {
 			return
 		} else if err != nil {
+			log.Printf("== stream ERROR: %s", err)
 			stream.Error(errors.E(errors.IO, err))
 			return
 		}
@@ -291,11 +296,13 @@ func decodeStream(stream ResponseChan, r io.ReadCloser, done <-chan struct{}) {
 			buf = buf[:l]
 		}
 		if _, err := readFull(r, buf, done); err != nil {
+			log.Printf("== readfull: ERROR: %s", err)
 			stream.Error(errors.E(errors.IO, err))
 			return
 		}
 
 		if err := stream.Send(buf, done); err != nil {
+			log.Printf("== send ERROR: %s", err)
 			stream.Error(errors.E(errors.IO, err))
 			return
 		}
