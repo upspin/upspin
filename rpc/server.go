@@ -209,8 +209,10 @@ func serveStream(s Stream, sess Session, w http.ResponseWriter, body []byte) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	connClosed := w.(http.CloseNotifier).CloseNotify()
 	go func() {
-		<-w.(http.CloseNotifier).CloseNotify()
+		<-connClosed
 		close(done)
 	}()
 
