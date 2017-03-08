@@ -111,6 +111,9 @@ func (p *Perm) updateLoop() {
 		if e.Error != nil {
 			log.Error.Printf("%s: watch event error: %s", op, e.Error)
 			close(done)
+			// Workaround for issues #317 and #316. The correct fix
+			// is to nil-out 'events' when issue #316 is resolved.
+			time.Sleep(retryTimeout)
 			continue // will next be !ok and re-start watcher.
 		}
 		// Process event.
