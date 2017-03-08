@@ -129,6 +129,13 @@ requests it.
 (Your public key is needed for securing and sharing Upspin files, and it's safe
 to share.)
 
+**Pay attention to the text in the output about remembering your "secret seed".
+It provides a way to regenerate your keys if you lose them.**
+
+_Note: If used interactively with a shell that keeps a command history, the
+using `keygen` with the `-secretseed` option may cause the secret to be saved in the history file.
+If so, the history file should be cleared after running `keygen`._
+
 
 ## Creating your Upspin directory
 
