@@ -33,6 +33,57 @@
       "revId": "19a28f3a71597cf36897debeb9a425a9cdce51f1",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "19f4edbe_014a7e9b",
+        "filename": "cmd/upspin/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 575,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-08T23:05:19Z",
+      "side": 1,
+      "message": "This paragraph, or similar, should also be present in the doc/signup.md",
+      "revId": "19a28f3a71597cf36897debeb9a425a9cdce51f1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "56568dfc_e5e1714f",
+        "filename": "cmd/upspin/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 608,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-08T23:05:19Z",
+      "side": 1,
+      "message": "oh no :-(\neduardo didn\u0027t intend for this to show up in the usage message.\nwe need to fix this\nadd a todo?",
+      "revId": "19a28f3a71597cf36897debeb9a425a9cdce51f1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d7e5b176_6f76a32b",
+        "filename": "cmd/upspin/signup.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-08T23:05:19Z",
+      "side": 1,
+      "message": "The fix for this hack is to make a keygen function that takes arguments, instead of using the flags. TODO?",
+      "revId": "19a28f3a71597cf36897debeb9a425a9cdce51f1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
