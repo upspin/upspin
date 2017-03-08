@@ -5,6 +5,7 @@
 package rpc
 
 import (
+	"crypto/x509"
 	"fmt"
 	"io/ioutil"
 	"net"
@@ -248,7 +249,7 @@ func startClient(port string, user upspin.UserName) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	pool := cfg.CertPool()
+	pool := x509.NewCertPool()
 	if ok := pool.AppendCertsFromPEM(pem); !ok {
 		log.Fatal("could not add certificates to pool")
 	}
