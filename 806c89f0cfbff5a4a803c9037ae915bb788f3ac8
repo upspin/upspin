@@ -1,0 +1,208 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1b824b45_9ca7d8a7",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-08T22:46:33Z",
+      "side": 1,
+      "message": "s/will/may/",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8bc1cb52_bfd1d85d",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-08T22:46:33Z",
+      "side": 1,
+      "message": "s/1/2/ perhaps?",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a642bc3c_d3de7050",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 320,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-08T22:46:33Z",
+      "side": 1,
+      "message": "We hope to have a garbage collector for storage soon, but do not have one yet.",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dcdf75b7_734bee6f",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 322,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-08T22:46:33Z",
+      "side": 1,
+      "message": "s/1/3/",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bbd48fee_84458579",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 323,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-08T22:46:33Z",
+      "side": 1,
+      "message": "maybe\ns/.$/, especially when experimenting./",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bc4542df_819de2c8",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-08T22:46:33Z",
+      "side": 1,
+      "message": "s/04/04 or later/ ?",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ffb17d83_1cece9c2",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-08T22:46:33Z",
+      "side": 1,
+      "message": "s/how/how to/",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "92230d6a_71af3fb3",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-08T22:46:33Z",
+      "side": 1,
+      "message": "d",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5d4f9cde_ea111449",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 341,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-08T22:46:33Z",
+      "side": 1,
+      "message": "d",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "71e047d4_9ba46b51",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 343,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-08T22:46:33Z",
+      "side": 1,
+      "message": "i thought adg didn\u0027t want you to do this",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2107713e_ca1a7be1",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 364,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-08T22:46:33Z",
+      "side": 1,
+      "message": "d",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "256d0453_357e50e7",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 365,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-08T22:46:33Z",
+      "side": 1,
+      "message": "d",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
