@@ -87,6 +87,23 @@
     },
     {
       "key": {
+        "uuid": "970f4dd1_8bc00d37",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-08T22:52:39Z",
+      "side": 1,
+      "message": "s/how/how to",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "bc4542df_819de2c8",
         "filename": "doc/server_setup.md",
         "patchSetId": 1
@@ -104,6 +121,23 @@
     },
     {
       "key": {
+        "uuid": "029563bd_8386293d",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-08T22:52:39Z",
+      "side": 1,
+      "message": "s/AMD64 machine running Ubuntu 16.04/Ubuntu machine\n\nThe code below give the extra version detail if it matters, but mostly I think it doesn\u0027t.",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "ffb17d83_1cece9c2",
         "filename": "doc/server_setup.md",
         "patchSetId": 1
@@ -115,6 +149,40 @@
       "writtenOn": "2017-03-08T22:46:33Z",
       "side": 1,
       "message": "s/how/how to/",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a69e618a_8b220f1a",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 330,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-08T22:52:39Z",
+      "side": 1,
+      "message": "s/In any case you msut do/Do\n\nYou don\u0027t literally have to use the same machine, just the same deploy data.  (That may or may not be on the same machine, since all directories get munged over time.)",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "732d0a88_b71f3de2",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 335,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-08T22:52:39Z",
+      "side": 1,
+      "message": "s/comnfiguration/configuration",
       "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -172,6 +240,23 @@
     },
     {
       "key": {
+        "uuid": "e5d35e13_c194320e",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-08T22:52:39Z",
+      "side": 1,
+      "message": "Mention somehow that this may now require a setcap.",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "2107713e_ca1a7be1",
         "filename": "doc/server_setup.md",
         "patchSetId": 1
@@ -200,6 +285,23 @@
       "writtenOn": "2017-03-08T22:46:33Z",
       "side": 1,
       "message": "d",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f1c95605_70ed4c94",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 372,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-08T22:52:39Z",
+      "side": 1,
+      "message": "This is the part that was a bit mysterious to me, so if adding a sentence explaining roughly what is going on under the covers might be worthwhile.  Or not.  Your call.",
       "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
