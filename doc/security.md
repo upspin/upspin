@@ -289,7 +289,7 @@ users permitted to store blocks on the server.
 
 The `upspin.io` servers use certificates from LetsEncrypt.
 You may use the default system Root CA list, or specify `tlscerts` in your
-`~/upspin/rc` pointing to a directory with just `DST_Root_CA_X3.pem`.
+`~/upspin/config` pointing to a directory with just `DST_Root_CA_X3.pem`.
 
 Implicit in the cryptographic discussion earlier is the fact that a directory
 server administrator can read any file name, the writer, and the list of readers.
