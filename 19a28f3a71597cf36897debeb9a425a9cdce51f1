@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "818a6f7d_27f13ff7",
+        "filename": "cmd/upspin/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-08T23:01:06Z",
+      "side": 1,
+      "message": "Thank you for this.   I\u0027ve been pondering other solutions and am unenthused about an environment variable.  Possibly looking for an appropriately formatted comment in secret.upspinkey works and enables the right kind of strict file permission control.  But I think our users expect a flag, and I\u0027m happy with your text which is most certainly accurate for now.",
+      "revId": "19a28f3a71597cf36897debeb9a425a9cdce51f1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d9d59b8c_32b061f4",
+        "filename": "cmd/upspin/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 571,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-08T23:01:06Z",
+      "side": 1,
+      "message": "This is a rather strong promise, but ok with me if we make it.\n\nDid adg@ send our initial security notice out to everyone in the key log?   Should we say somewhere around here that people need to enroll in the Google group if they expect to be told of critical updates?",
+      "revId": "19a28f3a71597cf36897debeb9a425a9cdce51f1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
