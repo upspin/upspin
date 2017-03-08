@@ -110,6 +110,7 @@ func (p *Perm) updateLoop() {
 		}
 		if e.Error != nil {
 			log.Error.Printf("%s: watch event error: %s", op, e.Error)
+			events = nil
 			close(done)
 			continue // will next be !ok and re-start watcher.
 		}
