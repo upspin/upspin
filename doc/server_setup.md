@@ -307,3 +307,71 @@ Hello, Upspin
 ```
 If you see the message, then congratulations!
 You have successfully set up an `upspinserver`.
+
+
+## Purging your storage
+
+For a number of reasons, you may wish to discard all your stored data:
+
+1. Upspin is in its early days. As a result we may make incompatible
+   changes in the storage or directory formats. This should be rare but
+   it may happen.
+1. When experimenting with the system, you may create a lot of garbage.
+   We hope to have a garbage collector for storage soon, but do not
+   have one yet. The only way to clean up is to purge everything and
+   start again.
+1. Even with a garbage collector, you may find that it is easier to purge
+   and restart from scratch than selectively delete files, especially
+   when experimenting.
+
+We detail here how to perform the purge if you are running `upspinserver`
+on an AMD64 machine running Ubuntu 16.04 or later with your storage on
+Google Cloud Storage. You will have to tailor these instructions to your
+own environment if you are doing something different.
+
+In any case you must do this using the original deploy configuration
+stored in the `upspin/deploy` directory by the process outlined above.
+
+On your `upspinserver` machine, as root, stop the `upspinserver`,
+and remove the local server configuration. This will remove all information
+about user trees:
+
+```
+$ ssh upspin.example.com
+% sudo systemctl stop upspinserver.service
+% sudo rm -fr ~upspin/upspin/server
+```
+
+Purge all references from storage. You can do this anywhere you have
+authenticated as the account used to setup your Google Cloud instance.
+If you have many references, this could take a while. If you have
+forgotten the name of your bucket, try `gsutil ls`:
+
+```
+$ gsutil -m rm gs://example-com-upspin/`**`
+```
+
+Restart the server. Since you have removed its configuration
+information, it will only answer configuration requests.
+
+```
+$ ssh upspin.example.com
+$ sudo systemctl start upspinserver.service
+```
+
+Reconfigure the server from a host that has your original `upspin/deploy`
+directory tree. This gives the server its Upspin keys, the initial contents
+of its `Writers` file, and authentication information for accessing cloud
+storage.
+
+```
+$ upspin setupserver -domain=example.com -host=upspin.example.com
+```
+
+If you want snapshots, configure them as well:
+
+```
+$ upspin snapshot
+```
+
+If you had previously added users to the server's `Writers` file, you will have to do it again.
