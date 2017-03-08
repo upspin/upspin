@@ -30,6 +30,13 @@ stores them locally, and sends a signup request to the public Upspin key server
 at key.upspin.io. The server will respond by sending a confirmation email to
 the given email address (or "username").
 
+The email address becomes a username after successful signup but is never
+again used by Upspin to send or receive email. Therefore the email address
+may be disabled once signup is complete if one wishes to have an Upspin
+name distinct from one's regular email address. Either way, if the email
+address is compromised after Upspin signup, the security of the user's
+Upspin data is unaffected.
+
 Signup writes a configuration file to $HOME/upspin/config, holding the
 username and the location of the directory and store servers. It writes the
 public and private keys to $HOME/.ssh. These locations may be set using the
@@ -46,6 +53,11 @@ recreate or reuse prior keys.
 
 The -signuponly flag tells signup to skip the generation of the configuration
 file and keys and only send the signup request to the key server.
+
+Note: If used interactively with a shell that keeps a command history, the
+-secretseed option may cause the secret to be saved in the history file.
+If so, the history file should be cleared after running signup with the
+-secretseed option.
 `
 	fs := flag.NewFlagSet("signup", flag.ExitOnError)
 	var (

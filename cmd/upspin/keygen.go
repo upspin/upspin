@@ -34,6 +34,11 @@ New users should instead use the signup command to create their
 first key. Keygen can be used to create new keys.
 
 See the description for rotate for information about updating keys.
+
+Note: If used interactively with a shell that keeps a command history, the
+-secretseed option may cause the secret to be saved in the history file.
+If so, the history file should be cleared after running keygen with the
+-secretseed option.
 `
 	// Keep flags in sync with signup.go. New flags here should appear
 	// there as well.
