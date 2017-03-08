@@ -92,8 +92,8 @@ func TestSaveKeygen(t *testing.T) {
 		t.Errorf("round 2: got private key %q; want %q", private, private2Key)
 	}
 
-	// Save, then write them to a file again.
-	err = saveKeys(dir)
+	// Update and rotate keys.
+	err = newState("test").saveKeys(dir, true)
 	if err != nil {
 		t.Fatalf("saving keys: %v", err)
 	}
