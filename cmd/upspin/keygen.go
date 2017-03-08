@@ -34,6 +34,11 @@ New users should instead use the signup command to create their
 first key. Keygen can be used to create new keys.
 
 See the description for rotate for information about updating keys.
+
+Note: If used interactively with a shell that keeps a command history, the
+-secretseed option may cause the secret to be saved in the history file.
+If so, the history file should be cleared after running keygen with the
+-secretseed option.
 `
 	// Keep flags in sync with signup.go. New flags here should appear
 	// there as well.
@@ -41,6 +46,7 @@ See the description for rotate for information about updating keys.
 	fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
 	fs.String("secretseed", "", "128 bit secret `seed` in proquint format")
 	fs.String("where", filepath.Join(config.Home(), ".ssh"), "`directory` to store keys")
+	// TODO: We do not what rotate to appear in the usage message.
 	fs.Bool("rotate", false, "rotate existing keys and replace them with new ones")
 	s.ParseFlags(fs, args, help, "keygen [-curve=256] [-secretseed=seed] [-where=$HOME/.ssh]")
 	if fs.NArg() != 0 {
