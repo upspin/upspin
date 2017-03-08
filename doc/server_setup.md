@@ -307,3 +307,73 @@ Hello, Upspin
 ```
 If you see the message, then congratulations!
 You have successfully set up an `upspinserver`.
+
+
+## Purging your storage
+
+For a number of reasons, you may wish to discard all your stored data:
+
+1. Upspin is in its early days. As a result we may make incompatible
+   changes in the storage or directory formats. This should be rare but
+   it will happen.
+1. When experimenting with the system, you may create a lot of garbage.
+   We hope to have one soon but we currently do not have a garbage collector
+   for storage. The only way to clean up is to purge everything and start again.
+1. Even with a garbage collector, you may find that it is easier to purge
+   and restart from scratch than selectively delete files.
+
+We detail here how perform the purge if you are running `upspinserver`
+on an AMD64 machine running Ubuntu 16.04 with your storage on Google
+Cloud Storage. You will have to tailor these instructions to your own
+environment if you are doing something different.
+
+In any case you must do this from the machine you originally deployed
+Upspin from since you will have to repeat the `setupserver` using the
+data stored in the `upspin/deploy` directory by the process outlined above.
+
+On your `upspinserver` machine, logon as the Upspin user, stop the `upspinserver`,
+and remove the local server comnfiguration. This will remove all information
+about user trees:
+
+```
+$ ssh upspin@upspin.example.com
+Welcome to Ubuntu 16.04.1 LTS (GNU/Linux 4.4.0-62-generic x86_64)
+Last login: Wed Mar  8 19:00:20 2017 from 192.168.1.10
+% systemctl stop upspinserver.service
+% rm -fr ~/upspin/server
+```
+
+Build a new `upspinserver` executable and copy it to the server machine:
+
+```
+$ GOOS=linux GOARCH=amd64 go build upspin.io/cmd/upspinserver
+$ scp upspinserver upspin@upspin.example.com:
+```
+
+Purge all references from storage. If you have forgotten what the bucket
+is called, try `gsutil ls`:
+
+```
+$ gsutil -m rm gs://example-com-upspin/`**`
+```
+
+Restart the server:
+
+```
+$ ssh upspin@upspin.example.com
+Welcome to Ubuntu 16.04.1 LTS (GNU/Linux 4.4.0-62-generic x86_64)
+Last login: Wed Mar  8 19:06:28 2017 from 192.168.1.10
+$ systemctl start upspinserver.service
+```
+
+Reconfigure the server from your host:
+
+```
+$ upspin setupserver -domain=example.com -host=upspin.example.com
+```
+
+If you want snapshots, configure them as well:
+
+```
+$ upspin snapshot
+```
