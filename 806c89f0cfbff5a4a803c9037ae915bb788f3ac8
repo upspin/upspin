@@ -104,6 +104,23 @@
     },
     {
       "key": {
+        "uuid": "c6de31b8_40b9a20d",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-08T22:53:42Z",
+      "side": 1,
+      "message": "how to",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "bc4542df_819de2c8",
         "filename": "doc/server_setup.md",
         "patchSetId": 1
@@ -223,6 +240,23 @@
     },
     {
       "key": {
+        "uuid": "efb40275_b95eb0b8",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 342,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-08T22:53:42Z",
+      "side": 1,
+      "message": "you nee to be root to do this, i believe",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "71e047d4_9ba46b51",
         "filename": "doc/server_setup.md",
         "patchSetId": 1
@@ -234,6 +268,41 @@
       "writtenOn": "2017-03-08T22:46:33Z",
       "side": 1,
       "message": "i thought adg didn\u0027t want you to do this",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c743a409_e583dcc4",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 343,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-08T22:53:42Z",
+      "side": 1,
+      "message": "no this is fine",
+      "parentUuid": "71e047d4_9ba46b51",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dea1a185_634b2165",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 346,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-08T22:53:42Z",
+      "side": 1,
+      "message": "This doesn\u0027t seem related to wiping all storage. I think we can leave this out here. If we want to be more helpful we can include a separate section on updating your upspinserver binary.",
       "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
