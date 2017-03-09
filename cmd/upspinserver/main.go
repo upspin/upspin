@@ -21,6 +21,7 @@ import (
 	"sync"
 
 	"upspin.io/errors"
+	"upspin.io/subcmd"
 
 	"upspin.io/client"
 	"upspin.io/cloud/https"
@@ -93,7 +94,7 @@ const (
 	setupServer
 )
 
-func initServer(mode initMode) (*ServerConfig, upspin.Config, error) {
+func initServer(mode initMode) (*subcmd.ServerConfig, upspin.Config, error) {
 	serverConfig, err := readServerConfig()
 	if os.IsNotExist(err) {
 		return nil, nil, noConfig
@@ -228,10 +229,10 @@ func (h *setupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	for _, name := range configureServerFiles {
+	for _, name := range subcmd.SetupServerFiles {
 		body, ok := files[name]
 		if !ok {
-			if optionalConfigureServerFiles[name] {
+			if subcmd.OptionalSetupServerFiles[name] {
 				continue
 			}
 			http.Error(w, fmt.Sprintf("missing config file %q", name), http.StatusBadRequest)
@@ -287,38 +288,15 @@ func existsOK(_ *upspin.DirEntry, err error) error {
 	return err
 }
 
-func readServerConfig() (*ServerConfig, error) {
-	cfgFile := filepath.Join(*cfgPath, serverConfigFile)
+func readServerConfig() (*subcmd.ServerConfig, error) {
+	cfgFile := filepath.Join(*cfgPath, subcmd.ServerConfigFile)
 	b, err := ioutil.ReadFile(cfgFile)
 	if err != nil {
 		return nil, err
 	}
-	cfg := &ServerConfig{}
+	cfg := &subcmd.ServerConfig{}
 	if err := json.Unmarshal(b, cfg); err != nil {
 		return nil, err
 	}
 	return cfg, nil
-}
-
-// Keep the following declarations in sync with cmd/upspin/setupserver.go.
-// TODO(adg): move these to their own package if/when there are more users.
-
-type ServerConfig struct {
-	Addr   upspin.NetAddr
-	User   upspin.UserName
-	Bucket string
-}
-
-const serverConfigFile = "serverconfig.json"
-
-var configureServerFiles = []string{
-	"Writers",
-	"public.upspinkey",
-	"secret.upspinkey",
-	"serviceaccount.json",
-	serverConfigFile,
-}
-
-var optionalConfigureServerFiles = map[string]bool{
-	"serviceaccount.json": true,
 }

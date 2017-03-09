@@ -165,9 +165,9 @@ func userFor(cfgPath string, cfg *subcmd.ServerConfig) (*upspin.User, error) {
 
 func (s *State) configureServer(cfgPath string, cfg *subcmd.ServerConfig) {
 	files := map[string][]byte{}
-	for _, name := range subcmd.ConfigureServerFiles {
+	for _, name := range subcmd.SetupServerFiles {
 		b, err := ioutil.ReadFile(filepath.Join(cfgPath, name))
-		if os.IsNotExist(err) && subcmd.OptionalConfigureServerFiles[name] {
+		if os.IsNotExist(err) && subcmd.OptionalSetupServerFiles[name] {
 			continue
 		}
 		if err != nil {
