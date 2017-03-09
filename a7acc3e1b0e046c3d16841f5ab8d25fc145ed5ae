@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3bb461d1_fba5ce80",
+        "filename": "cmd/upspin/signup.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-09T03:23:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "77e9a4a0_5a934a24",
+      "revId": "a7acc3e1b0e046c3d16841f5ab8d25fc145ed5ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b6cd7474_49b07781",
         "filename": "cmd/upspin/signup.go",
         "patchSetId": 2
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "511b3660_70d56016",
+        "filename": "cmd/upspin/signup.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-09T03:23:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b6cd7474_49b07781",
+      "revId": "a7acc3e1b0e046c3d16841f5ab8d25fc145ed5ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "19e3d880_a68772f0",
         "filename": "cmd/upspin/signup.go",
         "patchSetId": 2
@@ -50,6 +86,24 @@
       "revId": "a7acc3e1b0e046c3d16841f5ab8d25fc145ed5ae",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "482d168a_f98ba9f0",
+        "filename": "cmd/upspin/signup.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 283,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-09T03:23:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "19e3d880_a68772f0",
+      "revId": "a7acc3e1b0e046c3d16841f5ab8d25fc145ed5ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
