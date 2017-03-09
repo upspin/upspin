@@ -274,6 +274,14 @@ func (s *serverImpl) SessionForRequest(w http.ResponseWriter, r *http.Request) (
 		return nil, errors.E(errors.Invalid, errors.Str("invalid proxy request in header"))
 	}
 	authRequest, ok := r.Header[authRequestHeader]
+	// The HTTP RFC allows proxies to merge identical headers by joining them comma-separated.
+	// We have to split the authRequestHeader if necessary.
+	if ok && len(authRequest) == 1 && strings.Contains(authRequest[0], ",") {
+		authRequest = strings.Split(authRequest[0], ",")
+		for i, s := range authRequest {
+			authRequest[i] = strings.TrimSpace(s)
+		}
+	}
 	if ok && len(authRequest) != 5 {
 		return nil, errors.E(errors.Invalid, errors.Str("invalid auth request in header"))
 	}

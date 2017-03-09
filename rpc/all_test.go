@@ -5,15 +5,23 @@
 package rpc
 
 import (
+	"crypto/tls"
 	"crypto/x509"
 	"fmt"
 	"io/ioutil"
 	"net"
 	"net/http"
+	"net/http/httputil"
 	"testing"
 	"time"
 
 	pb "github.com/golang/protobuf/proto"
+
+	"net/url"
+
+	"net/http/httptest"
+
+	"strings"
 
 	"upspin.io/cache"
 	"upspin.io/cloud/https"
@@ -272,6 +280,36 @@ func startClient(port string, user upspin.UserName) {
 	}
 }
 
+// Create a proxy that concatenates identical header lines, separating them by a comma.
+// This is legal behavior according to the HTTP RFC, and Apache mod_proxy does this.
+func startProxy(backendport string) (port string) {
+	backend := &url.URL{Scheme: "https", Host: fmt.Sprintf("localhost:%s", backendport)}
+	cert, _ := tls.LoadX509KeyPair("testdata/cert.pem", "testdata/key.pem")
+	pem, _ := ioutil.ReadFile("testdata/cert.pem")
+	pool := x509.NewCertPool()
+	pool.AppendCertsFromPEM(pem)
+	tlsConfig := &tls.Config{
+		Certificates: []tls.Certificate{cert},
+		RootCAs:      pool,
+	}
+	tlsConfig.BuildNameToCertificate()
+
+	rp := httptest.NewUnstartedServer(&httputil.ReverseProxy{
+		Director: func(req *http.Request) {
+			req.URL.Scheme = backend.Scheme
+			req.URL.Host = backend.Host
+
+			req.Header.Set(authRequestHeader, strings.Join(req.Header[authRequestHeader], ","))
+		},
+		Transport: &http.Transport{TLSClientConfig: tlsConfig},
+	})
+	rp.TLS = tlsConfig
+	rp.StartTLS()
+
+	rpurl, _ := url.Parse(rp.URL)
+	return rpurl.Port()
+}
+
 func TestAll(t *testing.T) {
 	port := startServer(t)
 	startClient(port, joeUser)
@@ -329,5 +367,19 @@ func TestAll(t *testing.T) {
 	}
 	if cli.reqCount != srv.iteration {
 		t.Errorf("Expected client to be on iteration %d, was on %d", srv.iteration, cli.reqCount)
+	}
+
+	// Server forgets all auth tokens again, we need it to check the auth headers.
+	sessionCache = cache.NewLRU(100)
+	srv.iteration = 0
+	cli.reqCount = 0
+
+	// Insert the proxy between the client and server.
+	rpport := startProxy(port)
+	startClient(rpport, joeUser)
+
+	response = cli.Echo(t, payloads[0])
+	if response != payloads[0] {
+		t.Errorf("Payload %d: Expected response %q, got %q", 0, payloads[0], response)
 	}
 }
