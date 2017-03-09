@@ -152,7 +152,7 @@ func (d *proxiedDir) watcher() {
 		}
 		if err == upspin.ErrNotSupported {
 			// Can't survive this.
-			log.Debug.Printf("rpc/dircache.watcher: %s: %s", d.user, err)
+			log.Debug.Printf("dir/dircache.watcher: %s: %s", d.user, err)
 			return
 		}
 		if strings.Contains(err.Error(), "cannot read log at order") {
@@ -170,7 +170,7 @@ func (d *proxiedDir) watcher() {
 		} else {
 			seen = 0
 		}
-		log.Info.Printf("rpc/dircache.watcher: %s: %s", d.user, err)
+		log.Info.Printf("dir/dircache.watcher: %s: %s", d.user, err)
 		nextLogTime = time.Now().Add(time.Minute)
 		lastErr = newErr
 		time.Sleep(time.Second)
@@ -210,7 +210,6 @@ func (d *proxiedDir) watch() error {
 func (d *proxiedDir) handleEvent(e *upspin.Event) error {
 	// Something odd happened?
 	if e.Error != nil {
-		log.Info.Printf("rpc/dircache.handleEvent: %s", e.Error)
 		return e.Error
 	}
 
