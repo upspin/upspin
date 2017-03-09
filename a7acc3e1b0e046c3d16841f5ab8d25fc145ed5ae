@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "77e9a4a0_5a934a24",
+        "filename": "cmd/upspin/signup.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-09T02:47:24Z",
+      "side": 1,
+      "message": "delete",
+      "revId": "a7acc3e1b0e046c3d16841f5ab8d25fc145ed5ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b6cd7474_49b07781",
+        "filename": "cmd/upspin/signup.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-09T02:47:24Z",
+      "side": 1,
+      "message": "makeSignupURL ?",
+      "revId": "a7acc3e1b0e046c3d16841f5ab8d25fc145ed5ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "19e3d880_a68772f0",
+        "filename": "cmd/upspin/signup.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 283,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-09T02:47:24Z",
+      "side": 1,
+      "message": "// signupRequestHash generates a hash of the supplied arguments\n// that, when signed, is used to prove that a signup request originated\n// from the user that owns the supplied private key.\n\nboth here and in the other file",
+      "revId": "a7acc3e1b0e046c3d16841f5ab8d25fc145ed5ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "821cdd73_85e4509c",
+        "filename": "cmd/upspin/signup.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-09T02:47:24Z",
+      "side": 1,
+      "message": "just \u0027magic\u0027",
+      "revId": "a7acc3e1b0e046c3d16841f5ab8d25fc145ed5ae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
