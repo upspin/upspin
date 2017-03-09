@@ -15,22 +15,42 @@ import (
 	"upspin.io/upspin"
 )
 
-const serverConfigFile = "serverconfig.json"
+// ServerConfig describes the configuration of an upspinserver.
+type ServerConfig struct {
+	// Addr specifies the public host and port of the upspinserver.
+	Addr upspin.NetAddr
 
-var ConfigureServerFiles = []string{
+	// User specifies the user name that the upspinserver will run as.
+	User upspin.UserName
+
+	// Bucket specifies the Google Cloud Storage bucket that the
+	// upspinserver should use to store data.
+	// If empty, local disk is used instead.
+	Bucket string
+}
+
+// ServerConfigFile specifies the file name of the JSON-encoded ServerConfig.
+const ServerConfigFile = "serverconfig.json"
+
+// SetupServerFiles specifies the configuration files that 'upspin setupserver'
+// should send to the upspinserver.
+var SetupServerFiles = []string{
 	"Writers",
 	"public.upspinkey",
 	"secret.upspinkey",
 	"serviceaccount.json",
-	serverConfigFile,
+	ServerConfigFile,
 }
 
-var OptionalConfigureServerFiles = map[string]bool{
-	"serviceaccount.json": true,
+// OptionalSetupServerFiles specifies the configuration files that may be
+// missing when running 'upspin setupserver'.
+var OptionalSetupServerFiles = map[string]bool{
+	"serviceaccount.json": true, // Only needed for Google Cloud Storage.
 }
 
+// ReadServerConfig reads and JSON-decodes the ServerConfigFile under cfgPath.
 func (s *State) ReadServerConfig(cfgPath string) *ServerConfig {
-	cfgFile := filepath.Join(cfgPath, serverConfigFile)
+	cfgFile := filepath.Join(cfgPath, ServerConfigFile)
 	b, err := ioutil.ReadFile(cfgFile)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -45,8 +65,9 @@ func (s *State) ReadServerConfig(cfgPath string) *ServerConfig {
 	return cfg
 }
 
+// WriteServerConfig JSON-encodes and writes the ServerConfigFile under cfgPath.
 func (s *State) WriteServerConfig(cfgPath string, cfg *ServerConfig) {
-	cfgFile := filepath.Join(cfgPath, serverConfigFile)
+	cfgFile := filepath.Join(cfgPath, ServerConfigFile)
 	b, err := json.Marshal(cfg)
 	if err != nil {
 		s.Exit(err)
@@ -55,10 +76,4 @@ func (s *State) WriteServerConfig(cfgPath string, cfg *ServerConfig) {
 	if err != nil {
 		s.Exit(err)
 	}
-}
-
-type ServerConfig struct {
-	Addr   upspin.NetAddr
-	User   upspin.UserName
-	Bucket string
 }
