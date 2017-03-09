@@ -330,4 +330,18 @@ func TestAll(t *testing.T) {
 	if cli.reqCount != srv.iteration {
 		t.Errorf("Expected client to be on iteration %d, was on %d", srv.iteration, cli.reqCount)
 	}
+
+	// Test old-style client headers.
+	// TODO(adg): Remove handling of old-style headers on April 1 2017.
+	oldClientAuthHeader = true
+	startClient(port, joeUser)
+	srv.iteration = 0
+	cli.reqCount = 0
+	for i := range payloads {
+		response := cli.Echo(t, payloads[i])
+		if response != payloads[i] {
+			t.Errorf("Payload %d: Expected response %q, got %q", i, payloads[i], response)
+		}
+	}
+	oldClientAuthHeader = false
 }
