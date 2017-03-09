@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d7712088_3d4cbca0",
+        "filename": "serverutil/perm/perm_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-09T00:50:49Z",
+      "side": 1,
+      "message": "this struct literal looks awkward here\n\nerr :\u003d upspin.Event{...}\nselect {\ncase c \u003c- err:",
+      "revId": "cc57b386f493c1c8629a9d38952397aafb5b384e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
