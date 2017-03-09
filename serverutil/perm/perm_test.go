@@ -5,6 +5,7 @@
 package perm
 
 import (
+	"fmt"
 	"testing"
 	"time"
 
@@ -220,4 +221,36 @@ func TestAllowsOthersAndWildcard(t *testing.T) {
 			t.Errorf("%s is allowed; expected not allowed", user)
 		}
 	}
+}
+
+// Regression test for issue #317.
+func TestSequentialErrorsOk(t *testing.T) {
+	ownerEnv, wait, cleanup := setupEnv(t)
+	defer cleanup()
+
+	_, err := New(ownerEnv.Config, readyNow, owner, ownerEnv.DirServer.Lookup, errorReturningWatch)
+	if err != nil {
+		t.Fatal(err)
+	}
+	wait()
+
+	// No crash, no problem.
+}
+
+func errorReturningWatch(_ upspin.PathName, _ int64, done <-chan struct{}) (<-chan upspin.Event, error) {
+	c := make(chan upspin.Event)
+	go func() {
+		var i int
+		for {
+			err := upspin.Event{Error: fmt.Errorf("error %d", i)}
+			select {
+			case c <- err:
+				i++
+			case <-done:
+				return
+			}
+
+		}
+	}()
+	return c, nil
 }
