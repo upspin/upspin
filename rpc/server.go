@@ -273,13 +273,23 @@ func (s *serverImpl) SessionForRequest(w http.ResponseWriter, r *http.Request) (
 	if ok && len(proxyRequest) != 1 {
 		return nil, errors.E(errors.Invalid, errors.Str("invalid proxy request in header"))
 	}
+	// In the current implementation clients send a single header line with comma-separated values.
+	// Older clients send 5 separate header lines. They need to be supported for a transition period.
 	authRequest, ok := r.Header[authRequestHeader]
+	if ok && len(authRequest) == 1 {
+		authRequest = strings.Split(authRequest[0], ",")
+		// Trimming the split tokens is only needed for the transition period.
+		// It covers the scenario in which older clients send requests to new servers
+		// through proxies that concatenate header lines, as they also add whitespace.
+		for i, s := range authRequest {
+			authRequest[i] = strings.TrimSpace(s)
+		}
+	}
 	if ok && len(authRequest) != 5 {
-		return nil, errors.E(errors.Invalid, errors.Str("invalid auth request in header"))
+		return nil, errors.E(errors.Invalid, errors.Str("invalid auth request header"))
 	}
 	if authRequest == nil {
-		log.Printf("%#v", r.Header)
-		return nil, errors.E(errors.Invalid, errors.Str("no auth token or request in header"))
+		return nil, errors.E(errors.Invalid, errors.Str("missing auth request header"))
 	}
 	return s.handleSessionRequest(w, authRequest, proxyRequest, r.Host)
 }
