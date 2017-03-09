@@ -74,6 +74,10 @@ func (l *loggerImpl) put(kind string, actor upspin.UserName, u *upspin.User) err
 	l.mu.Lock()
 	defer l.mu.Unlock()
 
+	if err := l.populate(); err != nil {
+		return err
+	}
+
 	// Include the previous record's hash in the new hash,
 	// but only if there is a previous record.
 	i := bytes.LastIndex(l.log, hashPrefix)
@@ -86,10 +90,6 @@ func (l *loggerImpl) put(kind string, actor upspin.UserName, u *upspin.User) err
 		// Grab the hash hex, stripping the prefix and trailing newline.
 		prevHash := l.log[i+len(hashPrefix) : len(l.log)-1]
 		h.Write(prevHash)
-	}
-
-	if err := l.populate(); err != nil {
-		return err
 	}
 
 	l.log = append(l.log, record...)
