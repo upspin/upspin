@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cf4c923c_2372a44a",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-09T00:56:39Z",
+      "side": 1,
+      "message": "Please write a function\n\nfunc signupRequestHash(user upspin.UserName, dir, store upspin.NetAddr, key upspin.PublicKey) []byte\n\nthat is identical in both files in this CL.\n\nPut it at the bottom of each file with \"// please keep in sync with X\".\nAnd remove the \"signupRequestMagic\" constant; just put it there in the function.\n\nThen call singupRequestHash from your new functions in each file.",
+      "revId": "b2d1c12911b763d6cffedba5e1f8809e2ef65bb0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
