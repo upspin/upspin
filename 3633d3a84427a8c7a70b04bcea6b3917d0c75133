@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b15acd95_1a61827d",
+        "filename": "cmd/upspinserver/web.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-10T16:25:43Z",
+      "side": 1,
+      "message": "Period at the end.",
+      "revId": "3633d3a84427a8c7a70b04bcea6b3917d0c75133",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8fba3923_cdbe4f4b",
+        "filename": "cmd/upspinserver/web.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-10T16:25:43Z",
+      "side": 1,
+      "message": "Same here and below please.",
+      "revId": "3633d3a84427a8c7a70b04bcea6b3917d0c75133",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d9f52211_350f5c57",
+        "filename": "cmd/upspinserver/web.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-10T16:25:43Z",
+      "side": 1,
+      "message": "Instead of client.Get, use client/clientutil.ReadAll(whichAccess). It will save you some repeated work inside Get.\n\nIt should probably cache the Access file and even the which access result. But that can be another CL.",
+      "revId": "3633d3a84427a8c7a70b04bcea6b3917d0c75133",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "314c6a35_7d785c94",
+        "filename": "cmd/upspinserver/web.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-10T16:25:43Z",
+      "side": 1,
+      "message": "You mean read *or* list, right?",
+      "revId": "3633d3a84427a8c7a70b04bcea6b3917d0c75133",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
