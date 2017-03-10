@@ -43,23 +43,25 @@ const (
 // signupHandler implements an http.Handler that handles user creation requests
 // made by 'upspin signup' and the user themselves.
 type signupHandler struct {
-	fact upspin.Factotum
-	key  upspin.KeyServer
-	mail mail.Mail
+	fact    upspin.Factotum
+	key     upspin.KeyServer
+	mail    mail.Mail
+	project string
 
 	rate serverutil.RateLimiter
 }
 
 // newSignupHandler creates a new handler that serves /signup.
-func newSignupHandler(fact upspin.Factotum, key upspin.KeyServer, mailConfig string) (*signupHandler, error) {
+func newSignupHandler(fact upspin.Factotum, key upspin.KeyServer, mailConfig, project string) (*signupHandler, error) {
 	apiKey, _, _, err := parseMailConfig(mailConfig)
 	if err != nil {
 		return nil, err
 	}
 	m := &signupHandler{
-		fact: fact,
-		key:  key,
-		mail: sendgrid.New(apiKey, "upspin.io"),
+		fact:    fact,
+		key:     key,
+		mail:    sendgrid.New(apiKey, "upspin.io"),
+		project: project,
 		rate: serverutil.RateLimiter{
 			Backoff: 1 * time.Minute,
 			Max:     24 * time.Hour,
@@ -150,8 +152,8 @@ func (m *signupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Send a note to our internal list, so we're aware of signups.
-		subject := "New signup: " + string(u.Name)
-		body := fmt.Sprintf("%s signed up on %s", u.Name, time.Now().Format(time.Stamp))
+		subject := fmt.Sprintf("New signup on %s: %s", m.project, string(u.Name))
+		body := fmt.Sprintf("%s signed up with server %s on %s", u.Name, m.project, time.Now().Format(time.Stamp))
 		err = m.mail.Send(signupNotifyAddress, serverName, subject, body, noHTML)
 		if err != nil {
 			log.Error.Printf("Error sending mail to %q: %v", signupNotifyAddress, err)

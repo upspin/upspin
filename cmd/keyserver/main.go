@@ -99,7 +99,7 @@ func main() {
 		if f == nil {
 			log.Fatal("supplied config must include keys when -mail_config set")
 		}
-		h, err := newSignupHandler(f, key, *mailConfigFile)
+		h, err := newSignupHandler(f, key, *mailConfigFile, flags.Project)
 		if err != nil {
 			log.Fatal(err)
 		}
