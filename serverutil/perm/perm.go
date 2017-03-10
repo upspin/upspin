@@ -89,6 +89,7 @@ func (p *Perm) updateLoop() {
 
 	var events <-chan upspin.Event
 	var done chan struct{}
+	var accessOrder int64
 	for {
 		var err error
 		if events == nil {
@@ -112,6 +113,15 @@ func (p *Perm) updateLoop() {
 			log.Error.Printf("%s: watch event error: %s", op, e.Error)
 			events = nil
 			close(done)
+			continue
+		}
+		// An Access file could have granted or revoked our permission
+		// to watch the Writers file. Therefore, we must start the Watch
+		// again, after the Access event.
+		if access.IsAccessFile(e.Entry.Name) && e.Order > accessOrder {
+			accessOrder = e.Order
+			close(done)
+			events = nil
 			continue
 		}
 		// Process event.

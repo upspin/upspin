@@ -237,6 +237,41 @@ func TestSequentialErrorsOk(t *testing.T) {
 	// No crash, no problem.
 }
 
+// Issue #125
+func TestOrderOfPuts(t *testing.T) {
+	ownerEnv, wait, cleanup := setupEnv(t)
+	defer cleanup()
+
+	r := testenv.NewRunner()
+	r.AddUser(ownerEnv.Config)
+
+	r.As(owner)
+	r.MakeDirectory(groupDir)
+	r.Put(writersGroup, owner+" "+writer)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+
+	perm, err := New(ownerEnv.Config, readyNow, owner, ownerEnv.DirServer.Lookup, ownerEnv.DirServer.Watch)
+	if err != nil {
+		t.Fatal(err)
+	}
+	wait() // Update call.
+
+	r.Put(accessFile, accessContent) // So server can lookup Writers.
+	wait()                           // New watch event.
+
+	// Owner and writer are allowed.
+	for _, user := range []upspin.UserName{
+		owner,
+		writer,
+	} {
+		if !perm.IsWriter(user) {
+			t.Errorf("%s is not allowed, expected allowed", user)
+		}
+	}
+}
+
 func errorReturningWatch(_ upspin.PathName, _ int64, done <-chan struct{}) (<-chan upspin.Event, error) {
 	c := make(chan upspin.Event)
 	go func() {
