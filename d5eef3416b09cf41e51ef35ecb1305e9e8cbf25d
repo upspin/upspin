@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e68fcd29_a77c3e41",
+        "filename": "cmd/upspinserver/web.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-10T23:18:16Z",
+      "side": 1,
+      "message": "I think the order of operations here should be\n\nde, err \u003d s.cli.Lookup(name, true)\n\ndir, err \u003d s.cli.DirServer(de.Name)\n\ndeAccess, err \u003d dir.WhichAccess(de.Name)\n\n// check access perms\n\nthen you don\u0027t need to re-implement WhichAccess following links",
+      "revId": "d5eef3416b09cf41e51ef35ecb1305e9e8cbf25d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0baa7baf_c6109a45",
+        "filename": "cmd/upspinserver/web.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-10T23:18:16Z",
+      "side": 1,
+      "message": "why are there two globs?\nwhat is this codepath doing?",
+      "revId": "d5eef3416b09cf41e51ef35ecb1305e9e8cbf25d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
