@@ -17,7 +17,8 @@ import (
 
 const (
 	// Number of simultaneous writers.
-	writers = 20
+	// TODO: This should be configurable.
+	writers = 4
 
 	// Terminating characters for writeback link names.
 	writebackSuffix = "_wbf"
