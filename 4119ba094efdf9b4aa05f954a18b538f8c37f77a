@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d88e6918_81565886",
+        "filename": "rpc/all_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 283,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-10T00:20:48Z",
+      "side": 1,
+      "message": "Do we need this test now?",
+      "revId": "4119ba094efdf9b4aa05f954a18b538f8c37f77a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d3b6af5b_a7181487",
+        "filename": "rpc/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-10T00:20:48Z",
+      "side": 1,
+      "message": "Is this necessary? We joined the string, so splitting it should return it to its original form. Unless HTTP might mess with it?",
+      "revId": "4119ba094efdf9b4aa05f954a18b538f8c37f77a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
