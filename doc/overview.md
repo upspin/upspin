@@ -261,13 +261,13 @@ The storage and directory servers may be run anywhere, but we expect most to be
 run as cloud services for easy availability, scalability, and maintenance.
 
 The interfaces in Upspin make it easy to insert caching layers between the
-client and the storage and directory servers to mitigate the cost of remote
+client and servers to mitigate the cost of remote
 network access.
 
 ## Security
 
 Although Upspin allows a user to store and share data without encryption, we
-expect most users will want their data to be protected from unwarranted access,
+expect most users will want their data to be protected from unauthorized access,
 and so the system offers high security as the default.
 
 There are two separate issues about security.
@@ -285,8 +285,8 @@ during encryption of the data before it is written, and during decryption when
 read back.
 Both the encryption and decryption happen on the user's client machine, not in
 the network or on Upspin servers.
-This is called end-to-end encryption, and prevents a snoop (or the storage
-server) from being able to read the user's data by tapping the network or the
+This is called end-to-end encryption, and prevents a snoop
+from being able to read the user's data by tapping the network or the
 storage server.
 
 To share a file with a second user, that user must also be able to decrypt it.

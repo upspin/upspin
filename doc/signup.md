@@ -76,7 +76,20 @@ the confirmation link that it contains.
 Visiting that link proves to the key server that you control the email address
 that you are registering and completes the signup process.
 
-Here is the first step.
+You may use your regular email address or an
+Upspin-specific one; either way is fine.
+The address is published in key server logs as well as in any Upspin
+path name you share, so be sure your email account has whatever
+spam, anonymity, or other protection you feel is necessary.
+
+No email will be sent to the address after this signup step.
+All future Upspin operations, even updating later to a new key pair,
+will be validated exclusively with the key pair generated during signup.
+Someone with future access to your email can't masquerade as you in Upspin.
+Conversely, if you lose your keys even your email account is not enough
+for recovery.
+
+Here is the first step in more detail.
 Run this shell command, substituting your email address and directory and store
 servers:
 
