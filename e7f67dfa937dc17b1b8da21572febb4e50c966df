@@ -1,0 +1,225 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c5408464_f3813e2f",
+        "filename": "doc/security.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-10T23:40:09Z",
+      "side": 1,
+      "message": "`key.upspin.io`\n\nrephrase a bit, though:\n\n\n\nIf you can confirm a friend\u0027s public key some other way, compare it to what is stored\nat `key.upspin.io` and report to us ...\n\ndon\u0027t complain, report.",
+      "revId": "e7f67dfa937dc17b1b8da21572febb4e50c966df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "93157f14_619f4414",
+        "filename": "doc/security.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-10T23:40:09Z",
+      "side": 1,
+      "message": "grammatically bad. not sure what you\u0027re saying.\nand report, don\u0027t scream.",
+      "revId": "e7f67dfa937dc17b1b8da21572febb4e50c966df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fd581dcb_668a2d3a",
+        "filename": "doc/security.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-10T23:40:09Z",
+      "side": 1,
+      "message": "i think this whole paragraph needs an introductory sentence.",
+      "revId": "e7f67dfa937dc17b1b8da21572febb4e50c966df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0700a476_a793bc3f",
+        "filename": "doc/security.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-10T23:40:09Z",
+      "side": 1,
+      "message": "s/secretseed/secret seed/",
+      "revId": "e7f67dfa937dc17b1b8da21572febb4e50c966df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "02f110a5_fd71f8f6",
+        "filename": "doc/security.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-10T23:40:09Z",
+      "side": 1,
+      "message": "jargon? \n\"decade or three\": ugh",
+      "revId": "e7f67dfa937dc17b1b8da21572febb4e50c966df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6d3a6531_ac11b043",
+        "filename": "doc/security.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 294,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-10T23:40:09Z",
+      "side": 1,
+      "message": "who is this question for?",
+      "revId": "e7f67dfa937dc17b1b8da21572febb4e50c966df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "89f26deb_f29d3558",
+        "filename": "doc/security.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-10T23:40:09Z",
+      "side": 1,
+      "message": "no spaces around slashes.",
+      "revId": "e7f67dfa937dc17b1b8da21572febb4e50c966df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "eb1bc57d_4c7a36ce",
+        "filename": "doc/security.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-10T23:40:09Z",
+      "side": 1,
+      "message": "shared",
+      "revId": "e7f67dfa937dc17b1b8da21572febb4e50c966df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d47d9caa_6ed770f1",
+        "filename": "doc/security.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 380,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-10T23:40:09Z",
+      "side": 1,
+      "message": "s/at/adding/",
+      "revId": "e7f67dfa937dc17b1b8da21572febb4e50c966df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a163bae6_acf44658",
+        "filename": "doc/security.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 382,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-10T23:40:09Z",
+      "side": 1,
+      "message": "s/over/overly/\nyay english",
+      "revId": "e7f67dfa937dc17b1b8da21572febb4e50c966df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3a66b274_e3ee4e91",
+        "filename": "doc/security.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 384,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-10T23:40:09Z",
+      "side": 1,
+      "message": "s/this/\u0026,/",
+      "revId": "e7f67dfa937dc17b1b8da21572febb4e50c966df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b9765158_96c92500",
+        "filename": "doc/security.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 390,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-10T23:40:09Z",
+      "side": 1,
+      "message": "forever",
+      "revId": "e7f67dfa937dc17b1b8da21572febb4e50c966df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e1f57dba_8dbc7260",
+        "filename": "doc/signup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-10T23:40:09Z",
+      "side": 1,
+      "message": "this last sentence is important but has no context and i believe is covered well below.\ndelete it",
+      "revId": "e7f67dfa937dc17b1b8da21572febb4e50c966df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
