@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "4131172b_e8c79ad0",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-10T21:19:47Z",
+      "side": 1,
+      "message": "You are dreaming a sweet dream.\n\nDone.",
+      "parentUuid": "1b824b45_9ca7d8a7",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "8bc1cb52_bfd1d85d",
         "filename": "doc/server_setup.md",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2017-03-08T22:46:33Z",
       "side": 1,
       "message": "s/1/2/ perhaps?",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d4724972_b1e0957b",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-10T21:19:47Z",
+      "side": 1,
+      "message": "No, the md processing does the numbering.",
+      "parentUuid": "8bc1cb52_bfd1d85d",
       "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "cba5f2a1_2e0ebc98",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 320,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-10T21:19:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a642bc3c_d3de7050",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "dcdf75b7_734bee6f",
         "filename": "doc/server_setup.md",
         "patchSetId": 1
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "c2e9e634_4727d1da",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 322,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-10T21:19:47Z",
+      "side": 1,
+      "message": "No, md does that,  the 1. is just formatting control saying this is a numbered item.",
+      "parentUuid": "dcdf75b7_734bee6f",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "bbd48fee_84458579",
         "filename": "doc/server_setup.md",
         "patchSetId": 1
@@ -81,6 +153,24 @@
       "writtenOn": "2017-03-08T22:46:33Z",
       "side": 1,
       "message": "maybe\ns/.$/, especially when experimenting./",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2d3d7b40_1a930cfa",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 323,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-10T21:19:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bbd48fee_84458579",
       "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -121,6 +211,24 @@
     },
     {
       "key": {
+        "uuid": "b9093adc_5499ff6d",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-10T21:19:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "970f4dd1_8bc00d37",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "bc4542df_819de2c8",
         "filename": "doc/server_setup.md",
         "patchSetId": 1
@@ -155,6 +263,42 @@
     },
     {
       "key": {
+        "uuid": "8397ccbc_847a803b",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-10T21:19:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "029563bd_8386293d",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "df8a0a7f_3209236f",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-10T21:19:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bc4542df_819de2c8",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "ffb17d83_1cece9c2",
         "filename": "doc/server_setup.md",
         "patchSetId": 1
@@ -172,6 +316,24 @@
     },
     {
       "key": {
+        "uuid": "ce9736ee_1d854b0d",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-10T21:19:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ffb17d83_1cece9c2",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "a69e618a_8b220f1a",
         "filename": "doc/server_setup.md",
         "patchSetId": 1
@@ -183,6 +345,24 @@
       "writtenOn": "2017-03-08T22:52:39Z",
       "side": 1,
       "message": "s/In any case you msut do/Do\n\nYou don\u0027t literally have to use the same machine, just the same deploy data.  (That may or may not be on the same machine, since all directories get munged over time.)",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ef95b7c4_d7c21f11",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 330,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-10T21:19:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a69e618a_8b220f1a",
       "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -257,6 +437,24 @@
     },
     {
       "key": {
+        "uuid": "4c9d6154_a01e7d25",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 342,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-10T21:19:47Z",
+      "side": 1,
+      "message": "righto",
+      "parentUuid": "efb40275_b95eb0b8",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "71e047d4_9ba46b51",
         "filename": "doc/server_setup.md",
         "patchSetId": 1
@@ -309,6 +507,24 @@
     },
     {
       "key": {
+        "uuid": "6838f261_6b533bac",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 346,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-10T21:19:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dea1a185_634b2165",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "e5d35e13_c194320e",
         "filename": "doc/server_setup.md",
         "patchSetId": 1
@@ -320,6 +536,24 @@
       "writtenOn": "2017-03-08T22:52:39Z",
       "side": 1,
       "message": "Mention somehow that this may now require a setcap.",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8029d87f_2441cb2f",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-10T21:19:47Z",
+      "side": 1,
+      "message": "As per adg\u0027s comment, I\u0027ve removed redeploying the server binary.",
+      "parentUuid": "e5d35e13_c194320e",
       "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -343,6 +577,24 @@
     },
     {
       "key": {
+        "uuid": "9ab16860_33790119",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 364,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-10T21:19:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2107713e_ca1a7be1",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "256d0453_357e50e7",
         "filename": "doc/server_setup.md",
         "patchSetId": 1
@@ -360,6 +612,24 @@
     },
     {
       "key": {
+        "uuid": "94b3d4ac_0e1bb910",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 365,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-10T21:19:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "256d0453_357e50e7",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f1c95605_70ed4c94",
         "filename": "doc/server_setup.md",
         "patchSetId": 1
@@ -371,6 +641,24 @@
       "writtenOn": "2017-03-08T22:52:39Z",
       "side": 1,
       "message": "This is the part that was a bit mysterious to me, so if adding a sentence explaining roughly what is going on under the covers might be worthwhile.  Or not.  Your call.",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "edbb20fb_0cc63dba",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 372,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-10T21:19:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f1c95605_70ed4c94",
       "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
