@@ -13,6 +13,7 @@ import (
 	"upspin.io/client/clientutil"
 	"upspin.io/errors"
 	"upspin.io/log"
+	"upspin.io/path"
 	"upspin.io/upspin"
 	"upspin.io/user"
 )
@@ -89,6 +90,7 @@ func (p *Perm) updateLoop() {
 
 	var events <-chan upspin.Event
 	var done chan struct{}
+	var accessOrder int64
 	for {
 		var err error
 		if events == nil {
@@ -114,6 +116,15 @@ func (p *Perm) updateLoop() {
 			close(done)
 			continue
 		}
+		// An Access file could have granted or revoked our permission
+		// to watch the Writers file. Therefore, we must start the Watch
+		// again, after the Access event.
+		if isRelevantAccess(e.Entry.Name) && e.Order > accessOrder {
+			accessOrder = e.Order
+			close(done)
+			events = nil
+			continue
+		}
 		// Process event.
 		if e.Entry.Name != p.targetFile {
 			continue
@@ -127,6 +138,21 @@ func (p *Perm) updateLoop() {
 			log.Error.Printf("%s: updateUsers: %s", op, err)
 		}
 	}
+}
+
+// isRelevantAccess access reports whether name is an Access file in a Group
+// directory or at the root.
+func isRelevantAccess(name upspin.PathName) bool {
+	if !access.IsAccessFile(name) {
+		return false
+	}
+	parsed, err := path.Parse(name)
+	if err != nil {
+		log.Error.Printf("serverutil/perm.isRelevantAccess: unexpected error: %s", err)
+		return false
+	}
+	file := parsed.FilePath()
+	return file == "Access" || file == "Group/Access"
 }
 
 // Update retrieves and parses the Group file that rules over the set of allowed
