@@ -17,7 +17,8 @@ import (
 
 const (
 	// Number of simultaneous writers.
-	writers = 20
+	// TODO: This should be configurable.
+	writers = 4
 
 	// Terminating characters for writeback link names.
 	writebackSuffix = "_wbf"
@@ -291,7 +292,10 @@ func (wbq *writebackQueue) writeback(r *request) error {
 	if err != nil {
 		return err
 	}
+	t0 := time.Now()
 	refdata, err := store.Put(data)
+	t1 := time.Now()
+	log.Printf("Put %v took %v --  got err=%t", r.Location, t1.Sub(t0), err != nil)
 	if err != nil {
 		return err
 	}
