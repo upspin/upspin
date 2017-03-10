@@ -34,6 +34,24 @@
       "revId": "f8981167357dc3481f9e8ce96ffcfd738c3f134f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4be3a898_3b6e60d1",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-10T20:33:01Z",
+      "side": 1,
+      "message": "I was thinking n\u003d2, but n is really the number of times any access file is written, which will usually be small but might not be.\n\nI believe this code is correct but I\u0027m not sure it\u0027s the best we can do. For now, please add a comment to line 98.",
+      "parentUuid": "4e03e56e_d388bfd5",
+      "revId": "f8981167357dc3481f9e8ce96ffcfd738c3f134f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
