@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4c74d319_1cab894b",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-10T21:32:49Z",
+      "side": 1,
+      "message": "please start new sentence on new line. markdown will flow it nicely.\nmakes text easier to edit and diff.\n\nthere are a number of these in the new text.",
+      "revId": "aa72f72ea045ee87bbd191245b323cadbe80325a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "80f24072_8faa2dcd",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-10T21:32:49Z",
+      "side": 1,
+      "message": "you are inconsistent regarding the use of colons.\nbe consistent.",
+      "revId": "aa72f72ea045ee87bbd191245b323cadbe80325a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8876b03c_7ef01fe0",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 342,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-10T21:32:49Z",
+      "side": 1,
+      "message": "not sure about the -f. if it\u0027s not needed, don\u0027t specify it.\n\nis it needed? it wasn\u0027t when i did this a few days ago.",
+      "revId": "aa72f72ea045ee87bbd191245b323cadbe80325a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1b03fa29_9161c09c",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 346,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-10T21:32:49Z",
+      "side": 1,
+      "message": "s/setup/set up/\n\nsetup is a noun.",
+      "revId": "aa72f72ea045ee87bbd191245b323cadbe80325a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fccea27f_9ac3fae1",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 348,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-10T21:32:49Z",
+      "side": 1,
+      "message": "this reads like, \"here is how to use gsutil ls\".\n\nIf you have... `gsutil ls`.\nOnce you know the bucket name, `gsutil rm` can remove the data.\nThe `-m` argument speeds things up by working in parallel:",
+      "revId": "aa72f72ea045ee87bbd191245b323cadbe80325a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cecaa543_a9b68126",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 355,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-10T21:32:49Z",
+      "side": 1,
+      "message": "s/only/now only/",
+      "revId": "aa72f72ea045ee87bbd191245b323cadbe80325a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
