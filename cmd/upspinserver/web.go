@@ -12,7 +12,9 @@ import (
 	"net/http"
 	"strings"
 
+	"upspin.io/access"
 	"upspin.io/client"
+	"upspin.io/client/clientutil"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/path"
@@ -49,14 +51,6 @@ func (s *web) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// The server user can always see its own tree,
-	// so prevent access entirely from the web interface.
-	if p.User() == s.cfg.UserName() {
-		code := http.StatusForbidden
-		http.Error(w, http.StatusText(code), code)
-		return
-	}
-
 	// If the parsed path differs from the requested path, redirect.
 	name := p.Path()
 	if name != urlName {
@@ -64,46 +58,127 @@ func (s *web) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	des, err := s.cli.Glob(string(name))
+	// Get the Access file for the path.
+	whichAccess, err := s.whichAccessFollowLinks(name)
 	if err != nil {
 		httpError(w, err)
 		return
 	}
-	if len(des) == 0 {
-		http.Error(w, "Not found", http.StatusNotFound)
+	// No Access file, default permission denied.
+	if whichAccess == nil {
+		code := http.StatusForbidden
+		http.Error(w, http.StatusText(code), code)
+		return
+	}
+	accessData, err := clientutil.ReadAll(s.cfg, whichAccess)
+	if err != nil {
+		httpError(w, err)
+		return
+	}
+	acc, err := access.Parse(whichAccess.Name, accessData)
+	if err != nil {
+		httpError(w, err)
+		return
+	}
+	// Fetch 'All's read and list rights.
+	readable, err := acc.Can(access.AllUsers, access.Read, name, s.cli.Get)
+	if err != nil {
+		httpError(w, err)
+		return
+	}
+	listable, err := acc.Can(access.AllUsers, access.List, name, s.cli.Get)
+	if err != nil {
+		httpError(w, err)
 		return
 	}
 
-	if len(des) > 1 || des[0].IsDir() {
-		// Display glob listing or directory contents.
+	if !readable && !listable {
+		// No point carrying on from here.
+		code := http.StatusForbidden
+		http.Error(w, http.StatusText(code), code)
+		return
+	}
+
+	// Try to serve the file.
+	entry, err := s.cli.Lookup(name, true)
+	if err == nil && entry.IsDir() {
+		// Directory found but does 'all' have right to read.
+		if !listable {
+			code := http.StatusForbidden
+			http.Error(w, http.StatusText(code), code)
+			return
+		}
 		var d dirTemplateData
-		if len(des) > 1 {
-			d.Glob = name
-			d.Content = des
-		} else {
-			d.Dir = des[0]
-			d.Content, err = s.cli.Glob(string(name) + "/*")
-			if err != nil {
-				httpError(w, err)
-				return
-			}
-			if p.NElem() > 0 {
-				d.Parent = p.Drop(1).Path()
-			}
+		d.Dir = name
+		d.Content, err = s.cli.Glob(upspin.AllFilesGlob(name))
+		if err != nil {
+			httpError(w, err)
+			return
+		}
+		if p.NElem() > 0 {
+			d.Parent = p.Drop(1).Path()
 		}
 		if err := dirTemplate.Execute(w, d); err != nil {
 			log.Error.Printf("rendering directory template: %v", err)
 		}
 		return
-	}
-
-	// Serve the file.
-	data, err := s.cli.Get(name)
-	if err != nil {
+	} else if err == nil {
+		// File exisits, but do we have right to read.
+		if !readable {
+			code := http.StatusForbidden
+			http.Error(w, http.StatusText(code), code)
+			return
+		}
+		data, err := s.cli.Get(name)
+		if err != nil {
+			httpError(w, err)
+			return
+		}
+		w.Write(data)
+		return
+	} else if errors.Match(errors.E(errors.NotExist), err) {
+		if !listable {
+			// 'all' have right to 'list' so should return not found...
+			code := http.StatusForbidden
+			http.Error(w, http.StatusText(code), code)
+			return
+		}
+		entries, err := s.cli.Glob(string(name))
+		if err != nil {
+			httpError(w, err)
+			return
+		}
+		var d dirTemplateData
+		d.Glob = name
+		d.Content = entries
+		if err := dirTemplate.Execute(w, d); err != nil {
+			log.Error.Printf("rendering directory template: %v", err)
+		}
+		return
+	} else {
 		httpError(w, err)
 		return
 	}
-	w.Write(data)
+
+}
+
+func (s *web) whichAccessFollowLinks(name upspin.PathName) (*upspin.DirEntry, error) {
+	for loop := 0; loop < upspin.MaxLinkHops; loop++ {
+		dir, err := s.cli.DirServer(name)
+		if err != nil {
+			return nil, err
+		}
+		entry, err := dir.WhichAccess(name)
+		if err == upspin.ErrFollowLink {
+			name = entry.Link
+			continue
+		}
+		if err != nil {
+			return nil, err
+		}
+		return entry, nil
+	}
+	return nil, nil
 }
 
 func httpError(w http.ResponseWriter, err error) {
@@ -111,6 +186,8 @@ func httpError(w http.ResponseWriter, err error) {
 	case errors.Match(errors.E(errors.Private), err),
 		errors.Match(errors.E(errors.Permission), err):
 		http.Error(w, "Forbidden", http.StatusForbidden)
+	case errors.Match(errors.E(errors.NotExist), err):
+		http.Error(w, "Not Found", http.StatusNotFound)
 	default:
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -118,7 +195,7 @@ func httpError(w http.ResponseWriter, err error) {
 
 type dirTemplateData struct {
 	// One and only one of these must be set.
-	Dir  *upspin.DirEntry
+	Dir  upspin.PathName
 	Glob upspin.PathName
 
 	Parent  upspin.PathName
@@ -140,7 +217,7 @@ var templateFuncs = template.FuncMap{
 
 var dirTemplate = template.Must(template.New("dir").Funcs(templateFuncs).Parse(`
 {{with .Dir}}
-<h1>Index of {{.Name}}</h1>
+<h1>Index of {{.}}</h1>
 {{end}}
 {{with .Glob}}
 <h1>Matches for {{.}}</h1>
