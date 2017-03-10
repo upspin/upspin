@@ -12,7 +12,9 @@ import (
 	"net/http"
 	"strings"
 
+	"upspin.io/access"
 	"upspin.io/client"
+	"upspin.io/client/clientutil"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/path"
@@ -49,14 +51,6 @@ func (s *web) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// The server user can always see its own tree,
-	// so prevent access entirely from the web interface.
-	if p.User() == s.cfg.UserName() {
-		code := http.StatusForbidden
-		http.Error(w, http.StatusText(code), code)
-		return
-	}
-
 	// If the parsed path differs from the requested path, redirect.
 	name := p.Path()
 	if name != urlName {
@@ -64,24 +58,83 @@ func (s *web) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	des, err := s.cli.Glob(string(name))
+	// Get the Access file for the path.
+	dir, err := s.cli.DirServer(name)
 	if err != nil {
 		httpError(w, err)
 		return
 	}
-	if len(des) == 0 {
-		http.Error(w, "Not found", http.StatusNotFound)
+	whichAccess, err := dir.WhichAccess(name)
+	if err != nil {
+		httpError(w, err)
+		return
+	}
+	// No Access file, default permission denied.
+	if whichAccess == nil {
+		code := http.StatusForbidden
+		http.Error(w, http.StatusText(code), code)
+		return
+	}
+	accessData, err := clientutil.ReadAll(s.cfg, whichAccess)
+	if err != nil {
+		httpError(w, err)
+		return
+	}
+	acc, err := access.Parse(whichAccess.Name, accessData)
+	if err != nil {
+		httpError(w, err)
+		return
+	}
+	// Fetch 'All's read and list rights.
+	readable, err := acc.Can(access.AllUsers, access.Read, name, s.cli.Get)
+	if err != nil {
+		httpError(w, err)
+		return
+	}
+	listable, err := acc.Can(access.AllUsers, access.List, name, s.cli.Get)
+	if err != nil {
+		httpError(w, err)
 		return
 	}
 
-	if len(des) > 1 || des[0].IsDir() {
+	if !readable && !listable {
+		// No point carrying on from here.
+		code := http.StatusForbidden
+		http.Error(w, http.StatusText(code), code)
+		return
+	}
+
+
+	entries, err := s.cli.Glob(string(name))
+	if errors.Match(errors.E(errors.NotExist), err) || err == nil && len(entries) == 0 {
+		if listable {
+			// 'all' have right to 'list' so should return not found...
+			http.Error(w, "Not found", http.StatusNotFound)
+			return
+		} else {
+			// ...otherwise forbidden.
+			code := http.StatusForbidden
+			http.Error(w, http.StatusText(code), code)
+			return
+		}
+	} else if err != nil {
+		httpError(w, err)
+		return
+	}
+
+	if len(entries) > 1 || entries[0].IsDir() || entries[0].Name != name {
+		if !listable {
+			code := http.StatusForbidden
+			http.Error(w, http.StatusText(code), code)
+			return
+		}
 		// Display glob listing or directory contents.
 		var d dirTemplateData
-		if len(des) > 1 {
+		if entries[0].Name != name {
 			d.Glob = name
-			d.Content = des
+			d.Content = entries
 		} else {
-			d.Dir = des[0]
+			d.Dir = entries[0]
 			d.Content, err = s.cli.Glob(string(name) + "/*")
 			if err != nil {
 				httpError(w, err)
@@ -94,6 +147,12 @@ func (s *web) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		if err := dirTemplate.Execute(w, d); err != nil {
 			log.Error.Printf("rendering directory template: %v", err)
 		}
+		return
+	}
+
+	if !readable {
+		code := http.StatusForbidden
+		http.Error(w, http.StatusText(code), code)
 		return
 	}
 
