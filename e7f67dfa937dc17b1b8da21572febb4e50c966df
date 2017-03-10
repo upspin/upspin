@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "d07bbadb_3b0c76ee",
+        "filename": "doc/security.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-10T23:58:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c5408464_f3813e2f",
+      "revId": "e7f67dfa937dc17b1b8da21572febb4e50c966df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "93157f14_619f4414",
         "filename": "doc/security.md",
         "patchSetId": 1
@@ -33,6 +51,24 @@
       "revId": "e7f67dfa937dc17b1b8da21572febb4e50c966df",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "087bbc7a_098bd761",
+        "filename": "doc/security.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-10T23:58:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "93157f14_619f4414",
+      "revId": "e7f67dfa937dc17b1b8da21572febb4e50c966df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "795e128d_060e8133",
+        "filename": "doc/security.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-10T23:58:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fd581dcb_668a2d3a",
+      "revId": "e7f67dfa937dc17b1b8da21572febb4e50c966df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0700a476_a793bc3f",
         "filename": "doc/security.md",
         "patchSetId": 1
@@ -67,6 +121,24 @@
       "revId": "e7f67dfa937dc17b1b8da21572febb4e50c966df",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e8b1a289_056c5389",
+        "filename": "doc/security.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-10T23:58:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0700a476_a793bc3f",
+      "revId": "e7f67dfa937dc17b1b8da21572febb4e50c966df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "48ee7bb8_5b850376",
+        "filename": "doc/security.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-10T23:58:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "02f110a5_fd71f8f6",
+      "revId": "e7f67dfa937dc17b1b8da21572febb4e50c966df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6d3a6531_ac11b043",
         "filename": "doc/security.md",
         "patchSetId": 1
@@ -101,6 +191,24 @@
       "revId": "e7f67dfa937dc17b1b8da21572febb4e50c966df",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "266c3f53_b68c99c8",
+        "filename": "doc/security.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 294,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-10T23:58:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6d3a6531_ac11b043",
+      "revId": "e7f67dfa937dc17b1b8da21572febb4e50c966df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "cf636d13_b8e20b9d",
+        "filename": "doc/security.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-10T23:58:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "89f26deb_f29d3558",
+      "revId": "e7f67dfa937dc17b1b8da21572febb4e50c966df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "eb1bc57d_4c7a36ce",
         "filename": "doc/security.md",
         "patchSetId": 1
@@ -135,6 +261,24 @@
       "revId": "e7f67dfa937dc17b1b8da21572febb4e50c966df",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6f210286_98f99f32",
+        "filename": "doc/security.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-10T23:58:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "eb1bc57d_4c7a36ce",
+      "revId": "e7f67dfa937dc17b1b8da21572febb4e50c966df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -155,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "05c36c49_547352d6",
+        "filename": "doc/security.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 380,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-10T23:58:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d47d9caa_6ed770f1",
+      "revId": "e7f67dfa937dc17b1b8da21572febb4e50c966df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a163bae6_acf44658",
         "filename": "doc/security.md",
         "patchSetId": 1
@@ -169,6 +331,24 @@
       "revId": "e7f67dfa937dc17b1b8da21572febb4e50c966df",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0f7e7bce_bee6ade2",
+        "filename": "doc/security.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 382,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-10T23:58:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a163bae6_acf44658",
+      "revId": "e7f67dfa937dc17b1b8da21572febb4e50c966df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -189,6 +369,24 @@
     },
     {
       "key": {
+        "uuid": "003b3e3f_f3749fc4",
+        "filename": "doc/security.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 384,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-10T23:58:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a66b274_e3ee4e91",
+      "revId": "e7f67dfa937dc17b1b8da21572febb4e50c966df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b9765158_96c92500",
         "filename": "doc/security.md",
         "patchSetId": 1
@@ -206,6 +404,24 @@
     },
     {
       "key": {
+        "uuid": "ae71eacd_639a3079",
+        "filename": "doc/security.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 390,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-10T23:58:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b9765158_96c92500",
+      "revId": "e7f67dfa937dc17b1b8da21572febb4e50c966df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e1f57dba_8dbc7260",
         "filename": "doc/signup.md",
         "patchSetId": 1
@@ -217,6 +433,24 @@
       "writtenOn": "2017-03-10T23:40:09Z",
       "side": 1,
       "message": "this last sentence is important but has no context and i believe is covered well below.\ndelete it",
+      "revId": "e7f67dfa937dc17b1b8da21572febb4e50c966df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "faa0817c_e00dc131",
+        "filename": "doc/signup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-10T23:58:11Z",
+      "side": 1,
+      "message": "Done.\n\nBut we\u0027ve had a lot of complaints about not saying this often enough or soon enough.",
+      "parentUuid": "e1f57dba_8dbc7260",
       "revId": "e7f67dfa937dc17b1b8da21572febb4e50c966df",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
