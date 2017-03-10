@@ -302,7 +302,7 @@ As mentioned in the introduction, a concerned user could choose
 to run the directory server on their own machine.
 
 Besides observing metadata, a subverted directory server can cause harm
-by returning an incorrrect Access file to the client.
+by returning an incorrect Access file to the client.
 Access files are signed by the owner, but replay is possible;
 this might yield a stale list of readers or other permissions.
 (Similarly, the directory server could serve a stale signed DirEntry.)
