@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "9cf7d81e_7d5a7ccf",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-10T23:07:15Z",
+      "side": 1,
+      "message": "please put this with the other stdlib imports\n\nwhat is doing this? something in your IDE?\nis it shelling out to goimports? or does it try to do it itself?\nwe should report a bug somewhere",
+      "revId": "2e4656398412c2492f83192c807c6cf3bb7c24b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a0e035d6_6a5c9d4d",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-10T23:07:15Z",
+      "side": 1,
+      "message": "shouldn\u0027t the Watch API just handle this gracefully?",
+      "revId": "2e4656398412c2492f83192c807c6cf3bb7c24b7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "6638f6dc_df23f9a3",
         "filename": "serverutil/perm/perm.go",
         "patchSetId": 2
