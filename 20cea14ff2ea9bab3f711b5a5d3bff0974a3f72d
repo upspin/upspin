@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cce212b4_3ace1610",
+        "filename": "cmd/upspinserver/web.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-10T17:07:23Z",
+      "side": 1,
+      "message": "The OR above doesn\u0027t seem right. If there is another error it\u0027s likely len(des) would be zero. In that case, why wouldn\u0027t you print an error message?\n\nI think you can remove everything after errors.Match and the else below will catch this case.\n\nMaybe you meant \"|| err \u003d\u003d nil \u0026\u0026 len(des) \u003d\u003d 0\"? That way if nothing was returned it\u0027s the same answer as if it didn\u0027t exist?\n\n(BTW: I\u0027d rename \u0027des\u0027 to \u0027entries\u0027)",
+      "revId": "20cea14ff2ea9bab3f711b5a5d3bff0974a3f72d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
