@@ -16,6 +16,24 @@
       "revId": "20cea14ff2ea9bab3f711b5a5d3bff0974a3f72d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d8ccf723_a0808c93",
+        "filename": "cmd/upspinserver/web.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 5605
+      },
+      "writtenOn": "2017-03-10T17:29:21Z",
+      "side": 1,
+      "message": "Oops. I was replicating the old behaviour, so should have been checking \u0027err \u003d\u003d nil\u0027.",
+      "parentUuid": "cce212b4_3ace1610",
+      "revId": "20cea14ff2ea9bab3f711b5a5d3bff0974a3f72d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
