@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7dac2ec2_55f3f9c0",
+        "filename": "cmd/upspinserver/web.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-10T18:19:59Z",
+      "side": 1,
+      "message": "I don\u0027t think this would work with links though. See documentation for client.Glob:\n \n        //  Note that if links are\n\t// evaluated while executing Glob, the Name fields of the returned\n\t// DirEntries might not match the original argument pattern.\n\nEither you\u0027ll want to use dir.Glob or perhaps do a client.Lookup on name with followFinal \u003d false and figure out if it\u0027s a link.\n\nAt that point, you may need to break these cases down as it\u0027s getting hard to read. Maybe the block below could be a local func. Then you may have these various cases be a switch statement or separate ifs. But it depends what this looks like once you have the link issue sorted out.",
+      "revId": "c25686cd0bb7fb25b1b0d8c125fed8bd9e3b781e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
