@@ -16,6 +16,24 @@
       "revId": "f8981167357dc3481f9e8ce96ffcfd738c3f134f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4e03e56e_d388bfd5",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-10T18:48:15Z",
+      "side": 1,
+      "message": "No. I started like this, but if Writers is written before Access, using accessOrder here won\u0027t give me Writers, just whatever changes after that.\n\nIt\u0027s not n^2 but 2n right? I look at all files once, then when an updated Access file is first seen I look at all files again. I do not look again until  something new happens.\n\nOr maybe you\u0027re saying n\u003d2, but then it doesn\u0027t make a difference..",
+      "parentUuid": "cd566040_9f842e61",
+      "revId": "f8981167357dc3481f9e8ce96ffcfd738c3f134f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
