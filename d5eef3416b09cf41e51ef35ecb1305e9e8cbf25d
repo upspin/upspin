@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "5fef5f6c_3d6c5146",
+        "filename": "cmd/upspinserver/web.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-10T23:41:28Z",
+      "side": 1,
+      "message": "The URL should not contain a glob character.\nIt\u0027s fine for that to fail.",
+      "parentUuid": "f84cfb06_5cb92cc6",
+      "revId": "d5eef3416b09cf41e51ef35ecb1305e9e8cbf25d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "0baa7baf_c6109a45",
         "filename": "cmd/upspinserver/web.go",
         "patchSetId": 7
@@ -66,6 +84,24 @@
       "side": 1,
       "message": "There is a Glob earlier on, but that\u0027s when you know you\u0027re dealing with a directory and just listing it\u0027s contents, the second is actually applying a Glob generically.",
       "parentUuid": "0baa7baf_c6109a45",
+      "revId": "d5eef3416b09cf41e51ef35ecb1305e9e8cbf25d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b451f931_13890db5",
+        "filename": "cmd/upspinserver/web.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-10T23:41:28Z",
+      "side": 1,
+      "message": "We don\u0027t actually want the user to be able to perform arbitrary globs. We only want to glob directories.",
+      "parentUuid": "9c4a8d59_fc4a8eb7",
       "revId": "d5eef3416b09cf41e51ef35ecb1305e9e8cbf25d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
