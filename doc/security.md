@@ -33,8 +33,7 @@ own [elliptic curve](https://en.wikipedia.org/wiki/Elliptic_curve_cryptography)
 private key, and sending the ciphertext to a storage server and metadata to a
 directory server.
 
-The specific ciphersuite used is selectable (choices are plain text, meaning no
-encryption, and elliptic-curve; more may arise) and defaults to P-256 for the
+The specific ciphersuite used is selectable and defaults to P-256 for the
 elliptic curve algorithm, AES-256 for data encryption, and SHA-256 for
 checksums.
 The entire system is written in Go, is open-source, and uses Go's standard
@@ -153,11 +152,23 @@ storage server.
 ## Key Management
 
 An Upspin user joins the system by publishing a key to a central key server.
-We're running our own server for the moment but anticipate converting to
-[Key Transparency](https://security.googleblog.com/2017/01/security-through-transparency.html).
-For the time being, we enable detection of tampering with keys by
+We believe a global collection of public key bindings is the best way to
+promote easy sharing between strangers, and we think this need extends
+beyond Upspin.
+We're running our own key server for the moment but anticipate converting to
+[Key Transparency](https://security.googleblog.com/2017/01/security-through-transparency.html)
+or whatever other strong system becomes most popular.
+Our prototype enables detection of tampering by
 publishing a full, incrementally hashed transaction log at
 [https://key.upspin.io/log](https://key.upspin.io/log).
+
+If you can confirm a friend's public key out-of-band, check it against
+key.upspin.io and complain to us and the public if you ever find a mismatch.
+Also, compare the log hash with others similarly careful, and scream
+if you ever see a discrepancy.
+Watch for your own key in the log and scream if there's ever a change, even
+momentary, that you did not iniitate yourself.
+You'll be giving the rest of our users herd immunity.
 
 As far as Upspin is concerned, a user is an email address, authenticated by an
 elliptic curve key pair used for signing and encrypting.
@@ -264,7 +275,23 @@ Key pairs have three representations:
 3. a secret seed sufficient to reconstruct the key pair
 In form 1, the first bytes describe the packing name, e.g. "p256".
 In form 2, there is a Curve field in the struct that plays that role.
-Form 3, used only in **cmd/upspin/keygen.go**, is simply 128 bits of entropy.
+Form 3, used only in **cmd/upspin/keygen.go**, is simply 128 bits of entropy
+expressed as proquints.
+
+Although we're using AES 256 for bulk encryption to promote long-term
+interoperability, the default client uses only 128 bits of entropy in
+generating the elliptic curve key pair.
+That bit length was chosen to make the secretseed small enough for
+ordinary people to be willing to write down.
+Safe backup of the key is a long-term risk of all archival encryption.
+We'll see if the mental model of protecting a secret on paper
+works in real life.
+
+It seems 128 bits of entropy is good enough, at least until practical
+implementations of Grover's algorithm come along in a decade or three,
+and by then we'll have to replace elliptic curves anyway.
+Are people willing to write down the longer proquint strings suitable
+for curve p521 keys?
 
 By collecting all the private key operations into the factotum package, we are
 providing for an isolated implementation, as in qubes-split-gpg or ssh-agent.
@@ -331,3 +358,40 @@ Thus we expect even very cautious users can enjoy
 the availability advantages of public cloud storage.
 If they prefer,
 they can run the Upspin storage server code off their own local disk.
+
+## Alternative Designs
+
+The design space has many choices, offering different protections.
+
+Some ask why the directory server has access to cleartext filenames.
+It looked complicated to provide the API we do while somehow wrapping
+encryption keys for filenames that could be extracted by each client
+that needed them.
+Glob then has to then be implemented on the client, which adds even
+more complexity when done not by the file tree owner but by a client
+with permission only to parts of the tree.
+Homomorphic encryption approaches either don't support full glob or
+are very complicated themselves.
+In practice, the user can pick obscure filenames for special cases.
+The more challenging information leak from a malicious /
+compromised / compelled directory server is the list of reader
+accounts that you've share your file with.
+There are also some things that could be done about that,
+at cost and complexity.
+Google Cloud has decent security and also pushes back against
+over broad warrants, so we believe running the directory server
+in the cloud is an acceptable risk.
+If you worry about this run the directory server on
+your own well-protected system.
+
+Others ask why we depend on a central key server rather than some
+distributed or federated system.
+As mentioned before, we are not adamant about using our current
+key server for ever;
+if a better solution comes along we would consider switching.
+Any better system has to have at least the resistance our current
+one does to undetected tampering or inconsistent responses.
+
+Most of all, we welcome suggestions for how to make our system simpler.
+For us, complexity bugs are a bigger fear than warrants.
+
