@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cd566040_9f842e61",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-10T18:37:25Z",
+      "side": 1,
+      "message": "can you use accessOrder here instead of -1?\nas it is this loop is now n^2, although n is small.",
+      "revId": "f8981167357dc3481f9e8ce96ffcfd738c3f134f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
