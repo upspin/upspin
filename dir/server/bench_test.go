@@ -103,6 +103,69 @@ func benckmarkLookup(b *testing.B, cached bool, dir upspin.PathName) {
 	}
 }
 
+// Benchmarks for WhichAccess have two parameters besides the caching or no
+// caching one: 1) the directory that contains the Access file and 2) how far
+// under that directory the path name we give to WhichAccess.
+func BenchmarkWhichAccessNoCacheRoot(b *testing.B) {
+	benchmarkWhichAccess(b, !cached, userName, 0)
+}
+func BenchmarkWhichAccessCacheRoot(b *testing.B) {
+	benchmarkWhichAccess(b, cached, userName, 0)
+}
+func BenchmarkWhichAccessNoCache1Deep0Dist(b *testing.B) {
+	benchmarkWhichAccess(b, !cached, userName+"/"+mkName(), 0)
+}
+func BenchmarkWhichAccessCache1Deep0Dist(b *testing.B) {
+	benchmarkWhichAccess(b, cached, userName+"/"+mkName(), 0)
+}
+func BenchmarkWhichAccessNoCache1Deep1Dist(b *testing.B) {
+	benchmarkWhichAccess(b, !cached, userName+"/"+mkName(), 1)
+}
+func BenchmarkWhichAccessCache1Deep1Dist(b *testing.B) {
+	benchmarkWhichAccess(b, cached, userName+"/"+mkName(), 1)
+}
+func BenchmarkWhichAccessNoCache4Deep3Dist(b *testing.B) {
+	benchmarkWhichAccess(b, !cached, userName+"/"+mkName()+"/"+mkName()+"/"+mkName()+"/"+mkName(), 3)
+}
+func BenchmarkWhichAccessCache4Deep3Dist(b *testing.B) {
+	benchmarkWhichAccess(b, cached, userName+"/"+mkName()+"/"+mkName()+"/"+mkName()+"/"+mkName(), 3)
+}
+func BenchmarkWhichAccessNoCache4Deep10Dist(b *testing.B) {
+	benchmarkWhichAccess(b, !cached, userName+"/"+mkName()+"/"+mkName()+"/"+mkName()+"/"+mkName(), 10)
+}
+func BenchmarkWhichAccessCache4Deep10Dist(b *testing.B) {
+	benchmarkWhichAccess(b, cached, userName+"/"+mkName()+"/"+mkName()+"/"+mkName()+"/"+mkName(), 10)
+}
+
+func benchmarkWhichAccess(b *testing.B, cached bool, dir upspin.PathName, accessDistance int) {
+	b.StopTimer()
+	s, cfg, cleanup := setupBenchServer(b)
+	defer cleanup()
+	s.userTrees = cache.NewLRU(1)
+	s.access = cache.NewLRU(1)
+	s.defaultAccess = cache.NewLRU(1)
+	putAccessOrGroupFile(b, s, cfg, dir+"/Access", "*:"+userName)
+	for i := 0; i < accessDistance; i++ {
+		dir = dir + "/" + mkName()
+		makeDirectory(s, dir)
+	}
+	b.StartTimer()
+
+	for i := 0; i < b.N; i++ {
+		_, err := s.WhichAccess(dir + "/somename")
+		if err != nil {
+			b.Fatal(err)
+		}
+		if !cached {
+			b.StopTimer()
+			s.userTrees.RemoveOldest()
+			s.access.RemoveOldest()
+			s.defaultAccess.RemoveOldest()
+			b.StartTimer()
+		}
+	}
+}
+
 // setupBenchServer sets up the benchmark tests and returns the server to use,
 // the user's config and a clean up function to use after benchmarks are run.
 func setupBenchServer(t testing.TB) (*server, upspin.Config, func()) {

@@ -954,7 +954,7 @@ func makeDirectory(s *server, name upspin.PathName) (*upspin.DirEntry, error) {
 	return s.Put(entry)
 }
 
-func putAccessOrGroupFile(t *testing.T, s *server, userCtx upspin.Config, name upspin.PathName, contents string) (*upspin.DirEntry, error) {
+func putAccessOrGroupFile(t testing.TB, s *server, userCtx upspin.Config, name upspin.PathName, contents string) (*upspin.DirEntry, error) {
 	if !access.IsAccessFile(name) && !access.IsGroupFile(name) {
 		t.Fatalf("%s not an access file", name)
 	}
@@ -1128,7 +1128,7 @@ func newDirServerForTestingWithTestDir(t testing.TB, userName upspin.UserName, t
 	return svr.(*server), userCtx
 }
 
-func writeToStore(t *testing.T, ctx upspin.Config, data []byte) upspin.Location {
+func writeToStore(t testing.TB, ctx upspin.Config, data []byte) upspin.Location {
 	store, err := bind.StoreServer(ctx, ctx.StoreEndpoint())
 	if err != nil {
 		t.Fatal(err)
