@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "458bd0b7_224b37bd",
+        "filename": "doc/security.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-11T02:04:44Z",
+      "side": 1,
+      "message": "I did mean bold since that is actual text to type, but it was borderline.  Removed.",
+      "parentUuid": "33e13ee1_27b24fe4",
+      "revId": "9acf0214a1a661a7f9ebbf598b168c46292eed7d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "7e188873_b01288a4",
         "filename": "doc/signup.md",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2017-03-11T01:00:27Z",
       "side": 1,
       "message": "needs to be working only during",
+      "revId": "9acf0214a1a661a7f9ebbf598b168c46292eed7d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "247737b7_982238fd",
+        "filename": "doc/signup.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-11T02:04:44Z",
+      "side": 1,
+      "message": "Are you sure?   We don\u0027t mean it must exclusively be working during signup, we mean the only necessity is that it is working during signup.",
+      "parentUuid": "7e188873_b01288a4",
       "revId": "9acf0214a1a661a7f9ebbf598b168c46292eed7d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "a6f4f445_af070917",
+        "filename": "doc/signup.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-11T02:04:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2a836840_07bea161",
+      "revId": "9acf0214a1a661a7f9ebbf598b168c46292eed7d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "51bec555_87f384db",
         "filename": "doc/signup.md",
         "patchSetId": 2
@@ -67,6 +121,24 @@
       "revId": "9acf0214a1a661a7f9ebbf598b168c46292eed7d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "afad5ad9_7899a5b4",
+        "filename": "doc/signup.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-11T02:04:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "51bec555_87f384db",
+      "revId": "9acf0214a1a661a7f9ebbf598b168c46292eed7d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
