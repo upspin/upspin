@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "5b8d9f45_dccbbb51",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-11T01:54:17Z",
+      "side": 1,
+      "message": "I would stick with will.   We already have one incompatible DirEntry signature change pending, due to my blunder.  I\u0027d be very surprised if there were not more.",
+      "parentUuid": "4131172b_e8c79ad0",
+      "revId": "806c89f0cfbff5a4a803c9037ae915bb788f3ac8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "8bc1cb52_bfd1d85d",
         "filename": "doc/server_setup.md",
         "patchSetId": 1
