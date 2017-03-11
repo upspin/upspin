@@ -101,6 +101,40 @@
       "revId": "aa72f72ea045ee87bbd191245b323cadbe80325a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "164e0d88_9f1c16e1",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 368,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-11T01:54:17Z",
+      "side": 1,
+      "message": "When I tried this on my domain, at this step I got the errors below.  I think it is all be ok except that I did not comment out the cache: line in config beforehand and obviously don\u0027t have a root directory after the wipe.\n\nUser \"upspin@n2vi.org\" already exists on key server.\nConfigured upspinserver at \"upspin.n2vi.org:443\".\nupspin: setupserver: client.MakeDirectory: I/O error:\n\tdir/remote.Put(\"remote,upspin.n2vi.org:443\"):\n\trpc.Invoke: Post http://localhost:8888/api/Dir/Put: dial tcp [::1]:8888: getsockopt: connection refused",
+      "revId": "aa72f72ea045ee87bbd191245b323cadbe80325a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cde9fe8f_97b56b1e",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-11T01:54:17Z",
+      "side": 1,
+      "message": "I\u0027m not sure this is true.  Somehow the Writers file from upspin/deploy/ seems to be taking effect.",
+      "revId": "aa72f72ea045ee87bbd191245b323cadbe80325a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
