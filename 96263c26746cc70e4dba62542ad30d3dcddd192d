@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4a63c7db_b99b58f9",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-11T15:26:32Z",
+      "side": 1,
+      "message": "please start sentences on new lines (SONL)",
+      "revId": "96263c26746cc70e4dba62542ad30d3dcddd192d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "596cfc10_2327786b",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-11T15:26:32Z",
+      "side": 1,
+      "message": "SONL",
+      "revId": "96263c26746cc70e4dba62542ad30d3dcddd192d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
