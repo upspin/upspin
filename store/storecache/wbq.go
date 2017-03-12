@@ -16,9 +16,11 @@ import (
 )
 
 const (
-	// Number of simultaneous writers.
-	// TODO: This should be configurable.
-	writers = 4
+	// Maximum number of simultaneous writers.
+	writers = 20
+
+	// Initial number of simultaneous requests.
+	initialMaxInProgress = 8
 
 	// Terminating characters for writeback link names.
 	writebackSuffix = "_wbf"
@@ -58,7 +60,7 @@ type writebackQueue struct {
 
 	// All queued writeback requests. Also used/modified
 	// exclusively by the scheduler goroutine.
-	inFlight map[upspin.Location]*request
+	queued map[upspin.Location]*request
 
 	// request carries writeback requests to the scheduler.
 	request chan *request
@@ -80,22 +82,35 @@ type writebackQueue struct {
 
 	// Writers and scheduler send to terminated on exit.
 	terminated chan bool
+
+	// maxInProgress is a highwater mark for in progress requests.
+	// Whenever a timeout occurs and we have not more than maxInProgress
+	// simultaneous requests, we halve maxInProgress. Whenever maxInProgress
+	// requests complete while we have maxInProgress simultaneous requests
+	// occuring, we increment maxInProgress. Thus we have a slowly increasing
+	// but quickly decreasing limit resulting in a sawtooth that will feel
+	// out how much concurrency we can use without causing the server to
+	// timeout the requests.
+	inProgress    int
+	maxInProgress int
+	successful    int
 }
 
 func newWritebackQueue(sc *storeCache) *writebackQueue {
 	const op = "store/storecache.newWritebackQueue"
 
 	wbq := &writebackQueue{
-		sc:           sc,
-		byEndpoint:   make(map[upspin.Endpoint]*endpointQueue),
-		inFlight:     make(map[upspin.Location]*request),
-		request:      make(chan *request, writers),
-		flushRequest: make(chan *flushRequest, writers),
-		ready:        make(chan *request, writers),
-		done:         make(chan *request, writers),
-		retry:        make(chan *endpointQueue, writers),
-		die:          make(chan bool),
-		terminated:   make(chan bool),
+		sc:            sc,
+		byEndpoint:    make(map[upspin.Endpoint]*endpointQueue),
+		queued:        make(map[upspin.Location]*request),
+		request:       make(chan *request, writers),
+		flushRequest:  make(chan *flushRequest, writers),
+		ready:         make(chan *request, writers),
+		done:          make(chan *request, writers),
+		retry:         make(chan *endpointQueue, writers),
+		die:           make(chan bool),
+		terminated:    make(chan bool),
+		maxInProgress: initialMaxInProgress,
 	}
 
 	// Start scheduler.
@@ -159,11 +174,11 @@ func (wbq *writebackQueue) scheduler() {
 			log.Debug.Printf("%s: received %s %s", op, r.Reference, r.Endpoint)
 			// Keep a map of requests so that we can handle flushes
 			// and avoid Duplicates.
-			if wbq.inFlight[r.Location] != nil {
+			if wbq.queued[r.Location] != nil {
 				// Already queued. Unusual but OK.
 				break
 			}
-			wbq.inFlight[r.Location] = r
+			wbq.queued[r.Location] = r
 
 			// A new request
 			epq := wbq.byEndpoint[r.Endpoint]
@@ -177,10 +192,25 @@ func (wbq *writebackQueue) scheduler() {
 			epq.queue = append(epq.queue, r)
 		case r := <-wbq.done:
 			// A request has been completed.
+			inProgress := wbq.inProgress
+			wbq.inProgress--
 			epq := wbq.byEndpoint[r.Endpoint]
 			if r.err != nil {
-				// Mark endpoint dead and retry some time later.
+				// Put request back on the queue.
 				epq.queue = append(epq.queue, r)
+
+				// If the request has timed out, it may have been because we are trying
+				// too many at once. Back off if we are at or below maxInProgress. If not,
+				// we are just draining after the last back off.
+				if strings.Contains(r.err.Error(), "i/o timeout") {
+					wbq.successful = 0
+					if inProgress <= wbq.maxInProgress {
+						wbq.maxInProgress = (wbq.maxInProgress + 1) / 2
+					}
+					break
+				}
+
+				// Mark endpoint dead and retry some time later.
 				epq.live = false
 				time.AfterFunc(retryInterval, func() { wbq.retry <- epq })
 				break
@@ -189,12 +219,22 @@ func (wbq *writebackQueue) scheduler() {
 			// Remember that endpoint is live so we can queue more requests for it.
 			epq.live = true
 
+			// If we are at maxInProgress and succeed, remember that. After that happens
+			// maxInProgress times, we increment maxInProgress.
+			if inProgress == wbq.maxInProgress {
+				wbq.successful++
+			}
+			if wbq.successful >= wbq.maxInProgress && wbq.maxInProgress < writers {
+				wbq.successful = 0
+				wbq.maxInProgress++
+			}
+
 			// Awaken everyone waiting for a flush.
 			for _, c := range r.flushChans {
 				log.Debug.Printf("flushing...")
 				close(c)
 			}
-			delete(wbq.inFlight, r.Location)
+			delete(wbq.queued, r.Location)
 			log.Debug.Printf("%s: %s %s done", op, r.Reference, r.Endpoint)
 		case epq := <-wbq.retry:
 			// Retry the first request for an endpoint.
@@ -210,7 +250,7 @@ func (wbq *writebackQueue) scheduler() {
 				}
 			}
 		case fr := <-wbq.flushRequest:
-			r := wbq.inFlight[fr.Location]
+			r := wbq.queued[fr.Location]
 			if r == nil {
 				// Not in flight
 				close(fr.flushed)
@@ -237,6 +277,9 @@ func (wbq *writebackQueue) scheduler() {
 // TODO(p): I may want to make this fairer, i.e., circular queue scan.
 func (wbq *writebackQueue) pickAndQueue() bool {
 	for _, q := range wbq.byEndpoint {
+		if wbq.inProgress >= wbq.maxInProgress {
+			return false
+		}
 		if !q.live {
 			continue
 		}
@@ -246,6 +289,7 @@ func (wbq *writebackQueue) pickAndQueue() bool {
 		r := q.queue[0]
 		select {
 		case wbq.ready <- r:
+			wbq.inProgress++
 			q.queue = q.queue[1:]
 			return true
 		default:
