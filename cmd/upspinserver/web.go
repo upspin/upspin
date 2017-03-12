@@ -18,15 +18,17 @@ import (
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/path"
+	"upspin.io/serverutil/perm"
 	"upspin.io/upspin"
 )
 
 type web struct {
 	cfg upspin.Config
 	cli upspin.Client
+	store *perm.Store
 }
 
-func newWeb(cfg upspin.Config) http.Handler {
+func newWeb(cfg upspin.Config, store *perm.Store) http.Handler {
 	if !*enableWeb {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			http.NotFound(w, r)
@@ -35,6 +37,7 @@ func newWeb(cfg upspin.Config) http.Handler {
 	return &web{
 		cfg: cfg,
 		cli: client.New(cfg),
+		store: store,
 	}
 }
 
@@ -55,6 +58,13 @@ func (s *web) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	name := p.Path()
 	if name != urlName {
 		http.Redirect(w, r, "/"+string(name), http.StatusFound)
+		return
+	}
+
+	// Check if this user for the path is a Writer for the store.
+	if !s.store.IsWriter(p.User()) {
+		code := http.StatusForbidden
+		http.Error(w, http.StatusText(code), code)
 		return
 	}
 

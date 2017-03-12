@@ -50,6 +50,10 @@ func WrapStore(cfg upspin.Config, ready <-chan struct{}, store upspin.StoreServe
 	return s, nil
 }
 
+func (s *Store) IsWriter(user upspin.UserName) (bool) {
+	return s.perm.IsWriter(user)
+}
+
 // Put implements upspin.StoreServer.
 func (s *Store) Put(data []byte) (*upspin.Refdata, error) {
 	const op = "store/perm.Put"

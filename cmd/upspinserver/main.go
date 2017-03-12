@@ -55,14 +55,14 @@ var (
 func main() {
 	flags.Parse("https", "tls", "log")
 
-	server, cfg, err := initServer(startup)
+	server, cfg, store, err := initServer(startup)
 	if err == noConfig {
 		log.Print("Configuration file not found. Running in setup mode.")
 		http.Handle("/", &setupHandler{})
 	} else if err != nil {
 		log.Fatal(err)
 	} else {
-		http.Handle("/", newWeb(cfg))
+		http.Handle("/", newWeb(cfg, store))
 	}
 
 	// Set up HTTPS server.
@@ -94,12 +94,12 @@ const (
 	setupServer
 )
 
-func initServer(mode initMode) (*subcmd.ServerConfig, upspin.Config, error) {
+func initServer(mode initMode) (*subcmd.ServerConfig, upspin.Config, *perm.Store, error) {
 	serverConfig, err := readServerConfig()
 	if os.IsNotExist(err) {
-		return nil, nil, noConfig
+		return nil, nil, nil, noConfig
 	} else if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 
 	if serverConfig.Bucket != "" {
@@ -111,7 +111,7 @@ func initServer(mode initMode) (*subcmd.ServerConfig, upspin.Config, error) {
 
 	f, err := factotum.NewFromDir(*cfgPath)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	cfg = config.SetFactotum(cfg, f)
 
@@ -135,27 +135,27 @@ func initServer(mode initMode) (*subcmd.ServerConfig, upspin.Config, error) {
 		// No bucket configured, use simple on-disk store.
 		storeServerConfig = []string{"backend=Disk", "basePath=" + storagePath}
 	}
-	store, err := storeServer.New(storeServerConfig...)
+	storeServer, err := storeServer.New(storeServerConfig...)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
-	store, err = perm.WrapStore(storeCfg, ready, store)
+	store, err := perm.WrapStore(storeCfg, ready, storeServer)
 	if err != nil {
-		return nil, nil, fmt.Errorf("error wrapping store: %s", err)
+		return nil, nil, nil, fmt.Errorf("error wrapping store: %s", err)
 	}
 
 	// Set up DirServer.
 	logDir := filepath.Join(*cfgPath, "dirserver-logs")
 	if err := os.MkdirAll(logDir, 0700); err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	dir, err := dirServer.New(dirCfg, "userCacheSize=1000", "logDir="+logDir)
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	dir, err = perm.WrapDir(dirCfg, ready, serverConfig.User, dir)
 	if err != nil {
-		return nil, nil, fmt.Errorf("Can't wrap DirServer monitoring %s: %s", flags.StoreServerUser, err)
+		return nil, nil, nil, fmt.Errorf("Can't wrap DirServer monitoring %s: %s", flags.StoreServerUser, err)
 	}
 
 	// Set up RPC server.
@@ -180,7 +180,7 @@ func initServer(mode initMode) (*subcmd.ServerConfig, upspin.Config, error) {
 			}
 		}()
 	}
-	return serverConfig, cfg, nil
+	return serverConfig, cfg, store, nil
 }
 
 type setupHandler struct {
@@ -245,7 +245,7 @@ func (h *setupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	_, cfg, err := initServer(setupServer)
+	_, cfg, store, err := initServer(setupServer)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -253,7 +253,7 @@ func (h *setupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "OK")
 
 	h.done = true
-	h.web = newWeb(cfg)
+	h.web = newWeb(cfg, store)
 }
 
 func setupWriters(cfg upspin.Config) error {
