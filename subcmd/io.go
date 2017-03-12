@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"upspin.io/errors"
 	"upspin.io/path"
 	"upspin.io/upspin"
 )
@@ -174,15 +175,15 @@ func (s *State) GlobOneUpspinNoLinks(pattern string) upspin.PathName {
 	if err == upspin.ErrFollowLink {
 		s.Exitf("%s is a link", entries[0].Name)
 	}
+	if errors.Match(errors.E(errors.NotExist), err)  {
+		// No matches; file does not exist. That's OK.
+		return upspin.PathName(pattern)
+	}
 	if err != nil {
 		s.Exit(err)
 	}
 	if len(entries) > 1 {
 		s.Exitf("more than one file matches %s", pattern)
-	}
-	if len(entries) == 0 {
-		// No matches; file does not exist. That's OK.
-		return upspin.PathName(pattern)
 	}
 	return entries[0].Name
 }
