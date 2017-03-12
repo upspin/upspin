@@ -4,23 +4,36 @@
 
 package main
 
-import "flag"
+import (
+	"flag"
+
+	"upspin.io/upspin"
+)
 
 func (s *State) link(args ...string) {
 	const help = `
-Link creates an Upspin link. The link is created at the first path
-argument and points to the second path argument.
+Link creates an Upspin link. The link is created at the second path
+argument and points to the first path argument.
 `
+	var force bool
 	fs := flag.NewFlagSet("link", flag.ExitOnError)
+	fs.BoolVar(&force, "force", false, "force creation of link when original path doesn't exist")
 	// This is the same order as in the Unix ln command. It sorta feels
 	// backwards, but it's also the same as in cp, with the new name second.
-	s.ParseFlags(fs, args, help, "link original_path link_path")
+	s.ParseFlags(fs, args, help, "link [-force] original_path link_path")
 	if fs.NArg() != 2 {
 		fs.Usage()
 	}
 
-	originalPath := s.GlobOneUpspinNoLinks(fs.Arg(0))
-	linkPath := s.GlobOneUpspinNoLinks(fs.Arg(1))
+	originalPath := upspin.PathName(fs.Arg(0))
+	linkPath := upspin.PathName(fs.Arg(1))
+
+	if !force {
+		_, err := s.Client.Lookup(originalPath, false)
+		if err != nil {
+			s.Exit(err)
+		}
+	}
 
 	_, err := s.Client.PutLink(originalPath, linkPath)
 	if err != nil {
