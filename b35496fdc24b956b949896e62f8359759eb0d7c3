@@ -51,6 +51,24 @@
       "revId": "b35496fdc24b956b949896e62f8359759eb0d7c3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "87d3889e_bf173e8d",
+        "filename": "subcmd/io.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 5605
+      },
+      "writtenOn": "2017-03-12T21:38:05Z",
+      "side": 1,
+      "message": "I guess just passing the args directly to PutLink makes sense, as do we even need to check the destination exists?",
+      "parentUuid": "57d44549_09a3c851",
+      "revId": "b35496fdc24b956b949896e62f8359759eb0d7c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
