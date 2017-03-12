@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "98384401_001af6dd",
+        "filename": "dir/server/bench_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-12T20:54:14Z",
+      "side": 1,
+      "message": "You can write a single\n\nfunc BenchamarkWhichAccess\n\nand then use b.Run() to run sub-benchmarks. It might make it easier to name and lay out the permutations here.",
+      "revId": "0a1a3c6d7a8faee2033753e970f7df47f98481d2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7a11f031_979104db",
+        "filename": "dir/server/bench_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-12T20:54:14Z",
+      "side": 1,
+      "message": "put the function calls on the next line so they line up with the others, easier to see the difference between the cases that way",
+      "revId": "0a1a3c6d7a8faee2033753e970f7df47f98481d2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8773cf42_37c61d44",
+        "filename": "dir/server/bench_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-12T20:54:14Z",
+      "side": 1,
+      "message": "stoptimer here too?",
+      "revId": "0a1a3c6d7a8faee2033753e970f7df47f98481d2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
