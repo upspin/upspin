@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ca698cfe_2d73b2af",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 329,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-12T21:20:05Z",
+      "side": 1,
+      "message": "Really there\u0027s just an additional step if you\u0027re using GCS. The instructions otherwise work fine (the store data is in upspin/server/storage)",
+      "revId": "3d71b44862564bd600e2e1580811f53994ef32e6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
