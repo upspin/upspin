@@ -16,9 +16,11 @@ import (
 )
 
 const (
-	// Number of simultaneous writers.
-	// TODO: This should be configurable.
-	writers = 4
+	// Maximum number of simultaneous writers.
+	writers = 20
+
+	// Initial number of simultaneous requests.
+	initialMaxInProgress = 8
 
 	// Terminating characters for writeback link names.
 	writebackSuffix = "_wbf"
@@ -58,7 +60,7 @@ type writebackQueue struct {
 
 	// All queued writeback requests. Also used/modified
 	// exclusively by the scheduler goroutine.
-	inFlight map[upspin.Location]*request
+	queued map[upspin.Location]*request
 
 	// request carries writeback requests to the scheduler.
 	request chan *request
@@ -88,7 +90,7 @@ func newWritebackQueue(sc *storeCache) *writebackQueue {
 	wbq := &writebackQueue{
 		sc:           sc,
 		byEndpoint:   make(map[upspin.Endpoint]*endpointQueue),
-		inFlight:     make(map[upspin.Location]*request),
+		queued:       make(map[upspin.Location]*request),
 		request:      make(chan *request, writers),
 		flushRequest: make(chan *flushRequest, writers),
 		ready:        make(chan *request, writers),
@@ -153,17 +155,30 @@ func (wbq *writebackQueue) close() {
 // scheduler puts requests into the ready queue for the writers to work on.
 func (wbq *writebackQueue) scheduler() {
 	const op = "store/storecache.scheduler"
+
+	// maxInProgress is a highwater mark for in progress requests.
+	// Whenever a timeout occurs and we have not more than maxInProgress
+	// simultaneous requests, we halve maxInProgress. Whenever maxInProgress
+	// requests complete while we have maxInProgress simultaneous requests
+	// occuring, we increment maxInProgress. Thus we have a slowly increasing
+	// but quickly decreasing limit resulting in a sawtooth that will feel
+	// out how much concurrency we can use without causing the server to
+	// timeout the requests.
+	maxInProgress := initialMaxInProgress
+	inProgress := 0
+	successful := 0
+
 	for {
 		select {
 		case r := <-wbq.request:
 			log.Debug.Printf("%s: received %s %s", op, r.Reference, r.Endpoint)
 			// Keep a map of requests so that we can handle flushes
 			// and avoid Duplicates.
-			if wbq.inFlight[r.Location] != nil {
+			if wbq.queued[r.Location] != nil {
 				// Already queued. Unusual but OK.
 				break
 			}
-			wbq.inFlight[r.Location] = r
+			wbq.queued[r.Location] = r
 
 			// A new request
 			epq := wbq.byEndpoint[r.Endpoint]
@@ -177,10 +192,25 @@ func (wbq *writebackQueue) scheduler() {
 			epq.queue = append(epq.queue, r)
 		case r := <-wbq.done:
 			// A request has been completed.
+			inp := inProgress
+			inProgress--
 			epq := wbq.byEndpoint[r.Endpoint]
 			if r.err != nil {
-				// Mark endpoint dead and retry some time later.
+				// Put request back on the queue.
 				epq.queue = append(epq.queue, r)
+
+				// If the request has timed out, it may have been because we are trying
+				// too many at once. Back off if we are at or below maxInProgress. If not,
+				// we are just draining after the last back off.
+				if strings.Contains(r.err.Error(), "i/o timeout") {
+					successful = 0
+					if inp <= maxInProgress {
+						maxInProgress = (maxInProgress + 1) / 2
+					}
+					break
+				}
+
+				// Mark endpoint dead and retry some time later.
 				epq.live = false
 				time.AfterFunc(retryInterval, func() { wbq.retry <- epq })
 				break
@@ -189,12 +219,22 @@ func (wbq *writebackQueue) scheduler() {
 			// Remember that endpoint is live so we can queue more requests for it.
 			epq.live = true
 
+			// If we are at maxInProgress and succeed, remember that. After that happens
+			// maxInProgress times, we increment maxInProgress.
+			if inp == maxInProgress {
+				successful++
+			}
+			if successful >= maxInProgress && maxInProgress < writers {
+				successful = 0
+				maxInProgress++
+			}
+
 			// Awaken everyone waiting for a flush.
 			for _, c := range r.flushChans {
 				log.Debug.Printf("flushing...")
 				close(c)
 			}
-			delete(wbq.inFlight, r.Location)
+			delete(wbq.queued, r.Location)
 			log.Debug.Printf("%s: %s %s done", op, r.Reference, r.Endpoint)
 		case epq := <-wbq.retry:
 			// Retry the first request for an endpoint.
@@ -202,6 +242,7 @@ func (wbq *writebackQueue) scheduler() {
 				r := epq.queue[0]
 				select {
 				case wbq.ready <- r:
+					inProgress++
 					epq.queue = epq.queue[1:]
 				default:
 					// Queue full.
@@ -210,7 +251,7 @@ func (wbq *writebackQueue) scheduler() {
 				}
 			}
 		case fr := <-wbq.flushRequest:
-			r := wbq.inFlight[fr.Location]
+			r := wbq.queued[fr.Location]
 			if r == nil {
 				// Not in flight
 				close(fr.flushed)
@@ -224,36 +265,33 @@ func (wbq *writebackQueue) scheduler() {
 		}
 
 		// Fill the ready queue.
+	outer:
 		for {
-			if !wbq.pickAndQueue() {
-				break
+			// Round robin across the endpoints.
+			for _, q := range wbq.byEndpoint {
+				if inProgress >= maxInProgress {
+					// Avoid timeouts.
+					break outer
+				}
+				if !q.live {
+					continue
+				}
+				if len(q.queue) == 0 {
+					continue
+				}
+				r := q.queue[0]
+				select {
+				case wbq.ready <- r:
+					inProgress++
+					q.queue = q.queue[1:]
+					break
+				default:
+					// Queue is full.
+					break outer
+				}
 			}
 		}
 	}
-}
-
-// pickAndQueue finds a request to schedule and puts it into the ready queue.
-// It returns false if none found or the queue is full.
-// TODO(p): I may want to make this fairer, i.e., circular queue scan.
-func (wbq *writebackQueue) pickAndQueue() bool {
-	for _, q := range wbq.byEndpoint {
-		if !q.live {
-			continue
-		}
-		if len(q.queue) == 0 {
-			continue
-		}
-		r := q.queue[0]
-		select {
-		case wbq.ready <- r:
-			q.queue = q.queue[1:]
-			return true
-		default:
-			// Queue full.
-			return false
-		}
-	}
-	return false
 }
 
 func (wbq *writebackQueue) writer(me int) {
