@@ -87,6 +87,24 @@
       "revId": "b35496fdc24b956b949896e62f8359759eb0d7c3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c57ec5f6_9b8edeb2",
+        "filename": "subcmd/io.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 5605
+      },
+      "writtenOn": "2017-03-12T22:02:13Z",
+      "side": 1,
+      "message": "Or maybe print a warning to standard error? And a non-zero exit code?",
+      "parentUuid": "bd583756_7598ebf2",
+      "revId": "b35496fdc24b956b949896e62f8359759eb0d7c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
