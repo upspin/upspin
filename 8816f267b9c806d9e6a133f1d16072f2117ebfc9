@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ab0480de_e2295d6e",
+        "filename": "cmd/upspin/link.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-12T22:43:30Z",
+      "side": 1,
+      "message": "is inaccessible",
+      "range": {
+        "startLine": 20,
+        "startChar": 79,
+        "endLine": 20,
+        "endChar": 92
+      },
+      "revId": "8816f267b9c806d9e6a133f1d16072f2117ebfc9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "15a34a1f_d1f23273",
+        "filename": "cmd/upspin/link.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-12T22:43:30Z",
+      "side": 1,
+      "message": "let\u0027s go with -f instead of -force",
+      "revId": "8816f267b9c806d9e6a133f1d16072f2117ebfc9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
