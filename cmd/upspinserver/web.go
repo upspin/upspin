@@ -12,7 +12,9 @@ import (
 	"net/http"
 	"strings"
 
+	"upspin.io/access"
 	"upspin.io/client"
+	"upspin.io/client/clientutil"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/path"
@@ -49,14 +51,6 @@ func (s *web) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// The server user can always see its own tree,
-	// so prevent access entirely from the web interface.
-	if p.User() == s.cfg.UserName() {
-		code := http.StatusForbidden
-		http.Error(w, http.StatusText(code), code)
-		return
-	}
-
 	// If the parsed path differs from the requested path, redirect.
 	name := p.Path()
 	if name != urlName {
@@ -64,63 +58,109 @@ func (s *web) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	des, err := s.cli.Glob(string(name))
+	// Lookup name, but handle NotExist later, as response depends on
+	// whether 'All' has 'list' right.
+	entry, err := s.cli.Lookup(name, true)
+	if err != nil && !errors.Match(errors.E(errors.NotExist), err) {
+		httpError(w, err)
+		return
+	}
+	if entry != nil {
+		// Update name as we may have followed a link.
+		name = entry.Name
+	}
+
+	// Get the Access file for the path.
+	dir, err := s.cli.DirServer(name)
 	if err != nil {
 		httpError(w, err)
 		return
 	}
-	if len(des) == 0 {
-		http.Error(w, "Not found", http.StatusNotFound)
+	whichAccess, err := dir.WhichAccess(name)
+	if err != nil {
+		httpError(w, err)
+		return
+	}
+	// No Access file, default permission denied.
+	if whichAccess == nil {
+		code := http.StatusForbidden
+		http.Error(w, http.StatusText(code), code)
+		return
+	}
+	accessData, err := clientutil.ReadAll(s.cfg, whichAccess)
+	if err != nil {
+		httpError(w, err)
+		return
+	}
+	acc, err := access.Parse(whichAccess.Name, accessData)
+	if err != nil {
+		httpError(w, err)
+		return
+	}
+	// Check read and list rights for AllUsers.
+	readable, err := acc.Can(access.AllUsers, access.Read, name, s.cli.Get)
+	if err != nil {
+		httpError(w, err)
+		return
+	}
+	listable, err := acc.Can(access.AllUsers, access.List, name, s.cli.Get)
+	if err != nil {
+		httpError(w, err)
 		return
 	}
 
-	if len(des) > 1 || des[0].IsDir() {
-		// Display glob listing or directory contents.
+	switch {
+	case entry == nil && listable:
+		code := http.StatusNotFound
+		http.Error(w, http.StatusText(code), code)
+	case entry == nil:
+		code := http.StatusForbidden
+		http.Error(w, http.StatusText(code), code)
+	case entry.IsDir() && listable:
 		var d dirTemplateData
-		if len(des) > 1 {
-			d.Glob = name
-			d.Content = des
-		} else {
-			d.Dir = des[0]
-			d.Content, err = s.cli.Glob(string(name) + "/*")
-			if err != nil {
-				httpError(w, err)
-				return
-			}
-			if p.NElem() > 0 {
-				d.Parent = p.Drop(1).Path()
-			}
+		d.Dir = p.Path()
+		d.Content, err = s.cli.Glob(upspin.AllFilesGlob(name))
+		if err != nil {
+			httpError(w, err)
+			return
+		}
+		if p.NElem() > 0 {
+			d.Parent = p.Drop(1).Path()
 		}
 		if err := dirTemplate.Execute(w, d); err != nil {
 			log.Error.Printf("rendering directory template: %v", err)
+			httpError(w, err)
+			return
 		}
-		return
+	case !entry.IsDir() && readable:
+		data, err := s.cli.Get(name)
+		if err != nil {
+			httpError(w, err)
+			return
+		}
+		w.Write(data)
+	default:
+		code := http.StatusForbidden
+		http.Error(w, http.StatusText(code), code)
 	}
-
-	// Serve the file.
-	data, err := s.cli.Get(name)
-	if err != nil {
-		httpError(w, err)
-		return
-	}
-	w.Write(data)
 }
 
 func httpError(w http.ResponseWriter, err error) {
 	switch {
 	case errors.Match(errors.E(errors.Private), err),
 		errors.Match(errors.E(errors.Permission), err):
-		http.Error(w, "Forbidden", http.StatusForbidden)
+		code := http.StatusForbidden
+		http.Error(w, http.StatusText(code), code)
+	case errors.Match(errors.E(errors.NotExist), err):
+		code := http.StatusNotFound
+		http.Error(w, http.StatusText(code), code)
 	default:
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
 type dirTemplateData struct {
-	// One and only one of these must be set.
-	Dir  *upspin.DirEntry
-	Glob upspin.PathName
-
+	Dir  upspin.PathName
 	Parent  upspin.PathName
 	Content []*upspin.DirEntry
 }
@@ -139,18 +179,13 @@ var templateFuncs = template.FuncMap{
 }
 
 var dirTemplate = template.Must(template.New("dir").Funcs(templateFuncs).Parse(`
-{{with .Dir}}
-<h1>Index of {{.Name}}</h1>
-{{end}}
-{{with .Glob}}
-<h1>Matches for {{.}}</h1>
-{{end}}
+<h1>Index of {{.Dir}}</h1>
 <ul>
 {{with .Parent}}
 	<li><a href="/{{.}}">../</a></li>
 {{end}}
 {{range .Content}}
-	<li><a href="/{{.Name}}">{{shortname .Name}}{{if .IsDir}}/{{end}}</a></li>
+	<li><a href="/{{$.Dir}}/{{shortname .Name}}">{{shortname .Name}}{{if .IsDir}}/{{end}}</a></li>
 {{end}}
 </ul>
 `))
