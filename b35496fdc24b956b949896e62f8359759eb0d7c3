@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "416e0961_c8fd0b8a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-12T20:39:31Z",
+      "side": 1,
+      "message": "Can you please expand a little more in this commit message?",
+      "revId": "b35496fdc24b956b949896e62f8359759eb0d7c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "57d44549_09a3c851",
+        "filename": "subcmd/io.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-12T20:39:31Z",
+      "side": 1,
+      "message": "Since this is only used by the link subcommand, I\u0027d be inclined to remove it from this package and put it into cmd/upspin/link.go.\n\nBut this is an odd way of going about doing what we want to do; really we just want to do a single Lookup of the destination to make sure it exists. I\u0027m not sure we need do anything beyond that. So maybe a helper function doesn\u0027t really buy us anything.\n\nWant to try that?",
+      "revId": "b35496fdc24b956b949896e62f8359759eb0d7c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
