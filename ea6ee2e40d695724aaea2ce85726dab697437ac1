@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "47aeacea_ed3d8f36",
+        "filename": "cmd/upspinserver/web.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-12T20:45:46Z",
+      "side": 1,
+      "message": "// Check read and list rights for AllUsers.",
+      "revId": "ea6ee2e40d695724aaea2ce85726dab697437ac1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}

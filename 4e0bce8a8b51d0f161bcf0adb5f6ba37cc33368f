@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8fe3e334_7621cc8e",
+        "filename": "cmd/upspinserver/web.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-12T20:45:46Z",
+      "side": 0,
+      "message": "Jeez I had totally forgotten I\u0027d implemented this. I\u0027m glad it\u0027s gone now though.",
+      "revId": "4e0bce8a8b51d0f161bcf0adb5f6ba37cc33368f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
