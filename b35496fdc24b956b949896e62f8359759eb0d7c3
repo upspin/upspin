@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "f41f8abd_ba099783",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-12T20:40:01Z",
+      "side": 1,
+      "message": "Also commit the \"Fix\" should be \"fix\"; our style isn\u0027t to begin with a capital after the colon.",
+      "parentUuid": "416e0961_c8fd0b8a",
+      "revId": "b35496fdc24b956b949896e62f8359759eb0d7c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "57d44549_09a3c851",
         "filename": "subcmd/io.go",
         "patchSetId": 1
