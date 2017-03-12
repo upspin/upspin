@@ -165,28 +165,6 @@ func (s *State) GlobOneUpspinPath(pattern string) upspin.PathName {
 	return entries[0].Name
 }
 
-// GlobOneUpspinNoLinks glob-expands the argument, which must result in a
-// single Upspin path. The result must not be a link, but it's OK if it does not
-// exist at all.
-func (s *State) GlobOneUpspinNoLinks(pattern string) upspin.PathName {
-	// Use Dir not Client to catch links.
-	entries, err := s.DirServer(upspin.PathName(pattern)).Glob(pattern)
-	if err == upspin.ErrFollowLink {
-		s.Exitf("%s is a link", entries[0].Name)
-	}
-	if err != nil {
-		s.Exit(err)
-	}
-	if len(entries) > 1 {
-		s.Exitf("more than one file matches %s", pattern)
-	}
-	if len(entries) == 0 {
-		// No matches; file does not exist. That's OK.
-		return upspin.PathName(pattern)
-	}
-	return entries[0].Name
-}
-
 // GlobLocal glob-expands the argument, which should be a syntactically
 // valid Glob pattern (including a plain file name).
 func (s *State) GlobLocal(pattern string) []string {
