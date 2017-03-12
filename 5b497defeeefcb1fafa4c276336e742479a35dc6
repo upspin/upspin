@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ba53cdeb_39745825",
+        "filename": "cmd/keyserver/signup.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-12T22:24:17Z",
+      "side": 1,
+      "message": "on?",
+      "range": {
+        "startLine": 156,
+        "startChar": 36,
+        "endLine": 156,
+        "endChar": 47
+      },
+      "revId": "5b497defeeefcb1fafa4c276336e742479a35dc6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
