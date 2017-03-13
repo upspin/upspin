@@ -139,10 +139,6 @@ func initServer(mode initMode) (*subcmd.ServerConfig, upspin.Config, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	store, err = perm.WrapStore(storeCfg, ready, store)
-	if err != nil {
-		return nil, nil, fmt.Errorf("error wrapping store: %s", err)
-	}
 
 	// Set up DirServer.
 	logDir := filepath.Join(*cfgPath, "dirserver-logs")
@@ -153,10 +149,11 @@ func initServer(mode initMode) (*subcmd.ServerConfig, upspin.Config, error) {
 	if err != nil {
 		return nil, nil, err
 	}
-	dir, err = perm.WrapDir(dirCfg, ready, serverConfig.User, dir)
-	if err != nil {
-		return nil, nil, fmt.Errorf("Can't wrap DirServer monitoring %s: %s", flags.StoreServerUser, err)
-	}
+
+	// Wrap store and dir with permission checking.
+	perm := perm.NewFromDir(dirCfg, ready, serverConfig.User, dir)
+	store = perm.WrapStore(store)
+	dir = perm.WrapDir(dir)
 
 	// Set up RPC server.
 	httpStore := storeserver.New(storeCfg, store, serverConfig.Addr)

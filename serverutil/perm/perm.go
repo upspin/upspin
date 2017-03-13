@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"upspin.io/access"
+	"upspin.io/bind"
 	"upspin.io/client/clientutil"
 	"upspin.io/errors"
 	"upspin.io/log"
@@ -41,8 +42,8 @@ type Perm struct {
 	targetUser upspin.UserName
 	targetFile upspin.PathName
 
-	lookup LookupFunc
-	watch  WatchFunc
+	lookupFunc lookupFunc
+	watchFunc  watchFunc
 
 	// writers is the set of users allowed to write. If it's nil, all users
 	// are allowed. An empty map means no one is allowed.
@@ -50,24 +51,40 @@ type Perm struct {
 	mu      sync.RWMutex // guards writers
 }
 
-// LookupFunc looks up name, as defined by upspin.DirServer.
-type LookupFunc func(upspin.PathName) (*upspin.DirEntry, error)
+// lookupFunc looks up name, as defined by upspin.DirServer.
+type lookupFunc func(upspin.PathName) (*upspin.DirEntry, error)
 
-// WatchFunc watches name, as defined by upspin.DirServer.
-type WatchFunc func(upspin.PathName, int64, <-chan struct{}) (<-chan upspin.Event, error)
+// watchFunc watches name, as defined by upspin.DirServer.
+type watchFunc func(upspin.PathName, int64, <-chan struct{}) (<-chan upspin.Event, error)
 
-// New creates a new Perm monitoring the target user's Writers Group file, using
-// the provided Lookup function for lookups and the Watch function to watch
-// changes on the writers file. The target user is typically the user name of a
-// server, such as a StoreServer or a DirServer.
-func New(cfg upspin.Config, ready <-chan struct{}, target upspin.UserName, lookup LookupFunc, watch WatchFunc) (*Perm, error) {
+// New creates a new Perm monitoring the target user's Writers Group file,
+// resolving the DirServer using the given config. The target user is
+// typically the user name of a server, such as a StoreServer or a DirServer.
+func New(cfg upspin.Config, ready <-chan struct{}, target upspin.UserName) *Perm {
 	const op = "serverutil/perm.New"
+	return newPerm(op, cfg, ready, target, nil, nil)
+}
+
+// NewFromDir creates a new Perm monitoring the target user's Writers Group
+// file which must reside on the given DirServer. The target user is typically
+// the user name of a server, such as a StoreServer or a DirServer.
+func NewFromDir(cfg upspin.Config, ready <-chan struct{}, target upspin.UserName, dir upspin.DirServer) *Perm {
+	const op = "serverutil/perm.NewFromDir"
+	return newPerm(op, cfg, ready, target, dir.Lookup, dir.Watch)
+}
+
+// newPerm creates a new Perm monitoring the target user's Writers Group file,
+// using the provided LookupFunc for lookups and the WatchFunc function to
+// watch changes on the writers file. If lookup or watch are nil the DirServer
+// is resolved using bind and the given config. The target user is typically
+// the user name of a server, such as a StoreServer or a DirServer.
+func newPerm(op string, cfg upspin.Config, ready <-chan struct{}, target upspin.UserName, lookup lookupFunc, watch watchFunc) *Perm {
 	p := &Perm{
 		cfg:        cfg,
 		targetUser: target,
 		targetFile: upspin.PathName(target) + "/Group/" + WritersGroupFile,
-		lookup:     lookup,
-		watch:      watch,
+		lookupFunc: lookup,
+		watchFunc:  watch,
 		writers:    nil, // Start open.
 	}
 
@@ -80,7 +97,8 @@ func New(cfg upspin.Config, ready <-chan struct{}, target upspin.UserName, looku
 		}
 		go p.updateLoop()
 	}()
-	return p, nil
+
+	return p
 }
 
 // updateLoop continuously watches for updates on WritersGroupFile.
@@ -246,4 +264,34 @@ func (p *Perm) deleteUsers() {
 	p.writers = nil
 	p.mu.Unlock()
 	onUpdate()
+}
+
+func (p *Perm) lookup(name upspin.PathName) (*upspin.DirEntry, error) {
+	if f := p.lookupFunc; f != nil {
+		return f(name)
+	}
+	parsed, err := path.Parse(name)
+	if err != nil {
+		return nil, err
+	}
+	dir, err := bind.DirServerFor(p.cfg, parsed.User())
+	if err != nil {
+		return nil, err
+	}
+	return dir.Lookup(name)
+}
+
+func (p *Perm) watch(name upspin.PathName, order int64, done <-chan struct{}) (<-chan upspin.Event, error) {
+	if f := p.watchFunc; f != nil {
+		return f(name, order, done)
+	}
+	parsed, err := path.Parse(name)
+	if err != nil {
+		return nil, err
+	}
+	dir, err := bind.DirServerFor(p.cfg, parsed.User())
+	if err != nil {
+		return nil, err
+	}
+	return dir.Watch(name, order, done)
 }
