@@ -76,10 +76,7 @@ func main() {
 
 	// Wrap with permission checks.
 	ready := make(chan struct{})
-	store, err = perm.WrapStore(cfg, ready, store)
-	if err != nil {
-		log.Fatalf("Error wrapping store: %s", err)
-	}
+	store = perm.WrapStore(cfg, ready, store)
 
 	httpStore := storeserver.New(cfg, store, upspin.NetAddr(flags.NetAddr))
 	http.Handle("/api/Store/", httpStore)
