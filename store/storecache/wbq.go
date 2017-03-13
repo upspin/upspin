@@ -16,9 +16,11 @@ import (
 )
 
 const (
-	// Number of simultaneous writers.
-	// TODO: This should be configurable.
-	writers = 4
+	// Number of writer goroutines to start.
+	writers = 20
+
+	// Initial maximum number of parallel writebacks.
+	initialMaxParallel = 6
 
 	// Terminating characters for writeback link names.
 	writebackSuffix = "_wbf"
@@ -42,11 +44,18 @@ type flushRequest struct {
 	flushed chan bool
 }
 
+// the values for endpointQueue.state
+const (
+	unknown = iota // We don't know the state.
+	live           // The endpoint is alive and responding to requests.
+	dead           // The endpoint is not responding or responding with errors.
+)
+
 // endpointQueue represents a queue of pending requests destined
 // for an endpoint.
 type endpointQueue struct {
 	queue []*request // references waiting for writeback.
-	live  bool
+	state int
 }
 
 type writebackQueue struct {
@@ -58,7 +67,7 @@ type writebackQueue struct {
 
 	// All queued writeback requests. Also used/modified
 	// exclusively by the scheduler goroutine.
-	inFlight map[upspin.Location]*request
+	queued map[upspin.Location]*request
 
 	// request carries writeback requests to the scheduler.
 	request chan *request
@@ -88,7 +97,7 @@ func newWritebackQueue(sc *storeCache) *writebackQueue {
 	wbq := &writebackQueue{
 		sc:           sc,
 		byEndpoint:   make(map[upspin.Endpoint]*endpointQueue),
-		inFlight:     make(map[upspin.Location]*request),
+		queued:       make(map[upspin.Location]*request),
 		request:      make(chan *request, writers),
 		flushRequest: make(chan *flushRequest, writers),
 		ready:        make(chan *request, writers),
@@ -153,64 +162,63 @@ func (wbq *writebackQueue) close() {
 // scheduler puts requests into the ready queue for the writers to work on.
 func (wbq *writebackQueue) scheduler() {
 	const op = "store/storecache.scheduler"
+	p := newParallelism(initialMaxParallel)
 	for {
 		select {
 		case r := <-wbq.request:
 			log.Debug.Printf("%s: received %s %s", op, r.Reference, r.Endpoint)
 			// Keep a map of requests so that we can handle flushes
 			// and avoid Duplicates.
-			if wbq.inFlight[r.Location] != nil {
+			if wbq.queued[r.Location] != nil {
 				// Already queued. Unusual but OK.
 				break
 			}
-			wbq.inFlight[r.Location] = r
+			wbq.queued[r.Location] = r
 
 			// A new request
 			epq := wbq.byEndpoint[r.Endpoint]
 			if epq == nil {
-				// First time you see an endpoint, assume it isn't
-				// available but queue a retry to feel it out.
-				epq = &endpointQueue{live: false}
+				// New endpoints start in unknown state.
+				epq = &endpointQueue{state: unknown}
 				wbq.byEndpoint[r.Endpoint] = epq
-				go func() { wbq.retry <- epq }()
 			}
 			epq.queue = append(epq.queue, r)
 		case r := <-wbq.done:
 			// A request has been completed.
 			epq := wbq.byEndpoint[r.Endpoint]
 			if r.err != nil {
-				// Mark endpoint dead and retry some time later.
 				epq.queue = append(epq.queue, r)
-				epq.live = false
-				time.AfterFunc(retryInterval, func() { wbq.retry <- epq })
+				if p.failure(r.err) {
+					// The error has been dealt with
+					break
+				}
+
+				// Wait until the next attempt to this endpoint.
+				if epq.state != dead {
+					epq.state = dead
+					time.AfterFunc(retryInterval, func() { wbq.retry <- epq })
+				}
 				break
 			}
 
 			// Remember that endpoint is live so we can queue more requests for it.
-			epq.live = true
+			epq.state = live
+			p.success()
 
 			// Awaken everyone waiting for a flush.
 			for _, c := range r.flushChans {
 				log.Debug.Printf("flushing...")
 				close(c)
 			}
-			delete(wbq.inFlight, r.Location)
+			delete(wbq.queued, r.Location)
 			log.Debug.Printf("%s: %s %s done", op, r.Reference, r.Endpoint)
 		case epq := <-wbq.retry:
-			// Retry the first request for an endpoint.
-			if len(epq.queue) > 0 {
-				r := epq.queue[0]
-				select {
-				case wbq.ready <- r:
-					epq.queue = epq.queue[1:]
-				default:
-					// Queue full.
-					time.AfterFunc(retryInterval, func() { wbq.retry <- epq })
-					break
-				}
+			// Set its state to unknown so we'll try a single request to feel it out.
+			if epq.state == dead {
+				epq.state = unknown
 			}
 		case fr := <-wbq.flushRequest:
-			r := wbq.inFlight[fr.Location]
+			r := wbq.queued[fr.Location]
 			if r == nil {
 				// Not in flight
 				close(fr.flushed)
@@ -225,19 +233,25 @@ func (wbq *writebackQueue) scheduler() {
 
 		// Fill the ready queue.
 		for {
-			if !wbq.pickAndQueue() {
+			if !wbq.pickAndQueue(p) {
 				break
 			}
 		}
 	}
 }
 
-// pickAndQueue finds a request to schedule and puts it into the ready queue.
-// It returns false if none found or the queue is full.
-// TODO(p): I may want to make this fairer, i.e., circular queue scan.
-func (wbq *writebackQueue) pickAndQueue() bool {
+// pickAndQueue makes one round robin pass through the endpoint queues sending
+// the first request in each queue to the ready channel.
+//
+// It returns false if it found nothing to do.
+func (wbq *writebackQueue) pickAndQueue(p *parallelism) bool {
+	sent := false
 	for _, q := range wbq.byEndpoint {
-		if !q.live {
+		if !p.ok() {
+			// Already at the max parallel requests.
+			return false
+		}
+		if q.state == dead {
 			continue
 		}
 		if len(q.queue) == 0 {
@@ -247,13 +261,20 @@ func (wbq *writebackQueue) pickAndQueue() bool {
 		select {
 		case wbq.ready <- r:
 			q.queue = q.queue[1:]
-			return true
+			p.add()
+			if q.state == unknown {
+				// Once we send a request for an unknown endpoint
+				// assume it is dead until the request terminates
+				// and tells us otherwise.
+				q.state = dead
+			}
+			sent = true
 		default:
 			// Queue full.
 			return false
 		}
 	}
-	return false
+	return sent
 }
 
 func (wbq *writebackQueue) writer(me int) {
@@ -332,4 +353,106 @@ func (wbq *writebackQueue) flush(loc upspin.Location) {
 		flushed:  flushed,
 	}
 	<-flushed
+}
+
+// parallelism controls the number of parallel writebacks.
+// It implements a linear increase/multiplicative decrease
+// model that creates a sawtooth around the maximum usable
+// parallelism, that is, the max parallelism which doesn't cause
+// server timeouts.
+type parallelism struct {
+	// inFlight is the number of writebacks being performed in parallel.
+	inFlight int
+
+	// No new requests are started unless inFlight is less than max.
+	max int
+
+	// successes is the number of error free requests since
+	// the last timeout or change of max. When successes equals
+	// max, we increment max.
+	successes int
+}
+
+func newParallelism(max int) *parallelism {
+	if max < 1 {
+		max = 1
+	}
+	return &parallelism{max: max}
+}
+
+// failure is called when a writeback fails. It returns true if it
+// has dealt with the error.
+func (p *parallelism) failure(err error) bool {
+	const op = "store/storecache.failure"
+
+	p.inFlight--
+
+	// If we don't understand the error, let the caller handle it.
+	if !isTimeout(err) {
+		return false
+	}
+
+	// We have a timeout error. We assume that the error was caused by too much
+	// parallelism for the line slowing down each request to less than the servers
+	// can bear.
+
+	// The sequence of successes is broken, start again. We do this after the above
+	// check because failures not due to timeouts are not considered a problem in
+	// parallelism.
+	p.successes = 0
+
+	// If we are above max, we're responding to a previous error, don't reduce again.
+	if p.inFlight >= p.max {
+		return true
+	}
+
+	// Drop max by half. max will never go below 1 if it starts above 0.
+	p.max = (p.max + 1) / 2
+	log.Debug.Printf("%s: down %d", op, p.max)
+	return true
+}
+
+// success is called whenever a writeback succeeds.
+func (p *parallelism) success() {
+	const op = "store/storecache.success"
+
+	p.inFlight--
+
+	// Successes below max give us no information.
+	if p.inFlight+1 < p.max {
+		return
+	}
+
+	// Count the unbroken sequence of successes after a
+	// change in max.
+	p.successes++
+
+	// max can't go above the number of available writers.
+	if p.max == writers {
+		return
+	}
+
+	// If we have p.max sequential successful completions
+	// after the last p.max change, increase it by one. This is
+	// roughly equivalent to increasing p.max when p.max
+	// parallel writebacks complete together.
+	if p.successes >= p.max {
+		p.successes = 0
+		p.max++
+		log.Debug.Printf("%s: up %d", op, p.max)
+	}
+}
+
+func (p *parallelism) ok() bool {
+	return p.inFlight < p.max
+}
+
+func (p *parallelism) add() {
+	p.inFlight++
+}
+
+// isTimeout returns true if this was the result of a server timeout.
+func isTimeout(err error) bool {
+	estr := err.Error()
+	return strings.Contains(estr, "timeout") || strings.Contains(estr, "400")
 }
