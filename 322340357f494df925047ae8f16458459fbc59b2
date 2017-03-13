@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f85aa2c6_3764d194",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 355,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-13T21:17:27Z",
+      "side": 1,
+      "message": "the -m explanation was a request from rob.",
+      "range": {
+        "startLine": 355,
+        "startChar": 0,
+        "endLine": 355,
+        "endChar": 66
+      },
+      "revId": "322340357f494df925047ae8f16458459fbc59b2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "47515dd6_e6937a20",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 374,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-13T21:17:27Z",
+      "side": 1,
+      "message": "I would leave the snapshot reminder, even if you remove the command itself.  I know I forgot to do it after purging.",
+      "range": {
+        "startLine": 374,
+        "startChar": 0,
+        "endLine": 374,
+        "endChar": 48
+      },
+      "revId": "322340357f494df925047ae8f16458459fbc59b2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
