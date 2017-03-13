@@ -16,9 +16,11 @@ import (
 )
 
 const (
-	// Number of simultaneous writers.
-	// TODO: This should be configurable.
-	writers = 4
+	// Number of writer goroutines to start.
+	writers = 20
+
+	// Initial maximum number of parallel writebacks.
+	initialMaxParallel = 6
 
 	// Terminating characters for writeback link names.
 	writebackSuffix = "_wbf"
@@ -42,11 +44,17 @@ type flushRequest struct {
 	flushed chan bool
 }
 
+const (
+	unknown = iota
+	live
+	dead
+)
+
 // endpointQueue represents a queue of pending requests destined
 // for an endpoint.
 type endpointQueue struct {
 	queue []*request // references waiting for writeback.
-	live  bool
+	state int
 }
 
 type writebackQueue struct {
@@ -58,7 +66,7 @@ type writebackQueue struct {
 
 	// All queued writeback requests. Also used/modified
 	// exclusively by the scheduler goroutine.
-	inFlight map[upspin.Location]*request
+	queued map[upspin.Location]*request
 
 	// request carries writeback requests to the scheduler.
 	request chan *request
@@ -88,7 +96,7 @@ func newWritebackQueue(sc *storeCache) *writebackQueue {
 	wbq := &writebackQueue{
 		sc:           sc,
 		byEndpoint:   make(map[upspin.Endpoint]*endpointQueue),
-		inFlight:     make(map[upspin.Location]*request),
+		queued:       make(map[upspin.Location]*request),
 		request:      make(chan *request, writers),
 		flushRequest: make(chan *flushRequest, writers),
 		ready:        make(chan *request, writers),
@@ -153,24 +161,25 @@ func (wbq *writebackQueue) close() {
 // scheduler puts requests into the ready queue for the writers to work on.
 func (wbq *writebackQueue) scheduler() {
 	const op = "store/storecache.scheduler"
+	p := newParallelism(wbq, initialMaxParallel)
 	for {
 		select {
 		case r := <-wbq.request:
 			log.Debug.Printf("%s: received %s %s", op, r.Reference, r.Endpoint)
 			// Keep a map of requests so that we can handle flushes
 			// and avoid Duplicates.
-			if wbq.inFlight[r.Location] != nil {
+			if wbq.queued[r.Location] != nil {
 				// Already queued. Unusual but OK.
 				break
 			}
-			wbq.inFlight[r.Location] = r
+			wbq.queued[r.Location] = r
 
 			// A new request
 			epq := wbq.byEndpoint[r.Endpoint]
 			if epq == nil {
 				// First time you see an endpoint, assume it isn't
 				// available but queue a retry to feel it out.
-				epq = &endpointQueue{live: false}
+				epq = &endpointQueue{state: unknown}
 				wbq.byEndpoint[r.Endpoint] = epq
 				go func() { wbq.retry <- epq }()
 			}
@@ -179,38 +188,30 @@ func (wbq *writebackQueue) scheduler() {
 			// A request has been completed.
 			epq := wbq.byEndpoint[r.Endpoint]
 			if r.err != nil {
-				// Mark endpoint dead and retry some time later.
+				// Requeue and let parallelism decide exactly what to do.
 				epq.queue = append(epq.queue, r)
-				epq.live = false
-				time.AfterFunc(retryInterval, func() { wbq.retry <- epq })
+				p.failure(epq, r.err)
 				break
 			}
 
 			// Remember that endpoint is live so we can queue more requests for it.
-			epq.live = true
+			epq.state = live
+			p.success()
 
 			// Awaken everyone waiting for a flush.
 			for _, c := range r.flushChans {
 				log.Debug.Printf("flushing...")
 				close(c)
 			}
-			delete(wbq.inFlight, r.Location)
+			delete(wbq.queued, r.Location)
 			log.Debug.Printf("%s: %s %s done", op, r.Reference, r.Endpoint)
 		case epq := <-wbq.retry:
-			// Retry the first request for an endpoint.
-			if len(epq.queue) > 0 {
-				r := epq.queue[0]
-				select {
-				case wbq.ready <- r:
-					epq.queue = epq.queue[1:]
-				default:
-					// Queue full.
-					time.AfterFunc(retryInterval, func() { wbq.retry <- epq })
-					break
-				}
+			// Set its state to unknown so we'll try a single request to feel it out.
+			if epq.state == dead {
+				epq.state = unknown
 			}
 		case fr := <-wbq.flushRequest:
-			r := wbq.inFlight[fr.Location]
+			r := wbq.queued[fr.Location]
 			if r == nil {
 				// Not in flight
 				close(fr.flushed)
@@ -225,7 +226,7 @@ func (wbq *writebackQueue) scheduler() {
 
 		// Fill the ready queue.
 		for {
-			if !wbq.pickAndQueue() {
+			if !wbq.pickAndQueue(p) {
 				break
 			}
 		}
@@ -234,10 +235,13 @@ func (wbq *writebackQueue) scheduler() {
 
 // pickAndQueue finds a request to schedule and puts it into the ready queue.
 // It returns false if none found or the queue is full.
-// TODO(p): I may want to make this fairer, i.e., circular queue scan.
-func (wbq *writebackQueue) pickAndQueue() bool {
+// TODO(p): Consider making the selection fairer.
+func (wbq *writebackQueue) pickAndQueue(p *parallelism) bool {
 	for _, q := range wbq.byEndpoint {
-		if !q.live {
+		if !p.ok() {
+			return false
+		}
+		if q.state == dead {
 			continue
 		}
 		if len(q.queue) == 0 {
@@ -247,6 +251,13 @@ func (wbq *writebackQueue) pickAndQueue() bool {
 		select {
 		case wbq.ready <- r:
 			q.queue = q.queue[1:]
+			p.add()
+			if q.state == unknown {
+				// Once we send a request for an unknown endpoint
+				// assume it is dead until the request terminates
+				// and tells us otherwise.
+				q.state = dead
+			}
 			return true
 		default:
 			// Queue full.
@@ -332,4 +343,94 @@ func (wbq *writebackQueue) flush(loc upspin.Location) {
 		flushed:  flushed,
 	}
 	<-flushed
+}
+
+// parallelism controls the number of parallel writebacks.
+// It implements a liniear increase/multiplicative decrease
+// model that creates a sawtooth around the maximum usable
+// parallelism, i.e., the max parallelism which doesn't cause
+// server timeouts.
+type parallelism struct {
+	wbq *writebackQueue
+
+	// n is the number of writebacks being performed in parallel.
+	n int
+
+	// No new requests are started unless n is less than max.
+	max int
+
+	// successes is the number of error free requests since
+	// the last timeout or change of max. When successes equals
+	// max, we increment max.
+	successes int
+}
+
+func newParallelism(wbq *writebackQueue, max int) *parallelism {
+	if max < 1 {
+		max = 1
+	}
+	return &parallelism{wbq: wbq, max: max}
+}
+
+// failure is called when a writeback fails.
+func (p *parallelism) failure(epq *endpointQueue, err error) {
+	p.n--
+
+	// If we don't understand the error, mark the endpoint as dead and try again later later.
+	estr := err.Error()
+	if !strings.Contains(estr, "timeout") && !strings.Contains(estr, "400") {
+		epq.state = dead
+		time.AfterFunc(retryInterval, func() { p.wbq.retry <- epq })
+		return
+	}
+
+	// We have a timeout error. We assume that the error was caused by too much
+	// parallelism for the line, slowing down each request to less than the servers
+	// can bear.
+
+	// The sequence of successes is broken, start again. We do this after the above
+	// check because failures not due to timeouts are not considered a problem in
+	// parallelism.
+	p.successes = 0
+
+	// If we are above max, we're responding to a previous error, don't reduce again.
+	if p.n >= p.max {
+		return
+	}
+
+	// Drop max by half. max will never go below 1.
+	p.max = (p.max + 1) / 2
+}
+
+// success is called whenever a writeback succeeds.
+func (p *parallelism) success() {
+	p.n--
+
+	// Successes below max give us no information.
+	if p.n+1 < p.max {
+		return
+	}
+
+	// max can't go above the number of available writers.
+	if p.max == writers {
+		return
+	}
+
+	// If we have p.max sequential successful completions
+	// after changing p.max, increase it by one. This is
+	// roughly equivalent to increasing p.max when p.max
+	// parallel writebacks complete together.
+	p.successes++
+	if p.successes >= p.max {
+		p.successes = 0
+		p.max++
+	}
+}
+
+func (p *parallelism) ok() bool {
+	return p.n < p.max
+}
+
+func (p *parallelism) add() {
+	p.n++
 }
