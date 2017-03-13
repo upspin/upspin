@@ -412,7 +412,7 @@ func (l *clog) readLogFile(fn string) error {
 		}
 		switch e.request {
 		case versionReq:
-			log.Info.Printf("%s: verson other than first record", op)
+			log.Info.Printf("%s: version other than first record", op)
 			break
 		case globReq:
 			// Since we first log all the contents of a directory before the glob,
