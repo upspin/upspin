@@ -71,10 +71,7 @@ func TestCantFindFileAllowsAll(t *testing.T) {
 	ownerEnv, wait, cleanup := setupEnv(t)
 	defer cleanup()
 
-	perm, err := New(ownerEnv.Config, readyNow, owner, ownerEnv.DirServer.Lookup, ownerEnv.DirServer.Watch)
-	if err != nil {
-		t.Fatal(err)
-	}
+	perm := NewWithDir(ownerEnv.Config, readyNow, owner, ownerEnv.DirServer)
 	wait()
 
 	// Everyone is allowed, since we can't read the owner file.
@@ -103,10 +100,7 @@ func TestNoFileAllowsAll(t *testing.T) {
 		t.Fatal(r.Diag())
 	}
 
-	perm, err := New(ownerEnv.Config, readyNow, owner, ownerEnv.DirServer.Lookup, ownerEnv.DirServer.Watch)
-	if err != nil {
-		t.Fatal(err)
-	}
+	perm := NewWithDir(ownerEnv.Config, readyNow, owner, ownerEnv.DirServer)
 	wait()
 
 	// Everyone is allowed.
@@ -137,10 +131,7 @@ func TestAllowsOnlyOwner(t *testing.T) {
 		t.Fatal(r.Diag())
 	}
 
-	perm, err := New(ownerEnv.Config, readyNow, owner, ownerEnv.DirServer.Lookup, ownerEnv.DirServer.Watch)
-	if err != nil {
-		t.Fatal(err)
-	}
+	perm := NewWithDir(ownerEnv.Config, readyNow, owner, ownerEnv.DirServer)
 	wait()
 
 	// Owner is allowed.
@@ -175,10 +166,7 @@ func TestAllowsOthersAndWildcard(t *testing.T) {
 		t.Fatal(r.Diag())
 	}
 
-	perm, err := New(ownerEnv.Config, readyNow, owner, ownerEnv.DirServer.Lookup, ownerEnv.DirServer.Watch)
-	if err != nil {
-		t.Fatal(err)
-	}
+	perm := NewWithDir(ownerEnv.Config, readyNow, owner, ownerEnv.DirServer)
 	wait() // Update call
 	wait() // Watch event
 
@@ -228,10 +216,7 @@ func TestSequentialErrorsOk(t *testing.T) {
 	ownerEnv, wait, cleanup := setupEnv(t)
 	defer cleanup()
 
-	_, err := New(ownerEnv.Config, readyNow, owner, ownerEnv.DirServer.Lookup, errorReturningWatch)
-	if err != nil {
-		t.Fatal(err)
-	}
+	NewWithDir(ownerEnv.Config, readyNow, owner, ownerEnv.DirServer)
 	wait()
 
 	// No crash, no problem.
@@ -252,10 +237,7 @@ func TestOrderOfPuts(t *testing.T) {
 		t.Fatal(r.Diag())
 	}
 
-	perm, err := New(ownerEnv.Config, readyNow, owner, ownerEnv.DirServer.Lookup, ownerEnv.DirServer.Watch)
-	if err != nil {
-		t.Fatal(err)
-	}
+	perm := NewWithDir(ownerEnv.Config, readyNow, owner, ownerEnv.DirServer)
 	wait() // Update call.
 
 	r.Put(accessFile, accessContent) // So server can lookup Writers.

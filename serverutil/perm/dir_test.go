@@ -38,10 +38,7 @@ func TestDirIntegration(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Wrap the writer's DirServer, pointing Perm to the owner's group file.
-	dir, err := WrapDir(writerCtx, readyNow, owner, dirServer)
-	if err != nil {
-		t.Fatal(err)
-	}
+	dir := WrapDir(writerCtx, readyNow, owner, dirServer)
 	wait()
 	wait()
 

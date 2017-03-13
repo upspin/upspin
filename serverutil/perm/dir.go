@@ -10,33 +10,36 @@ import (
 	"upspin.io/upspin"
 )
 
-// Dir wraps a DirServer and implements permission checking when creating new
-// roots.
-type Dir struct {
+// WrapDir wraps the given DirServer with a DirServer that checks root-creation
+// permissions. It will only start polling the store permissions after the
+// ready channel is closed.
+func WrapDir(cfg upspin.Config, ready <-chan struct{}, target upspin.UserName, dir upspin.DirServer) upspin.DirServer {
+	const op = "serverutil/perm.WrapDir"
+	p := newPerm(op, cfg, ready, target, dir.Lookup, dir.Watch)
+	return p.WrapDir(dir)
+}
+
+// WrapDir wraps the given DirServer with a DirServer that checks root-creation
+// permissions using Perm.
+func (p *Perm) WrapDir(dir upspin.DirServer) upspin.DirServer {
+	return &dirWrapper{
+		DirServer: dir,
+		user:      p.cfg.UserName(),
+		perm:      p,
+	}
+}
+
+// dirWrapper wraps a DirServer and implements permission checking when
+// creating new roots.
+type dirWrapper struct {
 	upspin.DirServer
 
 	user upspin.UserName
 	perm *Perm
 }
 
-// WrapDir wraps the given DirServer with a DirServer that checks root-creation
-// permissions. It will only start polling the store permissions after the
-// ready channel is closed.
-func WrapDir(cfg upspin.Config, ready <-chan struct{}, targetUser upspin.UserName, dir upspin.DirServer) (*Dir, error) {
-	const op = "serverutil/perm.WrapDir"
-	p, err := New(cfg, ready, targetUser, dir.Lookup, dir.Watch)
-	if err != nil {
-		return nil, errors.E(op, err)
-	}
-	return &Dir{
-		DirServer: dir,
-		user:      cfg.UserName(),
-		perm:      p,
-	}, nil
-}
-
 // Put implements upspin.DirServer.
-func (d *Dir) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
+func (d *dirWrapper) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	const op = "serverutil/perm.Put"
 	p, err := path.Parse(entry.Name)
 	if err != nil {
@@ -49,7 +52,7 @@ func (d *Dir) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 }
 
 // Dial implements upspin.Service.
-func (d *Dir) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
+func (d *dirWrapper) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
 	const op = "serverutil/perm.Dial"
 	service, err := d.DirServer.Dial(config, e)
 	if err != nil {
