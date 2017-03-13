@@ -18,40 +18,39 @@ package perm
 // - Poll more frequently if the DirServer is unreachable (speeds up boot time).
 
 import (
-	"upspin.io/bind"
 	"upspin.io/errors"
-	"upspin.io/path"
 	"upspin.io/upspin"
 )
-
-// Store performs permission checking for StoreServer implementations.
-type Store struct {
-	upspin.StoreServer
-
-	serverCtx upspin.Config
-	user      upspin.UserName
-	perm      *Perm
-}
 
 // WrapStore wraps the given StoreServer with a StoreServer that checks access
 // permissions. It will only start polling the store permissions after the
 // ready channel is closed.
-func WrapStore(cfg upspin.Config, ready <-chan struct{}, store upspin.StoreServer) (*Store, error) {
-	s := &Store{
+func WrapStore(cfg upspin.Config, ready <-chan struct{}, store upspin.StoreServer) upspin.StoreServer {
+	const op = "serverutil/perm.WrapStore"
+	p := newPerm(op, cfg, ready, cfg.UserName(), nil, nil)
+	return p.WrapStore(store)
+}
+
+// WrapStore wraps the given StoreServer with a StoreServer that checks access
+// permissions using Perm.
+func (p *Perm) WrapStore(store upspin.StoreServer) upspin.StoreServer {
+	return &storeWrapper{
 		StoreServer: store,
-		serverCtx:   cfg,
-		user:        cfg.UserName(),
+		user:        p.cfg.UserName(),
+		perm:        p,
 	}
-	var err error
-	s.perm, err = New(cfg, ready, cfg.UserName(), s.lookup, s.watch)
-	if err != nil {
-		return nil, err
-	}
-	return s, nil
+}
+
+// storeWrapper performs permission checking for StoreServer implementations.
+type storeWrapper struct {
+	upspin.StoreServer
+
+	user upspin.UserName // set by Dial
+	perm *Perm
 }
 
 // Put implements upspin.StoreServer.
-func (s *Store) Put(data []byte) (*upspin.Refdata, error) {
+func (s *storeWrapper) Put(data []byte) (*upspin.Refdata, error) {
 	const op = "store/perm.Put"
 
 	if !s.perm.IsWriter(s.user) {
@@ -61,7 +60,7 @@ func (s *Store) Put(data []byte) (*upspin.Refdata, error) {
 }
 
 // Delete implements upspin.StoreServer.
-func (s *Store) Delete(ref upspin.Reference) error {
+func (s *storeWrapper) Delete(ref upspin.Reference) error {
 	const op = "store/perm.Delete"
 
 	if !s.perm.IsWriter(s.user) {
@@ -71,38 +70,14 @@ func (s *Store) Delete(ref upspin.Reference) error {
 }
 
 // Dial implements upspin.Service.
-func (s *Store) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
+func (s *storeWrapper) Dial(cfg upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
 	const op = "store/perm.Dial"
-	service, err := s.StoreServer.Dial(config, e)
+	service, err := s.StoreServer.Dial(cfg, e)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
 	newS := *s
-	newS.user = config.UserName()
+	newS.user = cfg.UserName()
 	newS.StoreServer = service.(upspin.StoreServer)
 	return &newS, nil
-}
-
-func (s *Store) lookup(name upspin.PathName) (*upspin.DirEntry, error) {
-	parsed, err := path.Parse(name)
-	if err != nil {
-		return nil, err
-	}
-	dir, err := bind.DirServerFor(s.serverCtx, parsed.User())
-	if err != nil {
-		return nil, err
-	}
-	return dir.Lookup(name)
-}
-
-func (s *Store) watch(name upspin.PathName, order int64, done <-chan struct{}) (<-chan upspin.Event, error) {
-	parsed, err := path.Parse(name)
-	if err != nil {
-		return nil, err
-	}
-	dir, err := bind.DirServerFor(s.serverCtx, parsed.User())
-	if err != nil {
-		return nil, err
-	}
-	return dir.Watch(name, order, done)
 }
