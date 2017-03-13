@@ -209,6 +209,9 @@ func DirServerFor(cc upspin.Config, userName upspin.UserName) (upspin.DirServer,
 		return nil, errors.E(op, err)
 	}
 	u, err := key.Lookup(userName)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
 	if err == nil {
 		endpoints = append(endpoints, u.Dirs...)
 	}
