@@ -21,15 +21,10 @@ run `upspinserver` by following these instructions.
 The following commands must be executed on the server as the super user, `root`,
 perhaps via `sudo su`.
 
-Create a Unix account named `upspin`.
-For the password, use a secure password generator to create a long, unguessable
-password.
-Don't worry if it's unwieldy, you won't need to type it again.
-The rest of the questions it asks should have sane defaults, so pressing
-Enter for each should be sufficient.
+Create a Unix account named `upspin`:
 
 ```
-$ adduser upspin
+$ useradd upspin
 ```
 
 Give yourself SSH access to the `upspin` account on the server (a convenience):
