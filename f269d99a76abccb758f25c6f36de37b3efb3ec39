@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cfc028d4_18daa39d",
+        "filename": "doc/server_setup_ubuntu.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-14T15:19:32Z",
+      "side": 1,
+      "message": "My impression is that --disabled-password is too recent an invention, though a good one, for us to assume.\nBSD and RedHat seem to be missing it, for example.   Do you know?\n\nHaving been at Bell Labs \"lab 127\" early enough to be use both GECOS and Unix, I can believe that second flag is widespread enough.",
+      "revId": "f269d99a76abccb758f25c6f36de37b3efb3ec39",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
