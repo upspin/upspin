@@ -89,25 +89,19 @@ binary is updated.
 
 ### Start the service
 
-Use `systemctl` to enable the service:
+Use `systemctl` to enable and start the service:
 
 ```
-$ systemctl enable /etc/systemd/system/upspinserver.service
+$ systemctl enable --now /etc/systemd/system/upspinserver.service
 ```
 
-Use `systemctl` to start the service:
-
-```
-$ systemctl start upspinserver.service
-```
-
-You may also use `systemctl stop` and `systemctl restart` to
-stop and restart the server, respectively.
+You may also use `systemctl stop upspinserver` and `systemctl restart
+upspinserver` to stop and restart the server, respectively.
 
 You can use `journalctl` to see the log output of the server:
 
 ```
-$ journalctl -f -u upspinserver.service
+$ journalctl -f -u upspinserver
 
 ```
 
