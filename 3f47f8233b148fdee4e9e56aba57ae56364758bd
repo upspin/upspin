@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "6377af1e_ff2f68f4",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-14T16:08:24Z",
+      "side": 1,
+      "message": "no, it is the number of writer goroutines.  that isn\u0027t variable.  max would imply that it is.",
+      "parentUuid": "4e4b5694_89681050",
+      "revId": "3f47f8233b148fdee4e9e56aba57ae56364758bd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "8e1b6b56_da5be795",
         "filename": "store/storecache/wbq.go",
         "patchSetId": 1
@@ -47,6 +65,30 @@
       "writtenOn": "2017-03-14T00:07:54Z",
       "side": 1,
       "message": "linear",
+      "range": {
+        "startLine": 349,
+        "startChar": 19,
+        "endLine": 349,
+        "endChar": 26
+      },
+      "revId": "3f47f8233b148fdee4e9e56aba57ae56364758bd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9d360deb_1f9b8738",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 349,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-14T16:08:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8e1b6b56_da5be795",
       "range": {
         "startLine": 349,
         "startChar": 19,
@@ -82,6 +124,30 @@
     },
     {
       "key": {
+        "uuid": "97d5531c_cd156c08",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 351,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-14T16:08:24Z",
+      "side": 1,
+      "message": "tdb",
+      "parentUuid": "f6cfd670_1d466c03",
+      "range": {
+        "startLine": 351,
+        "startChar": 16,
+        "endLine": 351,
+        "endChar": 20
+      },
+      "revId": "3f47f8233b148fdee4e9e56aba57ae56364758bd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f8d18951_5de61212",
         "filename": "store/storecache/wbq.go",
         "patchSetId": 1
@@ -93,6 +159,24 @@
       "writtenOn": "2017-03-14T00:07:54Z",
       "side": 1,
       "message": "i\u0027d go with something like \u0027inflight\u0027 here. n is pretty vague for a field name",
+      "revId": "3f47f8233b148fdee4e9e56aba57ae56364758bd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "60a5dbd8_84e6afd2",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 357,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-14T16:08:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f8d18951_5de61212",
       "revId": "3f47f8233b148fdee4e9e56aba57ae56364758bd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -116,6 +200,24 @@
     },
     {
       "key": {
+        "uuid": "b014f8d0_d44050ea",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 381,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-14T16:08:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "82e1c828_6b2e85bb",
+      "revId": "3f47f8233b148fdee4e9e56aba57ae56364758bd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "368c0fce_43b0073c",
         "filename": "store/storecache/wbq.go",
         "patchSetId": 1
@@ -127,6 +229,24 @@
       "writtenOn": "2017-03-14T00:07:54Z",
       "side": 1,
       "message": "it\u0027s a bit awkward that the only reason wbq and epq are known to this struct is in order to re-queue here.\nif you just pass an error into this func, you can do everything except the requeue here, and do the requeue in the scheduler method.\nthen this struct is just about parallelism, and nothing else.",
+      "revId": "3f47f8233b148fdee4e9e56aba57ae56364758bd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8c17aad7_9288b5ef",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 383,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-14T16:08:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "368c0fce_43b0073c",
       "revId": "3f47f8233b148fdee4e9e56aba57ae56364758bd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
