@@ -149,6 +149,11 @@ func cleanup() {
 }
 
 func TestMain(m *testing.M) {
+	if os.Getenv("TRAVIS") == "true" {
+		// TravisCI doesn't support FUSE filesystems.
+		fmt.Fprintln(os.Stderr, "Skipping upspinfs tests on TravisCI.")
+		os.Exit(0)
+	}
 	if err := mount(); err != nil {
 		fmt.Fprintf(os.Stderr, "mount failed: %s", err)
 		cleanup()
