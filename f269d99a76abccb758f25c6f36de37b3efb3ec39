@@ -16,6 +16,24 @@
       "revId": "f269d99a76abccb758f25c6f36de37b3efb3ec39",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f41ab2f9_852e5c43",
+        "filename": "doc/server_setup_ubuntu.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5065
+      },
+      "writtenOn": "2017-03-14T15:34:40Z",
+      "side": 1,
+      "message": "\u003e My impression is that --disabled-password is too recent an invention, though a good one, for us to assume.\n\u003e BSD and RedHat seem to be missing it, for example.   Do you know?\n\nFair point — I was taking the document title literally and only tested on Ubuntu 16.04.\n\nChanged it to use useradd, which is widely available and does the same thing.",
+      "parentUuid": "cfc028d4_18daa39d",
+      "revId": "f269d99a76abccb758f25c6f36de37b3efb3ec39",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
