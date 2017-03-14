@@ -227,7 +227,7 @@ func (bp *blockPacker) Close() error {
 	wrap := make([]wrappedKey, 2)
 
 	// First, wrap for myself.
-	p, _, err := factotum.ParsePublicKey(cfg.Factotum().PublicKey())
+	p, err := factotum.ParsePublicKey(cfg.Factotum().PublicKey())
 	if err != nil {
 		return errors.E(op, name, err)
 	}
@@ -258,7 +258,7 @@ func (bp *blockPacker) Close() error {
 			log.Debug.Printf("pack/ee: %q and %q have the same keys", owner, cfg.UserName())
 			wrap = wrap[:1]
 		} else {
-			p, _, err = factotum.ParsePublicKey(ownerKey)
+			p, err = factotum.ParsePublicKey(ownerKey)
 			if err != nil {
 				return errors.E(op, name, owner, err)
 			}
@@ -312,7 +312,7 @@ func (ee ee) Unpack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker
 	if err != nil {
 		return nil, errors.E(op, writer, err)
 	}
-	writerPubKey, _, err := factotum.ParsePublicKey(writerRawPubKey)
+	writerPubKey, err := factotum.ParsePublicKey(writerRawPubKey)
 	if err != nil {
 		return nil, errors.E(op, writer, err)
 	}
@@ -424,7 +424,7 @@ func (ee ee) Share(cfg upspin.Config, readers []upspin.PublicKey, packdata []*[]
 	hash := make([]keyHashArray, len(readers))
 	for i, pub := range readers {
 		var err error
-		pubkey[i], _, err = factotum.ParsePublicKey(pub)
+		pubkey[i], err = factotum.ParsePublicKey(pub)
 		if err != nil {
 			continue
 		}
@@ -522,7 +522,7 @@ func (ee ee) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName
 	if err != nil {
 		return errors.E(op, d.Name, err)
 	}
-	ownerPubKey, _, err := factotum.ParsePublicKey(ownerRawPubKey)
+	ownerPubKey, err := factotum.ParsePublicKey(ownerRawPubKey)
 	if err != nil {
 		return errors.E(op, d.Name, err)
 	}
@@ -533,7 +533,7 @@ func (ee ee) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName
 	if err != nil {
 		return errors.E(op, d.Name, err)
 	}
-	pubkey, _, err := factotum.ParsePublicKey(rawPublicKey)
+	pubkey, err := factotum.ParsePublicKey(rawPublicKey)
 	if err != nil {
 		return errors.E(op, d.Name, err)
 	}
@@ -604,7 +604,7 @@ func Countersign(oldKey upspin.PublicKey, f upspin.Factotum, d *upspin.DirEntry)
 	}
 
 	// Get ECDSA forms of keys.
-	oldPubKey, _, err := factotum.ParsePublicKey(oldKey)
+	oldPubKey, err := factotum.ParsePublicKey(oldKey)
 	if err != nil {
 		return errors.E(op, d.Name, err)
 	}
@@ -705,7 +705,7 @@ func aesUnwrap(f upspin.Factotum, w wrappedKey) (dkey []byte, err error) {
 	}
 	// Step 1.  Create shared Diffie-Hellman secret.
 	// S = rV
-	pub, _, err := factotum.ParsePublicKey(myPub)
+	pub, err := factotum.ParsePublicKey(myPub)
 	if err != nil {
 		return nil, err
 	}

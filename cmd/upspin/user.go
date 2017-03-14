@@ -144,7 +144,7 @@ func (s *State) putUser(fs *flag.FlagSet, keyServer upspin.KeyServer, inFile str
 	if userStruct.PublicKey == "" && !force {
 		s.Exitf("An empty public key will prevent user from accessing services. To override use -force.")
 	}
-	_, _, err = factotum.ParsePublicKey(userStruct.PublicKey)
+	_, err = factotum.ParsePublicKey(userStruct.PublicKey)
 	if err != nil && !force {
 		s.Exitf("invalid public key, to override use -force: %s", err.Error())
 	}
