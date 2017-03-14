@@ -16,6 +16,24 @@
       "revId": "62060eb023385c00f6a8bf7d0fb11126ce5bdcd0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6f782c9a_295315c5",
+        "filename": "cmd/upspinserver/web.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 5605
+      },
+      "writtenOn": "2017-03-14T14:53:39Z",
+      "side": 1,
+      "message": "I did think about this while implementing the change. My thoughts are if you\u0027re trusting someone to write data to your store, you can probably trust them to create links to things sensibly. Obviously you then need to be happy your server is being a proxy for data.\n\nMaybe a configuration option could be used, such that server owners can decide?",
+      "parentUuid": "dfd25e72_4a6caf30",
+      "revId": "62060eb023385c00f6a8bf7d0fb11126ce5bdcd0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
