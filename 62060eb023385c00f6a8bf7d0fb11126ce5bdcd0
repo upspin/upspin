@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dfd25e72_4a6caf30",
+        "filename": "cmd/upspinserver/web.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-14T10:11:28Z",
+      "side": 1,
+      "message": "I wonder if we should also check the user component of entry.Name?\nIt might be different to p.User() if there are links involved.\nThat\u0027s more of a policy decision, though.\nAdd a TODO here?",
+      "revId": "62060eb023385c00f6a8bf7d0fb11126ce5bdcd0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
