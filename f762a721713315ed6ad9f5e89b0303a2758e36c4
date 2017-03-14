@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a85636a_a3013e6a",
+        "filename": "cmd/upspinfs/upspinfs_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-14T03:53:09Z",
+      "side": 1,
+      "message": "is \"true\" always the exact string?",
+      "revId": "f762a721713315ed6ad9f5e89b0303a2758e36c4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
