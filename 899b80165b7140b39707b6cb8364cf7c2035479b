@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6ee16d5b_5d23435c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-14T01:40:51Z",
+      "side": 1,
+      "message": "Also mention that this now has Sign return an error of the provided hash is too long.",
+      "revId": "899b80165b7140b39707b6cb8364cf7c2035479b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
