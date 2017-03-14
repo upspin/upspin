@@ -23,6 +23,8 @@ Upspin is not an official Google product.
 
 Upspin has rough edges, and is not yet suitable for non-technical users.
 
+[![Build Status](https://travis-ci.org/upspin/upspin.svg?branch=master)](https://travis-ci.org/upspin/upspin)
+
 
 ## Contributing
 
