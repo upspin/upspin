@@ -183,7 +183,7 @@ func (ei ei) Unpack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker
 	if err != nil {
 		return nil, errors.E(op, writer, err)
 	}
-	writerPubKey, _, err := factotum.ParsePublicKey(writerRawPubKey)
+	writerPubKey, err := factotum.ParsePublicKey(writerRawPubKey)
 	if err != nil {
 		return nil, errors.E(op, writer, err)
 	}
@@ -269,7 +269,7 @@ func (ei ei) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName
 	if err != nil {
 		return errors.E(op, d.Name, err)
 	}
-	ownerPubKey, _, err := factotum.ParsePublicKey(ownerRawPubKey)
+	ownerPubKey, err := factotum.ParsePublicKey(ownerRawPubKey)
 	if err != nil {
 		return errors.E(op, d.Name, err)
 	}

@@ -151,7 +151,7 @@ func (p plainPack) Unpack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockUn
 	if err != nil {
 		return nil, errors.E(op, writer, err)
 	}
-	writerPubKey, _, err := factotum.ParsePublicKey(writerRawPubKey)
+	writerPubKey, err := factotum.ParsePublicKey(writerRawPubKey)
 	if err != nil {
 		return nil, errors.E(op, writer, err)
 	}

@@ -36,6 +36,7 @@ func TestNewFromDir(t *testing.T) {
 		// These should outright fail.
 		{"bad", false, "", "", "", ""},
 		{"empty", false, "", "", "", ""},
+		{"mismatched", false, pubKey, secKey, "", ""},
 	}
 	for _, c := range cases {
 		fi, err := NewFromDir(filepath.Join("testdata", c.dir))
@@ -68,5 +69,16 @@ func TestNewFromDir(t *testing.T) {
 		if got, want := f.keys[f.previous].private, c.prevSecret; got != want {
 			t.Errorf("NewFromDir(%q): got previous secret key %q, want %q", c.dir, got, want)
 		}
+	}
+}
+
+func TestSign(t *testing.T) {
+	fi, err := NewFromDir(filepath.Join("testdata", "ok"))
+	if err != nil {
+		t.Errorf("NewFromDir(testdata/ok): %v", err)
+	}
+	_, err = fi.Sign([]byte("this is too long a string for p256"))
+	if err == nil {
+		t.Errorf("factotum.Sing(longstring) should have failed")
 	}
 }

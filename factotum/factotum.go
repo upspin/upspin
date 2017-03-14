@@ -27,8 +27,7 @@ type factotumKey struct {
 	keyHash      []byte
 	public       upspin.PublicKey
 	private      string
-	ecdsaKeyPair ecdsa.PrivateKey // ecdsa form of key pair
-	curveName    string
+	ecdsaKeyPair ecdsa.PrivateKey
 }
 
 type keyHashArray [sha256.Size]byte
@@ -87,8 +86,7 @@ func NewFromKeys(public, private, archived []byte) (upspin.Factotum, error) {
 	return newFactotum(op, public, private, archived)
 }
 
-// newFactotum creates a new Factotum using the given keys. It is called from
-// new_mobile.go.
+// newFactotum creates a new Factotum using the given keys.
 func newFactotum(op string, public, private, archived []byte) (upspin.Factotum, error) {
 	pfk, err := makeKey(upspin.PublicKey(public), string(private))
 	if err != nil {
@@ -147,8 +145,7 @@ func stripCR(b []byte) []byte {
 
 // makeKey creates a factotumKey by filling in the derived fields.
 func makeKey(pub upspin.PublicKey, priv string) (*factotumKey, error) {
-	ePublicKey, curveName, err := ParsePublicKey(pub)
-	// TODO(ehg) sanity check that priv is consistent with pub
+	ePublicKey, err := ParsePublicKey(pub)
 	if err != nil {
 		return nil, err
 	}
@@ -161,7 +158,6 @@ func makeKey(pub upspin.PublicKey, priv string) (*factotumKey, error) {
 		public:       pub,
 		private:      priv,
 		ecdsaKeyPair: *ecdsaKeyPair,
-		curveName:    curveName,
 	}
 	return &fk, nil
 }
@@ -255,8 +251,11 @@ func (f factotum) ScalarMult(keyHash []byte, curve elliptic.Curve, x, y *big.Int
 
 // Sign signs a slice of bytes with the factotum's private key.
 func (f factotum) Sign(hash []byte) (upspin.Signature, error) {
-	// TODO(ehg): panic or at least error if len(hash)>curve length.
 	fk := f.keys[f.current]
+	curveLength := (fk.ecdsaKeyPair.Curve.Params().N.BitLen() + 7) / 8
+	if len(hash) > curveLength {
+		return sig0, errors.E(errors.Invalid, errors.Str("hash is too long to Sign"))
+	}
 	r, s, err := ecdsa.Sign(rand.Reader, &fk.ecdsaKeyPair, hash)
 	if err != nil {
 		return sig0, err
@@ -267,7 +266,7 @@ func (f factotum) Sign(hash []byte) (upspin.Signature, error) {
 // Verify verifies whether the given hash's signature was signed by the private
 // key corresponding to the given public key.
 func Verify(hash []byte, sig upspin.Signature, key upspin.PublicKey) error {
-	ecdsaPubKey, _, err := ParsePublicKey(key)
+	ecdsaPubKey, err := ParsePublicKey(key)
 	if err != nil {
 		return err
 	}
@@ -307,32 +306,37 @@ func (f factotum) PublicKeyFromHash(keyHash []byte) (upspin.PublicKey, error) {
 // parsePrivateKey returns an ECDSA private key given a user's ECDSA public key and a
 // string representation of the private key.
 func parsePrivateKey(publicKey *ecdsa.PublicKey, privateKey string) (priv *ecdsa.PrivateKey, err error) {
+	const op = "factotum.PublicKeyFromHash"
 	privateKey = strings.TrimSpace(string(privateKey))
 	var d big.Int
 	err = d.UnmarshalText([]byte(privateKey))
 	if err != nil {
-		return nil, err
+		return nil, errors.E(op, errors.Invalid, err)
+	}
+	x, y := publicKey.Curve.ScalarBaseMult(d.Bytes())
+	if x.Cmp(publicKey.X) != 0 || y.Cmp(publicKey.Y) != 0 {
+		return nil, errors.E(op, errors.Invalid, errors.Errorf("public and private keys do not correspond"))
 	}
 	return &ecdsa.PrivateKey{PublicKey: *publicKey, D: &d}, nil
 }
 
-// ParsePublicKey takes an Upspin representation of a public key and converts it into an ECDSA public key, returning its type.
+// ParsePublicKey takes an Upspin representation of a public key and converts it into an ECDSA public key.
 // The Upspin string representation uses \n as newline no matter what native OS it runs on.
-func ParsePublicKey(public upspin.PublicKey) (*ecdsa.PublicKey, string, error) {
+func ParsePublicKey(public upspin.PublicKey) (*ecdsa.PublicKey, error) {
 	const op = "factotum.ParsePublicKey"
 	fields := strings.Split(string(public), "\n")
 	if len(fields) != 4 { // 4 is because string should be terminated by \n, hence fields[3]==""
-		return nil, "", errors.E(op, errors.Invalid, errors.Errorf("expected keytype, two big ints and a newline; got %d %v", len(fields), fields))
+		return nil, errors.E(op, errors.Invalid, errors.Errorf("expected keytype, two big ints and a newline; got %d %v", len(fields), fields))
 	}
 	keyType := fields[0]
 	var x, y big.Int
 	_, ok := x.SetString(fields[1], 10)
 	if !ok {
-		return nil, "", errors.E(op, errors.Invalid, errors.Errorf("%s is not a big int", fields[1]))
+		return nil, errors.E(op, errors.Invalid, errors.Errorf("%s is not a big int", fields[1]))
 	}
 	_, ok = y.SetString(fields[2], 10)
 	if !ok {
-		return nil, "", errors.E(op, errors.Invalid, errors.Errorf("%s is not a big int", fields[2]))
+		return nil, errors.E(op, errors.Invalid, errors.Errorf("%s is not a big int", fields[2]))
 	}
 
 	var curve elliptic.Curve
@@ -344,9 +348,9 @@ func ParsePublicKey(public upspin.PublicKey) (*ecdsa.PublicKey, string, error) {
 	case "p384":
 		curve = elliptic.P384()
 	default:
-		return nil, "", errors.E(op, errors.Invalid, errors.Errorf("unknown key type: %q", keyType))
+		return nil, errors.E(op, errors.Invalid, errors.Errorf("unknown key type: %q", keyType))
 	}
-	return &ecdsa.PublicKey{Curve: curve, X: &x, Y: &y}, keyType, nil
+	return &ecdsa.PublicKey{Curve: curve, X: &x, Y: &y}, nil
 }
 
 func readFile(op, dir, name string) ([]byte, error) {
