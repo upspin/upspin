@@ -123,8 +123,8 @@ func (p *Perm) updateLoop() {
 		}
 		e, ok := <-events
 		if !ok {
+			log.Debug.Printf("%s: watch channel closed. Re-opening...", op)
 			events = nil
-			log.Printf("%s: watch channel closed. Re-opening...", op)
 			time.Sleep(retryTimeout)
 			continue
 		}
@@ -132,6 +132,7 @@ func (p *Perm) updateLoop() {
 			log.Error.Printf("%s: watch event error: %s", op, e.Error)
 			events = nil
 			close(done)
+			time.Sleep(retryTimeout)
 			continue
 		}
 		// An Access file could have granted or revoked our permission
@@ -139,8 +140,8 @@ func (p *Perm) updateLoop() {
 		// again, after the Access event.
 		if isRelevantAccess(e.Entry.Name) && e.Order > accessOrder {
 			accessOrder = e.Order
-			close(done)
 			events = nil
+			close(done)
 			continue
 		}
 		// Process event.
