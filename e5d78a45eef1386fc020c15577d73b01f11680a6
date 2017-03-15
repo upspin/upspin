@@ -16,6 +16,24 @@
       "revId": "e5d78a45eef1386fc020c15577d73b01f11680a6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "b8264966_4759550c",
+        "filename": "doc/server_setup_ubuntu.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-15T23:06:17Z",
+      "side": 1,
+      "message": "What does that involve?\nI\u0027d like to keep this pretty simple and general, if possible.",
+      "parentUuid": "4ae3d9a4_dc8d32fe",
+      "revId": "e5d78a45eef1386fc020c15577d73b01f11680a6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
