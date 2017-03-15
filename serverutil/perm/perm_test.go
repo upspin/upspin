@@ -39,12 +39,16 @@ func setupEnv(t *testing.T) (ownerEnv *testenv.Env, wait, cleanup func()) {
 	}
 
 	updated := make(chan bool)
+	oldRetryTimeout := retryTimeout
+	retryTimeout = 100 * time.Millisecond
 	onUpdate = func() { <-updated }
+	n := 0
 	wait = func() {
+		n++
 		const timeout = 2 * time.Second
 		select {
 		case <-time.After(timeout):
-			t.Fatal("timed out waiting for update")
+			t.Fatalf("timed out waiting for update %d", n)
 		case updated <- true:
 			// OK.
 		}
@@ -53,6 +57,7 @@ func setupEnv(t *testing.T) (ownerEnv *testenv.Env, wait, cleanup func()) {
 		ownerEnv.Exit()
 		close(updated) // Unblock the update loop, if blocked.
 		onUpdate = func() {}
+		retryTimeout = oldRetryTimeout
 	}
 
 	return
