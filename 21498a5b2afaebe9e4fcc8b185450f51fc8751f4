@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3dafc074_001c79ca",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-15T03:21:56Z",
+      "side": 1,
+      "message": "I think it would have been cleaner as\n\nfor {\n   events :\u003d watch(conech)\n   handleEvents(events)\n   close(donech)\n}\n\na little more obvious what is happening and less possible to miss the close in the next change.\n\nBut if you want to leave it this way, fine by me.",
+      "range": {
+        "startLine": 108,
+        "startChar": 1,
+        "endLine": 108,
+        "endChar": 4
+      },
+      "revId": "21498a5b2afaebe9e4fcc8b185450f51fc8751f4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
