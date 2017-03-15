@@ -274,24 +274,18 @@ func (s *serverImpl) SessionForRequest(w http.ResponseWriter, r *http.Request) (
 		return nil, errors.E(errors.Invalid, errors.Str("invalid proxy request in header"))
 	}
 	// Clients send a single header line with comma-separated values.
-	// Older clients send 5 separate header lines.
-	// They need to be supported for a transition period.
-	// TODO(adg): Remove handling of old-style headers on April 1 2017.
 	authRequest, ok := r.Header[authRequestHeader]
-	if ok && len(authRequest) == 1 {
-		authRequest = strings.Split(authRequest[0], ",")
-		// Trimming the split tokens is only needed for the transition period.
-		// It covers the scenario in which older clients send requests to new servers
-		// through proxies that concatenate header lines, as they also add whitespace.
-		for i, s := range authRequest {
-			authRequest[i] = strings.TrimSpace(s)
-		}
-	}
-	if ok && len(authRequest) != 5 {
-		return nil, errors.E(errors.Invalid, errors.Str("invalid auth request header"))
-	}
-	if authRequest == nil {
+	if !ok {
 		return nil, errors.E(errors.Invalid, errors.Str("missing auth request header"))
+	} else if len(authRequest) == 5 {
+		// Old-style authentication tokens should now fail,
+		// but provide an informative error message when they do.
+		// TODO(adg): Remove this if/else block on April 15.
+		return nil, errors.E(errors.Invalid, errors.Str("invalid auth request header (please update your Upspin clients and servers)"))
+	} else if len(authRequest) != 1 {
+		return nil, errors.E(errors.Invalid, errors.Str("invalid auth request header"))
+	} else {
+		authRequest = strings.Split(authRequest[0], ",")
 	}
 	return s.handleSessionRequest(w, authRequest, proxyRequest, r.Host)
 }
