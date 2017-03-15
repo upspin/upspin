@@ -167,11 +167,11 @@ func (w *watcher) sendCurrentAndWatch(clone, orig *Tree, p path.Parsed, offset i
 				Op:    Put,
 				Entry: n.entry,
 			}
-			err = w.sendEvent(logEntry, offset)
-			if err != nil {
-				return err
+			err := w.sendEvent(logEntry, offset)
+			if err == errTimeout || err == errClosed {
+				return nil
 			}
-			return nil
+			return err
 		}
 		err = clone.traverse(n, 0, fn)
 		if err != nil {
