@@ -24,7 +24,7 @@ perhaps via `sudo su`.
 Create a Unix account named `upspin`:
 
 ```
-$ useradd upspin
+$ useradd -m upspin
 ```
 
 Give yourself SSH access to the `upspin` account on the server (a convenience):
