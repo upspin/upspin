@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "52d41f75_93f8c203",
+        "filename": "cmd/upspin/keygen.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-15T04:11:12Z",
+      "side": 1,
+      "message": "I was perhaps unnecessarily confused by secretseed (camelcase?) and proquintStr being the same animal but with such different names.",
+      "range": {
+        "startLine": 69,
+        "startChar": 1,
+        "endLine": 69,
+        "endChar": 11
+      },
+      "revId": "6c3d283099fb92e34d387fe1b2407cb5a58c0b47",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
