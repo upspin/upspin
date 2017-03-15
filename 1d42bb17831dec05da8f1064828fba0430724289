@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0ab40f6b_652bab4c",
+        "filename": "cmd/upspin/keygen.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-15T02:07:20Z",
+      "side": 1,
+      "message": "I think it was of benefit to not say this if they are using -secretseed.\n\nhow about, before createKeys, put\n\nsecretseed :\u003d subcmd.StringFlag(fs, \"secretseed\")\npublic, private, proquintStr, err :\u003d createKeys(curve, secretseed)\n\nand then here, put\n\nif secretseed \u003d\u003d \"\" {",
+      "revId": "1d42bb17831dec05da8f1064828fba0430724289",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "252ca32b_3af98ac3",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-15T02:07:20Z",
+      "side": 1,
+      "message": "it\u0027s a little odd to take a string and return a []byte\nif you just make this return a string then you can just do the conversion, as you were before, in parsePrivateKey. (there\u0027s a strings.IndexByte and strings.TrimSpace you can use, too)\n\nno allocation characteristics will change",
+      "revId": "1d42bb17831dec05da8f1064828fba0430724289",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b315a1ed_30818390",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-15T02:07:20Z",
+      "side": 1,
+      "message": "i ?",
+      "revId": "1d42bb17831dec05da8f1064828fba0430724289",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
