@@ -303,13 +303,20 @@ func (f factotum) PublicKeyFromHash(keyHash []byte) (upspin.PublicKey, error) {
 	return fk.public, nil
 }
 
+// clean removes comments and starting and leading space.
+func clean(s string) string {
+	if i := strings.IndexByte(s, '#'); i >= 0 {
+		s = s[:i]
+	}
+	return strings.TrimSpace(s)
+}
+
 // parsePrivateKey returns an ECDSA private key given a user's ECDSA public key and a
 // string representation of the private key.
 func parsePrivateKey(publicKey *ecdsa.PublicKey, privateKey string) (priv *ecdsa.PrivateKey, err error) {
 	const op = "factotum.PublicKeyFromHash"
-	privateKey = strings.TrimSpace(string(privateKey))
 	var d big.Int
-	err = d.UnmarshalText([]byte(privateKey))
+	err = d.UnmarshalText([]byte(clean(privateKey)))
 	if err != nil {
 		return nil, errors.E(op, errors.Invalid, err)
 	}

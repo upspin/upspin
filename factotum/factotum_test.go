@@ -72,6 +72,25 @@ func TestNewFromDir(t *testing.T) {
 	}
 }
 
+func TestClean(t *testing.T) {
+	f, err := NewFromDir(filepath.Join("testdata", "ok"))
+	if err != nil {
+		t.Errorf("NewFromDir(testdata/ok): %v", err)
+	}
+	fi1 := f.(*factotum)
+	f, err = NewFromDir(filepath.Join("testdata", "comment"))
+	if err != nil {
+		t.Errorf("NewFromDir(testdata/comment): %v", err)
+	}
+	fi2 := f.(*factotum)
+	d1 := fi1.keys[fi1.current].ecdsaKeyPair.D
+	d2 := fi2.keys[fi2.current].ecdsaKeyPair.D
+	if d1.Cmp(d2) != 0 {
+		t.Errorf("NewFromDir ok and comment returned different keys")
+	}
+
+}
+
 func TestSign(t *testing.T) {
 	fi, err := NewFromDir(filepath.Join("testdata", "ok"))
 	if err != nil {
