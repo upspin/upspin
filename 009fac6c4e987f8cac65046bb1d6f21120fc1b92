@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fe656214_8db344d3",
+        "filename": "doc/server_setup_ubuntu.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-15T16:02:20Z",
+      "side": 1,
+      "message": "useradd, at least on my instance, doesn\u0027t create the user\u0027s home directory. You need the -d option to do that.",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 16
+      },
+      "revId": "009fac6c4e987f8cac65046bb1d6f21120fc1b92",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
