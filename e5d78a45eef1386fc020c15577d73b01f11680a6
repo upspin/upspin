@@ -34,6 +34,24 @@
       "revId": "e5d78a45eef1386fc020c15577d73b01f11680a6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "46091d7b_0daa2428",
+        "filename": "doc/server_setup_ubuntu.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5605
+      },
+      "writtenOn": "2017-03-15T23:09:56Z",
+      "side": 1,
+      "message": "Command would be: useradd -r -m -d /var/lib/upspin upspin",
+      "parentUuid": "b8264966_4759550c",
+      "revId": "e5d78a45eef1386fc020c15577d73b01f11680a6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
