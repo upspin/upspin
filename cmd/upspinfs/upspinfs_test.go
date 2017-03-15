@@ -12,10 +12,11 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"os"
-	"os/exec"
 	"path"
 	rtdebug "runtime/debug"
 	"testing"
+
+	"bazil.org/fuse"
 
 	"upspin.io/bind"
 	"upspin.io/config"
@@ -38,15 +39,6 @@ var testConfig struct {
 const (
 	perm = 0777
 )
-
-// unmount exists because (on Linux at least) you need an suid
-// program to unmount.
-func unmount(mountpoint string) error {
-	cmd := exec.Command("umount", mountpoint)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	return cmd.Run()
-}
 
 // testSetup creates a temporary user config with inprocess services.
 func testSetup(name string) (upspin.Config, error) {
@@ -105,7 +97,7 @@ func mount() error {
 			// No free mountpoint found. Just pick one and hope we aren't
 			// breaking another test.
 			testConfig.mountpoint = fmt.Sprintf("/tmp/upspinfstest%d", i)
-			unmount(testConfig.mountpoint)
+			fuse.Unmount(testConfig.mountpoint)
 			os.RemoveAll(testConfig.mountpoint)
 			if err = os.Mkdir(testConfig.mountpoint, 0777); err == nil {
 				found = true
@@ -143,7 +135,7 @@ func mount() error {
 }
 
 func cleanup() {
-	unmount(testConfig.mountpoint)
+	fuse.Unmount(testConfig.mountpoint)
 	os.RemoveAll(testConfig.mountpoint)
 	os.RemoveAll(testConfig.cacheDir)
 }
