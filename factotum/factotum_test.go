@@ -86,7 +86,7 @@ func TestClean(t *testing.T) {
 	d1 := fi1.keys[fi1.current].ecdsaKeyPair.D
 	d2 := fi2.keys[fi2.current].ecdsaKeyPair.D
 	if d1.Cmp(d2) != 0 {
-		t.Errorf("NewFromDir ok and comment returned different keys")
+		t.Errorf("NewFromDir: comment improperly affected key")
 	}
 
 }

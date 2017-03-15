@@ -5,6 +5,7 @@
 package main
 
 import (
+	"bytes"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -33,8 +34,7 @@ const (
 
 	private2Key = "47513031334211958720530809945101319621000940818220052385943490959145831252616\n"
 
-	archive2Key = `# EE
-p256
+	archive2Key = `p256
 20475414006091125411730282854763965332579614918776190347990649355528840360162
 41618798560597642013440926161855187887081385971895806061707694318148863738083
 103735382135370212717736500933863354513183407328603457343387144070761075604179
@@ -93,7 +93,7 @@ func TestSaveKeygen(t *testing.T) {
 	}
 
 	// Update and rotate keys.
-	err = newState("test").saveKeys(dir, true)
+	err = newState("test").saveKeys(dir, true, public, private)
 	if err != nil {
 		t.Fatalf("saving keys: %v", err)
 	}
@@ -122,6 +122,10 @@ func TestSaveKeygen(t *testing.T) {
 	data, err = ioutil.ReadFile(filepath.Join(dir, "secret2.upspinkey"))
 	if err != nil {
 		t.Fatal(err)
+	}
+	i := bytes.IndexByte(data, '\n')
+	if i >= 0 {
+		data = data[i+1:] // Strip "# EE modtime".
 	}
 	if string(data) != archive2Key {
 		t.Fatalf("reading archive key: got\n%s\n\twant\n%s", data, archive2Key)
