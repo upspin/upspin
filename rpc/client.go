@@ -25,10 +25,6 @@ import (
 	pb "github.com/golang/protobuf/proto"
 )
 
-// This is used by tests to test old clients against new servers.
-// TODO(adg): Remove handling of old-style headers on April 1 2017.
-var oldClientAuthHeader = false
-
 // Client is a partial upspin.Service that uses HTTP as a transport
 // and implements authentication using out-of-band headers.
 type Client interface {
@@ -155,12 +151,7 @@ func (c *httpClient) makeAuthenticatedRequest(op, method string, req pb.Message)
 			log.Error.Printf("%s: signUser: %s", op, err)
 			return nil, false, errors.E(op, err)
 		}
-		if oldClientAuthHeader {
-			// TODO(adg): Remove handling of old-style headers on April 1 2017.
-			header[authRequestHeader] = authMsg
-		} else {
-			header.Set(authRequestHeader, strings.Join(authMsg, ","))
-		}
+		header.Set(authRequestHeader, strings.Join(authMsg, ","))
 		if c.isProxy() {
 			needServerAuth = true
 			header.Set(proxyRequestHeader, c.proxyFor.String())
