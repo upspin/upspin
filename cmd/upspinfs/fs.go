@@ -457,7 +457,9 @@ func (n *node) Remove(context gContext.Context, req *fuse.RemoveRequest) error {
 	f.Unlock()
 
 	// Avoid write back if the file is currently in use.
+	fn.Lock()
 	fn.noWB = true
+	fn.Unlock()
 
 	// Forget the directory entry.
 	for i, de := range n.de {
