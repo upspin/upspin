@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "1fbc4f75_8ea12ccb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-15T02:26:39Z",
+      "side": 1,
+      "message": "usually we make the prefix here just the package, so\n\ncmd/upspin: add proquint...",
+      "revId": "1d42bb17831dec05da8f1064828fba0430724289",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "0ab40f6b_652bab4c",
         "filename": "cmd/upspin/keygen.go",
         "patchSetId": 1
