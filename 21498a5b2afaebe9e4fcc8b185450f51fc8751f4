@@ -22,6 +22,30 @@
       "revId": "21498a5b2afaebe9e4fcc8b185450f51fc8751f4",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9406b6fe_44eb31d8",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-15T03:32:56Z",
+      "side": 1,
+      "message": "I gave it a try, but I don\u0027t think that it\u0027ll work that way. What you have called handleEvents needs to close the done channel to signal that it\u0027s no longer interested in any more events, but after that it needs to continue to receive events. There\u0027s also the awkward wrinkle of accessOrder.\n\nOr am I misunderstanding your suggestion?",
+      "parentUuid": "3dafc074_001c79ca",
+      "range": {
+        "startLine": 108,
+        "startChar": 1,
+        "endLine": 108,
+        "endChar": 4
+      },
+      "revId": "21498a5b2afaebe9e4fcc8b185450f51fc8751f4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
