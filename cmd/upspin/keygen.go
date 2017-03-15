@@ -66,8 +66,8 @@ func (s *State) keygenCommand(fs *flag.FlagSet) {
 		fs.Usage()
 	}
 
-	secretseed := subcmd.StringFlag(fs, "secretseed")
-	public, private, proquintStr, err := createKeys(curve, secretseed)
+	secretFlag := subcmd.StringFlag(fs, "secretseed")
+	public, private, secretStr, err := createKeys(curve, secretFlag)
 	if err != nil {
 		s.Exitf("creating keys: %v", err)
 	}
@@ -77,11 +77,11 @@ func (s *State) keygenCommand(fs *flag.FlagSet) {
 		s.Exitf("-where must not be empty")
 	}
 	rotate := subcmd.BoolFlag(fs, "rotate")
-	err = s.saveKeys(where, rotate)
+	err = s.saveKeys(where, rotate, public, private)
 	if err != nil {
 		s.Exitf("saving previous keys failed, keys not generated: %s", err)
 	}
-	private = strings.TrimSpace(private) + " # " + proquintStr + "\n"
+	private = strings.TrimSpace(private) + " # " + secretStr + "\n"
 	err = writeKeys(where, public, private)
 	if err != nil {
 		s.Exitf("writing keys: %v", err)
@@ -90,9 +90,9 @@ func (s *State) keygenCommand(fs *flag.FlagSet) {
 	fmt.Printf("\t%s\n", filepath.Join(where, "public.upspinkey"))
 	fmt.Printf("\t%s\n", filepath.Join(where, "secret.upspinkey"))
 	fmt.Println("This key pair provides access to your Upspin identity and data.")
-	if secretseed == "" {
+	if secretFlag == "" {
 		fmt.Println("If you lose the keys you can re-create them by running this command:")
-		fmt.Printf("\tupspin keygen -secretseed %s\n", proquintStr)
+		fmt.Printf("\tupspin keygen -secretseed %s\n", secretStr)
 		fmt.Println("Write this command down and store it in a secure, private place.")
 		fmt.Println("Do not share your private key or this command with anyone.")
 	}
@@ -102,27 +102,27 @@ func (s *State) keygenCommand(fs *flag.FlagSet) {
 	fmt.Println()
 }
 
-func createKeys(curveName, secret string) (public, private, proquintStr string, err error) {
+func createKeys(curveName, secretFlag string) (public, private, secretStr string, err error) {
 	// Pick secret 128 bits.
 	// TODO(ehg)  Consider whether we are willing to ask users to write long seeds for P521.
 	b := make([]byte, 16)
-	if len(secret) > 0 {
-		if len((secret)) != 47 || (secret)[5] != '-' {
+	if len(secretFlag) > 0 {
+		if len((secretFlag)) != 47 || (secretFlag)[5] != '-' {
 			log.Printf("expected secret like\n lusab-babad-gutih-tugad.gutuk-bisog-mudof-sakat\n"+
-				"not\n %s\nkey not generated", secret)
+				"not\n %s\nkey not generated", secretFlag)
 			return "", "", "", errors.E("keygen", errors.Invalid, errors.Str("bad format for secret"))
 		}
 		for i := 0; i < 8; i++ {
-			binary.BigEndian.PutUint16(b[2*i:2*i+2], proquint.Decode([]byte((secret)[6*i:6*i+5])))
+			binary.BigEndian.PutUint16(b[2*i:2*i+2], proquint.Decode([]byte((secretFlag)[6*i:6*i+5])))
 		}
-		proquintStr = secret
+		secretStr = secretFlag
 	} else {
 		ee.GenEntropy(b)
 		proquints := make([]interface{}, 8)
 		for i := 0; i < 8; i++ {
 			proquints[i] = proquint.Encode(binary.BigEndian.Uint16(b[2*i : 2*i+2]))
 		}
-		proquintStr = fmt.Sprintf("%s-%s-%s-%s.%s-%s-%s-%s", proquints...)
+		secretStr = fmt.Sprintf("%s-%s-%s-%s.%s-%s-%s-%s", proquints...)
 		// Ignore punctuation on input;  this format is just to help the user keep their place.
 	}
 
@@ -130,7 +130,7 @@ func createKeys(curveName, secret string) (public, private, proquintStr string, 
 	if err != nil {
 		return "", "", "", err
 	}
-	return string(pub), priv, proquintStr, nil
+	return string(pub), priv, secretStr, nil
 }
 
 // writeKeyFile writes a single key to its file, removing the file
@@ -165,7 +165,7 @@ func writeKeys(where, publicKey, privateKey string) error {
 	return nil
 }
 
-func (s *State) saveKeys(where string, rotate bool) error {
+func (s *State) saveKeys(where string, rotate bool, newPublic, newPrivate string) error {
 	var (
 		publicFile  = filepath.Join(where, "public.upspinkey")
 		privateFile = filepath.Join(where, "secret.upspinkey")
@@ -191,14 +191,24 @@ func (s *State) saveKeys(where string, rotate bool) error {
 	if err != nil {
 		return err // Halt. Existing files are corrupted and need manual attention.
 	}
+	if string(public) == newPublic && string(private) == newPrivate {
+		return nil // No need to save duplicates.
+	}
 
 	// Write old key pair to archive file.
 	archive, err := os.OpenFile(archiveFile, os.O_WRONLY|os.O_APPEND|os.O_CREATE, 0600)
 	if err != nil {
 		return err // We don't have permission to archive old keys?
 	}
-	// TODO(ehg) add file date
-	_, err = fmt.Fprintf(archive, "# EE\n%s%s", public, private)
+
+	var modtime string
+	info, err := os.Stat(privateFile)
+	if err != nil {
+		modtime = ""
+	} else {
+		modtime = info.ModTime().UTC().Format(" 2006-01-02 15:04:05Z")
+	}
+	_, err = fmt.Fprintf(archive, "# EE%s\n%s%s", modtime, public, private)
 	if err != nil {
 		return err
 	}
