@@ -70,6 +70,30 @@
       "revId": "21498a5b2afaebe9e4fcc8b185450f51fc8751f4",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2ec8aaa9_59272196",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-15T03:59:34Z",
+      "side": 1,
+      "message": "I did try that but it didn\u0027t work. I haven\u0027t investigated why, because I feel like I\u0027m starting to shave yaks. If we change the logic we should do it in another CL. I\u0027ll add a TODO.",
+      "parentUuid": "9ae848b4_9f364bce",
+      "range": {
+        "startLine": 108,
+        "startChar": 1,
+        "endLine": 108,
+        "endChar": 4
+      },
+      "revId": "21498a5b2afaebe9e4fcc8b185450f51fc8751f4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
