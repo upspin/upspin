@@ -68,14 +68,20 @@ func (s *web) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Lookup name, but handle NotExist later, as response depends on
-	// whether 'All' has 'list' right.
+	// Lookup name.
 	entry, err := s.cli.Lookup(name, true)
-	if err != nil && !errors.Match(errors.E(errors.NotExist), err) {
+	switch {
+	case errors.Match(errors.E(errors.NotExist), err):
+		// Handle NotExist later, as response depends on
+		// whether 'All' has 'list' right.
+	case errors.Match(errors.E(errors.BrokenLink), err):
+		// Can't follow link so response will be based on
+		// containing directory Access.
+		name = p.Drop(1).Path()
+	case err != nil:
 		httpError(w, err)
 		return
-	}
-	if entry != nil {
+	default:
 		// Update name as we may have followed a link.
 		name = entry.Name
 	}
@@ -161,7 +167,8 @@ func httpError(w http.ResponseWriter, err error) {
 		errors.Match(errors.E(errors.Permission), err):
 		code := http.StatusForbidden
 		http.Error(w, http.StatusText(code), code)
-	case errors.Match(errors.E(errors.NotExist), err):
+	case errors.Match(errors.E(errors.NotExist), err),
+		errors.Match(errors.E(errors.BrokenLink), err):
 		code := http.StatusNotFound
 		http.Error(w, http.StatusText(code), code)
 	default:
