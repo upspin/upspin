@@ -19,16 +19,13 @@ import (
 	"upspin.io/user"
 )
 
-const (
-	// WritersGroupFile is the name of the Group file that specifies writers
-	// for a Perm instance.
-	WritersGroupFile = "Writers"
-)
+// WritersGroupFile is the name of the Group file that specifies
+// writers for a Perm instance.
+const WritersGroupFile = "Writers"
 
-const (
-	// retryTimeout is the interval between re-attempts between failures.
-	retryTimeout = 30 * time.Second
-)
+// retryTimeout is the interval between re-attempts between failures.
+// It is shortened during testing.
+var retryTimeout = 30 * time.Second
 
 // onUpdate is a testing stub that is called after each user list update occurs.
 var onUpdate = func() {}
@@ -93,9 +90,8 @@ func newPerm(op string, cfg upspin.Config, ready <-chan struct{}, target upspin.
 		err := p.Update()
 		if err != nil {
 			log.Error.Printf("%s: %v", op, err)
-			onUpdate() // Even if we failed, unblock tests.
 		}
-		go p.updateLoop()
+		go p.updateLoop(op)
 	}()
 
 	return p
@@ -103,18 +99,25 @@ func newPerm(op string, cfg upspin.Config, ready <-chan struct{}, target upspin.
 
 // updateLoop continuously watches for updates on WritersGroupFile.
 // It must be run in a goroutine.
-func (p *Perm) updateLoop() {
-	const op = "serverutil/perm.updateLoop"
-
-	var events <-chan upspin.Event
-	var done chan struct{}
-	var accessOrder int64
+func (p *Perm) updateLoop(op string) {
+	var (
+		events      <-chan upspin.Event
+		accessOrder int64
+		done        = func() {}
+	)
 	for {
 		var err error
 		if events == nil {
 			// Channel is not yet open. Open now.
-			done = make(chan struct{})
-			events, err = p.watch(upspin.PathName(p.targetUser)+"/", -1, done)
+			doneCh := make(chan struct{})
+			done = func() {
+				if doneCh != nil {
+					close(doneCh)
+					doneCh = nil
+				}
+			}
+			// TODO(edpin,adg): start watching at most recently seen order.
+			events, err = p.watch(upspin.PathName(p.targetUser)+"/", -1, doneCh)
 			if err != nil {
 				log.Error.Printf("%s: watch: %s", op, err)
 				time.Sleep(retryTimeout)
@@ -130,9 +133,7 @@ func (p *Perm) updateLoop() {
 		}
 		if e.Error != nil {
 			log.Error.Printf("%s: watch event error: %s", op, e.Error)
-			events = nil
-			close(done)
-			time.Sleep(retryTimeout)
+			done()
 			continue
 		}
 		// An Access file could have granted or revoked our permission
@@ -140,8 +141,7 @@ func (p *Perm) updateLoop() {
 		// again, after the Access event.
 		if isRelevantAccess(e.Entry.Name) && e.Order > accessOrder {
 			accessOrder = e.Order
-			events = nil
-			close(done)
+			done()
 			continue
 		}
 		// Process event.
@@ -179,18 +179,20 @@ func (p *Perm) Update() error {
 	if err != nil {
 		// If the group file does not exist, reset writers map.
 		if errors.Match(errors.E(errors.NotExist), err) {
-			p.deleteUsers()
+			p.deleteUsers() // Calls onUpdate.
 			return nil
 		}
+		onUpdate() // Even if we failed, unblock tests.
 		return err
 	}
-	return p.updateUsers(entry)
+	return p.updateUsers(entry) // Calls onUpdate.
 }
 
 // updateUsers reads the writers Group file entry and updates the user set.
 func (p *Perm) updateUsers(entry *upspin.DirEntry) error {
 	users, err := p.allowedWriters(entry)
 	if err != nil {
+		onUpdate() // Even if we failed, unblock tests.
 		return err
 	}
 	log.Printf("serverutil/perm: Setting writers to: %v", users)
