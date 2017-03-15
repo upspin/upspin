@@ -22,6 +22,30 @@
       "revId": "009fac6c4e987f8cac65046bb1d6f21120fc1b92",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e9a6792d_76f84576",
+        "filename": "doc/server_setup_ubuntu.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5065
+      },
+      "writtenOn": "2017-03-15T16:08:10Z",
+      "side": 1,
+      "message": "Good catch. Are you sure about the -d flag, though? Looking at https://manpages.debian.org/jessie/passwd/useradd.8.en.html and http://man.openbsd.org/useradd, it seems like -m is the flag we should specify.",
+      "parentUuid": "fe656214_8db344d3",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 16
+      },
+      "revId": "009fac6c4e987f8cac65046bb1d6f21120fc1b92",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
