@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a67c035d_82a43aef",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-15T21:01:45Z",
+      "side": 1,
+      "message": "It\u0027d be great if you could post those logs as issues, or contribute to this issue\n\nhttps://github.com/upspin/upspin/issues/165",
+      "revId": "306ff7c75ac5767efe84106958b6d39c98deeafb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
