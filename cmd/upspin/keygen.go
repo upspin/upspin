@@ -14,6 +14,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"upspin.io/config"
 	"upspin.io/errors"
@@ -65,7 +66,8 @@ func (s *State) keygenCommand(fs *flag.FlagSet) {
 		fs.Usage()
 	}
 
-	public, private, proquintStr, err := createKeys(curve, subcmd.StringFlag(fs, "secretseed"))
+	secretseed := subcmd.StringFlag(fs, "secretseed")
+	public, private, proquintStr, err := createKeys(curve, secretseed)
 	if err != nil {
 		s.Exitf("creating keys: %v", err)
 	}
@@ -79,6 +81,7 @@ func (s *State) keygenCommand(fs *flag.FlagSet) {
 	if err != nil {
 		s.Exitf("saving previous keys failed, keys not generated: %s", err)
 	}
+	private = strings.TrimSpace(private) + " # " + proquintStr + "\n"
 	err = writeKeys(where, public, private)
 	if err != nil {
 		s.Exitf("writing keys: %v", err)
@@ -87,13 +90,11 @@ func (s *State) keygenCommand(fs *flag.FlagSet) {
 	fmt.Printf("\t%s\n", filepath.Join(where, "public.upspinkey"))
 	fmt.Printf("\t%s\n", filepath.Join(where, "secret.upspinkey"))
 	fmt.Println("This key pair provides access to your Upspin identity and data.")
-	if proquintStr != "" {
+	if secretseed == "" {
 		fmt.Println("If you lose the keys you can re-create them by running this command:")
 		fmt.Printf("\tupspin keygen -secretseed %s\n", proquintStr)
 		fmt.Println("Write this command down and store it in a secure, private place.")
 		fmt.Println("Do not share your private key or this command with anyone.")
-	} else {
-		fmt.Println("Do not share your private key with anyone.")
 	}
 	if rotate {
 		fmt.Println("\nTo install new keys in the key server, see 'upspin rotate -help'.")
@@ -101,7 +102,7 @@ func (s *State) keygenCommand(fs *flag.FlagSet) {
 	fmt.Println()
 }
 
-func createKeys(curveName, secret string) (public string, private, proquintStr string, err error) {
+func createKeys(curveName, secret string) (public, private, proquintStr string, err error) {
 	// Pick secret 128 bits.
 	// TODO(ehg)  Consider whether we are willing to ask users to write long seeds for P521.
 	b := make([]byte, 16)
@@ -114,6 +115,7 @@ func createKeys(curveName, secret string) (public string, private, proquintStr s
 		for i := 0; i < 8; i++ {
 			binary.BigEndian.PutUint16(b[2*i:2*i+2], proquint.Decode([]byte((secret)[6*i:6*i+5])))
 		}
+		proquintStr = secret
 	} else {
 		ee.GenEntropy(b)
 		proquints := make([]interface{}, 8)
