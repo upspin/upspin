@@ -16,6 +16,24 @@
       "revId": "306ff7c75ac5767efe84106958b6d39c98deeafb",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3d23d118_449ef015",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-15T23:32:24Z",
+      "side": 1,
+      "message": "Your recent CL seemed to have fixed them for me, for a while.\nAnyway will post errors to that bug when I find them.\n\nI\u0027ll keep working through the security issues list myself, where at least I possibly have expertise, before trying to contribute to the one where I\u0027m a total newbie.  That is the kind of thing I wanted to study in retirement, though!",
+      "parentUuid": "a67c035d_82a43aef",
+      "revId": "306ff7c75ac5767efe84106958b6d39c98deeafb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
