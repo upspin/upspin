@@ -46,6 +46,30 @@
       "revId": "21498a5b2afaebe9e4fcc8b185450f51fc8751f4",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "9ae848b4_9f364bce",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-15T03:52:03Z",
+      "side": 1,
+      "message": "Since you know the order of the highest non error event you received, you can always restart there when you decide to close the watch.  There\u0027s no reason to drain the messages that have come in.",
+      "parentUuid": "9406b6fe_44eb31d8",
+      "range": {
+        "startLine": 108,
+        "startChar": 1,
+        "endLine": 108,
+        "endChar": 4
+      },
+      "revId": "21498a5b2afaebe9e4fcc8b185450f51fc8751f4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
