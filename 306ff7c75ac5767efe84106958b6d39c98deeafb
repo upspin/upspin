@@ -34,6 +34,24 @@
       "revId": "306ff7c75ac5767efe84106958b6d39c98deeafb",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5a6d539e_5b5c8c37",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-15T23:47:06Z",
+      "side": 1,
+      "message": "There are very few of us who are not newbies when it comes to race conditions. :-)",
+      "parentUuid": "3d23d118_449ef015",
+      "revId": "306ff7c75ac5767efe84106958b6d39c98deeafb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
