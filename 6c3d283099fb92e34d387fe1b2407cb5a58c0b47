@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "0739777e_7b652cc9",
+        "filename": "cmd/upspin/keygen.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-15T17:30:49Z",
+      "side": 1,
+      "message": "I\u0027ll rename secretseed and proquintStr in the upcoming CL.",
+      "parentUuid": "52d41f75_93f8c203",
+      "range": {
+        "startLine": 69,
+        "startChar": 1,
+        "endLine": 69,
+        "endChar": 11
+      },
+      "revId": "6c3d283099fb92e34d387fe1b2407cb5a58c0b47",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0ad89e4b_23215267",
         "filename": "factotum/factotum_test.go",
         "patchSetId": 3
@@ -42,6 +66,24 @@
     },
     {
       "key": {
+        "uuid": "06930d61_d8aba0a0",
+        "filename": "factotum/factotum_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-15T17:30:49Z",
+      "side": 1,
+      "message": "reworded in upcoming CL",
+      "parentUuid": "0ad89e4b_23215267",
+      "revId": "6c3d283099fb92e34d387fe1b2407cb5a58c0b47",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "480df91a_b730c2ab",
         "filename": "factotum/testdata/comment/secret2.upspinkey",
         "patchSetId": 3
@@ -53,6 +95,24 @@
       "writtenOn": "2017-03-15T11:29:02Z",
       "side": 1,
       "message": "two trailing spaces?",
+      "revId": "6c3d283099fb92e34d387fe1b2407cb5a58c0b47",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "396a1a9d_1b3ec887",
+        "filename": "factotum/testdata/comment/secret2.upspinkey",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-15T17:30:49Z",
+      "side": 1,
+      "message": "long-standing misfeature, waiting for me to add the date;  will fix soon",
+      "parentUuid": "480df91a_b730c2ab",
       "revId": "6c3d283099fb92e34d387fe1b2407cb5a58c0b47",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
