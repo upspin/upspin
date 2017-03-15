@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "311c6f1e_05823a9b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-15T02:28:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1fbc4f75_8ea12ccb",
+      "revId": "1d42bb17831dec05da8f1064828fba0430724289",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0ab40f6b_652bab4c",
         "filename": "cmd/upspin/keygen.go",
         "patchSetId": 1
@@ -33,6 +51,24 @@
       "revId": "1d42bb17831dec05da8f1064828fba0430724289",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0619c375_470c19e8",
+        "filename": "cmd/upspin/keygen.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-15T02:28:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0ab40f6b_652bab4c",
+      "revId": "1d42bb17831dec05da8f1064828fba0430724289",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "0d6e55b0_a023c5ec",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-15T02:28:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "252ca32b_3af98ac3",
+      "revId": "1d42bb17831dec05da8f1064828fba0430724289",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b315a1ed_30818390",
         "filename": "factotum/factotum.go",
         "patchSetId": 1
@@ -67,6 +121,24 @@
       "revId": "1d42bb17831dec05da8f1064828fba0430724289",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bebf2582_989a7fb4",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-15T02:28:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b315a1ed_30818390",
+      "revId": "1d42bb17831dec05da8f1064828fba0430724289",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
