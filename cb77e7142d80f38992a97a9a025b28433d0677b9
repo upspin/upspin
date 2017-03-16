@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b15db48b_afa19c48",
+        "filename": "cmd/upspinserver/web.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 5605
+      },
+      "writtenOn": "2017-03-16T18:02:48Z",
+      "side": 1,
+      "message": "This obviously doesn\u0027t work in the case where a path up from the requested path is the broken link. The handling of broken links in web is an issue regardless of this CL, so suggest this addressed this in a seperate CL.\n\nMaybe a custom which access function is required for this, that keeps moving up the path until no broken links are found.",
+      "revId": "cb77e7142d80f38992a97a9a025b28433d0677b9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
