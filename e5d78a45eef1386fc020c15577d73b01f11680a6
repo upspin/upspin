@@ -70,6 +70,24 @@
       "revId": "e5d78a45eef1386fc020c15577d73b01f11680a6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "c6ff539d_85b7ceac",
+        "filename": "doc/server_setup_ubuntu.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5065
+      },
+      "writtenOn": "2017-03-16T09:33:42Z",
+      "side": 1,
+      "message": "Agreed, let’s keep it simple in the end-user targeted instructions. We do already create upspin as system user with /var/lib/upspin home directory in the Debian distribution packaging, for example.",
+      "parentUuid": "18c4806f_fe9c4084",
+      "revId": "e5d78a45eef1386fc020c15577d73b01f11680a6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
