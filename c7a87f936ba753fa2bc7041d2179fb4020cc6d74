@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9753298f_31182388",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-16T16:04:54Z",
+      "side": 1,
+      "message": "// Calls onUpdate. ?",
+      "revId": "c7a87f936ba753fa2bc7041d2179fb4020cc6d74",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "47a7cdf6_fa84339d",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-16T16:04:54Z",
+      "side": 1,
+      "message": "// Even if we failed, unblock tests.",
+      "revId": "c7a87f936ba753fa2bc7041d2179fb4020cc6d74",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
