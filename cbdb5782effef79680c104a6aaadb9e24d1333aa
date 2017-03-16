@@ -16,6 +16,24 @@
       "revId": "cbdb5782effef79680c104a6aaadb9e24d1333aa",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "520d4c51_fb9d7442",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-16T20:22:35Z",
+      "side": 1,
+      "message": "You\u0027re right, it\u0027s not the right thing to do, it was just the thing to get Dave out of a jam until the real fix (8382) could go in.",
+      "parentUuid": "9cdd2e32_189728ba",
+      "revId": "cbdb5782effef79680c104a6aaadb9e24d1333aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
