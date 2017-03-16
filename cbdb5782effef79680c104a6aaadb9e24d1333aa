@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9cdd2e32_189728ba",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-16T16:19:57Z",
+      "side": 1,
+      "message": "Ha! You found the reason why I had put it there in a previous CL, even though you were against it because \"adding a sleep is hardly ever the right thing to do\".\n\nI\u0027m fine with this as a catch-all for other problems, but as you pointed out it is not the best fix. \n\nThe reason why this becomes a busy loop is because of a bug in rpc/client.go. In reality, the error you\u0027re likely seeing is that there\u0027s no root for the user and that is not supposed to be an Events.Error, but instead a dir.Watch error. The dir/server handles it that way and rpc/server handles it that way too, but rpc/client does not. I will file a bug and fix that. Then we can figure out if the sleep here is necessary for other error cases.",
+      "revId": "cbdb5782effef79680c104a6aaadb9e24d1333aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
