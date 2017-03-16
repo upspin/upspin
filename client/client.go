@@ -529,6 +529,9 @@ func (c *Client) lookup(op string, entry *upspin.DirEntry, fn lookupFn, followFi
 		if err == nil {
 			return resultEntry, entry, nil
 		}
+		if loop > 0 && errors.Match(errors.E(errors.NotExist), err) {
+			return resultEntry, nil, errors.E(op, errors.BrokenLink, originalName,  err)
+		}
 		if err != upspin.ErrFollowLink {
 			return resultEntry, nil, errors.E(op, err)
 		}
@@ -680,15 +683,12 @@ func (c *Client) Create(name upspin.PathName) (upspin.File, error) {
 // Open implements upspin.Client.
 func (c *Client) Open(name upspin.PathName) (upspin.File, error) {
 	const op = "client.Open"
-	entry, err := c.Lookup(name, true)
+	entry, err := c.Lookup(name, followFinalLink)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
 	if entry.IsDir() {
 		return nil, errors.E(op, errors.IsDir, name, errors.Str("cannot Open a directory"))
-	}
-	if entry.IsLink() {
-		return nil, errors.E(op, errors.Invalid, name, errors.Str("cannot Open a link"))
 	}
 	f, err := file.Readable(c.config, entry)
 	if err != nil {

@@ -8,6 +8,7 @@ import (
 	"flag"
 	"fmt"
 
+	"upspin.io/errors"
 	"upspin.io/upspin"
 )
 
@@ -35,11 +36,15 @@ that controls permissions for each of the argument paths.
 }
 
 func (s *State) whichAccessFollowLinks(name upspin.PathName) (*upspin.DirEntry, error) {
+	originalName := name
 	for loop := 0; loop < upspin.MaxLinkHops; loop++ {
 		entry, err := s.DirServer(name).WhichAccess(name)
 		if err == upspin.ErrFollowLink {
 			name = entry.Link
 			continue
+		}
+		if loop > 0 && errors.Match(errors.E(errors.NotExist), err) {
+			return nil, errors.E(errors.BrokenLink, originalName,  err)
 		}
 		if err != nil {
 			return nil, err
