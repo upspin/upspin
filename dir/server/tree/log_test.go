@@ -14,14 +14,14 @@ import (
 	"sort"
 	"testing"
 
+	"math/rand"
 	"upspin.io/errors"
 	"upspin.io/upspin"
 )
 
-var user upspin.UserName = "foo@bar.com"
-
-func TestMarshalUnmarshal(t *testing.T) {
-	entry := LogEntry{
+var (
+	user  upspin.UserName = "foo@bar.com"
+	entry                 = LogEntry{
 		Op: Delete,
 		Entry: upspin.DirEntry{
 			Name:       "foo@bar.com/dir/file.txt",
@@ -34,6 +34,9 @@ func TestMarshalUnmarshal(t *testing.T) {
 			Time:       1234567890,
 		},
 	}
+)
+
+func TestMarshalUnmarshal(t *testing.T) {
 	buf, err := entry.marshal()
 	if err != nil {
 		t.Fatal(err)
@@ -48,6 +51,89 @@ func TestMarshalUnmarshal(t *testing.T) {
 	if !reflect.DeepEqual(&entry, &newEntry) {
 		t.Errorf("newEntry = %v, want = %v", newEntry, entry)
 	}
+}
+
+func TestConcurrent(t *testing.T) {
+	const (
+		numWriters = 3
+		numReaders = 2
+	)
+	if testing.Short() {
+		// To run faster, run the log on a ram disk:
+		// mkdir /dev/shm/test
+		// env TMPDIR=/dev/shm/test go test -run=Concurrent
+		t.Skip("Concurrent test takes too long")
+	}
+	dir, err := ioutil.TempDir("", "TestConcurrent")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(dir)
+
+	logRW, _, err := NewLogs(user, dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	logRO, err := logRW.Clone()
+	if err != nil {
+		t.Fatal(err)
+	}
+	ready := make(chan bool, 1)
+	start := make(chan bool)
+	write := func() {
+		ready <- true
+		<-start
+		for i := 0; i < 100; i++ {
+			e := entry
+			e.Entry.Sequence = upspin.NewSequence()
+			e.Entry.Time = upspin.Now()
+			if rand.Intn(10) == 0 {
+				e.Entry.SignedName = "bar@foo.com/otherfile"
+			}
+			if rand.Intn(10) == 0 {
+				e.Entry.Link = "hello@example.com/subdir/file"
+			}
+			err := logRW.Append(&e)
+			if err != nil {
+				t.Fatal(err)
+			}
+		}
+		ready <- true
+	}
+	read := func() {
+		ready <- true
+		<-start
+		var offset int64
+		for i := 0; i < 100*numWriters; i++ {
+			_, next, err := logRO.ReadAt(1, offset)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if offset == next {
+				i--
+				continue
+			}
+			offset = next
+		}
+		ready <- true
+	}
+
+	for i := 0; i < numWriters; i++ {
+		go write()
+	}
+	for i := 0; i < numReaders; i++ {
+		go read()
+	}
+	for i := 0; i < numWriters+numReaders; i++ {
+		<-ready
+	}
+	for i := 0; i < numWriters+numReaders; i++ {
+		start <- true
+	}
+	for i := 0; i < numWriters+numReaders; i++ {
+		<-ready
+	}
+
 }
 
 func TestAppendRead(t *testing.T) {
