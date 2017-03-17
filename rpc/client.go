@@ -135,16 +135,8 @@ func NewClient(cfg upspin.Config, netAddr upspin.NetAddr, security SecurityLevel
 	return c, nil
 }
 
-func (c *httpClient) Invoke(method string, req, resp pb.Message, stream ResponseChan, done <-chan struct{}) error {
-	const op = "rpc.Invoke"
-
-	if (resp == nil) == (stream == nil) {
-		return errors.E(op, errors.Str("exactly one of resp and stream must be nil"))
-	}
-
+func (c *httpClient) makeRequest(op, method string, req pb.Message) (*http.Response, error) {
 	token, haveToken := c.authToken()
-
-retryAuth:
 	header := make(http.Header)
 	if haveToken {
 		// If we have a token already, supply it.
@@ -154,7 +146,7 @@ retryAuth:
 		authMsg, err := signUser(c.config, clientAuthMagic, serverAddr(c))
 		if err != nil {
 			log.Error.Printf("%s: signUser: %s", op, err)
-			return errors.E(op, err)
+			return nil, errors.E(op, err)
 		}
 		if oldClientAuthHeader {
 			// TODO(adg): Remove handling of old-style headers on April 1 2017.
@@ -170,7 +162,7 @@ retryAuth:
 	// Encode the payload.
 	payload, err := pb.Marshal(req)
 	if err != nil {
-		return errors.E(op, err)
+		return nil, errors.E(op, err)
 	}
 	header.Set("Content-Type", "application/octet-stream")
 
@@ -178,33 +170,51 @@ retryAuth:
 	url := fmt.Sprintf("%s/api/%s", c.baseURL, method)
 	httpReq, err := http.NewRequest("POST", url, bytes.NewReader(payload))
 	if err != nil {
-		return errors.E(op, errors.Invalid, err)
+		return nil, errors.E(op, errors.Invalid, err)
 	}
 	httpReq.Header = header
-	httpResp, err := c.client.Do(httpReq)
+	resp, err := c.client.Do(httpReq)
 	if err != nil {
-		return errors.E(op, errors.IO, err)
+		return nil, errors.E(op, errors.IO, err)
 	}
 	c.setLastActivity()
-	body := httpResp.Body
+	return resp, nil
+}
 
-	if httpResp.StatusCode != http.StatusOK {
-		msg, _ := ioutil.ReadAll(body)
-		body.Close()
-		if haveToken && bytes.Contains(msg, []byte(errUnauthenticated.Error())) {
-			// If the server restarted it will have forgotten about
-			// our session, and so our auth token becomes invalid.
-			// Invalidate the session and retry this request,
-			c.invalidateSession()
-			haveToken = false // Retry exactly once.
-			goto retryAuth
-		}
-		return errors.E(op, errors.IO, errors.Errorf("%s: %s", httpResp.Status, msg))
+func (c *httpClient) Invoke(method string, req, resp pb.Message, stream ResponseChan, done <-chan struct{}) error {
+	const op = "rpc.Invoke"
+
+	if (resp == nil) == (stream == nil) {
+		return errors.E(op, errors.Str("exactly one of resp and stream must be nil"))
 	}
+
+	var httpResp *http.Response
+	var err error
+	for i := 0; i < 2; i++ {
+		httpResp, err = c.makeRequest(op, method, req)
+		if err != nil {
+			return err
+		}
+		if httpResp.StatusCode != http.StatusOK {
+			msg, _ := ioutil.ReadAll(httpResp.Body)
+			httpResp.Body.Close()
+			// TODO(edpin,adg): unmarshal and check as it's more robust.
+			if bytes.Contains(msg, []byte(errUnauthenticated.Error())) {
+				// If the server restarted it will have forgotten about
+				// our session, and so our auth token becomes invalid.
+				// Invalidate the session and retry this request,
+				c.invalidateSession()
+				continue
+			}
+			return errors.E(op, errors.IO, errors.Errorf("%s: %s", httpResp.Status, msg))
+		}
+		break
+	}
+	body := httpResp.Body
 
 	if resp != nil {
 		// One-shot method, decode the response.
-		respBytes, _ := ioutil.ReadAll(body)
+		respBytes, err := ioutil.ReadAll(body)
 		body.Close()
 		if err != nil {
 			return errors.E(op, errors.IO, err)
@@ -214,17 +224,7 @@ retryAuth:
 		}
 	}
 
-	if haveToken {
-		// If we already had a token, we're done.
-		if stream != nil {
-			go decodeStream(stream, body, done)
-		}
-		return nil
-	}
-	// Otherwise, process the authentication response.
-
-	// Store the returned authentication token.
-	token = httpResp.Header.Get(authTokenHeader)
+	token := httpResp.Header.Get(authTokenHeader)
 	if len(token) == 0 {
 		authErr := httpResp.Header.Get(authErrorHeader)
 		if len(authErr) > 0 {
@@ -232,8 +232,9 @@ retryAuth:
 			return errors.E(op, errors.Permission, errors.Str(authErr))
 		}
 		// No authentication token returned, but no error either.
-		// The server doesn't care about authenticating this request.
 		// Proceed.
+	} else {
+		c.setAuthToken(token)
 	}
 
 	// If talking to a proxy, make sure it is running as the same user.
@@ -247,10 +248,6 @@ retryAuth:
 			body.Close()
 			return errors.E(op, errors.Permission, err)
 		}
-	}
-
-	if len(token) > 0 {
-		c.setAuthToken(token)
 	}
 
 	if stream != nil {
