@@ -6,6 +6,7 @@ package main
 
 import (
 	"bytes"
+	"crypto/sha256"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -160,9 +161,9 @@ If any state exists at the given location (-where) then the command aborts.
 	}
 
 	// Generate signature.
-	// TODO This should use sha256.
 	msg := "upspin-domain:" + *domain + "-" + string(s.Config.UserName())
-	sig, err := s.Config.Factotum().Sign([]byte(msg))
+	hash := sha256.Sum256([]byte(msg))
+	sig, err := s.Config.Factotum().Sign(hash[:])
 	if err != nil {
 		s.Exit(err)
 	}
@@ -273,9 +274,9 @@ func (s *State) setuphost(where, domain, curve string) {
 	}
 
 	// Generate signature.
-	// TODO This should use sha256.
 	msg := "upspin-domain:" + domain + "-" + string(s.Config.UserName())
-	sig, err := s.Config.Factotum().Sign([]byte(msg))
+	hash := sha256.Sum256([]byte(msg))
+	sig, err := s.Config.Factotum().Sign(hash[:])
 	if err != nil {
 		s.Exit(err)
 	}

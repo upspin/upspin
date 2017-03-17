@@ -394,7 +394,31 @@ func TestIsDomainAdminPutOther(t *testing.T) {
 		t.Error("Expected user not to be an admin")
 	}
 
-	// Not try to update otherDude's record and fail. Even domain admins
+	// Repeat this test with the new style signatures, one where a hash
+	// is taken first.
+	lookupTXT = func(domain string) ([]string, error) {
+		if domain == "dude.com" {
+			return []string{
+				"some unrelated TXT field",
+				"upspin:4f1f4d29537fe0239f21d1384c32c61795360c744ad4f6f474f46dd7c2d03edb-494d8cb1988121ee0056fb49d182ab200dd5ad3572f28a47444ed41e8e947123",
+			}, nil
+		}
+		return nil, errors.Str("no host found")
+	}
+	// New server for domainAdmin.
+	u, mockGCP = newKeyServerWithMocking(domainAdmin, domainAdmin, adminJSON)
+	u.lookupTXT = lookupTXT
+	// adminUser will now Put a new user record for otherDude.
+	user = &upspin.User{
+		Name:      otherDude,
+		PublicKey: upspin.PublicKey("adminUser can Put this"),
+	}
+	err = u.Put(user)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Now try to update otherDude's record and fail. Even domain admins
 	// cannot do that.
 
 	// Get a new server.
