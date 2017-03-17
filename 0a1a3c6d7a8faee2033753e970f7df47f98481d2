@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "682b0df8_8e86219c",
+        "filename": "dir/server/bench_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-17T01:51:40Z",
+      "side": 1,
+      "message": "func BenchmarkWhichAccess(b *testing.B) {\n\tdists :\u003d []int{0, 1, 3, 10}\n\tpaths :\u003d []string{\n\t\tuserName + \"/\" + mkName(),\n\t\tuserName + \"/\" + mkName() + \"/\" + mkName() + \"/\" + mkName() + \"/\" + mkName(),\n\t}\n\tfor _, cache :\u003d range []bool{true, false} {\n\t\tb.Run(fmt.Sprintf(\"cache\u003d%v\", cache), func(b *testing.B) {\n\t\t\tfor _, path :\u003d range paths {\n\t\t\t\tb.Run(fmt.Sprintf(\"depth\u003d%v\", strings.Count(path, \"/\")), func(b *testing.B) {\n\t\t\t\t\tfor _, dist :\u003d range dists {\n\t\t\t\t\t\tb.Run(fmt.Sprintf(\"dist\u003d%v\", dist), func(b *testing.B) {\n\t\t\t\t\t\t\tbenchmarkWhichAccess(b, cached, path, dist)\n\t\t\t\t\t\t})\n\t\t\t\t\t}\n\t\t\t\t})\n\t\t\t}\n\t\t})\n\t}\n}\n\nbenefits:\n- you know the test name corresponds with the test parameters\n- can easily run a subset of benchmarks to test, say dist\u003d1 only\n- easy to add additional permutations and/or parameters\n\ndrawbacks:\n- a kind of ugly for loop",
+      "parentUuid": "a13658bf_a764979c",
+      "revId": "0a1a3c6d7a8faee2033753e970f7df47f98481d2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "7a11f031_979104db",
         "filename": "dir/server/bench_test.go",
         "patchSetId": 1
