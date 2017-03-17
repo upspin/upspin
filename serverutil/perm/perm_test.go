@@ -25,11 +25,9 @@ const (
 )
 
 // setupEnv sets up a test environment, used by the tests in this package.
-// The wait func, when called, blocks until onUpdate fires or a timeout occurs.
-// The cleanup func should be called when the test function exits.
-func setupEnv(t *testing.T) (ownerEnv *testenv.Env, wait, cleanup func()) {
+func setupEnv(t *testing.T) *testenv.Env {
 	var err error
-	ownerEnv, err = testenv.New(&testenv.Setup{
+	env, err := testenv.New(&testenv.Setup{
 		OwnerName: owner,
 		Packing:   upspin.PlainPack,
 		Kind:      "server", // Must implement Watch API.
@@ -37,29 +35,38 @@ func setupEnv(t *testing.T) (ownerEnv *testenv.Env, wait, cleanup func()) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	return env
+}
 
-	updated := make(chan bool)
-	oldRetryTimeout := retryTimeout
-	retryTimeout = 100 * time.Millisecond
-	onUpdate = func() { <-updated }
+func newWithEnv(t *testing.T, env *testenv.Env) (perm *Perm, wait func()) {
+	wait, onUpdate, onRetry := newStubs(t)
+	cfg := env.Config
+	dir := env.DirServer
+	perm = newPerm("newWithEnv", cfg, readyNow, cfg.UserName(), dir.Lookup, dir.Watch, onUpdate, onRetry)
+	return
+}
+
+func newWithConfig(t *testing.T, cfg upspin.Config) (perm *Perm, wait func()) {
+	wait, onUpdate, onRetry := newStubs(t)
+	perm = newPerm("newWithConfig", cfg, readyNow, cfg.UserName(), nil, nil, onUpdate, onRetry)
+	return
+}
+
+// The wait func, when called, blocks until onUpdate fires or a timeout occurs.
+func newStubs(t *testing.T) (wait, onUpdate, onRetry func()) {
+	update := make(chan bool)
 	n := 0
 	wait = func() {
 		n++
-		const timeout = 2 * time.Second
 		select {
-		case <-time.After(timeout):
+		case <-time.After(2 * time.Second):
 			t.Fatalf("timed out waiting for update %d", n)
-		case updated <- true:
+		case update <- true:
 			// OK.
 		}
 	}
-	cleanup = func() {
-		ownerEnv.Exit()
-		close(updated) // Unblock the update loop, if blocked.
-		onUpdate = func() {}
-		retryTimeout = oldRetryTimeout
-	}
-
+	onUpdate = func() { <-update }
+	onRetry = func() { time.Sleep(100 * time.Millisecond) }
 	return
 }
 
@@ -73,10 +80,10 @@ func init() {
 }
 
 func TestCantFindFileAllowsAll(t *testing.T) {
-	ownerEnv, wait, cleanup := setupEnv(t)
-	defer cleanup()
+	env := setupEnv(t)
+	defer env.Exit()
 
-	perm := NewWithDir(ownerEnv.Config, readyNow, owner, ownerEnv.DirServer)
+	perm, wait := newWithEnv(t, env)
 	wait()
 
 	// Everyone is allowed, since we can't read the owner file.
@@ -93,19 +100,19 @@ func TestCantFindFileAllowsAll(t *testing.T) {
 }
 
 func TestNoFileAllowsAll(t *testing.T) {
-	ownerEnv, wait, cleanup := setupEnv(t)
-	defer cleanup()
+	env := setupEnv(t)
+	defer env.Exit()
 
 	// Put a permissive Access file, now server knows the file is not there.
 	r := testenv.NewRunner()
-	r.AddUser(ownerEnv.Config)
+	r.AddUser(env.Config)
 	r.As(owner)
 	r.Put(accessFile, accessContent) // So server can lookup the file.
 	if r.Failed() {
 		t.Fatal(r.Diag())
 	}
 
-	perm := NewWithDir(ownerEnv.Config, readyNow, owner, ownerEnv.DirServer)
+	perm, wait := newWithEnv(t, env)
 	wait()
 
 	// Everyone is allowed.
@@ -122,11 +129,11 @@ func TestNoFileAllowsAll(t *testing.T) {
 }
 
 func TestAllowsOnlyOwner(t *testing.T) {
-	ownerEnv, wait, cleanup := setupEnv(t)
-	defer cleanup()
+	env := setupEnv(t)
+	defer env.Exit()
 
 	r := testenv.NewRunner()
-	r.AddUser(ownerEnv.Config)
+	r.AddUser(env.Config)
 
 	r.As(owner)
 	r.Put(accessFile, accessContent) // So server can lookup the file.
@@ -136,7 +143,7 @@ func TestAllowsOnlyOwner(t *testing.T) {
 		t.Fatal(r.Diag())
 	}
 
-	perm := NewWithDir(ownerEnv.Config, readyNow, owner, ownerEnv.DirServer)
+	perm, wait := newWithEnv(t, env)
 	wait()
 
 	// Owner is allowed.
@@ -157,11 +164,11 @@ func TestAllowsOnlyOwner(t *testing.T) {
 }
 
 func TestAllowsOthersAndWildcard(t *testing.T) {
-	ownerEnv, wait, cleanup := setupEnv(t)
-	defer cleanup()
+	env := setupEnv(t)
+	defer env.Exit()
 
 	r := testenv.NewRunner()
-	r.AddUser(ownerEnv.Config)
+	r.AddUser(env.Config)
 
 	r.As(owner)
 	r.Put(accessFile, accessContent) // So server can lookup the file.
@@ -171,7 +178,7 @@ func TestAllowsOthersAndWildcard(t *testing.T) {
 		t.Fatal(r.Diag())
 	}
 
-	perm := NewWithDir(ownerEnv.Config, readyNow, owner, ownerEnv.DirServer)
+	perm, wait := newWithEnv(t, env)
 	wait() // Update call
 	wait() // Watch event
 
@@ -218,10 +225,10 @@ func TestAllowsOthersAndWildcard(t *testing.T) {
 
 // Regression test for issue #317.
 func TestSequentialErrorsOk(t *testing.T) {
-	ownerEnv, wait, cleanup := setupEnv(t)
-	defer cleanup()
+	env := setupEnv(t)
+	defer env.Exit()
 
-	NewWithDir(ownerEnv.Config, readyNow, owner, ownerEnv.DirServer)
+	_, wait := newWithEnv(t, env)
 	wait()
 
 	// No crash, no problem.
@@ -229,11 +236,11 @@ func TestSequentialErrorsOk(t *testing.T) {
 
 // Issue #125
 func TestOrderOfPuts(t *testing.T) {
-	ownerEnv, wait, cleanup := setupEnv(t)
-	defer cleanup()
+	env := setupEnv(t)
+	defer env.Exit()
 
 	r := testenv.NewRunner()
-	r.AddUser(ownerEnv.Config)
+	r.AddUser(env.Config)
 
 	r.As(owner)
 	r.MakeDirectory(groupDir)
@@ -242,7 +249,7 @@ func TestOrderOfPuts(t *testing.T) {
 		t.Fatal(r.Diag())
 	}
 
-	perm := NewWithDir(ownerEnv.Config, readyNow, owner, ownerEnv.DirServer)
+	perm, wait := newWithEnv(t, env)
 	wait() // Update call.
 
 	r.Put(accessFile, accessContent) // So server can lookup Writers.

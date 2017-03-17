@@ -23,12 +23,8 @@ import (
 // writers for a Perm instance.
 const WritersGroupFile = "Writers"
 
-// retryTimeout is the interval between re-attempts between failures.
-// It is shortened during testing.
-var retryTimeout = 30 * time.Second
-
-// onUpdate is a testing stub that is called after each user list update occurs.
-var onUpdate = func() {}
+// retryTimeout is the default interval of re-attempts between failures.
+const retryTimeout = 30 * time.Second
 
 // Perm tracks the set of users with write access to a server, as specified by
 // the Writers Group file. These might be users who can write blocks to a
@@ -41,6 +37,13 @@ type Perm struct {
 
 	lookupFunc lookupFunc
 	watchFunc  watchFunc
+
+	// onUpdate is a testing stub that is called after each user list update occurs.
+	onUpdate func()
+
+	// retryTimeout is called before retrying a watch.
+	// It is used for testing.
+	onRetry func()
 
 	// writers is the set of users allowed to write. If it's nil, all users
 	// are allowed. An empty map means no one is allowed.
@@ -59,7 +62,7 @@ type watchFunc func(upspin.PathName, int64, <-chan struct{}) (<-chan upspin.Even
 // typically the user name of a server, such as a StoreServer or a DirServer.
 func New(cfg upspin.Config, ready <-chan struct{}, target upspin.UserName) *Perm {
 	const op = "serverutil/perm.New"
-	return newPerm(op, cfg, ready, target, nil, nil)
+	return newPerm(op, cfg, ready, target, nil, nil, noop, retry)
 }
 
 // NewWithDir creates a new Perm monitoring the target user's Writers Group
@@ -67,21 +70,27 @@ func New(cfg upspin.Config, ready <-chan struct{}, target upspin.UserName) *Perm
 // the user name of a server, such as a StoreServer or a DirServer.
 func NewWithDir(cfg upspin.Config, ready <-chan struct{}, target upspin.UserName, dir upspin.DirServer) *Perm {
 	const op = "serverutil/perm.NewFromDir"
-	return newPerm(op, cfg, ready, target, dir.Lookup, dir.Watch)
+	return newPerm(op, cfg, ready, target, dir.Lookup, dir.Watch, noop, retry)
 }
+
+func noop() {}
+
+func retry() { time.Sleep(retryTimeout) }
 
 // newPerm creates a new Perm monitoring the target user's Writers Group file,
 // using the provided LookupFunc for lookups and the WatchFunc function to
 // watch changes on the writers file. If lookup or watch are nil the DirServer
 // is resolved using bind and the given config. The target user is typically
 // the user name of a server, such as a StoreServer or a DirServer.
-func newPerm(op string, cfg upspin.Config, ready <-chan struct{}, target upspin.UserName, lookup lookupFunc, watch watchFunc) *Perm {
+func newPerm(op string, cfg upspin.Config, ready <-chan struct{}, target upspin.UserName, lookup lookupFunc, watch watchFunc, onUpdate, onRetry func()) *Perm {
 	p := &Perm{
 		cfg:        cfg,
 		targetUser: target,
 		targetFile: upspin.PathName(target) + "/Group/" + WritersGroupFile,
 		lookupFunc: lookup,
 		watchFunc:  watch,
+		onUpdate:   onUpdate,
+		onRetry:    onRetry,
 		writers:    nil, // Start open.
 	}
 
@@ -120,7 +129,7 @@ func (p *Perm) updateLoop(op string) {
 			events, err = p.watch(upspin.PathName(p.targetUser)+"/", -1, doneCh)
 			if err != nil {
 				log.Error.Printf("%s: watch: %s", op, err)
-				time.Sleep(retryTimeout)
+				p.onRetry()
 				continue
 			}
 		}
@@ -128,7 +137,7 @@ func (p *Perm) updateLoop(op string) {
 		if !ok {
 			log.Debug.Printf("%s: watch channel closed. Re-opening...", op)
 			events = nil
-			time.Sleep(retryTimeout)
+			p.onRetry()
 			continue
 		}
 		if e.Error != nil {
@@ -182,7 +191,7 @@ func (p *Perm) Update() error {
 			p.deleteUsers() // Calls onUpdate.
 			return nil
 		}
-		onUpdate() // Even if we failed, unblock tests.
+		p.onUpdate() // Even if we failed, unblock tests.
 		return err
 	}
 	return p.updateUsers(entry) // Calls onUpdate.
@@ -192,13 +201,26 @@ func (p *Perm) Update() error {
 func (p *Perm) updateUsers(entry *upspin.DirEntry) error {
 	users, err := p.allowedWriters(entry)
 	if err != nil {
-		onUpdate() // Even if we failed, unblock tests.
+		p.onUpdate() // Even if we failed, unblock tests.
 		return err
 	}
 	log.Printf("serverutil/perm: Setting writers to: %v", users)
-	p.set(users)
-	onUpdate()
+	p.mu.Lock()
+	p.writers = make(map[upspin.UserName]bool, len(users))
+	for _, u := range users {
+		p.writers[u] = true
+	}
+	p.mu.Unlock()
+	p.onUpdate()
 	return nil
+}
+
+// deleteUsers resets the writers list to nil.
+func (p *Perm) deleteUsers() {
+	p.mu.Lock()
+	p.writers = nil
+	p.mu.Unlock()
+	p.onUpdate()
 }
 
 // allowedWriters reads the contents of the entry, interprets it exactly as
@@ -251,22 +273,6 @@ func (p *Perm) IsWriter(u upspin.UserName) bool {
 		return false
 	}
 	return p.writers[upspin.UserName("*@"+domain)]
-}
-
-func (p *Perm) set(users []upspin.UserName) {
-	p.mu.Lock()
-	defer p.mu.Unlock()
-	p.writers = make(map[upspin.UserName]bool)
-	for _, u := range users {
-		p.writers[u] = true
-	}
-}
-
-func (p *Perm) deleteUsers() {
-	p.mu.Lock()
-	p.writers = nil
-	p.mu.Unlock()
-	onUpdate()
 }
 
 func (p *Perm) lookup(name upspin.PathName) (*upspin.DirEntry, error) {
