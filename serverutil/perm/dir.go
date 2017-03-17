@@ -15,7 +15,7 @@ import (
 // ready channel is closed.
 func WrapDir(cfg upspin.Config, ready <-chan struct{}, target upspin.UserName, dir upspin.DirServer) upspin.DirServer {
 	const op = "serverutil/perm.WrapDir"
-	p := newPerm(op, cfg, ready, target, dir.Lookup, dir.Watch)
+	p := newPerm(op, cfg, ready, target, dir.Lookup, dir.Watch, noop, retry)
 	return p.WrapDir(dir)
 }
 
