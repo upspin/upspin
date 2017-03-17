@@ -16,6 +16,24 @@
       "revId": "9f12e5ff5c038443bebbb2ee1ee694add46ddb42",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3b929324_475d5458",
+        "filename": "key/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 351,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-17T20:08:54Z",
+      "side": 1,
+      "message": "Yes, that\u0027s my thinking too. Since re-registration is still allowed, we could ask people to re-register by a certain date with the new method.\n\nThanks.",
+      "parentUuid": "93ca67e5_a939b187",
+      "revId": "9f12e5ff5c038443bebbb2ee1ee694add46ddb42",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
