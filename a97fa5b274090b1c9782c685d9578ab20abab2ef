@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bc2e2dcb_cb08bce8",
+        "filename": "cmd/upspinserver/web.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-17T01:51:40Z",
+      "side": 0,
+      "message": "Remove this file from the CL",
+      "revId": "a97fa5b274090b1c9782c685d9578ab20abab2ef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
