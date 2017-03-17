@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "beb299e3_2c32163a",
+        "filename": "dir/server/bench_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-17T01:57:56Z",
+      "side": 1,
+      "message": "I find this loop very off-putting and harder to read. \n\nIt\u0027s not the style of the rest of this file.",
+      "parentUuid": "682b0df8_8e86219c",
+      "revId": "0a1a3c6d7a8faee2033753e970f7df47f98481d2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "7a11f031_979104db",
         "filename": "dir/server/bench_test.go",
         "patchSetId": 1
