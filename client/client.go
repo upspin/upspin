@@ -515,6 +515,7 @@ func (c *Client) lookup(op string, entry *upspin.DirEntry, fn lookupFn, followFi
 	// leaving the rest alone. As the fn will return a newly allocated entry,
 	// after each link we update the entry to achieve this.
 	originalName := entry.Name
+	var prevEntry *upspin.DirEntry
 	copied := false // Do we need to allocate a new entry to modify its name?
 	for loop := 0; loop < upspin.MaxLinkHops; loop++ {
 		parsed, err := path.Parse(entry.Name)
@@ -529,6 +530,10 @@ func (c *Client) lookup(op string, entry *upspin.DirEntry, fn lookupFn, followFi
 		if err == nil {
 			return resultEntry, entry, nil
 		}
+		if prevEntry != nil && errors.Match(errors.E(errors.NotExist), err) {
+			return resultEntry, nil, errors.E(errors.BrokenLink, prevEntry.Name,  err)
+		}
+		prevEntry = resultEntry
 		if err != upspin.ErrFollowLink {
 			return resultEntry, nil, errors.E(op, err)
 		}
@@ -680,15 +685,12 @@ func (c *Client) Create(name upspin.PathName) (upspin.File, error) {
 // Open implements upspin.Client.
 func (c *Client) Open(name upspin.PathName) (upspin.File, error) {
 	const op = "client.Open"
-	entry, err := c.Lookup(name, true)
+	entry, err := c.Lookup(name, followFinalLink)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
 	if entry.IsDir() {
 		return nil, errors.E(op, errors.IsDir, name, errors.Str("cannot Open a directory"))
-	}
-	if entry.IsLink() {
-		return nil, errors.E(op, errors.Invalid, name, errors.Str("cannot Open a link"))
 	}
 	f, err := file.Readable(c.config, entry)
 	if err != nil {
