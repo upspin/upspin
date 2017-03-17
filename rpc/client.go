@@ -41,7 +41,13 @@ type Client interface {
 	// For regular one-shot methods, the stream and done channels must be nil.
 	// For streaming RPC methods, the caller should provide a nil response
 	// and non-nil stream and done channels.
+	// TODO: remove stream param and add method InvokeStream.
 	Invoke(method string, req, resp pb.Message, stream ResponseChan, done <-chan struct{}) error
+
+	// InvokeUnauthenticated invokes an unauthenticated one-shot RPC method
+	// ("Server/Method") with request body req. Upon success, resp, if nil,
+	// contains the server's reply, if any.
+	InvokeUnauthenticated(method string, req, resp pb.Message) error
 }
 
 // ResponseChan describes a mechanism to report streamed messages to a client
@@ -158,7 +164,10 @@ func (c *httpClient) makeAuthenticatedRequest(op, method string, req pb.Message)
 			header.Set(proxyRequestHeader, c.proxyFor.String())
 		}
 	}
+	return c.invoke(op, method, req, header)
+}
 
+func (c *httpClient) invoke(op, method string, req pb.Message, header http.Header) (*http.Response, error) {
 	// Encode the payload.
 	payload, err := pb.Marshal(req)
 	if err != nil {
@@ -179,6 +188,30 @@ func (c *httpClient) makeAuthenticatedRequest(op, method string, req pb.Message)
 	}
 	c.setLastActivity()
 	return resp, nil
+}
+
+// InvokeUnauthenticated invokes an unauthenticated one-shot method with request
+// body req. Upon success, resp contains the server's reply, if any.
+func (c *httpClient) InvokeUnauthenticated(method string, req, resp pb.Message) error {
+	const op = "rpc.InvokeUnauthenticated"
+
+	httpResp, err := c.invoke(op, method, req, make(http.Header))
+	if err != nil {
+		return errors.E(op, errors.IO, err)
+	}
+
+	respBytes, err := ioutil.ReadAll(httpResp.Body)
+	httpResp.Body.Close()
+	if err != nil {
+		return errors.E(op, errors.IO, err)
+	}
+	if resp == nil {
+		return nil
+	}
+	if err := pb.Unmarshal(respBytes, resp); err != nil {
+		return errors.E(op, errors.Invalid, err)
+	}
+	return nil
 }
 
 func (c *httpClient) Invoke(method string, req, resp pb.Message, stream ResponseChan, done <-chan struct{}) error {
@@ -214,7 +247,7 @@ func (c *httpClient) Invoke(method string, req, resp pb.Message, stream Response
 
 	if resp != nil {
 		// One-shot method, decode the response.
-		respBytes, _ := ioutil.ReadAll(body)
+		respBytes, err := ioutil.ReadAll(body)
 		body.Close()
 		if err != nil {
 			return errors.E(op, errors.IO, err)
