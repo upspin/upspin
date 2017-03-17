@@ -23,8 +23,8 @@ import (
 )
 
 type web struct {
-	cfg upspin.Config
-	cli upspin.Client
+	cfg  upspin.Config
+	cli  upspin.Client
 	perm *perm.Perm
 }
 
@@ -35,8 +35,8 @@ func newWeb(cfg upspin.Config, perm *perm.Perm) http.Handler {
 		})
 	}
 	return &web{
-		cfg: cfg,
-		cli: client.New(cfg),
+		cfg:  cfg,
+		cli:  client.New(cfg),
 		perm: perm,
 	}
 }
@@ -170,7 +170,7 @@ func httpError(w http.ResponseWriter, err error) {
 }
 
 type dirTemplateData struct {
-	Dir  upspin.PathName
+	Dir     upspin.PathName
 	Parent  upspin.PathName
 	Content []*upspin.DirEntry
 }
