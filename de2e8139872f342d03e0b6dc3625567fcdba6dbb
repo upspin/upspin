@@ -16,6 +16,24 @@
       "revId": "de2e8139872f342d03e0b6dc3625567fcdba6dbb",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5454fa41_bebb347e",
+        "filename": "key/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-17T20:35:19Z",
+      "side": 1,
+      "message": "We can. But it\u0027s a bit more than a TODO since it requires coordination with existing Upspin domain owners. Filed https://github.com/upspin/upspin/issues/335 for that.",
+      "parentUuid": "8f7114b0_4791d626",
+      "revId": "de2e8139872f342d03e0b6dc3625567fcdba6dbb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
