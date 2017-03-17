@@ -67,6 +67,7 @@ const (
 	IO                        // External I/O error such as network failure.
 	Exist                     // Item already exists.
 	NotExist                  // Item does not exist.
+	BrokenLink                // Link target does not exist.
 	IsDir                     // Item is a directory.
 	NotDir                    // Item is not a directory..
 	NotEmpty                  // Directory not empty.
@@ -90,6 +91,8 @@ func (k Kind) String() string {
 		return "item already exists"
 	case NotExist:
 		return "item does not exist"
+	case BrokenLink:
+		return "link target does not exist"
 	case IsDir:
 		return "item is a directory"
 	case NotDir:

@@ -491,7 +491,7 @@ func TestSimpleLinks(t *testing.T) {
 		t.Fatalf("get of %q has text %q; should be %q", fileName, data, text)
 	}
 	// Put through the link.
-	_, err = client.Put(fileName, []byte(linkText))
+	_, err = client.Put(linkName, []byte(linkText))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -566,6 +566,67 @@ func TestGlobLinks(t *testing.T) {
 	if !globAndCheck(t, client, root+"/*/*",
 		"linkglobber@google.com/dir/file") {
 		t.Error("glob failed")
+	}
+}
+
+func TestBrokenLink(t *testing.T) {
+	const (
+		user     = "linkbroken@google.com"
+		root     = user + "/"
+		dirName  = root + "/dir"
+		fileName = dirName + "/file"
+		linkName = root + "/link"
+		linkText = "what a lovely day"
+	)
+	client := New(setup(user, ""))
+	// Install and check file.
+	_, err := client.MakeDirectory(dirName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Make a broken link.
+	entry, err := client.PutLink(fileName, linkName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if entry == nil {
+		t.Fatal("empty entry from PutLink")
+	}
+	// Attempt Get through the broken link.
+	data, err := client.Get(linkName)
+	if !errors.Match(errors.E(errors.BrokenLink), err) {
+		t.Fatalf("BrokenLink error not raised for %q: %q", linkName, err)
+	}
+	// Put through the link.
+	_, err = client.Put(linkName, []byte(linkText))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Get through the file.
+	data, err = client.Get(fileName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(data) != linkText {
+		t.Fatalf("get of %q has text %q; should be %q", fileName, data, linkText)
+	}
+	// Get through the link.
+	data, err = client.Get(linkName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(data) != linkText {
+		t.Fatalf("get of %q has text %q; should be %q", fileName, data, linkText)
+	}
+	// Delete the link.
+	err = client.Delete(linkName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Get through the file, which should still be there.
+	_, err = client.Get(fileName)
+	if err != nil {
+		t.Fatal(err)
 	}
 }
 

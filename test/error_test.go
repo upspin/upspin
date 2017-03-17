@@ -204,6 +204,17 @@ func testGetLinkErrors(t *testing.T, r *testenv.Runner) {
 	if !r.Match(errors.E(errors.Permission, upspin.PathName(file))) {
 		t.Fatal(r.Diag())
 	}
+
+	// Add list permission to reader and delete the target.
+	// Accessing the link should fail with a 'BrokenLink' error naming the link.
+	r.As(ownerName)
+	r.Put(dstAccess, "delete:"+ownerName+"\nlist:"+readerName)
+	r.Delete(file)
+	r.As(readerName)
+	r.Get(link)
+	if !r.Match(errors.E(errors.BrokenLink, link)) {
+		t.Fatal(r.Diag())
+	}
 }
 
 func testPutErrors(t *testing.T, r *testenv.Runner) {

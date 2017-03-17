@@ -68,14 +68,17 @@ func (s *web) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Lookup name, but handle NotExist later, as response depends on
-	// whether 'All' has 'list' right.
+	// Lookup name.
 	entry, err := s.cli.Lookup(name, true)
-	if err != nil && !errors.Match(errors.E(errors.NotExist), err) {
+	switch {
+	case errors.Match(errors.E(errors.NotExist), err),
+		errors.Match(errors.E(errors.BrokenLink), err):
+		// Handle NotExist or BrokenLink later, as response
+		// depends on whether 'All' has 'list' right.
+	case err != nil:
 		httpError(w, err)
 		return
-	}
-	if entry != nil {
+	default:
 		// Update name as we may have followed a link.
 		name = entry.Name
 	}
@@ -155,16 +158,24 @@ func (s *web) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// ifError checks if the error is the expected one, and if so writes back an
+// HTTP error of the corresponding code.
+func ifError(w http.ResponseWriter, got error, want errors.Kind, code int) bool {
+	if !errors.Match(errors.E(want), got) {
+		return false
+	}
+	http.Error(w, http.StatusText(code), code)
+	return true
+}
+
 func httpError(w http.ResponseWriter, err error) {
-	switch {
-	case errors.Match(errors.E(errors.Private), err),
-		errors.Match(errors.E(errors.Permission), err):
-		code := http.StatusForbidden
-		http.Error(w, http.StatusText(code), code)
-	case errors.Match(errors.E(errors.NotExist), err):
-		code := http.StatusNotFound
-		http.Error(w, http.StatusText(code), code)
-	default:
+	 // This construction sets the HTTP error to the first type that matches.
+	 switch {
+	 case ifError(w, err, errors.Private, http.StatusForbidden):
+	 case ifError(w, err, errors.Permission, http.StatusForbidden):
+	 case ifError(w, err, errors.NotExist, http.StatusNotFound):
+	 case ifError(w, err, errors.BrokenLink, http.StatusNotFound):
+	 default:
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
