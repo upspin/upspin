@@ -7,18 +7,17 @@ package perm
 import (
 	"testing"
 
-	"upspin.io/bind"
 	"upspin.io/errors"
 	"upspin.io/test/testenv"
 	"upspin.io/upspin"
 )
 
 func TestDirIntegration(t *testing.T) {
-	ownerEnv, wait, cleanup := setupEnv(t)
-	defer cleanup()
+	env := setupEnv(t)
+	defer env.Exit()
 
 	r := testenv.NewRunner()
-	r.AddUser(ownerEnv.Config)
+	r.AddUser(env.Config)
 	r.As(owner)
 	r.Put(accessFile, "r,l:all\n*:"+owner) // Permission for anyone to read and list, owner has all rights.
 	r.MakeDirectory(groupDir)
@@ -27,20 +26,22 @@ func TestDirIntegration(t *testing.T) {
 		t.Fatal(r.Diag())
 	}
 
-	// Create a new user without creating its root.
-	writerCtx, err := ownerEnv.NewUser(writer)
-	if err != nil {
-		t.Fatal(err)
-	}
+	perm, wait, cleanup := newWithEnv(t, env)
+	defer cleanup()
+	wait()
+	wait()
 
-	dirServer, err := bind.DirServerFor(writerCtx, writer)
+	// Create a new user without creating its root.
+	writerCtx, err := env.NewUser(writer)
 	if err != nil {
 		t.Fatal(err)
 	}
-	// Wrap the writer's DirServer, pointing Perm to the owner's group file.
-	dir := WrapDir(writerCtx, readyNow, owner, dirServer)
-	wait()
-	wait()
+	// Dial the DirServer as writer.
+	svc, err := perm.WrapDir(env.DirServer).Dial(writerCtx, writerCtx.DirEndpoint())
+	if err != nil {
+		t.Fatal(err)
+	}
+	dir := svc.(upspin.DirServer)
 
 	// At first, only owner can create a root, so it fails.
 	entry := &upspin.DirEntry{

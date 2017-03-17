@@ -27,7 +27,7 @@ import (
 // ready channel is closed.
 func WrapStore(cfg upspin.Config, ready <-chan struct{}, store upspin.StoreServer) upspin.StoreServer {
 	const op = "serverutil/perm.WrapStore"
-	p := newPerm(op, cfg, ready, cfg.UserName(), nil, nil)
+	p := newPerm(op, cfg, ready, cfg.UserName(), nil, nil, noop, defaultRetryTimeout)
 	return p.WrapStore(store)
 }
 

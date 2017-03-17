@@ -14,8 +14,12 @@ import (
 )
 
 func setupStoreEnv(t *testing.T) (store upspin.StoreServer, perm *Perm, ownerEnv *testenv.Env, wait, cleanup func()) {
-	ownerEnv, wait, cleanup = setupEnv(t)
-	perm = New(ownerEnv.Config, readyNow, owner)
+	ownerEnv = setupEnv(t)
+	perm, wait, cleanupFn := newWithEnv(t, ownerEnv)
+	cleanup = func() {
+		cleanupFn()
+		ownerEnv.Exit()
+	}
 	store = perm.WrapStore(ownerEnv.StoreServer)
 	return
 }
