@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "93ca67e5_a939b187",
+        "filename": "key/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 351,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-17T20:06:21Z",
+      "side": 1,
+      "message": "I have some lingering concern that this allows adding user123@example.com by taking some other signature done by upspin@example.com and registering a long domain name made from hash[:], using internationalized domain names.\n\nNot sure this exploit is easy to actually carry out, and anyway better to submit this CL first and deal with any additional transition measures in another CL.",
+      "revId": "9f12e5ff5c038443bebbb2ee1ee694add46ddb42",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
