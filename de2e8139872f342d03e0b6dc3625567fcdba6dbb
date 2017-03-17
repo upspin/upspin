@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8f7114b0_4791d626",
+        "filename": "key/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-17T20:19:07Z",
+      "side": 1,
+      "message": "can we delete this one day? i\u0027d like to think so. if so, please add a TODO",
+      "revId": "de2e8139872f342d03e0b6dc3625567fcdba6dbb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
