@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "35f917c2_8d101377",
+        "filename": "dir/server/tree/log_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-17T00:25:41Z",
+      "side": 1,
+      "message": "loops could be avoided by closing a receive channel, one per gating event.",
+      "revId": "d8e9c372d8a74463a2727c047e15337f62989871",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
