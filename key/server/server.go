@@ -7,6 +7,7 @@
 package server
 
 import (
+	"crypto/sha256"
 	"encoding/json"
 	"math/big"
 	"net"
@@ -341,6 +342,14 @@ func (s *server) verifyOwns(u upspin.UserName, pubKey upspin.PublicKey, domain s
 
 		log.Debug.Printf("Verifying if %q owns %q with pubKey: %q. Got sig: %q", u, domain, pubKey, txt[len(prefix):])
 		msg := "upspin-domain:" + domain + "-" + string(u)
+		hash := sha256.Sum256([]byte(msg))
+		lastErr = factotum.Verify(hash[:], sig, pubKey)
+		if lastErr == nil {
+			// Success!
+			return nil
+		}
+		// Try the old-style signature, in case this is a domain that
+		// was created prior to CL/8327.
 		lastErr = factotum.Verify([]byte(msg), sig, pubKey)
 		if lastErr == nil {
 			// Success!
