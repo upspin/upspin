@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e1527a63_7782b333",
+        "filename": "cmd/upspinserver/web.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-17T20:50:56Z",
+      "side": 1,
+      "message": "This is a pretty ugly routine. Try this (untested) cleanup:\n\n// ifError checks if the error is the expected one, and if so writes back an\n// HTTP error of the corresponding code.\nfunc ifError(w http.ResponseWriter, got, want error, code int) bool {\n  if !errors.Match(errors.E(want), err) {\n    return false\n  }\n  http.Error(w, http.StatusText(code), code)\n  return true\n}\n\nfunc httpError(w http.ResponseWriter, err error) {\n   // This construction sets the HTTP error to the first type that matches.\n   switch {\n   case isError(w, err, errors.Private, http.StatusForbidden):\n   case isError(w, err, errors.Permission, http.StatusForbidden):\n   case isError(w, err, errors.NotExist, http.StatusNotFound):\n   case isError(w, err, errors.BrokenLink, http.StatusNotFound):\n   default:\n    http.Error(w, err.Error(), http.StatusInternalServerError)\n  }\n}",
+      "revId": "11c16551cdde002d51a92858f425c735d5ebf7c8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4a27a4e7_98ffb58d",
+        "filename": "test/error_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-17T20:50:56Z",
+      "side": 1,
+      "message": "// Add list permission to reader and delete the target.\n// Accessing the link should fail witha  \u0027BrokenLink\u0027 error naming the link.",
+      "revId": "11c16551cdde002d51a92858f425c735d5ebf7c8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
