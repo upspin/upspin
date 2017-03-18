@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "794dc233_e4fbaae4",
+        "filename": "rpc/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-18T05:10:49Z",
+      "side": 1,
+      "message": "As per issue #310. Client should have Invoke, InvokeUnauthenticated and InvokeStream, to mirror the Server.",
+      "parentUuid": "813e8fc4_49738cbc",
+      "revId": "6cb84b5317c14bb560605d00cf8127a955a08041",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "178582f8_abd8cc9b",
         "filename": "rpc/client.go",
         "patchSetId": 1
@@ -33,6 +51,24 @@
       "revId": "6cb84b5317c14bb560605d00cf8127a955a08041",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "76bbbd87_95238ac1",
+        "filename": "rpc/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-18T05:10:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "178582f8_abd8cc9b",
+      "revId": "6cb84b5317c14bb560605d00cf8127a955a08041",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "d44ae0f9_1144b5ad",
+        "filename": "rpc/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-18T05:10:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2f491edf_9dd49268",
+      "revId": "6cb84b5317c14bb560605d00cf8127a955a08041",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b8e070d9_1354bcc7",
         "filename": "rpc/client.go",
         "patchSetId": 1
@@ -67,6 +121,24 @@
       "revId": "6cb84b5317c14bb560605d00cf8127a955a08041",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2f8b6e28_b67880fe",
+        "filename": "rpc/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-18T05:10:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b8e070d9_1354bcc7",
+      "revId": "6cb84b5317c14bb560605d00cf8127a955a08041",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "10400737_d8ab51b0",
+        "filename": "rpc/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-18T05:10:49Z",
+      "side": 1,
+      "message": "Was anticipating methods that don\u0027t require an answer, such as Ping or Close. But, not needed now and it should  be done before spending time reading reading the contents.\n\nRemoved.",
+      "parentUuid": "f825a6ca_67a639f3",
+      "revId": "6cb84b5317c14bb560605d00cf8127a955a08041",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "925082a5_6c987652",
         "filename": "rpc/client.go",
         "patchSetId": 1
@@ -101,6 +191,24 @@
       "revId": "6cb84b5317c14bb560605d00cf8127a955a08041",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3f9b115e_25ba0133",
+        "filename": "rpc/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-18T05:10:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "925082a5_6c987652",
+      "revId": "6cb84b5317c14bb560605d00cf8127a955a08041",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
