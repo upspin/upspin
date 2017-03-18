@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "681b6213_2ba49d30",
+        "filename": "rpc/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 252,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-18T00:42:47Z",
+      "side": 0,
+      "message": "why move this? the reason it\u0027s here is so that we don\u0027t set the auth token if the proxy stuff fails",
+      "revId": "4c265657655076dff2169358d6da34e3e134ee24",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
