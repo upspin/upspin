@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "813e8fc4_49738cbc",
+        "filename": "rpc/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-18T00:48:36Z",
+      "side": 1,
+      "message": "why?",
+      "revId": "6cb84b5317c14bb560605d00cf8127a955a08041",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "178582f8_abd8cc9b",
+        "filename": "rpc/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-18T00:48:36Z",
+      "side": 1,
+      "message": "can we get a better name here? Invoke calling makeRequest calling invoke is not easy to understand\n\nmaybe this should be makeRequest and the other should be makeAuthenticatedRequest (reverting my suggestion on the other CL, which I read first, sorry)",
+      "revId": "6cb84b5317c14bb560605d00cf8127a955a08041",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2f491edf_9dd49268",
+        "filename": "rpc/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-18T00:48:36Z",
+      "side": 1,
+      "message": "// InvokeUnauthenticated implements Client.",
+      "revId": "6cb84b5317c14bb560605d00cf8127a955a08041",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b8e070d9_1354bcc7",
+        "filename": "rpc/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-18T00:48:36Z",
+      "side": 1,
+      "message": "this code is now duplicated here and in Invoke. add another method",
+      "revId": "6cb84b5317c14bb560605d00cf8127a955a08041",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f825a6ca_67a639f3",
+        "filename": "rpc/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-18T00:48:36Z",
+      "side": 1,
+      "message": "why?",
+      "revId": "6cb84b5317c14bb560605d00cf8127a955a08041",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "925082a5_6c987652",
+        "filename": "rpc/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-18T00:48:36Z",
+      "side": 1,
+      "message": "// Invoke implements Client.",
+      "revId": "6cb84b5317c14bb560605d00cf8127a955a08041",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
