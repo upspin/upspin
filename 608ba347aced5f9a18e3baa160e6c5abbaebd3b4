@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "c01b534a_4197f80e",
+        "filename": "rpc/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-18T04:58:43Z",
+      "side": 1,
+      "message": "Done. But I think it\u0027s best to be explicit about it doing auth. It will come in handy in the next CL.",
+      "parentUuid": "9935fade_1f2796a4",
+      "revId": "608ba347aced5f9a18e3baa160e6c5abbaebd3b4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "3b4f37c1_ecaa3d10",
         "filename": "rpc/client.go",
         "patchSetId": 2
@@ -33,6 +51,24 @@
       "revId": "608ba347aced5f9a18e3baa160e6c5abbaebd3b4",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f2bff16e_a9636f46",
+        "filename": "rpc/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-18T04:58:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3b4f37c1_ecaa3d10",
+      "revId": "608ba347aced5f9a18e3baa160e6c5abbaebd3b4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }

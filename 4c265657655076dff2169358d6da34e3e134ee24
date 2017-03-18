@@ -16,6 +16,24 @@
       "revId": "4c265657655076dff2169358d6da34e3e134ee24",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "50159080_05a2ff34",
+        "filename": "rpc/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 252,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-18T04:58:43Z",
+      "side": 0,
+      "message": "It cleans up a piece of the logic, by storing it near where we check it was sent back.\n\nIf the server sent it back, why shouldn\u0027t we store it? If the proxy fails, it\u0027s for other reasons, no?",
+      "parentUuid": "681b6213_2ba49d30",
+      "revId": "4c265657655076dff2169358d6da34e3e134ee24",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
