@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "666a576f_f0c50ee2",
+        "filename": "rpc/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-19T02:02:49Z",
+      "side": 1,
+      "message": "return readResponse",
+      "revId": "b774f7a5e4acbfd4450d61bb2d40066ae669c358",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
