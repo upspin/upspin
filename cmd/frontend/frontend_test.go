@@ -75,11 +75,18 @@ func TestNoGzip(t *testing.T) {
 	}
 }
 
+const defaultHost = "upspin.io"
+
 func get(t *testing.T, url string) []byte {
+	return getHost(t, defaultHost, url)
+}
+
+func getHost(t *testing.T, host, url string) []byte {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		t.Fatalf("expected no error, but got %v", err)
 	}
+	req.Host = host
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		t.Fatalf("expected no error, but got %v", err)
@@ -97,10 +104,12 @@ func get(t *testing.T, url string) []byte {
 
 func TestGoImport(t *testing.T) {
 	once.Do(startServer)
-	b := get(t, "http://"+addr+"/?go-get=1")
-	expected := fmt.Sprintf(`<meta name="go-import" content="%v git %v">`, sourceBase, sourceRepo)
-	if strings.TrimSpace(string(b)) != expected {
-		t.Errorf("expected response body to be %q, got %q", expected, b)
+	for host := range sourceRepo {
+		b := getHost(t, host, "http://"+addr+"/?go-get=1")
+		expected := fmt.Sprintf(`<meta name="go-import" content="%v git %v">`, host, sourceRepo[host])
+		if strings.TrimSpace(string(b)) != expected {
+			t.Errorf("expected response body to be %q, got %q", expected, b)
+		}
 	}
 }
 
