@@ -39,12 +39,16 @@ func main() {
 	https.ListenAndServeFromFlags(nil, "frontend")
 }
 
-const (
-	sourceBase = "upspin.io"
-	sourceRepo = "https://upspin.googlesource.com/upspin"
+const extMarkdown = ".md"
 
-	extMarkdown = ".md"
-)
+// sourceRepo is a map from each custom domain their repo base URLs.
+var sourceRepo = map[string]string{
+	"upspin.io": "https://upspin.googlesource.com/upspin",
+
+	"android.upspin.io": "https://upspin.googlesource.com/android",
+	"augie.upspin.io":   "https://upspin.googlesource.com/augie",
+	"cloud.upspin.io":   "https://upspin.googlesource.com/cloud",
+}
 
 var (
 	baseTmpl    = template.Must(template.ParseFiles("templates/base.tmpl"))
@@ -101,10 +105,6 @@ type pageData struct {
 
 func (s *server) handleRoot(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	if r.URL.Query().Get("go-get") == "1" {
-		fmt.Fprintf(w, `<meta name="go-import" content="%v git %v">`, sourceBase, sourceRepo)
-		return
-	}
 	if r.URL.Path != "/" {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
@@ -208,7 +208,13 @@ type goGetHandler struct {
 
 func (h goGetHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Query().Get("go-get") == "1" {
-		fmt.Fprintf(w, `<meta name="go-import" content="%v git %v">`, sourceBase, sourceRepo)
+		base := r.Host
+		repo, ok := sourceRepo[base]
+		if !ok {
+			http.NotFound(w, r)
+			return
+		}
+		fmt.Fprintf(w, `<meta name="go-import" content="%v git %v">`, base, repo)
 		return
 	}
 	h.Handler.ServeHTTP(w, r)
