@@ -80,6 +80,7 @@ func get(t *testing.T, url string) []byte {
 	if err != nil {
 		t.Fatalf("expected no error, but got %v", err)
 	}
+	req.Host = "upspin.io"
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		t.Fatalf("expected no error, but got %v", err)
@@ -98,7 +99,7 @@ func get(t *testing.T, url string) []byte {
 func TestGoImport(t *testing.T) {
 	once.Do(startServer)
 	b := get(t, "http://"+addr+"/?go-get=1")
-	expected := fmt.Sprintf(`<meta name="go-import" content="%v git %v">`, sourceBase, sourceRepo)
+	expected := fmt.Sprintf(`<meta name="go-import" content="%v git %v">`, "upspin.io", sourceRepo["upspin.io"])
 	if strings.TrimSpace(string(b)) != expected {
 		t.Errorf("expected response body to be %q, got %q", expected, b)
 	}
