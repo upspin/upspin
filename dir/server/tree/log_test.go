@@ -83,6 +83,7 @@ func TestConcurrent(t *testing.T) {
 	var done sync.WaitGroup
 	start := make(chan struct{})
 	write := func() {
+		done.Add(1)
 		ready.Done()
 		<-start
 		for i := 0; i < 100; i++ {
