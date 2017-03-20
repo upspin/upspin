@@ -531,7 +531,7 @@ func (c *Client) lookup(op string, entry *upspin.DirEntry, fn lookupFn, followFi
 			return resultEntry, entry, nil
 		}
 		if prevEntry != nil && errors.Match(errors.E(errors.NotExist), err) {
-			return resultEntry, nil, errors.E(errors.BrokenLink, prevEntry.Name,  err)
+			return resultEntry, nil, errors.E(errors.BrokenLink, prevEntry.Name, err)
 		}
 		prevEntry = resultEntry
 		if err != upspin.ErrFollowLink {
