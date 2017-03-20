@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "840ed3c9_b55fd1ad",
+        "filename": "cmd/frontend/frontend.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-20T04:53:07Z",
+      "side": 1,
+      "message": "s1/to/for/?",
+      "revId": "994669add1e605c3db9c06bd297729b2abc16030",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
