@@ -9,13 +9,13 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
+	"math/rand"
 	"os"
 	"reflect"
 	"sort"
+	"sync"
 	"testing"
 
-	"math/rand"
-	"sync"
 	"upspin.io/errors"
 	"upspin.io/upspin"
 )
@@ -151,7 +151,7 @@ func TestAppendRead(t *testing.T) {
 	}
 
 	for i := 0; i < 10; i++ {
-		le := newLogEntry(upspin.PathName(fmt.Sprintf("foo@bar.com/hello%d", i)))
+		le := newLogEntry(upspin.PathName(fmt.Sprintf("foo@bar.com/hello%d", i)), i+1)
 		err := logger.Append(le)
 		if err != nil {
 			t.Fatal(err)
@@ -209,7 +209,7 @@ func TestAppendRead(t *testing.T) {
 	if got, want := len(entries), 1; got != want {
 		t.Fatalf("len(entries) = %d, want = %d", got, want)
 	}
-	err = clone.Append(newLogEntry(upspin.PathName("foo@bar.com/yabbadabadoo")))
+	err = clone.Append(newLogEntry(upspin.PathName("foo@bar.com/yabbadabadoo"), 17))
 	expectedErr := errors.E(errors.IO)
 	if !errors.Match(expectedErr, err) {
 		t.Errorf("err = %v, want = %v", err, expectedErr)
@@ -365,11 +365,8 @@ func TestChecksum(t *testing.T) {
 	}
 }
 
-var seq int64
-
-func newLogEntry(path upspin.PathName) *LogEntry {
+func newLogEntry(path upspin.PathName, seq int) *LogEntry {
 	var op Operation
-	seq++
 	if seq%2 == 0 {
 		op = Delete
 	} else {
@@ -381,7 +378,7 @@ func newLogEntry(path upspin.PathName) *LogEntry {
 			Name:       path,
 			SignedName: path,
 			Writer:     "foo@bar.com",
-			Sequence:   seq,
+			Sequence:   int64(seq),
 		},
 	}
 }
