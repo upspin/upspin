@@ -78,10 +78,15 @@ For our example these usernames will be `upspin-dir@example.com` and
 
 You need not use the signup process to create users for your servers.
 Instead, the `upspin setupdomain` command will do the work for you.
+
+Throughout this document, all commands are to be run on your
+local machine and so are marked with the shell prompt `local$`
+for clarity.
+
 This command sets up users for our example domain:
 
 ```
-$ upspin -project=example-project setupdomain -cluster -domain=example.com
+local$ upspin -project=example-project setupdomain -cluster -domain=example.com
 ```
 
 and should print something like this:
@@ -135,7 +140,7 @@ any other users you may choose to give Upspin user names within `example.com`).
 In general, one adds and edits user records in the key server using the command
 
 ```
-$ upspin user -put
+local$ upspin user -put
 ```
 
 but for the particular case of adding the server's users, it's simpler to use a
@@ -143,7 +148,7 @@ special variant of the `setupdomain` command with by the `-put-users` flag.
 Run this next:
 
 ```
-$ upspin -project=example-project setupdomain -cluster -put-users example.com
+local$ upspin -project=example-project setupdomain -cluster -put-users example.com
 ```
 
 The command should print something like this:
@@ -170,15 +175,15 @@ Install the Google Cloud SDK by following
 Install the components Upspin needs:
 
 ```
-$ gcloud components install kubectl beta
+local$ gcloud components install kubectl beta
 ```
 
 Ensure `gcloud`is authenticatedby running
 
 
 ```
-$ gcloud auth login
-$ gcloud auth application-default login
+local$ gcloud auth login
+local$ gcloud auth application-default login
 ```
 
 The following command creates a raft of Google Cloud Platform services under
@@ -186,7 +191,7 @@ The following command creates a raft of Google Cloud Platform services under
 various hosts of domain example.com.
 
 ```
-$ upspin-deploy -create -domain=example.com -project=example-project
+local$ upspin-deploy -create -domain=example.com -project=example-project
 ```
 
 If the above is successful, there will be two new servers running on GCP: the
@@ -243,7 +248,7 @@ create an Upspin tree in the directory server.
 Of course, the command you run should list the users of your own servers.
 
 ```
-$ upspin -project=example-project setupwriters -domain=example.com you@gmail.com
+local$ upspin -project=example-project setupwriters -domain=example.com you@gmail.com
 ```
 
 The servers are now available for general use.
