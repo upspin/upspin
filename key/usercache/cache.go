@@ -31,14 +31,18 @@ type userCacheServer struct {
 	// The underlying key server.
 	base upspin.KeyServer
 
-	// The following fields are used to defer dialing the underlying
-	// service until a Lookup or Put call requires it.
-	// If dialConfig is non-nil, then the Dial method has been called.
-	// If dialed is non-nil, then the underlying service has been dialed.
-	mu           sync.Mutex
-	dialConfig   upspin.Config
-	dialEndpoint upspin.Endpoint
-	dialed       upspin.KeyServer
+	dd *deferredDial
+}
+
+// deferredDial is used to defer dialing the underlying
+// service until a Lookup or Put call requires it.
+// If config is non-nil, then the Dial method has been called.
+// If dialed is non-nil, then the underlying service has been dialed.
+type deferredDial struct {
+	mu       sync.Mutex
+	config   upspin.Config
+	endpoint upspin.Endpoint
+	dialed   upspin.KeyServer
 }
 
 var _ upspin.KeyServer = (*userCacheServer)(nil)
@@ -90,7 +94,7 @@ func (c *userCacheServer) Lookup(name upspin.UserName) (*upspin.User, error) {
 	if err := c.dial(); err != nil {
 		return nil, errors.E(op, err)
 	}
-	u, err := c.dialed.Lookup(name)
+	u, err := c.dd.dialed.Lookup(name)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
@@ -108,7 +112,7 @@ func (c *userCacheServer) Put(user *upspin.User) error {
 	if err := c.dial(); err != nil {
 		return errors.E(op, err)
 	}
-	if err := c.dialed.Put(user); err != nil {
+	if err := c.dd.dialed.Put(user); err != nil {
 		return errors.E(op, err)
 	}
 	c.cache.entries.Remove(user.Name)
@@ -119,9 +123,9 @@ func (c *userCacheServer) Put(user *upspin.User) error {
 func (c *userCacheServer) Endpoint() upspin.Endpoint {
 	// We don't want Endpoint to trigger a Dial.
 	// Just return the Endpoint for either the dialed or base service.
-	c.mu.Lock()
-	svc := c.dialed
-	c.mu.Unlock()
+	c.dd.mu.Lock()
+	svc := c.dd.dialed
+	c.dd.mu.Unlock()
 	if svc == nil {
 		return svc.Endpoint()
 	}
@@ -132,9 +136,9 @@ func (c *userCacheServer) Endpoint() upspin.Endpoint {
 func (c *userCacheServer) Ping() bool {
 	// We don't want Ping to trigger a Dial.
 	// If we're not yet dialed, just return true.
-	c.mu.Lock()
-	svc := c.dialed
-	c.mu.Unlock()
+	c.dd.mu.Lock()
+	svc := c.dd.dialed
+	c.dd.mu.Unlock()
 	if svc == nil {
 		return true
 	}
@@ -149,9 +153,9 @@ func (c *userCacheServer) Authenticate(upspin.Config) error {
 // Close implements upspin.Service.
 func (c *userCacheServer) Close() {
 	// If we're dialed, closed the dialed service.
-	c.mu.Lock()
-	svc := c.dialed
-	c.mu.Unlock()
+	c.dd.mu.Lock()
+	svc := c.dd.dialed
+	c.dd.mu.Unlock()
 	if svc != nil {
 		svc.Close()
 		return
@@ -166,10 +170,10 @@ func (c *userCacheServer) Dial(cfg upspin.Config, e upspin.Endpoint) (upspin.Ser
 	c.cacheConfigUser(cfg)
 
 	cc := *c
-	cc.mu = sync.Mutex{}
-	cc.dialed = nil
-	cc.dialConfig = cfg
-	cc.dialEndpoint = e
+	cc.dd = &deferredDial{
+		config:   cfg,
+		endpoint: e,
+	}
 	return &cc, nil
 }
 
@@ -205,20 +209,20 @@ func (c *userCacheServer) cacheConfigUser(cfg upspin.Config) {
 // If Dial was not called, it returns an error.
 // If there is already a dialed service, it does nothing.
 func (c *userCacheServer) dial() error {
-	c.mu.Lock()
-	defer c.mu.Unlock()
+	c.dd.mu.Lock()
+	defer c.dd.mu.Unlock()
 
-	if c.dialed != nil {
+	if c.dd.dialed != nil {
 		return nil
 	}
-	if c.dialConfig == nil {
+	if c.dd.config == nil {
 		return errors.Str("server not dialed")
 	}
 
-	svc, err := c.base.Dial(c.dialConfig, c.dialEndpoint)
+	svc, err := c.base.Dial(c.dd.config, c.dd.endpoint)
 	if err != nil {
 		return err
 	}
-	c.dialed = svc.(upspin.KeyServer)
+	c.dd.dialed = svc.(upspin.KeyServer)
 	return nil
 }
