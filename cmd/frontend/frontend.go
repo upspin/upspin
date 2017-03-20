@@ -39,7 +39,10 @@ func main() {
 	https.ListenAndServeFromFlags(nil, "frontend")
 }
 
-const extMarkdown = ".md"
+const (
+	extMarkdown = ".md"
+	docHostname = "upspin.io" // redirect doc requests to this URL
+)
 
 // sourceRepo is a map from each custom domain their repo base URLs.
 var sourceRepo = map[string]string{
@@ -93,9 +96,9 @@ func (s *server) init() {
 		log.Error.Fatalf("Could not parse docs in %s: %s", *docPath, err)
 	}
 
-	s.mux.Handle("/", goGetHandler{http.HandlerFunc(s.handleRoot)})
-	s.mux.HandleFunc("/doc/", s.handleDoc)
-	s.mux.Handle("/images/", http.FileServer(http.Dir("./")))
+	s.mux.Handle("/", goGetHandler{canonicalHostHandler{http.HandlerFunc(s.handleRoot)}})
+	s.mux.Handle("/doc/", canonicalHostHandler{http.HandlerFunc(s.handleDoc)})
+	s.mux.Handle("/images/", canonicalHostHandler{http.FileServer(http.Dir("./"))})
 }
 
 type pageData struct {
@@ -203,7 +206,7 @@ func docTitle(b []byte) string {
 }
 
 type goGetHandler struct {
-	Handler http.Handler
+	http.Handler
 }
 
 func (h goGetHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -215,6 +218,21 @@ func (h goGetHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		fmt.Fprintf(w, `<meta name="go-import" content="%v git %v">`, base, repo)
+		return
+	}
+	h.Handler.ServeHTTP(w, r)
+}
+
+type canonicalHostHandler struct {
+	http.Handler
+}
+
+func (h canonicalHostHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// Redirect requests to foo.upspin.io to upspin.io.
+	if r.Host != docHostname && strings.HasSuffix(r.Host, "."+docHostname) {
+		u := *r.URL
+		u.Host = docHostname
+		http.Redirect(w, r, u.String(), http.StatusFound)
 		return
 	}
 	h.Handler.ServeHTTP(w, r)
