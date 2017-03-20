@@ -46,10 +46,14 @@ Run `upspin signup`, passing your chosen host name as its `-server` argument
 and your chosen Upspin user name as its final argument.
 Then follow the onscreen instructions.
 
+Throughout this document, we will mark commands to be run on your
+local machine with the shell prompt `local$` and commands to be
+run on your server with `server%`.
+
 For example:
 
 ```
-$ upspin signup -server=upspin.example.com you@gmail.com
+local$ upspin signup -server=upspin.example.com you@gmail.com
 ```
 
 The [Signing up a new user](/doc/signup.md) document describes this process in
@@ -72,7 +76,7 @@ your domain name as your server user name.
 This command sets up users for our example domain:
 
 ```
-$ upspin setupdomain -domain=example.com
+local$ upspin setupdomain -domain=example.com
 ```
 
 It should produce output like this:
@@ -151,11 +155,11 @@ Then, install the Google Cloud SDK by following
 Finally, use the `gcloud` tool to enable the required APIs:
 
 ```
-$ gcloud components install beta
-$ gcloud config set project example-com
-$ gcloud auth login
-$ gcloud beta service-management enable iam.googleapis.com
-$ gcloud beta service-management enable storage_api
+local$ gcloud components install beta
+local$ gcloud config set project example-com
+local$ gcloud auth login
+local$ gcloud beta service-management enable iam.googleapis.com
+local$ gcloud beta service-management enable storage_api
 ```
 
 ### Create a Google Cloud Storage bucket
@@ -164,7 +168,7 @@ Use the `gcloud` tool to obtain "application default credentials" so that the
 `upspin setupstorage` command can make changes to your Google Cloud Project:
 
 ```
-$ gcloud auth application-default login
+local$ gcloud auth application-default login
 ```
 
 Then use `upspin setupstorage` to create a storage bucket and an associated
@@ -174,7 +178,7 @@ Storage users, so it is prudent to include your domain name in the bucket name.
 (We will use `example-com-upspin`.)
 
 ```
-$ upspin -project=<project> setupstorage -domain=example.com example-com-upspin
+local$ upspin -project=<project> setupstorage -domain=example.com example-com-upspin
 ```
 
 It should produce output like this:
@@ -250,7 +254,7 @@ On your workstation, run `upspin setupserver` to send your server keys and
 configuration to the `upspinserver` instance:
 
 ```
-$ upspin setupserver -domain=example.com -host=upspin.example.com
+local$ upspin setupserver -domain=example.com -host=upspin.example.com
 ```
 
 This registers the server user with the public key server, copies the
@@ -293,7 +297,7 @@ You should now be able to communicate with your Upspin installation using the
 To test that you can write and read to your Upspin tree, first create a file:
 
 ```
-$ echo Hello, Upspin | upspin put you@gmail.com/hello
+local$ echo Hello, Upspin | upspin put you@gmail.com/hello
 ```
 
 The `upspin put` command reads data from standard input and writes it to a file
@@ -302,7 +306,7 @@ in the root of your Upspin tree named "hello".
 Then read the file back, and you should see the greeting echoed back to you.
 
 ```
-$ upspin get you@gmail.com/hello
+local$ upspin get you@gmail.com/hello
 Hello, Upspin
 ```
 If you see the message, then congratulations!
@@ -334,9 +338,9 @@ and remove the local server configuration.
 This will remove all information about user trees.
 
 ```
-$ ssh upspin@upspin.example.com
-% sudo systemctl stop upspinserver.service
-% sudo rm -r ~upspin/upspin/server
+local$ ssh upspin@upspin.example.com
+server% sudo systemctl stop upspinserver.service
+server% sudo rm -r ~upspin/upspin/server
 ```
 
 If you configured your server to use Google Cloud Storage with `upspin
@@ -349,7 +353,7 @@ You can do this anywhere you have authenticated as the account used
 to set up your Google Cloud instance.
 
 ```
-$ gsutil -m rm gs://example-com-upspin/`**`
+local$ gsutil -m rm gs://example-com-upspin/`**`
 ```
 
 The `-m` speeds things up by working in parallel.
@@ -357,8 +361,8 @@ The `-m` speeds things up by working in parallel.
 Now that all your Upspin data has been purged, restart the server.
 
 ```
-$ ssh upspin@upspin.example.com
-$ sudo systemctl start upspinserver.service
+local$ ssh upspin@upspin.example.com
+server% sudo systemctl start upspinserver.service
 ```
 
 Since you have removed its configuration information, the `upspinserver` won't
@@ -370,7 +374,7 @@ This gives the server its Upspin keys, the initial contents of its `Writers`
 file, and authentication information for accessing cloud storage (if any).
 
 ```
-$ upspin setupserver -domain=example.com -host=upspin.example.com
+local$ upspin setupserver -domain=example.com -host=upspin.example.com
 ```
 
 Now the server should be ready to use once more.
