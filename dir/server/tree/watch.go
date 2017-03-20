@@ -152,6 +152,8 @@ func (t *Tree) addWatcher(p path.Parsed, w *watcher) error {
 func (w *watcher) sendCurrentAndWatch(clone, orig *Tree, p path.Parsed, offset int64) {
 	const op = "dir/server/tree.sendCurrentAndWatch"
 
+	defer clone.Close()
+
 	n, _, err := clone.loadPath(p)
 	if err != nil && !errors.Match(errNotExist, err) {
 		log.Error.Printf("%s: error loading path: %s", op, err)

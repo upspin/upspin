@@ -717,6 +717,14 @@ func (t *Tree) Close() error {
 	if err != nil {
 		return errors.E(op, err)
 	}
+	err = t.log.Close()
+	if err != nil {
+		return errors.E(op, err)
+	}
+	err = t.logIndex.Close()
+	if err != nil {
+		return errors.E(op, err)
+	}
 
 	return nil
 }
