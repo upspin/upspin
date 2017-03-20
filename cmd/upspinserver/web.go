@@ -169,13 +169,13 @@ func ifError(w http.ResponseWriter, got error, want errors.Kind, code int) bool 
 }
 
 func httpError(w http.ResponseWriter, err error) {
-	 // This construction sets the HTTP error to the first type that matches.
-	 switch {
-	 case ifError(w, err, errors.Private, http.StatusForbidden):
-	 case ifError(w, err, errors.Permission, http.StatusForbidden):
-	 case ifError(w, err, errors.NotExist, http.StatusNotFound):
-	 case ifError(w, err, errors.BrokenLink, http.StatusNotFound):
-	 default:
+	// This construction sets the HTTP error to the first type that matches.
+	switch {
+	case ifError(w, err, errors.Private, http.StatusForbidden):
+	case ifError(w, err, errors.Permission, http.StatusForbidden):
+	case ifError(w, err, errors.NotExist, http.StatusNotFound):
+	case ifError(w, err, errors.BrokenLink, http.StatusNotFound):
+	default:
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
