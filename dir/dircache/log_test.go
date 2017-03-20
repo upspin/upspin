@@ -135,12 +135,12 @@ func TestLogFile(t *testing.T) {
 	log.SetLevel("debug")
 	dir, err := ioutil.TempDir("/tmp", "dircacheserverlog")
 	if err != nil {
-		t.Fatal("creating test directory")
+		t.Fatalf("creating test directory: %v", err)
 	}
 	defer os.RemoveAll(dir)
 	l, err := openLog(config.SetUserName(config.New(), testUser), dir, 1000000)
 	if err != nil {
-		t.Fatal("creating test log")
+		t.Fatalf("creating test log: %v", err)
 	}
 
 	// Ensure that the log LRU contains what we put into it.
