@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "6a8eedfb_68d3b057",
+        "filename": "serverutil/perm/store_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-20T18:11:04Z",
+      "side": 1,
+      "message": "Ah, no, actually, perm was running as \"owner\", so it was fine. Here, you made it run as the  server itself.",
+      "parentUuid": "94fc5517_1a995fa2",
+      "revId": "af1419f40c3e0640bc85b4be500a24eec22a0e9d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "dd50b4bd_142081a7",
         "filename": "serverutil/perm/store_test.go",
         "patchSetId": 2
