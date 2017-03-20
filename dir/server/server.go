@@ -657,6 +657,23 @@ func (s *server) Watch(name upspin.PathName, order int64, done <-chan struct{}) 
 		return nil, errors.E(op, name, err)
 	}
 
+	// Normally, s.loadTreeFor would fail for a user who does not have
+	// logs yet. But it does implicitly create a log if the user is
+	// allowed to create a root (that is, the user is the owner of the
+	// path). Permissions for creating a root are normally done by Perm, but
+	// Perm needs to Watch a file. Due to a chicken-and-egg when that file
+	// is owned by someone who can create the tree, the root gets created
+	// incorrectly. This is a bug somewhere between the DirServer and Perm
+	// and is probably indicative that a simpler version of Perm should be
+	// folded into s.canCreateRoot below.
+	hasLog, err := tree.HasLog(p.User(), s.logDir)
+	if err != nil {
+		return nil, err
+	}
+	if !hasLog {
+		return nil, s.errPerm(op, p.Path())
+	}
+
 	tree, err := s.loadTreeFor(p.User(), o)
 	if err != nil {
 		return nil, errors.E(op, err)
