@@ -13,6 +13,7 @@ import (
 	"sort"
 	"sync"
 
+	"runtime"
 	"upspin.io/client/clientutil"
 	"upspin.io/errors"
 	"upspin.io/log"
@@ -717,6 +718,14 @@ func (t *Tree) Close() error {
 	if err != nil {
 		return errors.E(op, err)
 	}
+	err = t.log.Close()
+	if err != nil {
+		return errors.E(op, err)
+	}
+	err = t.logIndex.Close()
+	if err != nil {
+		return errors.E(op, err)
+	}
 
 	return nil
 }
@@ -808,10 +817,16 @@ func (t *Tree) recoverFromLog() error {
 func (t *Tree) OnEviction(key interface{}) {
 	const op = "dir/server/tree.OnEviction"
 	log.Debug.Printf("%s: tree being evicted: %s", op, t.log.User())
+	// We do not call t.Close here because we can't be sure the DirServer
+	// is done using us. But because this is likely our last chance to clean
+	// up, we set a finalizer.
 	err := t.Flush()
 	if err != nil {
 		log.Error.Printf("%s: flush: %v", op, err)
 	}
+	runtime.SetFinalizer(t, func(t *Tree) {
+		t.Close()
+	})
 }
 
 // String implements fmt.Stringer.
