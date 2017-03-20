@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "1e05d485_b4d9add9",
+        "filename": "serverutil/perm/store_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-20T22:11:22Z",
+      "side": 1,
+      "message": "Fixed",
+      "parentUuid": "81a269a1_6b108eda",
+      "revId": "af1419f40c3e0640bc85b4be500a24eec22a0e9d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "94fc5517_1a995fa2",
         "filename": "serverutil/perm/store_test.go",
         "patchSetId": 2
@@ -51,6 +69,24 @@
       "revId": "af1419f40c3e0640bc85b4be500a24eec22a0e9d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "457b98ef_e77ad1aa",
+        "filename": "serverutil/perm/store_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-20T22:11:22Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "6a8eedfb_68d3b057",
+      "revId": "af1419f40c3e0640bc85b4be500a24eec22a0e9d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
