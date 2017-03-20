@@ -10,6 +10,7 @@ package tree
 import (
 	"bytes"
 	"fmt"
+	"runtime"
 	"sort"
 	"sync"
 
@@ -713,9 +714,19 @@ func (t *Tree) Close() error {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
-	err := t.flush()
-	if err != nil {
-		return errors.E(op, err)
+	var firstErr error
+	check := func(err error) {
+		if err != nil && firstErr != nil {
+			firstErr = err
+		}
+	}
+
+	check(t.flush())
+	check(t.log.Close())
+	check(t.logIndex.Close())
+
+	if firstErr != nil {
+		return errors.E(op, firstErr)
 	}
 
 	return nil
@@ -808,10 +819,19 @@ func (t *Tree) recoverFromLog() error {
 func (t *Tree) OnEviction(key interface{}) {
 	const op = "dir/server/tree.OnEviction"
 	log.Debug.Printf("%s: tree being evicted: %s", op, t.log.User())
+	// We do not call t.Close here because we can't be sure the DirServer
+	// is done using us. But because this is likely our last chance to clean
+	// up, we set a finalizer.
 	err := t.Flush()
 	if err != nil {
 		log.Error.Printf("%s: flush: %v", op, err)
 	}
+	runtime.SetFinalizer(t, func(t *Tree) {
+		err := t.Close()
+		if err != nil {
+			log.Error.Printf("%s: finalizing tree: %s", op, err)
+		}
+	})
 }
 
 // String implements fmt.Stringer.

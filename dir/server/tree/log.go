@@ -278,6 +278,19 @@ func (l *Log) Clone() (*Log, error) {
 	return &newLog, nil
 }
 
+// Close closes the log.
+func (l *Log) Close() error {
+	l.mu.Lock()
+	defer l.mu.Unlock()
+
+	if l.file != nil {
+		err := l.file.Close()
+		l.file = nil
+		return err
+	}
+	return nil
+}
+
 // User returns the user name who owns the root of the tree that this
 // log index represents.
 func (li *LogIndex) User() upspin.UserName {
@@ -411,6 +424,26 @@ func (li *LogIndex) SaveOffset(offset int64) error {
 	defer li.mu.Unlock()
 
 	return overwriteAndSync(op, li.indexFile, tmp[:n])
+}
+
+// Close closes the LogIndex.
+func (li *LogIndex) Close() error {
+	li.mu.Lock()
+	defer li.mu.Unlock()
+
+	var firstErr error
+	if li.indexFile != nil {
+		firstErr = li.indexFile.Close()
+		li.indexFile = nil
+	}
+	if li.rootFile != nil {
+		err := li.rootFile.Close()
+		li.rootFile = nil
+		if err != nil && firstErr == nil {
+			firstErr = err
+		}
+	}
+	return firstErr
 }
 
 // marshal packs the LogEntry into a new byte slice for storage.
