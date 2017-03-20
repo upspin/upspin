@@ -16,6 +16,24 @@
       "revId": "033249266b67e2bf8687671d95d18b776347e4b0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2dc9bbe3_0e381bcc",
+        "filename": "doc/server_setup_ubuntu.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-20T21:29:55Z",
+      "side": 1,
+      "message": "Hmm, good point. Root\u0027s prompt is usually #, so let me subtly introduce that.",
+      "parentUuid": "219cac32_257c8a7e",
+      "revId": "033249266b67e2bf8687671d95d18b776347e4b0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
