@@ -41,7 +41,7 @@ func (r *remote) Lookup(name upspin.UserName) (*upspin.User, error) {
 		UserName: string(name),
 	}
 	resp := new(proto.KeyLookupResponse)
-	if err := r.Invoke("Key/Lookup", req, resp, nil, nil); err != nil {
+	if err := r.InvokeUnauthenticated("Key/Lookup", req, resp); err != nil {
 		return nil, op.error(err)
 	}
 	if len(resp.Error) != 0 {
