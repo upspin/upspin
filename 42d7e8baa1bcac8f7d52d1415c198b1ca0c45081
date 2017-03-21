@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "56c0f23a_5f1eee06",
+        "filename": "test/watch_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-21T19:20:03Z",
+      "side": 1,
+      "message": "// comment",
+      "revId": "42d7e8baa1bcac8f7d52d1415c198b1ca0c45081",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
