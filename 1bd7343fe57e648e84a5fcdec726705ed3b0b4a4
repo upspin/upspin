@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "3f597779_406dbd6e",
+        "filename": "cmd/upspin/signup.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-21T21:52:29Z",
+      "side": 1,
+      "message": "Eric suggested -secretseedfile",
+      "parentUuid": "3ae3a1c0_1180cdfb",
+      "revId": "1bd7343fe57e648e84a5fcdec726705ed3b0b4a4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "abc43874_55f3aecc",
         "filename": "cmd/upspin/signup.go",
         "patchSetId": 1
