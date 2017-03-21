@@ -35,17 +35,12 @@ New users should instead use the signup command to create their
 first key. Keygen can be used to create new keys.
 
 See the description for rotate for information about updating keys.
-
-Note: If used interactively with a shell that keeps a command history, the
--secretseed option may cause the secret to be saved in the history file.
-If so, the history file should be cleared after running keygen with the
--secretseed option.
 `
 	// Keep flags in sync with signup.go. New flags here should appear
 	// there as well.
 	fs := flag.NewFlagSet("keygen", flag.ExitOnError)
 	fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
-	fs.String("secretseed", "", "128 bit secret `seed` in proquint format")
+	fs.String("secretseed", "", "the seed containing a 128 bit secret in proquint format or a file that contains it")
 	fs.String("where", filepath.Join(config.Home(), ".ssh"), "`directory` to store keys")
 	// TODO: We do not what rotate to appear in the usage message.
 	fs.Bool("rotate", false, "rotate existing keys and replace them with new ones")
@@ -106,17 +101,13 @@ func createKeys(curveName, secretFlag string) (public, private, secretStr string
 	// Pick secret 128 bits.
 	// TODO(ehg)  Consider whether we are willing to ask users to write long seeds for P521.
 	b := make([]byte, 16)
-	if len(secretFlag) > 0 {
-		if len((secretFlag)) != 47 || (secretFlag)[5] != '-' {
-			log.Printf("expected secret like\n lusab-babad-gutih-tugad.gutuk-bisog-mudof-sakat\n"+
-				"not\n %s\nkey not generated", secretFlag)
-			return "", "", "", errors.E("keygen", errors.Invalid, errors.Str("bad format for secret"))
-		}
-		for i := 0; i < 8; i++ {
-			binary.BigEndian.PutUint16(b[2*i:2*i+2], proquint.Decode([]byte((secretFlag)[6*i:6*i+5])))
-		}
-		secretStr = secretFlag
-	} else {
+
+	// There are three cases:
+	// 1) No secretFlag was given. Create a new secret seed.
+	// 2) A secretFlag looks valid. Accept it.
+	// 3) The secretFlag must be a file. Try to read it.
+	switch {
+	case secretFlag == "":
 		ee.GenEntropy(b)
 		proquints := make([]interface{}, 8)
 		for i := 0; i < 8; i++ {
@@ -124,6 +115,24 @@ func createKeys(curveName, secretFlag string) (public, private, secretStr string
 		}
 		secretStr = fmt.Sprintf("%s-%s-%s-%s.%s-%s-%s-%s", proquints...)
 		// Ignore punctuation on input;  this format is just to help the user keep their place.
+
+	case validSecretSeed(secretFlag):
+		secretStr = secretFlag
+	default:
+		data, err := ioutil.ReadFile(secretFlag)
+		if err != nil {
+			return "", "", "", errors.E("keygen", errors.IO, err)
+		}
+		secretStr = strings.TrimSpace(string(data))
+	}
+
+	if !validSecretSeed(secretStr) {
+		log.Printf("expected secret like\n lusab-babad-gutih-tugad.gutuk-bisog-mudof-sakat\n"+
+			"not\n %s\nkey not generated", secretStr)
+		return "", "", "", errors.E("keygen", errors.Invalid, errors.Str("bad format for secret"))
+	}
+	for i := 0; i < 8; i++ {
+		binary.BigEndian.PutUint16(b[2*i:2*i+2], proquint.Decode([]byte((secretStr)[6*i:6*i+5])))
 	}
 
 	pub, priv, err := ee.CreateKeys(curveName, b)
@@ -131,6 +140,12 @@ func createKeys(curveName, secretFlag string) (public, private, secretStr string
 		return "", "", "", err
 	}
 	return string(pub), priv, secretStr, nil
+}
+
+// validSecretSeed reports whether a seed conforms to the proquint format.
+// TODO: this could be more strict.
+func validSecretSeed(seed string) bool {
+	return len(seed) == 47 && seed[5] == '-'
 }
 
 // writeKeyFile writes a single key to its file, removing the file
