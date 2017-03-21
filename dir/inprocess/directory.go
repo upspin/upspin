@@ -438,6 +438,10 @@ func (s *server) Watch(name upspin.PathName, order int64, done <-chan struct{}) 
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
+	// The root must exist.
+	if s.db.root[parsed.User()] == nil {
+		return nil, errors.E(op, name, errors.NotExist)
+	}
 	return s.db.eventMgr.watch(s, parsed, order, done)
 }
 
