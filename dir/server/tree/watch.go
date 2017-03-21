@@ -71,6 +71,13 @@ func (t *Tree) Watch(p path.Parsed, order int64, done <-chan struct{}) (<-chan *
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
+	// Watch can watch non-existent files, but not non-existent roots.
+	// Therefore, we ensure the root exists before we proceed.
+	err := t.loadRoot()
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+
 	// Clone the logs so we can keep reading it while the current tree
 	// continues to be updated (we're about to unlock this tree).
 	cLog, err := t.log.Clone()
