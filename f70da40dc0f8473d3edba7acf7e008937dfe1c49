@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4e031ab4_5e6438ba",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 660,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-21T00:33:02Z",
+      "side": 1,
+      "message": "Can\u0027t we just create the log when the tree is created? That would side step all this awkwardness.",
+      "revId": "f70da40dc0f8473d3edba7acf7e008937dfe1c49",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
