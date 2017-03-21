@@ -1054,7 +1054,6 @@ func testGlobLinkErrors(t *testing.T, r *testenv.Runner) {
 	}
 }
 
-// TODO: delete through links.
 func testDeleteErrors(t *testing.T, r *testenv.Runner) {
 	const (
 		base                    = ownerName + "/delete-errors"
@@ -1133,7 +1132,9 @@ func testDeleteErrors(t *testing.T, r *testenv.Runner) {
 
 	// Owner can delete his own Access file and remaining entries.
 	r.Delete(accessFile)
-	r.Delete(fileInDir)
+	// Even through a link.
+	r.PutLink(dir, base+"/link-to-dir")
+	r.Delete(base + "/link-to-dir/fileInDir")
 	r.Delete(dir)
 	if r.Failed() {
 		t.Fatal(r.Diag())

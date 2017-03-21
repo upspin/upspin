@@ -111,6 +111,18 @@ func testSnapshot(t *testing.T, r *testenv.Runner) {
 	if !r.GotNilEntry() {
 		t.Fatal(r.Diag())
 	}
+
+	// No one can delete snapshots.
+	r.Delete(found)
+	if !r.Match(errors.E(errors.Permission)) {
+		t.Fatal(r.Diag())
+	}
+
+	// No one can overwrite a snapshot.
+	r.Put(found, "yo")
+	if !r.Match(errors.E(errors.Permission)) {
+		t.Fatal(r.Diag())
+	}
 }
 
 func randomString(t *testing.T, size int) string {
