@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3ae3a1c0_1180cdfb",
+        "filename": "cmd/upspin/signup.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-21T21:45:03Z",
+      "side": 1,
+      "message": "If we\u0027re okay with breaking backward compatibility, sure. I wrote it this way in case someone is already using scripts with this flag. But I\u0027m fine with your suggestion too. I\u0027ll let others comment too.",
+      "parentUuid": "023481dd_7624d8ce",
+      "revId": "1bd7343fe57e648e84a5fcdec726705ed3b0b4a4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "abc43874_55f3aecc",
         "filename": "cmd/upspin/signup.go",
         "patchSetId": 1
@@ -33,6 +51,24 @@
       "revId": "1bd7343fe57e648e84a5fcdec726705ed3b0b4a4",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "81475286_66b2cda6",
+        "filename": "cmd/upspin/signup.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-21T21:45:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "abc43874_55f3aecc",
+      "revId": "1bd7343fe57e648e84a5fcdec726705ed3b0b4a4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
