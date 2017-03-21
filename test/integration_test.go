@@ -302,6 +302,8 @@ var integrationTests = []struct {
 	{"RootDeletion", testRootDeletion},
 	{"ReadAccess", testReadAccess},
 	{"GroupAccess", testGroupAccess},
+	{"WriteReadAllAccessFile", testWriteReadAllAccessFile},
+
 	{"Watch", testWatchCurrent},
 	{"WatchErrors", testWatchErrors},
 	{"WatchNonExistentFile", testWatchNonExistentFile},
