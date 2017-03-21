@@ -224,11 +224,13 @@ func TestAllowsOthersAndWildcard(t *testing.T) {
 }
 
 // Regression test for issue #317.
-func TestSequentialErrorsOk(t *testing.T) {
+func TestSequentialErrorsOK(t *testing.T) {
 	env := setupEnv(t)
 	defer env.Exit()
 
-	_, wait := newWithEnv(t, env)
+	wait, onUpdate, onRetry := newStubs(t)
+	cfg := env.Config
+	newPerm("TestSequentialErrorsOK", cfg, readyNow, owner, env.DirServer.Lookup, errorReturningWatch, onUpdate, onRetry)
 	wait()
 
 	// No crash, no problem.
@@ -253,7 +255,10 @@ func TestOrderOfPuts(t *testing.T) {
 	wait() // Update call.
 
 	r.Put(accessFile, accessContent) // So server can lookup Writers.
-	wait()                           // New watch event.
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+	wait() // New watch event.
 
 	// Owner and writer are allowed.
 	for _, user := range []upspin.UserName{
