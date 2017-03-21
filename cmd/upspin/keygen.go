@@ -38,14 +38,14 @@ See the description for rotate for information about updating keys.
 
 Note: If used interactively with a shell that keeps a command history, the
 -secretseed option may cause the secret to be saved in the history file.
-If so, the history file should be cleared after running keygen with the
--secretseed option.
+To prevent that, use -secretseed=stdin to have the secret seed be read from
+stdion. Or, clear the history after running keygen with the -secretseed option.
 `
 	// Keep flags in sync with signup.go. New flags here should appear
 	// there as well.
 	fs := flag.NewFlagSet("keygen", flag.ExitOnError)
 	fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
-	fs.String("secretseed", "", "128 bit secret `seed` in proquint format")
+	fs.String("secretseed", "", "128 bit secret `seed` in proquint format or the word 'stdin' to read the seed from stdin")
 	fs.String("where", filepath.Join(config.Home(), ".ssh"), "`directory` to store keys")
 	// TODO: We do not what rotate to appear in the usage message.
 	fs.Bool("rotate", false, "rotate existing keys and replace them with new ones")
@@ -107,6 +107,14 @@ func createKeys(curveName, secretFlag string) (public, private, secretStr string
 	// TODO(ehg)  Consider whether we are willing to ask users to write long seeds for P521.
 	b := make([]byte, 16)
 	if len(secretFlag) > 0 {
+		if secretFlag == "stdin" {
+			data, err := ioutil.ReadAll(os.Stdin)
+			if err != nil {
+				return "", "", "", errors.E("keygen", errors.IO, err)
+			}
+			secretFlag = strings.TrimSpace(string(data))
+			// Fall through and check what we read is correct.
+		}
 		if len((secretFlag)) != 47 || (secretFlag)[5] != '-' {
 			log.Printf("expected secret like\n lusab-babad-gutih-tugad.gutuk-bisog-mudof-sakat\n"+
 				"not\n %s\nkey not generated", secretFlag)

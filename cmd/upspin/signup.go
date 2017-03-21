@@ -58,8 +58,8 @@ file and keys and only send the signup request to the key server.
 
 Note: If used interactively with a shell that keeps a command history, the
 -secretseed option may cause the secret to be saved in the history file.
-If so, the history file should be cleared after running signup with the
--secretseed option.
+To prevent that, use -secretseed=stdin to have the secret seed be read from
+stdion. Or, clear the history after running keygen with the -secretseed option.
 `
 	fs := flag.NewFlagSet("signup", flag.ExitOnError)
 	var (
@@ -69,13 +69,11 @@ If so, the history file should be cleared after running signup with the
 		storeServer = fs.String("store", "", "Store server `address`")
 		bothServer  = fs.String("server", "", "Store and Directory server `address` (if combined)")
 		signupOnly  = fs.Bool("signuponly", false, "only send signup request to key server; do not generate config or keys")
-		// This is needed because signup uses command keygen to generate
-		// keys, and keygen requires a rotate flag.
-		_ = fs.Bool("rotate", false, "always false during sign up")
 	)
 	// Used only in keygen.
 	fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
-	fs.String("secretseed", "", "128 bit secret `seed` in proquint format")
+	fs.String("secretseed", "", "128 bit secret `seed` in proquint format or the word 'stdin' to read the seed from stdin")
+	fs.Bool("rotate", false, "always false during sign up")
 
 	s.ParseFlags(fs, args, help, "[-config=<file>] signup -dir=<addr> -store=<addr> [flags] <username>\n       upspin [-config=<file>] signup -server=<addr> [flags] <username>")
 
