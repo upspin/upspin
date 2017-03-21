@@ -212,7 +212,7 @@ func testGetLinkErrors(t *testing.T, r *testenv.Runner) {
 	r.Delete(file)
 	r.As(readerName)
 	r.Get(link)
-	if !r.Match(errors.E(errors.BrokenLink, link)) {
+	if !r.Match(errors.E(errors.BrokenLink, upspin.PathName(link))) {
 		t.Fatal(r.Diag())
 	}
 }
