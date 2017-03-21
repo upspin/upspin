@@ -8,7 +8,6 @@ package test
 // that support Watch; on others it simply skips this test.
 
 import (
-	"strings"
 	"testing"
 
 	"upspin.io/errors"
@@ -20,15 +19,20 @@ import (
 // there is an ErrNotSupported error, returns false. It returns true
 // if there was no error; otherwise it fatals.
 func watchSupported(t *testing.T, r *testenv.Runner) bool {
-	if r.Failed() {
-		err := r.Diag()
-		if strings.Contains(err, upspin.ErrNotSupported.Error()) {
-			t.Log("Watch not supported for this DirServer.")
-			return false
-		}
+	supported, err := watchSupportedError(t, r)
+	if err != nil {
 		t.Fatal(err)
 	}
-	return true
+	return supported
+}
+
+func watchSupportedError(t *testing.T, r *testenv.Runner) (bool, error) {
+	err := r.Err()
+	if errors.Match(upspin.ErrNotSupported, err) {
+		t.Log("Watch not supported for this DirServer.")
+		return false, nil
+	}
+	return true, err
 }
 
 func testWatchCurrent(t *testing.T, r *testenv.Runner) {
@@ -290,5 +294,15 @@ func testWatchSubtree(t *testing.T, r *testenv.Runner) {
 	r.GetNEvents(1)
 	if !r.GotEvent(dirFile, hasBlocks) {
 		t.Fatal(r.Diag())
+	}
+}
+
+func testWatchNonExistentRoot(t *testing.T, r *testenv.Runner) {
+	r.As(ownerName)
+	r.DirWatch(readerName+"/", -1)
+	if supported, err := watchSupportedError(t, r); !supported {
+		return
+	} else if !errors.Match(errNotExist, err) {
+		t.Fatalf("Expcted %v, got %v", errNotExist, err)
 	}
 }
