@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9516dc6f_cea26da8",
+        "filename": "test/watch_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-21T18:21:57Z",
+      "side": 1,
+      "message": "surely watchNotSupporterError?\n\nbut i don\u0027t understand why this is necessary.",
+      "revId": "f9a377bb0c8cf2d856a19410bac7399749dd0f1e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2d87e3e6_8313cdf0",
+        "filename": "test/watch_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-21T18:21:57Z",
+      "side": 1,
+      "message": "else is unnecessary.",
+      "revId": "f9a377bb0c8cf2d856a19410bac7399749dd0f1e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
