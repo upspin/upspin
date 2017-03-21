@@ -562,7 +562,7 @@ func testWriteReadAllAccessFile(t *testing.T, r *testenv.Runner) {
 		base             = ownerName + "/readall-access"
 		accessFile       = base + "/Access"
 		file             = base + "/file"
-		subDir           = ownerName + "/dir"
+		subDir           = base + "/dir"
 		subDirAccessFile = subDir + "/Access"
 		subDirFile       = subDir + "/subfile"
 	)
@@ -632,7 +632,7 @@ func testWriteReadAllAccessFile(t *testing.T, r *testenv.Runner) {
 	r.Put(file, "text")
 	r.MakeDirectory(subDir)
 	r.Put(subDirFile, "text")
-	// r.Put(subDirAccessFile, readAll) // TODO: this fails with `test@upspin.io/dir/Access: client.Put: cannot add "read:all" permission to existing files`
+	r.Put(subDirAccessFile, readAll)
 	if r.Failed() {
 		t.Fatal(r.Diag())
 	}
