@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "023481dd_7624d8ce",
+        "filename": "cmd/upspin/signup.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-21T21:32:27Z",
+      "side": 1,
+      "message": "I suggest -input\u003dfile.\n\nMore general, less Unix-specific.",
+      "revId": "1bd7343fe57e648e84a5fcdec726705ed3b0b4a4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "abc43874_55f3aecc",
+        "filename": "cmd/upspin/signup.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-21T21:32:27Z",
+      "side": 1,
+      "message": "s/stdion/stdin/\nBut should go away anyway.",
+      "revId": "1bd7343fe57e648e84a5fcdec726705ed3b0b4a4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
