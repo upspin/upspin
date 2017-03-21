@@ -1,0 +1,22 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "070bf88a_f7b3bdaf",
+        "filename": "serverutil/perm/perm_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-21T00:10:32Z",
+      "side": 1,
+      "message": "Sent https://upspin-review.googlesource.com/8485",
+      "parentUuid": "6c39fc32_5790d3be",
+      "revId": "f5ad8e0c34c13061311abe09671422252d770df8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
