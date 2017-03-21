@@ -306,6 +306,20 @@ func TestWatchNonExistingNode(t *testing.T) {
 	}
 }
 
+func TestCannotWatchNonExistentRoot(t *testing.T) {
+	config, log, logIndex := newConfigForTesting(t, userName)
+	tree, err := New(config, log, logIndex)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Get a watcher for the current subtree, rooted at orig/sub1.
+	done := make(chan struct{})
+	_, err = tree.Watch(mkpath(t, userName+"/orig/sub1"), -1, done)
+	if !errors.Match(errNotExist, err) {
+		t.Fatalf("Expected NotExist, got = %v", err)
+	}
+}
+
 // Tests internal functionality that can be tricky.
 func TestRemoveDeadWatchers(t *testing.T) {
 	d := make(chan struct{})
