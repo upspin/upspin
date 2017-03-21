@@ -141,9 +141,10 @@ func NewClient(cfg upspin.Config, netAddr upspin.NetAddr, security SecurityLevel
 	return c, nil
 }
 
-func (c *httpClient) makeAuthenticatedRequest(op, method string, req pb.Message) (*http.Response, error) {
+func (c *httpClient) makeAuthenticatedRequest(op, method string, req pb.Message) (*http.Response, bool, error) {
 	token, haveToken := c.authToken()
 	header := make(http.Header)
+	needServerAuth := false
 	if haveToken {
 		// If we have a token already, supply it.
 		header.Set(authTokenHeader, token)
@@ -152,7 +153,7 @@ func (c *httpClient) makeAuthenticatedRequest(op, method string, req pb.Message)
 		authMsg, err := signUser(c.config, clientAuthMagic, serverAddr(c))
 		if err != nil {
 			log.Error.Printf("%s: signUser: %s", op, err)
-			return nil, errors.E(op, err)
+			return nil, false, errors.E(op, err)
 		}
 		if oldClientAuthHeader {
 			// TODO(adg): Remove handling of old-style headers on April 1 2017.
@@ -161,10 +162,12 @@ func (c *httpClient) makeAuthenticatedRequest(op, method string, req pb.Message)
 			header.Set(authRequestHeader, strings.Join(authMsg, ","))
 		}
 		if c.isProxy() {
+			needServerAuth = true
 			header.Set(proxyRequestHeader, c.proxyFor.String())
 		}
 	}
-	return c.makeRequest(op, method, req, header)
+	resp, err := c.makeRequest(op, method, req, header)
+	return resp, needServerAuth, err
 }
 
 func (c *httpClient) makeRequest(op, method string, req pb.Message, header http.Header) (*http.Response, error) {
@@ -212,8 +215,9 @@ func (c *httpClient) Invoke(method string, req, resp pb.Message, stream Response
 
 	var httpResp *http.Response
 	var err error
+	var needServerAuth bool
 	for i := 0; i < 2; i++ {
-		httpResp, err = c.makeAuthenticatedRequest(op, method, req)
+		httpResp, needServerAuth, err = c.makeAuthenticatedRequest(op, method, req)
 		if err != nil {
 			return err
 		}
@@ -256,7 +260,7 @@ func (c *httpClient) Invoke(method string, req, resp pb.Message, stream Response
 	}
 
 	// If talking to a proxy, make sure it is running as the same user.
-	if c.isProxy() {
+	if needServerAuth {
 		msg, ok := httpResp.Header[authRequestHeader]
 		if !ok {
 			body.Close()
