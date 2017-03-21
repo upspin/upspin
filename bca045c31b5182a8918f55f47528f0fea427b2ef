@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cc1a08c5_fabf2ffc",
+        "filename": "test/access_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 565,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-21T20:31:48Z",
+      "side": 1,
+      "message": "Doh! My bad for not noticing.",
+      "revId": "bca045c31b5182a8918f55f47528f0fea427b2ef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
