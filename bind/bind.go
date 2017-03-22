@@ -88,6 +88,8 @@ var (
 	reverseLookup      = make(map[upspin.Service]dialKey)
 
 	inflightDials = make(map[dialKey]*inflightDial)
+
+	noCache bool
 )
 
 const allowOverwrite = true // for documentation purposes
@@ -254,6 +256,9 @@ func Release(service upspin.Service) error {
 
 // reachableService finds a bound and reachable service in the cache or dials a fresh one and saves it in the cache.
 func reachableService(cc upspin.Config, op string, e upspin.Endpoint, cache dialCache, dialer upspin.Dialer) (upspin.Service, error) {
+	if noCache {
+		return dialer.Dial(cc, e)
+	}
 	key := dialKey{
 		user:     cc.UserName(),
 		endpoint: e,
@@ -337,4 +342,12 @@ func reachableService(cc upspin.Config, op string, e upspin.Endpoint, cache dial
 		return nil, errors.E(op, dial.err)
 	}
 	return dial.service, nil
+}
+
+// NoCache supresses the caching of dial results. This was added for
+// debugging.
+func NoCache() {
+	mu.Lock()
+	defer mu.Unlock()
+	noCache = true
 }
