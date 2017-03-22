@@ -311,7 +311,7 @@ func (s *server) verifyOwns(u upspin.UserName, pubKey upspin.PublicKey, domain s
 	if err != nil {
 		return errors.E(errors.IO, err)
 	}
-	lastErr := errors.Str("not an administrator")
+	lastErr := errors.Errorf("not an administrator for %s", domain)
 	const prefix = "upspin:"
 	for _, txt := range txts {
 		if len(txt) < len(prefix)+20 {
@@ -341,20 +341,13 @@ func (s *server) verifyOwns(u upspin.UserName, pubKey upspin.PublicKey, domain s
 		sig.S = &ss
 
 		log.Debug.Printf("Verifying if %q owns %q with pubKey: %q. Got sig: %q", u, domain, pubKey, txt[len(prefix):])
-		msg := "upspin-domain:" + domain + "-" + string(u)
-		hash := sha256.Sum256([]byte(msg))
-		lastErr = factotum.Verify(hash[:], sig, pubKey)
-		if lastErr == nil {
+		hash := sha256.Sum256([]byte("upspin-domain:" + domain + "-" + string(u)))
+		err := factotum.Verify(hash[:], sig, pubKey)
+		if err == nil {
 			// Success!
 			return nil
 		}
-		// Try the old-style signature, in case this is a domain that
-		// was created prior to CL/8327.
-		lastErr = factotum.Verify([]byte(msg), sig, pubKey)
-		if lastErr == nil {
-			// Success!
-			return nil
-		}
+		lastErr = errors.E(errors.Errorf("%s: verifying ownership of domain %s; re-run cmd/upspin setupdomain?", err, domain))
 	}
 	return lastErr
 }
