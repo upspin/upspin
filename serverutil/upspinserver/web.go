@@ -4,7 +4,7 @@
 
 // TODO(adg,andybons): make the HTML pages prettier
 
-package main
+package upspinserver
 
 import (
 	"fmt"
