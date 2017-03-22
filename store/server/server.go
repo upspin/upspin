@@ -17,9 +17,6 @@ import (
 	"upspin.io/log"
 	"upspin.io/metric"
 	"upspin.io/upspin"
-
-	_ "upspin.io/cloud/storage/disk"
-	_ "upspin.io/cloud/storage/gcs"
 )
 
 // server implements upspin.StoreServer.
