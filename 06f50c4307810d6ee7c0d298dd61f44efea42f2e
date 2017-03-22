@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "0a33926b_f5443a9d",
+        "filename": "cmd/upspinserver/web.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 5605
+      },
+      "writtenOn": "2017-03-22T20:34:05Z",
+      "side": 1,
+      "message": "Maybe a different description would be better...this method specifically has behaviour for broken links.",
+      "parentUuid": "44f59133_f6f72003",
+      "revId": "06f50c4307810d6ee7c0d298dd61f44efea42f2e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "acef5af0_fa5fafe0",
         "filename": "cmd/upspinserver/web.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2017-03-22T20:20:01Z",
       "side": 1,
       "message": "I don\u0027t understand this. If it\u0027s broken, why continue up the path?",
+      "revId": "06f50c4307810d6ee7c0d298dd61f44efea42f2e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "58bf7404_b81dd5ae",
+        "filename": "cmd/upspinserver/web.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 5605
+      },
+      "writtenOn": "2017-03-22T20:34:05Z",
+      "side": 1,
+      "message": "The server may have permission to access the link, but AllUsers may not have permission to even know the link exists. Hence going back up the path to find the first Access file which will tell us what permission AllUsers have.",
+      "parentUuid": "acef5af0_fa5fafe0",
       "revId": "06f50c4307810d6ee7c0d298dd61f44efea42f2e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -50,6 +86,24 @@
       "revId": "06f50c4307810d6ee7c0d298dd61f44efea42f2e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "79d84884_6e1c9ffe",
+        "filename": "cmd/upspinserver/web.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 5605
+      },
+      "writtenOn": "2017-03-22T20:34:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "86a513a8_594c45b2",
+      "revId": "06f50c4307810d6ee7c0d298dd61f44efea42f2e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
