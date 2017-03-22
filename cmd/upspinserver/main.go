@@ -20,13 +20,11 @@ import (
 	"path/filepath"
 	"sync"
 
-	"upspin.io/errors"
-	"upspin.io/subcmd"
-
 	"upspin.io/client"
 	"upspin.io/cloud/https"
 	"upspin.io/config"
 	dirServer "upspin.io/dir/server"
+	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/flags"
 	"upspin.io/log"
@@ -34,15 +32,20 @@ import (
 	"upspin.io/rpc/storeserver"
 	"upspin.io/serverutil/perm"
 	storeServer "upspin.io/store/server"
+	"upspin.io/subcmd"
 	"upspin.io/upspin"
 
-	// Load useful packers
+	// Packers.
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/eeintegrity"
 	_ "upspin.io/pack/plain"
 
-	// Load required transports
+	// Required transports.
 	_ "upspin.io/transports"
+
+	// Storage implementations.
+	_ "upspin.io/cloud/storage/disk"
+	_ "upspin.io/cloud/storage/gcs"
 )
 
 var (
