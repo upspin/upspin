@@ -44,15 +44,14 @@ var SetupServerFiles = []string{
 	"Writers",
 	"public.upspinkey",
 	"secret.upspinkey",
-	"serviceaccount.json",
 	ServerConfigFile,
 }
 
 // OptionalSetupServerFiles specifies the configuration files that may be
 // missing when running 'upspin setupserver'.
-var OptionalSetupServerFiles = map[string]bool{
-	"serviceaccount.json": true, // Only needed for Google Cloud Storage.
-}
+var OptionalSetupServerFiles = map[string]bool{}
+
+// TODO(adg): remove OptionalSetupServerFiles as it is no longer used.
 
 // ReadServerConfig reads and JSON-decodes the ServerConfigFile under cfgPath.
 func (s *State) ReadServerConfig(cfgPath string) *ServerConfig {
