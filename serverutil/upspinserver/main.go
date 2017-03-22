@@ -17,6 +17,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 
 	"upspin.io/client"
@@ -125,12 +126,17 @@ func initServer(mode initMode) (*subcmd.ServerConfig, upspin.Config, *perm.Perm,
 
 	// Set up StoreServer.
 	var storeServerConfig []string
-	storagePath := filepath.Join(*cfgPath, "storage")
-	if serverConfig.Bucket != "" {
+	switch {
+	case len(serverConfig.StoreConfig) > 0:
+		// Use the provided configuration, if available.
+		storeServerConfig = serverConfig.StoreConfig
+	case serverConfig.Bucket != "":
 		// Bucket configured, use Google Cloud Storage.
+		// TODO(adg): remove this when the Bucket field is retired.
 		storeServerConfig = []string{"backend=GCS", "gcpBucketName=" + serverConfig.Bucket, "defaultACL=publicRead"}
-	} else {
+	default:
 		// No bucket configured, use simple on-disk store.
+		storagePath := filepath.Join(*cfgPath, "storage")
 		storeServerConfig = []string{"backend=Disk", "basePath=" + storagePath}
 	}
 	store, err := storeServer.New(storeServerConfig...)
@@ -160,12 +166,7 @@ func initServer(mode initMode) (*subcmd.ServerConfig, upspin.Config, *perm.Perm,
 	http.Handle("/api/Dir/", httpDir)
 
 	log.Println("Store and Directory servers initialized.")
-
-	if b := serverConfig.Bucket; b != "" {
-		log.Printf("Storing data in the Google Cloud Storage bucket %q", b)
-	} else {
-		log.Printf("Storing data under %s", storagePath)
-	}
+	log.Printf("Store server configuration: %s", strings.Join(storeServerConfig, " "))
 
 	if mode == setupServer {
 		// Create Writers file if this was triggered by 'upspin setupserver'.
