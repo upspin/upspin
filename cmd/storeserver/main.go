@@ -24,12 +24,16 @@ import (
 	"upspin.io/store/server"
 	"upspin.io/upspin"
 
-	// We need the directory transports to fetch write permissions.
+	// Directory transports to fetch write permissions.
 	_ "upspin.io/transports"
 
-	// Load packers for reading Access and Group files.
+	// Packers for reading Access and Group files.
 	_ "upspin.io/pack/eeintegrity"
 	_ "upspin.io/pack/plain"
+
+	// Storage implementations.
+	_ "upspin.io/cloud/storage/disk"
+	_ "upspin.io/cloud/storage/gcs"
 )
 
 const (
