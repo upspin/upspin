@@ -7,34 +7,16 @@ package main
 import (
 	"flag"
 	"fmt"
-	"net"
-	"net/http"
 	"os"
 
 	"upspin.io/config"
-	"upspin.io/dir/dircache"
 	"upspin.io/flags"
 	"upspin.io/log"
-	"upspin.io/rpc/dirserver"
-	"upspin.io/rpc/storeserver"
-	"upspin.io/store/storecache"
 
 	"upspin.io/upspin"
-
-	// Load required transports
-	_ "upspin.io/transports"
-
-	// Load useful packers
-	_ "upspin.io/pack/ee"
-	_ "upspin.io/pack/plain"
 )
 
 const serverName = "cacheserver"
-
-var (
-	cacheSizeFlag = flag.Int64("cachesize", 5e9, "max disk `bytes` for cache")
-	writethrough  = flag.Bool("writethrough", false, "make storage cache writethrough")
-)
 
 func main() {
 	flag.Usage = usage
@@ -58,34 +40,14 @@ func main() {
 		log.Fatalf("no storage/dir cache network address specified")
 	}
 
-	// Stop the cache server recursing.
-	cfg = config.SetCacheEndpoint(cfg, upspin.Endpoint{})
-
-	// Calculate limits.
-	maxRefBytes := (9 * (*cacheSizeFlag)) / 10
-	maxLogBytes := maxRefBytes / 9
-
-	sc, blockFlusher, err := storecache.New(cfg, flags.CacheDir, maxRefBytes, *writethrough)
+	// Start the server and wait until it terminates.
+	done, err := serve(cfg, addr)
 	if err != nil {
-		log.Fatalf("opening cache: %s", err)
+		log.Fatalf("cacheserver: %s", err)
 	}
-	ss := storeserver.New(cfg, sc, "")
-
-	dc, err := dircache.New(cfg, flags.CacheDir, maxLogBytes, blockFlusher)
-	if err != nil {
-		log.Fatalf("opening cache: %s", err)
+	if err := <-done; err != nil {
+		log.Fatalf("cacheserver: %s", err)
 	}
-	ds := dirserver.New(cfg, dc, "")
-
-	ln, err := net.Listen("tcp", addr)
-	if err != nil {
-		log.Fatalf("listen: %s", err)
-	}
-
-	http.Handle("/api/Store/", ss)
-	http.Handle("/api/Dir/", ds)
-	err = http.Serve(ln, nil)
-	log.Fatalf("serve: %v", err)
 }
 
 func usage() {
