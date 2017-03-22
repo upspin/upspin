@@ -9,10 +9,8 @@ package main
 
 import (
 	"context"
-	"encoding/base64"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -84,7 +82,7 @@ func main() {
 	cfgPath := filepath.Join(*where, *domain)
 	cfg := s.ReadServerConfig(cfgPath)
 
-	email := s.createServiceAccount(cfgPath)
+	email, privateKeyData := s.createServiceAccount(cfgPath)
 	fmt.Printf("Service account %q created.\n", email)
 
 	s.createBucket(email, bucket)
@@ -94,6 +92,7 @@ func main() {
 		"backend=GCS",
 		"defaultACL=publicRead",
 		"gcpBucketName=" + bucket,
+		"privateKeyData=" + privateKeyData,
 	}
 	s.WriteServerConfig(cfgPath, cfg)
 
@@ -102,7 +101,7 @@ func main() {
 	s.ExitNow()
 }
 
-func (s *state) createServiceAccount(cfgPath string) (email string) {
+func (s *state) createServiceAccount(cfgPath string) (email, privateKeyData string) {
 	// TODO(adg): detect that key exists and re-use it
 	client, err := google.DefaultClient(context.Background(), iam.CloudPlatformScope)
 	if err != nil {
@@ -135,16 +134,7 @@ func (s *state) createServiceAccount(cfgPath string) (email string) {
 		s.Exit(err)
 	}
 
-	b, err := base64.StdEncoding.DecodeString(key.PrivateKeyData)
-	if err != nil {
-		s.Exit(err)
-	}
-	err = ioutil.WriteFile(filepath.Join(cfgPath, "serviceaccount.json"), b, 0600)
-	if err != nil {
-		s.Exit(err)
-	}
-
-	return acct.Email
+	return acct.Email, key.PrivateKeyData
 }
 
 func (s *state) createBucket(email, bucket string) {

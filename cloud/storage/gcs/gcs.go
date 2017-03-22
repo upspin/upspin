@@ -7,13 +7,14 @@ package gcs // import "upspin.io/cloud/storage/gcs"
 
 import (
 	"bytes"
+	"encoding/base64"
 	"io/ioutil"
 	"net/http"
 	"strings"
 	"time"
 
 	gContext "golang.org/x/net/context"
-
+	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/googleapi"
 	gcsBE "google.golang.org/api/storage/v1"
@@ -44,8 +45,9 @@ const (
 
 // Keys used for storing dial options.
 const (
-	bucketName = "gcpBucketName"
-	defaultACL = "defaultACL"
+	bucketName     = "gcpBucketName"
+	defaultACL     = "defaultACL"
+	privateKeyData = "privateKeyData"
 )
 
 // gcsImpl is an implementation of Storage that connects to a Google Cloud Storage (GCS) backend.
@@ -69,12 +71,30 @@ func New(opts *storage.Opts) (storage.Storage, error) {
 		return nil, errors.E(op, errors.Invalid, errors.Errorf("%q option is required", defaultACL))
 	}
 
-	// Authentication is provided by the gcloud tool when running locally, and
-	// by the associated service account when running on Compute Engine.
-	client, err := google.DefaultClient(gContext.Background(), scope)
-	if err != nil {
-		return nil, errors.E(op, errors.IO, errors.Errorf("unable to get default client: %s", err))
+	var client *http.Client
+	if keyData, ok := opts.Opts[privateKeyData]; !ok {
+		// Authentication is provided by the associated service account
+		// when running on Compute Engine.
+		// TODO(adg): remove this once we have deprecated passing
+		// seviceaccount.json around. We should return an error here.
+		var err error
+		client, err = google.DefaultClient(gContext.Background(), scope)
+		if err != nil {
+			return nil, errors.E(op, errors.IO, errors.Errorf("unable to get default client: %s", err))
+		}
+	} else {
+		b, err := base64.StdEncoding.DecodeString(keyData)
+		if err != nil {
+			return nil, errors.E(op, errors.IO, errors.Errorf("unable to decode %s: %s", privateKeyData, err))
+		}
+		cfg, err := google.JWTConfigFromJSON(b, scope)
+		if err != nil {
+			return nil, errors.E(op, errors.Invalid, err)
+		}
+		ctx := gContext.Background()
+		client = oauth2.NewClient(ctx, cfg.TokenSource(ctx))
 	}
+
 	service, err := gcsBE.New(client)
 	if err != nil {
 		return nil, errors.E(op, errors.IO, errors.Errorf("unable to create storage service: %s", err))
