@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "bd3e8f83_5b0b65fe",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-22T20:13:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c7ecc39c_d7093f45",
+      "revId": "36d5752d0415651ae39cc382543f8e1e58ee441f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "50557ca1_9c5e3e0f",
         "filename": "cmd/cacheserver/endtoend_test.go",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2017-03-22T18:11:09Z",
       "side": 1,
       "message": "merge with the second group above?",
+      "revId": "36d5752d0415651ae39cc382543f8e1e58ee441f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3494576b_bbd1a91e",
+        "filename": "cmd/cacheserver/endtoend_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-22T20:13:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "50557ca1_9c5e3e0f",
       "revId": "36d5752d0415651ae39cc382543f8e1e58ee441f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "11cf6c76_b11fe353",
+        "filename": "cmd/cacheserver/endtoend_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-22T20:13:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "570afb6f_670a2f92",
+      "revId": "36d5752d0415651ae39cc382543f8e1e58ee441f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "803a5c4a_ece16031",
         "filename": "cmd/cacheserver/endtoend_test.go",
         "patchSetId": 3
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "b8346797_42e0c756",
+        "filename": "cmd/cacheserver/endtoend_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-22T20:13:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "803a5c4a_ece16031",
+      "revId": "36d5752d0415651ae39cc382543f8e1e58ee441f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "3c748020_9d6820a9",
         "filename": "cmd/cacheserver/endtoend_test.go",
         "patchSetId": 3
@@ -81,6 +153,24 @@
       "writtenOn": "2017-03-22T18:11:09Z",
       "side": 1,
       "message": "In some Unix flavors closing a port can impose a delay until it can be re-used. Not sure if this is true anymore.",
+      "revId": "36d5752d0415651ae39cc382543f8e1e58ee441f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ffebb39f_09215290",
+        "filename": "cmd/cacheserver/endtoend_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-22T20:13:05Z",
+      "side": 1,
+      "message": "Only if it was used to make a connection.\n\nActually, I should find a better way to do this that doesn\u0027t require looking first and picking a port since there is a window between the close and the subsequent Listen where someone else can grab it.  I actually copied this from other tests in our world so I\u0027ll fix it everywhere at once once I figure out better.  For now I\u0027ll leave this as is.",
+      "parentUuid": "3c748020_9d6820a9",
       "revId": "36d5752d0415651ae39cc382543f8e1e58ee441f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
