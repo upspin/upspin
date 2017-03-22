@@ -101,6 +101,8 @@ func initServer(mode initMode) (*subcmd.ServerConfig, upspin.Config, *perm.Perm,
 		return nil, nil, nil, err
 	}
 
+	// TODO(adg): remove this once we have deprecated serviceaccount.json
+	// and the Bucket field.
 	if serverConfig.Bucket != "" {
 		os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", filepath.Join(*cfgPath, "serviceaccount.json"))
 	}
