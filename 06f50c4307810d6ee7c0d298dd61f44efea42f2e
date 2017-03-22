@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "44f59133_f6f72003",
+        "filename": "cmd/upspinserver/web.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-22T20:20:01Z",
+      "side": 1,
+      "message": "how does it handle broken links?",
+      "revId": "06f50c4307810d6ee7c0d298dd61f44efea42f2e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "acef5af0_fa5fafe0",
+        "filename": "cmd/upspinserver/web.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-22T20:20:01Z",
+      "side": 1,
+      "message": "I don\u0027t understand this. If it\u0027s broken, why continue up the path?",
+      "revId": "06f50c4307810d6ee7c0d298dd61f44efea42f2e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "86a513a8_594c45b2",
+        "filename": "cmd/upspinserver/web.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-22T20:20:01Z",
+      "side": 1,
+      "message": "If permission denied is the default, why aren\u0027t you returning an error here? Maybe this should be \n// No Access file, no read nor list rights for AllUsers.\n?",
+      "revId": "06f50c4307810d6ee7c0d298dd61f44efea42f2e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
