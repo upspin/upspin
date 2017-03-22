@@ -90,7 +90,11 @@ func main() {
 	s.createBucket(email, bucket)
 	fmt.Printf("Bucket %q created.\n", bucket)
 
-	cfg.Bucket = bucket
+	cfg.StoreConfig = []string{
+		"backend=GCS",
+		"defaultACL=publicRead",
+		"gcpBucketName=" + bucket,
+	}
 	s.WriteServerConfig(cfgPath, cfg)
 
 	fmt.Printf("You should now deploy the upspinserver binary and run 'upspin setupserver'.\n")
