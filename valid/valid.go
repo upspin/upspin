@@ -120,6 +120,7 @@ func Endpoint(endpoint upspin.Endpoint) error {
 // - Attr must not include AttrIncomplete
 // - Packing must be known
 // - Sequence must have a known special value or be non-negative
+// - for non-directory entries, a Writer field is required.
 func DirEntry(entry *upspin.DirEntry) error {
 	const op = "valid.DirEntry"
 	// SignedName must be good.
@@ -185,6 +186,13 @@ func DirEntry(entry *upspin.DirEntry) error {
 		if err := DirBlock(block); err != nil {
 			return errors.E(op, errors.Invalid, entry.Name, err)
 		}
+	}
+	// For non-directory entries, a Writer field is required.
+	if entry.IsDir() {
+		return nil
+	}
+	if err := UserName(entry.Writer); err != nil {
+		return errors.E(op, errors.Str("invalid writer"), err)
 	}
 	return nil
 }

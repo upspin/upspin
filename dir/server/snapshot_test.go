@@ -260,6 +260,7 @@ func TestTriggerSnapshotWithPut(t *testing.T) {
 		Name:       snapshotUser + "/" + snapshotControlFile,
 		SignedName: snapshotUser + "/" + snapshotControlFile,
 		Packing:    upspin.PlainPack,
+		Writer:     "some@valid.user.name",
 	}
 
 	entry, err := s.Put(de)
