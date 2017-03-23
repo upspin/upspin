@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9d1a38bc_21e12708",
+        "filename": "cmd/upspinserver/web.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-23T20:28:41Z",
+      "side": 1,
+      "message": "What if the link points to another dirserver?",
+      "revId": "72028dbff2d232193b0a921ee49a044e5b6db819",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
