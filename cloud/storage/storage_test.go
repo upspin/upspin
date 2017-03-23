@@ -7,12 +7,10 @@ package storage_test
 import (
 	"reflect"
 	"testing"
-	"time"
 
 	"upspin.io/cloud/storage"
 	"upspin.io/cloud/storage/storagetest"
 	"upspin.io/errors"
-	"upspin.io/upspin"
 )
 
 func TestRegister(t *testing.T) {
@@ -39,17 +37,6 @@ type dialingStorage struct {
 }
 
 func (d *dialingStorage) new(opts *storage.Opts) (storage.Storage, error) {
-	if len(opts.Addrs) != len(d.expectedOpts.Addrs) {
-		d.t.Fatalf("Expected %d addrs, got %d", len(d.expectedOpts.Addrs), len(opts.Addrs))
-	}
-	for i, a := range opts.Addrs {
-		if a != d.expectedOpts.Addrs[i] {
-			d.t.Errorf("Address mismatch on addr %d, expected %q, got %q", i, d.expectedOpts.Addrs[i], a)
-		}
-	}
-	if d.expectedOpts.Timeout != opts.Timeout {
-		d.t.Errorf("Expected timeout %v, got %v", d.expectedOpts.Timeout, opts.Timeout)
-	}
 	if len(opts.Opts) != len(d.expectedOpts.Opts) {
 		d.t.Fatalf("Expected %d key-value pairs, got %d", len(d.expectedOpts.Opts), len(opts.Opts))
 	}
@@ -61,20 +48,15 @@ func (d *dialingStorage) new(opts *storage.Opts) (storage.Storage, error) {
 
 func TestDial(t *testing.T) {
 	d := dialingStorage{t, storage.Opts{
-		Timeout: 17 * time.Second,
-		Addrs:   []upspin.NetAddr{"foo.com:1234", "bla.org:9999"},
-		Opts:    map[string]string{"key1": "val1", "key2": "val2", "key3": "val3"},
+		Opts: map[string]string{"key1": "val1", "key2": "val2", "key3": "val3"},
 	}}
 	err := storage.Register("dialTest", d.new)
 	if err != nil {
 		t.Fatal(err)
 	}
 	_, err = storage.Dial("dialTest",
-		storage.WithTimeout(17*time.Second),
-		storage.WithNetAddr("foo.com:1234"),
 		storage.WithKeyValue("key1", "val1"),
-		storage.WithOptions("key2=val2,key3=val3"),
-		storage.WithNetAddr("bla.org:9999"))
+		storage.WithOptions("key2=val2,key3=val3"))
 	if err == nil {
 		t.Fatal("Expected a particular error")
 	}
