@@ -186,6 +186,12 @@ func DirEntry(entry *upspin.DirEntry) error {
 			return errors.E(op, errors.Invalid, entry.Name, err)
 		}
 	}
+	if entry.IsDir() {
+		return nil
+	}
+	if err := UserName(entry.Writer); err != nil {
+		return errors.E(op, errors.Invalid, entry.Writer, errors.Errorf("invalid writer: %s", err))
+	}
 	return nil
 }
 
