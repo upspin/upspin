@@ -83,40 +83,8 @@ func (s *web) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		name = entry.Name
 	}
 
-	// Get the Access file for the path.
-	dir, err := s.cli.DirServer(name)
-	if err != nil {
-		httpError(w, err)
-		return
-	}
-	whichAccess, err := dir.WhichAccess(name)
-	if err != nil {
-		httpError(w, err)
-		return
-	}
-	// No Access file, default permission denied.
-	if whichAccess == nil {
-		code := http.StatusForbidden
-		http.Error(w, http.StatusText(code), code)
-		return
-	}
-	accessData, err := clientutil.ReadAll(s.cfg, whichAccess)
-	if err != nil {
-		httpError(w, err)
-		return
-	}
-	acc, err := access.Parse(whichAccess.Name, accessData)
-	if err != nil {
-		httpError(w, err)
-		return
-	}
-	// Check read and list rights for AllUsers.
-	readable, err := acc.Can(access.AllUsers, access.Read, name, s.cli.Get)
-	if err != nil {
-		httpError(w, err)
-		return
-	}
-	listable, err := acc.Can(access.AllUsers, access.List, name, s.cli.Get)
+	// Fetch read and list rights for AllUsers.
+	readable, listable, err := s.accessAll(name)
 	if err != nil {
 		httpError(w, err)
 		return
@@ -156,6 +124,58 @@ func (s *web) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		code := http.StatusForbidden
 		http.Error(w, http.StatusText(code), code)
 	}
+}
+// whichAccess returns Access entry for path name, handling links.
+func (s *web) whichAccess(name upspin.PathName) (*upspin.DirEntry, error) {
+	dir, err := s.cli.DirServer(name)
+	if err != nil {
+		return nil, err
+	}
+	for {
+		whichAccess, err := dir.WhichAccess(name)
+		if err == upspin.ErrFollowLink {
+			// If we get link error, go back up the path looking for
+			// the Access file that rules over the link.
+			name = path.DropPath(name, 1)
+			continue
+		}
+		if err != nil {
+			return nil, err
+		}
+		return whichAccess, nil
+	}
+}
+
+// accessAll returns read and list rights of path for AllUsers.
+func (s *web) accessAll(name upspin.PathName) (bool, bool, error) {
+	// Get access entry.
+	whichAccess, err := s.whichAccess(name)
+	if err != nil {
+		return false, false, err
+	}
+	// No Access file, no read nor list rights for AllUsers.
+	if whichAccess == nil {
+		return false, false, nil
+	}
+	accessData, err := clientutil.ReadAll(s.cfg, whichAccess)
+	if err != nil {
+		return false, false, err
+	}
+	acc, err := access.Parse(whichAccess.Name, accessData)
+	if err != nil {
+		return false, false, err
+	}
+	// Check read and list rights for AllUsers.
+	readable, err := acc.Can(access.AllUsers, access.Read, name, s.cli.Get)
+	if err != nil {
+		return false, false, err
+	}
+	listable, err := acc.Can(access.AllUsers, access.List, name, s.cli.Get)
+	if err != nil {
+		return false, false, err
+	}
+
+	return readable, listable, nil
 }
 
 // ifError checks if the error is the expected one, and if so writes back an
