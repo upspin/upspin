@@ -75,6 +75,14 @@ var (
 	// StoreServerName is the Upspin user name of the StoreServer.
 	StoreServerUser = ""
 
+	// Prudent sets an extra security mode in the client to check for malicious or
+	// buggy servers, at possible cost in performance or convenience.
+	// Specifically, one check is that the writer listed in a directory entry is
+	// either the owner or a user currently with write permission. This protects
+	// against a forged directory entry at the cost of potentially blocking
+	// a legitimate file written by a user who no longer has write permission.
+	Prudent = false
+
 	// TLSCertFile and TLSKeyFile specify the location of a TLS
 	// certificate/key pair used for serving TLS (HTTPS).
 	TLSCertFile = ""
@@ -117,6 +125,17 @@ var flags = map[string]*flagVar{
 		arg: func() string { return strArg("serverconfig", configFlag{&ServerConfig}.String(), "") },
 	},
 	"storeserveruser": strVar(&StoreServerUser, "storeserveruser", "", "user name of the StoreServer"),
+	"prudent": &flagVar{
+		set: func() {
+			flag.BoolVar(&Prudent, "prudent", false, "protect against malicious directory server")
+		},
+		arg: func() string {
+			if !Prudent {
+				return ""
+			}
+			return "-prudent"
+		},
+	},
 	"tls": &flagVar{
 		set: func() {
 			flag.StringVar(&TLSCertFile, "tls_cert", "", "TLS Certificate `file` in PEM format")
