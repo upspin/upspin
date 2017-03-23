@@ -75,6 +75,9 @@ var (
 	// StoreServerName is the Upspin user name of the StoreServer.
 	StoreServerUser = ""
 
+	// Tinfoil sets an extra secure mode, protecting against malicious directory servers.
+	Tinfoil = false
+
 	// TLSCertFile and TLSKeyFile specify the location of a TLS
 	// certificate/key pair used for serving TLS (HTTPS).
 	TLSCertFile = ""
@@ -117,6 +120,17 @@ var flags = map[string]*flagVar{
 		arg: func() string { return strArg("serverconfig", configFlag{&ServerConfig}.String(), "") },
 	},
 	"storeserveruser": strVar(&StoreServerUser, "storeserveruser", "", "user name of the StoreServer"),
+	"tinfoil": &flagVar{
+		set: func() {
+			flag.BoolVar(&Tinfoil, "tinfoil", false, "protect against malicious directory server")
+		},
+		arg: func() string {
+			if !Tinfoil {
+				return ""
+			}
+			return "-tinfoil"
+		},
+	},
 	"tls": &flagVar{
 		set: func() {
 			flag.StringVar(&TLSCertFile, "tls_cert", "", "TLS Certificate `file` in PEM format")

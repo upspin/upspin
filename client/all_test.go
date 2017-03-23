@@ -664,3 +664,5 @@ func TestRejectBadGroupFile(t *testing.T) {
 		t.Fatalf("error = %s, want = %s", err, expectedErr)
 	}
 }
+
+// TODO add a malicious directory server to test tinfoil checks
