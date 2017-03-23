@@ -292,6 +292,12 @@ func TestDirEntry(t *testing.T) {
 		t.Fatal("no error for overlapping blocks")
 	}
 	restore()
+	// Zero-length block.
+	entry.Blocks = append(entry.Blocks, upspin.DirBlock{})
+	if err := DirEntry(&entry); err == nil {
+		t.Fatal("no error for zero-length block")
+	}
+	restore()
 	// Invalid block.
 	entry.Blocks[1].Location.Endpoint.Transport = 44
 	if err := DirEntry(&entry); err == nil {
