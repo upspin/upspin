@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4b2c2e53_0bd817fb",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-23T22:44:38Z",
+      "side": 1,
+      "message": "This is probably not the preferred way of doing this, since flags in packages are not allowed.\n\nWe may need to put this in New() or somehow tag it along upspin.Config.",
+      "revId": "8174ea2a579614bdad53bbf1ea104c804e5e3ebb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "487eacb9_203cb694",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 737,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-23T22:44:38Z",
+      "side": 1,
+      "message": "err probably already includes name, since it came from c.Lookup (I think).",
+      "revId": "8174ea2a579614bdad53bbf1ea104c804e5e3ebb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
