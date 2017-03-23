@@ -241,9 +241,6 @@ func (h *setupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	for _, name := range subcmd.SetupServerFiles {
 		body, ok := files[name]
 		if !ok {
-			if subcmd.OptionalSetupServerFiles[name] {
-				continue
-			}
 			http.Error(w, fmt.Sprintf("missing config file %q", name), http.StatusBadRequest)
 			return
 		}
