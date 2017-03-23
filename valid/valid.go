@@ -186,6 +186,9 @@ func DirEntry(entry *upspin.DirEntry) error {
 			return errors.E(op, errors.Invalid, entry.Name, err)
 		}
 	}
+	if entry.Writer == "" {
+		return errors.E(op, errors.Invalid, entry.Name, errors.Str("entry must have a Writer"))
+	}
 	return nil
 }
 
