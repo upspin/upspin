@@ -16,6 +16,24 @@
       "revId": "c23e2f1b7452bbcaa141c736ff178742e48666e6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2cd4892b_60207aa5",
+        "filename": "serverutil/upspinserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-23T04:01:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8c8d2f26_000f6ebc",
+      "revId": "c23e2f1b7452bbcaa141c736ff178742e48666e6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
