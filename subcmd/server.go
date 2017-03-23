@@ -47,12 +47,6 @@ var SetupServerFiles = []string{
 	ServerConfigFile,
 }
 
-// OptionalSetupServerFiles specifies the configuration files that may be
-// missing when running 'upspin setupserver'.
-var OptionalSetupServerFiles = map[string]bool{}
-
-// TODO(adg): remove OptionalSetupServerFiles as it is no longer used.
-
 // ReadServerConfig reads and JSON-decodes the ServerConfigFile under cfgPath.
 func (s *State) ReadServerConfig(cfgPath string) *ServerConfig {
 	cfgFile := filepath.Join(cfgPath, ServerConfigFile)
