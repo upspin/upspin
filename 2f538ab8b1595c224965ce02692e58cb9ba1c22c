@@ -16,6 +16,24 @@
       "revId": "2f538ab8b1595c224965ce02692e58cb9ba1c22c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "98d50426_499e5792",
+        "filename": "valid/valid.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-23T17:33:01Z",
+      "side": 1,
+      "message": "That is very expensive to do though. Should we be calling the keyserver from valid?\n\nBTW: I just found out the counter-example: directories. The directory entry will have a Writer as the DirServer, so the Writer field should be empty there. I will change this to only check when Attr is not AttrDirectory.",
+      "parentUuid": "f0a4af92_e8d87e1e",
+      "revId": "2f538ab8b1595c224965ce02692e58cb9ba1c22c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
