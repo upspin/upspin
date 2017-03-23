@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2f9e95b1_93d83cc1",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 505,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-23T21:38:01Z",
+      "side": 1,
+      "message": "delete the first comma or:\n\nThe block may be of any size \u003e\u003d 1 byte, but...",
+      "revId": "bf30d0aa718cd654d7226e74af1378b4c5ee5a63",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
