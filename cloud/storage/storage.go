@@ -64,7 +64,7 @@ func WithOptions(options string) DialOpts {
 	return func(o *Opts) error {
 		pairs := strings.Split(options, ",")
 		for _, p := range pairs {
-			kv := strings.Split(p, "=")
+			kv := strings.SplitN(p, "=", 2)
 			if len(kv) != 2 {
 				return errors.E(op, errors.Invalid, errors.Errorf("error parsing option %s", kv))
 			}
