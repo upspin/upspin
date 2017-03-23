@@ -16,6 +16,7 @@ import (
 	"path/filepath"
 
 	"golang.org/x/oauth2/google"
+	"google.golang.org/api/googleapi"
 	iam "google.golang.org/api/iam/v1"
 	storage "google.golang.org/api/storage/v1"
 
@@ -51,6 +52,8 @@ Authenticate and enable the necessary APIs:
 	$ gcloud --project <project> beta service-management enable iam.googleapis.com storage_api
 And, finally, authenticate again in a different way:
 	$ gcloud auth application-default login
+
+Running this command when the service account or bucket exist is a no-op.
 `
 
 func main() {
@@ -83,10 +86,8 @@ func main() {
 	cfg := s.ReadServerConfig(cfgPath)
 
 	email, privateKeyData := s.createServiceAccount(cfgPath)
-	fmt.Printf("Service account %q created.\n", email)
 
 	s.createBucket(email, bucket)
-	fmt.Printf("Bucket %q created.\n", bucket)
 
 	cfg.StoreConfig = []string{
 		"backend=GCS",
@@ -102,7 +103,6 @@ func main() {
 }
 
 func (s *state) createServiceAccount(cfgPath string) (email, privateKeyData string) {
-	// TODO(adg): detect that key exists and re-use it
 	client, err := google.DefaultClient(context.Background(), iam.CloudPlatformScope)
 	if err != nil {
 		// TODO: ask the user to run 'gcloud auth application-default login'
@@ -113,8 +113,6 @@ func (s *state) createServiceAccount(cfgPath string) (email, privateKeyData stri
 		s.Exit(err)
 	}
 
-	// TODO(adg): detect that the account exists
-	// and decide what to do in that case
 	name := "projects/" + flags.Project
 	req := &iam.CreateServiceAccountRequest{
 		AccountId: "upspinstorage", // TODO(adg): flag?
@@ -122,8 +120,18 @@ func (s *state) createServiceAccount(cfgPath string) (email, privateKeyData stri
 			DisplayName: "Upspin Storage",
 		},
 	}
+	created := true
 	acct, err := svc.Projects.ServiceAccounts.Create(name, req).Do()
-	if err != nil {
+	if isExists(err) {
+		// This should be the name we need to get.
+		// TODO(adg): make this more robust by listing instead.
+		guess := name + "/serviceAccounts/upspinstorage@" + flags.Project + ".iam.gserviceaccount.com"
+		acct, err = svc.Projects.ServiceAccounts.Get(guess).Do()
+		if err != nil {
+			s.Exit(err)
+		}
+		created = false
+	} else if err != nil {
 		s.Exit(err)
 	}
 
@@ -132,6 +140,11 @@ func (s *state) createServiceAccount(cfgPath string) (email, privateKeyData stri
 	key, err := svc.Projects.ServiceAccounts.Keys.Create(name, req2).Do()
 	if err != nil {
 		s.Exit(err)
+	}
+	if created {
+		fmt.Printf("Service account %q created.\n", acct.Email)
+	} else {
+		fmt.Printf("A new key for the service account %q was created.\n", acct.Email)
 	}
 
 	return acct.Email, key.PrivateKeyData
@@ -158,7 +171,27 @@ func (s *state) createBucket(email, bucket string) {
 		Name: bucket,
 		// TODO(adg): flag for location
 	}).Do()
-	if err != nil {
+	if isExists(err) {
+		// TODO(adg): update bucket ACL to make sure the service
+		// account has access. (For now, we assume that the user
+		// created the bucket using this command and that the bucket
+		// has the correct permissions.)
+		fmt.Printf("Bucket %q already exists; re-using it.\n", bucket)
+	} else if err != nil {
 		s.Exit(err)
+	} else {
+		fmt.Printf("Bucket %q created.\n", bucket)
 	}
+}
+
+func isExists(err error) bool {
+	if e, ok := err.(*googleapi.Error); ok && len(e.Errors) > 0 {
+		for _, e := range e.Errors {
+			if e.Reason != "alreadyExists" && e.Reason != "conflict" {
+				return false
+			}
+		}
+		return true
+	}
+	return false
 }
