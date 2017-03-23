@@ -16,6 +16,24 @@
       "revId": "bf30d0aa718cd654d7226e74af1378b4c5ee5a63",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "967e6367_3e0129f2",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 505,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-23T21:43:23Z",
+      "side": 1,
+      "message": "But that mixes math and prose. How\u0027s \n\nThe block my be of any size greater than or equal to one byte, but...\n\n?",
+      "parentUuid": "2f9e95b1_93d83cc1",
+      "revId": "bf30d0aa718cd654d7226e74af1378b4c5ee5a63",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
