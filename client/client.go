@@ -187,6 +187,60 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 	return entry, nil
 }
 
+// validSigner checks that the file signer is either the owner
+// or else has write permission.
+// The directory server already checks that entry.Writer
+// has Write access. Only under the Prudent flag do we
+// recheck, protecting against a bad directory server.
+func (c *Client) validSigner(entry *upspin.DirEntry) error {
+	if !flags.Prudent {
+		return nil
+	}
+	parsed, err := path.Parse(entry.SignedName)
+	if err != nil {
+		return err
+	}
+	if parsed.User() == entry.Writer {
+		return nil
+	}
+	path := parsed.Path()
+	// We have walked the path, so no links, so we can query the DirServer ourselves.
+	dir, err := c.DirServer(path)
+	if err != nil {
+		return err
+	}
+	acc, err := c.access(path, dir)
+	if err != nil {
+		return err
+	}
+	canWrite, err := acc.Can(entry.Writer, access.Write, entry.SignedName, c.Get)
+	if err != nil {
+		return err
+	}
+	if canWrite {
+		return nil
+	}
+	return errors.E(errors.Invalid, parsed.User(), errors.Str("signer does not have write permission"))
+}
+
+// access returns an Access struct for the applicable, parsed Access file.
+// Links have been evaluated so we can ask the DirServer directly.
+func (c *Client) access(path upspin.PathName, dir upspin.DirServer) (*access.Access, error) {
+	whichAccess, err := dir.WhichAccess(path)
+	if err != nil || whichAccess == nil {
+		return nil, err
+	}
+	err = validateWhichAccess(path, whichAccess)
+	if err != nil {
+		return nil, err
+	}
+	accessData, err := c.Get(whichAccess.Name)
+	if err != nil {
+		return nil, err
+	}
+	return access.Parse(whichAccess.Name, accessData)
+}
+
 var errReadAll = errors.Str(`cannot add "read:all" permission to existing files`)
 
 // readAllOK checks that we are not adding read:all permission to an existing
@@ -213,25 +267,13 @@ func (c *Client) readAllOK(parsed path.Parsed) error {
 	// The directory has files, but it's OK if they're already read:all.
 	// We check this by seeing whether the controlling Access file,
 	// which could be in this directory or a parent, already has read:all.
-	whichAccess, err := dir.WhichAccess(parsed.Path())
+	acc, err := c.access(parsed.Path(), dir)
 	if err != nil {
 		return err
 	}
-	err = validateWhichAccess(parsed.Path(), whichAccess)
-	if err != nil {
-		return err
-	}
-	if whichAccess == nil {
+	if acc == nil {
 		// There is no Access file so there is no read:all set already.
 		return errReadAll
-	}
-	accessData, err := c.Get(whichAccess.Name)
-	if err != nil {
-		return err
-	}
-	acc, err := access.Parse(whichAccess.Name, accessData)
-	if err != nil {
-		return err
 	}
 	if !acc.IsReadableByAll() {
 		return errReadAll
@@ -454,6 +496,9 @@ func (c *Client) Get(name upspin.PathName) ([]byte, error) {
 
 	if entry.IsDir() {
 		return nil, errors.E(op, name, errors.IsDir)
+	}
+	if err = c.validSigner(entry); err != nil {
+		return nil, errors.E(op, name, err)
 	}
 	ss := s.StartSpan("ReadAll")
 	data, err := clientutil.ReadAll(c.config, entry)
@@ -691,6 +736,9 @@ func (c *Client) Open(name upspin.PathName) (upspin.File, error) {
 	}
 	if entry.IsDir() {
 		return nil, errors.E(op, errors.IsDir, name, errors.Str("cannot Open a directory"))
+	}
+	if err = c.validSigner(entry); err != nil {
+		return nil, errors.E(op, name, err)
 	}
 	f, err := file.Readable(c.config, entry)
 	if err != nil {
