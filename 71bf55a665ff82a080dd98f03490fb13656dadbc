@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e1830f48_aac90834",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 505,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-23T21:27:08Z",
+      "side": 1,
+      "message": "for clarity here, maybe s/positive/non-zero/. this is like a spec and should be precise.\nthe error message doesn\u0027t have to be so rigid.",
+      "revId": "71bf55a665ff82a080dd98f03490fb13656dadbc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
