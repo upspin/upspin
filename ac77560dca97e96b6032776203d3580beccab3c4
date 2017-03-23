@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0e9e4059_1e4d87f6",
+        "filename": "valid/valid.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-23T21:09:24Z",
+      "side": 1,
+      "message": "\"non-positive block size %d\"",
+      "revId": "ac77560dca97e96b6032776203d3580beccab3c4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
