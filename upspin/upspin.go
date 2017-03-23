@@ -502,7 +502,7 @@ type DirEntry struct {
 const BlockSize = 1024 * 1024
 
 // DirBlock describes a block of data representing a contiguous section of a file.
-// The block may be of any size, including zero bytes, but in large files is usually
+// The block may be of any positive size, but in large files is usually
 // BlockSize long.
 type DirBlock struct {
 	Location Location // Location of data in store.
