@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f0a4af92_e8d87e1e",
+        "filename": "valid/valid.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-23T17:27:28Z",
+      "side": 1,
+      "message": "the writer must be a valid user. check that instead",
+      "revId": "2f538ab8b1595c224965ce02692e58cb9ba1c22c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
