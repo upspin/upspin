@@ -168,7 +168,7 @@ func initServer(mode initMode) (*subcmd.ServerConfig, upspin.Config, *perm.Perm,
 	http.Handle("/api/Dir/", httpDir)
 
 	log.Println("Store and Directory servers initialized.")
-	log.Printf("Store server configuration: %s", strings.Join(storeServerConfig, " "))
+	log.Printf("Store server configuration: %s", fmtStoreConfig(storeServerConfig))
 
 	if mode == setupServer {
 		// Create Writers file if this was triggered by 'upspin setupserver'.
@@ -179,6 +179,18 @@ func initServer(mode initMode) (*subcmd.ServerConfig, upspin.Config, *perm.Perm,
 		}()
 	}
 	return serverConfig, cfg, perm, nil
+}
+
+// fmtStoreConfig formats a ServerConfig.StoreConfig value as a string,
+// ommitting any privateKeyData fields as they include sensitive information.
+func fmtStoreConfig(cfg []string) string {
+	var out []string
+	for _, s := range cfg {
+		if !strings.HasPrefix(s, "privateKeyData=") {
+			out = append(out, s)
+		}
+	}
+	return strings.Join(out, " ")
 }
 
 type setupHandler struct {
