@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2a1ecc2f_56293a90",
+        "filename": "cloud/storage/gcs/gcs.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-23T03:13:22Z",
+      "side": 1,
+      "message": "Aren\u0027t you deprecating this now? What\u0027s missing?",
+      "revId": "ecf674da1b5dc05e7b8e8bf9d9c1584869d65e7c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ae533444_5f6682ee",
+        "filename": "subcmd/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-23T03:13:22Z",
+      "side": 1,
+      "message": "Why not remove now then?",
+      "revId": "ecf674da1b5dc05e7b8e8bf9d9c1584869d65e7c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
