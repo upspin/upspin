@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "120b835c_554e6082",
+        "filename": "cmd/upspinserver/web.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-23T04:04:42Z",
+      "side": 1,
+      "message": "I think it handles links, not broken links. See below.",
+      "parentUuid": "0a33926b_f5443a9d",
+      "revId": "06f50c4307810d6ee7c0d298dd61f44efea42f2e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "acef5af0_fa5fafe0",
         "filename": "cmd/upspinserver/web.go",
         "patchSetId": 1
@@ -66,6 +84,24 @@
       "side": 1,
       "message": "The server may have permission to access the link, but AllUsers may not have permission to even know the link exists. Hence going back up the path to find the first Access file which will tell us what permission AllUsers have.",
       "parentUuid": "acef5af0_fa5fafe0",
+      "revId": "06f50c4307810d6ee7c0d298dd61f44efea42f2e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1f076835_e9033d9f",
+        "filename": "cmd/upspinserver/web.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-23T04:04:42Z",
+      "side": 1,
+      "message": "I see. So you don\u0027t want to follow the link, but instead show it. Ok. But if that\u0027s right, the comment about broken link doesn\u0027t make sense to me. It could very well not be broken and you would know if you followed it (by doing dir.WhichAccess(whichAccess.Link)). \n\nMaybe something like:\n\n// If we get link error, go back up the path looking for the Access file that rules over the link\n\n?",
+      "parentUuid": "58bf7404_b81dd5ae",
       "revId": "06f50c4307810d6ee7c0d298dd61f44efea42f2e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
