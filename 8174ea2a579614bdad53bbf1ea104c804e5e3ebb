@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "31153b2a_eeb81510",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-23T23:55:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c9e8443d_5e51d950",
+      "revId": "8174ea2a579614bdad53bbf1ea104c804e5e3ebb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4b2c2e53_0bd817fb",
         "filename": "client/client.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2017-03-23T22:44:38Z",
       "side": 1,
       "message": "This is probably not the preferred way of doing this, since flags in packages are not allowed.\n\nWe may need to put this in New() or somehow tag it along upspin.Config.",
+      "revId": "8174ea2a579614bdad53bbf1ea104c804e5e3ebb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7cc0af54_284c1fad",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-23T23:55:11Z",
+      "side": 1,
+      "message": "If there is an example I can follow, happy to do so.",
+      "parentUuid": "4b2c2e53_0bd817fb",
       "revId": "8174ea2a579614bdad53bbf1ea104c804e5e3ebb",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -50,6 +86,24 @@
       "revId": "8174ea2a579614bdad53bbf1ea104c804e5e3ebb",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7313ac5a_ce2b0c71",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-23T23:55:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e3b737e3_91a93595",
+      "revId": "8174ea2a579614bdad53bbf1ea104c804e5e3ebb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -88,6 +142,24 @@
     },
     {
       "key": {
+        "uuid": "e40710e0_5b1ec51d",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-23T23:55:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "98d47bfb_e67d9bc6",
+      "revId": "8174ea2a579614bdad53bbf1ea104c804e5e3ebb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5c9d8c70_d79faadd",
         "filename": "client/client.go",
         "patchSetId": 1
@@ -99,6 +171,30 @@
       "writtenOn": "2017-03-23T23:19:40Z",
       "side": 1,
       "message": "Why not move this above validateWhichAccess?",
+      "range": {
+        "startLine": 236,
+        "startChar": 1,
+        "endLine": 238,
+        "endChar": 2
+      },
+      "revId": "8174ea2a579614bdad53bbf1ea104c804e5e3ebb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "509f5c75_fdadb57e",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-23T23:55:11Z",
+      "side": 1,
+      "message": "No change from before.   I imagine the idea was to check on whether there was someone trying to trick us with the whichAccess before treating even the value nil as reliable.  But in practice right now we don\u0027t actually check nil thoroughly.\n\nI\u0027ll move it as you suggest and later if we do something more thorough we can move back.",
+      "parentUuid": "5c9d8c70_d79faadd",
       "range": {
         "startLine": 236,
         "startChar": 1,
@@ -125,6 +221,24 @@
       "revId": "8174ea2a579614bdad53bbf1ea104c804e5e3ebb",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0c8af90f_3d9af1da",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 737,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-23T23:55:11Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "487eacb9_203cb694",
+      "revId": "8174ea2a579614bdad53bbf1ea104c804e5e3ebb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
