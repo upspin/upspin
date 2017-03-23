@@ -34,6 +34,24 @@
       "revId": "bf30d0aa718cd654d7226e74af1378b4c5ee5a63",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "331cfc7f_e5e49c62",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 505,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-23T21:45:23Z",
+      "side": 1,
+      "message": "Blocks can be of any non-zero size, ....\n\n(no one will think a negative size is valid.)",
+      "parentUuid": "967e6367_3e0129f2",
+      "revId": "bf30d0aa718cd654d7226e74af1378b4c5ee5a63",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
