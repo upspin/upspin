@@ -70,6 +70,47 @@
     },
     {
       "key": {
+        "uuid": "00265904_c95cc681",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-23T23:19:40Z",
+      "side": 1,
+      "message": "+1",
+      "parentUuid": "98d47bfb_e67d9bc6",
+      "revId": "8174ea2a579614bdad53bbf1ea104c804e5e3ebb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5c9d8c70_d79faadd",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-23T23:19:40Z",
+      "side": 1,
+      "message": "Why not move this above validateWhichAccess?",
+      "range": {
+        "startLine": 236,
+        "startChar": 1,
+        "endLine": 238,
+        "endChar": 2
+      },
+      "revId": "8174ea2a579614bdad53bbf1ea104c804e5e3ebb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "487eacb9_203cb694",
         "filename": "client/client.go",
         "patchSetId": 1
