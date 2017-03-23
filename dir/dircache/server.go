@@ -130,7 +130,8 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		}
 	}
 	de, err := dir.Put(entry)
-	if de == nil && err == nil {
+	if err == nil {
+		// If the put worked, remember it.
 		s.clog.logRequest(putReq, name, err, entry)
 	}
 

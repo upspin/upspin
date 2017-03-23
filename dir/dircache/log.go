@@ -272,8 +272,9 @@ func (l *clog) wipeLog(user upspin.UserName) {
 			continue
 		}
 
-		// Glob requests are obsoleted by obsoleting their children.
+		// Glob requests can be marked as incomplete.
 		if e.request == globReq || e.request == obsoleteReq {
+			e.complete = false
 			continue
 		}
 		e.request = obsoleteReq
