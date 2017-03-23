@@ -16,6 +16,24 @@
       "revId": "71bf55a665ff82a080dd98f03490fb13656dadbc",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cdf66c49_e6e75fa8",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 505,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-23T21:36:14Z",
+      "side": 1,
+      "message": "I changed to non-zero, positive to be precise, even though not very many people would think that non-zero negative is fine.",
+      "parentUuid": "e1830f48_aac90834",
+      "revId": "71bf55a665ff82a080dd98f03490fb13656dadbc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
