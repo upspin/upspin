@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "c9e8443d_5e51d950",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-23T23:04:59Z",
+      "side": 1,
+      "message": "intended",
+      "revId": "8174ea2a579614bdad53bbf1ea104c804e5e3ebb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "4b2c2e53_0bd817fb",
         "filename": "client/client.go",
         "patchSetId": 1
@@ -13,6 +30,40 @@
       "writtenOn": "2017-03-23T22:44:38Z",
       "side": 1,
       "message": "This is probably not the preferred way of doing this, since flags in packages are not allowed.\n\nWe may need to put this in New() or somehow tag it along upspin.Config.",
+      "revId": "8174ea2a579614bdad53bbf1ea104c804e5e3ebb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e3b737e3_91a93595",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-23T23:04:59Z",
+      "side": 1,
+      "message": "return errors.E(errors.Invalid, parsed.User(), errors.Str(\"signer does not have write permission\"))\n\nyou can rephrase the string as you see fit",
+      "revId": "8174ea2a579614bdad53bbf1ea104c804e5e3ebb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "98d47bfb_e67d9bc6",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-23T23:04:59Z",
+      "side": 1,
+      "message": "maybe just access not validAccess?",
       "revId": "8174ea2a579614bdad53bbf1ea104c804e5e3ebb",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
