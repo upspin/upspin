@@ -8,10 +8,8 @@ package storage // import "upspin.io/cloud/storage"
 
 import (
 	"strings"
-	"time"
 
 	"upspin.io/errors"
-	"upspin.io/upspin"
 )
 
 // Storage is a low-level storage interface for services to store their data
@@ -42,9 +40,7 @@ var registration = make(map[string]StorageConstructor)
 // Opts holds configuration options for the storage backend.
 // It is meant to be used by implementations of Storage.
 type Opts struct {
-	Opts    map[string]string // key-value pair
-	Timeout time.Duration
-	Addrs   []upspin.NetAddr
+	Opts map[string]string // key-value pair
 }
 
 // DialOpts is a daisy-chaining mechanism for setting options to a backend during Dial.
@@ -58,23 +54,6 @@ func Register(name string, fn StorageConstructor) error {
 	}
 	registration[name] = fn
 	return nil
-}
-
-// WithNetAddr sets a network host:port pair as the network address to dial.
-// Multiple calls can be made to register a pool of servers.
-func WithNetAddr(netAddr upspin.NetAddr) DialOpts {
-	return func(o *Opts) error {
-		o.Addrs = append(o.Addrs, netAddr)
-		return nil
-	}
-}
-
-// WithTimeout sets a maximum duration for dialing.
-func WithTimeout(timeout time.Duration) DialOpts {
-	return func(o *Opts) error {
-		o.Timeout = timeout
-		return nil
-	}
 }
 
 // WithOptions parses a string in the format "key1=value1,key2=value2,..." where keys and values
