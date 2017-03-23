@@ -186,6 +186,13 @@ func DirEntry(entry *upspin.DirEntry) error {
 			return errors.E(op, errors.Invalid, entry.Name, err)
 		}
 	}
+	// For non-directory entries, a Writer field is required.
+	if entry.IsDir() {
+		return nil
+	}
+	if err := UserName(entry.Writer); err != nil {
+		return errors.E(op, errors.Str("invalid writer"), err)
+	}
 	return nil
 }
 
