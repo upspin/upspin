@@ -84,6 +84,7 @@ func setup(userName upspin.UserName, publicKey upspin.PublicKey) upspin.Config {
 		Name:       name,
 		SignedName: name,
 		Attr:       upspin.AttrDirectory,
+		Writer:     userName,
 	}
 	_, err = dir.Put(entry)
 	if err != nil {

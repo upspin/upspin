@@ -268,6 +268,18 @@ func TestDirEntry(t *testing.T) {
 		t.Fatal("no error for bad packing")
 	}
 	restore()
+	// No writer.
+	entry.Writer = ""
+	if err := DirEntry(&entry); err == nil {
+		t.Fatal("no error for missing writer")
+	}
+	restore()
+	// Badly-formatted writer.
+	entry.Writer = "yo!"
+	if err := DirEntry(&entry); err == nil {
+		t.Fatal("no error for badly-formatted writer")
+	}
+	restore()
 	// Block overlap
 	entry.Blocks[1].Offset--
 	if err := DirEntry(&entry); err == nil {
