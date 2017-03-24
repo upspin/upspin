@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "4dda08a7_dde1d9f7",
+        "filename": "dir/server/tree/log_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-24T04:09:48Z",
+      "side": 0,
+      "message": "The way ready was used here is effectively meaningless. When a \"go fn()\" statement is evaluated a goroutine is created and the scheduler prepares to run it. Synchronizing with a goroutine to check that it\u0027s \"running\" just causes the scheduler to run wake the goroutine and then put it back to sleep, just as it would have woken the goroutine to execute it in the first place.\n\nJust run \"go fn()\" and let it run!\n\nI also think the use of the start channel is similarly unnecessary, but I left it in so the change delta is smaller.",
+      "parentUuid": "989149f5_495f56bf",
+      "revId": "d978b69d8d56d9aa919b9daa08b8c94179ebacab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "1694b6e0_10171c26",
         "filename": "dir/server/tree/log_test.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2017-03-24T04:00:43Z",
       "side": 0,
       "message": "Why? No one will call done.Wait until all goroutines have called their Add(1).",
+      "revId": "d978b69d8d56d9aa919b9daa08b8c94179ebacab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bdfc9330_76b86d51",
+        "filename": "dir/server/tree/log_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-24T04:09:48Z",
+      "side": 0,
+      "message": "WaitGroup is subtle:\n\nhttps://golang.org/pkg/sync/#WaitGroup.Add\n\nI\u0027m sorry if the doc for Add is hard to follow (it was hard to write!).\nThe upshot is that if we call Wait before any of the calls to Add have completed, then all bets are off.\nWe call done.Wait() after closing start, but closing start doesn\u0027t guarantee that any of the goroutines have called done.Add, so that\u0027s a misuse of the WaitGroup API.",
+      "parentUuid": "1694b6e0_10171c26",
       "revId": "d978b69d8d56d9aa919b9daa08b8c94179ebacab",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
