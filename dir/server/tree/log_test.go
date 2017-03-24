@@ -56,8 +56,8 @@ func TestMarshalUnmarshal(t *testing.T) {
 
 func TestConcurrent(t *testing.T) {
 	const (
-		numWriters = 3
-		numReaders = 2
+		numWriters = 100
+		numReaders = 100
 	)
 	if testing.Short() {
 		// To run faster, run the log on a ram disk:
@@ -69,7 +69,7 @@ func TestConcurrent(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer os.RemoveAll(dir)
+	//defer os.RemoveAll(dir)
 
 	logRW, _, err := NewLogs(user, dir)
 	if err != nil {
@@ -86,7 +86,7 @@ func TestConcurrent(t *testing.T) {
 		done.Add(1)
 		ready.Done()
 		<-start
-		for i := 0; i < 100; i++ {
+		for i := 0; i < 1000; i++ {
 			e := entry
 			e.Entry.Sequence = upspin.NewSequence()
 			e.Entry.Time = upspin.Now()
@@ -95,6 +95,27 @@ func TestConcurrent(t *testing.T) {
 			}
 			if rand.Intn(10) == 0 {
 				e.Entry.Link = "hello@example.com/subdir/file"
+			}
+			if rand.Intn(5) == 0 {
+				e.Entry.Writer = "meh@yo.com"
+			}
+			numBlocks := rand.Intn(20)
+			var offs int64
+			for b := 0; b < numBlocks; b++ {
+				packSize := rand.Intn(3000)
+				packdata := make([]byte, packSize)
+				_, err := rand.Read(packdata)
+				if err != nil {
+					t.Fatal(err)
+				}
+				size := rand.Int63n(1000)
+				block := upspin.DirBlock{
+					Offset:   offs,
+					Size:     size,
+					Packdata: packdata,
+				}
+				offs += size
+				e.Entry.Blocks = append(e.Entry.Blocks, block)
 			}
 			err := logRW.Append(&e)
 			if err != nil {
@@ -108,7 +129,7 @@ func TestConcurrent(t *testing.T) {
 		ready.Done()
 		<-start
 		var offset int64
-		for i := 0; i < 100*numWriters; i++ {
+		for i := 0; i < 1000*numWriters; i++ {
 			_, next, err := logRO.ReadAt(1, offset)
 			if err != nil {
 				t.Fatal(err)
