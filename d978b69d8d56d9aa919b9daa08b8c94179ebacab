@@ -141,6 +141,24 @@
       "revId": "d978b69d8d56d9aa919b9daa08b8c94179ebacab",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f9ec6bed_3ff830d0",
+        "filename": "dir/server/tree/log_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-24T04:28:45Z",
+      "side": 0,
+      "message": "I\u0027m basing this CL on your other CL, so you might as well try it and see if the change works for you there. Just trying to help.",
+      "parentUuid": "721a7e8c_df5247e3",
+      "revId": "d978b69d8d56d9aa919b9daa08b8c94179ebacab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
