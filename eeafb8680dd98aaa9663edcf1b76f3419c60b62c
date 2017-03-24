@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "69c66f42_a6164537",
+        "filename": "client/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-24T00:08:21Z",
+      "side": 1,
+      "message": "s/  / /",
+      "revId": "eeafb8680dd98aaa9663edcf1b76f3419c60b62c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "650a3c4a_c3162cc6",
+        "filename": "client/client.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-24T00:08:21Z",
+      "side": 1,
+      "message": "// Links have been evaluated so we can ask the DirServer directly.",
+      "revId": "eeafb8680dd98aaa9663edcf1b76f3419c60b62c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
