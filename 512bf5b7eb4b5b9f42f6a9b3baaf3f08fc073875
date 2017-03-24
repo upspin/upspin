@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "efaf66dc_858481c2",
+        "filename": "flags/flags.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-24T18:18:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bb1b7e63_fda66c2d",
+      "revId": "512bf5b7eb4b5b9f42f6a9b3baaf3f08fc073875",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "781c87f3_8e5e2208",
         "filename": "flags/flags.go",
         "patchSetId": 4
