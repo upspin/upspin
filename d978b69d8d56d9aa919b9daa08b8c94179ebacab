@@ -123,6 +123,24 @@
       "revId": "d978b69d8d56d9aa919b9daa08b8c94179ebacab",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "721a7e8c_df5247e3",
+        "filename": "dir/server/tree/log_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-24T04:26:44Z",
+      "side": 0,
+      "message": "You described seeing lock-ups when running TestConcurrent with bufio.Reader, right?\nI was able to reproduce those errors, and tracked it down to a stack trace with only a few goroutines. Those goroutines were running the testing package infrastructure and TestConcurrent. No dir/server/tree code was running at all. The line that TestConcurrent was blocked at was done.Wait().\n\nWith this small simplification to the test the lock-ups go away.\n\nIf the lock-ups happen while only the test is running, then surely it has something to do with the test?",
+      "parentUuid": "a566997b_bbccff55",
+      "revId": "d978b69d8d56d9aa919b9daa08b8c94179ebacab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
