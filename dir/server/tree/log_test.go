@@ -14,6 +14,7 @@ import (
 	"reflect"
 	"sort"
 	"sync"
+	"sync/atomic"
 	"testing"
 
 	"upspin.io/errors"
@@ -58,6 +59,7 @@ func TestConcurrent(t *testing.T) {
 	const (
 		numWriters = 3
 		numReaders = 2
+		numEntries = 100
 	)
 	if testing.Short() {
 		// To run faster, run the log on a ram disk:
@@ -79,14 +81,13 @@ func TestConcurrent(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	var ready sync.WaitGroup
 	var done sync.WaitGroup
 	start := make(chan struct{})
+	aborting := int32(0) // if positive, indicates a fatal and all must quit.
 	write := func() {
-		done.Add(1)
-		ready.Done()
+		defer done.Done()
 		<-start
-		for i := 0; i < 100; i++ {
+		for i := 0; i < numEntries; i++ {
 			e := entry
 			e.Entry.Sequence = upspin.NewSequence()
 			e.Entry.Time = upspin.Now()
@@ -106,7 +107,8 @@ func TestConcurrent(t *testing.T) {
 				packdata := make([]byte, packSize)
 				_, err := rand.Read(packdata)
 				if err != nil {
-					panic(err)
+					atomic.StoreInt32(&aborting, 1)
+					t.Fatal(err)
 				}
 				size := rand.Int63n(1000)
 				block := upspin.DirBlock{
@@ -117,22 +119,28 @@ func TestConcurrent(t *testing.T) {
 				offs += size
 				e.Entry.Blocks = append(e.Entry.Blocks, block)
 			}
+			if atomic.LoadInt32(&aborting) == 1 {
+				return
+			}
 			err := logRW.Append(&e)
 			if err != nil {
-				panic(err)
+				atomic.StoreInt32(&aborting, 1)
+				t.Fatal(err)
 			}
 		}
-		done.Done()
 	}
 	read := func() {
-		done.Add(1)
-		ready.Done()
+		defer done.Done()
 		<-start
 		var offset int64
-		for i := 0; i < 100*numWriters; i++ {
+		for i := 0; i < numEntries*numWriters; i++ {
+			if atomic.LoadInt32(&aborting) == 1 {
+				return
+			}
 			_, next, err := logRO.ReadAt(1, offset)
 			if err != nil {
-				panic(err)
+				atomic.StoreInt32(&aborting, 1)
+				t.Fatal(err)
 			}
 			if offset == next {
 				i--
@@ -140,17 +148,15 @@ func TestConcurrent(t *testing.T) {
 			}
 			offset = next
 		}
-		done.Done()
 	}
 
-	ready.Add(numWriters + numReaders)
+	done.Add(numWriters + numReaders)
 	for i := 0; i < numWriters; i++ {
 		go write()
 	}
 	for i := 0; i < numReaders; i++ {
 		go read()
 	}
-	ready.Wait()
 	close(start)
 	done.Wait()
 }
