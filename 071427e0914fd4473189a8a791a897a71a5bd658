@@ -142,6 +142,30 @@
       "revId": "071427e0914fd4473189a8a791a897a71a5bd658",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "81ee938f_c35f51f4",
+        "filename": "flags/flags.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-24T19:03:03Z",
+      "side": 1,
+      "message": "I\u0027m happy with Rob\u0027s change of 11:57.   I\u0027ll wait a few minutes for other pending email before making that change.",
+      "parentUuid": "8258b755_4926726a",
+      "range": {
+        "startLine": 83,
+        "startChar": 4,
+        "endLine": 83,
+        "endChar": 31
+      },
+      "revId": "071427e0914fd4473189a8a791a897a71a5bd658",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
