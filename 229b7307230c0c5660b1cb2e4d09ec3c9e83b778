@@ -16,6 +16,24 @@
       "revId": "229b7307230c0c5660b1cb2e4d09ec3c9e83b778",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5d5491e8_a92be95b",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-24T02:57:51Z",
+      "side": 1,
+      "message": "No this was not the original problem. The original problem is on line 558 of the original file. I was ignoring the \"n\" param from r.Read.\n\nSo, I had to implement a readNBytes function (or write an inline loop around r.Read on line 558).\n\nI implemented readNBytes in the most straightforward way. But it was locking up. I thought I had made a dumb mistake somewhere but I couldn\u0027t figure out where. Luckily, I found LimitedReader which composes nicely with ReadAll and is much shorter. But they also lock up if we wrap a buffered reader. So I removed the buffered reader and things worked again.\n\nAny decent operating system has a read ahead buffer and, even better, since this is always moving towards the tail of the file, it\u0027s likely the tail has just been put. True, the syscalls might slow things down a bit, but in the context of reading bytes from disk, is that meaningful? Isn\u0027t os.File buffering already?",
+      "parentUuid": "be9287f7_244f9707",
+      "revId": "229b7307230c0c5660b1cb2e4d09ec3c9e83b778",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
