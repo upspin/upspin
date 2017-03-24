@@ -96,9 +96,30 @@ func TestConcurrent(t *testing.T) {
 			if rand.Intn(10) == 0 {
 				e.Entry.Link = "hello@example.com/subdir/file"
 			}
+			if rand.Intn(5) == 0 {
+				e.Entry.Writer = "meh@yo.com"
+			}
+			numBlocks := rand.Intn(20)
+			var offs int64
+			for b := 0; b < numBlocks; b++ {
+				packSize := rand.Intn(3000)
+				packdata := make([]byte, packSize)
+				_, err := rand.Read(packdata)
+				if err != nil {
+					panic(err)
+				}
+				size := rand.Int63n(1000)
+				block := upspin.DirBlock{
+					Offset:   offs,
+					Size:     size,
+					Packdata: packdata,
+				}
+				offs += size
+				e.Entry.Blocks = append(e.Entry.Blocks, block)
+			}
 			err := logRW.Append(&e)
 			if err != nil {
-				t.Fatal(err)
+				panic(err)
 			}
 		}
 		done.Done()
@@ -111,7 +132,7 @@ func TestConcurrent(t *testing.T) {
 		for i := 0; i < 100*numWriters; i++ {
 			_, next, err := logRO.ReadAt(1, offset)
 			if err != nil {
-				t.Fatal(err)
+				panic(err)
 			}
 			if offset == next {
 				i--
@@ -122,11 +143,10 @@ func TestConcurrent(t *testing.T) {
 		done.Done()
 	}
 
-	ready.Add(numWriters)
+	ready.Add(numWriters + numReaders)
 	for i := 0; i < numWriters; i++ {
 		go write()
 	}
-	ready.Add(numReaders)
 	for i := 0; i < numReaders; i++ {
 		go read()
 	}
