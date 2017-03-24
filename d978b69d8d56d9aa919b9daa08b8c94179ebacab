@@ -69,6 +69,24 @@
       "revId": "d978b69d8d56d9aa919b9daa08b8c94179ebacab",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7de0068f_2bddb5f2",
+        "filename": "dir/server/tree/log_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-24T04:20:00Z",
+      "side": 0,
+      "message": "Actually it wasn\u0027t the calls to done.Add and done.Wait that were out of order (although they weren\u0027t after I removed ready, which is why I got confused). It was the original calls to ready.Add and ready.Done. Since the writer goroutines were started before the second call to Add, it\u0027s possible that the waitgroup internal counter reached zero before the second call to Add, leaving all the readers blocked.\n\nIt\u0027s all a bit weird and hard to follow, but simplifying it makes the code not deadlock anymore, so that seems like a win?",
+      "parentUuid": "bdfc9330_76b86d51",
+      "revId": "d978b69d8d56d9aa919b9daa08b8c94179ebacab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
