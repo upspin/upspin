@@ -79,12 +79,10 @@ func TestConcurrent(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	var ready sync.WaitGroup
 	var done sync.WaitGroup
 	start := make(chan struct{})
 	write := func() {
-		done.Add(1)
-		ready.Done()
+		defer done.Done()
 		<-start
 		for i := 0; i < 100; i++ {
 			e := entry
@@ -122,11 +120,9 @@ func TestConcurrent(t *testing.T) {
 				t.Fatal(err)
 			}
 		}
-		done.Done()
 	}
 	read := func() {
-		done.Add(1)
-		ready.Done()
+		defer done.Done()
 		<-start
 		var offset int64
 		for i := 0; i < 100*numWriters; i++ {
@@ -140,18 +136,15 @@ func TestConcurrent(t *testing.T) {
 			}
 			offset = next
 		}
-		done.Done()
 	}
 
-	ready.Add(numWriters)
+	done.Add(numWriters + numReaders)
 	for i := 0; i < numWriters; i++ {
 		go write()
 	}
-	ready.Add(numReaders)
 	for i := 0; i < numReaders; i++ {
 		go read()
 	}
-	ready.Wait()
 	close(start)
 	done.Wait()
 }
