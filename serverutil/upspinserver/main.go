@@ -101,12 +101,6 @@ func initServer(mode initMode) (*subcmd.ServerConfig, upspin.Config, *perm.Perm,
 		return nil, nil, nil, err
 	}
 
-	// TODO(adg): remove this once we have deprecated serviceaccount.json
-	// and the Bucket field.
-	if serverConfig.Bucket != "" {
-		os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", filepath.Join(*cfgPath, "serviceaccount.json"))
-	}
-
 	cfg := config.New()
 	cfg = config.SetUserName(cfg, serverConfig.User)
 
@@ -132,10 +126,6 @@ func initServer(mode initMode) (*subcmd.ServerConfig, upspin.Config, *perm.Perm,
 	case len(serverConfig.StoreConfig) > 0:
 		// Use the provided configuration, if available.
 		storeServerConfig = serverConfig.StoreConfig
-	case serverConfig.Bucket != "":
-		// Bucket configured, use Google Cloud Storage.
-		// TODO(adg): remove this when the Bucket field is retired.
-		storeServerConfig = []string{"backend=GCS", "gcpBucketName=" + serverConfig.Bucket, "defaultACL=publicRead"}
 	default:
 		// No bucket configured, use simple on-disk store.
 		storagePath := filepath.Join(*cfgPath, "storage")
