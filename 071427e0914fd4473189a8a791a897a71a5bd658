@@ -22,6 +22,30 @@
       "revId": "071427e0914fd4473189a8a791a897a71a5bd658",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a3239a6d_9ebd56d1",
+        "filename": "flags/flags.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-24T18:56:50Z",
+      "side": 1,
+      "message": "It does say \"one check\" and \"potentially blocking\", which implies it\u0027s not a complete specification.\ni think it\u0027s pretty good now.",
+      "parentUuid": "c20e425b_8a2f40b4",
+      "range": {
+        "startLine": 83,
+        "startChar": 4,
+        "endLine": 83,
+        "endChar": 31
+      },
+      "revId": "071427e0914fd4473189a8a791a897a71a5bd658",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
