@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "989149f5_495f56bf",
+        "filename": "dir/server/tree/log_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-24T04:00:43Z",
+      "side": 0,
+      "message": "Why remove this? We want to wait until all goroutines are ready.",
+      "revId": "d978b69d8d56d9aa919b9daa08b8c94179ebacab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1694b6e0_10171c26",
+        "filename": "dir/server/tree/log_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-24T04:00:43Z",
+      "side": 0,
+      "message": "Why? No one will call done.Wait until all goroutines have called their Add(1).",
+      "revId": "d978b69d8d56d9aa919b9daa08b8c94179ebacab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
