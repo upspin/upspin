@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0834321b_9c3220eb",
+        "filename": "dir/server/tree/log_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-24T18:08:48Z",
+      "side": 1,
+      "message": "you depend on it being zero at the start, which by stylistic considerations would be better written as\n\naborting :\u003d int32(0)\nor\nvar aborting int32 \u003d 0",
+      "revId": "a8c4b2719e6f9c35d8a1ac469acc1654053fa7d9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
