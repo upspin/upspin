@@ -22,6 +22,30 @@
       "revId": "580d6458a1ee013afc670a24381e5efa22808081",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "751da3c1_e0e9a55c",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 562,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-24T05:26:44Z",
+      "side": 1,
+      "message": "This is  the wrong version. Patch set 6 is the most recent.  (We crossed emails, sorry).",
+      "parentUuid": "54a85423_ee8452b7",
+      "range": {
+        "startLine": 562,
+        "startChar": 0,
+        "endLine": 562,
+        "endChar": 67
+      },
+      "revId": "580d6458a1ee013afc670a24381e5efa22808081",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
