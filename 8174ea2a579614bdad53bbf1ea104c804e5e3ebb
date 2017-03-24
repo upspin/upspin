@@ -72,6 +72,24 @@
     },
     {
       "key": {
+        "uuid": "72b1fb92_efbaaea8",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-24T01:15:58Z",
+      "side": 1,
+      "message": "You\u0027d need to change client.New to take a Config and this flag.\n\nBut I don\u0027t see anyone complaining about this. I think it\u0027s fine for one-off things like this. I was just echoing what I was told a while ago. Marking as resolved on my end.",
+      "parentUuid": "7cc0af54_284c1fad",
+      "revId": "8174ea2a579614bdad53bbf1ea104c804e5e3ebb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e3b737e3_91a93595",
         "filename": "client/client.go",
         "patchSetId": 1
