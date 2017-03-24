@@ -87,6 +87,24 @@
       "revId": "d978b69d8d56d9aa919b9daa08b8c94179ebacab",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a566997b_bbccff55",
+        "filename": "dir/server/tree/log_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-24T04:20:26Z",
+      "side": 0,
+      "message": "That\u0027s why there was a ready channel, so that we can\u0027t possibly miss some of the add by reaching wait before it\u0027s added.\n\nI don\u0027t think this test was wrong at all. It\u0027s red herring.",
+      "parentUuid": "bdfc9330_76b86d51",
+      "revId": "d978b69d8d56d9aa919b9daa08b8c94179ebacab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
