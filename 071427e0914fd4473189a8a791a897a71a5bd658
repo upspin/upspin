@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c20e425b_8a2f40b4",
+        "filename": "flags/flags.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-24T18:54:33Z",
+      "side": 1,
+      "message": "Better.  It is not incorrect as stands, juist misleading.  Though read-only is a bogus description. Just no longer writable by the original writer.  For example, if rob was the original writer, I have rw access, but rob now only has read access or no access at all, it is not a read-only file but this change blocks me reading it.  Rather than over qualify, why not just say \"potentially blocking legitimate files\". You\u0027ll probably change what it does soon enough anyways.\n\nI\u0027m a hater of word smithing but when I walked into the middle of this conversation earlier this week, the language being bandied about was so imprecise about a subject that revolves around precision that it took me forever to figure out what you were talking about in order to judge the implications.",
+      "range": {
+        "startLine": 83,
+        "startChar": 4,
+        "endLine": 83,
+        "endChar": 31
+      },
+      "revId": "071427e0914fd4473189a8a791a897a71a5bd658",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
