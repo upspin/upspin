@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "58eef074_b3e9c889",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-24T03:21:23Z",
+      "side": 1,
+      "message": "Why do you think locks up with the buffered reader?\nI just made the change myself and found the same thing.\n\nAs far as I know, *os.File is not buffered.",
+      "parentUuid": "5d5491e8_a92be95b",
+      "revId": "229b7307230c0c5660b1cb2e4d09ec3c9e83b778",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "1e9835fc_625a5fd8",
         "filename": "dir/server/tree/log.go",
         "patchSetId": 2
@@ -48,6 +66,23 @@
       "writtenOn": "2017-03-24T03:13:58Z",
       "side": 1,
       "message": "you want io.ReadFull here.",
+      "revId": "229b7307230c0c5660b1cb2e4d09ec3c9e83b778",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "49a23979_ba4ba6cd",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 562,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-24T03:21:23Z",
+      "side": 1,
+      "message": "I think you want\n\ndata :\u003d make([]byte, entrySize)\nio.ReadFull(r, data)",
       "revId": "229b7307230c0c5660b1cb2e4d09ec3c9e83b778",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
