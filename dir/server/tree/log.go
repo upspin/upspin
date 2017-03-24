@@ -7,7 +7,6 @@ package tree
 // This file defines and implements Log and LogIndex for use in Tree.
 
 import (
-	"bufio"
 	"encoding/binary"
 	"io"
 	"io/ioutil"
@@ -41,8 +40,9 @@ type LogEntry struct {
 type Log struct {
 	user upspin.UserName // user for whom this log is intended.
 
-	mu   *sync.Mutex // protects the file, making reads/write atomic.
-	file *os.File    // file descriptor for the log.
+	mu      *sync.Mutex // protects the file, making reads/write atomic.
+	file    *os.File    // file descriptor for the log.
+	checker *checker    // io.Reader that does buffering and checksumming.
 }
 
 // LogIndex reads and writes from/to stable storage the log state information
@@ -54,6 +54,15 @@ type LogIndex struct {
 	mu        *sync.Mutex // protects the files, making reads/write atomic.
 	indexFile *os.File    // file descriptor for the last index in the log.
 	rootFile  *os.File    // file descriptor for the root of the tree.
+}
+
+// defaultBufferSize is the size used to buffer reads from the log.
+const defaultBufferSize = 4096
+
+var pool = sync.Pool{
+	New: func() interface{} {
+		return make([]byte, defaultBufferSize)
+	},
 }
 
 // NewLogs returns a new Log and a new LogIndex for a user, logging to and from
@@ -73,9 +82,10 @@ func NewLogs(user upspin.UserName, directory string) (*Log, *LogIndex, error) {
 		return nil, nil, errors.E(op, errors.IO, err)
 	}
 	l := &Log{
-		user: user,
-		mu:   &sync.Mutex{},
-		file: loggerFile,
+		user:    user,
+		mu:      &sync.Mutex{},
+		file:    loggerFile,
+		checker: newChecker(loggerFile),
 	}
 
 	rloc := rootFile(user, directory)
@@ -204,7 +214,8 @@ func (l *Log) ReadAt(n int, offset int64) (dst []LogEntry, next int64, err error
 	l.mu.Lock()
 	defer l.mu.Unlock()
 
-	// TODO: don't seek. Use file.ReadAt instead.
+	// We can't use ReadAt as unmarshal does the reading, typically one byte
+	// at a time. So we seek to offset.
 	fileOffset := l.lastOffset()
 	if offset >= fileOffset {
 		// End of file.
@@ -215,20 +226,20 @@ func (l *Log) ReadAt(n int, offset int64) (dst []LogEntry, next int64, err error
 		return nil, 0, errors.E(op, errors.IO, err)
 	}
 	next = offset
-	cbr := newChecker(bufio.NewReader(l.file))
+	l.checker.reset()
 	for i := 0; i < n; i++ {
 		if next == fileOffset {
 			// End of file.
 			return dst, fileOffset, nil
 		}
 		var le LogEntry
-		err := le.unmarshal(cbr)
+		err := le.unmarshal(l.checker)
 		if err != nil {
 			return dst, next, err
 		}
 		dst = append(dst, le)
-		next = next + int64(cbr.count)
-		cbr.reset()
+		next = next + int64(l.checker.count)
+		l.checker.resetChecksum()
 	}
 	return
 }
@@ -275,6 +286,7 @@ func (l *Log) Clone() (*Log, error) {
 	}
 	newLog := *l
 	newLog.file = f
+	newLog.checker = newChecker(f)
 	return &newLog, nil
 }
 
@@ -283,6 +295,7 @@ func (l *Log) Close() error {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 
+	l.checker.close()
 	if l.file != nil {
 		err := l.file.Close()
 		l.file = nil
@@ -486,61 +499,183 @@ func appendBytes(b, bytes []byte) []byte {
 
 var checksumSalt = [4]byte{0xde, 0xad, 0xbe, 0xef}
 
-// checker computes the checksum of a file as it reads bytes from it. It also
-// reports the number of bytes read in its count field.
+// checker is a buffered io.Reader and io.ByteReader that counts bytes and
+// computes the checksum of the bytes read.
 type checker struct {
-	rd     *bufio.Reader
-	count  int
-	chksum [4]byte
+	rd      io.Reader
+	count   int
+	chksum  [4]byte
+	buf     []byte
+	r       int // next position to read from buf.
+	w       int // last+1 written position into buf.
+	lastErr error
+	hasPool bool // whether buf is from the sync pool.
 }
 
-func newChecker(r *bufio.Reader) *checker {
-	return &checker{rd: r, chksum: checksumSalt}
+var _ io.ByteReader = (*checker)(nil)
+var _ io.Reader = (*checker)(nil)
+
+func newCheckerForTesting(r io.Reader, size int) *checker {
+	return &checker{
+		rd:      r,
+		chksum:  checksumSalt,
+		buf:     make([]byte, size),
+		r:       0,
+		w:       0,
+		hasPool: false,
+	}
+}
+
+func newChecker(r io.Reader) *checker {
+	return &checker{
+		rd:      r,
+		chksum:  checksumSalt,
+		buf:     pool.Get().([]byte),
+		r:       0,
+		w:       0,
+		hasPool: true,
+	}
+}
+
+func (c *checker) len() int {
+	return c.w - c.r
+}
+
+func (c *checker) cap() int {
+	return len(c.buf)
+}
+
+// fill attempts to fill an empty buffer.
+func (c *checker) fill() {
+	if c.len() > 0 {
+		panic("buffer not empty")
+	}
+	if c.lastErr != nil {
+		return
+	}
+	n, err := c.rd.Read(c.buf)
+	if err != nil {
+		c.lastErr = err
+	}
+	c.r = 0
+	c.w = n
+}
+
+func (c *checker) err() error {
+	err := c.lastErr
+	c.lastErr = nil
+	return err
+}
+
+func (c *checker) errNilOrEOF() bool {
+	return c.lastErr == nil || c.lastErr == io.EOF
+}
+
+// read reads from the underlying reader into p and returns the number of
+// bytes read, which may be smaller than the bytes available in the reader and
+// smaller than len(p).
+func (c *checker) read(p []byte) (n int, err error) {
+	if c.len() == 0 {
+		// Only fill buffer if the request is for less than our buffer's
+		// capacity.
+		if len(p) >= c.cap() {
+			return c.rd.Read(p)
+		}
+		c.fill()
+	}
+	if c.r > c.w {
+		panic("invalid buffer state")
+	}
+	n = copy(p, c.buf[c.r:c.w])
+	c.r += n
+	if c.r == c.cap() {
+		// We read a full buffer, hence we're now empty.
+		c.r = 0
+		c.w = 0
+	}
+	if c.errNilOrEOF() {
+		return n, nil
+	}
+	return n, c.err()
 }
 
 // ReadByte implements io.ByteReader.
-func (r *checker) ReadByte() (byte, error) {
-	b, err := r.rd.ReadByte()
-	if err == nil {
-		r.chksum[r.count%4] = r.chksum[r.count%4] ^ b
-		r.count++
+func (c *checker) ReadByte() (byte, error) {
+	var p [1]byte
+	var err error
+	for {
+		var n int
+		n, err = c.Read(p[:])
+		if n == 1 || err != nil {
+			break
+		}
 	}
-	return b, err
+	return p[0], err
 }
 
-// reset resets the checksum and the counting of bytes, without affecting the
-// reader state.
-func (r *checker) reset() {
-	r.count = 0
-	r.chksum = checksumSalt
+// resetChecksum resets the checksum and the counting of bytes, without
+// affecting the state of the reader.
+func (c *checker) resetChecksum() {
+	c.count = 0
+	c.chksum = checksumSalt
 }
 
-// Read implements io.Reader.
-func (r *checker) Read(p []byte) (n int, err error) {
-	n, err = r.rd.Read(p)
+// reset resets the state of the reader, forgetting any buffered reads and the
+// checksum and counting of bytes.
+func (c *checker) reset() {
+	c.lastErr = nil
+	c.w = 0
+	c.r = 0
+	c.resetChecksum()
+}
+
+// Read implements io.Reader. It implicitly computes the checksum of the read
+// bytes.
+func (c *checker) Read(p []byte) (n int, err error) {
+	n, err = c.read(p)
 	if err != nil {
 		return
 	}
 	for i := 0; i < n; i++ {
-		offs := r.count + i
-		r.chksum[offs%4] = r.chksum[offs%4] ^ p[i]
+		offs := c.count + i
+		c.chksum[offs%4] = c.chksum[offs%4] ^ p[i]
 	}
-	r.count += n
+	c.count += n
 	return
 }
 
-func (r *checker) readChecksum() ([4]byte, error) {
-	var c [4]byte
+func (c *checker) readChecksum() ([4]byte, error) {
+	var chk [4]byte
+	// Do not use io.ReadFull here. We're calling c.read not c.Read, which
+	// does checksum (our checksum is not checksummed!)
+	p := chk[:]
+	tot := 0
+	for {
+		n, err := c.read(p)
+		if err != nil {
+			return chk, err
+		}
+		p = p[n:]
+		tot += n
+		if tot == 4 {
+			break
+		}
+	}
+	c.count += tot
+	if tot != 4 {
+		return chk, errors.Str("missing checksum")
+	}
+	return chk, nil
+}
 
-	n, err := io.ReadFull(r.rd, c[:])
-	if err != nil {
-		return c, err
+// close closes the checker. Future use of checker will cause unpredictable
+// errors.
+func (c *checker) close() {
+	if c.hasPool {
+		pool.Put(c.buf)
 	}
-	r.count += n
-	if n != 4 {
-		return c, errors.Str("missing checksum")
-	}
-	return c, nil
+	c.buf = nil
+	c.hasPool = false
 }
 
 // unmarshal unpacks a marshaled LogEntry from a Reader and stores it in the

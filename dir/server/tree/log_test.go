@@ -5,7 +5,6 @@
 package tree
 
 import (
-	"bufio"
 	"bytes"
 	"fmt"
 	"io/ioutil"
@@ -44,7 +43,7 @@ func TestMarshalUnmarshal(t *testing.T) {
 		t.Fatal(err)
 	}
 	var newEntry LogEntry
-	r := newChecker(bufio.NewReader(bytes.NewReader(buf)))
+	r := newCheckerForTesting(bytes.NewReader(buf), 100)
 	err = newEntry.unmarshal(r)
 	if err != nil {
 		t.Fatal(err)
@@ -77,10 +76,12 @@ func TestConcurrent(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer logRW.Close()
 	logRO, err := logRW.Clone()
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer logRO.Close()
 	var done sync.WaitGroup
 	start := make(chan struct{})
 	aborting := int32(0) // if positive, indicates a fatal and all must quit.
@@ -390,6 +391,96 @@ func TestChecksum(t *testing.T) {
 		chksum := checksum(tc.buf)
 		if tc.chksum != chksum {
 			t.Errorf("%d: chksum = %x, want = %x", i, chksum, tc.chksum)
+		}
+	}
+}
+
+func TestCheckerReadByte(t *testing.T) {
+	const (
+		test1 = "123456"
+		test2 = "abcdefgh"
+	)
+
+	for _, size := range []int{4096, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1} {
+		r := bytes.NewBuffer([]byte(test1))
+		c := newCheckerForTesting(r, size)
+		for i, be := range []byte(test1) {
+			b, err := c.ReadByte()
+			if err != nil {
+				t.Fatal(err)
+			}
+			if b != be {
+				t.Fatalf("%d,%d: Expected %c, got %c", size, i, be, b)
+			}
+		}
+		// Verify that adding more data to the reader produces the
+		// expected new characters.
+		_, err := r.Write([]byte(test2))
+		if err != nil {
+			t.Fatal(err)
+		}
+		for i, be := range []byte(test2) {
+			b, err := c.ReadByte()
+			if err != nil {
+				t.Fatal(err)
+			}
+			if b != be {
+				t.Fatalf("%d,%d: Expected %c, got %c", size, i, be, b)
+			}
+		}
+	}
+}
+
+func TestCheckerRead(t *testing.T) {
+	const (
+		test1 = "123456"
+		test2 = "abcdefghijk"
+		test3 = "=pq!"
+	)
+
+	// Read in chunks of size 'rd'.
+	for _, rd := range []int{8000, 4096, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1} {
+		// Make read buffers of size 'size'.
+		for _, size := range []int{4096, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1} {
+			r := bytes.NewBuffer([]byte(test1))
+			c := newCheckerForTesting(r, size)
+
+			readN := func(n int) []byte {
+				p := make([]byte, n)
+				n, err := c.Read(p)
+				if err != nil {
+					t.Fatalf("%d,%d: %s", rd, size, err)
+				}
+				return p[:n]
+			}
+			check := func(s string) {
+				p := ""
+				for tries := 0; tries < len(s)/rd+3; tries++ {
+					p += string(readN(rd))
+					if len(p) == len(s) {
+						break
+					}
+				}
+				if string(p) != s {
+					t.Errorf("%d,%d: Expected %s, got %s", rd, size, s, p)
+				}
+			}
+			check(test1)
+
+			// Add new stuff.
+			_, err := r.Write([]byte(test2))
+			if err != nil {
+				t.Fatal(err)
+			}
+			check(test2)
+
+			// Add new stuff.
+			_, err = r.Write([]byte(test3))
+			if err != nil {
+				t.Fatal(err)
+			}
+			check(test3)
+			c.close()
 		}
 	}
 }
