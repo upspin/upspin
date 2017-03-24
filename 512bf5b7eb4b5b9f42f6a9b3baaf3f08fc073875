@@ -73,6 +73,24 @@
     },
     {
       "key": {
+        "uuid": "143a2c6a_b61b1b74",
+        "filename": "flags/flags.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-24T18:22:06Z",
+      "side": 1,
+      "message": "well, read-only is technically unnecessary but it\u0027s tricky.\nplease propose a rewrite. i want the documentation of the flag to show the pros and cons.",
+      "parentUuid": "ba369e84_985b2cfa",
+      "revId": "512bf5b7eb4b5b9f42f6a9b3baaf3f08fc073875",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "781c87f3_8e5e2208",
         "filename": "flags/flags.go",
         "patchSetId": 4
