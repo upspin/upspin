@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "beb8ecdd_0ef8db09",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-24T03:33:39Z",
+      "side": 1,
+      "message": "I don\u0027t know. I\u0027ll spend tomorrow investigating this. It could be my locking, but  Log and LogIndex have very straightforward locking. (lock followed by defer unlock). I\u0027ll take a look to see if there\u0027s any path we end up calling lock from a locked method. But if it\u0027s that, buffering should not prevent the error, maybe mask it. I never get lock ups without buffering.\n\nIf I can\u0027t find a deadlock, I\u0027ll try to isolate this to the smallest piece of code I can, so that if the Go libraries are bad somehow, I will be able to report them with a very small example.",
+      "parentUuid": "58eef074_b3e9c889",
+      "revId": "229b7307230c0c5660b1cb2e4d09ec3c9e83b778",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "1e9835fc_625a5fd8",
         "filename": "dir/server/tree/log.go",
         "patchSetId": 2
@@ -86,6 +104,24 @@
       "revId": "229b7307230c0c5660b1cb2e4d09ec3c9e83b778",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "820b7f31_3520dffd",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 562,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-24T03:33:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "49a23979_ba4ba6cd",
+      "revId": "229b7307230c0c5660b1cb2e4d09ec3c9e83b778",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
