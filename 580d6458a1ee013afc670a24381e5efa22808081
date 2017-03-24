@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "54a85423_ee8452b7",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 562,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-24T05:24:18Z",
+      "side": 1,
+      "message": "I take it you are relying on the mu.Lock to make sure you are never in the middle of writing an entry while you are reading it?\n\nIf so, this now looks correct to me.\n\nRather than all this stacking of io.Readers and the resulting single byte os reads for the VarInts, I probably would have implemented my own buffered reader but that\u0027s just me.  Something has to eat up all those cycles.",
+      "range": {
+        "startLine": 562,
+        "startChar": 0,
+        "endLine": 562,
+        "endChar": 67
+      },
+      "revId": "580d6458a1ee013afc670a24381e5efa22808081",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
