@@ -94,6 +94,54 @@
       "revId": "071427e0914fd4473189a8a791a897a71a5bd658",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "2a099e59_5248e4f9",
+        "filename": "flags/flags.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-24T19:02:42Z",
+      "side": 1,
+      "message": "Fine by me.",
+      "parentUuid": "98555607_5e21a506",
+      "range": {
+        "startLine": 83,
+        "startChar": 4,
+        "endLine": 83,
+        "endChar": 31
+      },
+      "revId": "071427e0914fd4473189a8a791a897a71a5bd658",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "13334e64_7124e9a2",
+        "filename": "flags/flags.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-24T19:02:42Z",
+      "side": 1,
+      "message": "Also fine by me.",
+      "parentUuid": "8258b755_4926726a",
+      "range": {
+        "startLine": 83,
+        "startChar": 4,
+        "endLine": 83,
+        "endChar": 31
+      },
+      "revId": "071427e0914fd4473189a8a791a897a71a5bd658",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
