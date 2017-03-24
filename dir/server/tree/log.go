@@ -7,7 +7,6 @@ package tree
 // This file defines and implements Log and LogIndex for use in Tree.
 
 import (
-	"bufio"
 	"encoding/binary"
 	"io"
 	"io/ioutil"
@@ -215,7 +214,7 @@ func (l *Log) ReadAt(n int, offset int64) (dst []LogEntry, next int64, err error
 		return nil, 0, errors.E(op, errors.IO, err)
 	}
 	next = offset
-	cbr := newChecker(bufio.NewReader(l.file))
+	cbr := newChecker(l.file)
 	for i := 0; i < n; i++ {
 		if next == fileOffset {
 			// End of file.
@@ -485,23 +484,28 @@ var checksumSalt = [4]byte{0xde, 0xad, 0xbe, 0xef}
 // checker computes the checksum of a file as it reads bytes from it. It also
 // reports the number of bytes read in its count field.
 type checker struct {
-	rd     *bufio.Reader
+	rd     io.Reader
 	count  int
 	chksum [4]byte
 }
 
-func newChecker(r *bufio.Reader) *checker {
+func newChecker(r io.Reader) *checker {
 	return &checker{rd: r, chksum: checksumSalt}
 }
 
 // ReadByte implements io.ByteReader.
 func (r *checker) ReadByte() (byte, error) {
-	b, err := r.rd.ReadByte()
-	if err == nil {
-		r.chksum[r.count%4] = r.chksum[r.count%4] ^ b
-		r.count++
+	var b [1]byte
+	n, err := r.rd.Read(b[:])
+	if err != nil {
+		return b[0], err
 	}
-	return b, err
+	if n != 1 {
+		return b[0], errors.Str("read zero bytes")
+	}
+	r.chksum[r.count%4] = r.chksum[r.count%4] ^ b[0]
+	r.count++
+	return b[0], nil
 }
 
 // reset resets the checksum and the counting of bytes, without affecting the
@@ -554,8 +558,9 @@ func (le *LogEntry) unmarshal(r *checker) error {
 	if entrySize <= 0 {
 		return errors.E(op, errors.IO, errors.Errorf("invalid entry size: %d", entrySize))
 	}
+	// Read exactly entrySize bytes.
 	data := make([]byte, entrySize)
-	_, err = r.Read(data)
+	_, err = io.ReadFull(r, data)
 	if err != nil {
 		return errors.E(op, errors.IO, errors.Errorf("reading %d bytes from entry: %s", entrySize, err))
 	}
