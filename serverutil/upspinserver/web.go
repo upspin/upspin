@@ -125,6 +125,7 @@ func (s *web) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, http.StatusText(code), code)
 	}
 }
+
 // whichAccess returns Access entry for path name, handling links.
 func (s *web) whichAccess(name upspin.PathName) (*upspin.DirEntry, error) {
 	dir, err := s.cli.DirServer(name)
