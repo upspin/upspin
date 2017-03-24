@@ -527,7 +527,8 @@ func (r *checker) Read(p []byte) (n int, err error) {
 
 func (r *checker) readChecksum() ([4]byte, error) {
 	var c [4]byte
-	n, err := r.rd.Read(c[:])
+
+	n, err := io.ReadFull(r.rd, c[:])
 	if err != nil {
 		return c, err
 	}
@@ -554,8 +555,9 @@ func (le *LogEntry) unmarshal(r *checker) error {
 	if entrySize <= 0 {
 		return errors.E(op, errors.IO, errors.Errorf("invalid entry size: %d", entrySize))
 	}
+	// Read exactly entrySize bytes.
 	data := make([]byte, entrySize)
-	_, err = r.Read(data)
+	_, err = io.ReadFull(r, data)
 	if err != nil {
 		return errors.E(op, errors.IO, errors.Errorf("reading %d bytes from entry: %s", entrySize, err))
 	}
