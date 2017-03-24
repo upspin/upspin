@@ -450,9 +450,13 @@ func (li *LogIndex) Close() error {
 func (le *LogEntry) marshal() ([]byte, error) {
 	const op = "dir/server/tree.LogEntry.marshal"
 	var b []byte
-	var tmp [1]byte // For use by PutVarint.
+	var tmp [16]byte // For use by PutVarint.
+	// This should have been b = append(b, byte(le.Op)) since Operation
+	// is known to fit in a byte. However, we already encode it with
+	// Varint and changing it would cause backward-incompatible issues.
 	n := binary.PutVarint(tmp[:], int64(le.Op))
 	b = append(b, tmp[:n]...)
+
 	entry, err := le.Entry.Marshal()
 	if err != nil {
 		return nil, errors.E(op, err)
