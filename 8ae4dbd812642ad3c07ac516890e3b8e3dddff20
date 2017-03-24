@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8005c159_be920f41",
+        "filename": "flags/flags.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-24T18:25:25Z",
+      "side": 1,
+      "message": "if it is going to be expanded it should at least be correct.  I am happier with a version that says there are costs vs one that doesn\u0027t.  With a flag named Prudent, why would anyone choose not to do it otherwise?  When it was called tinfoil there was at least the implication that someone using it is crazy for one reason or another.",
+      "range": {
+        "startLine": 78,
+        "startChar": 1,
+        "endLine": 82,
+        "endChar": 16
+      },
+      "revId": "8ae4dbd812642ad3c07ac516890e3b8e3dddff20",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
