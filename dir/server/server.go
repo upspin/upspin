@@ -214,7 +214,7 @@ func (s *server) lookupWithPermissions(op string, name upspin.PathName, opts ...
 			if canAny, _, err := s.hasRight(access.AnyRight, p, opts...); err != nil {
 				return nil, err
 			} else if !canAny {
-				return nil, s.errPerm(op, p, opts...)
+				return nil, errors.E(op, name, errors.Private)
 			}
 		}
 		return nil, err // s.lookup wraps err already.
