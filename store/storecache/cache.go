@@ -221,7 +221,9 @@ func (c *storeCache) get(cfg upspin.Config, ref upspin.Reference, e upspin.Endpo
 		return true
 	}
 
-	// If we only see 503 errors, retry in the hope we can live through it.
+	const serviceUnavailable = "503" // String representation of http.StatusServiceUnavailable.
+
+	// If we only see serviceUnavailable errors, retry in the hope we can live through them.
 	for tries := 0; tries < 3; tries++ {
 		var fatal bool
 
@@ -236,12 +238,12 @@ func (c *storeCache) get(cfg upspin.Config, ref upspin.Reference, e upspin.Endpo
 				continue
 			}
 
-			// In case of a 503 error, retry a few times.
+			// In case of a serviceUnavailable error, retry a few times.
 			var locs []upspin.Location
 			var refdata *upspin.Refdata
 			data, refdata, locs, err = store.Get(loc.Reference)
 			if isError(err) {
-				if !strings.Contains(err.Error(), "503") {
+				if !strings.Contains(err.Error(), serviceUnavailable) {
 					fatal = true
 				}
 				continue // locs guaranteed to be nil.
