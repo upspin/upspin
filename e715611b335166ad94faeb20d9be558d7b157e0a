@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "93c1fb75_128b1707",
+        "filename": "key/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-25T18:50:58Z",
+      "side": 1,
+      "message": "You still want the sp.End() immediately after the putUserEntry since that was what we were trying to measure.",
+      "range": {
+        "startLine": 208,
+        "startChar": 1,
+        "endLine": 208,
+        "endChar": 9
+      },
+      "revId": "e715611b335166ad94faeb20d9be558d7b157e0a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
