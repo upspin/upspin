@@ -417,14 +417,15 @@ func (cr *cachedRef) saveToCacheFile(file string, data []byte) error {
 		cleanup()
 		return errors.New("writing cache file")
 	}
-	if err := os.Rename(tmpName, file); err != nil {
-		cleanup()
-		return err
-	}
 	if err := f.Close(); err != nil {
 		cleanup()
 		return err
 	}
+	if err := os.Rename(tmpName, file); err != nil {
+		cleanup()
+		return err
+	}
+
 	cr.size = int64(len(data))
 	cr.valid = true
 	cr.busy = false
