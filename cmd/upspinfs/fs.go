@@ -599,6 +599,7 @@ func (n *node) Setattr(context gContext.Context, req *fuse.SetattrRequest, resp 
 			n.Unlock()
 			h.Release(context, nil)
 		}
+		n.attr.Size = req.Size
 	}
 	if req.Valid.Mode() {
 		n.attr.Mode = req.Mode
