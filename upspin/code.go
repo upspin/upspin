@@ -7,8 +7,8 @@ package upspin // import "upspin.io/upspin"
 import (
 	"crypto/rand"
 	"encoding/binary"
-	"errors"
-	"fmt" // Cannot use Upspin's error package because it would introduce a dependency cycle.
+	"errors" // Cannot use Upspin's error package because it would introduce a dependency cycle.
+	"fmt"
 	"sort"
 	"strings"
 	"time"
