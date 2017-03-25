@@ -711,7 +711,7 @@ func (s *server) watch(op string, treeEvents <-chan *upspin.Event, outEvents cha
 		if e.Entry == nil {
 			// It's likely an error. Pass it along. We're sure to
 			// have treeEvents closed in the next loop.
-			outEvents <- *e
+			sendEvent(e)
 			continue
 		}
 
