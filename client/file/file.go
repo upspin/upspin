@@ -185,11 +185,15 @@ func (f *File) Seek(offset int64, whence int) (ret int64, err error) {
 	case 1:
 		ret = f.offset + offset
 	case 2:
-		ret = int64(len(f.data)) + offset
+		if f.writable {
+			ret = int64(len(f.data)) + offset
+		} else {
+			ret = f.size + offset
+		}
 	default:
 		return 0, errors.E(op, errors.Invalid, f.name, errors.Str("bad whence"))
 	}
-	if ret < 0 || offset > maxInt {
+	if ret < 0 || offset > maxInt || !f.writable && ret > f.size {
 		return 0, errors.E(op, errors.Invalid, f.name, errors.Str("bad offset"))
 	}
 	f.offset = ret
