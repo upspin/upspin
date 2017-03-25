@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fce1a494_fcf80089",
+        "filename": "store/storecache/cache.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-25T15:32:44Z",
+      "side": 1,
+      "message": "representation",
+      "revId": "be3559859d8a26afae8fe324d8fe42a6e0bccaa7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
