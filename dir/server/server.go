@@ -205,7 +205,7 @@ func (s *server) lookupWithPermissions(op string, name upspin.PathName, opts ...
 	entry, err := s.lookup(op, p, entryMustBeClean, opts...)
 
 	// Check if the user can know about the file at all. If not, to prevent
-	// leaking its existence, return NotExist.
+	// leaking its existence, return Private.
 	if err == upspin.ErrFollowLink {
 		return s.errLink(op, entry, opts...)
 	}
