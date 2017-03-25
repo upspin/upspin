@@ -52,7 +52,7 @@ type storeCache struct {
 	cfg   upspin.Config
 	sync.Mutex
 	dir   string     // Top directory for cached references.
-	limit int64      // Sort limit of the maximum bytes to store.
+	limit int64      // Soft limit of the maximum bytes to store.
 	lru   *cache.LRU // Key is the reference. Value is &cachedRef.
 	wbq   *writebackQueue
 }
