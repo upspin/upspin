@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df0decd4_cccb4c29",
+        "filename": "store/storecache/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-25T15:16:41Z",
+      "side": 1,
+      "message": "// String representation of http.StatusServiceUnavailable.",
+      "revId": "708f2f80c43cbf438ed68d7f68191a3f8d5336d1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bbdb036d_ef68acd0",
+        "filename": "store/storecache/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 226,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-25T15:16:41Z",
+      "side": 1,
+      "message": "s/it/them/",
+      "revId": "708f2f80c43cbf438ed68d7f68191a3f8d5336d1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
