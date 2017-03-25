@@ -134,8 +134,14 @@ func (r *remote) Watch(name upspin.PathName, order int64, done <-chan struct{}) 
 					op.logErr(err)
 					return
 				}
-				events <- *e
+				select {
+				case events <- *e:
+				case <-done:
+					return
+				}
+
 			case <-done:
+				return
 			}
 		}
 	}()
