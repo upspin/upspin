@@ -103,6 +103,52 @@ func benckmarkLookup(b *testing.B, cached bool, dir upspin.PathName) {
 	}
 }
 
+func BenchmarkDeleteAtRoot(b *testing.B) {
+	benchmarkDelete(b, userName)
+}
+
+func BenchmarkDelete1Deep(b *testing.B) {
+	benchmarkDelete(b, userName+"/"+mkName())
+}
+
+func BenchmarkDelete2Deep(b *testing.B) {
+	benchmarkDelete(b, userName+"/"+mkName()+"/"+mkName())
+}
+
+func BenchmarkDelete4Deep(b *testing.B) {
+	benchmarkDelete(b, userName+"/"+mkName()+"/"+mkName()+"/"+mkName()+"/"+mkName())
+}
+
+func benchmarkDelete(b *testing.B, dir upspin.PathName) {
+	b.StopTimer()
+	s, _, cleanup := setupBenchServer(b)
+	defer cleanup()
+	mkAll(b, s, dir)
+
+	var names []upspin.PathName
+	for i := 0; i < b.N; i++ {
+		subdir := mkName()
+		name := dir + "/" + subdir
+		_, err := s.Put(&upspin.DirEntry{
+			Name:       name,
+			SignedName: name,
+			Attr:       upspin.AttrDirectory,
+		})
+		if err != nil {
+			b.Fatal(err)
+		}
+		names = append(names, name)
+	}
+
+	b.StartTimer()
+	for _, name := range names {
+		_, err := s.Delete(name)
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
 // Benchmarks for WhichAccess have two parameters besides the caching or no
 // caching one: 1) the directory that contains the Access file and 2) how far
 // under that directory the path name we give to WhichAccess.
