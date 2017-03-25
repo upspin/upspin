@@ -241,7 +241,7 @@ func TestWatchNonExistingNode(t *testing.T) {
 
 	// Get a watcher for the current subtree, rooted at orig/sub1.
 	done := make(chan struct{})
-	ch, err := tree.Watch(mkpath(t, userName+"/orig/sub1"), -1, done)
+	ch, err := tree.Watch(mkpath(t, userName+"/orig/sub1"), 0, done)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -298,10 +298,15 @@ func TestWatchNonExistingNode(t *testing.T) {
 		{"/orig/sub1", isDelete, !hasBlocks},
 		{"/orig/sub1", !isDelete, !hasBlocks},
 	} {
-		event := <-ch
-		err = checkEvent(event, userName+exp.name, exp.isDelete, exp.hasBlocks)
-		if err != nil {
-			t.Errorf("%d: %s", i, err)
+		select {
+		case event := <-ch:
+			err = checkEvent(event, userName+exp.name, exp.isDelete, exp.hasBlocks)
+			if err != nil {
+				t.Errorf("%d: %s", i, err)
+
+			}
+		case <-time.After(time.Minute):
+			t.Fatalf("failed to receive event within %v", time.Minute)
 		}
 	}
 }
