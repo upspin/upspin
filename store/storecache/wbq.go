@@ -419,7 +419,7 @@ func (p *parallelism) success() {
 
 	p.inFlight--
 
-	// Successes below max give us no information.
+	// inFlight below max (not enough write load) give us no information.
 	if p.inFlight+1 < p.max {
 		return
 	}
