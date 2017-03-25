@@ -882,7 +882,7 @@ func (s *server) canCreateRoot(user upspin.UserName) bool {
 }
 
 // errPerm checks whether the user has any right to the given path, and if so
-// returns a Permission error. Otherwise it returns a NotExist error.
+// returns a Permission error. Otherwise it returns a Private error.
 // This is used to prevent probing of the name space.
 func (s *server) errPerm(op string, p path.Parsed, opts ...options) error {
 	// Before returning, check that the user has the right to know,
