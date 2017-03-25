@@ -420,6 +420,7 @@ func (cr *cachedRef) saveToCacheFile(file string, data []byte) error {
 		return err
 	}
 	if err := f.Close(); err != nil {
+		tmpName = file // raname tmpName to file for cleanup
 		cleanup()
 		return err
 	}
