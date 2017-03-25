@@ -78,22 +78,24 @@ func (r *RateLimiter) pass(now time.Time, key string) (bool, time.Duration) {
 		}
 	} else {
 		// We have seen this visitor before.
-		// If MaxBackoff has passed since its last request,
-		// permit it and reset the backoff to its initial state.
 		// If v.backoff has passed, permit it but double the backoff.
 		// Otherwise, deny it.
+		// If MaxBackoff has passed since its last request,
+		// permit it and reset the backoff to its initial state.
 		resetTime := v.seen.Add(r.Max)
-		passTime := v.seen.Add(v.backoff)
-		switch {
-		case now.After(resetTime):
+		if now.After(resetTime) {
 			v.backoff = r.Backoff
-		case now.After(passTime):
-			v.backoff *= 2
-			if v.backoff > r.Max {
-				v.backoff = r.Max
+		} else {
+			passTime := v.seen.Add(v.backoff)
+
+			if now.After(passTime) {
+				v.backoff *= 2
+				if v.backoff > r.Max {
+					v.backoff = r.Max
+				}
+			} else {
+				return false, passTime.Sub(now)
 			}
-		default:
-			return false, passTime.Sub(now)
 		}
 
 		// Mark that we've seen this visitor now.
