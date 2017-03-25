@@ -30,7 +30,7 @@ var (
 	writethrough  = flag.Bool("writethrough", false, "make storage cache writethrough")
 )
 
-func serve(cfg upspin.Config, addr string) (chan error, error) {
+func serve(cfg upspin.Config, addr string) (<-chan error, error) {
 	// Stop the cache server recursing.
 	cfg = config.SetCacheEndpoint(cfg, upspin.Endpoint{})
 
