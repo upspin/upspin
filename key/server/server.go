@@ -203,13 +203,14 @@ func (s *server) Put(u *upspin.User) error {
 	sp = span.StartSpan("putUserEntry")
 	err = s.putUserEntry(op, entry)
 	sp.End()
+	// Remove this new user from the negative cache regardless of error.
+	// When error is returned, the user might still be put already.
+	s.negCache.Remove(u.Name)
 	if err != nil {
 		return err
 	}
 
-	// Remove this new user from the negative cache and update it on the
-	// positive cache.
-	s.negCache.Remove(u.Name)
+	// Update it on the positive cache.
 	s.cache.Add(u.Name, entry)
 
 	sp = span.StartSpan("logger.PutSuccess")
