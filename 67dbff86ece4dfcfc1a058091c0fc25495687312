@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6bac0d01_14146720",
+        "filename": "dir/server/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-25T05:19:41Z",
+      "side": 1,
+      "message": "it looks like you could replace this if-else block with s.errPerm.",
+      "revId": "67dbff86ece4dfcfc1a058091c0fc25495687312",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
