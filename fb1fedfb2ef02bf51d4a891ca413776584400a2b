@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cb0bea2c_f77979f3",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 5660
+      },
+      "writtenOn": "2017-03-25T05:48:23Z",
+      "side": 1,
+      "message": "We eat errNotExist at line359 by using s.errPerm even if user has AnyAccess. It seems that we are not consistent about what error to return when users have AnyAccess but file is not found.",
+      "revId": "fb1fedfb2ef02bf51d4a891ca413776584400a2b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
