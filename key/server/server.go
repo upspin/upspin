@@ -204,6 +204,10 @@ func (s *server) Put(u *upspin.User) error {
 	err = s.putUserEntry(op, entry)
 	sp.End()
 	if err != nil {
+		// Clear out both negative and positive caches on error since we are not certain
+		// about the remote storage state.
+		s.negCache.Remove(u.Name)
+		s.cache.Remove(u.Name)
 		return err
 	}
 
