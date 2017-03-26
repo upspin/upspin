@@ -69,6 +69,41 @@
       "revId": "ed025a8a7334bc80de156ed31640d0d23ddb1ecc",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "eae62138_778feaa1",
+        "filename": "key/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-26T00:39:46Z",
+      "side": 1,
+      "message": "I\u0027m not sure I want to second-guess what the storage layer is telling me. Perhaps there\u0027s a specific error we want to consider as \"don\u0027t know\"?Also , this raises a question: should we update the positive cache as well, if there is an updated user in the backend?\n\nPerhaps the thing to do is remove the user from both caches if we suspect an error *after* successful storage.",
+      "parentUuid": "47a70a82_14c8d799",
+      "revId": "ed025a8a7334bc80de156ed31640d0d23ddb1ecc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6bcd61da_b6719a20",
+        "filename": "key/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-26T00:39:46Z",
+      "side": 1,
+      "message": "Since this comment has no surrounding context anymore, I\u0027d just drop it or write something like:\n\n// Ensure user cache is up-to-date.",
+      "revId": "ed025a8a7334bc80de156ed31640d0d23ddb1ecc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
