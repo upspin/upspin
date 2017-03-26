@@ -16,6 +16,24 @@
       "revId": "8e3cb7028c3f506c5a4223659b1368cb8edfe708",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2b8eeaed_f5afb482",
+        "filename": "dir/remote/remote.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 5660
+      },
+      "writtenOn": "2017-03-26T00:21:07Z",
+      "side": 1,
+      "message": "But then, even if done is closed, we might be blocking here waiting. \nAlso remote is the owner of event channel, so remote cannot wait for it to be closed since event channel can only be closed by remote itself.\n\nMaybe I miss something, can you explain more?\n\nThanks.",
+      "parentUuid": "ef2bf36b_b58c06d8",
+      "revId": "8e3cb7028c3f506c5a4223659b1368cb8edfe708",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
