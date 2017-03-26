@@ -35,6 +35,12 @@ import (
 const (
 	defaultValid          = 2 * time.Minute
 	defaultEnoentDuration = time.Minute
+
+	// Files and directories will appear in the host OS with
+	// these permissions, regardless of Access file contents.
+	// TODO(p): consider reflecting the actual Access file
+	// permissions.
+	unixPermissions = 0700
 )
 
 // upspinFS represents an instance of the mounted file system.
@@ -245,7 +251,7 @@ func (n *node) Create(context gContext.Context, req *fuse.CreateRequest, resp *f
 	}
 
 	// A new node.
-	nn := f.allocNode(n, req.Name, req.Mode&0777, 0, time.Now())
+	nn := f.allocNode(n, req.Name, unixPermissions, 0, time.Now())
 	nn.attr.Uid = req.Header.Uid
 	nn.attr.Gid = req.Header.Gid
 
@@ -276,7 +282,7 @@ func (n *node) Mkdir(context gContext.Context, req *fuse.MkdirRequest) (fs.Node,
 	n.Lock()
 	defer n.Unlock()
 
-	nn := n.f.allocNode(n, req.Name, (req.Mode&0777)|os.ModeDir, 0, time.Now())
+	nn := n.f.allocNode(n, req.Name, unixPermissions|os.ModeDir, 0, time.Now())
 	nn.attr.Uid = req.Header.Uid
 	nn.attr.Gid = req.Header.Gid
 	dir, err := n.f.dirLookup(nn.user)
@@ -503,7 +509,7 @@ func (n *node) Lookup(context gContext.Context, name string) (fs.Node, error) {
 	}
 
 	// Make a node to hand back to fuse.
-	mode := os.FileMode(0700)
+	mode := os.FileMode(unixPermissions)
 	if de.IsDir() {
 		mode |= os.ModeDir
 	}
@@ -602,7 +608,7 @@ func (n *node) Setattr(context gContext.Context, req *fuse.SetattrRequest, resp 
 		n.attr.Size = req.Size
 	}
 	if req.Valid.Mode() {
-		n.attr.Mode = req.Mode
+		// We ignore mode changes but still return success.
 	}
 	if req.Valid.Mtime() {
 		// Set the modify time.
@@ -722,7 +728,7 @@ func (n *node) Link(ctx gContext.Context, req *fuse.LinkRequest, old fs.Node) (f
 	if err != nil {
 		return nil, e2e(errors.E(op, n.uname, err))
 	}
-	nn := n.f.allocNode(n, req.NewName, 0700, uint64(size), time.Unix(int64(de.Time), 0))
+	nn := n.f.allocNode(n, req.NewName, unixPermissions, uint64(size), time.Unix(int64(de.Time), 0))
 	nn.exists()
 	return nn, nil
 }
@@ -833,7 +839,7 @@ func (n *node) Symlink(ctx gContext.Context, req *fuse.SymlinkRequest) (fs.Node,
 		return nil, e2e(errors.E(op, n.uname, err))
 	}
 	log.Debug.Printf("Symlink target %q", target)
-	nn := n.f.allocNode(n, req.NewName, os.ModeSymlink|0700, uint64(len(target)), time.Now())
+	nn := n.f.allocNode(n, req.NewName, os.ModeSymlink|unixPermissions, uint64(len(target)), time.Now())
 	nn.link = target
 	if err := n.f.cache.putRedirect(nn, target); err != nil {
 		return nil, e2e(errors.E(op, n.uname, err))
