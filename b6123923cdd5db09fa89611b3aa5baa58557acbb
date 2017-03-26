@@ -16,6 +16,47 @@
       "revId": "b6123923cdd5db09fa89611b3aa5baa58557acbb",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a624ae7b_20aacf4b",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 438,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-26T02:32:24Z",
+      "side": 1,
+      "message": "I don\u0027t really understand your wording but I believe I understand your point.\n\nWhat we are actually trying to do is find a maximal p.max that will guarantee that p.max writebacks can occur concurrently without a timeout error.  Like tcp windows we approximate that with a sawtooth that  increments past the goal and then falls back.  We limit p.max to a large but finite number, i.e., the preallocated writers and hope that will be enough.  Unlimited would easily blow all the fds in the serving process.\n\nIf we simultaneously start p.max writerbacks and they all terminated with out a timeout, that would certainly prove that p.max was at or lower than the maximum attainable.  That is what the sentence means. That maximum will change with time so we have to continually feel our way.\n\nThe heuristic here merely approximates that test.  It is measuring exactly that if we have a continuous queue of writebacks to perform.\nHowever if inflight is fluctuating at and below p.max we require only that  p.max writebacks terminate while inflight is at p.max with no intervening timeouts.  It allows us to increase p.max even when the load only sporadically increase to p.max.\n\nGiven your question, I will update the comment to exactly this.",
+      "parentUuid": "a94b9ede_3c7631a8",
+      "revId": "b6123923cdd5db09fa89611b3aa5baa58557acbb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "072575a5_f0246de8",
+        "filename": "store/storecache/wbq_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-26T02:32:24Z",
+      "side": 1,
+      "message": "Normally I would not perform this test since it is codifying behavior of a heuristic that is trying to approximate a behavior we really want. Almost any change to the heuristic will break the test.\n\nHowever since it helps elucidate the behavior of the heuristic, I\u0027m fine with it.  After it is merged I believe I will add the explanatory comments.\n\nThanks for doing it.",
+      "range": {
+        "startLine": 27,
+        "startChar": 5,
+        "endLine": 27,
+        "endChar": 27
+      },
+      "revId": "b6123923cdd5db09fa89611b3aa5baa58557acbb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
