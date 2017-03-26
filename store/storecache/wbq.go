@@ -408,6 +408,8 @@ func (p *parallelism) failure(err error) bool {
 	}
 
 	// Drop max by half. max will never go below 1 if it starts above 0.
+	// We assume that even at half the maximum attainable error free
+	// concurrency we will achieve maximum throughput.
 	p.max = (p.max + 1) / 2
 	log.Debug.Printf("%s: down %d", op, p.max)
 	return true
@@ -433,10 +435,22 @@ func (p *parallelism) success() {
 		return
 	}
 
-	// If we have p.max sequential successful completions
-	// after the last p.max change, increase it by one. This is
-	// roughly equivalent to increasing p.max when p.max
-	// parallel writebacks complete together.
+	// We are trying to find a maximal p.max that will guarantee that p.max
+	// writebacks can occur concurrently without a timeout error.  Like tcp
+	// windows we approximate that with a sawtooth that increments past the
+	// goal and then falls back.  We limit p.max to a large but finite number,
+	// that is, the number of preallocated writers and hope that will be enough.
+	// Unlimited would easily DOS the server.
+	//
+	// If we simultaneously start p.max writerbacks and they all terminate
+	// without a timeout, that would certainly prove that p.max was at or
+	// lower than the maximum attainable. This heuristic approximates
+	// that. In the case of a continuous queue of writebacks, it is measuring
+	// exactly that. However if the offered load is fluctuating so that
+	// inflight is fluctuating at and below p.max, we require only that
+	// p.max writebacks terminate while inflight is at p.max with no
+	// intervening timeouts. This allows us to increase p.max even when the
+	// load only sporadically increases to p.max.
 	if p.successes >= p.max {
 		p.successes = 0
 		p.max++
