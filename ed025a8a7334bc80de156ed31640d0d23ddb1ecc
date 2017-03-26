@@ -108,6 +108,24 @@
     },
     {
       "key": {
+        "uuid": "eea51cbf_25c2f437",
+        "filename": "key/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 5660
+      },
+      "writtenOn": "2017-03-26T03:37:09Z",
+      "side": 1,
+      "message": "\u003e  Perhaps there\u0027s a specific error we want to consider as \"don\u0027t know\"?\n\nSorry. I should be more clear. There are two different kinds of bad things can happen in my mind:\n\n1. bad responses that are returned from the storage layer: auth failed, size too big, internal error, etc..\n2. errors that are returned from network layer: timeouts, connection drops, etc..\n\n\nWhen type 1 problem occurs, we know what happens. I generally do not consider them as \"errors\".\n\nWhen type 2 issue occurs, we have to further differentiate the problems if we want to handle it more gracefully. For example, if network issues happens before the server receives the request, we know it should never happen. However, most RPC framework does not provide this kind of flexibility to us...  So normally, I would simply clear out cache when network error happens on a networked storage system to keep cache consistent.\n\nI would love to just drop both caches when we see an error around line 210. What do you think?",
+      "parentUuid": "c8b2b942_dbf23fe5",
+      "revId": "ed025a8a7334bc80de156ed31640d0d23ddb1ecc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "6bcd61da_b6719a20",
         "filename": "key/server/server.go",
         "patchSetId": 2
