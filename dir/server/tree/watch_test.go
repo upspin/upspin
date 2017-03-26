@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"upspin.io/errors"
+	"upspin.io/path"
 	"upspin.io/upspin"
 )
 
@@ -361,6 +362,43 @@ func TestRemoveDeadWatchers(t *testing.T) {
 		// Verify that only the expected number of open watchers remain.
 		if got, want := len(n.watchers), tc.open; got != want {
 			t.Fatalf("%d: open = %d, want = %d", i, got, want)
+		}
+	}
+}
+
+func TestMoveDownWatchers(t *testing.T) {
+	wp, err := path.Parse("foo@bar.com/p/n1")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tests := []struct {
+		node   *node
+		parent *node
+		moved  bool
+	}{
+		{
+			node: &node{entry: upspin.DirEntry{Name: "foo@bar.com/p/n1"}},
+			parent: &node{
+				entry:    upspin.DirEntry{Name: "foo@bar.com/p/"},
+				watchers: []*watcher{&watcher{path: wp}},
+			},
+			moved: true,
+		},
+		{
+			node: &node{entry: upspin.DirEntry{Name: "foo@bar.com/p/n111"}},
+			parent: &node{
+				entry:    upspin.DirEntry{Name: "foo@bar.com/p/"},
+				watchers: []*watcher{&watcher{path: wp}},
+			},
+			moved: false,
+		},
+	}
+
+	for i, test := range tests {
+		moveDownWatchers(test.node, test.parent)
+		if moved := len(test.node.watchers) == 1; moved != test.moved {
+			t.Errorf("#%d: moved = %v, want %v", i, moved, test.moved)
 		}
 	}
 }

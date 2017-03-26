@@ -367,7 +367,7 @@ func moveDownWatchers(node, parent *node) {
 	p, _ := path.Parse(node.entry.Name) // err can't happen.
 	for i := 0; i < len(parent.watchers); i++ {
 		w := parent.watchers[i]
-		if w.path.NElem() < p.NElem() || w.path.First(p.NElem()).Path() == p.Path() {
+		if w.path.NElem() < p.NElem() || !(w.path.First(p.NElem()).Path() == p.Path()) {
 			curr++
 			continue
 		}
