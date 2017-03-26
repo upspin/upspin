@@ -289,6 +289,143 @@ func TestFileRandomAccess(t *testing.T) {
 	}
 }
 
+func TestFileSeek(t *testing.T) {
+	const (
+		user     = "fileseek@google.com"
+		root     = user + "/"
+		fileName = root + "file"
+	)
+	client, f, data := setupFileIO(user, fileName, Max, t)
+
+	// Seek to random offsets and Write random sizes to create file.
+	// Start with a map of bools (easy) saying the byte has been written.
+	// Loop until its length is the file size, meaning every byte has been written.
+	written := make(map[int]bool)
+	// Initial offset start of file.
+	curOffset := int64(0)
+	for len(written) != Max {
+		// Cycle for each whence value.
+		for whence := 0; whence < 3; whence++ {
+			// Pick a random offset and length.
+			offset := rand.Intn(Max)
+			// Don't bother starting at a known location - speeds up the coverage.
+			for written[offset] {
+				offset = rand.Intn(Max)
+			}
+			length := rand.Intn(Max / 100)
+			if offset+length > Max {
+				length = Max - offset
+			}
+			seekOffset := int64(offset)
+			switch whence {
+			case 1:
+				seekOffset -= curOffset
+			case 2:
+				// Seek to end of file first, so we know current file length.
+				fLen, err := f.Seek(0, whence)
+				if err != nil {
+					t.Fatalf("Seek(0, whence %d): %v", whence, err)
+				}
+				seekOffset -= fLen
+			}
+			o, err := f.Seek(seekOffset, whence)
+			if err != nil {
+				t.Fatalf("Seek(offset %d, whence %d): %v", seekOffset, whence, err)
+			}
+			if o != int64(offset) {
+				t.Fatalf("Seek failed (whence %d): expected offset %d got %d", whence, offset, o)
+			}
+			n, err := f.Write(data[offset:offset+length])
+			if err != nil {
+				t.Fatalf("Write(length %d): %v", length, err)
+			}
+			if n != length {
+				t.Fatalf("Write length failed: offset %d expected %d got %d", offset, length, n)
+			}
+			curOffset = o + int64(length)
+			for i := offset; i < offset+length; i++ {
+				written[i] = true
+			}
+		}
+	}
+	err := f.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Read file back all at once, for simple verification.
+	f, err = client.Open(fileName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+	result := make([]byte, Max)
+	n, err := f.Read(result)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if n != Max {
+		t.Fatalf("Read: expected %d got %d", Max, n)
+	}
+	if !bytes.Equal(data, result) {
+		for i, c := range data {
+			if result[i] != c {
+				t.Fatalf("byte at offset %d should be %#.2x is %#.2x", i, c, result[i])
+			}
+		}
+	}
+
+	// Now use a similar algorithm to Write but with Read to check random access.
+	read := make(map[int]bool)
+	buf := make([]byte, Max)
+	curOffset = int64(0)
+	for len(read) != Max {
+		// Cycle for each whence value.
+		for whence := 0; whence < 3; whence++ {
+			// Pick a random offset and length.
+			offset := rand.Intn(Max)
+			// Don't bother starting at a known location - speeds up the coverage.
+			for read[offset] {
+				offset = rand.Intn(Max)
+			}
+			length := rand.Intn(Max / 100)
+			if offset+length > Max {
+				length = Max - offset
+			}
+			seekOffset := int64(offset)
+			switch whence {
+			case 1:
+				seekOffset -= curOffset
+			case 2:
+				seekOffset -= Max
+			}
+			o, err := f.Seek(seekOffset, whence)
+			if err != nil {
+				t.Fatalf("Seek(offset %d, whence %d): %v", seekOffset, whence, err)
+			}
+			if o != int64(offset) {
+				t.Fatalf("Seek failed (whence %d): expected offset %d got %d", whence, offset, o)
+			}
+			n, err := f.Read(buf[offset:offset+length])
+			if err != nil {
+				t.Fatalf("Read(length %d): %v", offset, length, err)
+			}
+			if n != length {
+				t.Fatalf("Read length failed: offset %d expected %d got %d", offset, length, n)
+			}
+			for i := offset; i < offset+length; i++ {
+				if buf[i] != data[i] {
+					t.Fatalf("ReadAt at %d (%#x): expected %#.2x got %#.2x", i, i, data[i], buf[i])
+				}
+			}
+			curOffset = o + int64(length)
+			for i := offset; i < offset+length; i++ {
+				read[i] = true
+			}
+		}
+	}
+}
+
 func TestFileZeroFill(t *testing.T) {
 	const (
 		user     = "zerofill@google.com"
