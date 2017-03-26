@@ -51,6 +51,24 @@
       "revId": "ed025a8a7334bc80de156ed31640d0d23ddb1ecc",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "47a70a82_14c8d799",
+        "filename": "key/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 5660
+      },
+      "writtenOn": "2017-03-26T00:28:35Z",
+      "side": 1,
+      "message": "In most of the network storage system, I believe \"error\" means \"not sure\", and \"ok\" means \"stored\".",
+      "parentUuid": "b6834192_0c987df9",
+      "revId": "ed025a8a7334bc80de156ed31640d0d23ddb1ecc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
