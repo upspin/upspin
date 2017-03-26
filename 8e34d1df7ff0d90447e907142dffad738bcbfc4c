@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a7c74385_4ce7be9a",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-26T06:38:53Z",
+      "side": 1,
+      "message": "De Morgan\u0027s law?",
+      "range": {
+        "startLine": 370,
+        "startChar": 35,
+        "endLine": 370,
+        "endChar": 79
+      },
+      "revId": "8e34d1df7ff0d90447e907142dffad738bcbfc4c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
