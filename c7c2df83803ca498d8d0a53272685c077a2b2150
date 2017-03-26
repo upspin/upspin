@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "685eed90_6767843b",
+        "filename": "dir/server/tree/log_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-26T08:00:31Z",
+      "side": 1,
+      "message": "How about this?\n\nabort :\u003d func() { atomic.StoreInt32(\u0026aborting, 1) }\naborted :\u003d func() bool { return atomic.LoadInt32(\u0026aborting) \u003d\u003d 1 }",
+      "revId": "c7c2df83803ca498d8d0a53272685c077a2b2150",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
