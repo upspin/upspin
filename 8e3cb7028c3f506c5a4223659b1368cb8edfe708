@@ -34,6 +34,24 @@
       "revId": "8e3cb7028c3f506c5a4223659b1368cb8edfe708",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b3c3a5e8_c9bdcf14",
+        "filename": "dir/remote/remote.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-26T00:46:30Z",
+      "side": 1,
+      "message": "Maybe this is fine on second look. I\u0027ll let Andrew confirm.",
+      "parentUuid": "2b8eeaed_f5afb482",
+      "revId": "8e3cb7028c3f506c5a4223659b1368cb8edfe708",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
