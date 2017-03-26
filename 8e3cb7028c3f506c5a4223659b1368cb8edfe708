@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ef2bf36b_b58c06d8",
+        "filename": "dir/remote/remote.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-26T00:16:18Z",
+      "side": 1,
+      "message": "I don\u0027t think this sub-select is necessary. If the events channel is not ready, remote should just wait for it to be or be closed.",
+      "revId": "8e3cb7028c3f506c5a4223659b1368cb8edfe708",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
