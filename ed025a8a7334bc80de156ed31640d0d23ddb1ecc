@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d10ccde6_89144d79",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-26T00:20:43Z",
+      "side": 1,
+      "message": "invalidate",
+      "revId": "ed025a8a7334bc80de156ed31640d0d23ddb1ecc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2dd4b0ca_f8109e01",
+        "filename": "key/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-26T00:20:43Z",
+      "side": 1,
+      "message": "Why would the user be put on error?",
+      "revId": "ed025a8a7334bc80de156ed31640d0d23ddb1ecc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
