@@ -52,6 +52,24 @@
       "revId": "8e3cb7028c3f506c5a4223659b1368cb8edfe708",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f6d34b63_b7c698db",
+        "filename": "dir/remote/remote.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-26T06:20:25Z",
+      "side": 1,
+      "message": "You could certainly get stuck here if the reader closes done without emptying.  My only use of it is in the dircache and it doesn\u0027t hang simply because it recvs till it sees an error effectively emptying the pipe.  But there is no reason for a client to do that.",
+      "parentUuid": "b3c3a5e8_c9bdcf14",
+      "revId": "8e3cb7028c3f506c5a4223659b1368cb8edfe708",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
