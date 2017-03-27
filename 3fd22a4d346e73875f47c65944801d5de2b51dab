@@ -108,6 +108,24 @@
     },
     {
       "key": {
+        "uuid": "13efe0f9_cbc514e8",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 515,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-27T18:08:43Z",
+      "side": 1,
+      "message": "In hindsight, we should have used this: https://bitbucket.org/StephaneBunel/xxhash-go",
+      "parentUuid": "10341ead_9e97f3de",
+      "revId": "3fd22a4d346e73875f47c65944801d5de2b51dab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "19600c11_738307aa",
         "filename": "dir/server/tree/log.go",
         "patchSetId": 4
