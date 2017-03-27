@@ -57,9 +57,9 @@ func TestMarshalUnmarshal(t *testing.T) {
 
 func TestConcurrent(t *testing.T) {
 	const (
-		numWriters = 3
-		numReaders = 2
-		numEntries = 100
+		numWriters = 30
+		numReaders = 20
+		numEntries = 1000
 	)
 	if testing.Short() {
 		// To run faster, run the log on a ram disk:
