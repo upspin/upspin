@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3ff86fbc_55b898b8",
+        "filename": "exp/cmd/upbox/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-27T23:33:15Z",
+      "side": 1,
+      "message": "print to stderr please",
+      "revId": "7a53979404668b5eea99283997ca03138cfa22a5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
