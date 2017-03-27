@@ -72,6 +72,24 @@
     },
     {
       "key": {
+        "uuid": "6e1f7cae_f6da1965",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 515,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-27T17:36:41Z",
+      "side": 1,
+      "message": "it\u0027s 4 byte-by-byte checksums. usually a 32-bit checksum mixes the values more.\ni realize it\u0027s not being changed in this CL, i\u0027m just observing it\u0027s strange and somewhat weak, yet expensive.",
+      "parentUuid": "6a1aa7b6_19fd2c4a",
+      "revId": "3fd22a4d346e73875f47c65944801d5de2b51dab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "19600c11_738307aa",
         "filename": "dir/server/tree/log.go",
         "patchSetId": 4
@@ -101,6 +119,24 @@
       "side": 1,
       "message": "I don\u0027t understand.\n\nThe checksum is not part of the change in this CL.",
       "parentUuid": "19600c11_738307aa",
+      "revId": "3fd22a4d346e73875f47c65944801d5de2b51dab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e43e7dc4_ca305983",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 549,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-27T17:36:41Z",
+      "side": 1,
+      "message": "offs :\u003d (c.count + i) % 4\nc.chksum[offs] \u003d c.chksum[offs] ^ p[i]",
+      "parentUuid": "9f385627_fae0c015",
       "revId": "3fd22a4d346e73875f47c65944801d5de2b51dab",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
