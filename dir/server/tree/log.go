@@ -215,23 +215,34 @@ func (l *Log) ReadAt(n int, offset int64) (dst []LogEntry, next int64, err error
 		return nil, 0, errors.E(op, errors.IO, err)
 	}
 	next = offset
-	cbr := newChecker(bufio.NewReader(l.file))
+
+	var br *bufio.Reader
+	if r, ok := bufferPool.Get().(*bufio.Reader); ok {
+		br = r
+		br.Reset(l.file)
+	} else {
+		br = bufio.NewReader(l.file)
+	}
+	defer func() { bufferPool.Put(br) }()
 	for i := 0; i < n; i++ {
+		chk := newChecker(br)
 		if next == fileOffset {
 			// End of file.
 			return dst, fileOffset, nil
 		}
 		var le LogEntry
-		err := le.unmarshal(cbr)
+		err := le.unmarshal(chk)
 		if err != nil {
 			return dst, next, err
 		}
 		dst = append(dst, le)
-		next = next + int64(cbr.count)
-		cbr.reset()
+		next = next + int64(chk.count)
 	}
 	return
 }
+
+// bufferPool stores *bufio.Readers for re-use by calls to ReadAt.
+var bufferPool sync.Pool
 
 // LastOffset returns the offset of the end of the file or -1 on error.
 func (l *Log) LastOffset() int64 {
@@ -484,63 +495,65 @@ func appendBytes(b, bytes []byte) []byte {
 	return b
 }
 
-var checksumSalt = [4]byte{0xde, 0xad, 0xbe, 0xef}
+type byteReaderReader interface {
+	io.ByteReader
+	io.Reader
+}
 
-// checker computes the checksum of a file as it reads bytes from it. It also
-// reports the number of bytes read in its count field.
+// checker computes the checksum of a file as it reads bytes from it
+// and reports the number of bytes read in its count field.
 type checker struct {
-	rd     *bufio.Reader
+	rd     byteReaderReader
 	count  int
 	chksum [4]byte
 }
 
-func newChecker(r *bufio.Reader) *checker {
-	return &checker{rd: r, chksum: checksumSalt}
+var checksumSalt = [4]byte{0xde, 0xad, 0xbe, 0xef}
+
+func newChecker(r byteReaderReader) *checker {
+	return &checker{rd: r, count: 0, chksum: checksumSalt}
 }
 
 // ReadByte implements io.ByteReader.
-func (r *checker) ReadByte() (byte, error) {
-	b, err := r.rd.ReadByte()
+func (c *checker) ReadByte() (byte, error) {
+	b, err := c.rd.ReadByte()
 	if err == nil {
-		r.chksum[r.count%4] = r.chksum[r.count%4] ^ b
-		r.count++
+		c.chksum[c.count%4] = c.chksum[c.count%4] ^ b
+		c.count++
 	}
 	return b, err
 }
 
-// reset resets the checksum and the counting of bytes, without affecting the
-// reader state.
-func (r *checker) reset() {
-	r.count = 0
-	r.chksum = checksumSalt
+// reset resets the checksum and the counting of bytes, without
+// affecting the reader state.
+func (c *checker) reset() {
+	c.count = 0
+	c.chksum = checksumSalt
 }
 
 // Read implements io.Reader.
-func (r *checker) Read(p []byte) (n int, err error) {
-	n, err = r.rd.Read(p)
+func (c *checker) Read(p []byte) (n int, err error) {
+	n, err = c.rd.Read(p)
 	if err != nil {
 		return
 	}
 	for i := 0; i < n; i++ {
-		offs := r.count + i
-		r.chksum[offs%4] = r.chksum[offs%4] ^ p[i]
+		offs := (c.count + i) % 4
+		c.chksum[offs] = c.chksum[offs] ^ p[i]
 	}
-	r.count += n
+	c.count += n
 	return
 }
 
-func (r *checker) readChecksum() ([4]byte, error) {
-	var c [4]byte
+func (c *checker) readChecksum() ([4]byte, error) {
+	var chk [4]byte
 
-	n, err := io.ReadFull(r.rd, c[:])
+	n, err := io.ReadFull(c.rd, chk[:])
 	if err != nil {
-		return c, err
+		return chk, err
 	}
-	r.count += n
-	if n != 4 {
-		return c, errors.Str("missing checksum")
-	}
-	return c, nil
+	c.count += n
+	return chk, nil
 }
 
 // unmarshal unpacks a marshaled LogEntry from a Reader and stores it in the
