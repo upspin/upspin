@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "cae633af_42ca9de8",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 503,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-27T03:18:59Z",
+      "side": 1,
+      "message": "The double job here is intentional and planned -- it\u0027s for the sake of performance and avoiding doing work we don\u0027t need. bufio does more than we need and it makes internal data movements. It also lets us undo reads by keeping track of the last byte, etc, which we also don\u0027t need.",
+      "parentUuid": "b4957e72_19ae434f",
+      "revId": "61d328fd89d42df58fd7446ca0c3a4f2908f4855",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "14731d91_1277ea12",
         "filename": "dir/server/tree/log.go",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2017-03-27T02:26:41Z",
       "side": 1,
       "message": "why do you care whether the buffer was from the pool when putting it back?",
+      "revId": "61d328fd89d42df58fd7446ca0c3a4f2908f4855",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "15acfc9e_3011fa3e",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 674,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-27T03:18:59Z",
+      "side": 1,
+      "message": "Originally it was to avoid problems with buffers of different sizes. Originally, supporting different sizes was a feature, then it became just for testing. \n\nCurrently it\u0027s because there was nothing in the sync.Pool documentation that led me to believe I could Put an object I did not Get from it. I assumed Put was to say \"I\u0027m done, return it to the pool\". I see now it also does not say I can\u0027t Put stuff in there that didn\u0027t come from Pool.New.\n\nGood, so if I can Put stuff I did not Get, then I can test here whether the buffer size is the default size.",
+      "parentUuid": "14731d91_1277ea12",
       "revId": "61d328fd89d42df58fd7446ca0c3a4f2908f4855",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
