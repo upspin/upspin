@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bb7a503e_5a208274",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-27T02:26:41Z",
+      "side": 0,
+      "message": "here you could pull a bufio.Reader out of a pool and call its Reset method,\nand then put it back in the pool at the end of this method\n(see my other comment for context)",
+      "revId": "5a25e5b0ff184d901d193840b7c8cc90e83739ec",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}

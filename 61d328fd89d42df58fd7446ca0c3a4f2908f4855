@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b4957e72_19ae434f",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 503,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-27T02:26:41Z",
+      "side": 1,
+      "message": "I don\u0027t understand why this type is now a buffer as well.\nIf bufio.Reader wasn\u0027t working for you, why not replace it with your own simpler implementation, rather than making checker do two things?\nIt\u0027s weird that the two features, checksumming and buffering, are put together here, since they have nothing to do with each other.\n\nIf you want to avoid allocations, the bufio.Reader type has a Reset method that can be used to re-use the bufio.Reader on a new io.Reader.\nThe net/http package, for instance, uses sync.Pool to recycle *bufio.Readers between connections, exactly as you want to do here.\n\nIt seems wrong that we should be implementing our own buffered reader when there is a widely-used and well-tested version in the standard library.",
+      "revId": "61d328fd89d42df58fd7446ca0c3a4f2908f4855",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "14731d91_1277ea12",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 674,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-27T02:26:41Z",
+      "side": 1,
+      "message": "why do you care whether the buffer was from the pool when putting it back?",
+      "revId": "61d328fd89d42df58fd7446ca0c3a4f2908f4855",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
