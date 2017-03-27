@@ -77,10 +77,12 @@ func TestConcurrent(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer logRW.Close()
 	logRO, err := logRW.Clone()
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer logRO.Close()
 	var done sync.WaitGroup
 	start := make(chan struct{})
 	aborting := int32(0) // if positive, indicates a fatal and all must quit.

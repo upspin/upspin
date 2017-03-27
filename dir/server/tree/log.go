@@ -41,8 +41,9 @@ type LogEntry struct {
 type Log struct {
 	user upspin.UserName // user for whom this log is intended.
 
-	mu   *sync.Mutex // protects the file, making reads/write atomic.
-	file *os.File    // file descriptor for the log.
+	mu      *sync.Mutex // protects the file, making reads/write atomic.
+	file    *os.File    // file descriptor for the log.
+	checker *checker
 }
 
 // LogIndex reads and writes from/to stable storage the log state information
@@ -73,9 +74,10 @@ func NewLogs(user upspin.UserName, directory string) (*Log, *LogIndex, error) {
 		return nil, nil, errors.E(op, errors.IO, err)
 	}
 	l := &Log{
-		user: user,
-		mu:   &sync.Mutex{},
-		file: loggerFile,
+		user:    user,
+		mu:      &sync.Mutex{},
+		file:    loggerFile,
+		checker: newChecker(loggerFile),
 	}
 
 	rloc := rootFile(user, directory)
@@ -215,20 +217,20 @@ func (l *Log) ReadAt(n int, offset int64) (dst []LogEntry, next int64, err error
 		return nil, 0, errors.E(op, errors.IO, err)
 	}
 	next = offset
-	cbr := newChecker(bufio.NewReader(l.file))
+	l.checker.reset(l.file)
 	for i := 0; i < n; i++ {
 		if next == fileOffset {
 			// End of file.
 			return dst, fileOffset, nil
 		}
 		var le LogEntry
-		err := le.unmarshal(cbr)
+		err := le.unmarshal(l.checker)
 		if err != nil {
 			return dst, next, err
 		}
 		dst = append(dst, le)
-		next = next + int64(cbr.count)
-		cbr.reset()
+		next = next + int64(l.checker.count)
+		l.checker.resetChecksum()
 	}
 	return
 }
@@ -275,6 +277,7 @@ func (l *Log) Clone() (*Log, error) {
 	}
 	newLog := *l
 	newLog.file = f
+	newLog.checker = newChecker(f)
 	return &newLog, nil
 }
 
@@ -283,6 +286,7 @@ func (l *Log) Close() error {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 
+	l.checker.close()
 	if l.file != nil {
 		err := l.file.Close()
 		l.file = nil
@@ -494,53 +498,75 @@ type checker struct {
 	chksum [4]byte
 }
 
-func newChecker(r *bufio.Reader) *checker {
-	return &checker{rd: r, chksum: checksumSalt}
+var pool sync.Pool
+
+func newChecker(r io.Reader) *checker {
+	var rd *bufio.Reader
+	if brd, ok := pool.Get().(*bufio.Reader); brd != nil && ok {
+		rd = brd
+		rd.Reset(r)
+	} else {
+		rd = bufio.NewReader(r)
+	}
+	return &checker{rd: rd, chksum: checksumSalt}
 }
 
 // ReadByte implements io.ByteReader.
-func (r *checker) ReadByte() (byte, error) {
-	b, err := r.rd.ReadByte()
+func (c *checker) ReadByte() (byte, error) {
+	b, err := c.rd.ReadByte()
 	if err == nil {
-		r.chksum[r.count%4] = r.chksum[r.count%4] ^ b
-		r.count++
+		c.chksum[c.count%4] = c.chksum[c.count%4] ^ b
+		c.count++
 	}
 	return b, err
 }
 
-// reset resets the checksum and the counting of bytes, without affecting the
-// reader state.
-func (r *checker) reset() {
-	r.count = 0
-	r.chksum = checksumSalt
+// resetChecksum resets the checksum and the counting of bytes, without
+// affecting the reader state.
+func (c *checker) resetChecksum() {
+	c.count = 0
+	c.chksum = checksumSalt
+}
+
+// reset clears all internal state: clears count, checksum and any buffering.
+func (c *checker) reset(rd io.Reader) {
+	c.rd.Reset(rd)
+	c.resetChecksum()
+}
+
+// close closes the checker and releases internal storage. Future uses of it are
+// invalid.
+func (c *checker) close() {
+	c.rd.Reset(nil)
+	pool.Put(c.rd)
 }
 
 // Read implements io.Reader.
-func (r *checker) Read(p []byte) (n int, err error) {
-	n, err = r.rd.Read(p)
+func (c *checker) Read(p []byte) (n int, err error) {
+	n, err = c.rd.Read(p)
 	if err != nil {
 		return
 	}
 	for i := 0; i < n; i++ {
-		offs := r.count + i
-		r.chksum[offs%4] = r.chksum[offs%4] ^ p[i]
+		offs := c.count + i
+		c.chksum[offs%4] = c.chksum[offs%4] ^ p[i]
 	}
-	r.count += n
+	c.count += n
 	return
 }
 
-func (r *checker) readChecksum() ([4]byte, error) {
-	var c [4]byte
+func (c *checker) readChecksum() ([4]byte, error) {
+	var chk [4]byte
 
-	n, err := io.ReadFull(r.rd, c[:])
+	n, err := io.ReadFull(c.rd, chk[:])
 	if err != nil {
-		return c, err
+		return chk, err
 	}
-	r.count += n
+	c.count += n
 	if n != 4 {
-		return c, errors.Str("missing checksum")
+		return chk, errors.Str("missing checksum")
 	}
-	return c, nil
+	return chk, nil
 }
 
 // unmarshal unpacks a marshaled LogEntry from a Reader and stores it in the
