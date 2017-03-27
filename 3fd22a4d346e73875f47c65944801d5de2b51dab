@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "56045228_e7551d57",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-27T17:19:54Z",
+      "side": 1,
+      "message": "s/removes/remove/",
+      "revId": "3fd22a4d346e73875f47c65944801d5de2b51dab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fa42aa41_d584fd72",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 515,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-27T17:19:54Z",
+      "side": 1,
+      "message": "this is a very strange checksum",
+      "revId": "3fd22a4d346e73875f47c65944801d5de2b51dab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "19600c11_738307aa",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 549,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-27T17:19:54Z",
+      "side": 1,
+      "message": "if you\u0027re going to calculate offs and store it in a variable, why not include the modulo?",
+      "revId": "3fd22a4d346e73875f47c65944801d5de2b51dab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6c9ecd36_b2052934",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 563,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-27T17:19:54Z",
+      "side": 1,
+      "message": "This check can never fail according to the guarantees of ReadFull. I\u0027d drop ti.",
+      "revId": "3fd22a4d346e73875f47c65944801d5de2b51dab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
