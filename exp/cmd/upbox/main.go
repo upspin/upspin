@@ -165,7 +165,7 @@ func (cfg *Config) Run() error {
 		return err
 	}
 	for _, u := range cfg.Users {
-		fmt.Printf("Generating keys for user %q\n", u.Name)
+		fmt.Fprintf(os.Stderr, "upbox: generating keys for user %q\n", u.Name)
 		dir := userDir(u.Name)
 		if err := os.MkdirAll(dir, 0700); err != nil {
 			return err
@@ -295,11 +295,13 @@ func (cfg *Config) Run() error {
 	if err != nil {
 		return err
 	}
-	shell := exec.Command("upspin",
-		"-config="+configFile,
-		"-log="+*logLevel,
+	args = []string{
+		"-config=" + configFile,
+		"-log=" + *logLevel,
 		"shell",
-	)
+	}
+	fmt.Fprintf(os.Stderr, "upbox: upspin %s\n", strings.Join(args, " "))
+	shell := exec.Command("upspin", args...)
 	shell.Stdin = os.Stdin
 	shell.Stdout = os.Stdout
 	shell.Stderr = os.Stderr
