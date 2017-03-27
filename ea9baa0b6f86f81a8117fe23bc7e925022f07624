@@ -16,6 +16,24 @@
       "revId": "ea9baa0b6f86f81a8117fe23bc7e925022f07624",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b9c78bc3_a0f45b0c",
+        "filename": "cmd/upspin/watch.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-27T23:39:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b00439c9_9980e7a1",
+      "revId": "ea9baa0b6f86f81a8117fe23bc7e925022f07624",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
