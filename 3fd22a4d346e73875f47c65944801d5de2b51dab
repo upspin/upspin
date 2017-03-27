@@ -90,6 +90,24 @@
     },
     {
       "key": {
+        "uuid": "10341ead_9e97f3de",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 515,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-27T17:40:10Z",
+      "side": 1,
+      "message": "It is a little weak, but not as expensive as SHA256 for example. I had a benchmark comparing the two until recently. \n\nI have not tested CRC-32 though.",
+      "parentUuid": "6e1f7cae_f6da1965",
+      "revId": "3fd22a4d346e73875f47c65944801d5de2b51dab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "19600c11_738307aa",
         "filename": "dir/server/tree/log.go",
         "patchSetId": 4
@@ -140,6 +158,24 @@
       "revId": "3fd22a4d346e73875f47c65944801d5de2b51dab",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0cf6cb9e_761004ce",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 549,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-27T17:40:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e43e7dc4_ca305983",
+      "revId": "3fd22a4d346e73875f47c65944801d5de2b51dab",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
