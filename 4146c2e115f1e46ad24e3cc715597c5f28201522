@@ -16,6 +16,24 @@
       "revId": "4146c2e115f1e46ad24e3cc715597c5f28201522",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9f8b6a7d_ae50ef43",
+        "filename": "cmd/upspin/watch.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-27T23:58:27Z",
+      "side": 1,
+      "message": "I don\u0027t think there\u0027s any way to know when it\u0027s \"done\"?",
+      "parentUuid": "ab156baa_7bdc81a4",
+      "revId": "4146c2e115f1e46ad24e3cc715597c5f28201522",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
