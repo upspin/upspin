@@ -31,59 +31,67 @@ const (
 	defaultServerKind = "inprocess"
 )
 
+// The Parse and Register functions bind these variables to their respective
+// command-line flags.
 var (
-	// BlockSize is the block size used when writing large files. The default is 1MB.
+	// BlockSize ("blocksize") is the block size used when writing large files.
+	// The default is 1MB.
 	BlockSize = defaultBlockSize
 
-	// CacheDir specifies the directory for the various file caches.
+	// CacheDir ("cachedir") specifies the directory for the various file
+	// caches.
 	defaultCacheDir = filepath.Join(config.Home(), "upspin")
 	CacheDir        = defaultCacheDir
 
-	// Config names the Upspin configuration file to use.
+	// Config ("config") names the Upspin configuration file to use.
 	defaultConfig = filepath.Join(config.Home(), "upspin", "config")
 	Config        = defaultConfig
 
-	// HTTPAddr is the network address on which to listen for incoming
-	// insecure network connections.
+	// HTTPAddr ("http") is the network address on which to listen for
+	// incoming insecure network connections.
 	HTTPAddr = defaultHTTPAddr
 
-	// HTTPSAddr is the network address on which to listen for incoming
-	// secure network connections.
+	// HTTPSAddr ("https") is the network address on which to listen for
+	// incoming secure network connections.
 	HTTPSAddr = defaultHTTPSAddr
 
-	// LetsEncryptCache is the location of a file in which the Let's
-	// Encrypt certificates are stored. The containing directory should
-	// be owner-accessible only (chmod 0700).
+	// LetsEncryptCache ("letscache") is the location of a file in which
+	// the Let's Encrypt certificates are stored. The containing directory
+	// should be owner-accessible only (chmod 0700).
 	LetsEncryptCache = ""
 
-	// Log sets the level of logging (implements flag.Value).
+	// Log ("log") sets the level of logging (implements flag.Value).
 	Log logFlag
 
-	// NetAddr is the publicly accessible network address of this server.
+	// NetAddr ("addr") is the publicly accessible network address of this
+	// server.
 	NetAddr = ""
 
-	// Project is the project name on GCP; used by servers, upspin-deploy,
-	// and cmd/upspin setupdomain.
+	// Project ("project") is the project name on GCP; used by servers,
+	// upspin-deploy, and cmd/upspin setupdomain.
 	Project = ""
 
-	// ServerConfig specifies configuration options ("key=value") for servers.
+	// ServerConfig ("serverconfig") specifies configuration options for
+	// servers in "key=value" pairs.
 	ServerConfig []string
 
-	// ServerKind is the implementation kind of this server.
+	// ServerKind ("kind") is the implementation kind of this server.
 	ServerKind = defaultServerKind
 
-	// StoreServerName is the Upspin user name of the StoreServer.
+	// StoreServerName ("storeserveruser") is the Upspin user name of the
+	// StoreServer.
 	StoreServerUser = ""
 
-	// Prudent sets an extra security mode in the client to check for malicious or
-	// buggy servers, at possible cost in performance or convenience.
-	// Specifically, one check is that the writer listed in a directory entry is
-	// either the owner or a user currently with write permission. This protects
-	// against a forged directory entry at the cost of potentially blocking
-	// a legitimate file written by a user who no longer has write permission.
+	// Prudent ("prudent") sets an extra security mode in the client to
+	// check for malicious or buggy servers, at possible cost in
+	// performance or convenience. Specifically, one check is that the
+	// writer listed in a directory entry is either the owner or a user
+	// currently with write permission. This protects against a forged
+	// directory entry at the cost of potentially blocking a legitimate
+	// file written by a user who no longer has write permission.
 	Prudent = false
 
-	// TLSCertFile and TLSKeyFile specify the location of a TLS
+	// TLSCertFile and TLSKeyFile ("tls") specify the location of a TLS
 	// certificate/key pair used for serving TLS (HTTPS).
 	TLSCertFile = ""
 	TLSKeyFile  = ""
