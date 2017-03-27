@@ -73,6 +73,13 @@ func (p *proxiedDirs) proxyFor(name upspin.PathName, ep *upspin.Endpoint) {
 	}
 	u := parsed.User()
 	d := p.m[u]
+
+	// If the endpoint changed, kill off the current watcher.
+	if d != nil && *d.ep != *ep {
+		d.close()
+		d = nil
+	}
+
 	if d == nil {
 		d = &proxiedDir{l: p.l, ep: ep, user: u}
 		p.m[u] = d
@@ -85,13 +92,7 @@ func (p *proxiedDirs) proxyFor(name upspin.PathName, ep *upspin.Endpoint) {
 	// watching.
 	d.atime = time.Now()
 
-	// If the endpoint changed, kill off the current watcher.
-	if d.ep != nil && *d.ep != *ep {
-		d.close()
-	}
-
 	// Start a watcher if none is running.
-	d.ep = ep
 	if d.die == nil {
 		d.die = make(chan bool)
 		d.dying = make(chan bool)

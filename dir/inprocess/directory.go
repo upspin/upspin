@@ -439,6 +439,8 @@ func (s *server) Watch(name upspin.PathName, order int64, done <-chan struct{}) 
 		return nil, errors.E(op, err)
 	}
 	// The root must exist.
+	s.db.mu.RLock()
+	defer s.db.mu.RUnlock()
 	if s.db.root[parsed.User()] == nil {
 		return nil, errors.E(op, name, errors.NotExist)
 	}
