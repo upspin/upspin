@@ -16,6 +16,24 @@
       "revId": "a7191d991cb06288b94388a065f103442c648ad5",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "81202aac_c1c4f149",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 503,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-27T04:30:46Z",
+      "side": 1,
+      "message": "Yes, but because of cloning (one for each call to Watch) there could be lots of (potentially) short-lived Logs that need their own bufio. \n\nMaybe newChecker should be obtainable from the pool as well?",
+      "parentUuid": "658beaf8_9cc47e50",
+      "revId": "a7191d991cb06288b94388a065f103442c648ad5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
