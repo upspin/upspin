@@ -34,6 +34,24 @@
       "revId": "a7191d991cb06288b94388a065f103442c648ad5",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fa335ad0_47c3661b",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 503,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-27T05:26:39Z",
+      "side": 1,
+      "message": "what i was proposing initially is that you put the bufio.reader outside the checker enitrely, so that in ReadAt you do\n\nbr :\u003d pool.Get().(*bufio.Reader)\nbr.Reset(rd)\nchk :\u003d newChecker(br)\n// do the stuff reading from chk\npool.Put(br)\n\nthen you don\u0027t need to carry around the checker in the Log struct (it\u0027s a tiny struct that will likely be stack allocated anyway), and you\u0027ll be reusing buffers where possible",
+      "parentUuid": "81202aac_c1c4f149",
+      "revId": "a7191d991cb06288b94388a065f103442c648ad5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
