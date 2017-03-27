@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "658beaf8_9cc47e50",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 503,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-27T04:21:54Z",
+      "side": 1,
+      "message": "you might well just allocate the bufio.Reader here and remove the pool entirely, since the checker is owned by the Log and each Log can just have one bufio.Reader",
+      "revId": "a7191d991cb06288b94388a065f103442c648ad5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
