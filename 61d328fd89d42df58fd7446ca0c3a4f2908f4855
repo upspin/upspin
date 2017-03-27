@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "8f317187_e23ea83e",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 503,
+      "author": {
+        "id": 5660
+      },
+      "writtenOn": "2017-03-27T05:11:33Z",
+      "side": 1,
+      "message": "I am also not a fan of the responsibilities of checker. The main responsibility of checker should be checking. But from external view (when it interacts with other components), we treat it as reader. I feel it is confusing when I read the code yesterday.\n\nIt seems to me that we can have our own entry reader that embeds a checker. Check might access the buffer in the entry reader for efficiency reason. From external point of view, entry reader always return a checked entry.",
+      "parentUuid": "d30f5c78_dd2b8bf8",
+      "revId": "61d328fd89d42df58fd7446ca0c3a4f2908f4855",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "14731d91_1277ea12",
         "filename": "dir/server/tree/log.go",
         "patchSetId": 3
