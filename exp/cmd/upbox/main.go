@@ -295,11 +295,13 @@ func (cfg *Config) Run() error {
 	if err != nil {
 		return err
 	}
-	shell := exec.Command("upspin",
-		"-config="+configFile,
-		"-log="+*logLevel,
+	args = []string{
+		"-config=" + configFile,
+		"-log=" + *logLevel,
 		"shell",
-	)
+	}
+	fmt.Printf("upbox: upspin %s\n", strings.Join(args, " "))
+	shell := exec.Command("upspin", args...)
 	shell.Stdin = os.Stdin
 	shell.Stdout = os.Stdout
 	shell.Stderr = os.Stderr
