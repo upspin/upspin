@@ -11,6 +11,7 @@ import (
 	"html/template"
 	"net/http"
 	"strings"
+	"time"
 
 	"upspin.io/access"
 	"upspin.io/client"
@@ -114,12 +115,13 @@ func (s *web) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	case !entry.IsDir() && readable:
-		data, err := s.cli.Get(name)
+		f, err := s.cli.Open(entry.Name)
 		if err != nil {
 			httpError(w, err)
 			return
 		}
-		w.Write(data)
+		defer f.Close()
+		http.ServeContent(w, r, string(entry.Name), time.Unix(int64(entry.Time), 0), f)
 	default:
 		code := http.StatusForbidden
 		http.Error(w, http.StatusText(code), code)
