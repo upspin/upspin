@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8a6c7266_01ca5f16",
+        "filename": "serverutil/upspinserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 323,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-28T04:27:14Z",
+      "side": 1,
+      "message": "s/R/r/ and include the full path name of the file if you can. as written this could be utterly baffling.",
+      "revId": "c3babc8d73ce4a6be227227c5b1d11b6fc4fe13d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0fa771d5_937bd5d6",
+        "filename": "serverutil/upspinserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-28T04:27:14Z",
+      "side": 1,
+      "message": "ditto\nalso this shouldn\u0027t be the same error text as above.",
+      "revId": "c3babc8d73ce4a6be227227c5b1d11b6fc4fe13d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
