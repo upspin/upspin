@@ -247,6 +247,45 @@ func TestAppendRead(t *testing.T) {
 	}
 }
 
+func TestReadRotatedLog(t *testing.T) {
+	dir, err := ioutil.TempDir("", "TestReadRotatedLog")
+	if err != nil {
+		t.Fatal(err)
+	}
+	//defer os.RemoveAll(dir)
+
+	// Simulate a rotated log exists. NewLog will open the rotated one and
+	// read from it.
+
+	err = os.Mkdir(logSubDir(user, dir), 0700)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Create the rotated file.
+	f, err := os.Create(logFile(user, 345678, dir))
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+
+	// Open Logs for user.
+	l, _, err := NewLogs(user, dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = l.Append(&entry)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Verify we appended to the right place.
+	if fi, err := f.Stat(); err == nil && fi.Size() < 30 {
+		t.Fatalf("Append did not write to the rotated file; read %d bytes", fi.Size())
+	} else if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestLogIndex(t *testing.T) {
 	dir, err := ioutil.TempDir("", "TestAppendRead")
 	if err != nil {
