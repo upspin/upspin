@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"math/rand"
 	"os"
+	"path/filepath"
 	"reflect"
 	"sort"
 	"sync"
@@ -67,11 +68,8 @@ func TestConcurrent(t *testing.T) {
 		// env TMPDIR=/dev/shm/test go test -run=Concurrent
 		t.Skip("Concurrent test takes too long")
 	}
-	dir, err := ioutil.TempDir("", "TestConcurrent")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
+	dir, cleanup := setup(t, "Concurrent")
+	defer cleanup()
 
 	logRW, _, err := NewLogs(user, dir)
 	if err != nil {
@@ -130,7 +128,7 @@ func TestConcurrent(t *testing.T) {
 	}
 	read := func() {
 		defer done.Done()
-		logRO, err := logRW.Clone()
+		logRO, err := logRW.NewReader()
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -167,11 +165,8 @@ func TestConcurrent(t *testing.T) {
 
 func TestAppendRead(t *testing.T) {
 	const minEntrySize = 30 // Just a hint so we can assert offsets.
-	dir, err := ioutil.TempDir("", "TestAppendRead")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
+	dir, cleanup := setup(t, "AppendRead")
+	defer cleanup()
 
 	logger, _, err := NewLogs(user, dir)
 	if err != nil {
@@ -193,10 +188,14 @@ func TestAppendRead(t *testing.T) {
 		t.Errorf("LastOffset = %d, want > %d", got, wantAtLeast)
 	}
 	// Read LogEntries back.
+	lrd, err := logger.NewReader()
+	if err != nil {
+		t.Fatal(err)
+	}
 	var entries []LogEntry
 	offset := int64(0)
 	for i := 0; i < 11; i++ { // Tries to go past EOF.
-		entry, next, err := logger.ReadAt(offset)
+		entry, next, err := lrd.ReadAt(offset)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -220,23 +219,104 @@ func TestAppendRead(t *testing.T) {
 	if got, want := string(entries[9].Entry.Name), "foo@bar.com/hello9"; got != want {
 		t.Errorf("entries[9].Entry.Name = %q, want = %q", got, want)
 	}
+}
 
-	// Clone the log and ensure it's read-only.
-	clone, err := logger.Clone()
+func TestOldStyleLogs(t *testing.T) {
+	dir, cleanup := setup(t, "OldStyleLogs")
+	defer cleanup()
+
+	err := os.Mkdir(logSubDir(user, dir), 0700)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := clone.LastOffset(), logger.LastOffset(); got != want {
-		t.Errorf("LastOffset = %d, want = %d", got, want)
-	}
-	entry, offset, err = clone.ReadAt(0)
+	// Create an existing old-style log.
+	f, err := os.Create(filepath.Join(dir, oldStyleLogFilePrefix+string(user)))
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = clone.Append(newLogEntry(upspin.PathName("foo@bar.com/yabbadabadoo"), 17))
-	expectedErr := errors.E(errors.IO)
-	if !errors.Match(expectedErr, err) {
-		t.Errorf("err = %v, want = %v", err, expectedErr)
+	f.Close()
+
+	// Makes a hard link to the existing old style.
+	l, _, err := NewLogs(user, dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	l.Close()
+
+	// Open it again. No errors.
+	l, _, err = NewLogs(user, dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	l.Close()
+}
+
+func TestReadRotatedLog(t *testing.T) {
+	dir, cleanup := setup(t, "ReadRotatedLog")
+	defer cleanup()
+
+	// Simulate a rotated log exists. NewLog will open the rotated one and
+	// read from it.
+
+	err := os.Mkdir(logSubDir(user, dir), 0700)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a few rotated logs.
+	f, err := os.Create(logFile(user, 345678, dir))
+	if err != nil {
+		t.Fatal(err)
+	}
+	f.Close()
+	f, err = os.Create(logFile(user, 555111, dir))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Open Logs for user.
+	l, _, err := NewLogs(user, dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = l.Append(&entry)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Verify we appended some bytes to the right place. The exact size is
+	// not important, but something greater than zero.
+	if fi, err := f.Stat(); err == nil && fi.Size() < 30 {
+		t.Fatalf("Append did not write to the rotated file; read %d bytes", fi.Size())
+	} else if err != nil {
+		t.Fatal(err)
+	}
+	l.Close()
+	f.Close()
+
+	// Create one more rotated log so we can test reading from the middle.
+	f, err = os.Create(logFile(user, 777222, dir))
+	if err != nil {
+		t.Fatal(err)
+	}
+	f.Close()
+
+	// Open Logs again and get a reader reading from 345678.
+	l, _, err = NewLogs(user, dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rd, err := l.NewReader()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	le, _, err := rd.ReadAt(555111)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(&le, &entry) {
+		t.Fatalf("Expected\n%+v\nGot:\n%+v", entry, le)
 	}
 }
 
@@ -319,11 +399,8 @@ func TestLogIndex(t *testing.T) {
 }
 
 func TestListUsers(t *testing.T) {
-	dir, err := ioutil.TempDir("", "TestListUsers")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(dir)
+	dir, cleanup := setup(t, "ListUsers")
+	defer cleanup()
 
 	// Create a few test users.
 	for _, u := range []upspin.UserName{
@@ -421,6 +498,16 @@ func sameUsers(t *testing.T, got, want []upspin.UserName) bool {
 		}
 	}
 	return true
+}
+
+// setup creates a testing directory and returns its name and a cleanup
+// function.
+func setup(t *testing.T, testName string) (string, func()) {
+	dir, err := ioutil.TempDir("", testName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return dir, func() { os.RemoveAll(dir) }
 }
 
 // For sorting a slice of upspin.UserName.
