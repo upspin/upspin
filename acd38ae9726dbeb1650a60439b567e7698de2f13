@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "66070512_fbe7e62c",
+        "filename": "upspin/marshal_bench_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-28T16:10:43Z",
+      "side": 1,
+      "message": "// linkDirEnt has a link and no blocks.",
+      "revId": "acd38ae9726dbeb1650a60439b567e7698de2f13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f949daca_abe3e9dd",
+        "filename": "upspin/marshal_bench_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-28T16:10:43Z",
+      "side": 1,
+      "message": "...blocks.",
+      "revId": "acd38ae9726dbeb1650a60439b567e7698de2f13",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
