@@ -16,6 +16,24 @@
       "revId": "3845fadd003d85da4651a0f43fe718b2b3d29c96",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4ad3d9ad_8c3535d0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5660
+      },
+      "writtenOn": "2017-03-28T03:23:22Z",
+      "side": 1,
+      "message": "Good catch. Do you have a script to check/generate the commit prefix?",
+      "parentUuid": "861618da_b5107e51",
+      "revId": "3845fadd003d85da4651a0f43fe718b2b3d29c96",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
