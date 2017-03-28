@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "77dee0de_5beb6d88",
+        "filename": "exp/cmd/dingus/dingus.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-28T20:51:06Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "4152e0e7_20422141",
+      "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6d9381d4_2d82d945",
         "filename": "exp/cmd/dingus/dingus.go",
         "patchSetId": 1
@@ -53,6 +71,24 @@
     },
     {
       "key": {
+        "uuid": "f35fda26_afaa532a",
+        "filename": "exp/cmd/dingus/dingus.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-28T20:51:06Z",
+      "side": 1,
+      "message": "every time someone requests an Access file, it will allocate a new byte slice.\nI\u0027d rather not declare another constant and add two more []byte conversions.\nleaving as is",
+      "parentUuid": "6d9381d4_2d82d945",
+      "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "92d63afe_898b7e84",
         "filename": "exp/cmd/dingus/dingus.go",
         "patchSetId": 1
@@ -67,6 +103,24 @@
       "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "20f40b90_6285d84e",
+        "filename": "exp/cmd/dingus/dingus.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-28T20:51:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "92d63afe_898b7e84",
+      "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -121,6 +175,24 @@
     },
     {
       "key": {
+        "uuid": "cbfb789f_75ace4db",
+        "filename": "exp/cmd/dingus/dingus.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-28T20:51:06Z",
+      "side": 1,
+      "message": "and then i\u0027d be copying lots of byte slices with identical data around.",
+      "parentUuid": "4f272f68_d3162aa6",
+      "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "7334c809_90d6482b",
         "filename": "exp/cmd/dingus/dingus.go",
         "patchSetId": 1
@@ -135,6 +207,24 @@
       "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "abcafeec_b00e5223",
+        "filename": "exp/cmd/dingus/dingus.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-28T20:51:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7334c809_90d6482b",
+      "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -155,6 +245,24 @@
     },
     {
       "key": {
+        "uuid": "63d7edc0_d0891729",
+        "filename": "exp/cmd/dingus/dingus.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-28T20:51:06Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "dffc7d4d_50b6dddf",
+      "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bc097198_4a8e31d8",
         "filename": "exp/cmd/dingus/dingus.go",
         "patchSetId": 1
@@ -169,6 +277,24 @@
       "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "93ee9032_fd796894",
+        "filename": "exp/cmd/dingus/dingus.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 339,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-28T20:51:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bc097198_4a8e31d8",
+      "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -189,6 +315,24 @@
     },
     {
       "key": {
+        "uuid": "992fd738_fe641239",
+        "filename": "exp/cmd/dingus/dingus.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 381,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-28T20:51:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c71455a1_3d3ccbe0",
+      "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3345873a_393f21f2",
         "filename": "exp/cmd/dingus/dingus.go",
         "patchSetId": 1
@@ -206,6 +350,24 @@
     },
     {
       "key": {
+        "uuid": "669dde35_97ca8250",
+        "filename": "exp/cmd/dingus/dingus.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 390,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-28T20:51:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3345873a_393f21f2",
+      "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f265fcdb_fa837364",
         "filename": "exp/cmd/dingus/dingus.go",
         "patchSetId": 1
@@ -220,6 +382,24 @@
       "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "41e462ed_b2e704c3",
+        "filename": "exp/cmd/dingus/dingus.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 409,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-28T20:51:06Z",
+      "side": 1,
+      "message": "I wanted to use crypto/rand, not math/rand\nbut it doesn\u0027t matter i guess\ndone",
+      "parentUuid": "f265fcdb_fa837364",
+      "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
