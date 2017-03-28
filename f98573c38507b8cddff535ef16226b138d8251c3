@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "bf8e4e31_b7f9cc57",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-28T16:24:34Z",
+      "side": 1,
+      "message": "My only comment is that, while fun, I think we do a disservice to newcomers to our source code who are exploring this subtree by giving it an obscure name.\n\nI\u0027d recommend something more helpful, maybe something like \"dynamicserver\" or \"contextualserver\"",
+      "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "4152e0e7_20422141",
         "filename": "exp/cmd/dingus/dingus.go",
         "patchSetId": 1
