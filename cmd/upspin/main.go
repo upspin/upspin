@@ -184,9 +184,8 @@ func (s *State) getCommand(op string) func(*State, ...string) {
 			s.runCommand(path, append(flags.Args(), args...)...)
 		}
 	}
-	fmt.Fprintf(os.Stderr, "upspin: no such command %q\n", op)
 	printCommands()
-	os.Exit(2)
+	s.Exitf("no such command %q", op)
 	return nil
 }
 
