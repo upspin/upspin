@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "e5041ad9_768bdbf2",
+        "filename": "rpc/doc.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-28T22:09:02Z",
+      "side": 1,
+      "message": "Missing the auth tokens in the http headers.   But Quan wants us to consider replacing all that by OAuth2 anyway.\n\nI\u0027m still of the opinion that it is worth documenting enough of the history to give the reader a basis for assessing how much effort they want to put into attempting implementing the wire protocol from scratch.",
+      "revId": "db64a83ab35325b0dd2541e42e716b09054876a2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "9d9bccb3_606ce971",
         "filename": "rpc/doc.go",
         "patchSetId": 2
