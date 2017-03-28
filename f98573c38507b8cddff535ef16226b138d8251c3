@@ -1,0 +1,208 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4152e0e7_20422141",
+        "filename": "exp/cmd/dingus/dingus.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-28T16:11:53Z",
+      "side": 1,
+      "message": "this could use a helper one day",
+      "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6d9381d4_2d82d945",
+        "filename": "exp/cmd/dingus/dingus.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-28T16:11:53Z",
+      "side": 1,
+      "message": "make this a string constant and put the []byte at the call site. it won\u0027t allocate.",
+      "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "92d63afe_898b7e84",
+        "filename": "exp/cmd/dingus/dingus.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-28T16:11:53Z",
+      "side": 1,
+      "message": "constant",
+      "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ef244616_de3f7245",
+        "filename": "exp/cmd/dingus/dingus.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-28T16:11:53Z",
+      "side": 1,
+      "message": "constant",
+      "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f016aaa7_fe758811",
+        "filename": "exp/cmd/dingus/dingus.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-28T16:11:53Z",
+      "side": 1,
+      "message": "we need a version of path.join that builds a path starting with a UserName",
+      "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4f272f68_d3162aa6",
+        "filename": "exp/cmd/dingus/dingus.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-28T16:11:53Z",
+      "side": 1,
+      "message": "but if you did, you wouldn\u0027t need the comment and the code would be shorter and more general",
+      "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7334c809_90d6482b",
+        "filename": "exp/cmd/dingus/dingus.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-28T16:11:53Z",
+      "side": 1,
+      "message": "n is just len(s.ClosedBox). you don\u0027t need the variable outside the loop. be more idiomatic",
+      "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dffc7d4d_50b6dddf",
+        "filename": "exp/cmd/dingus/dingus.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-28T16:11:53Z",
+      "side": 1,
+      "message": "ok, we need a helper here. but for another day",
+      "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bc097198_4a8e31d8",
+        "filename": "exp/cmd/dingus/dingus.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 339,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-28T16:11:53Z",
+      "side": 1,
+      "message": "This method",
+      "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c71455a1_3d3ccbe0",
+        "filename": "exp/cmd/dingus/dingus.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 381,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-28T16:11:53Z",
+      "side": 1,
+      "message": "why is this a variable?",
+      "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3345873a_393f21f2",
+        "filename": "exp/cmd/dingus/dingus.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 390,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-28T16:11:53Z",
+      "side": 1,
+      "message": "this doesn\u0027t need regular expressions!",
+      "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f265fcdb_fa837364",
+        "filename": "exp/cmd/dingus/dingus.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 409,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-28T16:11:53Z",
+      "side": 1,
+      "message": "var state [][]byte \u003d {\n []byte(\"A dead cat.\\n\"),\n []byte(\"A live cat.\\n\"),\n}\n\nfunc randomState() []byte {\n   return state[rand.Intn(2)]\n}",
+      "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
