@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6fbf10ac_b1ecb055",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-28T20:30:53Z",
+      "side": 1,
+      "message": "use \"all\" for this rather than \"*\"\n\nall: ....",
+      "revId": "f30b883359e2c12e7978b0d4869a1d69f2db4130",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
