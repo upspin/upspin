@@ -420,7 +420,7 @@ func (t *Tree) loadKids(parent *node) error {
 	if err != nil {
 		return err
 	}
-	err = t.loadKidsFromBlock(parent, data)
+	err = loadKidsFromBlock(parent, data)
 	if err != nil {
 		return err
 	}

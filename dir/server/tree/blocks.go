@@ -101,7 +101,7 @@ func storeBlock(store upspin.StoreServer, bp upspin.BlockPacker, data []byte) er
 }
 
 // loadKidsFromBlock unmarshals a block of packed dirEntries into a node.
-func (t *Tree) loadKidsFromBlock(n *node, block []byte) error {
+func loadKidsFromBlock(n *node, block []byte) error {
 	if n.kids == nil {
 		n.kids = make(map[string]*node)
 	}
