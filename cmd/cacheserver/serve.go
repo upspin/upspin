@@ -5,6 +5,7 @@
 package main
 
 import (
+	"expvar"
 	"flag"
 	"net"
 	"net/http"
@@ -62,6 +63,7 @@ func serve(cfg upspin.Config, addr string) (<-chan error, error) {
 
 	mux.Handle("/api/Store/", ss)
 	mux.Handle("/api/Dir/", ds)
+	mux.Handle("/debug/vars", expvar.Handler())
 	done := make(chan error)
 	go func() {
 		done <- httpServer.Serve(ln)
