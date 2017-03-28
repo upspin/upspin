@@ -78,11 +78,6 @@ func TestConcurrent(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer logRW.Close()
-	logRO, err := logRW.Clone()
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer logRO.Close()
 	var done sync.WaitGroup
 	start := make(chan struct{})
 	aborting := int32(0) // if positive, indicates a fatal and all must quit.
@@ -135,6 +130,11 @@ func TestConcurrent(t *testing.T) {
 	}
 	read := func() {
 		defer done.Done()
+		logRO, err := logRW.Clone()
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer logRO.Close()
 		<-start
 		var offset int64
 		for i := 0; i < numEntries*numWriters; i++ {
