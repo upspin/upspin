@@ -227,6 +227,15 @@ func TestExpiration(t *testing.T) {
 	}
 }
 
+func TestEndpoint(t *testing.T) {
+	const name = "test@upspin.io"
+	_, svc := setup(t, name)
+
+	if got := svc.Endpoint(); got != keyService.Endpoint() {
+		t.Errorf("endpoint = %d, want %d", got, keyService.Endpoint())
+	}
+}
+
 // try looks up a name through the cached and uncached KeyServers and
 // compares the results.
 func try(t *testing.T, uncached, cached upspin.KeyServer, name string) {
