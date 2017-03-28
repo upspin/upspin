@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "9811e2de_af90141b",
+        "filename": "rpc/doc.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-28T23:04:59Z",
+      "side": 1,
+      "message": "I reflowed it to be tidy, and fmt chose 85 columns for some reason. redone.",
+      "parentUuid": "9d9bccb3_606ce971",
+      "revId": "db64a83ab35325b0dd2541e42e716b09054876a2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "5c0b6e4f_3b073d57",
         "filename": "rpc/doc.go",
         "patchSetId": 2
@@ -47,6 +65,24 @@
       "writtenOn": "2017-03-28T21:56:22Z",
       "side": 1,
       "message": "why did you reflow this? the sentences began on newlines before",
+      "revId": "db64a83ab35325b0dd2541e42e716b09054876a2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "721c30a4_947cc234",
+        "filename": "rpc/doc.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-28T23:04:59Z",
+      "side": 1,
+      "message": "i reflowed so it looks good in the editor.\ni only do the sentence on newline thing in html etc, where it\u0027s hard to see the structure",
+      "parentUuid": "5c0b6e4f_3b073d57",
       "revId": "db64a83ab35325b0dd2541e42e716b09054876a2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
