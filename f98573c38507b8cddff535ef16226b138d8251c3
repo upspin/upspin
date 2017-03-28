@@ -89,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "053e30a2_12b4fb2f",
+        "filename": "exp/cmd/dingus/dingus.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-28T21:23:01Z",
+      "side": 1,
+      "message": "It won\u0027t allocate.",
+      "parentUuid": "f35fda26_afaa532a",
+      "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "92d63afe_898b7e84",
         "filename": "exp/cmd/dingus/dingus.go",
         "patchSetId": 1
@@ -118,6 +136,24 @@
       "side": 1,
       "message": "Done",
       "parentUuid": "92d63afe_898b7e84",
+      "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "051944ab_c59911ba",
+        "filename": "exp/cmd/dingus/dingus.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-28T21:23:01Z",
+      "side": 1,
+      "message": "Actually this could be access.AccessFile.",
+      "parentUuid": "20f40b90_6285d84e",
       "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -187,6 +223,24 @@
       "side": 1,
       "message": "and then i\u0027d be copying lots of byte slices with identical data around.",
       "parentUuid": "4f272f68_d3162aa6",
+      "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "34e804cb_13d141a8",
+        "filename": "exp/cmd/dingus/dingus.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-28T21:23:01Z",
+      "side": 1,
+      "message": "but as it is you\u0027d be obscuring a point about how to write an Upspin server.",
+      "parentUuid": "cbfb789f_75ace4db",
       "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
