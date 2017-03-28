@@ -52,6 +52,24 @@
       "revId": "4146c2e115f1e46ad24e3cc715597c5f28201522",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "10a177c2_d3dded9c",
+        "filename": "cmd/upspin/watch.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-28T00:06:57Z",
+      "side": 1,
+      "message": "Not sure how to get the current order :-/\nIIRC it was possible with the original design but ed and dave argued to change the meaning of -1. Not sure.",
+      "parentUuid": "e983be32_25517c3f",
+      "revId": "4146c2e115f1e46ad24e3cc715597c5f28201522",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
