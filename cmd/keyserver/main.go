@@ -73,9 +73,9 @@ func main() {
 	// Create a new key implementation.
 	var key upspin.KeyServer
 	switch flags.ServerKind {
-	case "inprocess":
+	case flags.ServerKindInProcess:
 		key = inprocess.New()
-	case "server":
+	case flags.ServerKindServer:
 		key, err = server.New(flags.ServerConfig...)
 	default:
 		err = errors.Errorf("bad -kind %q", flags.ServerKind)

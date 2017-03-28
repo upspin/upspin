@@ -64,11 +64,11 @@ func main() {
 	var dir upspin.DirServer
 	err = nil
 	switch flags.ServerKind {
-	case "inprocess":
+	case flags.ServerKindInProcess:
 		dir = inprocess.New(cfg)
-	case "filesystem":
+	case flags.ServerKindFilesystem:
 		dir, err = filesystem.New(cfg, flags.ServerConfig...)
-	case "server":
+	case flags.ServerKindServer:
 		dir, err = server.New(cfg, flags.ServerConfig...)
 	default:
 		err = errors.Errorf("bad -kind %q", flags.ServerKind)

@@ -28,7 +28,11 @@ const (
 	defaultHTTPAddr   = ":80"
 	defaultHTTPSAddr  = ":443"
 	defaultLog        = "info"
-	defaultServerKind = "inprocess"
+	defaultServerKind = ServerKindInProcess
+
+	ServerKindInProcess  = "inprocess"
+	ServerKindServer     = "server"
+	ServerKindFilesystem = "filesystem"
 )
 
 var (
@@ -108,7 +112,7 @@ var flags = map[string]*flagVar{
 	"config":    strVar(&Config, "config", Config, "user's configuration `file`"),
 	"http":      strVar(&HTTPAddr, "http", HTTPAddr, "`address` for incoming insecure network connections"),
 	"https":     strVar(&HTTPSAddr, "https", HTTPSAddr, "`address` for incoming secure network connections"),
-	"kind":      strVar(&ServerKind, "kind", ServerKind, "server implementation `kind` (inprocess, gcp)"),
+	"kind":      strVar(&ServerKind, "kind", ServerKind, "server implementation `kind` (inprocess, server, etc.)"),
 	"letscache": strVar(&LetsEncryptCache, "letscache", "", "Let's Encrypt cache `directory`"),
 	"log": &flagVar{
 		set: func() {
