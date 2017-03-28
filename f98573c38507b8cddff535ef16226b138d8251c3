@@ -107,6 +107,24 @@
     },
     {
       "key": {
+        "uuid": "fc48aaeb_88bd38bf",
+        "filename": "exp/cmd/dingus/dingus.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-28T21:46:08Z",
+      "side": 1,
+      "message": "How can it not? I don\u0027t understand",
+      "parentUuid": "053e30a2_12b4fb2f",
+      "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "92d63afe_898b7e84",
         "filename": "exp/cmd/dingus/dingus.go",
         "patchSetId": 1
@@ -177,6 +195,24 @@
     },
     {
       "key": {
+        "uuid": "de48276a_e530753b",
+        "filename": "exp/cmd/dingus/dingus.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-28T21:46:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ef244616_de3f7245",
+      "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f016aaa7_fe758811",
         "filename": "exp/cmd/dingus/dingus.go",
         "patchSetId": 1
@@ -191,6 +227,24 @@
       "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d918eb43_186ecd5a",
+        "filename": "exp/cmd/dingus/dingus.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-28T21:46:08Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "f016aaa7_fe758811",
+      "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -244,6 +298,24 @@
       "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "32c1a798_c106325f",
+        "filename": "exp/cmd/dingus/dingus.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-28T21:46:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "34e804cb_13d141a8",
+      "revId": "f98573c38507b8cddff535ef16226b138d8251c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
