@@ -17,7 +17,6 @@ import (
 	"sync"
 
 	"upspin.io/errors"
-	"upspin.io/log"
 	"upspin.io/upspin"
 )
 
@@ -187,7 +186,7 @@ func (l *Log) Append(e *LogEntry) error {
 	if err != nil {
 		return errors.E(op, errors.IO, err)
 	}
-	// TODO(edpin): remove once debugging is done.
+	// Sanity check: flush worked and the new offset is the expected one.
 	newOffs := prevOffs + int64(n)
 	if newOffs != l.lastOffset() {
 		// This might indicate a race somewhere, despite the locks.
@@ -204,7 +203,8 @@ func (l *Log) ReadAt(n int, offset int64) (dst []LogEntry, next int64, err error
 	l.mu.Lock()
 	defer l.mu.Unlock()
 
-	// TODO: don't seek. Use file.ReadAt instead.
+	// We can't ReadAt here since unmarshal does the reading, typically one
+	// byte at a time. So we Seek to the right position instead.
 	fileOffset := l.lastOffset()
 	if offset >= fileOffset {
 		// End of file.
@@ -590,9 +590,7 @@ func (le *LogEntry) unmarshal(r *checker) error {
 		return errors.E(op, errors.IO, err)
 	}
 	if len(leftOver) != 0 {
-		log.Error.Printf("%s: %d bytes left; log misaligned at entry %+v", op, len(leftOver), le.Entry)
-		// fall through and verify checksum while debugging.
-		// TODO(edpin): remove this and return an error.
+		return errors.E(op, errors.IO, errors.Errorf("%d bytes left; log misaligned for entry %+v", len(leftOver), le.Entry))
 	}
 	chk, err := r.readChecksum()
 	if err != nil {
@@ -600,9 +598,6 @@ func (le *LogEntry) unmarshal(r *checker) error {
 	}
 	if chk != r.chksum {
 		return errors.E(op, errors.IO, errors.Errorf("invalid checksum: got %x, expected %x for entry %+v", r.chksum, chk, le.Entry))
-	}
-	if len(leftOver) != 0 {
-		return errors.E(op, errors.IO, errors.Errorf("%d bytes left; log misaligned for entry %+v", len(leftOver), le.Entry))
 	}
 	return nil
 }
