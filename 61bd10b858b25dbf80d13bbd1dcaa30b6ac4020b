@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "990c124c_a81a52e6",
+        "filename": "exp/cmd/dingus/dingus.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-28T23:15:18Z",
+      "side": 1,
+      "message": "Since you go out of your way to define the constant accessName...  Personally, I would have refrained from defining the constant.",
+      "range": {
+        "startLine": 195,
+        "startChar": 6,
+        "endLine": 195,
+        "endChar": 14
+      },
+      "revId": "61bd10b858b25dbf80d13bbd1dcaa30b6ac4020b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
