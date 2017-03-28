@@ -126,7 +126,7 @@ func (c *userCacheServer) Endpoint() upspin.Endpoint {
 	c.dd.mu.Lock()
 	svc := c.dd.dialed
 	c.dd.mu.Unlock()
-	if svc == nil {
+	if svc != nil {
 		return svc.Endpoint()
 	}
 	return c.base.Endpoint()
