@@ -396,7 +396,9 @@ func (r *Runner) GotEvent(p upspin.PathName, withBlocks bool) bool {
 	if r.Failed() {
 		return false
 	}
+	var got []upspin.PathName
 	for _, e := range r.Events {
+		got = append(got, e.Entry.Name)
 		if e.Entry.Name != p {
 			continue
 		}
@@ -415,7 +417,7 @@ func (r *Runner) GotEvent(p upspin.PathName, withBlocks bool) bool {
 		}
 		return true
 	}
-	r.lastErr = errors.Errorf("expected Event for %q", p)
+	r.lastErr = errors.Errorf("expected Event for %q; got events for these paths instead: %v", p, got)
 	_, r.errFile, r.errLine, _ = runtime.Caller(1)
 	return false
 }
