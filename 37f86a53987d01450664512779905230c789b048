@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c58400e2_65357dd2",
+        "filename": "test/testenv/runner.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 420,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-28T03:01:28Z",
+      "side": 1,
+      "message": "This isn\u0027t the best message, as \"got\" is either empty or a list of things we received. The message doesn\u0027t explain that well.\n\nMaybe\n\nexpected Event for %q; got events for these paths instead: %v",
+      "revId": "37f86a53987d01450664512779905230c789b048",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
