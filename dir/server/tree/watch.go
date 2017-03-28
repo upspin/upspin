@@ -55,9 +55,9 @@ type watcher struct {
 	// goroutine to look for work at the end of the log.
 	hasWork chan bool
 
-	// log is a read-only cloned instance of the Tree's log that keeps track
-	// of this watcher's progress.
-	log *Log
+	// log is a reader instance of the Tree's log that keeps track of this
+	// watcher's progress.
+	log *Reader
 
 	// closed indicates whether the watcher is closed (1) or open (0).
 	// It must be loaded and stored atomically.
@@ -80,7 +80,7 @@ func (t *Tree) Watch(p path.Parsed, order int64, done <-chan struct{}) (<-chan *
 
 	// Clone the logs so we can keep reading it while the current tree
 	// continues to be updated (we're about to unlock this tree).
-	cLog, err := t.log.Clone()
+	cLog, err := t.log.NewReader()
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
@@ -117,7 +117,7 @@ func (t *Tree) Watch(p path.Parsed, order int64, done <-chan struct{}) (<-chan *
 			user:     t.user,
 			config:   t.config,
 			packer:   t.packer,
-			log:      cLog,
+			log:      nil, // Cloned tree is read-only.
 			logIndex: cIndex,
 		}
 		// Start sending the current state of the cloned tree and setup
