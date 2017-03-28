@@ -9,6 +9,7 @@ package tree
 import (
 	"bufio"
 	"encoding/binary"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -16,6 +17,7 @@ import (
 	"strings"
 	"sync"
 
+	"strconv"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/upspin"
@@ -29,6 +31,8 @@ const (
 	Put Operation = iota
 	Delete
 )
+
+const maxLogSize = 100 * 1024 * 1024 // 100MB per each user log.
 
 // LogEntry is the unit of logging.
 type LogEntry struct {
@@ -67,7 +71,8 @@ type LogIndex struct {
 // created by Clone.
 func NewLogs(user upspin.UserName, directory string) (*Log, *LogIndex, error) {
 	const op = "dir/server/tree.NewLogs"
-	loc := logFile(user, directory)
+	off := lastLogOffsetFor(user, directory)
+	loc := logFile(user, off, directory)
 	loggerFile, err := os.OpenFile(loc, os.O_RDWR|os.O_CREATE, 0600)
 	if err != nil {
 		return nil, nil, errors.E(op, errors.IO, err)
@@ -100,7 +105,7 @@ func NewLogs(user upspin.UserName, directory string) (*Log, *LogIndex, error) {
 // HasLog reports whether user has logs in directory.
 func HasLog(user upspin.UserName, directory string) (bool, error) {
 	const op = "dir/server/tree.HasLog"
-	loc := logFile(user, directory)
+	loc := logFile(user, 0, directory)
 	loggerFile, err := os.OpenFile(loc, os.O_RDONLY, 0600)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -117,7 +122,7 @@ func HasLog(user upspin.UserName, directory string) (bool, error) {
 func DeleteLogs(user upspin.UserName, directory string) error {
 	const op = "dir/server/tree.DeleteLogs"
 	for _, fn := range []string{
-		logFile(user, directory),
+		logFile(user, 0, directory),
 		rootFile(user, directory),
 		indexFile(user, directory),
 	} {
@@ -126,7 +131,9 @@ func DeleteLogs(user upspin.UserName, directory string) error {
 			return errors.E(op, errors.IO, err)
 		}
 	}
-	return nil
+	// Remove the log offsets directory, if any, with all its contents.
+	// RemoveAll returns nil if the subdir does not exist.
+	return os.RemoveAll(logSubDir(user, directory))
 }
 
 // ListUsers applies a pattern to all known users in directory and returns
@@ -135,8 +142,8 @@ func DeleteLogs(user upspin.UserName, directory string) error {
 // pattern could be "*+*@*".
 func ListUsers(pattern string, directory string) ([]upspin.UserName, error) {
 	const op = "dir/server/tree.GlobUsers"
-	prefix := logFile("", directory)
-	matches, err := filepath.Glob(logFile(upspin.UserName(pattern), directory))
+	prefix := logFile("", 0, directory)
+	matches, err := filepath.Glob(logFile(upspin.UserName(pattern), 0, directory))
 	if err != nil {
 		return nil, errors.E(op, errors.IO, err)
 	}
@@ -147,8 +154,17 @@ func ListUsers(pattern string, directory string) ([]upspin.UserName, error) {
 	return users, nil
 }
 
-func logFile(user upspin.UserName, directory string) string {
-	return filepath.Join(directory, "tree.log."+string(user))
+func logFile(user upspin.UserName, offset int64, directory string) string {
+	switch offset {
+	case 0:
+		return filepath.Join(directory, "tree.log."+string(user))
+	default:
+		return filepath.Join(logSubDir(user, directory), fmt.Sprintf("%0d", offset))
+	}
+}
+
+func logSubDir(user upspin.UserName, directory string) string {
+	return filepath.Join(directory, "d.tree.log."+string(user))
 }
 
 func indexFile(user upspin.UserName, directory string) string {
@@ -157,6 +173,26 @@ func indexFile(user upspin.UserName, directory string) string {
 
 func rootFile(user upspin.UserName, directory string) string {
 	return filepath.Join(directory, "tree.root."+string(user))
+}
+
+func lastLogOffsetFor(user upspin.UserName, directory string) int64 {
+	offs, err := filepath.Glob(filepath.Join(logSubDir(user, directory), "*"))
+	if err != nil {
+		return 0 // No subdirectory; the initial log file must be it.
+	}
+	max := int64(0)
+	for _, o := range offs {
+
+		off, err := strconv.ParseInt(filepath.Base(o), 10, 64)
+		if err != nil {
+			log.Error.Printf("Can't parse log offset: %s", o)
+		}
+		log.Printf("=== got %d", off)
+		if off > max {
+			max = off
+		}
+	}
+	return max
 }
 
 // User returns the user name who owns the root of the tree that this log represents.
