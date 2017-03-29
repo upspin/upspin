@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2d5cbc7e_61746868",
+        "filename": "rpc/doc.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-29T04:13:33Z",
+      "side": 1,
+      "message": "grammar",
+      "range": {
+        "startLine": 67,
+        "startChar": 53,
+        "endLine": 67,
+        "endChar": 69
+      },
+      "revId": "2553420a4a34828cfc56f86aeb011bf85b0e6406",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
