@@ -46,6 +46,23 @@
       "revId": "f82693d7d42fd06258a258915aa61f75bc5db5b2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "0d19fab2_67ce7c20",
+        "filename": "serverutil/perm/perm_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-29T23:56:33Z",
+      "side": 1,
+      "message": "At some point you had this here:\n\nlog.SetOutput(ioutil.Discard)\n\nIt might be useful to bring it back. It prints a ton of stuff last I looked.",
+      "revId": "f82693d7d42fd06258a258915aa61f75bc5db5b2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
