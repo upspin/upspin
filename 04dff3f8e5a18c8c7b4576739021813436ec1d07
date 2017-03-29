@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "8665d3a5_5de7f3d6",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-29T05:07:33Z",
+      "side": 1,
+      "message": "Isn\u0027t this just the user log directory?  Why call it log offset directory?",
+      "range": {
+        "startLine": 132,
+        "startChar": 16,
+        "endLine": 132,
+        "endChar": 36
+      },
+      "revId": "04dff3f8e5a18c8c7b4576739021813436ec1d07",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6641dd51_67beaba2",
         "filename": "dir/server/tree/log.go",
         "patchSetId": 2
@@ -16,6 +39,47 @@
       "revId": "04dff3f8e5a18c8c7b4576739021813436ec1d07",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "59b487af_02579d06",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-29T05:07:33Z",
+      "side": 1,
+      "message": "We might have our cake and eat it too if the start up code builds a hard link from the old log file to the subdirectory .0 file if it doesn\u0027t already exist.  That way it will continue to work even on a rollback but we can just use the new names. In the future we can just kill off that code.",
+      "parentUuid": "6641dd51_67beaba2",
+      "revId": "04dff3f8e5a18c8c7b4576739021813436ec1d07",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f184bd4f_f961b8ae",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-29T05:07:33Z",
+      "side": 1,
+      "message": "It might be nice to Glob the directory and remember all the files and their start offset. That way ReadAts will have the info it needs. You don\u0027t want to have just the last one.\n\nAlso, you need to know what the last one is so you can continue appending...",
+      "range": {
+        "startLine": 176,
+        "startChar": 5,
+        "endLine": 176,
+        "endChar": 21
+      },
+      "revId": "04dff3f8e5a18c8c7b4576739021813436ec1d07",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
