@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "df6949a6_ce47b337",
+        "filename": "exp/cmd/demoserver/main.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-29T22:40:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "66dc04d7_41f78289",
+      "revId": "657de5c419f330f564687d6376fd24eb814ed3df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "36051104_89d4e522",
         "filename": "exp/cmd/demoserver/main.go",
         "patchSetId": 6
@@ -30,6 +48,24 @@
       "writtenOn": "2017-03-29T22:27:36Z",
       "side": 1,
       "message": "do you need the shitty URL escapes?",
+      "revId": "657de5c419f330f564687d6376fd24eb814ed3df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "266698ea_e4d63b9e",
+        "filename": "exp/cmd/demoserver/main.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-29T22:40:56Z",
+      "side": 1,
+      "message": "apparently not",
+      "parentUuid": "36051104_89d4e522",
       "revId": "657de5c419f330f564687d6376fd24eb814ed3df",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
