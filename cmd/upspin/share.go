@@ -263,6 +263,10 @@ func (s *Sharer) readers(entry *upspin.DirEntry) ([]upspin.UserName, string, boo
 					self = true
 				}
 			}
+			if !ok && s.fix {
+				ok = true
+				thisUser = "unknown"
+			}
 			if !ok && !unknownUser {
 				// We have a key but no user with that key is known to us.
 				// This means an access change has removed permissions for some user
