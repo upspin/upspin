@@ -16,6 +16,24 @@
       "revId": "1a07a3ca4cc5e0722bb0a94e9076a50446023054",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c1fcb42f_ba84c9f1",
+        "filename": "rpc/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-03-29T00:45:04Z",
+      "side": 1,
+      "message": "There are a number of reasons but yes, flexibility is a big one.\nAnother is the advantages of distinguishing string from PathName from UserName from NetAddr using the type system.",
+      "parentUuid": "b260e6b3_b16fb344",
+      "revId": "1a07a3ca4cc5e0722bb0a94e9076a50446023054",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
