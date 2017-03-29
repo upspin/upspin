@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6641dd51_67beaba2",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5660
+      },
+      "writtenOn": "2017-03-29T02:05:50Z",
+      "side": 1,
+      "message": "hmm... I think if we start a fresh server, the first log with offset 0 should be put into the user sub dir with offset in its filename for consistent reason.",
+      "revId": "04dff3f8e5a18c8c7b4576739021813436ec1d07",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b85a8537_fcc2866c",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 5660
+      },
+      "writtenOn": "2017-03-29T02:05:50Z",
+      "side": 1,
+      "message": "remove this empty line?",
+      "revId": "04dff3f8e5a18c8c7b4576739021813436ec1d07",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ff1a67d6_92338d91",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 5660
+      },
+      "writtenOn": "2017-03-29T02:05:50Z",
+      "side": 1,
+      "message": "can we explicitly continue the loop here?",
+      "revId": "04dff3f8e5a18c8c7b4576739021813436ec1d07",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f79a11b9_6dbb5c25",
+        "filename": "dir/server/tree/log_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 255,
+      "author": {
+        "id": 5660
+      },
+      "writtenOn": "2017-03-29T02:05:50Z",
+      "side": 1,
+      "message": "fix this commented out code?",
+      "revId": "04dff3f8e5a18c8c7b4576739021813436ec1d07",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "af553e83_9641bd0b",
+        "filename": "dir/server/tree/log_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 282,
+      "author": {
+        "id": 5660
+      },
+      "writtenOn": "2017-03-29T02:05:50Z",
+      "side": 1,
+      "message": "where does the const 30 come from? can we add a comment for it?",
+      "revId": "04dff3f8e5a18c8c7b4576739021813436ec1d07",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
