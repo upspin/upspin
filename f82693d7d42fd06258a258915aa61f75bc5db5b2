@@ -63,6 +63,24 @@
       "revId": "f82693d7d42fd06258a258915aa61f75bc5db5b2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "359d0834_84d6a646",
+        "filename": "serverutil/perm/perm_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-03-30T00:03:37Z",
+      "side": 1,
+      "message": "Fine for when we are actively debugging it, but I\u0027d rather not lose any information in general.",
+      "parentUuid": "0d19fab2_67ce7c20",
+      "revId": "f82693d7d42fd06258a258915aa61f75bc5db5b2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
