@@ -45,6 +45,10 @@ type Options struct {
 	// It has no effect if LetsEncryptCache is non-empty.
 	CertFile string
 	KeyFile  string
+
+	// InsecureHTTP specifies whether to serve insecure HTTP without TLS.
+	// An error occurs if this is attempted with a non-loopback address.
+	InsecureHTTP bool
 }
 
 var defaultOptions = &Options{
@@ -87,7 +91,16 @@ func ListenAndServe(ready chan<- struct{}, serverName, addr string, opt *Options
 	}
 
 	var config *tls.Config
-	if file := opt.LetsEncryptCache; file != "" {
+	if opt.InsecureHTTP {
+		log.Info.Printf("https: serving insecure HTTP on %q", addr)
+		host, _, err := net.SplitHostPort(addr)
+		if err != nil {
+			log.Fatalf("https: couldn't parse address: %v", err)
+		}
+		if host != "localhost" && host != "127.0.0.1" && host != "::1" {
+			log.Fatalf("https: cannot serve insecure HTTP on non-loopback address %q", addr)
+		}
+	} else if file := opt.LetsEncryptCache; file != "" {
 		log.Info.Printf("https: serving HTTPS on %q using Let's Encrypt certificates", addr)
 		m.Cache = autocert.DirCache(file)
 		config = &tls.Config{GetCertificate: m.GetCertificate}
@@ -143,7 +156,10 @@ func ListenAndServe(ready chan<- struct{}, serverName, addr string, opt *Options
 		// its serving loop.
 		ln.Close()
 	})
-	err = server.Serve(tls.NewListener(ln, config))
+	if !opt.InsecureHTTP {
+		ln = tls.NewListener(ln, config)
+	}
+	err = server.Serve(ln)
 	log.Printf("https: %v", err)
 	shutdown.Now(1)
 }
@@ -151,10 +167,15 @@ func ListenAndServe(ready chan<- struct{}, serverName, addr string, opt *Options
 // ListenAndServeFromFlags is the same as ListenAndServe, but it determines the
 // listen address and Options from command-line flags in the flags package.
 func ListenAndServeFromFlags(ready chan<- struct{}, serverName string) {
-	ListenAndServe(ready, serverName, flags.HTTPSAddr, &Options{
+	addr := flags.HTTPSAddr
+	if flags.InsecureHTTP {
+		addr = flags.HTTPAddr
+	}
+	ListenAndServe(ready, serverName, addr, &Options{
 		LetsEncryptCache: flags.LetsEncryptCache,
 		CertFile:         flags.TLSCertFile,
 		KeyFile:          flags.TLSKeyFile,
+		InsecureHTTP:     flags.InsecureHTTP,
 	})
 }
 
