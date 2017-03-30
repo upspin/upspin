@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "a042290a_f19c0f00",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-30T21:54:31Z",
+      "side": 1,
+      "message": "Discussed offline. It makes reverting to the old style harder. But I don\u0027t disagree. Maybe this could be another future migration.",
+      "parentUuid": "bf0d5657_18f4ec05",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 74
+      },
+      "revId": "6cf1c67fb6f4a04ce032183974bc88757d019cf1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "4cb4882c_8510d65d",
         "filename": "dir/server/tree/log.go",
         "patchSetId": 3
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "25b9aff5_80107130",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-30T21:54:31Z",
+      "side": 1,
+      "message": "Yes. Good catch. Fixed and added a test.",
+      "parentUuid": "4cb4882c_8510d65d",
+      "range": {
+        "startLine": 119,
+        "startChar": 2,
+        "endLine": 124,
+        "endChar": 3
+      },
+      "revId": "6cf1c67fb6f4a04ce032183974bc88757d019cf1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "68679184_9745d417",
         "filename": "dir/server/tree/log.go",
         "patchSetId": 3
@@ -59,6 +107,30 @@
       "writtenOn": "2017-03-30T19:18:46Z",
       "side": 1,
       "message": "Two stats, a write, and a sync seems pretty expensive for a single append.\n\nWhat happens when you truncate the file on read errors?  Aren\u0027t you just going to continue writing at some place past the end of the file forcing the intervening space to be nulls?\n\nOf course, I don\u0027t like this truncation thing.  I really think you should just read ahead a byte at a time till you reach something that checksums correctly.",
+      "range": {
+        "startLine": 261,
+        "startChar": 0,
+        "endLine": 261,
+        "endChar": 51
+      },
+      "revId": "6cf1c67fb6f4a04ce032183974bc88757d019cf1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7f8f90b5_10811e1e",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-30T21:54:31Z",
+      "side": 1,
+      "message": "The file is in append mode. It should seek to the new end of file.\n\nI can do the skipping in another CL. Filed issue #351. Also see #350 for future alternative solutions.",
+      "parentUuid": "68679184_9745d417",
       "range": {
         "startLine": 261,
         "startChar": 0,
