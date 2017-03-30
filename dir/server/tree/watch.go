@@ -269,16 +269,14 @@ func (w *watcher) sendEventFromLog(offset int64) (int64, error) {
 		default:
 		}
 
-		logs, next, err := w.log.ReadAt(1, curr)
+		logEntry, next, err := w.log.ReadAt(curr)
 		if err != nil {
 			return next, errors.E(op, errors.Invalid, errors.Errorf("cannot read log at order %d: %v", curr, err))
 		}
-		if len(logs) != 1 {
-			// End of log.
-			return next, nil
+		if next == curr {
+			return curr, nil
 		}
 		curr = next
-		logEntry := logs[0]
 		path := logEntry.Entry.SignedName
 		if !isPrefixPath(path, w.path) {
 			// Not a log of interest.
@@ -399,7 +397,7 @@ func notifyWatchers(watchers []*watcher) {
 	}
 }
 
-// newIsPrefixPath reports whether the path has a pathwise prefix.
+// isPrefixPath reports whether the path has a pathwise prefix.
 func isPrefixPath(name upspin.PathName, prefix path.Parsed) bool {
 	parsed, err := path.Parse(name)
 	if err != nil {
