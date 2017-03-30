@@ -141,7 +141,7 @@ func TestConcurrent(t *testing.T) {
 			if aborted() {
 				return
 			}
-			_, next, err := logRO.ReadAt(1, offset)
+			_, next, err := logRO.ReadAt(offset)
 			if err != nil {
 				abort()
 				t.Fatal(err)
@@ -192,37 +192,33 @@ func TestAppendRead(t *testing.T) {
 	if got, wantAtLeast := logger.LastOffset(), int64(minEntrySize*10); got < wantAtLeast {
 		t.Errorf("LastOffset = %d, want > %d", got, wantAtLeast)
 	}
-	// Read LogEntries back in two passes.
-	entries, nextOffset, err := logger.ReadAt(6, 0)
-	if err != nil {
-		t.Fatal(err)
+	// Read LogEntries back.
+	var entries []LogEntry
+	offset := int64(0)
+	for i := 0; i < 11; i++ { // Tries to go past EOF.
+		entry, next, err := logger.ReadAt(offset)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if next == offset {
+			break
+		}
+		offset = next
+		entries = append(entries, entry)
 	}
-	if got, want := len(entries), 6; got != want {
-		t.Fatalf("len(entries) = %d, want = %d", got, want)
-	}
-	if wantAtLeast := int64(minEntrySize * 6); nextOffset < wantAtLeast {
-		t.Errorf("nextOffset = %d, want > %d", nextOffset, wantAtLeast)
-	}
-	// Read more. Attempt to go past the EOF
-	entries, nextOffset, err = logger.ReadAt(32, nextOffset)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if got, want := len(entries), 4; got != want { // 4 remaining entries.
-		t.Fatalf("len(entries) = %d, want = %d", got, want)
-	}
-	if want := logger.LastOffset(); nextOffset != want {
-		t.Errorf("nextOffset = %d, want = %d", nextOffset, want)
+
+	if want := logger.LastOffset(); offset != want {
+		t.Errorf("nextOffset = %d, want = %d", offset, want)
 	}
 	// Spot-check some entries.
-	if got, want := string(entries[0].Entry.Name), "foo@bar.com/hello6"; got != want {
-		t.Errorf("entries[0].Entry.Name = %q, want = %q", got, want)
+	if got, want := string(entries[6].Entry.Name), "foo@bar.com/hello6"; got != want {
+		t.Errorf("entries[6].Entry.Name = %q, want = %q", got, want)
 	}
-	if got, want := entries[0].Op, Put; got != want {
-		t.Errorf("entries[0].Op = %v, want = %v", got, want)
+	if got, want := entries[6].Op, Put; got != want {
+		t.Errorf("entries[6].Op = %v, want = %v", got, want)
 	}
-	if got, want := string(entries[3].Entry.Name), "foo@bar.com/hello9"; got != want {
-		t.Errorf("entries[3].Entry.Name = %q, want = %q", got, want)
+	if got, want := string(entries[9].Entry.Name), "foo@bar.com/hello9"; got != want {
+		t.Errorf("entries[9].Entry.Name = %q, want = %q", got, want)
 	}
 
 	// Clone the log and ensure it's read-only.
@@ -233,12 +229,9 @@ func TestAppendRead(t *testing.T) {
 	if got, want := clone.LastOffset(), logger.LastOffset(); got != want {
 		t.Errorf("LastOffset = %d, want = %d", got, want)
 	}
-	entries, nextOffset, err = clone.ReadAt(1, 0)
+	entry, offset, err = clone.ReadAt(0)
 	if err != nil {
 		t.Fatal(err)
-	}
-	if got, want := len(entries), 1; got != want {
-		t.Fatalf("len(entries) = %d, want = %d", got, want)
 	}
 	err = clone.Append(newLogEntry(upspin.PathName("foo@bar.com/yabbadabadoo"), 17))
 	expectedErr := errors.E(errors.IO)

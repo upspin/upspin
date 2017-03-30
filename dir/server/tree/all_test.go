@@ -63,18 +63,19 @@ func TestPutNodes(t *testing.T) {
 	if got, want := log.LastOffset(), int64(totBytes); got < want {
 		t.Fatalf("LastIndex = %d, want > %d", got, want)
 	}
-	entries, _, err := log.ReadAt(2, int64(0))
+	entry, next, err := log.ReadAt(int64(0))
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := len(entries), 2; got != want {
-		t.Errorf("len(entries) = %d, want = %d", got, want)
+	if !reflect.DeepEqual(&entry.Entry, dir2) {
+		t.Errorf("dir2 = %v, want %v", entry.Entry, dir2)
 	}
-	if !reflect.DeepEqual(&entries[0].Entry, dir2) {
-		t.Errorf("dir2 = %v, want %v", entries[0].Entry, dir2)
+	entry, _, err = log.ReadAt(next)
+	if err != nil {
+		t.Fatal(err)
 	}
-	if !reflect.DeepEqual(&entries[1].Entry, dir3) {
-		t.Errorf("dir3 = %v, want %v", entries[1].Entry, dir3)
+	if !reflect.DeepEqual(&entry.Entry, dir3) {
+		t.Errorf("dir3 = %v, want %v", entry.Entry, dir3)
 	}
 
 	// Lookup path.
@@ -192,17 +193,14 @@ func TestPutNodes(t *testing.T) {
 		t.Fatalf("cfg.Log.LastIndex() = %d, want %d", log.LastOffset(), want)
 	}
 	// Verify logged entry is the deletion of a file.
-	entries, _, err = log.ReadAt(1, last)
+	entry, _, err = log.ReadAt(last)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if len(entries) != 1 {
-		t.Fatalf("len(entries) = %d, want = 1", len(entries))
-	}
-	if got, want := entries[0].Entry.Name, upspin.PathName(userName+"/dir/img.jpg"); got != want {
+	if got, want := entry.Entry.Name, upspin.PathName(userName+"/dir/img.jpg"); got != want {
 		t.Errorf("entries[0].Name = %s, want = %s", got, want)
 	}
-	if got, want := entries[0].Op, Delete; got != want {
+	if got, want := entry.Op, Delete; got != want {
 		t.Errorf("entries[0].Op = %v, want = %v", got, want)
 	}
 }

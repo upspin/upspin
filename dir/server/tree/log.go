@@ -195,10 +195,9 @@ func (l *Log) Append(e *LogEntry) error {
 	return nil
 }
 
-// ReadAt reads at most n entries from the log starting at offset. It
-// returns the next offset. In case of error, if dst is not nil it means the
-// error occurred after reading some entries (<n).
-func (l *Log) ReadAt(n int, offset int64) (dst []LogEntry, next int64, err error) {
+// ReadAt reads a log entry from the log starting at offset. It
+// returns the next offset.
+func (l *Log) ReadAt(offset int64) (le LogEntry, next int64, err error) {
 	const op = "dir/server/tree.Log.Read"
 	l.mu.Lock()
 	defer l.mu.Unlock()
@@ -208,29 +207,20 @@ func (l *Log) ReadAt(n int, offset int64) (dst []LogEntry, next int64, err error
 	fileOffset := l.lastOffset()
 	if offset >= fileOffset {
 		// End of file.
-		return dst, fileOffset, nil
+		return le, fileOffset, nil
 	}
 	_, err = l.file.Seek(offset, io.SeekStart)
 	if err != nil {
-		return nil, 0, errors.E(op, errors.IO, err)
+		return le, 0, errors.E(op, errors.IO, err)
 	}
 	next = offset
 	checker := newChecker(l.file)
 	defer checker.close()
-	for i := 0; i < n; i++ {
-		if next == fileOffset {
-			// End of file.
-			return dst, fileOffset, nil
-		}
-		var le LogEntry
-		err := le.unmarshal(checker)
-		if err != nil {
-			return dst, next, err
-		}
-		dst = append(dst, le)
-		next = next + int64(checker.count)
-		checker.resetChecksum()
+	err = le.unmarshal(checker)
+	if err != nil {
+		return le, 0, errors.E(op, errors.IO, err)
 	}
+	next = next + int64(checker.count)
 	return
 }
 
