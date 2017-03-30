@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8b2940fb_948f9c2f",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-30T17:38:45Z",
+      "side": 1,
+      "message": "How does this effect performance?  You now only have one record in the bufio at a time.",
+      "range": {
+        "startLine": 198,
+        "startChar": 1,
+        "endLine": 199,
+        "endChar": 27
+      },
+      "revId": "d219d28b4188a9339aff5bec592ae57a5b6c7a08",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "6aaf6986_610850ca",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 765,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-30T17:38:45Z",
+      "side": 1,
+      "message": "You didn\u0027t do it before, but since you are truncating the log,  do you need to change logIndex?",
+      "range": {
+        "startLine": 763,
+        "startChar": 3,
+        "endLine": 765,
+        "endChar": 4
+      },
+      "revId": "d219d28b4188a9339aff5bec592ae57a5b6c7a08",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
