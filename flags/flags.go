@@ -55,6 +55,10 @@ var (
 	// incoming secure network connections.
 	HTTPSAddr = defaultHTTPSAddr
 
+	// InsecureHTTP ("insecure") specifies whether to serve insecure HTTP
+	// on HTTPAddr, instead of serving HTTPS (secured by TLS) on HTTPSAddr.
+	InsecureHTTP = false
+
 	// LetsEncryptCache ("letscache") is the location of a file in which
 	// the Let's Encrypt certificates are stored. The containing directory
 	// should be owner-accessible only (chmod 0700).
@@ -112,10 +116,21 @@ var flags = map[string]*flagVar{
 			return fmt.Sprintf("-blocksize=%d", BlockSize)
 		},
 	},
-	"cachedir":  strVar(&CacheDir, "cachedir", CacheDir, "`directory` containing all file caches"),
-	"config":    strVar(&Config, "config", Config, "user's configuration `file`"),
-	"http":      strVar(&HTTPAddr, "http", HTTPAddr, "`address` for incoming insecure network connections"),
-	"https":     strVar(&HTTPSAddr, "https", HTTPSAddr, "`address` for incoming secure network connections"),
+	"cachedir": strVar(&CacheDir, "cachedir", CacheDir, "`directory` containing all file caches"),
+	"config":   strVar(&Config, "config", Config, "user's configuration `file`"),
+	"http":     strVar(&HTTPAddr, "http", HTTPAddr, "`address` for incoming insecure network connections"),
+	"https":    strVar(&HTTPSAddr, "https", HTTPSAddr, "`address` for incoming secure network connections"),
+	"insecure": &flagVar{
+		set: func() {
+			flag.BoolVar(&InsecureHTTP, "insecure", false, "whether to serve insecure HTTP instead of HTTPS")
+		},
+		arg: func() string {
+			if InsecureHTTP {
+				return "-insecure"
+			}
+			return ""
+		},
+	},
 	"kind":      strVar(&ServerKind, "kind", ServerKind, "server implementation `kind` (inprocess, gcp)"),
 	"letscache": strVar(&LetsEncryptCache, "letscache", "", "Let's Encrypt cache `directory`"),
 	"log": &flagVar{
