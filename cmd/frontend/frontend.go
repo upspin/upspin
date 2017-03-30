@@ -30,7 +30,7 @@ var (
 )
 
 func main() {
-	flags.Parse("http", "https", "insecure", "letscache", "log", "tls")
+	flags.Parse("https", "log")
 	http.Handle("/", newServer())
 	go func() {
 		log.Printf("Serving HTTP->HTTPS redirect on %q", flags.HTTPAddr)

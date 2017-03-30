@@ -42,7 +42,7 @@ import (
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
-	flags.Parse("config", "insecure", "http", "https", "addr", "log", "letscache", "tls")
+	flags.Parse("config", "https", "addr", "log")
 
 	addr := upspin.NetAddr(flags.NetAddr)
 	ep := upspin.Endpoint{

@@ -18,9 +18,8 @@ import (
 
 // flagVar represents a flag in this package.
 type flagVar struct {
-	set  func()        // Set the value at parse time.
-	arg  func() string // Return the argument to set the flag.
-	arg2 func() string // Return the argument to set the second flag; usually nil.
+	set func()          // Set the value at parse time.
+	arg func() []string // Return the arguments to set the flags.
 }
 
 const (
@@ -46,23 +45,6 @@ var (
 	// Config ("config") names the Upspin configuration file to use.
 	defaultConfig = filepath.Join(config.Home(), "upspin", "config")
 	Config        = defaultConfig
-
-	// HTTPAddr ("http") is the network address on which to listen for
-	// incoming insecure network connections.
-	HTTPAddr = defaultHTTPAddr
-
-	// HTTPSAddr ("https") is the network address on which to listen for
-	// incoming secure network connections.
-	HTTPSAddr = defaultHTTPSAddr
-
-	// InsecureHTTP ("insecure") specifies whether to serve insecure HTTP
-	// on HTTPAddr, instead of serving HTTPS (secured by TLS) on HTTPSAddr.
-	InsecureHTTP = false
-
-	// LetsEncryptCache ("letscache") is the location of a file in which
-	// the Let's Encrypt certificates are stored. The containing directory
-	// should be owner-accessible only (chmod 0700).
-	LetsEncryptCache = ""
 
 	// Log ("log") sets the level of logging (implements flag.Value).
 	Log logFlag
@@ -94,8 +76,29 @@ var (
 	// directory entry at the cost of potentially blocking a legitimate
 	// file written by a user who no longer has write permission.
 	Prudent = false
+)
 
-	// TLSCertFile and TLSKeyFile ("tls") specify the location of a TLS
+// The Parse and Register functions bind these variables to their respective
+// command-line flags when called with the "https" identifier.
+var (
+	// HTTPAddr is the network address on which to listen for
+	// incoming insecure network connections.
+	HTTPAddr = defaultHTTPAddr
+
+	// HTTPSAddr is the network address on which to listen for
+	// incoming secure network connections.
+	HTTPSAddr = defaultHTTPSAddr
+
+	// InsecureHTTP specifies whether to serve insecure HTTP
+	// on HTTPAddr, instead of serving HTTPS (secured by TLS) on HTTPSAddr.
+	InsecureHTTP = false
+
+	// LetsEncryptCache is the location of a file in which
+	// the Let's Encrypt certificates are stored. The containing directory
+	// should be owner-accessible only (chmod 0700).
+	LetsEncryptCache = ""
+
+	// TLSCertFile and TLSKeyFile specify the location of a TLS
 	// certificate/key pair used for serving TLS (HTTPS).
 	TLSCertFile = ""
 	TLSKeyFile  = ""
@@ -109,63 +112,71 @@ var flags = map[string]*flagVar{
 		set: func() {
 			flag.IntVar(&BlockSize, "blocksize", BlockSize, "`size` of blocks when writing large files")
 		},
-		arg: func() string {
+		arg: func() []string {
 			if BlockSize == defaultBlockSize {
-				return ""
+				return nil
 			}
-			return fmt.Sprintf("-blocksize=%d", BlockSize)
+			return []string{fmt.Sprintf("-blocksize=%d", BlockSize)}
 		},
 	},
 	"cachedir": strVar(&CacheDir, "cachedir", CacheDir, "`directory` containing all file caches"),
 	"config":   strVar(&Config, "config", Config, "user's configuration `file`"),
-	"http":     strVar(&HTTPAddr, "http", HTTPAddr, "`address` for incoming insecure network connections"),
-	"https":    strVar(&HTTPSAddr, "https", HTTPSAddr, "`address` for incoming secure network connections"),
-	"insecure": &flagVar{
-		set: func() {
-			flag.BoolVar(&InsecureHTTP, "insecure", false, "whether to serve insecure HTTP instead of HTTPS")
-		},
-		arg: func() string {
-			if InsecureHTTP {
-				return "-insecure"
-			}
-			return ""
-		},
-	},
-	"kind":      strVar(&ServerKind, "kind", ServerKind, "server implementation `kind` (inprocess, gcp)"),
-	"letscache": strVar(&LetsEncryptCache, "letscache", "", "Let's Encrypt cache `directory`"),
+	"kind":     strVar(&ServerKind, "kind", ServerKind, "server implementation `kind` (inprocess, gcp)"),
 	"log": &flagVar{
 		set: func() {
 			Log.Set("info")
 			flag.Var(&Log, "log", "`level` of logging: debug, info, error, disabled")
 		},
-		arg: func() string { return strArg("log", Log.String(), defaultLog) },
+		arg: func() []string { return strArg(Log.String(), "log", defaultLog) },
 	},
 	"project": strVar(&Project, "project", Project, "GCP `project` name"),
 	"serverconfig": &flagVar{
 		set: func() {
 			flag.Var(configFlag{&ServerConfig}, "serverconfig", "comma-separated list of configuration options (key=value) for this server")
 		},
-		arg: func() string { return strArg("serverconfig", configFlag{&ServerConfig}.String(), "") },
+		arg: func() []string { return strArg(configFlag{&ServerConfig}.String(), "serverconfig", "") },
 	},
 	"storeserveruser": strVar(&StoreServerUser, "storeserveruser", "", "user name of the StoreServer"),
 	"prudent": &flagVar{
 		set: func() {
 			flag.BoolVar(&Prudent, "prudent", false, "protect against malicious directory server")
 		},
-		arg: func() string {
+		arg: func() []string {
 			if !Prudent {
-				return ""
+				return nil
 			}
-			return "-prudent"
+			return []string{"-prudent"}
 		},
 	},
-	"tls": &flagVar{
+
+	"https": &flagVar{
 		set: func() {
+			flag.StringVar(&HTTPAddr, "http", HTTPAddr, "`address` for incoming insecure network connections")
+			flag.StringVar(&HTTPSAddr, "https", HTTPSAddr, "`address` for incoming secure network connections")
+			flag.BoolVar(&InsecureHTTP, "insecure", false, "whether to serve insecure HTTP instead of HTTPS")
+			flag.StringVar(&LetsEncryptCache, "letscache", "", "Let's Encrypt cache `directory`")
 			flag.StringVar(&TLSCertFile, "tls_cert", "", "TLS Certificate `file` in PEM format")
 			flag.StringVar(&TLSKeyFile, "tls_key", "", "TLS Key `file` in PEM format")
 		},
-		arg:  func() string { return strArg("tls_cert", TLSCertFile, "") },
-		arg2: func() string { return strArg("tls_key", TLSKeyFile, "") },
+		arg: func() []string {
+			var args []string
+			str := func(value, name, _default string) {
+				arg := strArg(value, name, _default)
+				if len(arg) == 0 {
+					return
+				}
+				args = append(args, arg...)
+			}
+			str(HTTPAddr, "http", HTTPAddr)
+			str(HTTPSAddr, "https", HTTPSAddr)
+			if InsecureHTTP {
+				args = append(args, "-insecure")
+			}
+			str(LetsEncryptCache, "letscache", "")
+			str(TLSCertFile, "tls_cert", "")
+			str(TLSKeyFile, "tls_key", "")
+			return args
+		},
 	},
 }
 
@@ -213,13 +224,10 @@ func Args() []string {
 	var args []string
 	for _, flag := range flags {
 		arg := flag.arg()
-		if arg == "" {
+		if len(arg) == 0 {
 			continue
 		}
-		args = append(args, arg)
-		if flag.arg2 != nil {
-			args = append(args, flag.arg2())
-		}
+		args = append(args, arg...)
 	}
 	return args
 }
@@ -230,19 +238,19 @@ func strVar(value *string, name, _default, usage string) *flagVar {
 		set: func() {
 			flag.StringVar(value, name, _default, usage)
 		},
-		arg: func() string {
-			return strArg(name, *value, _default)
+		arg: func() []string {
+			return strArg(*value, name, _default)
 		},
 	}
 }
 
 // strArg returns a command-line argument that will recreate the flag,
 // or the empty string if the value is the default.
-func strArg(name, value, _default string) string {
+func strArg(value, name, _default string) []string {
 	if value == _default {
-		return ""
+		return nil
 	}
-	return "-" + name + "=" + value
+	return []string{"-" + name + "=" + value}
 }
 
 type logFlag string
