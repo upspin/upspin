@@ -436,19 +436,6 @@ func (l *clog) readLogFile(fn string) error {
 	return nil
 }
 
-func (l *clog) myDirServer(pathName upspin.PathName) bool {
-	name := string(pathName)
-	// Pull off the user name.
-	var userName string
-	slash := strings.IndexByte(name, '/')
-	if slash < 0 {
-		userName = name
-	} else {
-		userName = name[:slash]
-	}
-	return userName == string(l.cfg.UserName())
-}
-
 func (l *clog) close() error {
 	// Stop go routines.
 	close(l.exit)
@@ -595,9 +582,6 @@ func (l *clog) logRequest(op request, name upspin.PathName, err error, de *upspi
 }
 
 func (l *clog) logRequestWithOrder(op request, name upspin.PathName, err error, de *upspin.DirEntry, order int64) {
-	if !l.myDirServer(name) {
-		return
-	}
 	if !cacheableError(err) {
 		return
 	}
@@ -644,9 +628,6 @@ func cacheableGlob(p upspin.PathName) (upspin.PathName, bool) {
 }
 
 func (l *clog) logGlobRequest(pattern upspin.PathName, err error, entries []*upspin.DirEntry) {
-	if !l.myDirServer(pattern) {
-		return
-	}
 	if !cacheableError(err) {
 		return
 	}
