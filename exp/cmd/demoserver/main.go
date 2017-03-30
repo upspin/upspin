@@ -15,7 +15,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"math/rand"
 	"net/http"
@@ -43,10 +42,7 @@ import (
 
 func main() {
 	rand.Seed(time.Now().UnixNano())
-
-	// TODO(adg): make this flag a feature of package https.
-	doTLS := flag.Bool("tls", true, "Serve TLS (HTTPS)")
-	flags.Parse("config", "http", "https", "addr", "log", "letscache", "tls")
+	flags.Parse("config", "insecure", "http", "https", "addr", "log", "letscache", "tls")
 
 	addr := upspin.NetAddr(flags.NetAddr)
 	ep := upspin.Endpoint{
@@ -66,12 +62,7 @@ func main() {
 	http.Handle("/api/Store/", storeserver.New(cfg, s.StoreServer(), addr))
 	http.Handle("/api/Dir/", dirserver.New(cfg, s.DirServer(), addr))
 
-	if *doTLS {
-		https.ListenAndServeFromFlags(nil, "dingus")
-	} else {
-		// TODO(adg): check that the address is localhost.
-		log.Fatal(http.ListenAndServe(flags.HTTPAddr, nil))
-	}
+	https.ListenAndServeFromFlags(nil, "demoserver")
 }
 
 // box represents an opened box.

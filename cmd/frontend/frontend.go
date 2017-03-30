@@ -30,12 +30,14 @@ var (
 )
 
 func main() {
-	flags.Parse("http", "https", "letscache", "log", "tls")
+	flags.Parse("http", "https", "insecure", "letscache", "log", "tls")
 	http.Handle("/", newServer())
-	go func() {
-		log.Printf("Serving HTTP->HTTPS redirect on %q", flags.HTTPAddr)
-		log.Fatal(http.ListenAndServe(flags.HTTPAddr, http.HandlerFunc(redirectHTTP)))
-	}()
+	if !flags.InsecureHTTP {
+		go func() {
+			log.Printf("Serving HTTP->HTTPS redirect on %q", flags.HTTPAddr)
+			log.Fatal(http.ListenAndServe(flags.HTTPAddr, http.HandlerFunc(redirectHTTP)))
+		}()
+	}
 	https.ListenAndServeFromFlags(nil, "frontend")
 }
 
