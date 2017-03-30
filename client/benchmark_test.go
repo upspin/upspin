@@ -87,7 +87,7 @@ func setupBench(b *testing.B, userName upspin.UserName, packing upspin.Packing, 
 		b.Fatalf("No such key for packing: %d", packing)
 	}
 
-	cfg := setup(userName, pub)
+	cfg := setup(baseCfg, userName, pub)
 	if packing == upspin.EEPack {
 		cfg = config.SetPacking(cfg, packing)
 		f, err := factotum.NewFromDir(testutil.Repo(keyDir))

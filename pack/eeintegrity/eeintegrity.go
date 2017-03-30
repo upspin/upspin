@@ -258,28 +258,26 @@ func (ei ei) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName
 		return errors.E(op, errors.Invalid, d.Name, err)
 	}
 
-	// File owner is part of the pathname
-	parsed, err := path.Parse(d.Name)
-	if err != nil {
+	if _, err := path.Parse(d.Name); err != nil {
 		return errors.E(op, err)
 	}
-	owner := parsed.User()
-	// The owner has a well-known public key
-	ownerRawPubKey, err := packutil.GetPublicKey(cfg, owner)
+
+	// The writer has a well-known public key.
+	writerRawPubKey, err := packutil.GetPublicKey(cfg, d.Writer)
 	if err != nil {
 		return errors.E(op, d.Name, err)
 	}
-	ownerPubKey, err := factotum.ParsePublicKey(ownerRawPubKey)
+	writerPubKey, err := factotum.ParsePublicKey(writerRawPubKey)
 	if err != nil {
 		return errors.E(op, d.Name, err)
 	}
 
-	// Verify that this was signed with the owner's old or new public key.
+	// Verify that this was signed with the writer's old or new public key.
 	f := cfg.Factotum()
 	vhash := f.DirEntryHash(d.SignedName, d.Link, d.Attr, d.Packing, d.Time, dkey, cipherSum)
-	if !ecdsa.Verify(ownerPubKey, vhash, sig.R, sig.S) &&
-		!ecdsa.Verify(ownerPubKey, vhash, sig2.R, sig2.S) {
-		// Check sig2 in case ownerPubKey is rotating.
+	if !ecdsa.Verify(writerPubKey, vhash, sig.R, sig.S) &&
+		!ecdsa.Verify(writerPubKey, vhash, sig2.R, sig2.S) {
+		// Check sig2 in case writerPubKey is rotating.
 		return errors.E(op, d.Name, errVerify)
 	}
 
