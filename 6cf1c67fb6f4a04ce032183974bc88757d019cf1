@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf0d5657_18f4ec05",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-30T19:18:46Z",
+      "side": 1,
+      "message": "If up to me, I would have made the subdirectory just the user name and put al the files into it.  For backward compatibility you could have then linked them back to the old names but at some point in the future, the only thing you would have would a directory with a bunch of user names in it.  For me, visually appealing.",
+      "range": {
+        "startLine": 16,
+        "startChar": 0,
+        "endLine": 19,
+        "endChar": 74
+      },
+      "revId": "6cf1c67fb6f4a04ce032183974bc88757d019cf1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4cb4882c_8510d65d",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-30T19:18:46Z",
+      "side": 1,
+      "message": "Won\u0027t this error out the second time you start the server since the link will already exist and *nix hard links will fail if the file already exists?",
+      "range": {
+        "startLine": 119,
+        "startChar": 2,
+        "endLine": 124,
+        "endChar": 3
+      },
+      "revId": "6cf1c67fb6f4a04ce032183974bc88757d019cf1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "68679184_9745d417",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-03-30T19:18:46Z",
+      "side": 1,
+      "message": "Two stats, a write, and a sync seems pretty expensive for a single append.\n\nWhat happens when you truncate the file on read errors?  Aren\u0027t you just going to continue writing at some place past the end of the file forcing the intervening space to be nulls?\n\nOf course, I don\u0027t like this truncation thing.  I really think you should just read ahead a byte at a time till you reach something that checksums correctly.",
+      "range": {
+        "startLine": 261,
+        "startChar": 0,
+        "endLine": 261,
+        "endChar": 51
+      },
+      "revId": "6cf1c67fb6f4a04ce032183974bc88757d019cf1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
