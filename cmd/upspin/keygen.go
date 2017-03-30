@@ -200,7 +200,7 @@ func (s *State) saveKeys(where string, rotate bool, newPublic, newPrivate string
 		return err
 	}
 	if !rotate {
-		s.Exitf("prior keys exist; rerun with -rotate to update keys")
+		s.Exitf("prior keys exist; rerun with rotate command to update keys")
 	}
 	public, err := ioutil.ReadFile(publicFile)
 	if err != nil {
