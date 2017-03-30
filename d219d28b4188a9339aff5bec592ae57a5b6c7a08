@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "f13c407e_37df0f30",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-30T17:43:12Z",
+      "side": 1,
+      "message": "I haven\u0027t measured. :-(\n\nI guess I don\u0027t need to do this, but except for recoverFromLog, which happens on crashes only, no one else was using n\u003e1. Watch can\u0027t do n\u003e1, which is the other user.",
+      "parentUuid": "8b2940fb_948f9c2f",
+      "range": {
+        "startLine": 198,
+        "startChar": 1,
+        "endLine": 199,
+        "endChar": 27
+      },
+      "revId": "d219d28b4188a9339aff5bec592ae57a5b6c7a08",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6aaf6986_610850ca",
         "filename": "dir/server/tree/tree.go",
         "patchSetId": 1
@@ -36,6 +60,30 @@
       "writtenOn": "2017-03-30T17:38:45Z",
       "side": 1,
       "message": "You didn\u0027t do it before, but since you are truncating the log,  do you need to change logIndex?",
+      "range": {
+        "startLine": 763,
+        "startChar": 3,
+        "endLine": 765,
+        "endChar": 4
+      },
+      "revId": "d219d28b4188a9339aff5bec592ae57a5b6c7a08",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "048b322c_9ac7dc3d",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 765,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-03-30T17:43:12Z",
+      "side": 1,
+      "message": "Turns out the previous SaveOffset(lastProcessed) did nothing. lastProcessed is already what we had saved. It does not need to be updated. We will recover from what we have up to the truncation point.",
+      "parentUuid": "6aaf6986_610850ca",
       "range": {
         "startLine": 763,
         "startChar": 3,
