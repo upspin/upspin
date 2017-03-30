@@ -131,8 +131,9 @@ func TestPack256(t *testing.T) {
 func TestName256(t *testing.T) {
 	const (
 		user    upspin.UserName = "joe@upspin.io"
-		name                    = upspin.PathName(user + "/file/of/user.256")
-		newName                 = upspin.PathName(user + "/file/of/user.256.2")
+		owner   upspin.UserName = "carla@upspin.io"
+		name                    = upspin.PathName(owner + "/file/of/user.256")
+		newName                 = upspin.PathName(owner + "/file/of/user.256.2")
 		text                    = "this is some text 256"
 	)
 	cfg, packer := setup(user)

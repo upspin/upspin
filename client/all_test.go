@@ -26,6 +26,7 @@ import (
 )
 
 var baseCfg upspin.Config
+var baseCfg2 upspin.Config
 
 func init() {
 	inProcess := upspin.Endpoint{
@@ -33,6 +34,7 @@ func init() {
 		NetAddr:   "", // ignored
 	}
 
+	// Create baseCfg with user1's keys.
 	f, err := factotum.NewFromDir(testutil.Repo("key", "testdata", "user1")) // Always use user1's keys.
 	if err != nil {
 		panic("cannot initialize factotum: " + err.Error())
@@ -44,6 +46,19 @@ func init() {
 	baseCfg = config.SetStoreEndpoint(baseCfg, inProcess)
 	baseCfg = config.SetDirEndpoint(baseCfg, inProcess)
 	baseCfg = config.SetFactotum(baseCfg, f)
+
+	// Create baseCfg2 with joe's keys.
+	f, err = factotum.NewFromDir(testutil.Repo("key", "testdata", "joe")) // Always use user1's keys.
+	if err != nil {
+		panic("cannot initialize factotum: " + err.Error())
+	}
+
+	baseCfg2 = config.New()
+	baseCfg2 = config.SetPacking(baseCfg, upspin.EEIntegrityPack)
+	baseCfg2 = config.SetKeyEndpoint(baseCfg, inProcess)
+	baseCfg2 = config.SetStoreEndpoint(baseCfg, inProcess)
+	baseCfg2 = config.SetDirEndpoint(baseCfg, inProcess)
+	baseCfg2 = config.SetFactotum(baseCfg, f)
 
 	bind.RegisterKeyServer(upspin.InProcess, keyserver.New())
 	bind.RegisterStoreServer(upspin.InProcess, storeserver.New())
@@ -59,8 +74,8 @@ func checkTransport(s upspin.Service) {
 	}
 }
 
-func setup(userName upspin.UserName, publicKey upspin.PublicKey) upspin.Config {
-	cfg := config.SetUserName(baseCfg, userName)
+func setup(base upspin.Config, userName upspin.UserName, publicKey upspin.PublicKey) upspin.Config {
+	cfg := config.SetUserName(base, userName)
 	key, _ := bind.KeyServer(cfg, cfg.KeyEndpoint())
 	checkTransport(key)
 	dir, _ := bind.DirServer(cfg, cfg.DirEndpoint())
@@ -98,7 +113,7 @@ func TestPutGetTopLevelFile(t *testing.T) {
 		user = "user1@google.com"
 		root = user + "/"
 	)
-	client := New(setup(user, ""))
+	client := New(setup(baseCfg, user, ""))
 	const (
 		fileName = root + "file"
 		text     = "hello sailor"
@@ -119,7 +134,7 @@ func TestPutGetTopLevelFile(t *testing.T) {
 const Max = 100 * 1000 // Must be > 100.
 
 func setupFileIO(user upspin.UserName, fileName upspin.PathName, max int, t *testing.T) (upspin.Client, upspin.File, []byte) {
-	client := New(setup(user, ""))
+	client := New(setup(baseCfg, user, ""))
 	f, err := client.Create(fileName)
 	if err != nil {
 		t.Fatal("create file:", err)
@@ -335,7 +350,7 @@ func TestFileSeek(t *testing.T) {
 			if o != int64(offset) {
 				t.Fatalf("Seek failed (whence %d): expected offset %d got %d", whence, offset, o)
 			}
-			n, err := f.Write(data[offset:offset+length])
+			n, err := f.Write(data[offset : offset+length])
 			if err != nil {
 				t.Fatalf("Write(length %d): %v", length, err)
 			}
@@ -406,7 +421,7 @@ func TestFileSeek(t *testing.T) {
 			if o != int64(offset) {
 				t.Fatalf("Seek failed (whence %d): expected offset %d got %d", whence, offset, o)
 			}
-			n, err := f.Read(buf[offset:offset+length])
+			n, err := f.Read(buf[offset : offset+length])
 			if err != nil {
 				t.Fatalf("Read(length %d): %v", offset, length, err)
 			}
@@ -505,7 +520,7 @@ func globAndCheck(t *testing.T, client upspin.Client, pattern string, expect ...
 
 func TestGlob(t *testing.T) {
 	const user = "multiuser@a.co"
-	client := New(setup(user, ""))
+	client := New(setup(baseCfg, user, ""))
 	var err error
 
 	for _, fno := range []int{0, 1, 7, 17} {
@@ -534,7 +549,7 @@ func TestGlob(t *testing.T) {
 
 func TestPutDuplicateAndRename(t *testing.T) {
 	const user = "link@a.com"
-	client := New(setup(user, ""))
+	client := New(setup(baseCfg, user, ""))
 	original := upspin.PathName(fmt.Sprintf("%s/original", user))
 	text := "the rain in spain"
 	if _, err := client.Put(original, []byte(text)); err != nil {
@@ -585,6 +600,66 @@ func TestPutDuplicateAndRename(t *testing.T) {
 	}
 }
 
+func TestRenames(t *testing.T) {
+	testRenames(t, upspin.EEPack)
+	testRenames(t, upspin.EEIntegrityPack)
+}
+
+func testRenames(t *testing.T, packing upspin.Packing) {
+	owner := upspin.UserName(fmt.Sprintf("owner@%d.testrenames.com", packing))
+	user := upspin.UserName(fmt.Sprintf("user@%d.testrenames.com", packing))
+	text := "the rain in spain"
+
+	// Use different keys for the two users.
+	cfg := config.SetPacking(baseCfg, packing)
+	ownerClient := New(setup(cfg, owner, ""))
+	cfg = config.SetPacking(baseCfg2, packing)
+	userClient := New(setup(cfg, user, ""))
+
+	// Allow user to use owner's directory.
+	access := upspin.PathName(fmt.Sprintf("%s/Access", owner))
+	perms := fmt.Sprintf("*: %s, %s\n", owner, user)
+	if _, err := ownerClient.Put(access, []byte(perms)); err != nil {
+		t.Fatal("put file:", err)
+	}
+
+	// User creates and renames.
+	original := upspin.PathName(fmt.Sprintf("%s/user_original", owner))
+	if _, err := userClient.Put(original, []byte(text)); err != nil {
+		t.Fatal("put file:", err)
+	}
+	renamed := upspin.PathName(fmt.Sprintf("%s/user_renamed", owner))
+	if err := userClient.Rename(original, renamed); err != nil {
+		t.Fatal("rename file:", err)
+	}
+
+	// Owner renames user created file.
+	if err := ownerClient.Rename(renamed, original); err != nil {
+		t.Fatal("rename file:", err)
+	}
+	if err := ownerClient.Delete(original); err != nil {
+		t.Fatal("delete file:", err)
+	}
+
+	// Owner creates and renames.
+	original = upspin.PathName(fmt.Sprintf("%s/owner_original", owner))
+	if _, err := userClient.Put(original, []byte(text)); err != nil {
+		t.Fatal("put file:", err)
+	}
+	renamed = upspin.PathName(fmt.Sprintf("%s/owner_renamed", owner))
+	if err := userClient.Rename(original, renamed); err != nil {
+		t.Fatal("link file:", err)
+	}
+
+	// User renames owner created file.
+	if err := userClient.Rename(renamed, original); err != nil {
+		t.Fatal("link file:", err)
+	}
+	if err := userClient.Delete(original); err != nil {
+		t.Fatal("delete file:", err)
+	}
+}
+
 func TestSimpleLinks(t *testing.T) {
 	const (
 		user     = "linker@google.com"
@@ -595,7 +670,7 @@ func TestSimpleLinks(t *testing.T) {
 		text     = "hello sailor"
 		linkText = "what a lovely day"
 	)
-	client := New(setup(user, ""))
+	client := New(setup(baseCfg, user, ""))
 	// Install and check file.
 	_, err := client.MakeDirectory(dirName)
 	if err != nil {
@@ -670,7 +745,7 @@ func TestGlobLinks(t *testing.T) {
 		linkName = root + "/link" // Will point to dir.
 		text     = "ignored"
 	)
-	client := New(setup(user, ""))
+	client := New(setup(baseCfg, user, ""))
 	_, err := client.MakeDirectory(dirName)
 	if err != nil {
 		t.Fatal(err)
@@ -716,7 +791,7 @@ func TestBrokenLink(t *testing.T) {
 		linkName = root + "/link"
 		linkText = "what a lovely day"
 	)
-	client := New(setup(user, ""))
+	client := New(setup(baseCfg, user, ""))
 	// Install and check file.
 	_, err := client.MakeDirectory(dirName)
 	if err != nil {
@@ -775,7 +850,7 @@ func TestRejectBadAccessFile(t *testing.T) {
 		accessFile    = root + "/Access"
 		accessContent = "all:*"
 	)
-	client := New(setup(user, ""))
+	client := New(setup(baseCfg, user, ""))
 	_, err := client.Put(accessFile, []byte(accessContent))
 	expectedErr := errors.E(upspin.PathName(accessFile), errors.Invalid)
 	if !errors.Match(expectedErr, err) {
@@ -791,7 +866,7 @@ func TestRejectBadGroupFile(t *testing.T) {
 		groupFile    = groupDir + "/mygroup"
 		groupContent = "foo@x, yo! ; whoo-hoo!"
 	)
-	client := New(setup(user, ""))
+	client := New(setup(baseCfg, user, ""))
 	_, err := client.MakeDirectory(groupDir)
 	if err != nil {
 		t.Fatal(err)
