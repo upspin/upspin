@@ -153,6 +153,7 @@ func (s *State) shareCommand(fs *flag.FlagSet) {
 	}
 
 	var entriesToFix []*upspin.DirEntry
+	printedDiscrepancyHeader := true
 
 	// Identify the entries we need to update.
 	for _, entry := range entries {
@@ -186,9 +187,10 @@ func (s *State) shareCommand(fs *flag.FlagSet) {
 		}
 		userList := userListToString(users)
 		if userList != keyUsers || self {
-			if !s.sharer.quiet {
-				if len(entriesToFix) == 0 {
+			if !s.sharer.quiet || !s.sharer.fix {
+				if !printedDiscrepancyHeader {
 					fmt.Println("\nAccess discrepancies:")
+					printedDiscrepancyHeader = true
 				}
 				fmt.Printf("\n%s:\n", entry.Name)
 				fmt.Printf("\tAccess: %s\n", userList)
