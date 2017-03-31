@@ -423,7 +423,7 @@ func TestFileSeek(t *testing.T) {
 			}
 			n, err := f.Read(buf[offset : offset+length])
 			if err != nil {
-				t.Fatalf("Read(length %d): %v", offset, length, err)
+				t.Fatalf("Read(offset %d, length %d): %v", offset, length, err)
 			}
 			if n != length {
 				t.Fatalf("Read length failed: offset %d expected %d got %d", offset, length, n)

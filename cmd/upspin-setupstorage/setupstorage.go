@@ -97,7 +97,7 @@ func main() {
 	}
 	s.WriteServerConfig(cfgPath, cfg)
 
-	fmt.Printf("You should now deploy the upspinserver binary and run 'upspin setupserver'.\n")
+	fmt.Fprintf(os.Stderr, "You should now deploy the upspinserver binary and run 'upspin setupserver'.\n")
 
 	s.ExitNow()
 }
@@ -142,9 +142,9 @@ func (s *state) createServiceAccount(cfgPath string) (email, privateKeyData stri
 		s.Exit(err)
 	}
 	if created {
-		fmt.Printf("Service account %q created.\n", acct.Email)
+		fmt.Fprintf(os.Stderr, "Service account %q created.\n", acct.Email)
 	} else {
-		fmt.Printf("A new key for the service account %q was created.\n", acct.Email)
+		fmt.Fprintf(os.Stderr, "A new key for the service account %q was created.\n", acct.Email)
 	}
 
 	return acct.Email, key.PrivateKeyData
@@ -176,11 +176,11 @@ func (s *state) createBucket(email, bucket string) {
 		// account has access. (For now, we assume that the user
 		// created the bucket using this command and that the bucket
 		// has the correct permissions.)
-		fmt.Printf("Bucket %q already exists; re-using it.\n", bucket)
+		fmt.Fprintf(os.Stderr, "Bucket %q already exists; re-using it.\n", bucket)
 	} else if err != nil {
 		s.Exit(err)
 	} else {
-		fmt.Printf("Bucket %q created.\n", bucket)
+		fmt.Fprintf(os.Stderr, "Bucket %q created.\n", bucket)
 	}
 }
 
