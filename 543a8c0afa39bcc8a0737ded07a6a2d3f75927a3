@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b9a5035f_71d511aa",
+        "filename": "cmd/upspin/snapshot.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-31T16:43:14Z",
+      "side": 1,
+      "message": "Might we use a name less likely to clobber something real?",
+      "revId": "543a8c0afa39bcc8a0737ded07a6a2d3f75927a3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
