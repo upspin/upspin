@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0331cf6f_b4fae6b2",
+        "filename": "doc/index.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-03-31T21:28:14Z",
+      "side": 1,
+      "message": "Why not a parallel construction, e.g. The [RPC](https://godoc.org/upspin.io/rpc) document is a semiformal...",
+      "revId": "278d5aae1962fee3863a4aa404af43a246d1bd61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
