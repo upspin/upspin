@@ -27,7 +27,7 @@ When running the shell, the leading "upspin" is assumed on each command.
 	}
 	prompt := func() {
 		if len(*promptFlag) > 0 {
-			fmt.Print(*promptFlag)
+			fmt.Fprint(os.Stderr, *promptFlag)
 		}
 	}
 	if *promptFlag == promptPlaceholder {
@@ -71,7 +71,7 @@ func (s *State) exec(line string, verbose bool) {
 		return
 	}
 	if verbose {
-		fmt.Println(" + " + strings.Join(words, " "))
+		fmt.Fprintln(os.Stderr, " + "+strings.Join(words, " "))
 	}
 	s.Name = words[0]
 	fn(s, words[1:]...)

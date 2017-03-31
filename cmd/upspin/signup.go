@@ -167,8 +167,8 @@ file and keys and only send the signup request to the key server.
 			s.Exit(err)
 		}
 	}
-	fmt.Println("Configuration file written to:")
-	fmt.Printf("\t%s\n\n", flags.Config)
+	fmt.Fprintf(os.Stderr, "Configuration file written to:\n")
+	fmt.Fprintf(os.Stderr, "\t%s\n\n", flags.Config)
 
 	// Generate a new key.
 	s.keygenCommand(fs)
@@ -201,8 +201,8 @@ func (s *State) registerUser(configFile string) {
 	if r.StatusCode != http.StatusOK {
 		s.Exitf("key server error: %s", b)
 	}
-	fmt.Printf("A signup email has been sent to %q,\n", cfg.UserName())
-	fmt.Println("please read it for further instructions.")
+	fmt.Fprintf(os.Stderr, "A signup email has been sent to %q,\n", cfg.UserName())
+	fmt.Fprintf(os.Stderr, "please read it for further instructions.\n")
 }
 
 // makeSignupURL returns an encoded URL used to sign up a new user with the

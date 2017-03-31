@@ -81,20 +81,20 @@ func (s *State) keygenCommand(fs *flag.FlagSet) {
 	if err != nil {
 		s.Exitf("writing keys: %v", err)
 	}
-	fmt.Println("Upspin private/public key pair written to:")
-	fmt.Printf("\t%s\n", filepath.Join(where, "public.upspinkey"))
-	fmt.Printf("\t%s\n", filepath.Join(where, "secret.upspinkey"))
-	fmt.Println("This key pair provides access to your Upspin identity and data.")
+	fmt.Fprintln(os.Stderr, "Upspin private/public key pair written to:")
+	fmt.Fprintf(os.Stderr, "\t%s\n", filepath.Join(where, "public.upspinkey"))
+	fmt.Fprintf(os.Stderr, "\t%s\n", filepath.Join(where, "secret.upspinkey"))
+	fmt.Fprintln(os.Stderr, "This key pair provides access to your Upspin identity and data.")
 	if secretFlag == "" {
-		fmt.Println("If you lose the keys you can re-create them by running this command:")
-		fmt.Printf("\tupspin keygen -secretseed %s\n", secretStr)
-		fmt.Println("Write this command down and store it in a secure, private place.")
-		fmt.Println("Do not share your private key or this command with anyone.")
+		fmt.Fprintln(os.Stderr, "If you lose the keys you can re-create them by running this command:")
+		fmt.Fprintf(os.Stderr, "\tupspin keygen -secretseed %s\n", secretStr)
+		fmt.Fprintln(os.Stderr, "Write this command down and store it in a secure, private place.")
+		fmt.Fprintln(os.Stderr, "Do not share your private key or this command with anyone.")
 	}
 	if rotate {
-		fmt.Println("\nTo install new keys in the key server, see 'upspin rotate -help'.")
+		fmt.Fprintln(os.Stderr, "\nTo install new keys in the key server, see 'upspin rotate -help'.")
 	}
-	fmt.Println()
+	fmt.Fprintln(os.Stderr)
 }
 
 func createKeys(curveName, secretFlag string) (public, private, secretStr string, err error) {
@@ -231,6 +231,6 @@ func (s *State) saveKeys(where string, rotate bool, newPublic, newPrivate string
 	if err != nil {
 		return err
 	}
-	fmt.Printf("Saved previous key pair to:\n\t%s\n", archiveFile)
+	fmt.Fprintf(os.Stderr, "Saved previous key pair to:\n\t%s\n", archiveFile)
 	return nil
 }

@@ -232,7 +232,7 @@ func TestEndpoint(t *testing.T) {
 	_, svc := setup(t, name)
 
 	if got := svc.Endpoint(); got != keyService.Endpoint() {
-		t.Errorf("endpoint = %d, want %d", got, keyService.Endpoint())
+		t.Errorf("endpoint = %v, want %v", got, keyService.Endpoint())
 	}
 }
 

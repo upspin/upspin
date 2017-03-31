@@ -189,12 +189,12 @@ func (s *State) shareCommand(fs *flag.FlagSet) {
 		if userList != keyUsers || self {
 			if !s.sharer.quiet || !s.sharer.fix {
 				if !printedDiscrepancyHeader {
-					fmt.Println("\nAccess discrepancies:")
+					fmt.Fprintln(os.Stderr, "\nAccess discrepancies:")
 					printedDiscrepancyHeader = true
 				}
-				fmt.Printf("\n%s:\n", entry.Name)
-				fmt.Printf("\tAccess: %s\n", userList)
-				fmt.Printf("\tKeys:   %s\n", keyUsers)
+				fmt.Fprintf(os.Stderr, "\n%s:\n", entry.Name)
+				fmt.Fprintf(os.Stderr, "\tAccess: %s\n", userList)
+				fmt.Fprintf(os.Stderr, "\tKeys:   %s\n", keyUsers)
 			}
 			entriesToFix = append(entriesToFix, entry)
 		}
