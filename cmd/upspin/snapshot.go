@@ -80,6 +80,10 @@ the directory server for the user's root supports them.
 		Name:       name,
 		SignedName: name,
 		Packing:    upspin.PlainPack,
+		Writer:     s.Config.UserName(),
 	}
-	s.DirServer(entry.Name).Put(entry)
+	_, err = s.DirServer(entry.Name).Put(entry)
+	if err != nil {
+		s.Exit(err)
+	}
 }
