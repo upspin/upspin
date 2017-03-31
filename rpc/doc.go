@@ -64,7 +64,7 @@ there are Marshal and Unmarshal methods that encode and decode these types
 to byte slices. (The details of these encodings are listed below.) Thus
 within the protocol buffer types, these appear as proto type "bytes".
 
-These types are handled differently so the DirServer can to serialize them
+These types are handled differently so the DirServer can serialize them
 easily for storage.
 
 The errors.Error type is also handled specially so its full functionality

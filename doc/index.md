@@ -31,6 +31,10 @@ Performance is not a primary goal. Uniformity and security are.
   common usage scenarios.
 - The [Mascot](/doc/mascot.md) document introduces our mascot, Augie,
   including downloadable images and usage information.
+- The [RPC](https://godoc.org/upspin.io/rpc) document is a semiformal
+  description of the wire protocol used to communicate between clients
+  and servers.
+
 
 ## Community
 
