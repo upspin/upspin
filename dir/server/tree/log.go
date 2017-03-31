@@ -115,18 +115,11 @@ func NewLogs(user upspin.UserName, directory string) (*Writer, *LogIndex, error)
 		// Is there an existing, old-style log file? If so, hard link it
 		// to the zero offset entry in the user's subdirectory.
 		oldLogName := filepath.Join(directory, oldStyleLogFilePrefix+string(user))
-		_, err := os.Stat(oldLogName)
-		if err == nil {
-			// Only hardlink if the link does not yet exist.
-			if _, err := os.Stat(logFile(user, 0, directory)); err != nil {
-				err = os.Link(oldLogName, logFile(user, 0, directory))
-				if err != nil {
-					return nil, nil, errors.E(op, errors.IO, err)
-				}
-			}
+		newLogName := logFile(user, 0, directory)
+		err := linkIfNotExist(oldLogName, newLogName)
+		if err != nil {
+			return nil, nil, errors.E(op, errors.IO, err)
 		}
-		// Other errors are ignored. If they're bad enough, we'll fail
-		// below.
 	}
 
 	loc := logFile(user, off[0], directory)
@@ -134,6 +127,18 @@ func NewLogs(user upspin.UserName, directory string) (*Writer, *LogIndex, error)
 	if err != nil {
 		return nil, nil, errors.E(op, errors.IO, err)
 	}
+
+	// We now have a new log name. Ensure we create an old log name too (for
+	// new roots) so that we could go back to old naming style if needed.
+	if off[0] == 0 {
+		oldLogName := filepath.Join(directory, oldStyleLogFilePrefix+string(user))
+		newLogName := logFile(user, 0, directory)
+		err := linkIfNotExist(newLogName, oldLogName)
+		if err != nil {
+			return nil, nil, errors.E(op, errors.IO, err)
+		}
+	}
+
 	l := &Writer{
 		user:       user,
 		mu:         &sync.Mutex{},
@@ -158,6 +163,27 @@ func NewLogs(user upspin.UserName, directory string) (*Writer, *LogIndex, error)
 		rootFile:  rootFile,
 	}
 	return l, li, nil
+}
+
+// linkIfNotExist links oldname to newname if newname does not yet exist.
+// Otherwise it does nothing. If oldname does not exist, it does nothing.
+func linkIfNotExist(oldname, newname string) error {
+	_, err := os.Stat(newname)
+	if err == nil {
+		// Already exist, nothing to do.
+		return nil
+	}
+	if err != nil && !os.IsNotExist(err) {
+		return err
+	}
+	_, err = os.Stat(oldname)
+	if os.IsNotExist(err) {
+		return nil
+	}
+	if err != nil {
+		return err
+	}
+	return os.Link(oldname, newname)
 }
 
 // HasLog reports whether user has logs in directory.
