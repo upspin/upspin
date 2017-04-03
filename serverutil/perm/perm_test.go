@@ -39,24 +39,29 @@ func setupEnv(t *testing.T) *testenv.Env {
 }
 
 func newWithEnv(t *testing.T, env *testenv.Env) (perm *Perm, wait func()) {
-	wait, onUpdate, onRetry := newStubs(t)
+	wait, onUpdate, onRetry, ready := newStubs(t)
 	cfg := env.Config
 	dir := env.DirServer
-	perm = newPerm("newWithEnv", cfg, readyNow, cfg.UserName(), dir.Lookup, dir.Watch, onUpdate, onRetry)
+	perm = newPerm("newWithEnv", cfg, ready, cfg.UserName(), dir.Lookup, dir.Watch, onUpdate, onRetry)
 	return
 }
 
 func newWithConfig(t *testing.T, cfg upspin.Config) (perm *Perm, wait func()) {
-	wait, onUpdate, onRetry := newStubs(t)
-	perm = newPerm("newWithConfig", cfg, readyNow, cfg.UserName(), nil, nil, onUpdate, onRetry)
+	wait, onUpdate, onRetry, ready := newStubs(t)
+	perm = newPerm("newWithConfig", cfg, ready, cfg.UserName(), nil, nil, onUpdate, onRetry)
 	return
 }
 
 // The wait func, when called, blocks until onUpdate fires or a timeout occurs.
-func newStubs(t *testing.T) (wait, onUpdate, onRetry func()) {
+func newStubs(t *testing.T) (wait, onUpdate, onRetry func(), ready chan struct{}) {
 	update := make(chan bool)
+	ready = make(chan struct{})
 	n := 0
 	wait = func() {
+		if ready != nil {
+			close(ready)
+			ready = nil
+		}
 		n++
 		select {
 		case <-time.After(2 * time.Second):
@@ -228,9 +233,9 @@ func TestSequentialErrorsOK(t *testing.T) {
 	env := setupEnv(t)
 	defer env.Exit()
 
-	wait, onUpdate, onRetry := newStubs(t)
+	wait, onUpdate, onRetry, ready := newStubs(t)
 	cfg := env.Config
-	newPerm("TestSequentialErrorsOK", cfg, readyNow, owner, env.DirServer.Lookup, errorReturningWatch, onUpdate, onRetry)
+	newPerm("TestSequentialErrorsOK", cfg, ready, owner, env.DirServer.Lookup, errorReturningWatch, onUpdate, onRetry)
 	wait()
 
 	// No crash, no problem.
