@@ -321,7 +321,7 @@ func (r *Reader) ReadAt(offset int64) (le LogEntry, next int64, err error) {
 			// Load new file offsets in case there was a log rotation.
 			r.offsets = logOffsetsFor(filepath.Dir(r.file.Name()))
 		}
-		readOffset := r.readOffet(offset)
+		readOffset := r.readOffset(offset)
 		// Locate the file and open it.
 		err := r.openLogAtOffset(readOffset, filepath.Dir(r.file.Name()))
 		if err != nil {
@@ -361,7 +361,7 @@ func (r *Reader) ReadAt(offset int64) (le LogEntry, next int64, err error) {
 
 // readOffset returns the log we must read from to satisfy offset. If offset
 // is not in the range of what we have stored it returns -1.
-func (r *Reader) readOffet(offset int64) int64 {
+func (r *Reader) readOffset(offset int64) int64 {
 	for _, o := range r.offsets { // r.offsets are in descending order.
 		if offset >= o {
 			return o
