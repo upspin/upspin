@@ -189,7 +189,7 @@ func (s *State) shareCommand(fs *flag.FlagSet) {
 		if userList != keyUsers || self {
 			if !s.sharer.quiet || !s.sharer.fix {
 				if !printedDiscrepancyHeader {
-					fmt.Fprintln(os.Stderr, "\nAccess discrepancies:")
+					fmt.Fprintln(os.Stderr, "\nDiscrepancies between users in Access files and users in wrapped keys:")
 					printedDiscrepancyHeader = true
 				}
 				fmt.Fprintf(os.Stderr, "\n%s:\n", entry.Name)
