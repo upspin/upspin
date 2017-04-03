@@ -63,18 +63,14 @@ func TestPutNodes(t *testing.T) {
 	if got, want := log.LastOffset(), int64(totBytes); got < want {
 		t.Fatalf("LastIndex = %d, want > %d", got, want)
 	}
-	lrd, err := log.NewReader()
-	if err != nil {
-		t.Fatal(err)
-	}
-	entry, next, err := lrd.ReadAt(int64(0))
+	entry, next, err := log.ReadAt(int64(0))
 	if err != nil {
 		t.Fatal(err)
 	}
 	if !reflect.DeepEqual(&entry.Entry, dir2) {
 		t.Errorf("dir2 = %v, want %v", entry.Entry, dir2)
 	}
-	entry, _, err = lrd.ReadAt(next)
+	entry, _, err = log.ReadAt(next)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -197,7 +193,7 @@ func TestPutNodes(t *testing.T) {
 		t.Fatalf("cfg.Log.LastIndex() = %d, want %d", log.LastOffset(), want)
 	}
 	// Verify logged entry is the deletion of a file.
-	entry, _, err = lrd.ReadAt(last)
+	entry, _, err = log.ReadAt(last)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1090,7 +1086,7 @@ func newDirEntry(name upspin.PathName, isDir bool, config upspin.Config) (path.P
 
 // newConfigForTesting creates the necessary items to instantiate a Tree for
 // testing.
-func newConfigForTesting(t *testing.T, userName upspin.UserName) (upspin.Config, *Writer, *LogIndex) {
+func newConfigForTesting(t *testing.T, userName upspin.UserName) (upspin.Config, *Log, *LogIndex) {
 	factotum, err := factotum.NewFromDir(testutil.Repo("key", "testdata", "test"))
 	if err != nil {
 		t.Fatal(err)
