@@ -45,6 +45,9 @@ type Perm struct {
 	// It is used for testing.
 	onRetry func()
 
+	// done signals the watch loop to exit.
+	done <-chan struct{}
+
 	// writers is the set of users allowed to write. If it's nil, all users
 	// are allowed. An empty map means no one is allowed.
 	writers map[upspin.UserName]bool
@@ -62,7 +65,7 @@ type watchFunc func(upspin.PathName, int64, <-chan struct{}) (<-chan upspin.Even
 // typically the user name of a server, such as a StoreServer or a DirServer.
 func New(cfg upspin.Config, ready <-chan struct{}, target upspin.UserName) *Perm {
 	const op = "serverutil/perm.New"
-	return newPerm(op, cfg, ready, target, nil, nil, noop, retry)
+	return newPerm(op, cfg, ready, target, nil, nil, noop, retry, nil)
 }
 
 // NewWithDir creates a new Perm monitoring the target user's Writers Group
@@ -70,7 +73,7 @@ func New(cfg upspin.Config, ready <-chan struct{}, target upspin.UserName) *Perm
 // the user name of a server, such as a StoreServer or a DirServer.
 func NewWithDir(cfg upspin.Config, ready <-chan struct{}, target upspin.UserName, dir upspin.DirServer) *Perm {
 	const op = "serverutil/perm.NewFromDir"
-	return newPerm(op, cfg, ready, target, dir.Lookup, dir.Watch, noop, retry)
+	return newPerm(op, cfg, ready, target, dir.Lookup, dir.Watch, noop, retry, nil)
 }
 
 func noop() {}
@@ -82,7 +85,7 @@ func retry() { time.Sleep(retryTimeout) }
 // watch changes on the writers file. If lookup or watch are nil the DirServer
 // is resolved using bind and the given config. The target user is typically
 // the user name of a server, such as a StoreServer or a DirServer.
-func newPerm(op string, cfg upspin.Config, ready <-chan struct{}, target upspin.UserName, lookup lookupFunc, watch watchFunc, onUpdate, onRetry func()) *Perm {
+func newPerm(op string, cfg upspin.Config, ready <-chan struct{}, target upspin.UserName, lookup lookupFunc, watch watchFunc, onUpdate, onRetry func(), done <-chan struct{}) *Perm {
 	p := &Perm{
 		cfg:        cfg,
 		targetUser: target,
@@ -92,6 +95,7 @@ func newPerm(op string, cfg upspin.Config, ready <-chan struct{}, target upspin.
 		onUpdate:   onUpdate,
 		onRetry:    onRetry,
 		writers:    nil, // Start open.
+		done:       done,
 	}
 
 	go func() {
@@ -115,6 +119,13 @@ func (p *Perm) updateLoop(op string) {
 		done        = func() {}
 	)
 	for {
+		select {
+		case <-p.done:
+			done()
+			return
+		default:
+		}
+
 		var err error
 		if events == nil {
 			// Channel is not yet open. Open now.
