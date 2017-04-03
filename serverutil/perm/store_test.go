@@ -15,8 +15,11 @@ import (
 
 func setupStoreEnv(t *testing.T) (store upspin.StoreServer, perm *Perm, ownerEnv *testenv.Env, wait, cleanup func()) {
 	ownerEnv = setupEnv(t)
-	cleanup = func() { ownerEnv.Exit() }
-	perm, wait = newWithEnv(t, ownerEnv)
+	perm, wait, done := newWithEnv(t, ownerEnv)
+	cleanup = func() {
+		ownerEnv.Exit()
+		done()
+	}
 	store = perm.WrapStore(ownerEnv.StoreServer)
 	return
 }
@@ -125,7 +128,8 @@ func TestStoreIncludeRemoteGroups(t *testing.T) {
 		t.Fatal(r.Diag())
 	}
 
-	perm, wait := newWithConfig(t, ownerEnv.Config)
+	perm, wait, done := newWithConfig(t, ownerEnv.Config)
+	defer done()
 	wait() // Update call
 	wait() // Watch event
 

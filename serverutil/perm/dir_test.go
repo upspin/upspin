@@ -26,7 +26,8 @@ func TestDirIntegration(t *testing.T) {
 		t.Fatal(r.Diag())
 	}
 
-	perm, wait := newWithEnv(t, env)
+	perm, wait, done := newWithEnv(t, env)
+	defer done()
 	wait()
 	wait()
 
