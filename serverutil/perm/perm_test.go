@@ -38,17 +38,21 @@ func setupEnv(t *testing.T) *testenv.Env {
 	return env
 }
 
-func newWithEnv(t *testing.T, env *testenv.Env) (perm *Perm, wait func()) {
+func newWithEnv(t *testing.T, env *testenv.Env) (perm *Perm, wait, done func()) {
 	wait, onUpdate, onRetry, ready := newStubs(t)
 	cfg := env.Config
 	dir := env.DirServer
-	perm = newPerm("newWithEnv", cfg, ready, cfg.UserName(), dir.Lookup, dir.Watch, onUpdate, onRetry)
+	doneCh := make(chan struct{})
+	done = func() { close(doneCh) }
+	perm = newPerm("newWithEnv", cfg, ready, cfg.UserName(), dir.Lookup, dir.Watch, onUpdate, onRetry, doneCh)
 	return
 }
 
-func newWithConfig(t *testing.T, cfg upspin.Config) (perm *Perm, wait func()) {
+func newWithConfig(t *testing.T, cfg upspin.Config) (perm *Perm, wait, done func()) {
 	wait, onUpdate, onRetry, ready := newStubs(t)
-	perm = newPerm("newWithConfig", cfg, ready, cfg.UserName(), nil, nil, onUpdate, onRetry)
+	doneCh := make(chan struct{})
+	done = func() { close(doneCh) }
+	perm = newPerm("newWithConfig", cfg, ready, cfg.UserName(), nil, nil, onUpdate, onRetry, doneCh)
 	return
 }
 
@@ -88,7 +92,8 @@ func TestCantFindFileAllowsAll(t *testing.T) {
 	env := setupEnv(t)
 	defer env.Exit()
 
-	perm, wait := newWithEnv(t, env)
+	perm, wait, done := newWithEnv(t, env)
+	defer done()
 	wait()
 
 	// Everyone is allowed, since we can't read the owner file.
@@ -117,7 +122,8 @@ func TestNoFileAllowsAll(t *testing.T) {
 		t.Fatal(r.Diag())
 	}
 
-	perm, wait := newWithEnv(t, env)
+	perm, wait, done := newWithEnv(t, env)
+	defer done()
 	wait()
 
 	// Everyone is allowed.
@@ -148,7 +154,8 @@ func TestAllowsOnlyOwner(t *testing.T) {
 		t.Fatal(r.Diag())
 	}
 
-	perm, wait := newWithEnv(t, env)
+	perm, wait, done := newWithEnv(t, env)
+	defer done()
 	wait()
 
 	// Owner is allowed.
@@ -183,7 +190,8 @@ func TestAllowsOthersAndWildcard(t *testing.T) {
 		t.Fatal(r.Diag())
 	}
 
-	perm, wait := newWithEnv(t, env)
+	perm, wait, done := newWithEnv(t, env)
+	defer done()
 	wait() // Update call
 	wait() // Watch event
 
@@ -235,7 +243,9 @@ func TestSequentialErrorsOK(t *testing.T) {
 
 	wait, onUpdate, onRetry, ready := newStubs(t)
 	cfg := env.Config
-	newPerm("TestSequentialErrorsOK", cfg, ready, owner, env.DirServer.Lookup, errorReturningWatch, onUpdate, onRetry)
+	done := make(chan struct{})
+	defer close(done)
+	newPerm("TestSequentialErrorsOK", cfg, ready, owner, env.DirServer.Lookup, errorReturningWatch, onUpdate, onRetry, done)
 	wait()
 
 	// No crash, no problem.
@@ -256,7 +266,8 @@ func TestOrderOfPuts(t *testing.T) {
 		t.Fatal(r.Diag())
 	}
 
-	perm, wait := newWithEnv(t, env)
+	perm, wait, done := newWithEnv(t, env)
+	defer done()
 	wait() // Update call.
 
 	r.Put(accessFile, accessContent) // So server can lookup Writers.
