@@ -6,6 +6,7 @@
 package https // import "upspin.io/cloud/https"
 
 import (
+	gContext "context"
 	"crypto/tls"
 	"io/ioutil"
 	"net"
@@ -15,7 +16,6 @@ import (
 	"time"
 
 	"golang.org/x/crypto/acme/autocert"
-	gContext "golang.org/x/net/context"
 	"google.golang.org/api/option"
 
 	"cloud.google.com/go/compute/metadata"
