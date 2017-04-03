@@ -6,6 +6,7 @@
 package https // import "upspin.io/cloud/https"
 
 import (
+	"context"
 	"crypto/tls"
 	"io/ioutil"
 	"net"
@@ -15,7 +16,6 @@ import (
 	"time"
 
 	"golang.org/x/crypto/acme/autocert"
-	gContext "golang.org/x/net/context"
 	"google.golang.org/api/option"
 
 	"cloud.google.com/go/compute/metadata"
@@ -251,7 +251,7 @@ type autocertCache struct {
 }
 
 func newAutocertCache(bucket, prefix string) (cache autocertCache, err error) {
-	ctx := gContext.Background()
+	ctx := context.Background()
 	client, err := storage.NewClient(ctx, option.WithScopes(storage.ScopeFullControl))
 	if err != nil {
 		return
@@ -261,7 +261,7 @@ func newAutocertCache(bucket, prefix string) (cache autocertCache, err error) {
 	return
 }
 
-func (cache autocertCache) Get(ctx gContext.Context, name string) ([]byte, error) {
+func (cache autocertCache) Get(ctx context.Context, name string) ([]byte, error) {
 	r, err := cache.b.Object(cache.server + name).NewReader(ctx)
 	if err == storage.ErrObjectNotExist {
 		return nil, autocert.ErrCacheMiss
@@ -273,7 +273,7 @@ func (cache autocertCache) Get(ctx gContext.Context, name string) ([]byte, error
 	return ioutil.ReadAll(r)
 }
 
-func (cache autocertCache) Put(ctx gContext.Context, name string, data []byte) error {
+func (cache autocertCache) Put(ctx context.Context, name string, data []byte) error {
 	// TODO(ehg) Do we need to add contentType="text/plain; charset=utf-8"?
 	w := cache.b.Object(cache.server + name).NewWriter(ctx)
 	_, err := w.Write(data)
@@ -286,6 +286,6 @@ func (cache autocertCache) Put(ctx gContext.Context, name string, data []byte) e
 	return err
 }
 
-func (cache autocertCache) Delete(ctx gContext.Context, name string) error {
+func (cache autocertCache) Delete(ctx context.Context, name string) error {
 	return cache.b.Object(cache.server + name).Delete(ctx)
 }
