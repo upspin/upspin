@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6927dc0e_f9f72f76",
+        "filename": "cmd/upspin/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-04-03T22:20:51Z",
+      "side": 1,
+      "message": "There are tons of flags here that shouldn\u0027t be registered\n\n-addr\n-cachedir\n-http\n-https\n-insecure\n-kind\n-letscache\n-serverconfig\n-storeserveruser\n-writethrough",
+      "revId": "1dc3f04be2242315581134f2741e1b87101da31c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
