@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "74c8a7ad_670ebbff",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-04-03T21:57:21Z",
+      "side": 1,
+      "message": "cloud/https: update to track changes to x/crypto/acme/autocert",
+      "revId": "532c0a9dff797cc971bec8fbd1bc078084b1a25a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
