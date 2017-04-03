@@ -34,6 +34,24 @@
       "revId": "543a8c0afa39bcc8a0737ded07a6a2d3f75927a3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d012ffbd_aa4ef24d",
+        "filename": "cmd/upspin/snapshot.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-04-03T17:03:20Z",
+      "side": 1,
+      "message": "This comment really has nothing to do with this CL which is just fixing a problem with that file.\n\nI have no problem with the name. __double_super_secret_invisible_snapshot_control_file is hard to type.\n\nThe alternative might be a file called Control (or IOCTL) that you Put a request into.  Then at least every server would have a Control file that they could use for whatever purpose and we\u0027d only take one name out of the namespace.  Also, I would make it visible.  This one is invisible.\n\nWe would have to special case it in the client as we do for Access and Group files so that it isn\u0027t encrypted or the server might not be able to read the requests.",
+      "parentUuid": "b7e5f2c0_e0bf3a1e",
+      "revId": "543a8c0afa39bcc8a0737ded07a6a2d3f75927a3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
