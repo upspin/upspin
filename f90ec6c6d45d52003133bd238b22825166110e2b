@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "4e012bd6_4c702409",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-04-04T00:42:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1d079177_dd3d4f56",
+      "revId": "f90ec6c6d45d52003133bd238b22825166110e2b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5333f7f5_78724c12",
         "filename": "serverutil/perm/perm.go",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2017-04-04T00:40:58Z",
       "side": 1,
       "message": "this isn\u0027t sufficient. e.Order could be -1.",
+      "revId": "f90ec6c6d45d52003133bd238b22825166110e2b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "60a9f635_6dbc58da",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-04-04T00:42:28Z",
+      "side": 1,
+      "message": "It shouldn\u0027t be. The Order field should return the Order for the entry its sending.",
+      "parentUuid": "5333f7f5_78724c12",
       "revId": "f90ec6c6d45d52003133bd238b22825166110e2b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
