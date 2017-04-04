@@ -115,8 +115,8 @@ func newPerm(op string, cfg upspin.Config, ready <-chan struct{}, target upspin.
 func (p *Perm) updateLoop(op string) {
 	var (
 		events      <-chan upspin.Event
-		accessOrder int64
-		done        = func() {}
+		accessOrder int64 = -1
+		done              = func() {}
 	)
 	for {
 		select {
@@ -159,6 +159,12 @@ func (p *Perm) updateLoop(op string) {
 		// An Access file could have granted or revoked our permission
 		// to watch the Writers file. Therefore, we must start the Watch
 		// again, after the Access event.
+		if accessOrder < 0 {
+			// If we haven't seen an order before then we should
+			// remember the first one we see, so that we don't
+			// restart watching during the initial traversal.
+			accessOrder = e.Order
+		}
 		if isRelevantAccess(e.Entry.Name) && e.Order > accessOrder {
 			accessOrder = e.Order
 			done()
