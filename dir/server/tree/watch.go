@@ -81,6 +81,9 @@ func (t *Tree) Watch(p path.Parsed, order int64, done <-chan struct{}) (<-chan *
 	// Clone the logs so we can keep reading it while the current tree
 	// continues to be updated (we're about to unlock this tree).
 	cLog, err := t.log.Clone()
+	if errors.Match(errors.E(errors.NotExist), err) {
+		return nil, errors.E(op, errors.NotExist, errors.Str("no root for user"))
+	}
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
@@ -109,6 +112,9 @@ func (t *Tree) Watch(p path.Parsed, order int64, done <-chan struct{}) (<-chan *
 		// Make a copy of the tree so we have an immutable tree in
 		// memory, at a fixed log position.
 		cIndex, err := t.logIndex.Clone()
+		if errors.Match(errors.E(errors.NotExist), err) {
+			return nil, errors.E(op, errors.NotExist, errors.Str("no root for user"))
+		}
 		if err != nil {
 			return nil, errors.E(op, err)
 		}
