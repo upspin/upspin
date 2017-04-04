@@ -28,6 +28,10 @@ import (
 	_ "upspin.io/pack/ee"
 )
 
+func init() {
+	panic("change")
+}
+
 var inTest = false // Generate errors instead of logs for certain problems.
 
 // base implements upspin.Config, returning default values for all operations.
