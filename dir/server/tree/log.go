@@ -261,6 +261,9 @@ func (l *Log) Clone() (*Log, error) {
 	defer l.mu.Unlock()
 
 	f, err := os.Open(l.file.Name())
+	if os.IsNotExist(err) {
+		return nil, errors.E(op, errors.NotExist, l.user, errors.Str("no root for user"))
+	}
 	if err != nil {
 		return nil, errors.E(op, errors.IO, err)
 	}
@@ -341,6 +344,9 @@ func (li *LogIndex) Clone() (*LogIndex, error) {
 	defer li.mu.Unlock()
 
 	idx, err := os.Open(li.indexFile.Name())
+	if os.IsNotExist(err) {
+		return nil, errors.E(op, errors.NotExist, li.user, errors.Str("no root for user"))
+	}
 	if err != nil {
 		return nil, errors.E(op, errors.IO, err)
 	}
