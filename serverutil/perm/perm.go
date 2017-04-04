@@ -115,8 +115,8 @@ func newPerm(op string, cfg upspin.Config, ready <-chan struct{}, target upspin.
 func (p *Perm) updateLoop(op string) {
 	var (
 		events      <-chan upspin.Event
-		accessOrder int64
-		done        = func() {}
+		accessOrder int64 = -1
+		done              = func() {}
 	)
 	for {
 		select {
@@ -163,6 +163,17 @@ func (p *Perm) updateLoop(op string) {
 			accessOrder = e.Order
 			done()
 			continue
+		}
+		if accessOrder < 0 {
+			// If we haven't seen an order before then we should
+			// remember the first one we see, so that we don't
+			// restart watching during the initial traversal.
+			// Do this after the check above, in case the first watch
+			// event we see is a new Access file, granting us access.
+			// We rely on the fact that the server won't send us an
+			// event for the Access file first if we do have access
+			// during the first traversal.
+			accessOrder = e.Order
 		}
 		// Process event.
 		if e.Entry.Name != p.targetFile {
