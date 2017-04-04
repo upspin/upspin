@@ -42,7 +42,8 @@ const (
 )
 
 func TestSaveKeygen(t *testing.T) {
-	public, private, _, err := createKeys("p256", secretStr)
+	s := newState("test")
+	public, private, _, err := s.createKeys("p256", secretStr)
 	if err != nil {
 		t.Fatalf("creating keys: %v", err)
 	}
@@ -59,7 +60,7 @@ func TestSaveKeygen(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer os.RemoveAll(dir)
-	err = writeKeys(dir, public, private)
+	err = s.writeKeys(dir, public, private)
 	if err != nil {
 		t.Fatalf("writing keys: %v", err)
 	}
@@ -81,7 +82,7 @@ func TestSaveKeygen(t *testing.T) {
 	}
 
 	// Generate again.
-	public, private, _, err = createKeys("p256", secretStr2)
+	public, private, _, err = s.createKeys("p256", secretStr2)
 	if err != nil {
 		t.Fatalf("creating keys: %v", err)
 	}
@@ -97,7 +98,7 @@ func TestSaveKeygen(t *testing.T) {
 	if err != nil {
 		t.Fatalf("saving keys: %v", err)
 	}
-	err = writeKeys(dir, public, private)
+	err = s.writeKeys(dir, public, private)
 	if err != nil {
 		t.Fatalf("writing keys: %v", err)
 	}
