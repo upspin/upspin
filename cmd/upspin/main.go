@@ -105,7 +105,7 @@ func main() {
 	log.SetFlags(0)
 	log.SetPrefix("upspin: ")
 	flag.Usage = usage
-	flags.Parse() // enable all flags
+	flags.Parse(flags.Client)
 
 	if len(flag.Args()) < 1 {
 		fmt.Fprintln(os.Stderr, intro)

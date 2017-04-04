@@ -53,7 +53,7 @@ var (
 )
 
 func Main() {
-	flags.Parse("http", "https", "insecure", "tls", "log")
+	flags.Parse(flags.Server)
 
 	server, cfg, perm, err := initServer(startup)
 	if err == noConfig {
