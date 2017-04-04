@@ -53,7 +53,7 @@ Authenticate and enable the necessary APIs:
 And, finally, authenticate again in a different way:
 	$ gcloud auth application-default login
 
-Running this command when the service account or bucket exist is a no-op.
+Running this command when the service account or bucket exists is a no-op.
 `
 
 func main() {
@@ -69,7 +69,7 @@ func main() {
 	where := flag.String("where", filepath.Join(os.Getenv("HOME"), "upspin", "deploy"), "`directory` to store private configuration files")
 	domain := flag.String("domain", "", "domain `name` for this Upspin installation")
 
-	flags.Register() // enable all global flags
+	flags.Register("project")
 
 	s.ParseFlags(flag.CommandLine, os.Args[1:], help,
 		"-project=<gcp_project_name> setupstorage -domain=<name> <bucket_name>")

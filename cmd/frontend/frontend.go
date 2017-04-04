@@ -30,7 +30,7 @@ var (
 )
 
 func main() {
-	flags.Parse("http", "https", "insecure", "letscache", "log", "tls")
+	flags.Parse(flags.Server)
 	http.Handle("/", newServer())
 	if !flags.InsecureHTTP {
 		go func() {
