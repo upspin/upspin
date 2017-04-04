@@ -69,7 +69,7 @@ func main() {
 	where := flag.String("where", filepath.Join(os.Getenv("HOME"), "upspin", "deploy"), "`directory` to store private configuration files")
 	domain := flag.String("domain", "", "domain `name` for this Upspin installation")
 
-	flags.Register() // enable all global flags
+	flags.Register("project")
 
 	s.ParseFlags(flag.CommandLine, os.Args[1:], help,
 		"-project=<gcp_project_name> setupstorage -domain=<name> <bucket_name>")
