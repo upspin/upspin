@@ -12,15 +12,38 @@ import (
 	"path/filepath"
 	"strings"
 
+	"upspin.io/config"
 	"upspin.io/path"
 	"upspin.io/upspin"
 )
+
+var home string
+
+// Tilde processes a leading tilde, if any, in the local file name.
+// If the file name does not begin with a tilde, Tilde returns the argument unchanged.
+// This special processing (only) is applied to all local file names passed to
+// functions in this package.
+// It calls Exit on failure.
+func (s *State) Tilde(file string) string {
+	if file != "" && file[0] == '~' {
+		if home == "" {
+			var err error
+			home, err = config.Homedir()
+			if err != nil {
+				s.Exit(err)
+			}
+		}
+		file = filepath.Join(home, file[1:])
+	}
+	return file
+}
 
 // ReadAll reads all contents from a local input file or from stdin if
 // the input file name is empty
 func (s *State) ReadAll(fileName string) []byte {
 	var input *os.File
 	var err error
+	fileName = s.Tilde(fileName)
 	if fileName == "" {
 		input = os.Stdin
 	} else {
@@ -37,7 +60,7 @@ func (s *State) ReadAll(fileName string) []byte {
 
 // OpenLocal opens a file on local disk.
 func (s *State) OpenLocal(path string) *os.File {
-	f, err := os.Open(path)
+	f, err := os.Open(s.Tilde(path))
 	if err != nil {
 		s.Exit(err)
 	}
@@ -46,7 +69,7 @@ func (s *State) OpenLocal(path string) *os.File {
 
 // CreateLocal creates a file on local disk.
 func (s *State) CreateLocal(path string) *os.File {
-	f, err := os.Create(path)
+	f, err := os.Create(s.Tilde(path))
 	if err != nil {
 		s.Exit(err)
 	}
@@ -56,7 +79,7 @@ func (s *State) CreateLocal(path string) *os.File {
 // MkdirLocal creates a directory on local disk.
 // It requires all but the last element to be present.
 func (s *State) MkdirLocal(path string) {
-	err := os.Mkdir(path, 0700)
+	err := os.Mkdir(s.Tilde(path), 0700)
 	if err != nil {
 		s.Exit(err)
 	}
@@ -65,7 +88,7 @@ func (s *State) MkdirLocal(path string) {
 // MkdirAllLocal creates a directory on local disk.
 // It creates as much of the path as is necessary.
 func (s *State) MkdirAllLocal(path string) {
-	err := os.MkdirAll(path, 0700)
+	err := os.MkdirAll(s.Tilde(path), 0700)
 	if err != nil {
 		s.Exit(err)
 	}
@@ -73,7 +96,7 @@ func (s *State) MkdirAllLocal(path string) {
 
 // ShouldNotExist calls s.Exit if the file already exists.
 func (s *State) ShouldNotExist(path string) {
-	_, err := os.Stat(path)
+	_, err := os.Stat(s.Tilde(path))
 	if err == nil {
 		s.Exitf("%s already exists", path)
 	}
@@ -168,6 +191,7 @@ func (s *State) GlobOneUpspinPath(pattern string) upspin.PathName {
 // GlobLocal glob-expands the argument, which should be a syntactically
 // valid Glob pattern (including a plain file name).
 func (s *State) GlobLocal(pattern string) []string {
+	pattern = s.Tilde(pattern)
 	// If it has no metacharacters, leave it alone.
 	if !HasGlobChar(pattern) {
 		return []string{pattern}

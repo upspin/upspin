@@ -76,7 +76,7 @@ If any state exists at the given location (-where) then the command aborts.
 	}
 
 	var (
-		baseDir         = filepath.Join(*where, *domain)
+		baseDir         = filepath.Join(s.Tilde(*where), *domain)
 		dirServerPath   = filepath.Join(baseDir, "dirserver")
 		storeServerPath = filepath.Join(baseDir, "storeserver")
 		dirConfig       = filepath.Join(dirServerPath, "config")
@@ -107,19 +107,19 @@ If any state exists at the given location (-where) then the command aborts.
 
 	// Generate keys for the dirserver and the storeserver.
 	var noProquint string
-	dirPublic, dirPrivate, dirProquint, err := createKeys(*curveName, noProquint)
+	dirPublic, dirPrivate, dirProquint, err := s.createKeys(*curveName, noProquint)
 	if err != nil {
 		s.Exit(err)
 	}
-	storePublic, storePrivate, storeProquint, err := createKeys(*curveName, noProquint)
+	storePublic, storePrivate, storeProquint, err := s.createKeys(*curveName, noProquint)
 	if err != nil {
 		s.Exit(err)
 	}
-	err = writeKeys(dirServerPath, dirPublic, dirPrivate)
+	err = s.writeKeys(dirServerPath, dirPublic, dirPrivate)
 	if err != nil {
 		s.Exit(err)
 	}
-	err = writeKeys(storeServerPath, storePublic, storePrivate)
+	err = s.writeKeys(storeServerPath, storePublic, storePrivate)
 	if err != nil {
 		s.Exit(err)
 	}
@@ -264,11 +264,11 @@ func (s *State) setuphost(where, domain, curve string) {
 
 	// Generate and write keys for the server user.
 	var noProquint string
-	pub, pri, proquint, err := createKeys(curve, noProquint)
+	pub, pri, proquint, err := s.createKeys(curve, noProquint)
 	if err != nil {
 		s.Exit(err)
 	}
-	err = writeKeys(cfgPath, pub, pri)
+	err = s.writeKeys(cfgPath, pub, pri)
 	if err != nil {
 		s.Exit(err)
 	}
