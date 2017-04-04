@@ -7,6 +7,7 @@
 package main // import "upspin.io/cmd/dirserver"
 
 import (
+	"flag"
 	"net/http"
 
 	"upspin.io/cloud/gcpmetric"
@@ -41,8 +42,10 @@ const (
 	maxQPS        = 1000 // unlimited metric reports per second
 )
 
+var storeServerUser = flag.String("storeserveruser", "", "`user name` of the StoreServer")
+
 func main() {
-	flags.Parse("addr", "config", "http", "https", "insecure", "kind", "storeserveruser", "letscache", "log", "project", "serverconfig", "tls")
+	flags.Parse(flags.Server, "kind", "project", "serverconfig")
 
 	if flags.Project != "" {
 		cloudLog.Connect(flags.Project, serverName)
@@ -79,9 +82,9 @@ func main() {
 
 	// Wrap with permission checks, if requested.
 	var ready chan struct{}
-	if flags.StoreServerUser != "" {
+	if *storeServerUser != "" {
 		ready = make(chan struct{})
-		dir = perm.WrapDir(cfg, ready, upspin.UserName(flags.StoreServerUser), dir)
+		dir = perm.WrapDir(cfg, ready, upspin.UserName(*storeServerUser), dir)
 	} else {
 		log.Printf("Warning: no Writers Group file protection -- all access permitted")
 	}

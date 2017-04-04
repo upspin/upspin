@@ -20,7 +20,7 @@ const serverName = "cacheserver"
 
 func main() {
 	flag.Usage = usage
-	flags.Parse()
+	flags.Parse(flags.Server)
 
 	// Load configuration and keys for this server. It needn't have a real username.
 	cfg, err := config.FromFile(flags.Config)

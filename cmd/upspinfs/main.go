@@ -34,7 +34,7 @@ func usage() {
 
 func main() {
 	flag.Usage = usage
-	flags.Parse("addr", "cachedir", "config", "log")
+	flags.Parse(flags.Server, "cachedir")
 
 	if flag.NArg() != 1 {
 		usage()

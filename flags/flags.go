@@ -31,6 +31,22 @@ const (
 	defaultServerKind = "inprocess"
 )
 
+// None is the set of no flags. It is rarely needed as most programs
+// use either the Server or Client set.
+var None = []string{}
+
+// Server is the set of flags most useful in servers. It can be passed as the
+// argument to Parse to set up the package for a server.
+var Server = []string{
+	"config", "log", "http", "https", "letscache", "tls", "addr", "insecure",
+}
+
+// Client is the set of flags most useful in clients. It can be passed as the
+// argument to Parse to set up the package for a client.
+var Client = []string{
+	"config", "log", "blocksize", "prudent",
+}
+
 // The Parse and Register functions bind these variables to their respective
 // command-line flags.
 var (
@@ -81,10 +97,6 @@ var (
 
 	// ServerKind ("kind") is the implementation kind of this server.
 	ServerKind = defaultServerKind
-
-	// StoreServerName ("storeserveruser") is the Upspin user name of the
-	// StoreServer.
-	StoreServerUser = ""
 
 	// Prudent ("prudent") sets an extra security mode in the client to
 	// check for malicious or buggy servers, at possible cost in
@@ -147,7 +159,6 @@ var flags = map[string]*flagVar{
 		},
 		arg: func() string { return strArg("serverconfig", configFlag{&ServerConfig}.String(), "") },
 	},
-	"storeserveruser": strVar(&StoreServerUser, "storeserveruser", "", "user name of the StoreServer"),
 	"prudent": &flagVar{
 		set: func() {
 			flag.BoolVar(&Prudent, "prudent", false, "protect against malicious directory server")
@@ -169,20 +180,32 @@ var flags = map[string]*flagVar{
 	},
 }
 
-// Parse registers the command-line flags for the given flag names
-// and calls flag.Parse. Passing zero names registers all flags.
-// Passing an unknown name triggers a panic.
+// Parse registers the command-line flags for the given default flags list, plus
+// any extra flag names, and calls flag.Parse. Passing no flag names in either
+// list registers all flags. Passing an unknown name triggers a panic.
+// The Server and Client variables contain useful default sets.
 //
-// For example:
-// 	flags.Parse("config", "endpoint") // Register Config and Endpoint.
-// or
-// 	flags.Parse() // Register all flags.
-func Parse(names ...string) {
-	Register(names...)
+// Examples:
+// 	flags.Parse(flags.Client) // Register all client flags.
+//	flags.Parse(flags.Server, "cachedir") // Register all server flags plus cachedir.
+// 	flags.Parse(nil) // Register all flags.
+// 	flags.Parse(flags.None, "config", "endpoint") // Register only config and endpoint.
+func Parse(defaultList []string, extras ...string) {
+	if len(defaultList) == 0 && len(extras) == 0 {
+		Register()
+	} else {
+		if len(defaultList) > 0 {
+			Register(defaultList...)
+		}
+		if len(extras) > 0 {
+			Register(extras...)
+		}
+	}
 	flag.Parse()
 }
 
 // Register registers the command-line flags for the given flag names.
+// Unlike Parse, it may be called multiple times.
 // Passing zero names install all flags.
 // Passing an unknown name triggers a panic.
 //
