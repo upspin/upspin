@@ -10,12 +10,16 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
+	"upspin.io/config"
 	"upspin.io/errors"
 	"upspin.io/path"
 	"upspin.io/subcmd"
 	"upspin.io/upspin"
 )
+
+var home string
 
 func (s *State) cp(args ...string) {
 	const help = `
@@ -27,6 +31,10 @@ If the final argument is not a directory, cp requires exactly two
 path names and copies the contents of the first to the second.
 The -R flag requires that the final argument be a directory.
 
+All file names given to cp must be fully qualified rooted paths,
+either locally or within Upspin. For local paths only, an initial
+tilde (~) is substituted for the user's home directory.
+
 When copying from one Upspin path to another Upspin path, cp can be
 very efficient, copying only the references to the data rather than
 the data itself.
@@ -35,6 +43,14 @@ the data itself.
 	fs.Bool("v", false, "log each file as it is copied")
 	fs.Bool("R", false, "recursively copy directories")
 	s.ParseFlags(fs, args, help, "cp [opts] file... file or cp [opts] file... directory")
+
+	var err error
+	if home == "" {
+		home, err = config.Homedir()
+		if err != nil {
+			s.Exitf("no home directory: %v", err)
+		}
+	}
 
 	cs := &copyState{
 		state:   s,
@@ -131,7 +147,7 @@ func (s *State) open(file cpFile) (io.ReadCloser, error) {
 	if file.isUpspin {
 		return s.Client.Open(upspin.PathName(file.path))
 	}
-	return os.Open(file.path)
+	return os.Open(s.Tilde(file.path))
 }
 
 // create creates the file regardless of its location.
@@ -140,7 +156,7 @@ func (s *State) create(file cpFile) (io.WriteCloser, error) {
 		fd, err := s.Client.Create(upspin.PathName(file.path))
 		return fd, err
 	}
-	fd, err := os.Create(file.path)
+	fd, err := os.Create(s.Tilde(file.path))
 	return fd, err
 }
 
@@ -259,24 +275,40 @@ func (cs *copyState) doCopy(reader io.ReadCloser, writer io.WriteCloser) {
 }
 
 // glob glob-expands the argument, which could be a local file
-// name or an Upspin path name.
+// name or an Upspin path name. Files on the local machine
+// must be identified by absolute paths.
+// That is, they must be full paths, just as with Upspin paths.
 func (cs *copyState) glob(pattern string) (files []cpFile) {
-	parsed, err := path.Parse(upspin.PathName(pattern))
-	if err == nil {
-		// It's an Upspin path.
-		for _, path := range cs.state.GlobUpspinPath(parsed.String()) {
+	if pattern == "" {
+		cs.state.Exitf("empty path name")
+	}
+
+	// Path on local machine?
+	if filepath.IsAbs(pattern) || strings.HasPrefix(pattern, "~") {
+		for _, path := range cs.state.GlobLocal(pattern) {
 			files = append(files, cpFile{
-				path:     string(path),
-				isUpspin: true,
+				path:     path,
+				isUpspin: false,
 			})
 		}
 		return files
+
 	}
-	// It's a local path.
-	for _, path := range cs.state.GlobLocal(pattern) {
+
+	// Extra check to catch use of relative path on local machine.
+	if !strings.Contains(pattern, "@") {
+		cs.state.Exitf("local pattern not absolute path: %s", pattern)
+	}
+
+	// It must be an Upspin path.
+	parsed, err := path.Parse(upspin.PathName(pattern))
+	if err != nil {
+		cs.state.Exit(err)
+	}
+	for _, path := range cs.state.GlobUpspinPath(parsed.String()) {
 		files = append(files, cpFile{
-			path:     path,
-			isUpspin: false,
+			path:     string(path),
+			isUpspin: true,
 		})
 	}
 	return files
@@ -300,7 +332,8 @@ func (s *State) contents(cs *copyState, dir cpFile) ([]cpFile, error) {
 		return files, err
 	}
 	// Local directory.
-	fd, err := os.Open(dir.path)
+	dirPath := s.Tilde(dir.path)
+	fd, err := os.Open(dirPath)
 	if err != nil {
 		s.Fail(err)
 		return nil, err
@@ -314,7 +347,7 @@ func (s *State) contents(cs *copyState, dir cpFile) ([]cpFile, error) {
 	files := make([]cpFile, len(names))
 	for i, name := range names {
 		files[i] = cpFile{
-			path:     filepath.Join(dir.path, name),
+			path:     filepath.Join(dirPath, name),
 			isUpspin: false,
 		}
 	}

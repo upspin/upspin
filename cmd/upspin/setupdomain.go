@@ -115,11 +115,11 @@ If any state exists at the given location (-where) then the command aborts.
 	if err != nil {
 		s.Exit(err)
 	}
-	err = writeKeys(dirServerPath, dirPublic, dirPrivate)
+	err = s.writeKeys(dirServerPath, dirPublic, dirPrivate)
 	if err != nil {
 		s.Exit(err)
 	}
-	err = writeKeys(storeServerPath, storePublic, storePrivate)
+	err = s.writeKeys(storeServerPath, storePublic, storePrivate)
 	if err != nil {
 		s.Exit(err)
 	}
@@ -268,7 +268,7 @@ func (s *State) setuphost(where, domain, curve string) {
 	if err != nil {
 		s.Exit(err)
 	}
-	err = writeKeys(cfgPath, pub, pri)
+	err = s.writeKeys(cfgPath, pub, pri)
 	if err != nil {
 		s.Exit(err)
 	}
