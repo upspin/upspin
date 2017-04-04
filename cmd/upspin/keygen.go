@@ -62,12 +62,12 @@ func (s *State) keygenCommand(fs *flag.FlagSet) {
 	}
 
 	secretFlag := subcmd.StringFlag(fs, "secretseed")
-	public, private, secretStr, err := createKeys(curve, secretFlag)
+	public, private, secretStr, err := s.createKeys(curve, secretFlag)
 	if err != nil {
 		s.Exitf("creating keys: %v", err)
 	}
 
-	where := subcmd.StringFlag(fs, "where")
+	where := subcmd.Tilde(subcmd.StringFlag(fs, "where"))
 	if where == "" {
 		s.Exitf("-where must not be empty")
 	}
@@ -77,7 +77,7 @@ func (s *State) keygenCommand(fs *flag.FlagSet) {
 		s.Exitf("saving previous keys failed, keys not generated: %s", err)
 	}
 	private = strings.TrimSpace(private) + " # " + secretStr + "\n"
-	err = writeKeys(where, public, private)
+	err = s.writeKeys(where, public, private)
 	if err != nil {
 		s.Exitf("writing keys: %v", err)
 	}
@@ -97,7 +97,7 @@ func (s *State) keygenCommand(fs *flag.FlagSet) {
 	fmt.Fprintln(os.Stderr)
 }
 
-func createKeys(curveName, secretFlag string) (public, private, secretStr string, err error) {
+func (s *State) createKeys(curveName, secretFlag string) (public, private, secretStr string, err error) {
 	// Pick secret 128 bits.
 	// TODO(ehg)  Consider whether we are willing to ask users to write long seeds for P521.
 	b := make([]byte, 16)
@@ -119,7 +119,7 @@ func createKeys(curveName, secretFlag string) (public, private, secretStr string
 	case validSecretSeed(secretFlag):
 		secretStr = secretFlag
 	default:
-		data, err := ioutil.ReadFile(secretFlag)
+		data, err := ioutil.ReadFile(subcmd.Tilde(secretFlag))
 		if err != nil {
 			return "", "", "", errors.E("keygen", errors.IO, err)
 		}
@@ -150,7 +150,7 @@ func validSecretSeed(seed string) bool {
 
 // writeKeyFile writes a single key to its file, removing the file
 // beforehand if necessary due to permission errors.
-func writeKeyFile(name, key string) error {
+func (s *State) writeKeyFile(name, key string) error {
 	const create = os.O_RDWR | os.O_CREATE | os.O_TRUNC
 	fd, err := os.OpenFile(name, create, 0400)
 	if os.IsPermission(err) && os.Remove(name) == nil {
@@ -168,12 +168,12 @@ func writeKeyFile(name, key string) error {
 }
 
 // writeKeys save both the public and private keys to their respective files.
-func writeKeys(where, publicKey, privateKey string) error {
-	err := writeKeyFile(filepath.Join(where, "secret.upspinkey"), privateKey)
+func (s *State) writeKeys(where, publicKey, privateKey string) error {
+	err := s.writeKeyFile(filepath.Join(where, "secret.upspinkey"), privateKey)
 	if err != nil {
 		return err
 	}
-	err = writeKeyFile(filepath.Join(where, "public.upspinkey"), publicKey)
+	err = s.writeKeyFile(filepath.Join(where, "public.upspinkey"), publicKey)
 	if err != nil {
 		return err
 	}
