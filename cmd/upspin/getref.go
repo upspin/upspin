@@ -10,6 +10,7 @@ import (
 	"os"
 
 	"upspin.io/bind"
+	"upspin.io/subcmd"
 	"upspin.io/upspin"
 )
 
@@ -50,10 +51,7 @@ the user's default store server. It does not resolve redirections.
 	if *outFile == "" {
 		output = os.Stdout
 	} else {
-		output, err = os.Create(*outFile)
-		if err != nil {
-			s.Exit(err)
-		}
+		output = s.CreateLocal(subcmd.Tilde(*outFile))
 		defer output.Close()
 	}
 	_, err = output.Write(data)

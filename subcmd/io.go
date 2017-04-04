@@ -9,18 +9,61 @@ package subcmd
 import (
 	"io/ioutil"
 	"os"
+	"os/user"
 	"path/filepath"
 	"strings"
 
+	"upspin.io/config"
 	"upspin.io/path"
 	"upspin.io/upspin"
 )
+
+var userLookup = user.Lookup
+
+var home string // Main user's home directory.
+
+func homeDir(who string) string {
+	if who == "" {
+		if home == "" {
+			var err error
+			home, err = config.Homedir()
+			if err != nil {
+				return "~" // What else can we do?
+			}
+		}
+	}
+	u, err := userLookup(who)
+	if err != nil {
+		return "~" + who // Again, what else can we do?
+	}
+	return u.HomeDir
+}
+
+// Tilde processes a leading tilde, if any, in the local file name.
+// If the file name does not begin with a tilde, Tilde returns the argument unchanged.
+// This special processing (only) is applied to all local file names passed to
+// functions in this package.
+// If the target user does not exist, it returns the original string.
+func Tilde(file string) string {
+	if file == "" || file[0] != '~' {
+		return file
+	}
+	if file == "~" {
+		return homeDir("")
+	}
+	slash := strings.IndexByte(file, '/')
+	if slash < 0 {
+		return homeDir(file[1:])
+	}
+	return filepath.Join(homeDir(file[1:slash]), file[slash+1:])
+}
 
 // ReadAll reads all contents from a local input file or from stdin if
 // the input file name is empty
 func (s *State) ReadAll(fileName string) []byte {
 	var input *os.File
 	var err error
+	fileName = Tilde(fileName)
 	if fileName == "" {
 		input = os.Stdin
 	} else {
@@ -37,7 +80,7 @@ func (s *State) ReadAll(fileName string) []byte {
 
 // OpenLocal opens a file on local disk.
 func (s *State) OpenLocal(path string) *os.File {
-	f, err := os.Open(path)
+	f, err := os.Open(Tilde(path))
 	if err != nil {
 		s.Exit(err)
 	}
@@ -46,7 +89,7 @@ func (s *State) OpenLocal(path string) *os.File {
 
 // CreateLocal creates a file on local disk.
 func (s *State) CreateLocal(path string) *os.File {
-	f, err := os.Create(path)
+	f, err := os.Create(Tilde(path))
 	if err != nil {
 		s.Exit(err)
 	}
@@ -56,7 +99,7 @@ func (s *State) CreateLocal(path string) *os.File {
 // MkdirLocal creates a directory on local disk.
 // It requires all but the last element to be present.
 func (s *State) MkdirLocal(path string) {
-	err := os.Mkdir(path, 0700)
+	err := os.Mkdir(Tilde(path), 0700)
 	if err != nil {
 		s.Exit(err)
 	}
@@ -65,7 +108,7 @@ func (s *State) MkdirLocal(path string) {
 // MkdirAllLocal creates a directory on local disk.
 // It creates as much of the path as is necessary.
 func (s *State) MkdirAllLocal(path string) {
-	err := os.MkdirAll(path, 0700)
+	err := os.MkdirAll(Tilde(path), 0700)
 	if err != nil {
 		s.Exit(err)
 	}
@@ -73,7 +116,7 @@ func (s *State) MkdirAllLocal(path string) {
 
 // ShouldNotExist calls s.Exit if the file already exists.
 func (s *State) ShouldNotExist(path string) {
-	_, err := os.Stat(path)
+	_, err := os.Stat(Tilde(path))
 	if err == nil {
 		s.Exitf("%s already exists", path)
 	}
@@ -168,6 +211,7 @@ func (s *State) GlobOneUpspinPath(pattern string) upspin.PathName {
 // GlobLocal glob-expands the argument, which should be a syntactically
 // valid Glob pattern (including a plain file name).
 func (s *State) GlobLocal(pattern string) []string {
+	pattern = Tilde(pattern)
 	// If it has no metacharacters, leave it alone.
 	if !HasGlobChar(pattern) {
 		return []string{pattern}
