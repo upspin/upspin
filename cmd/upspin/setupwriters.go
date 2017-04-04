@@ -14,6 +14,7 @@ import (
 	"upspin.io/client"
 	"upspin.io/config"
 	"upspin.io/errors"
+	"upspin.io/subcmd"
 	"upspin.io/upspin"
 	"upspin.io/user"
 )
@@ -52,7 +53,7 @@ the list, so the directory server can use the store for its own data storage.
 		users = append(users, u)
 	}
 
-	cfgDir := filepath.Join(*where, *domain)
+	cfgDir := filepath.Join(subcmd.Tilde(*where), *domain)
 	if fi, err := os.Stat(cfgDir); err != nil {
 		s.Exitf("error reading configuration directory: %v", err)
 	} else if !fi.IsDir() {

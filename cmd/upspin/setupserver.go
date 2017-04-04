@@ -54,7 +54,7 @@ The calling user must be the same one that ran 'upspin setupdomain'.
 		fs.Usage()
 	}
 
-	cfgPath := filepath.Join(*where, *domain)
+	cfgPath := filepath.Join(subcmd.Tilde(*where), *domain)
 	cfg := s.ReadServerConfig(cfgPath)
 
 	// Stash the provided host name in the server config file.

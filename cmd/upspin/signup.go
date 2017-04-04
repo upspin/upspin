@@ -21,6 +21,7 @@ import (
 
 	"upspin.io/config"
 	"upspin.io/flags"
+	"upspin.io/subcmd"
 	"upspin.io/upspin"
 	"upspin.io/user"
 )
@@ -142,7 +143,7 @@ file and keys and only send the signup request to the key server.
 		UserName:  userName,
 		Dir:       dirEndpoint,
 		Store:     storeEndpoint,
-		SecretDir: *where,
+		SecretDir: subcmd.Tilde(*where),
 		Packing:   "ee",
 	})
 	if err != nil {

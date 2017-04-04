@@ -7,6 +7,8 @@ package main
 import (
 	"flag"
 	"os"
+
+	"upspin.io/subcmd"
 )
 
 func (s *State) get(args ...string) {
@@ -31,10 +33,7 @@ Get writes to standard output the contents identified by the Upspin path.
 	if *outFile == "" {
 		output = os.Stdout
 	} else {
-		output, err = os.Create(*outFile)
-		if err != nil {
-			s.Exit(err)
-		}
+		output = s.CreateLocal(subcmd.Tilde(*outFile))
 		defer output.Close()
 	}
 	_, err = output.Write(data)
