@@ -16,6 +16,24 @@
       "revId": "b20f4a2aa5ef18c605f7187013c587b89971ad47",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "18592645_cbd26e84",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-04-04T00:49:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "734fbd0a_7e8fb4da",
+      "revId": "b20f4a2aa5ef18c605f7187013c587b89971ad47",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
