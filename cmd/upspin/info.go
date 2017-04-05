@@ -5,6 +5,7 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"os"
@@ -58,8 +59,9 @@ type infoDirEntry struct {
 	*upspin.DirEntry
 	state *State
 	// The following fields are computed as we run.
-	access    *access.Access
-	lastUsers string
+	access     *access.Access
+	accessFile string
+	lastUsers  string
 }
 
 func (d *infoDirEntry) TimeString() string {
@@ -75,17 +77,26 @@ func (d *infoDirEntry) Rights() []access.Right {
 }
 
 func (d *infoDirEntry) Readers() string {
-	d.state.sharer.addAccess(d.DirEntry)
+	if d.access != nil {
+		d.WhichAccess()
+	}
 	d.lastUsers = "<nobody>"
 	if d.IsDir() {
 		return "is a directory"
 	}
-	_, users, _, err := d.state.sharer.readers(d.DirEntry)
+	users, err := d.access.Users(access.Read, d.state.Client.Get)
 	if err != nil {
 		return err.Error()
 	}
-	d.lastUsers = users
-	return users
+	var b bytes.Buffer
+	for i, user := range users {
+		if i > 0 {
+			b.WriteByte(' ')
+		}
+		b.WriteString(string(user))
+	}
+	d.lastUsers = b.String()
+	return d.lastUsers
 }
 
 func (d *infoDirEntry) Sequence() int64 {
@@ -128,6 +139,9 @@ func (d *infoDirEntry) Users(right access.Right) string {
 }
 
 func (d *infoDirEntry) WhichAccess() string {
+	if d.access != nil {
+		return d.accessFile
+	}
 	var acc *access.Access
 	accEntry, err := d.state.whichAccessFollowLinks(d.Name)
 	if err != nil {
@@ -153,6 +167,7 @@ func (d *infoDirEntry) WhichAccess() string {
 		}
 	}
 	d.access = acc
+	d.accessFile = accFile
 	return accFile
 }
 
