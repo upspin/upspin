@@ -168,11 +168,22 @@ func ListenAndServe(ready chan<- struct{}, serverName, addr string, opt *Options
 // listen address and Options from command-line flags in the flags package.
 func ListenAndServeFromFlags(ready chan<- struct{}, serverName string) {
 	addr := flags.HTTPSAddr
+	letsEncryptHosts := []string{}
 	if flags.InsecureHTTP {
 		addr = flags.HTTPAddr
+	} else if flags.TLSCertFile == "" || flags.TLSKeyFile == "" {
+		host, _, err := net.SplitHostPort(addr)
+		if err != nil {
+			log.Printf("Error parsing addr from config %q: %v", addr, err)
+			log.Printf("Warning: Let's Encrypt certificates will be fetched for any host.")
+		} else {
+			letsEncryptHosts = []string{host}
+		}
 	}
+
 	ListenAndServe(ready, serverName, addr, &Options{
 		LetsEncryptCache: flags.LetsEncryptCache,
+		LetsEncryptHosts: letsEncryptHosts,
 		CertFile:         flags.TLSCertFile,
 		KeyFile:          flags.TLSKeyFile,
 		InsecureHTTP:     flags.InsecureHTTP,

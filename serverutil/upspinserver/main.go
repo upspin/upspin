@@ -14,7 +14,6 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
-	"net"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -54,7 +53,7 @@ var (
 func Main() {
 	flags.Parse(flags.Server)
 
-	server, cfg, perm, err := initServer(startup)
+	cfg, perm, err := initServer(startup)
 	if err == noConfig {
 		log.Print("Configuration file not found. Running in setup mode.")
 		http.Handle("/", &setupHandler{})
@@ -64,24 +63,7 @@ func Main() {
 		http.Handle("/", newWeb(cfg, perm))
 	}
 
-	// Set up HTTPS server.
-	var opt https.Options
-	if flags.TLSCertFile != "" && flags.TLSKeyFile != "" {
-		opt.CertFile = flags.TLSCertFile
-		opt.KeyFile = flags.TLSKeyFile
-	} else {
-		opt.LetsEncryptCache = flags.LetsEncryptCache
-		if server != nil {
-			host, _, err := net.SplitHostPort(string(server.Addr))
-			if err != nil {
-				log.Printf("Error parsing addr from config %q: %v", server.Addr, err)
-				log.Printf("Warning: Let's Encrypt certificates will be fetched for any host.")
-			} else {
-				opt.LetsEncryptHosts = []string{host}
-			}
-		}
-	}
-	https.ListenAndServe(ready, "upspinserver", flags.HTTPSAddr, &opt)
+	https.ListenAndServeFromFlags(ready, "upspinserver")
 }
 
 var noConfig = errors.Str("no configuration")
@@ -93,12 +75,12 @@ const (
 	setupServer
 )
 
-func initServer(mode initMode) (*subcmd.ServerConfig, upspin.Config, *perm.Perm, error) {
+func initServer(mode initMode) (upspin.Config, *perm.Perm, error) {
 	serverConfig, err := readServerConfig()
 	if os.IsNotExist(err) {
-		return nil, nil, nil, noConfig
+		return nil, nil, noConfig
 	} else if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, err
 	}
 
 	cfg := config.New()
@@ -106,7 +88,7 @@ func initServer(mode initMode) (*subcmd.ServerConfig, upspin.Config, *perm.Perm,
 
 	f, err := factotum.NewFromDir(*cfgPath)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, err
 	}
 	cfg = config.SetFactotum(cfg, f)
 
@@ -133,17 +115,17 @@ func initServer(mode initMode) (*subcmd.ServerConfig, upspin.Config, *perm.Perm,
 	}
 	store, err := storeServer.New(storeServerConfig...)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, err
 	}
 
 	// Set up DirServer.
 	logDir := filepath.Join(*cfgPath, "dirserver-logs")
 	if err := os.MkdirAll(logDir, 0700); err != nil {
-		return nil, nil, nil, err
+		return nil, nil, err
 	}
 	dir, err := dirServer.New(dirCfg, "userCacheSize=1000", "logDir="+logDir)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, err
 	}
 
 	// Wrap store and dir with permission checking.
@@ -168,7 +150,7 @@ func initServer(mode initMode) (*subcmd.ServerConfig, upspin.Config, *perm.Perm,
 			}
 		}()
 	}
-	return serverConfig, cfg, perm, nil
+	return cfg, perm, nil
 }
 
 // fmtStoreConfig formats a ServerConfig.StoreConfig value as a string,
@@ -242,7 +224,7 @@ func (h *setupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	_, cfg, perm, err := initServer(setupServer)
+	cfg, perm, err := initServer(setupServer)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
