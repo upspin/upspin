@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ecde1d64_48e2aa16",
+        "filename": "cmd/upspin/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 476,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-04-05T00:38:14Z",
+      "side": 1,
+      "message": "this list of flags is weird. why so long?",
+      "revId": "222ff7da44309d75513a71c99729243d69a1564a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
