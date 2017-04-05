@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d2e242c1_d17640a2",
+        "filename": "cmd/upspin/share.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 320,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-04-05T20:58:55Z",
+      "side": 1,
+      "message": "Something I just noticed, that is, something old. If I rotate my key, the sequence is:\n  upspin keygen -rotate    # Create new key.\n  upspin countersign       # Update file signatures to use new key.\n  upspin rotate            # Save new key to key server.\n  upspin share -r -fix me@example.com/  # Update keys in file metadata.\nHowever, if I have any eeIntegrity or linked files (which have signed DirEntries), the share won\u0027t update them because this avoids links being returned and shareCommand specifically doesn\u0027t do EEIntegrity.  Am I confused?",
+      "range": {
+        "startLine": 318,
+        "startChar": 2,
+        "endLine": 320,
+        "endChar": 3
+      },
+      "revId": "8c0ac502f6952b9bd28d73b59972f89852788350",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
