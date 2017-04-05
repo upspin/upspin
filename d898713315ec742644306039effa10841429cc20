@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6e378c70_8e281fbd",
+        "filename": "subcmd/io.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-04-05T02:07:08Z",
+      "side": 1,
+      "message": "~/ means your home directory.  ~account means account\u0027s home directory.  Not sure you want to support the latter but just replacing a leading ~ with a home directory, rather than looking for a lone ~ or ~/ will cause problems.",
+      "range": {
+        "startLine": 28,
+        "startChar": 1,
+        "endLine": 28,
+        "endChar": 34
+      },
+      "revId": "d898713315ec742644306039effa10841429cc20",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b90b7158_dc41363f",
+        "filename": "subcmd/io.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-04-05T02:07:08Z",
+      "side": 1,
+      "message": "you don\u0027t need this line.",
+      "range": {
+        "startLine": 46,
+        "startChar": 29,
+        "endLine": 46,
+        "endChar": 0
+      },
+      "revId": "d898713315ec742644306039effa10841429cc20",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
