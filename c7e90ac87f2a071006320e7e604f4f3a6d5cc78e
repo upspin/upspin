@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a1c3578_7e419b06",
+        "filename": "cmd/cacheserver/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-04-05T00:31:27Z",
+      "side": 1,
+      "message": "this should be flags.Parse(nil)",
+      "revId": "c7e90ac87f2a071006320e7e604f4f3a6d5cc78e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d6d27f3e_f1074c27",
+        "filename": "cmd/dirserver/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-04-05T00:31:27Z",
+      "side": 1,
+      "message": "`user name`",
+      "range": {
+        "startLine": 45,
+        "startChar": 58,
+        "endLine": 45,
+        "endChar": 67
+      },
+      "revId": "c7e90ac87f2a071006320e7e604f4f3a6d5cc78e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bc40ad5a_938a0e85",
+        "filename": "flags/flags.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-04-05T00:31:27Z",
+      "side": 1,
+      "message": "while you\u0027re cleaning up, let\u0027s remove this from package flags too.",
+      "range": {
+        "startLine": 99,
+        "startChar": 1,
+        "endLine": 99,
+        "endChar": 11
+      },
+      "revId": "c7e90ac87f2a071006320e7e604f4f3a6d5cc78e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
