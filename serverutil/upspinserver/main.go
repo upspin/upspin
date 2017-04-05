@@ -47,7 +47,6 @@ import (
 
 var (
 	cfgPath   = flag.String("serverconfig", filepath.Join(config.Home(), "upspin", "server"), "server configuration `directory`")
-	letsPath  = flag.String("letscache", filepath.Join(config.Home(), "upspin", "letsencrypt"), "Let's Encrypt cache `directory`")
 	enableWeb = flag.Bool("web", false, "enable Upspin web interface")
 	ready     = make(chan struct{})
 )
@@ -71,7 +70,7 @@ func Main() {
 		opt.CertFile = flags.TLSCertFile
 		opt.KeyFile = flags.TLSKeyFile
 	} else {
-		opt.LetsEncryptCache = *letsPath
+		opt.LetsEncryptCache = flags.LetsEncryptCache
 		if server != nil {
 			host, _, err := net.SplitHostPort(string(server.Addr))
 			if err != nil {
