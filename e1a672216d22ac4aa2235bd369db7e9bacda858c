@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "e521ce48_f984842a",
+        "filename": "cloud/https/https.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 5361
+      },
+      "writtenOn": "2017-04-06T08:36:28Z",
+      "side": 1,
+      "message": "The line and its if-statement can only be reached if flags.InsecureHTTP is false. I guess I am not getting the point here. Would you kindly help me see it? Is it about improving the readability/clarity of the condition?",
+      "parentUuid": "83b4c7b1_13c9609e",
+      "revId": "e1a672216d22ac4aa2235bd369db7e9bacda858c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "5d9eb246_120ac52b",
         "filename": "cloud/https/https.go",
         "patchSetId": 3
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "975b032d_522870c2",
+        "filename": "cloud/https/https.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 5361
+      },
+      "writtenOn": "2017-04-06T08:36:28Z",
+      "side": 1,
+      "message": "Would NetAddr be always set? Or would I need to check it to be empty and init it then from flags.HTTPSAddr?",
+      "parentUuid": "5d9eb246_120ac52b",
+      "revId": "e1a672216d22ac4aa2235bd369db7e9bacda858c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "b5c1cb0f_7f49cd56",
         "filename": "serverutil/upspinserver/main.go",
         "patchSetId": 3
@@ -47,6 +83,24 @@
       "writtenOn": "2017-04-06T06:52:48Z",
       "side": 1,
       "message": "somewhere in this file we need to set flags.NetAddr to the ServerConfig.Addr value",
+      "revId": "e1a672216d22ac4aa2235bd369db7e9bacda858c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "929254f6_225db79a",
+        "filename": "serverutil/upspinserver/main.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 5361
+      },
+      "writtenOn": "2017-04-06T08:36:28Z",
+      "side": 1,
+      "message": "Since I eliminated the *subcmd.ServerConfig return-value, the last-but-one line in initServer() would be my first idea.",
+      "parentUuid": "b5c1cb0f_7f49cd56",
       "revId": "e1a672216d22ac4aa2235bd369db7e9bacda858c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
