@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "0687c2a9_efeded48",
+        "filename": "cloud/https/https.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-04-06T22:27:49Z",
+      "side": 1,
+      "message": "oh, right, I just misread the code. This is fine.",
+      "parentUuid": "e521ce48_f984842a",
+      "revId": "e1a672216d22ac4aa2235bd369db7e9bacda858c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "5d9eb246_120ac52b",
         "filename": "cloud/https/https.go",
         "patchSetId": 3
@@ -72,6 +90,24 @@
     },
     {
       "key": {
+        "uuid": "6c145f7f_f390e418",
+        "filename": "cloud/https/https.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-04-06T22:27:49Z",
+      "side": 1,
+      "message": "just don\u0027t set letsEncryptHosts if the flag is empty",
+      "parentUuid": "975b032d_522870c2",
+      "revId": "e1a672216d22ac4aa2235bd369db7e9bacda858c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "b5c1cb0f_7f49cd56",
         "filename": "serverutil/upspinserver/main.go",
         "patchSetId": 3
@@ -101,6 +137,41 @@
       "side": 1,
       "message": "Since I eliminated the *subcmd.ServerConfig return-value, the last-but-one line in initServer() would be my first idea.",
       "parentUuid": "b5c1cb0f_7f49cd56",
+      "revId": "e1a672216d22ac4aa2235bd369db7e9bacda858c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6637d83f_a6f0fb54",
+        "filename": "serverutil/upspinserver/main.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-04-06T22:27:49Z",
+      "side": 1,
+      "message": "see my comment below",
+      "parentUuid": "929254f6_225db79a",
+      "revId": "e1a672216d22ac4aa2235bd369db7e9bacda858c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "43af6db1_cf95a2ae",
+        "filename": "serverutil/upspinserver/main.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-04-06T22:27:49Z",
+      "side": 1,
+      "message": "you should set flags.NetAddr here, when the function can no longer return an error but before http serving begins",
       "revId": "e1a672216d22ac4aa2235bd369db7e9bacda858c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
