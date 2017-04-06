@@ -24,9 +24,6 @@ import (
 	"upspin.io/upspin"
 	"upspin.io/user"
 	"upspin.io/valid"
-
-	// We use GCS as the backing for our data.
-	_ "upspin.io/cloud/storage/gcs"
 )
 
 // New initializes an instance of the key service.
