@@ -8,8 +8,6 @@ package main // import "upspin.io/cmd/upspin"
 
 import (
 	"flag"
-	"fmt"
-	"os"
 
 	"upspin.io/config"
 	"upspin.io/pack/ee"
@@ -66,17 +64,26 @@ func (s *State) countersignCommand(fs *flag.FlagSet) {
 
 // countersign adds a second signature using factotum.
 func (c *Countersigner) countersign(entry *upspin.DirEntry, newF upspin.Factotum) {
-	// TODO(ehg)  Handle PlainPack and EEIntegrityPack as well.
-	err := ee.Countersign(c.oldKey, newF, entry)
+	var err error
+	switch entry.Packing {
+	case upspin.EEPack:
+		err = ee.Countersign(c.oldKey, newF, entry)
+	case upspin.EEIntegrityPack:
+		// TODO err = eeintegrity.Countersign(c.oldKey, newF, entry)
+		c.state.Failf("can't handle EEPack for %q\n", entry.Name)
+		return
+	case upspin.PlainPack:
+		return // Nothing to do.
+	}
 	if err != nil {
-		c.state.Exit(err)
+		c.state.Fail(err)
+		return
 	}
 	_, err = c.state.DirServer(entry.Name).Put(entry)
 	if err != nil {
 		// If we get ErrFollowLink, the item changed underfoot, so reporting
 		// an error in that case is OK.
-		fmt.Fprintf(os.Stderr, "error putting entry back for %q: %s\n", entry.Name, err)
-		c.state.ExitCode = 1
+		c.state.Failf("error putting entry back for %q: %s\n", entry.Name, err)
 	}
 }
 
@@ -90,9 +97,10 @@ func (c *Countersigner) entriesFromDirectory(dir upspin.PathName) []*upspin.DirE
 	entries := make([]*upspin.DirEntry, 0, len(thisDir))
 	// Add plain files that have signatures by self.
 	for _, e := range thisDir {
-		if !e.IsDir() && !e.IsLink() &&
-			e.Packing == upspin.EEPack &&
-			string(e.Writer) == string(c.state.Config.UserName()) {
+		if e.IsDir() || e.IsLink() {
+			continue
+		}
+		if e.Writer == c.state.Config.UserName() { // TODO: Why this condition?
 			entries = append(entries, e)
 		}
 	}
