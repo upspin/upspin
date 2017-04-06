@@ -25,8 +25,8 @@ argument and points to the first path argument.
 		fs.Usage()
 	}
 
-	originalPath := upspin.PathName(fs.Arg(0))
-	linkPath := upspin.PathName(fs.Arg(1))
+	originalPath := upspin.PathName(s.AtSign(fs.Arg(0)))
+	linkPath := upspin.PathName(s.AtSign(fs.Arg(1)))
 
 	if !force {
 		_, err := s.Client.Lookup(originalPath, false)

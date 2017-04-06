@@ -36,6 +36,9 @@ its -l flag and debugging enabled, run
 
 	upspin -log debug ls -l
 
+As a shorthand, a lone at sign (@) at the beginning of an Upspin path
+stands for the current user's Upspin root.
+
 For a list of available subcommands and global flags, run
 
 	upspin -help
@@ -112,6 +115,10 @@ arguments must not be directories unless the -R flag is set.
 If the final argument is not a directory, cp requires exactly two
 path names and copies the contents of the first to the second.
 The -R flag requires that the final argument be a directory.
+
+All file names given to cp must be fully qualified paths,
+either locally or within Upspin. For local paths, this means
+they must be absolute paths or start with '.', '..',  or '~'.
 
 When copying from one Upspin path to another Upspin path, cp can be
 very efficient, copying only the references to the data rather than

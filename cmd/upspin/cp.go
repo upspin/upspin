@@ -319,7 +319,7 @@ func (cs *copyState) glob(pattern string) (files []cpFile) {
 	}
 
 	// It must be an Upspin path.
-	parsed, err := path.Parse(upspin.PathName(pattern))
+	parsed, err := path.Parse(cs.state.AtSign(pattern))
 	if err != nil {
 		cs.state.Exit(err)
 	}
