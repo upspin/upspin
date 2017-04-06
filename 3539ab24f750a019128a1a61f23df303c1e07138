@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "13845425_9bcce791",
+        "filename": "cmd/upspin/put.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-04-06T05:13:48Z",
+      "side": 1,
+      "message": "doesn\u0027t AtSign return a PathName?",
+      "range": {
+        "startLine": 32,
+        "startChar": 27,
+        "endLine": 32,
+        "endChar": 43
+      },
+      "revId": "3539ab24f750a019128a1a61f23df303c1e07138",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
