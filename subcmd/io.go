@@ -39,6 +39,27 @@ func homeDir(who string) string {
 	return u.HomeDir
 }
 
+// AtSign processes a leading at sign, if any, in the Upspin file name and replaces it
+// with the current user name. The name must be strictly "@" or begin with "@/";
+// unlike Tilde, it does not look up other user's roots.
+// The argument is of type string; once a file becomes an upspin.PathName it should
+// not be passed to this function.
+// If the file name does not begin with an at sign, AtSign returns the argument
+// unchanged except for promotion to upspin.PathName.
+// If the target user does not exist, it returns the original string.
+func (s *State) AtSign(file string) upspin.PathName {
+	if s.Config == nil || file == "" || file[0] != '@' {
+		return upspin.PathName(file)
+	}
+	if file == "@" {
+		return upspin.PathName(s.Config.UserName() + "/")
+	}
+	if strings.HasPrefix(file, "@/") {
+		return upspin.PathName(string(s.Config.UserName()) + file[1:])
+	}
+	return upspin.PathName(file)
+}
+
 // Tilde processes a leading tilde, if any, in the local file name.
 // If the file name does not begin with a tilde, Tilde returns the argument unchanged.
 // This special processing (only) is applied to all local file names passed to
@@ -155,13 +176,14 @@ func (s *State) GlobAllUpspinPath(args []string) []upspin.PathName {
 // not exist, the function exits.
 func (s *State) GlobUpspin(pattern string) []*upspin.DirEntry {
 	// Must be a valid Upspin path.
-	parsed, err := path.Parse(upspin.PathName(pattern))
+	pat := s.AtSign(pattern)
+	parsed, err := path.Parse(pat)
 	if err != nil {
 		s.Exit(err)
 	}
 	// If it has no metacharacters, look it up to be sure it exists.
-	if !HasGlobChar(pattern) {
-		entry, err := s.Client.Lookup(upspin.PathName(pattern), true)
+	if !HasGlobChar(string(pat)) {
+		entry, err := s.Client.Lookup(pat, true)
 		if err != nil {
 			s.Exit(err)
 		}
@@ -179,13 +201,14 @@ func (s *State) GlobUpspin(pattern string) []*upspin.DirEntry {
 // the path names.
 func (s *State) GlobUpspinPath(pattern string) []upspin.PathName {
 	// Note: We could call GlobUpspin but that might do an unnecessary Lookup.
-	parsed, err := path.Parse(upspin.PathName(pattern))
+	pat := s.AtSign(pattern)
+	parsed, err := path.Parse(pat)
 	if err != nil {
 		s.Exit(err)
 	}
 	// If it has no metacharacters, leave it alone but clean it.
-	if !HasGlobChar(pattern) {
-		return []upspin.PathName{path.Clean(upspin.PathName(pattern))}
+	if !HasGlobChar(string(pat)) {
+		return []upspin.PathName{parsed.Path()}
 	}
 	entries, err := s.Client.Glob(parsed.String())
 	if err != nil {

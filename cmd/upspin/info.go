@@ -35,7 +35,8 @@ of the link.
 		fs.Usage()
 	}
 	for _, name := range fs.Args() {
-		entries, err := s.DirServer(upspin.PathName(name)).Glob(name)
+		name := s.AtSign(name)
+		entries, err := s.DirServer(name).Glob(string(name))
 		// ErrFollowLink is OK; we still get the relevant entry.
 		if err != nil && err != upspin.ErrFollowLink {
 			s.Exit(err)
