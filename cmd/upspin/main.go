@@ -63,6 +63,9 @@ its -l flag and debugging enabled, run
 
 	upspin -log debug ls -l
 
+As a shorthand, a lone at sign (@) at the beginning of an Upspin path
+stands for the current user's Upspin root.
+
 For a list of available subcommands and global flags, run
 
 	upspin -help
