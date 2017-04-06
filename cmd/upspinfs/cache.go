@@ -336,6 +336,7 @@ func (cf *cachedFile) writeback(h *handle) error {
 	for tries := 0; ; tries++ {
 		de, err = cf.c.client.Put(n.uname, cleartext)
 		if err == nil {
+			n.attr.Mtime = de.Time.Go()
 			break
 		}
 		if tries > 5 || !strings.Contains(err.Error(), "unreachable") {
