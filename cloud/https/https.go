@@ -13,10 +13,7 @@ import (
 	"path/filepath"
 	"time"
 
-	"cloud.google.com/go/compute/metadata"
 	"golang.org/x/crypto/acme/autocert"
-
-	cloudAutocert "upspin.io/cloud/autocert"
 
 	"upspin.io/access"
 	"upspin.io/config"
@@ -67,22 +64,6 @@ func (opt *Options) applyDefaults() {
 	}
 	if opt.KeyFile == "" {
 		opt.KeyFile = defaultOptions.KeyFile
-	}
-}
-
-func (opt *Options) CloudAutocert(serverName string) {
-	// TODO(adg): remove this when we remove GCP stuff.
-	if metadata.OnGCE() && opt.LetsEncryptCache == "" {
-		const key = "letsencrypt-bucket"
-		bucket, err := metadata.InstanceAttributeValue(key)
-		if err != nil {
-			log.Fatalf("https: couldn't read %q metadata value: %v", key, err)
-		}
-		cache, err := cloudAutocert.NewCache(bucket, serverName)
-		if err != nil {
-			log.Fatalf("https: couldn't set up letsencrypt cache: %v", err)
-		}
-		opt.AutocertCache = cache
 	}
 }
 
