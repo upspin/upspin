@@ -23,6 +23,7 @@ import (
 	_ "upspin.io/key/transports"
 
 	// Possible storage backends.
+	"upspin.io/cloud/https"
 	_ "upspin.io/cloud/storage/disk"
 	_ "upspin.io/cloud/storage/gcs"
 )
@@ -61,6 +62,9 @@ func main() {
 	}
 
 	keyserver.Main(setupTestUser)
+	opt := https.OptionsFromFlags()
+	opt.CloudAutocert(serverName)
+	https.ListenAndServe(nil, opt)
 }
 
 // isLocal returns true if the name only resolves to loopback addresses.

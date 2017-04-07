@@ -14,7 +14,6 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
-	"net"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -22,7 +21,6 @@ import (
 	"sync"
 
 	"upspin.io/client"
-	"upspin.io/cloud/https"
 	"upspin.io/config"
 	dirServer "upspin.io/dir/server"
 	"upspin.io/errors"
@@ -48,13 +46,13 @@ import (
 var (
 	cfgPath   = flag.String("serverconfig", filepath.Join(config.Home(), "upspin", "server"), "server configuration `directory`")
 	enableWeb = flag.Bool("web", false, "enable Upspin web interface")
-	ready     = make(chan struct{})
+	readyCh   = make(chan struct{})
 )
 
-func Main() {
+func Main() (ready chan struct{}) {
 	flags.Parse(flags.Server)
 
-	server, cfg, perm, err := initServer(startup)
+	_, cfg, perm, err := initServer(startup)
 	if err == noConfig {
 		log.Print("Configuration file not found. Running in setup mode.")
 		http.Handle("/", &setupHandler{})
@@ -64,24 +62,9 @@ func Main() {
 		http.Handle("/", newWeb(cfg, perm))
 	}
 
-	// Set up HTTPS server.
-	var opt https.Options
-	if flags.TLSCertFile != "" && flags.TLSKeyFile != "" {
-		opt.CertFile = flags.TLSCertFile
-		opt.KeyFile = flags.TLSKeyFile
-	} else {
-		opt.LetsEncryptCache = flags.LetsEncryptCache
-		if server != nil {
-			host, _, err := net.SplitHostPort(string(server.Addr))
-			if err != nil {
-				log.Printf("Error parsing addr from config %q: %v", server.Addr, err)
-				log.Printf("Warning: Let's Encrypt certificates will be fetched for any host.")
-			} else {
-				opt.LetsEncryptHosts = []string{host}
-			}
-		}
-	}
-	https.ListenAndServe(ready, "upspinserver", flags.HTTPSAddr, &opt)
+	// TODO(adg): plumb through ServerConfig.Addr to https.Options.LetsEncryptHosts.
+
+	return readyCh
 }
 
 var noConfig = errors.Str("no configuration")
@@ -147,7 +130,7 @@ func initServer(mode initMode) (*subcmd.ServerConfig, upspin.Config, *perm.Perm,
 	}
 
 	// Wrap store and dir with permission checking.
-	perm := perm.NewWithDir(dirCfg, ready, serverConfig.User, dir)
+	perm := perm.NewWithDir(dirCfg, readyCh, serverConfig.User, dir)
 	store = perm.WrapStore(store)
 	dir = perm.WrapDir(dir)
 
