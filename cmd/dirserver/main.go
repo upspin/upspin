@@ -7,11 +7,6 @@
 package main // import "upspin.io/cmd/dirserver"
 
 import (
-	"upspin.io/cloud/gcpmetric"
-	cloudLog "upspin.io/cloud/log"
-	"upspin.io/flags"
-	"upspin.io/log"
-	"upspin.io/metric"
 	"upspin.io/serverutil/dirserver"
 
 	// TODO: Which of these are actually needed?
@@ -25,24 +20,6 @@ import (
 	_ "upspin.io/transports"
 )
 
-const (
-	serverName    = "dirserver"
-	samplingRatio = 1    // report all metrics
-	maxQPS        = 1000 // unlimited metric reports per second
-)
-
 func main() {
-	flags.Register("project")
-
-	if flags.Project != "" {
-		cloudLog.Connect(flags.Project, serverName)
-		svr, err := gcpmetric.NewSaver(flags.Project, samplingRatio, maxQPS, "serverName", serverName)
-		if err != nil {
-			log.Fatalf("Can't start a metric saver for GCP project %q: %s", flags.Project, err)
-		} else {
-			metric.RegisterSaver(svr)
-		}
-	}
-
 	dirserver.Main()
 }

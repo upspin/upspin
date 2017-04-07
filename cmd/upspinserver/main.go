@@ -12,7 +12,6 @@ import (
 
 	// Storage implementations.
 	_ "upspin.io/cloud/storage/disk"
-	_ "upspin.io/cloud/storage/gcs"
 )
 
 func main() {
