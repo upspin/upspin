@@ -7,6 +7,7 @@
 package main // import "upspin.io/cmd/dirserver"
 
 import (
+	"upspin.io/cloud/https"
 	"upspin.io/serverutil/dirserver"
 
 	// TODO: Which of these are actually needed?
@@ -21,5 +22,6 @@ import (
 )
 
 func main() {
-	dirserver.Main()
+	ready := dirserver.Main()
+	https.ListenAndServeFromFlags(ready)
 }
