@@ -8,13 +8,14 @@ package main // import "upspin.io/cmd/storeserver"
 
 import (
 	"upspin.io/cloud/gcpmetric"
+	"upspin.io/cloud/https"
 	cloudLog "upspin.io/cloud/log"
 	"upspin.io/flags"
 	"upspin.io/log"
 	"upspin.io/metric"
 	"upspin.io/serverutil/storeserver"
 
-	// Storage implementations.
+	// Storage implementation.
 	_ "upspin.io/cloud/storage/disk"
 	_ "upspin.io/cloud/storage/gcs"
 )
@@ -38,5 +39,8 @@ func main() {
 		}
 	}
 
-	storeserver.Main()
+	ready := storeserver.Main()
+	opt := https.OptionsFromFlags()
+	opt.CloudAutocert(serverName)
+	https.ListenAndServe(ready, opt)
 }

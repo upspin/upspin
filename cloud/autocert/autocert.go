@@ -5,7 +5,7 @@
 // Package autocert provides an autocert.Cache implementation that stores
 // the certificate cache in a Google Cloud Storage bucket.
 //
-// Note: this package will shortly be moved to gcp.upspin.io.
+// TODO(adg): remove this when we're moving to gcp.upspin.io.
 package autocert // import "upspin.io/cloud/autocert"
 
 import (

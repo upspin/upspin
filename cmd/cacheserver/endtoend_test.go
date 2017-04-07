@@ -173,7 +173,7 @@ func startCombinedServer(cfg upspin.Config) (*upspin.Endpoint, error) {
 	ep, _ := upspin.ParseEndpoint("remote," + addr)
 
 	ready := make(chan struct{})
-	go https.ListenAndServe(ready, "test", addr, nil)
+	go https.ListenAndServe(ready, &https.Options{Addr: addr})
 	<-ready
 	return ep, nil
 }
