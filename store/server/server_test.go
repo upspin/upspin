@@ -13,7 +13,7 @@ import (
 	"upspin.io/errors"
 
 	// Import needed storage backend.
-	_ "upspin.io/cloud/storage/gcs"
+	_ "upspin.io/cloud/storage/disk"
 )
 
 const (
@@ -99,7 +99,7 @@ func TestNew(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping part of test when network unavailable; depends on credential availability")
 	}
-	_, err = New("backend=GCS", "defaultACL=publicRead", "gcpBucketName=zee bucket")
+	_, err = New("backend=Disk")
 	if err != nil {
 		t.Fatal(err)
 	}
