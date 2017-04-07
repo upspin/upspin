@@ -10,7 +10,6 @@ import (
 	"flag"
 	"net/http"
 
-	"upspin.io/cloud/https"
 	"upspin.io/config"
 	"upspin.io/dir/inprocess"
 	"upspin.io/dir/server"
@@ -33,11 +32,9 @@ import (
 	_ "upspin.io/transports"
 )
 
-const serverName = "dirserver"
-
 var storeServerUser = flag.String("storeserveruser", "", "`user name` of the StoreServer")
 
-func Main() {
+func Main() (ready chan struct{}) {
 	flags.Parse(flags.Server, "kind", "serverconfig")
 
 	// Load configuration and keys for this server. It needs a real upspin username and keys.
@@ -64,7 +61,6 @@ func Main() {
 	}
 
 	// Wrap with permission checks, if requested.
-	var ready chan struct{}
 	if *storeServerUser != "" {
 		ready = make(chan struct{})
 		dir = perm.WrapDir(cfg, ready, upspin.UserName(*storeServerUser), dir)
@@ -75,5 +71,5 @@ func Main() {
 	httpDir := dirserver.New(cfg, dir, upspin.NetAddr(flags.NetAddr))
 	http.Handle("/api/Dir/", httpDir)
 
-	https.ListenAndServeFromFlags(ready, serverName)
+	return ready
 }

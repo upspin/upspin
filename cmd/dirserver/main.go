@@ -8,6 +8,7 @@ package main // import "upspin.io/cmd/dirserver"
 
 import (
 	"upspin.io/cloud/gcpmetric"
+	"upspin.io/cloud/https"
 	cloudLog "upspin.io/cloud/log"
 	"upspin.io/flags"
 	"upspin.io/log"
@@ -44,5 +45,6 @@ func main() {
 		}
 	}
 
-	dirserver.Main()
+	ready := dirserver.Main()
+	https.ListenAndServeFromFlags(ready)
 }
