@@ -71,7 +71,7 @@ func (ei ei) String() string {
 
 // Pack implements upspin.Packer.
 func (ei ei) Pack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockPacker, error) {
-	const op = "pack/ei.Pack"
+	const op = "pack/eeintegrity.Pack"
 	if err := pack.CheckPacking(ei, d); err != nil {
 		return nil, errors.E(op, errors.Invalid, d.Name, err)
 	}
@@ -97,7 +97,7 @@ type blockPacker struct {
 
 // Pack implements upspin.BlockPacker.
 func (bp *blockPacker) Pack(cleartext []byte) (ciphertext []byte, err error) {
-	const op = "pack/ei.blockPacker.Pack"
+	const op = "pack/eeintegrity.blockPacker.Pack"
 	if err := internal.CheckLocationSet(bp.entry); err != nil {
 		return nil, err
 	}
@@ -133,7 +133,7 @@ func (bp *blockPacker) SetLocation(l upspin.Location) {
 
 // Close implements upspin.BlockPacker.
 func (bp *blockPacker) Close() error {
-	const op = "pack/ei.blockPacker.Close"
+	const op = "pack/eeintegrity.blockPacker.Close"
 	if err := internal.CheckLocationSet(bp.entry); err != nil {
 		return err
 	}
@@ -154,7 +154,7 @@ func (bp *blockPacker) Close() error {
 
 // Unpack implements upspin.Packer.
 func (ei ei) Unpack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker, error) {
-	const op = "pack/ei.Unpack"
+	const op = "pack/eeintegrity.Unpack"
 	if err := pack.CheckPacking(ei, d); err != nil {
 		return nil, errors.E(op, errors.Invalid, d.Name, err)
 	}
@@ -215,7 +215,7 @@ type blockUnpacker struct {
 
 // Unpack implements upspin.BlockUnpacker.
 func (bp *blockUnpacker) Unpack(ciphertext []byte) (cleartext []byte, err error) {
-	const op = "pack/ei.blockUpacker.Unpack"
+	const op = "pack/eeintegrity.blockUpacker.Unpack"
 	// Validate checksum.
 	b := sha256.Sum256(ciphertext)
 	sum := b[:]
@@ -244,7 +244,7 @@ func (ei ei) Share(cfg upspin.Config, readers []upspin.PublicKey, packdata []*[]
 
 // Name implements upspin.Packer.
 func (ei ei) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName) error {
-	const op = "pack/ei.Name"
+	const op = "pack/eeintegrity.Name"
 	if d.IsDir() {
 		return errors.E(op, d.Name, errors.IsDir, "cannot rename directory")
 	}
@@ -302,6 +302,41 @@ func (ei ei) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName
 	}
 	d.Name = newName
 
+	return nil
+}
+
+// Countersign uses the key in factotum f to add a signature to a DirEntry that is already signed by oldKey.
+func (ei ei) Countersign(oldKey upspin.PublicKey, f upspin.Factotum, d *upspin.DirEntry) error {
+	const op = "pack/eeintegrity.Countersign"
+	if d.IsDir() {
+		return errors.E(op, d.Name, errors.IsDir, "cannot sign directory")
+	}
+
+	// Get ECDSA form of old key.
+	oldPubKey, err := factotum.ParsePublicKey(oldKey)
+	if err != nil {
+		return errors.E(op, d.Name, err)
+	}
+
+	// Extract existing signatures, but keep only the newest.
+	sig, _, cipherSum, err := pdUnmarshal(d.Packdata)
+	if err != nil {
+		return errors.E(op, d.Name, errors.Invalid, err)
+	}
+
+	// Verify existing signature with oldKey.
+	dkey := make([]byte, aesKeyLen)
+	vhash := f.DirEntryHash(d.SignedName, d.Link, d.Attr, d.Packing, d.Time, dkey, cipherSum)
+	if !ecdsa.Verify(oldPubKey, vhash, sig.R, sig.S) {
+		return errors.E(op, d.Name, errVerify, "unable to verify existing signature")
+	}
+
+	// Sign with newKey.
+	sig1, err := f.FileSign(vhash)
+	if err != nil {
+		return errors.E(op, d.Name, errVerify, "unable to make new signature")
+	}
+	pdMarshal(&d.Packdata, sig1, sig, cipherSum)
 	return nil
 }
 
