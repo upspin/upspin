@@ -1,0 +1,242 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d58dedf5_6acc5019",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 611,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-04-07T20:26:53Z",
+      "side": 1,
+      "message": "Extract current signatures, but keep only the newest.",
+      "revId": "f51ca229a60b3a40f47c2c05de1c64cc5296773e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1824d25c_e14760c6",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 647,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-04-07T20:26:53Z",
+      "side": 1,
+      "message": "d\n\nwe don\u0027t keep around bugs in the code to break tests.",
+      "revId": "f51ca229a60b3a40f47c2c05de1c64cc5296773e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0d883237_32f25354",
+        "filename": "pack/ee/ee_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-04-07T20:26:53Z",
+      "side": 1,
+      "message": "one space after period.",
+      "revId": "f51ca229a60b3a40f47c2c05de1c64cc5296773e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e6e03cee_15681c51",
+        "filename": "pack/ee/ee_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 367,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-04-07T20:26:53Z",
+      "side": 1,
+      "message": "t.Fatal(\"cannot create second (key-rotated) factotum for joe: %v\", err)",
+      "revId": "f51ca229a60b3a40f47c2c05de1c64cc5296773e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e7c2f180_7c1318cd",
+        "filename": "pack/ee/ee_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 369,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-04-07T20:26:53Z",
+      "side": 1,
+      "message": "joeCfg or even joeConfig",
+      "revId": "f51ca229a60b3a40f47c2c05de1c64cc5296773e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "341b02f5_bbc27a83",
+        "filename": "pack/ee/ee_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 374,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-04-07T20:26:53Z",
+      "side": 1,
+      "message": "t.Fatal",
+      "revId": "f51ca229a60b3a40f47c2c05de1c64cc5296773e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7fbd644e_75985fbe",
+        "filename": "pack/ee/ee_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-04-07T20:26:53Z",
+      "side": 1,
+      "message": "use %q for these.",
+      "revId": "f51ca229a60b3a40f47c2c05de1c64cc5296773e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ab2755fa_087ee1a2",
+        "filename": "pack/ee/ee_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 385,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-04-07T20:26:53Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "f51ca229a60b3a40f47c2c05de1c64cc5296773e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5c149afe_94b4f5aa",
+        "filename": "pack/eeintegrity/eeintegrity.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-04-07T20:26:53Z",
+      "side": 1,
+      "message": "please change all these ops to say eeintegrity instead of ei.",
+      "revId": "f51ca229a60b3a40f47c2c05de1c64cc5296773e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d72f78fb_a17dc640",
+        "filename": "pack/eeintegrity/eeintegrity.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 322,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-04-07T20:26:53Z",
+      "side": 1,
+      "message": "Extract existing signatures, but keep only the newest.",
+      "revId": "f51ca229a60b3a40f47c2c05de1c64cc5296773e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f84d815b_2115e657",
+        "filename": "pack/eeintegrity/eeintegrity.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-04-07T20:26:53Z",
+      "side": 1,
+      "message": "d",
+      "revId": "f51ca229a60b3a40f47c2c05de1c64cc5296773e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c99e113e_26c73964",
+        "filename": "pack/plain/plain.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-04-07T20:26:53Z",
+      "side": 1,
+      "message": "Extract existing signatures, but keep only the newest.",
+      "revId": "f51ca229a60b3a40f47c2c05de1c64cc5296773e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "73ddcf29_fa68bd3c",
+        "filename": "pack/plain/plain.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-04-07T20:26:53Z",
+      "side": 1,
+      "message": "d",
+      "revId": "f51ca229a60b3a40f47c2c05de1c64cc5296773e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "456b8d97_3a2ca801",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-04-07T20:26:53Z",
+      "side": 1,
+      "message": "what are sig1 and sig2? words like this i would expect to see in the signature (sic) of the func, but they aren\u0027t there.",
+      "revId": "f51ca229a60b3a40f47c2c05de1c64cc5296773e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
