@@ -13,5 +13,5 @@ import (
 
 func main() {
 	frontend.Main()
-	https.ListenAndServeFromFlags(nil, "frontend")
+	https.ListenAndServeFromFlags(nil)
 }
