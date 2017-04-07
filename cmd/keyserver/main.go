@@ -10,12 +10,9 @@ import (
 	"flag"
 	"net"
 
-	"upspin.io/cloud/gcpmetric"
-	cloudLog "upspin.io/cloud/log"
 	"upspin.io/factotum"
 	"upspin.io/flags"
 	"upspin.io/log"
-	"upspin.io/metric"
 	"upspin.io/serverutil/keyserver"
 	"upspin.io/upspin"
 
@@ -25,20 +22,6 @@ import (
 	// Possible storage backends.
 	"upspin.io/cloud/https"
 	_ "upspin.io/cloud/storage/disk"
-	_ "upspin.io/cloud/storage/gcs"
-)
-
-const (
-	// serverName is the name of this server.
-	serverName = "keyserver"
-
-	// metricSampleSize is the size of the sample from which pick one metric
-	// to save.
-	metricSampleSize = 100
-
-	// metricMaxQPS is the maximum number of metric batches to save per
-	// second.
-	metricMaxQPS = 5
 )
 
 var (
@@ -47,24 +30,8 @@ var (
 )
 
 func main() {
-	flags.Register("project")
-
-	if flags.Project != "" {
-		cloudLog.Connect(flags.Project, serverName)
-		// Disable logging locally so we don't pay the price of local
-		// unbuffered writes on a busy server.
-		log.SetOutput(nil)
-		svr, err := gcpmetric.NewSaver(flags.Project, metricSampleSize, metricMaxQPS, "serverName", serverName)
-		if err != nil {
-			log.Fatalf("Can't start a metric saver for GCP project %q: %s", flags.Project, err)
-		}
-		metric.RegisterSaver(svr)
-	}
-
 	keyserver.Main(setupTestUser)
-	opt := https.OptionsFromFlags()
-	opt.CloudAutocert(serverName)
-	https.ListenAndServe(nil, opt)
+	https.ListenAndServeFromFlags(nil)
 }
 
 // isLocal returns true if the name only resolves to loopback addresses.
