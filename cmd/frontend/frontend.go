@@ -13,5 +13,7 @@ import (
 
 func main() {
 	frontend.Main()
-	https.ListenAndServeFromFlags(nil, "frontend")
+	opt := https.OptionsFromFlags()
+	opt.CloudAutocert("frontend")
+	https.ListenAndServe(nil, opt)
 }
