@@ -62,7 +62,7 @@ func main() {
 	http.Handle("/api/Store/", storeserver.New(cfg, s.StoreServer(), addr))
 	http.Handle("/api/Dir/", dirserver.New(cfg, s.DirServer(), addr))
 
-	https.ListenAndServeFromFlags(nil, "demoserver")
+	https.ListenAndServeFromFlags(nil)
 }
 
 // box represents an opened box.

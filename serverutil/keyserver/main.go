@@ -10,7 +10,6 @@ import (
 	"flag"
 	"net/http"
 
-	"upspin.io/cloud/https"
 	"upspin.io/config"
 	"upspin.io/errors"
 	"upspin.io/flags"
@@ -24,16 +23,13 @@ import (
 	_ "upspin.io/key/transports"
 )
 
-// serverName is the name of this server.
-const serverName = "keyserver"
-
 // mailConfig specifies a config file name for the mail service.
 // The format of the email config file must be lines: api key, incoming email
 // provider user name and password.
 var mailConfigFile = flag.String("mail_config", "", "config file name for mail service")
 
 // Main starts the keyserver. If setup is not nil it is called with the
-// instantiated KeyServer before it starts serving clients.
+// instantiated KeyServer.
 func Main(setup func(upspin.KeyServer)) {
 	flags.Parse(flags.Server, "kind", "serverconfig")
 
@@ -80,6 +76,4 @@ func Main(setup func(upspin.KeyServer)) {
 	} else {
 		log.Println("keyserver: -mail_config not set, /signup deactivated")
 	}
-
-	https.ListenAndServeFromFlags(nil, "keyserver")
 }

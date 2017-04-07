@@ -9,7 +9,6 @@ package storeserver // import "upspin.io/serverutil/storeserver"
 import (
 	"net/http"
 
-	"upspin.io/cloud/https"
 	"upspin.io/config"
 	"upspin.io/errors"
 	"upspin.io/exp/store/filesystem"
@@ -29,9 +28,7 @@ import (
 	_ "upspin.io/pack/plain"
 )
 
-const serverName = "storeserver"
-
-func Main() {
+func Main() (ready chan struct{}) {
 	flags.Parse(flags.Server, "kind", "serverconfig")
 
 	// Load configuration and keys for this server. It needs a real upspin username and keys.
@@ -58,10 +55,11 @@ func Main() {
 	}
 
 	// Wrap with permission checks.
-	ready := make(chan struct{})
+	ready = make(chan struct{})
 	store = perm.WrapStore(cfg, ready, store)
 
 	httpStore := storeserver.New(cfg, store, upspin.NetAddr(flags.NetAddr))
 	http.Handle("/api/Store/", httpStore)
-	https.ListenAndServeFromFlags(ready, serverName)
+
+	return ready
 }

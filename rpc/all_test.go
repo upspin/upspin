@@ -86,7 +86,9 @@ func startServer(t *testing.T) (port string) {
 	}))
 
 	ready := make(chan struct{})
-	go https.ListenAndServe(ready, "test", fmt.Sprintf("localhost:%s", port), nil)
+	go https.ListenAndServe(ready, &https.Options{
+		Addr: fmt.Sprintf("localhost:%s", port),
+	})
 	<-ready
 	return port
 }
