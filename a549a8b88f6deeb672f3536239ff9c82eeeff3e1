@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c140e4a6_c2c79096",
+        "filename": "cmd/upspin/countersign.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-04-07T00:00:53Z",
+      "side": 1,
+      "message": "That\u0027s not true.  PlainPack still has to sign {name, packing, time}.",
+      "revId": "a549a8b88f6deeb672f3536239ff9c82eeeff3e1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "261b79f1_4fa28398",
+        "filename": "cmd/upspin/countersign.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-04-07T00:00:53Z",
+      "side": 1,
+      "message": "I think this is out of date.   We now sign links.\n\nJust remove \"|| e.IsLink()\" to fix.   I was already doing this in a pending CL but it will be simpler if you commit yours first.",
+      "revId": "a549a8b88f6deeb672f3536239ff9c82eeeff3e1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "323d4631_e418da16",
+        "filename": "cmd/upspin/countersign.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-04-07T00:00:53Z",
+      "side": 1,
+      "message": "We only want to update the signature if we were the signer.",
+      "revId": "a549a8b88f6deeb672f3536239ff9c82eeeff3e1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
