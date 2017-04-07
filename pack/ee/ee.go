@@ -595,20 +595,20 @@ func (ee ee) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName
 }
 
 // Countersign uses the key in factotum f to add a signature to a DirEntry that is already signed by oldKey.
-func Countersign(oldKey upspin.PublicKey, f upspin.Factotum, d *upspin.DirEntry) error {
+func (ee ee) Countersign(oldKey upspin.PublicKey, f upspin.Factotum, d *upspin.DirEntry) error {
 	// TODO(ehg) Consolidate shared code amongst Countersign, Name, Share.
 	const op = "pack/ee.Countersign"
-	if d.IsDir() || d.IsLink() {
-		return errors.E(op, d.Name, errors.IsDir, "cannot sign directory or link")
+	if d.IsDir() {
+		return errors.E(op, d.Name, errors.IsDir, "cannot sign directory")
 	}
 
-	// Get ECDSA forms of keys.
+	// Get ECDSA form of old key.
 	oldPubKey, err := factotum.ParsePublicKey(oldKey)
 	if err != nil {
 		return errors.E(op, d.Name, err)
 	}
 
-	// Extract existing signature
+	// Extract existing signature, ignoring existing sig2.
 	sig, _, wrap, cipherSum, err := pdUnmarshal(d.Packdata)
 	if err != nil {
 		return errors.E(op, d.Name, errors.Invalid, err)
@@ -644,6 +644,7 @@ func Countersign(oldKey upspin.PublicKey, f upspin.Factotum, d *upspin.DirEntry)
 	if err != nil {
 		return errors.E(op, d.Name, errVerify, "unable to make new signature")
 	}
+	// sig1.R = big.NewInt(12345) // deliberate bug, to test TestCountersign
 	pdMarshal(&d.Packdata, sig1, sig, wrap, cipherSum)
 	return nil
 }

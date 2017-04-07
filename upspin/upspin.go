@@ -219,6 +219,12 @@ type Packer interface {
 	// only that of the Upspin user invoking the method. The Packdata
 	// in entry must contain a wrapped key for that user.
 	Name(config Config, entry *DirEntry, path PathName) error
+
+	// Countersign updates the signatures in the DirEntry when a writer
+	// is in the process of switching to a new key.  It checks that
+	// sig1 verifies under the old key, moves sig1 onto sig2,
+	// and creates a new sig1 using the new key.
+	Countersign(oldKey PublicKey, f Factotum, d *DirEntry) error
 }
 
 const (

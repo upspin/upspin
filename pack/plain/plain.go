@@ -201,6 +201,45 @@ func (p plainPack) Name(cfg upspin.Config, dirEntry *upspin.DirEntry, newName up
 	}
 	dirEntry.Name = parsed.Path()
 	dirEntry.SignedName = dirEntry.Name
+	// TODO  Don't we need to update the signature after changing the name?
+	return nil
+}
+
+// Countersign uses the key in factotum f to add a signature to a DirEntry that is already signed by oldKey.
+func (p plainPack) Countersign(oldKey upspin.PublicKey, f upspin.Factotum, d *upspin.DirEntry) error {
+	// TODO(ehg) Consolidate shared code amongst Countersign, Name, Share.
+	const op = "pack/plain.Countersign"
+	if d.IsDir() {
+		return errors.E(op, d.Name, errors.IsDir, "cannot sign directory")
+	}
+
+	// Get ECDSA form of old key.
+	oldPubKey, err := factotum.ParsePublicKey(oldKey)
+	if err != nil {
+		return errors.E(op, d.Name, err)
+	}
+
+	// Extract existing signature, ignoring existing sig2.
+	sig, _, err := pdUnmarshal(d.Packdata)
+	if err != nil {
+		return errors.E(op, d.Name, errors.Invalid, err)
+	}
+
+	// Verify existing signature with oldKey.
+	dkey := make([]byte, aesKeyLen)
+	sum := make([]byte, sha256.Size)
+	vhash := f.DirEntryHash(d.SignedName, d.Link, d.Attr, d.Packing, d.Time, dkey, sum)
+	if !ecdsa.Verify(oldPubKey, vhash, sig.R, sig.S) {
+		return errors.E(op, d.Name, errVerify, "unable to verify existing signature")
+	}
+
+	// Sign with newKey.
+	sig1, err := f.FileSign(vhash)
+	if err != nil {
+		return errors.E(op, d.Name, errVerify, "unable to make new signature")
+	}
+	// sig1.R = big.NewInt(12345) // deliberate bug, to test TestCountersign
+	pdMarshal(&d.Packdata, sig1, sig)
 	return nil
 }
 

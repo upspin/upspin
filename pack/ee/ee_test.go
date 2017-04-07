@@ -212,6 +212,7 @@ func shareBlob(t *testing.T, cfg upspin.Config, packer upspin.Packer, readers []
 }
 
 func TestSharing(t *testing.T) {
+	// TODO This could be cleaned up to be more like TestCountersign.
 	// joe@google.com is the owner of a file that is shared with bob@foo.com.
 	const (
 		joesUserName   upspin.UserName = "joe@google.com"
@@ -226,7 +227,7 @@ func TestSharing(t *testing.T) {
 
 	// Set up Joe as the creator/owner.
 	joecfg, packer := setup(joesUserName)
-	// Set up a mock user service that knows about Joe's public keys (for checking signature during unpack).
+	// Set up a mock key service that knows about Joe's public keys (for checking signature during unpack).
 	mockKey := &dummyKey{
 		userToMatch: []upspin.UserName{joesUserName},
 		keyToReturn: []upspin.PublicKey{joecfg.Factotum().PublicKey()},
@@ -327,6 +328,61 @@ func TestBadSharing(t *testing.T) {
 	}
 	if !errors.Match(errors.E(errors.CannotDecrypt), err) {
 		t.Fatalf("Expected CannotDecrypt error, got %s", err)
+	}
+}
+
+func TestCountersign(t *testing.T) {
+	const (
+		joeUserName upspin.UserName = "joe@google.com"
+		bobUserName upspin.UserName = "bob@foo.com"
+		pathName                    = upspin.PathName(joeUserName + "/secret_for_bob")
+		text                        = "bob, here's the secret file. Sincerely, The Joe."
+	)
+	joecfg, packer := setup(joeUserName)
+	joePublic := joecfg.Factotum().PublicKey()
+	bobcfg, packer := setup(bobUserName)
+	bobPublic := bobcfg.Factotum().PublicKey()
+	bobcfg = config.SetKeyEndpoint(bobcfg, upspin.Endpoint{Transport: upspin.InProcess})
+
+	// Set up key server.  This is a no-op if done by earlier tests.
+	mockKeys := &dummyKey{
+		userToMatch: []upspin.UserName{joeUserName},
+		keyToReturn: []upspin.PublicKey{joePublic},
+	}
+	bind.RegisterKeyServer(upspin.InProcess, mockKeys)
+	joecfg = config.SetKeyEndpoint(joecfg, upspin.Endpoint{Transport: upspin.InProcess})
+
+	// Share file with Bob.
+	d := &upspin.DirEntry{
+		Name:       pathName,
+		SignedName: pathName,
+	}
+	d.Writer = joecfg.UserName()
+	cipher := packBlob(t, joecfg, packer, d, []byte(text))
+	shareBlob(t, joecfg, packer, []upspin.PublicKey{joePublic, bobPublic}, &d.Packdata)
+
+	// Emulate Joe executing "upspin keygen -rotate".
+	f2, err := factotum.NewFromDir(testutil.Repo("key", "testdata", "joe2"))
+	if err != nil {
+		log.Fatalf("unable to initialize factotum from joe2")
+	}
+	joecfg = config.SetFactotum(joecfg, f2)
+
+	// We know from TestSharing that Bob can read. Try again with Countersign.
+	err = packer.Countersign(joePublic, joecfg.Factotum(), d)
+	if err != nil {
+		log.Fatal(err)
+	}
+	clear := unpackBlob(t, bobcfg, packer, d, cipher)
+	if string(clear) != text {
+		t.Errorf("Expected %s, got %s", text, clear)
+	}
+
+	// And yet again, after emulating Joe executing "upspin rotate".
+	mockKeys.keyToReturn[0] = joecfg.Factotum().PublicKey()
+	clear = unpackBlob(t, bobcfg, packer, d, cipher)
+	if string(clear) != text {
+		t.Errorf("Expected %s, got %s", text, clear)
 	}
 }
 

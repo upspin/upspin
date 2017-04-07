@@ -10,7 +10,6 @@ import (
 	"flag"
 
 	"upspin.io/config"
-	"upspin.io/pack/ee"
 	"upspin.io/upspin"
 )
 
@@ -64,19 +63,8 @@ func (s *State) countersignCommand(fs *flag.FlagSet) {
 
 // countersign adds a second signature using factotum.
 func (c *Countersigner) countersign(entry *upspin.DirEntry, newF upspin.Factotum) {
-	var err error
-	switch entry.Packing {
-	case upspin.EEPack:
-		err = ee.Countersign(c.oldKey, newF, entry)
-	case upspin.EEIntegrityPack:
-		// TODO err = eeintegrity.Countersign(c.oldKey, newF, entry)
-		c.state.Failf("can't handle EEPack for %q\n", entry.Name)
-		return
-	case upspin.PlainPack:
-		// TODO err = plain.Countersign(c.oldKey, newF, entry)
-		c.state.Failf("can't handle PlainPack for %q\n", entry.Name)
-		return
-	}
+	packer := lookupPacker(entry)
+	err := packer.Countersign(c.oldKey, newF, entry)
 	if err != nil {
 		c.state.Fail(err)
 		return
