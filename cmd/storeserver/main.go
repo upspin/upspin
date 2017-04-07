@@ -7,12 +7,14 @@
 package main // import "upspin.io/cmd/storeserver"
 
 import (
+	"upspin.io/cloud/https"
 	"upspin.io/serverutil/storeserver"
 
-	// Storage implementations.
+	// Storage implementation.
 	_ "upspin.io/cloud/storage/disk"
 )
 
 func main() {
-	storeserver.Main()
+	ready := storeserver.Main()
+	https.ListenAndServeFromFlags(ready)
 }

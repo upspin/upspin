@@ -6,9 +6,7 @@
 package https // import "upspin.io/cloud/https"
 
 import (
-	"context"
 	"crypto/tls"
-	"io/ioutil"
 	"net"
 	"net/http"
 	"os"
@@ -16,10 +14,6 @@ import (
 	"time"
 
 	"golang.org/x/crypto/acme/autocert"
-	"google.golang.org/api/option"
-
-	"cloud.google.com/go/compute/metadata"
-	"cloud.google.com/go/storage"
 
 	"upspin.io/access"
 	"upspin.io/errors"
@@ -32,6 +26,13 @@ import (
 // outside GCE. The default is the self-signed certificate in
 // upspin.io/rpc/testdata.
 type Options struct {
+	// Addr specifies the host and port on which the server should listen.
+	Addr string
+
+	// AutocertCache provides a cache for use with Let's Encrypt.
+	// If non-nil, enables Let's Encrypt ceritficates for this server.
+	AutocertCache autocert.Cache
+
 	// LetsEncryptCache specifies the cache file for Let's Encrypt.
 	// If non-empty, enables Let's Encrypt certificates for this server.
 	LetsEncryptCache string
@@ -65,19 +66,38 @@ func (opt *Options) applyDefaults() {
 	}
 }
 
+// OptionsFromFlags returns Options derived from the command-line flags present
+// in the upspin.io/flags package.
+func OptionsFromFlags() *Options {
+	addr := flags.HTTPSAddr
+	if flags.InsecureHTTP {
+		addr = flags.HTTPAddr
+	}
+	return &Options{
+		Addr:             addr,
+		LetsEncryptCache: flags.LetsEncryptCache,
+		CertFile:         flags.TLSCertFile,
+		KeyFile:          flags.TLSKeyFile,
+		InsecureHTTP:     flags.InsecureHTTP,
+	}
+}
+
+// ListenAndServeFromFlags is the same as ListenAndServe, but it determines the
+// listen address and Options from command-line flags in the flags package.
+func ListenAndServeFromFlags(ready chan<- struct{}) {
+	ListenAndServe(ready, OptionsFromFlags())
+}
+
 // ListenAndServe serves the http.DefaultServeMux by HTTPS (and HTTP,
 // redirecting to HTTPS), storing SSL credentials in the Google Cloud Storage
 // buckets letsencrypt*.
-//
-// If the server is running outside GCE, instead an HTTPS server is started on
-// the address specified by addr using the certificate details specified by opt.
 //
 // The given channel, if any, is closed when the TCP listener has succeeded.
 // It may be used to signal that the server is ready to start serving requests.
 //
 // ListenAndServe does not return. It exits the program when the server is
 // shut down (via SIGTERM or due to an error) and calls shutdown.Shutdown.
-func ListenAndServe(ready chan<- struct{}, serverName, addr string, opt *Options) {
+func ListenAndServe(ready chan<- struct{}, opt *Options) {
 	if opt == nil {
 		opt = defaultOptions
 	} else {
@@ -90,6 +110,7 @@ func ListenAndServe(ready chan<- struct{}, serverName, addr string, opt *Options
 		m.HostPolicy = autocert.HostWhitelist(h...)
 	}
 
+	addr := opt.Addr
 	var config *tls.Config
 	if opt.InsecureHTTP {
 		log.Info.Printf("https: serving insecure HTTP on %q", addr)
@@ -104,18 +125,9 @@ func ListenAndServe(ready chan<- struct{}, serverName, addr string, opt *Options
 		log.Info.Printf("https: serving HTTPS on %q using Let's Encrypt certificates", addr)
 		m.Cache = autocert.DirCache(file)
 		config = &tls.Config{GetCertificate: m.GetCertificate}
-	} else if metadata.OnGCE() {
+	} else if cache := opt.AutocertCache; cache != nil {
 		addr = ":443"
-		log.Info.Printf("https: serving HTTPS on GCE %q using Let's Encrypt certificates", addr)
-		const key = "letsencrypt-bucket"
-		bucket, err := metadata.InstanceAttributeValue(key)
-		if err != nil {
-			log.Fatalf("https: couldn't read %q metadata value: %v", key, err)
-		}
-		cache, err := newAutocertCache(bucket, serverName)
-		if err != nil {
-			log.Fatalf("https: couldn't set up letsencrypt cache: %v", err)
-		}
+		log.Info.Printf("https: serving HTTPS on %q using Let's Encrypt certificates", addr)
 		m.Cache = cache
 		config = &tls.Config{GetCertificate: m.GetCertificate}
 	} else {
@@ -162,21 +174,6 @@ func ListenAndServe(ready chan<- struct{}, serverName, addr string, opt *Options
 	err = server.Serve(ln)
 	log.Printf("https: %v", err)
 	shutdown.Now(1)
-}
-
-// ListenAndServeFromFlags is the same as ListenAndServe, but it determines the
-// listen address and Options from command-line flags in the flags package.
-func ListenAndServeFromFlags(ready chan<- struct{}, serverName string) {
-	addr := flags.HTTPSAddr
-	if flags.InsecureHTTP {
-		addr = flags.HTTPAddr
-	}
-	ListenAndServe(ready, serverName, addr, &Options{
-		LetsEncryptCache: flags.LetsEncryptCache,
-		CertFile:         flags.TLSCertFile,
-		KeyFile:          flags.TLSKeyFile,
-		InsecureHTTP:     flags.InsecureHTTP,
-	})
 }
 
 // newDefaultTLSConfig creates a new TLS config based on the certificate files given.
@@ -242,50 +239,4 @@ func isReadableFile(path string) (bool, error) {
 	}
 	fd.Close()
 	return true, nil // Item exists and is readable.
-}
-
-// autocertCache implements autocert.Cache.
-type autocertCache struct {
-	b      *storage.BucketHandle
-	server string
-}
-
-func newAutocertCache(bucket, prefix string) (cache autocertCache, err error) {
-	ctx := context.Background()
-	client, err := storage.NewClient(ctx, option.WithScopes(storage.ScopeFullControl))
-	if err != nil {
-		return
-	}
-	cache.b = client.Bucket(bucket)
-	cache.server = prefix + "-"
-	return
-}
-
-func (cache autocertCache) Get(ctx context.Context, name string) ([]byte, error) {
-	r, err := cache.b.Object(cache.server + name).NewReader(ctx)
-	if err == storage.ErrObjectNotExist {
-		return nil, autocert.ErrCacheMiss
-	}
-	if err != nil {
-		return nil, err
-	}
-	defer r.Close()
-	return ioutil.ReadAll(r)
-}
-
-func (cache autocertCache) Put(ctx context.Context, name string, data []byte) error {
-	// TODO(ehg) Do we need to add contentType="text/plain; charset=utf-8"?
-	w := cache.b.Object(cache.server + name).NewWriter(ctx)
-	_, err := w.Write(data)
-	if err != nil {
-		log.Printf("https: writing letsencrypt cache: %s %v", name, err)
-	}
-	if err := w.Close(); err != nil {
-		log.Printf("https: writing letsencrypt cache: %s %v", name, err)
-	}
-	return err
-}
-
-func (cache autocertCache) Delete(ctx context.Context, name string) error {
-	return cache.b.Object(cache.server + name).Delete(ctx)
 }

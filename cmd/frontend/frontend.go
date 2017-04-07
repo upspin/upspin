@@ -38,7 +38,7 @@ func main() {
 			log.Fatal(http.ListenAndServe(flags.HTTPAddr, http.HandlerFunc(redirectHTTP)))
 		}()
 	}
-	https.ListenAndServeFromFlags(nil, "frontend")
+	https.ListenAndServeFromFlags(nil)
 }
 
 const (

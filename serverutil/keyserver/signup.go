@@ -38,6 +38,8 @@ const (
 	signupNotifyAddress = "upspin-sendgrid@google.com"
 
 	noHTML = "" // for mail.Send
+
+	serverName = "keyserver"
 )
 
 // signupHandler implements an http.Handler that handles user creation requests
