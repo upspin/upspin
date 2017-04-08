@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cbd5a0cf_d5b15105",
+        "filename": "pack/plain/plain.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-04-08T18:59:18Z",
+      "side": 1,
+      "message": "no need for this variable is there?",
+      "revId": "d7a1bfeb9c740c519adbb2b6e6290b025ebe15d9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
