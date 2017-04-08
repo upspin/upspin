@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "cbd17979_31734c70",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-04-08T20:06:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "535aea02_0040e394",
+      "revId": "d7a1bfeb9c740c519adbb2b6e6290b025ebe15d9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cbd5a0cf_d5b15105",
         "filename": "pack/plain/plain.go",
         "patchSetId": 1
@@ -66,6 +84,24 @@
       "side": 1,
       "message": "i think e isn\u0027t carrying its weight. it does nothing except require an extra copy.\nf is fine.",
       "parentUuid": "81356b76_f6cf0ed0",
+      "revId": "d7a1bfeb9c740c519adbb2b6e6290b025ebe15d9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e2013996_ab32ff61",
+        "filename": "pack/plain/plain.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-04-08T20:06:15Z",
+      "side": 1,
+      "message": "Ah, I see.   How about if I drop the *?   Then line 210 doesn\u0027t have to change but we avoid a copy?",
+      "parentUuid": "d374d824_546b79bc",
       "revId": "d7a1bfeb9c740c519adbb2b6e6290b025ebe15d9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
