@@ -47,19 +47,6 @@ type wrappedKey struct {
 
 type keyHashArray [sha256.Size]byte // sometimes we need the array
 
-// ecdsaKeyHash returns the hash of a key given in ECDSA format
-// and is the binary-format counterpart of KeyHash in package factotum.
-func ecdsaKeyHash(p *ecdsa.PublicKey) []byte {
-	name, ok := ellipticNames[p.Curve.Params().Name]
-	if !ok { // supposedly can't construct such an ecdsa.PublicKey
-		log.Error.Printf("pack/ee: unrecognized key type: %s", p.Curve.Params().Name)
-		return nil
-	}
-	keyBytes := upspin.PublicKey(fmt.Sprintf("%s\n%s\n%s\n", name, p.X.String(), p.Y.String()))
-	// this string should be the same as the file contents ~/.ssh/public.upspinkey
-	return factotum.KeyHash(keyBytes)
-}
-
 var _ upspin.Packer = ee{}
 
 type ee struct{}
@@ -227,11 +214,12 @@ func (bp *blockPacker) Close() error {
 	wrap := make([]wrappedKey, 2)
 
 	// First, wrap for myself.
-	p, err := factotum.ParsePublicKey(cfg.Factotum().PublicKey())
+	rp := cfg.Factotum().PublicKey()
+	p, err := factotum.ParsePublicKey(rp)
 	if err != nil {
 		return errors.E(op, name, err)
 	}
-	wrap[0], err = gcmWrap(p, bp.dkey)
+	wrap[0], err = gcmWrap(rp, p, bp.dkey)
 	if err != nil {
 		return errors.E(op, name, err)
 	}
@@ -262,7 +250,7 @@ func (bp *blockPacker) Close() error {
 			if err != nil {
 				return errors.E(op, name, owner, err)
 			}
-			wrap[1], err = gcmWrap(p, bp.dkey)
+			wrap[1], err = gcmWrap(ownerKey, p, bp.dkey)
 			if err != nil {
 				return errors.E(op, name, owner, err)
 			}
@@ -474,7 +462,7 @@ func (ee ee) Share(cfg upspin.Config, readers []upspin.PublicKey, packdata []*[]
 			}
 			pw, ok := alreadyWrapped[hash[i]]
 			if !ok { // then need to wrap
-				w, err := gcmWrap(pubkey[i], dkey)
+				w, err := gcmWrap(readers[i], pubkey[i], dkey)
 				if err != nil {
 					continue
 				}
@@ -532,13 +520,9 @@ func (ee ee) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName
 	if err != nil {
 		return errors.E(op, d.Name, err)
 	}
-	pubkey, err := factotum.ParsePublicKey(rawPublicKey)
-	if err != nil {
-		return errors.E(op, d.Name, err)
-	}
 
 	// For quick lookup, hash my public key and locate my wrapped key in the metadata.
-	rhash := ecdsaKeyHash(pubkey)
+	rhash := factotum.KeyHash(rawPublicKey)
 	wrapFound := false
 	var w wrappedKey
 	for _, w = range wrap {
@@ -614,7 +598,7 @@ func (ee ee) Countersign(oldKey upspin.PublicKey, f upspin.Factotum, d *upspin.D
 	}
 
 	// Get wrapped key.
-	rhash := ecdsaKeyHash(oldPubKey)
+	rhash := factotum.KeyHash(oldKey)
 	wrapFound := false
 	var w wrappedKey
 	for _, w = range wrap {
@@ -648,7 +632,7 @@ func (ee ee) Countersign(oldKey upspin.PublicKey, f upspin.Factotum, d *upspin.D
 }
 
 // gcmWrap implements NIST 800-56Ar2; see also RFC6637 §8.
-func gcmWrap(R *ecdsa.PublicKey, dkey []byte) (w wrappedKey, err error) {
+func gcmWrap(pub upspin.PublicKey, R *ecdsa.PublicKey, dkey []byte) (w wrappedKey, err error) {
 	// Step 1.  Create shared Diffie-Hellman secret.
 	// v, V=vG  ephemeral key pair
 	// S = vR   shared point
@@ -669,7 +653,7 @@ func gcmWrap(R *ecdsa.PublicKey, dkey []byte) (w wrappedKey, err error) {
 	if err != nil {
 		return
 	}
-	w.keyHash = ecdsaKeyHash(R)
+	w.keyHash = factotum.KeyHash(pub)
 	mess := []byte(fmt.Sprintf("%02x:%x:%x", upspin.EEPack, w.keyHash, w.nonce))
 	hash := sha256.New
 	hkdf := hkdf.New(hash, S, nil, mess) // TODO(security-reviewer) reconsider salt
