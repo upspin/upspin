@@ -201,8 +201,17 @@ func (p plainPack) Name(cfg upspin.Config, dirEntry *upspin.DirEntry, newName up
 	}
 	dirEntry.Name = parsed.Path()
 	dirEntry.SignedName = dirEntry.Name
-	// TODO  Don't we need to update the signature after changing the name?
-	return nil
+
+	// Update entry signature.
+	f := cfg.Factotum()
+	e := *dirEntry
+	dkey := make([]byte, aesKeyLen)
+	sum := make([]byte, sha256.Size)
+	sig, err := f.FileSign(f.DirEntryHash(e.SignedName, e.Link, e.Attr, e.Packing, e.Time, dkey, sum))
+	if err != nil {
+		return errors.E(op, err)
+	}
+	return pdMarshal(&dirEntry.Packdata, sig, upspin.Signature{})
 }
 
 // Countersign uses the key in factotum f to add a signature to a DirEntry that is already signed by oldKey.

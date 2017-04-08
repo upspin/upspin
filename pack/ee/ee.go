@@ -417,8 +417,6 @@ func (ee ee) Share(cfg upspin.Config, readers []upspin.PublicKey, packdata []*[]
 	// Share updates the wrapped keys, leaving the other two fields unchanged.
 	// For efficiency, Share() reuses the wrapped key for readers common to the old and new lists.
 
-	// TODO(ehg) Check that wrapping for owner and writer are retained.
-
 	// Fetch all the public keys we'll need.
 	pubkey := make([]*ecdsa.PublicKey, len(readers))
 	hash := make([]keyHashArray, len(readers))
