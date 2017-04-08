@@ -16,6 +16,24 @@
       "revId": "d7a1bfeb9c740c519adbb2b6e6290b025ebe15d9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "81356b76_f6cf0ed0",
+        "filename": "pack/plain/plain.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-04-08T19:09:29Z",
+      "side": 1,
+      "message": "These two short names are just to make line 210 more readable, and for consistency with pack/eeintegrity.\n\nJust to be sure I understand your comment:  you\u0027d prefer that I remove lines 206 and 207 and make 210 longer?",
+      "parentUuid": "cbd5a0cf_d5b15105",
+      "revId": "d7a1bfeb9c740c519adbb2b6e6290b025ebe15d9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
