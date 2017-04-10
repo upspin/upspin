@@ -26,6 +26,7 @@ func TestParallelismOK(t *testing.T) {
 
 func TestParallelismSuccess(t *testing.T) {
 	max := 5
+	multiple := 2
 	p := newParallelism(max)
 
 	// fill in inflights with write load
@@ -33,16 +34,16 @@ func TestParallelismSuccess(t *testing.T) {
 		p.add()
 	}
 
-	for n := 1; n <= 3; n++ {
-		// start to succeed with continuous write load
-		for i := 0; i < max+n; i++ {
+	for n := 0; n <= 3; n++ {
+		// We should increase p.max with multiple*p.max successes.
+		for i := 0; i < multiple*max; i++ {
 			p.success()
 			p.add()
 		}
-
-		if p.max != max+n {
+		if p.max != max+1 {
 			t.Errorf("p.max = %d, want %d", p.max, max+n)
 		}
+		max++
 
 		// fill in the one new slot of inflight
 		p.add()
