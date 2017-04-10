@@ -426,6 +426,13 @@ func (p *parallelism) success() {
 		return
 	}
 
+	// Don't start counting until we terminate at p.max.
+	// This lets us get down to p.max after a reduction before
+	// we start increasing again.
+	if p.inFlight+1 > p.max {
+		return
+	}
+
 	// Count the unbroken sequence of successes after a
 	// change in max.
 	p.successes++
