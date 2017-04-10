@@ -12,6 +12,7 @@ import (
 	"upspin.io/bind"
 	"upspin.io/errors"
 	"upspin.io/log"
+	"upspin.io/serverutil"
 	"upspin.io/upspin"
 )
 
@@ -35,6 +36,7 @@ type request struct {
 	upspin.Location
 	err        error       // the result of the Put() to the StoreServer.
 	flushChans []chan bool // each flusher waits for its chan to close.
+	len        int64       // inserted by writeback.
 }
 
 // flushRequest represents a requester waiting for the writeback to happen.
@@ -89,6 +91,9 @@ type writebackQueue struct {
 
 	// Writers and scheduler send to terminated on exit.
 	terminated chan bool
+
+	goodput *serverutil.RateCounter
+	output  *serverutil.RateCounter
 }
 
 func newWritebackQueue(sc *storeCache) *writebackQueue {
@@ -106,6 +111,8 @@ func newWritebackQueue(sc *storeCache) *writebackQueue {
 		die:          make(chan bool),
 		terminated:   make(chan bool),
 	}
+	wbq.goodput, _ = serverutil.NewRateCounter(5, time.Minute)
+	wbq.output, _ = serverutil.NewRateCounter(5, time.Minute)
 
 	// Start scheduler.
 	go wbq.scheduler()
@@ -189,8 +196,15 @@ func (wbq *writebackQueue) scheduler() {
 			if r.err != nil {
 				epq.queue = append(epq.queue, r)
 				if p.failure(r.err) {
-					// The error has been dealt with
+					// The error has been dealt with. Since it was
+					// probably a server timeout, count it for output.
+					wbq.output.Add(r.len)
+					log.Error.Printf("%s: timeout: goodput %f MB/s, output %f MB/s",
+						op, wbq.goodput.Rate()/(60.0*1000000.0),
+						wbq.output.Rate()/(60.0*1000000.0))
 					break
+				} else {
+					log.Error.Printf("%s: writeback failed: %s", op, r.err)
 				}
 
 				// Mark endpoint as dead so we don't waste time trying. Retry
@@ -200,6 +214,9 @@ func (wbq *writebackQueue) scheduler() {
 					time.AfterFunc(retryInterval, func() { wbq.retry <- epq })
 				}
 				break
+			} else {
+				wbq.output.Add(r.len)
+				wbq.goodput.Add(r.len)
 			}
 
 			// Mark endpoint as live so we can queue more requests for it.
@@ -286,9 +303,7 @@ func (wbq *writebackQueue) writer(me int) {
 			r.err = nil
 
 			// Write it back.
-			if r.err = wbq.writeback(r); r.err != nil {
-				log.Error.Printf("store/storecache.writer: writeback failed: %s", r.err)
-			}
+			r.err = wbq.writeback(r)
 			wbq.done <- r
 		case <-wbq.die:
 			wbq.terminated <- true
@@ -308,6 +323,7 @@ func (wbq *writebackQueue) writeback(r *request) error {
 		log.Error.Printf("store/storecache.writer: disappeared before writeback: %s", err)
 		return nil
 	}
+	r.len = int64(len(data))
 
 	// Try to write it back.
 	store, err := bind.StoreServer(wbq.sc.cfg, r.Endpoint)
@@ -342,7 +358,10 @@ func (wbq *writebackQueue) requestWriteback(ref upspin.Reference, e upspin.Endpo
 	}
 
 	// Let the scheduler know.
-	wbq.request <- &request{upspin.Location{Reference: ref, Endpoint: e}, nil, nil}
+	wbq.request <- &request{
+		Location: upspin.Location{Reference: ref, Endpoint: e},
+		len:      0,
+	}
 	return nil
 }
 
@@ -426,6 +445,13 @@ func (p *parallelism) success() {
 		return
 	}
 
+	// Don't start counting until we terminate at p.max.
+	// This lets us get down to p.max after a reduction before
+	// we start increasing again.
+	if p.inFlight+1 > p.max {
+		return
+	}
+
 	// Count the unbroken sequence of successes after a
 	// change in max.
 	p.successes++
@@ -448,10 +474,10 @@ func (p *parallelism) success() {
 	// that. In the case of a continuous queue of writebacks, it is measuring
 	// exactly that. However if the offered load is fluctuating so that
 	// inflight is fluctuating at and below p.max, we require only that
-	// p.max writebacks terminate while inflight is at p.max with no
+	// a mjultiple of p.max writebacks terminate while inflight is at p.max with no
 	// intervening timeouts. This allows us to increase p.max even when the
 	// load only sporadically increases to p.max.
-	if p.successes >= p.max {
+	if p.successes >= 2*p.max {
 		p.successes = 0
 		p.max++
 		log.Debug.Printf("%s: up %d", op, p.max)
