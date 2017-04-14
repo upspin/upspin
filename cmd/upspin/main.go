@@ -119,12 +119,15 @@ func main() {
 	state := newState(op)
 	args := flag.Args()[1:]
 
+	if !strings.Contains(state.Name, "setup") && !strings.Contains(state.Name, "signup") {
+		cacheutil.Start(state.Config)
+	}
+
 	// Shell cannot be in commands because of the initialization loop,
 	// and anyway we should avoid recursion in the interpreter.
 	if state.Name == "shell" {
 		// Start the cache if needed.
 		state.init()
-		cacheutil.Start(state.Config)
 		state.shell(args...)
 		state.ExitNow()
 		return
