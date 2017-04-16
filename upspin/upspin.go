@@ -429,6 +429,8 @@ type DirServer interface {
 	// such that a directory is sent before its contents. After the full
 	// tree has been sent, the operation proceeds as normal.
 	//
+	// If order is -2, the server sends only new events.
+	//
 	// If the order is otherwise invalid, this is reported by the
 	// server sending a single event with a non-nil Error field with
 	// Kind=errors.Invalid. The events channel is then closed.

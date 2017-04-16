@@ -129,6 +129,16 @@ func (t *Tree) Watch(p path.Parsed, order int64, done <-chan struct{}) (<-chan *
 		// Start sending the current state of the cloned tree and setup
 		// the watcher for this tree once the current state is sent.
 		go w.sendCurrentAndWatch(clone, t, p, offset)
+	} else if order == -2 {
+		// We must flush the tree so we know our logs are current (or we
+		// need to recover the tree from the logs).
+		err := t.flush()
+		if err != nil {
+			return nil, errors.E(op, err)
+		}
+
+		offset := t.log.LastOffset()
+		go w.watch(offset)
 	} else {
 		// Set up the notification hook.
 		err = t.addWatcher(p, w)
