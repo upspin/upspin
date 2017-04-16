@@ -252,7 +252,7 @@ func (e *eventManager) watch(server *server, root path.Parsed, order int64, done
 	// Must do this in the background and return so client can receive initialization events.
 	go func() {
 		switch order {
-		case 0:
+		case upspin.WatchStart:
 			// 0 is a special case in the API, but it's not a special case here.
 			fallthrough
 		default:
@@ -260,12 +260,14 @@ func (e *eventManager) watch(server *server, root path.Parsed, order int64, done
 				log.Printf("dir/inprocess.Watch %q could not send all initial events", root)
 				return
 			}
-		case -1:
+		case upspin.WatchCurrent:
 			// Send state of tree under name.
 			if !l.sendTree(root.Path()) {
 				log.Printf("dir/inprocess.Watch %q could not send all initial events", root)
 				return
 			}
+			fallthrough
+		case upspin.WatchNew:
 			// Start transmitting from where we were before sendTree.
 			l.order = int64(len(eventsSoFar))
 		}
