@@ -54,7 +54,7 @@ func testWatchCurrent(t *testing.T, r *testenv.Runner) {
 		t.Fatal(r.Diag())
 	}
 
-	done := r.DirWatch(base, -1)
+	done := r.DirWatch(base, upspin.WatchCurrent)
 	if !watchSupported(t, r) {
 		return
 	}
@@ -76,7 +76,7 @@ func testWatchCurrent(t *testing.T, r *testenv.Runner) {
 
 	// Reader can set a watcher, but will get no data due to lack of rights.
 	r.As(readerName)
-	done = r.DirWatch(base, -1)
+	done = r.DirWatch(base, upspin.WatchCurrent)
 	if !r.GetErrorEvent(errors.E(errors.Str("no response on event channel after one second"))) {
 		t.Fatal(r.Diag())
 	}
@@ -87,7 +87,7 @@ func testWatchCurrent(t *testing.T, r *testenv.Runner) {
 	r.Put(access, "l: "+readerName+"\n*:"+ownerName)
 
 	r.As(readerName)
-	done = r.DirWatch(base, -1)
+	done = r.DirWatch(base, upspin.WatchCurrent)
 	if r.Failed() {
 		t.Fatal(r.Diag())
 	}
@@ -159,7 +159,7 @@ func testWatchNonExistentFile(t *testing.T, r *testenv.Runner) {
 		t.Fatal(r.Diag())
 	}
 
-	r.DirWatch(base, -1)
+	r.DirWatch(base, upspin.WatchCurrent)
 	if !watchSupported(t, r) {
 		return
 	}
@@ -191,7 +191,7 @@ func testWatchNonExistentDir(t *testing.T, r *testenv.Runner) {
 	r.As(ownerName)
 	// Don't create the dir yet.
 
-	r.DirWatch(base, -1)
+	r.DirWatch(base, upspin.WatchCurrent)
 	if !watchSupported(t, r) {
 		return
 	}
@@ -239,7 +239,7 @@ func testWatchForbiddenFile(t *testing.T, r *testenv.Runner) {
 
 	// Switch users. Should not see event.
 	r.As(readerName)
-	r.DirWatch(file, -1)
+	r.DirWatch(file, upspin.WatchCurrent)
 	if !watchSupported(t, r) {
 		return
 	}
@@ -257,7 +257,7 @@ func testWatchForbiddenFile(t *testing.T, r *testenv.Runner) {
 
 	// Now should see file as other user.
 	r.As(readerName)
-	r.DirWatch(file, -1)
+	r.DirWatch(file, upspin.WatchCurrent)
 	r.GetNEvents(1)
 	if !r.GotEvent(file, hasBlocks) {
 		t.Fatal(r.Diag())
@@ -280,7 +280,7 @@ func testWatchSubtree(t *testing.T, r *testenv.Runner) {
 		t.Fatal(r.Diag())
 	}
 
-	r.DirWatch(dir, -1)
+	r.DirWatch(dir, upspin.WatchCurrent)
 	if !watchSupported(t, r) {
 		return
 	}
@@ -302,7 +302,7 @@ func testWatchSubtree(t *testing.T, r *testenv.Runner) {
 
 func testWatchNonExistentRoot(t *testing.T, r *testenv.Runner) {
 	r.As(ownerName)
-	r.DirWatch(readerName+"/", -1)
+	r.DirWatch(readerName+"/", upspin.WatchCurrent)
 	supported, err := watchNotSupportedError(t, r)
 	if !supported {
 		return
