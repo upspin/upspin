@@ -320,6 +320,19 @@ var (
 // when evaluating a single path name.
 const MaxLinkHops = 20
 
+// Special values that can be used in place of the order argument in the
+// Watch function.
+const (
+	_ = iota
+	// WatchCurrentAndFuture tells Watch to first send a sequence of
+	// events describing the entire tree rooted at name. The Events are
+	// sent in sequence such that a directory is sent before its contents.
+	// After the full tree has been sent, the operation proceeds as normal.
+	WatchCurrentAndFuture = -iota
+	// WatchFuture tells Watch to send only new events.
+	WatchFuture
+)
+
 // DirServer manages the name space for one or more users.
 type DirServer interface {
 	Dialer
@@ -424,10 +437,12 @@ type DirServer interface {
 	//
 	// If order is 0, all events known to the DirServer are sent.
 	//
-	// If order is -1, the server first sends a sequence of events describing
-	// the entire tree rooted at name. The Events are sent in sequence
-	// such that a directory is sent before its contents. After the full
-	// tree has been sent, the operation proceeds as normal.
+	// If order is WatchCurrentAndFuture, the server first sends a sequence
+	// of events describing the entire tree rooted at name. The Events are
+	// sent in sequence such that a directory is sent before its contents.
+	// After the full tree has been sent, the operation proceeds as normal.
+	//
+	// If order is WatchFuture, the server sends only new events.
 	//
 	// If the order is otherwise invalid, this is reported by the
 	// server sending a single event with a non-nil Error field with

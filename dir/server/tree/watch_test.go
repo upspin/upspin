@@ -228,6 +228,57 @@ func TestWatchFromCurrent(t *testing.T) {
 	}
 }
 
+func TestWatchNew(t *testing.T) {
+	config, log, logIndex := newConfigForTesting(t, userName)
+	tree, err := New(config, log, logIndex)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	buildTree(t, tree, config)
+
+	// Get a watcher for the current subtree, rooted at orig/sub1.
+	done := make(chan struct{})
+	ch, err := tree.Watch(mkpath(t, userName+"/orig/sub1"), -2, done)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Make further modifications.
+	_, err = tree.Put(newDirEntry("/orig/sub1/thesis.pdf", !isDir, config))
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = tree.Delete(mkpath(t, userName+"/orig/sub1/file1.txt"))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// The Watcher only gives us new updates.
+	for i, exp := range []struct {
+		name      upspin.PathName
+		isDelete  bool
+		hasBlocks bool
+	}{
+		{"/orig/sub1/thesis.pdf", !isDelete, hasBlocks},
+		{"/orig/sub1/file1.txt", isDelete, hasBlocks},
+	} {
+		event := <-ch
+		err = checkEvent(event, userName+exp.name, exp.isDelete, exp.hasBlocks)
+		if err != nil {
+			t.Errorf("%d: %s", i, err)
+		}
+	}
+
+	// No further events.
+	select {
+	case event := <-ch:
+		t.Errorf("Expected no event, got %v", event)
+	case <-time.After(10 * time.Millisecond):
+		// Ok. Nothing should ever show up.
+	}
+}
+
 func TestWatchNonExistingNode(t *testing.T) {
 	config, log, logIndex := newConfigForTesting(t, userName)
 	tree, err := New(config, log, logIndex)
