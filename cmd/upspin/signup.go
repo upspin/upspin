@@ -91,6 +91,7 @@ file and keys and only send the signup request to the key server.
 
 	// Check flags.
 	if fs.NArg() != 1 {
+		s.Failf("after flags parsed, expected 1 argument but saw %d", fs.NArg())
 		fs.Usage()
 	}
 	if *bothServer != "" {
