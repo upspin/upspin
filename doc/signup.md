@@ -17,7 +17,7 @@ Note that your chosen username will become a matter of public record in our
 Next you need to decide whether you are going to deploy your own Upspin
 directory and store servers, or use those maintained by someone else.
 
-While it is straightforward to deploy one's own servers, it is a more complex
+While it is not too hard to deploy one's own servers, it is an involved
 process that is documented in [Setting up `upspinserver`](/doc/server_setup.md).
 If you can use an existing service, that will save you some time and trouble.
 
@@ -65,7 +65,7 @@ To register your details with the key server takes two steps.
 
 First, the `upspin signup` command generates a key pair, saves it locally, and
 sends the user details and the public key to the key server.
-It also creates a local copy of the information called an "`config`" file that
+It also creates a local copy of the information called a "config" file that
 it stores in a local directory, typically `$HOME/upspin`.
 Config files are discussed in detail in [Upspin configuration](/doc/config.md).
 You should read that document to see how to set up your Upspin environment,
@@ -86,7 +86,7 @@ No email will be sent to the address after this signup step.
 All future Upspin operations, even updating later to a new key pair,
 will be validated exclusively with the key pair generated during signup.
 Someone with future access to your email can't masquerade as you in Upspin.
-Conversely, if you lose your keys even your email account is not enough
+Conversely, if you lose your keys your email account is not useful
 for recovery.
 
 Here is the first step in more detail.
@@ -145,7 +145,7 @@ to share.)
 **Pay attention to the text in the output about remembering your "secret seed".
 It provides a way to regenerate your keys if you lose them.**
 
-_Note: If used interactively with a shell that keeps a command history, the
+_Note: If used interactively with a shell that keeps a command history,
 using `keygen` with the `-secretseed` option may cause the secret to be saved in the history file.
 If so, the history file should be cleared after running `keygen`._
 
@@ -154,7 +154,7 @@ If so, the history file should be cleared after running `keygen`._
 
 Once you are registered in the key server, the next step is to create a
 directory that will host your Upspin tree.
-This will of course be done in the directory server you have registered above.
+This will of course be done in the directory server you have registered.
 
 If you are planning to run your own Upspin directory and store servers, you
 must deploy them now, once you are registered with the key server.
@@ -167,7 +167,7 @@ in that directory and store data in that store server.
 
 With the servers running and granting you access permission, and with your
 correct information registered in the key server, all you need to do to get
-started is create a user root, which is just a `"make directory"` command using
+started is create a user root, which is just a "make directory" command using
 the `upspin` tool:
 
 `$ upspin mkdir you@gmail.com/`
@@ -196,7 +196,7 @@ $ sum hello.jpg ciao.jpg
 1600 21 ciao.jpg
 ```
 
-The upspin command has many other subcommands.
+The `upspin` command has many other subcommands.
 Run
 
 
@@ -211,7 +211,7 @@ Each subcommand also has help:
 $ upspin cp -help
 ```
 
-Although the upspin command supports all the functionality of the system, for
+Although the `upspin` command supports all the functionality of the system, for
 smoother operation you'll want to install the FUSE daemon, `upspinfs`, and a
 cache server that improves performance. The cache server is particularly
 important, and the setup instructions are in the [Upspin configuration](/doc/config.md)

@@ -76,7 +76,7 @@ remote,dir.example.com:443
 with a comma separating the transport and address and a colon separating the
 address and port.
 
-In practice, though the transport and port are elided because the default
+In practice, though, the transport and port are omitted because the default
 transport, `remote`, defines a service provided across a network connection,
 and the default port, 443, is the standard port for encrypted (TLS)
 communications, as used by the HTTPS protocol.
@@ -89,6 +89,7 @@ dir.example.com
 Other than `remote`, the default, the only other transports are `inprocess`,
 which defines a service in the process as the client and is typically used only
 for debugging, and `unassigned`, which represents a server that does not exist.
+These appear in config files only rarely, and only for expert use.
 
 ## Settings
 
@@ -104,7 +105,7 @@ safest, securest packing.
 Others are `plain`, which leaves the data untouched, and `eeintegrity`, which
 like `plain` leaves the data untouched but adds an end-to-end integrity check
 that can detect tampering.
-It is used to store things like Access files, which must be readable by outside
+Integrity packing is used to store things like Access files, which must be readable by outside
 agents such as directory servers but must also be secured.
 If the packing is not set in the config file, `ee` is assumed.
 
@@ -134,7 +135,8 @@ go doc upspin.io/cmd/cacheserver
 
 * The **`secrets`** setting identifies a directory in which the user's public
 and private keys are stored.
-If not set, the keys are assumed to live in the directory `$HOME/.ssh`.
+If not set, the keys are assumed to live in the directory `.ssh` within
+the user's home directory (on Unix, `$HOME/.ssh`).
 
 * The **`tlscerts`** setting identifies a directory in which to locate TLS
 certificate root authorities.
