@@ -641,8 +641,8 @@ func (c *Config) copySource(dir, pkgPath string) error {
 		// Copy frontend dependencies not listed by `go list`.
 		for _, d := range []string{
 			"doc",
-			"cmd/frontend/images",
-			"cmd/frontend/templates",
+			"doc/images",
+			"doc/templates",
 		} {
 			s := fmt.Sprintf("%s %s\n",
 				filepath.Join("upspin.io", d),
