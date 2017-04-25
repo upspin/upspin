@@ -22,7 +22,6 @@ import (
 	"cloud.google.com/go/storage"
 
 	"upspin.io/access"
-	"upspin.io/config"
 	"upspin.io/errors"
 	"upspin.io/flags"
 	"upspin.io/log"
@@ -91,15 +90,6 @@ func ListenAndServe(ready chan<- struct{}, serverName, addr string, opt *Options
 		m.HostPolicy = autocert.HostWhitelist(h...)
 	}
 
-	letscache := opt.LetsEncryptCache
-	if letscache == "" {
-		dir := filepath.Join(config.Home(), "upspin", "letsencrypt")
-		info, err := os.Stat(dir)
-		if err == nil && info.IsDir() && (info.Mode().Perm() == 0700) {
-			letscache = dir
-		}
-	}
-
 	var config *tls.Config
 	if opt.InsecureHTTP {
 		log.Info.Printf("https: serving insecure HTTP on %q", addr)
@@ -110,9 +100,16 @@ func ListenAndServe(ready chan<- struct{}, serverName, addr string, opt *Options
 		if host != "localhost" && host != "127.0.0.1" && host != "::1" {
 			log.Fatalf("https: cannot serve insecure HTTP on non-loopback address %q", addr)
 		}
-	} else if letscache != "" {
+	} else if dir := opt.LetsEncryptCache; dir != "" {
 		log.Info.Printf("https: serving HTTPS on %q using Let's Encrypt certificates", addr)
-		m.Cache = autocert.DirCache(letscache)
+		fi, err := os.Stat(dir)
+		if err != nil {
+			log.Fatalf("https: could not read -letscache directory: %v", err)
+		}
+		if !fi.IsDir() {
+			log.Fatalf("https: could not read -letscache directory: %v is not a directory", dir)
+		}
+		m.Cache = autocert.DirCache(dir)
 		config = &tls.Config{GetCertificate: m.GetCertificate}
 	} else if metadata.OnGCE() {
 		addr = ":443"
