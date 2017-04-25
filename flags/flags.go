@@ -56,12 +56,14 @@ var (
 
 	// CacheDir ("cachedir") specifies the directory for the various file
 	// caches.
+	CacheDir = defaultCacheDir
+
 	defaultCacheDir = filepath.Join(config.Home(), "upspin")
-	CacheDir        = defaultCacheDir
 
 	// Config ("config") names the Upspin configuration file to use.
+	Config = defaultConfig
+
 	defaultConfig = filepath.Join(config.Home(), "upspin", "config")
-	Config        = defaultConfig
 
 	// HTTPAddr ("http") is the network address on which to listen for
 	// incoming insecure network connections.
@@ -79,6 +81,8 @@ var (
 	// the Let's Encrypt certificates are stored. The containing directory
 	// should be owner-accessible only (chmod 0700).
 	LetsEncryptCache = ""
+
+	defaultLetsEncryptCache = filepath.Join(config.Home(), "upspin", "letsencrypt")
 
 	// Log ("log") sets the level of logging (implements flag.Value).
 	Log logFlag
@@ -144,7 +148,7 @@ var flags = map[string]*flagVar{
 		},
 	},
 	"kind":      strVar(&ServerKind, "kind", ServerKind, "server implementation `kind` (inprocess, gcp)"),
-	"letscache": strVar(&LetsEncryptCache, "letscache", "", "Let's Encrypt cache `directory`"),
+	"letscache": strVar(&LetsEncryptCache, "letscache", defaultLetsEncryptCache, "Let's Encrypt cache `directory`"),
 	"log": &flagVar{
 		set: func() {
 			Log.Set("info")
