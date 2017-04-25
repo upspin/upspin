@@ -2,16 +2,19 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package main
+package frontend
 
 import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 	"sync"
 	"testing"
+
+	"upspin.io/test/testutil"
 )
 
 var (
@@ -24,6 +27,10 @@ var (
 )
 
 func startServer() {
+	if err := parseTemplates(testutil.Repo("doc/templates")); err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
 	*docPath = testDocPath
 	s := newServer().(*server)
 	s.mux.Handle("/_test", canonicalHostHandler{http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
