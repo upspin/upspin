@@ -13,7 +13,7 @@ Substitute your own user and domain names in the examples that follow.
 ## Allowing a family member to share your Upspin installation
 
 When you followed [the server setup instructions](/doc/server_setup.md),
-`upspin setupserver` created an initial version of the access controls
+`upspin setupserver` created an initial version of the access control
 files for your Upspin installation that allows access for `ann@example.com` and
 the server user `upspin@example.com`.
 
