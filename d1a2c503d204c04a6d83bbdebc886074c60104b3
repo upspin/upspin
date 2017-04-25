@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "95533f5d_9f98caae",
+        "filename": "cloud/autocert/autocert.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-04-25T22:38:26Z",
+      "side": 1,
+      "message": "I\u0027ll change it in the other CL, this code will be deleted anyway",
+      "parentUuid": "0c6f6f13_2e076bd7",
+      "revId": "d1a2c503d204c04a6d83bbdebc886074c60104b3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "68b644a9_3bb9314a",
         "filename": "cloud/autocert/autocert.go",
         "patchSetId": 8
@@ -33,6 +51,24 @@
       "revId": "d1a2c503d204c04a6d83bbdebc886074c60104b3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ba52208d_2db63b1f",
+        "filename": "cloud/autocert/autocert.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-04-25T22:38:26Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "68b644a9_3bb9314a",
+      "revId": "d1a2c503d204c04a6d83bbdebc886074c60104b3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "36133ae3_e6790843",
+        "filename": "serverutil/dirserver/main.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-04-25T22:38:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0598ce2_47ae7ff7",
+      "revId": "d1a2c503d204c04a6d83bbdebc886074c60104b3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5c01308e_f4f3f86c",
         "filename": "serverutil/storeserver/main.go",
         "patchSetId": 8
@@ -67,6 +121,24 @@
       "revId": "d1a2c503d204c04a6d83bbdebc886074c60104b3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0a6aba40_01f7efb1",
+        "filename": "serverutil/storeserver/main.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-04-25T22:38:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5c01308e_f4f3f86c",
+      "revId": "d1a2c503d204c04a6d83bbdebc886074c60104b3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
