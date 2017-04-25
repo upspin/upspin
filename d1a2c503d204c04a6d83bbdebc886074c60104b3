@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0c6f6f13_2e076bd7",
+        "filename": "cloud/autocert/autocert.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-04-25T22:30:52Z",
+      "side": 1,
+      "message": "Let\u0027s Encrypt ?",
+      "revId": "d1a2c503d204c04a6d83bbdebc886074c60104b3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "68b644a9_3bb9314a",
+        "filename": "cloud/autocert/autocert.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-04-25T22:30:52Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "d1a2c503d204c04a6d83bbdebc886074c60104b3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b0598ce2_47ae7ff7",
+        "filename": "serverutil/dirserver/main.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-04-25T22:30:52Z",
+      "side": 1,
+      "message": "use \u003c-",
+      "revId": "d1a2c503d204c04a6d83bbdebc886074c60104b3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5c01308e_f4f3f86c",
+        "filename": "serverutil/storeserver/main.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-04-25T22:30:52Z",
+      "side": 1,
+      "message": "can you put a \u003c- on the type for clarity?",
+      "revId": "d1a2c503d204c04a6d83bbdebc886074c60104b3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
