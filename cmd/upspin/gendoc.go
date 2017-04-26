@@ -99,6 +99,7 @@ func (s *State) helpDocs(out io.Writer, command string, args ...string) {
 	// the global flags by comparing the text to the output of
 	// "upspin -help", saved above.
 	// This method isn't the cheapest, but it's easy.
+	home := os.Getenv("HOME")
 	lines := toLines(b.String())
 Without:
 	for _, line := range lines {
@@ -111,6 +112,7 @@ Without:
 				continue Without
 			}
 		}
+		line = strings.Replace(line, home, "/home/user", -1)
 		fmt.Fprintf(out, "%s\n", line)
 	}
 }
