@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "33955fad_8dd19ce5",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-04-26T03:42:47Z",
+      "side": 1,
+      "message": "comma before \u0027each\u0027",
+      "revId": "b467842e9e19a2f0115d04ed13750d1f35ad6d2b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5736113c_1c919b53",
+        "filename": "doc/server_setup_ubuntu.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-04-26T03:42:47Z",
+      "side": 1,
+      "message": "trailing blank",
+      "revId": "b467842e9e19a2f0115d04ed13750d1f35ad6d2b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
