@@ -3,20 +3,28 @@
 ## Introduction
 
 This document describes how to create an Upspin installation by deploying
-`upspin.io/cmd/upspinserver`, a combined Upspin Store and Directory server, to
+an `upspinserver`, a combined Upspin Store and Directory server, to
 a Linux-based machine.
 The installation will use the central Upspin Key server (`key.upspin.io`) for
 authentication, which permits inter-operation with other Upspin servers.
+
+There are multiple versions of `upspinserver`, each depending on where the
+associated storage is kept, either on the server's local disk or with a cloud
+storage provider.
+The binaries that use cloud storage providers each have a suffix that
+identifies the provider, such as `upspinserver-gcp` for the Google Cloud
+Platform.
+These binaries are also kept in distinct repositories, such as `gcp.upspin.io`
+for the Google Cloud Platform.
 
 The process follows these steps:
 
 - sign up for an Upspin user account, registering your public key with the
   central server `key.upspin.io`,
 - configure a domain name and create an Upspin user for the server,
-- create a Google Cloud Project and set up a Google Cloud Storage bucket (this
-  step may be skipped if you wish to store data on your server's local disk),
-- deploy `upspinserver` to a Linux-based server,
-- configure `upspinserver`.
+- if necessary, set up the cloud storage service,
+- deploy the `upspinserver` to a Linux-based server,
+- configure the `upspinserver`.
 
 Each of these steps (besides deployment) has a corresponding `upspin`
 subcommand to assist you with the process.
@@ -121,7 +129,7 @@ On a Unix machine you can verify that your record is in place (it may take a
 few minutes to propagate) by running:
 
 ```
-host -t TXT example.com
+local$ host -t TXT example.com
 ```
 
 Once the TXT record is in place, the key server will permit you to register the
@@ -130,15 +138,61 @@ any other users you may choose to give Upspin user names within `example.com`).
 At a later step, the `upspin setupserver` command will register your server
 user for you automatically.
 
-## Set up the Google Cloud Storage service
 
-**Note**: if you do not wish to store your data in Google Cloud Storage you may
-skip this section (move on to "Set up a server"), in which case data will be
-stored on the local disk of your chosen server.
+## Set up storage and build the `upspinserver` binary
+
+The following sub-sections each describe how to obtain and build a
+`upspinserver` binary and set up the storage for a particular location,
+such as the server's local disk or a cloud storage provider.
+
+Follow the instructions appropriate for your chosen storage location.
+
+You will need to build an `upspinserver` binary for the server's operating
+system and processor architecture.
+We will assume 64-bit Linux in this document.
+
+
+### Local disk
+
+To run off local disk you need to build the `upspin.io/cmd/upspinserver` binary:
+
+```
+local$ GOOS=linux GOARCH=amd64 go build upspin.io/cmd/upspinserver
+```
+
+The default is to store data in $HOME/upspin/storage.
+TODO upspin-setupstorage stuff
+
 **If you choose to store your Upspin data on the your server's local disk then
 in the event of a disk failure all your Upspin data will be lost.**
 
-### Create a Google Cloud Project
+
+### Google Cloud Storage
+
+#### Build `upspinserver-gcp` and `upspin-setupstorage-gcp`
+
+To use Google Cloud Storage fetch the `gcp.upspin.io` repository and use the
+`upspinserver-gcp` and `upspin-setupstorage-gcp` variants.
+
+Fetch the repository and its dependencies:
+
+```
+local$ go get -d gcp.upspin.io/cmd/...
+```
+
+Install the `upspin-setupstorage-gcp` command:
+
+```
+local$ go install gcp.upspin.io/cmd/upspin-setupstorage-gcp
+```
+
+Build the `upspinserver-gcp` binary:
+
+```
+local$ GOOS=linux GOARCH=amd64 go build gcp.upspin.io/cmd/upspinserver-gcp
+```
+
+#### Create a Google Cloud Project
 
 First create a Google Cloud Project and associated Billing Account by visiting the
 [Cloud Console](https://cloud.google.com/console).
@@ -162,23 +216,23 @@ local$ gcloud beta service-management enable iam.googleapis.com
 local$ gcloud beta service-management enable storage_api
 ```
 
-### Create a Google Cloud Storage bucket
+#### Create a Google Cloud Storage bucket
 
 Use the `gcloud` tool to obtain "application default credentials" so that the
-`upspin setupstorage` command can make changes to your Google Cloud Project:
+`upspin setupstorage-gcp` command can make changes to your Google Cloud Project:
 
 ```
 local$ gcloud auth application-default login
 ```
 
-Then use `upspin setupstorage` to create a storage bucket and an associated
+Now use `upspin setupstorage-gcp` to create a storage bucket and an associated
 service account for accessing the bucket.
 Note that the bucket name must be globally unique among all Google Cloud
 Storage users, so it is prudent to include your domain name in the bucket name.
 (We will use `example-com-upspin`.)
 
 ```
-local$ upspin -project=<project> setupstorage -domain=example.com example-com-upspin
+local$ upspin -project=<project> setupstorage-gcp -domain=example.com example-com-upspin
 ```
 
 It should produce output like this:
@@ -189,13 +243,14 @@ Bucket "example-com-upspin" created.
 You should now deploy the upspinserver binary and run 'upspin setupserver'.
 ```
 
-## Set up a server and deploy `upspinserver`
 
-Now build `upspinserver` and deploy it to a publicly-accessible server.
+## Set up a server and deploy the `upspinserver` binary
+
+Now provision a server and deploy the `upspinserver` binary to it.
 
 ### Provision a server
 
-You can run `upspinserver` on any server, including Linux, MacOS, Windows,
+You can run an `upspinserver` on any server, including Linux, MacOS, Windows,
 and [more](https://golang.org/doc/install#requirements), as long as it has a
 publicly-accessible IP address and can run Go programs.
 
@@ -205,9 +260,9 @@ publicly-accessible IP address and can run Go programs.
 For a personal Upspin installation, a server with 1 CPU core, 2GB of memory,
 and 20GB of available disk space should be sufficient.
 
-You can provision a suitable Linux VM in your Google Cloud Project by visiting
-the Compute section of the [Cloud Console](https://cloud.google.com/console)
-and clicking "Create VM".
+If you're using the Google Cloud Platform, you can provision a suitable Linux
+VM by visiting the Compute section of the
+[Cloud Console](https://cloud.google.com/console) and clicking "Create VM".
 
 > If you're unfamiliar with Google Cloud's virtual machines, here are some sane
 > defaults: choose the `n1-standard-1` machine type, select the Ubuntu 16.04
@@ -226,14 +281,15 @@ IP address.
 
 ### Deploy `upspinserver`
 
-Now build `upspin.io/cmd/upspinserver` and configure your server to run
-it on startup and serve on port `443`.
+Now deploy your `upspinserver` binary to your server and configure it to run on
+startup and serve on port `443`.
 
 You may do this however you like, but you may wish to follow one of these
 guides:
 
 - [Running `upspinserver` on Ubuntu 16.04](/doc/server_setup_ubuntu.md)
 - (More coming soon...)
+
 
 ## Test connectivity
 
@@ -279,14 +335,14 @@ Configured upspinserver at "upspin.example.com:443".
 Created root "you@gmail.com".
 ```
 
-If you make a mistake configuring `upspinserver` you can start over by
+If you make a mistake configuring your server, you can start over by
 removing `$HOME/upspin/server` and re-running `upspin setupserver`.
 Note that the `$HOME/upspin/server` directory contains your directory server
 data, and—if you are using the local disk for storage—any store server objects.
 Deleting these files effectively deletes all the data you have put into Upspin.
-If you are using Google Cloud Storage you may want to delete the contents of
-your storage bucket before running `upspin setupserver` again to avoid paying
-to store orphaned objects.
+If you are using a cloud service you may want to delete the contents of your
+storage bucket before running `upspin setupserver` again to avoid paying to
+store orphaned objects.
 
 
 ## Use your server
@@ -309,11 +365,14 @@ Then read the file back, and you should see the greeting echoed back to you.
 local$ upspin get you@gmail.com/hello
 Hello, Upspin
 ```
+
 If you see the message, then congratulations!
 You have successfully set up an `upspinserver`.
 
 
 ## Purging your storage
+
+> TODO: move this to an administrative document.
 
 For a number of reasons, you may wish to discard all your stored data:
 
@@ -328,12 +387,12 @@ For a number of reasons, you may wish to discard all your stored data:
    and restart from scratch than selectively delete files, especially
    when experimenting.
 
-We detail here how to perform the purge if you are running `upspinserver` on
+We detail here how to perform the purge if you are running an `upspinserver` on
 machine running Ubuntu 16.04 or later.
 You will have to tailor these instructions to your own environment
 if you are doing something different.
 
-On your `upspinserver` machine, as root, stop the `upspinserver`,
+On your server machine, as root, stop the `upspinserver`,
 and remove the local server configuration.
 This will remove all information about user trees.
 
@@ -344,7 +403,7 @@ server% sudo rm -r ~upspin/upspin/server
 ```
 
 If you configured your server to use Google Cloud Storage with `upspin
-setupstorage` then you should also purge all references from your storage
+setupstorage-gcp` then you should also purge all references from your storage
 bucket.
 Run the following command, substituting your own bucket name for
 `example-com-upspin`.
