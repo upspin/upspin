@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e9ce5902_b9682277",
+        "filename": "doc/deploying_to_google_cloud.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-04-26T21:28:28Z",
+      "side": 1,
+      "message": "to the Google ?",
+      "revId": "a34eb03622f8fdff61fb95ff87aca6cf51f1d559",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4bb5c935_0d6a8e6b",
+        "filename": "doc/deploying_to_google_cloud.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-04-26T21:28:28Z",
+      "side": 1,
+      "message": "`gcp.upspin.io`",
+      "revId": "a34eb03622f8fdff61fb95ff87aca6cf51f1d559",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
