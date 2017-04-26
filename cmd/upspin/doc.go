@@ -51,8 +51,10 @@ Upspin commands:
 	cp
 	deletestorage
 	deploy
+	deploy-gcp
 	get
 	getref
+	github
 	info
 	keygen
 	link
@@ -65,6 +67,7 @@ Upspin commands:
 	setupdomain
 	setupserver
 	setupstorage
+	setupstorage-gcp
 	setupwriters
 	share
 	signup
@@ -79,7 +82,7 @@ Global flags:
   -cachesize bytes
     	max disk bytes for cache (default 5000000000)
   -config file
-    	user's configuration file (default "/Users/r/upspin/config")
+    	user's configuration file (default "/home/user/upspin/config")
   -log level
     	level of logging: debug, info, error, disabled (default info)
   -prudent
@@ -239,7 +242,7 @@ Flags:
   -secretseed string
     	the seed containing a 128 bit secret in proquint format or a file that contains it
   -where directory
-    	directory to store keys (default "/Users/r/.ssh")
+    	directory to store keys (default "/home/user/.ssh")
 
 
 
@@ -414,7 +417,7 @@ Flags:
   -put-users
     	put server users to the key server
   -where directory
-    	directory to store private configuration files (default "/Users/r/upspin/deploy")
+    	directory to store private configuration files (default "/home/user/upspin/deploy")
 
 
 
@@ -444,7 +447,7 @@ Flags:
   -host name
     	host name of upspinserver (empty implies the cluster dir.domain and store.domain)
   -where directory
-    	directory to store private configuration files (default "/Users/r/upspin/deploy")
+    	directory to store private configuration files (default "/home/user/upspin/deploy")
   -writers users
     	additional users to be given write access to this server
 
@@ -452,43 +455,17 @@ Flags:
 
 Sub-command setupstorage
 
-Usage: upspin -project=<gcp_project_name> setupstorage -domain=<name> <bucket_name>
-
-Setupstorage is the second step in establishing an upspinserver,
-It sets up cloud storage for your Upspin installation. You may skip this step
-if you wish to store Upspin data on your server's local disk.
-The first step is 'setupdomain' and the final step is 'setupserver'.
-
-Setupstorage creates a Google Cloud Storage bucket and a service account for
-accessing that bucket. It then writes the service account private key to
-$where/$domain/serviceaccount.json and updates the server configuration files
-in that directory to use the specified bucket.
-
-Before running this command, you must create a Google Cloud Project and
-associated Billing Account using the Cloud Console:
-	https://cloud.google.com/console
-The project ID can be any available string, but for clarity it's helpful to
-pick something that resembles your domain name.
-
-You must also install the Google Cloud SDK:
-	https://cloud.google.com/sdk/downloads
-Authenticate and enable the necessary APIs:
-	$ gcloud auth login
-	$ gcloud --project <project> beta service-management enable iam.googleapis.com storage_api
-And, finally, authenticate again in a different way:
-	$ gcloud auth application-default login
-
-Running this command when the service account or bucket exists is a no-op.
-
+flag provided but not defined: -letscache
+Usage: upspin setupstorage -domain=<name> -path=<storage_dir>
 Flags:
   -domain name
     	domain name for this Upspin installation
   -help
     	print more information about the command
-  -project project
-    	GCP project name
+  -path directory
+    	directory on the server in which to keep Upspin storage (default is $HOME/upspin/server/storage)
   -where directory
-    	directory to store private configuration files (default "/Users/r/upspin/deploy")
+    	directory to store private configuration files (default "/home/user/upspin/deploy")
 
 
 
@@ -511,7 +488,7 @@ Flags:
   -help
     	print more information about the command
   -where directory
-    	directory containing private configuration files (default "/Users/r/upspin/deploy")
+    	directory containing private configuration files (default "/home/user/upspin/deploy")
 
 
 
@@ -603,7 +580,7 @@ Flags:
   -store address
     	Store server address
   -where directory
-    	directory to store keys (default "/Users/r/.ssh")
+    	directory to store keys (default "/home/user/.ssh")
 
 
 
