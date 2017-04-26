@@ -14,9 +14,9 @@ server, and that the server is reachable at your chosen host name.
 > The exact commands may differ on your system.
 
 Once the server is running you should log in to it as root and configure it to
-run `upspinserver` by following these instructions.
+run the appropriate `upspinserver` by following these instructions.
 
-## Create a user for `upspinserver`
+## Create a user
 
 The following commands must be executed on the server as the super user, `root`,
 perhaps via `sudo su`.
@@ -42,13 +42,22 @@ server% cat > .ssh/authorized_keys
 (Paste your SSH public key here and type Control-D and Enter)
 ```
 
-## Build `upspinserver` and copy it to the server
+## Copy the `upspinserver` binary to the server
 
-From your workstation, run these commands:
+When following the [setup instructions](server_setup.md) you built an
+`upspinserver` server binary appropriate for your chosen storage technology
+(local disk or a cloud storage provider).
+
+The binary may be named `upspinserver` or have a cloud service suffix,
+as with `upspinserver-gcp`.
+When we copy the binary we always install it as simply `upspinserver` so the
+subsequent instructions are the same for all configurations.
+
+From your workstation, copy the binary to the server (substitute the name of
+your binary for `upspinserver-foo`):
 
 ```
-local$ GOOS=linux GOARCH=amd64 go build upspin.io/cmd/upspinserver
-local$ scp upspinserver upspin@upspin.example.com:.
+local$ scp upspinserver-foo upspin@upspin.example.com:upspinserver
 ```
 
 ## Run `upspinserver` on server startup
