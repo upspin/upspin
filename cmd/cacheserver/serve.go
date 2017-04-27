@@ -7,13 +7,13 @@ package main
 import (
 	"expvar"
 	"flag"
-	"net"
 	"net/http"
 
 	"upspin.io/config"
 	"upspin.io/dir/dircache"
 	"upspin.io/flags"
 	"upspin.io/rpc/dirserver"
+	"upspin.io/rpc/local"
 	"upspin.io/rpc/storeserver"
 	"upspin.io/store/storecache"
 	"upspin.io/upspin"
@@ -51,7 +51,7 @@ func serve(cfg upspin.Config, addr string) (<-chan error, error) {
 	}
 	ds := dirserver.New(cfg, dc, "")
 
-	ln, err := net.Listen("tcp", addr)
+	ln, err := local.Listen("tcp", addr)
 	if err != nil {
 		return nil, err
 	}

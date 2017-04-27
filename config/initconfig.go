@@ -20,6 +20,7 @@ import (
 	"upspin.io/factotum"
 	"upspin.io/log"
 	"upspin.io/pack"
+	"upspin.io/rpc/local"
 	"upspin.io/upspin"
 	"upspin.io/user"
 
@@ -140,7 +141,7 @@ func InitConfig(r io.Reader) (upspin.Config, error) {
 		keyserver:   defaultKeyEndpoint.String(),
 		dirserver:   "",
 		storeserver: "",
-		cache:       "",
+		cache:       "no",
 		secrets:     "",
 		tlscerts:    "",
 	}
@@ -221,8 +222,17 @@ func InitConfig(r io.Reader) (upspin.Config, error) {
 
 	cfg = SetKeyEndpoint(cfg, parseEndpoint(op, vals, keyserver, &err))
 	cfg = SetStoreEndpoint(cfg, parseEndpoint(op, vals, storeserver, &err))
-	cfg = SetCacheEndpoint(cfg, parseEndpoint(op, vals, cache, &err))
 	cfg = SetDirEndpoint(cfg, parseEndpoint(op, vals, dirserver, &err))
+
+	// A shorthand for the default local address.
+	// TODO(p): phase out the ability to specify an address, yes or no should suffice.
+	switch vals[cache] {
+	case "y", "yes":
+		vals[cache] = local.LocalName(cfg, "cacheserver")
+	case "n", "no":
+		vals[cache] = ""
+	}
+	cfg = SetCacheEndpoint(cfg, parseEndpoint(op, vals, cache, &err))
 
 	return cfg, err
 }
