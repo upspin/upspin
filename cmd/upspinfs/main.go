@@ -18,6 +18,7 @@ import (
 	"upspin.io/config"
 	"upspin.io/flags"
 	"upspin.io/log"
+	"upspin.io/rpc/local"
 
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/eeintegrity"
@@ -57,11 +58,17 @@ func main() {
 	}
 	done := do(cfg, mountpoint, flags.CacheDir)
 
-	// Serve expvar data on NetAddr.
-	if len(flags.NetAddr) > 0 {
-		go func() {
-			log.Fatal(http.ListenAndServe(flags.NetAddr, nil))
-		}()
+	// Serve expvar data.
+	ln, err := local.Listen("tcp", local.LocalName(cfg, "upspinfs"))
+	if err != nil {
+		log.Fatal(err)
 	}
+	srv := &http.Server{}
+	go func() {
+		log.Fatal(srv.Serve(ln))
+	}()
+
+	// Wait for an unmount.
 	<-done
+	srv.Close()
 }
