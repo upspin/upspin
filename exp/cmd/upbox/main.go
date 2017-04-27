@@ -224,6 +224,7 @@ func (cfg *Config) Run() error {
 			"-log=" + *logLevel,
 			"-tls_cert=" + filepath.Join(tmpDir, "cert.pem"),
 			"-tls_key=" + filepath.Join(tmpDir, "key.pem"),
+			"-letscache=", // disable
 			"-https=" + s.addr,
 			"-addr=" + s.addr,
 		}
