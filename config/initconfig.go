@@ -19,6 +19,7 @@ import (
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/log"
+	"upspin.io/netlocal"
 	"upspin.io/pack"
 	"upspin.io/upspin"
 	"upspin.io/user"
@@ -140,7 +141,7 @@ func InitConfig(r io.Reader) (upspin.Config, error) {
 		keyserver:   defaultKeyEndpoint.String(),
 		dirserver:   "",
 		storeserver: "",
-		cache:       "",
+		cache:       "nocache",
 		secrets:     "",
 		tlscerts:    "",
 	}
@@ -221,8 +222,13 @@ func InitConfig(r io.Reader) (upspin.Config, error) {
 
 	cfg = SetKeyEndpoint(cfg, parseEndpoint(op, vals, keyserver, &err))
 	cfg = SetStoreEndpoint(cfg, parseEndpoint(op, vals, storeserver, &err))
-	cfg = SetCacheEndpoint(cfg, parseEndpoint(op, vals, cache, &err))
 	cfg = SetDirEndpoint(cfg, parseEndpoint(op, vals, dirserver, &err))
+
+	// A shorthand for the default local address.
+	if v := vals[cache]; v == "y" || v == "yes" {
+		vals[cache] = netlocal.LocalName(cfg, "cacheserver")
+	}
+	cfg = SetCacheEndpoint(cfg, parseEndpoint(op, vals, cache, &err))
 
 	return cfg, err
 }
