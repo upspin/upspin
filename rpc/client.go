@@ -20,6 +20,7 @@ import (
 	"upspin.io/bind"
 	"upspin.io/errors"
 	"upspin.io/log"
+	"upspin.io/netlocal"
 	"upspin.io/upspin"
 
 	pb "github.com/golang/protobuf/proto"
@@ -119,7 +120,7 @@ func NewClient(cfg upspin.Config, netAddr upspin.NetAddr, security SecurityLevel
 		// The following values are the same as
 		// net/http.DefaultTransport.
 		Proxy: http.ProxyFromEnvironment,
-		DialContext: (&net.Dialer{
+		DialContext: (&netlocal.Dialer{
 			Timeout:   30 * time.Second,
 			KeepAlive: 30 * time.Second,
 		}).DialContext,
