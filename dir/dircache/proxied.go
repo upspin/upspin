@@ -13,6 +13,7 @@ import (
 	"sync"
 	"time"
 
+	"upspin.io/access"
 	"upspin.io/bind"
 	"upspin.io/errors"
 	"upspin.io/log"
@@ -225,19 +226,22 @@ func (d *proxiedDir) handleEvent(e *upspin.Event) error {
 	if d.order == -1 {
 		d.l.wipeLog(d.user)
 	}
-
-	// Is this a file we are watching?
 	log.Debug.Printf("watch entry %s %v", e.Entry.Name, e)
-	_, ok := d.l.lru.Get(lruKey{name: e.Entry.Name, glob: false})
-	if !ok {
-		// Not a file we are watching, how about in a directory we are watching?
-		dirName := path.DropPath(e.Entry.Name, 1)
-		if dirName == e.Entry.Name {
-			return nil
-		}
-		_, ok := d.l.lru.Get(lruKey{name: dirName, glob: true})
+
+	// Is this a file we are watching? We always watch Access files since ones we never
+	// saw before can affect our cached state.
+	if !access.IsAccessFile(e.Entry.Name) {
+		_, ok := d.l.lru.Get(lruKey{name: e.Entry.Name, glob: false})
 		if !ok {
-			return nil
+			// Not a file we are watching, how about in a directory we are watching?
+			dirName := path.DropPath(e.Entry.Name, 1)
+			if dirName == e.Entry.Name {
+				return nil
+			}
+			_, ok := d.l.lru.Get(lruKey{name: dirName, glob: true})
+			if !ok {
+				return nil
+			}
 		}
 	}
 
