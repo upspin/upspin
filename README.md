@@ -1,6 +1,6 @@
 # Upspin
 
-![Augie](cmd/frontend/images/augie.jpg)
+![Augie](doc/images/augie.jpg)
 
 Documentation: [upspin.io](https://upspin.io/)
 
