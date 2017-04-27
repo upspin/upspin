@@ -20,6 +20,7 @@ import (
 	"upspin.io/bind"
 	"upspin.io/errors"
 	"upspin.io/log"
+	"upspin.io/rpc/local"
 	"upspin.io/upspin"
 
 	pb "github.com/golang/protobuf/proto"
@@ -119,7 +120,7 @@ func NewClient(cfg upspin.Config, netAddr upspin.NetAddr, security SecurityLevel
 		// The following values are the same as
 		// net/http.DefaultTransport.
 		Proxy: http.ProxyFromEnvironment,
-		DialContext: (&net.Dialer{
+		DialContext: (&local.Dialer{
 			Timeout:   30 * time.Second,
 			KeepAlive: 30 * time.Second,
 		}).DialContext,
@@ -357,6 +358,12 @@ func readFull(r io.Reader, b []byte, done <-chan struct{}) (int, error) {
 }
 
 func isLocal(addr string) bool {
+	// Check for local IPC.
+	if local.IsLocal(addr) {
+		return true
+	}
+
+	// Check for loopback network.
 	host, _, err := net.SplitHostPort(addr)
 	if err != nil {
 		return false
