@@ -1249,7 +1249,13 @@ func (e *clogEntry) String() string {
 		rv += fmt.Sprintf(" error<%s>", e.error)
 	}
 	if e.de != nil {
-		rv += fmt.Sprintf(" de<%s, %s, %d>", e.de.Name, e.de.Link, e.de.Sequence)
+		dtype := "file"
+		if e.de.IsDir() {
+			dtype = "dir"
+		} else if e.de.IsLink() {
+			dtype = "link"
+		}
+		rv += fmt.Sprintf(" de<%s, %s, %s, %d>", e.de.Name, dtype, e.de.Link, e.de.Sequence)
 	}
 	if e.children != nil {
 		rv += fmt.Sprintf(" children<%v>", e.children)
