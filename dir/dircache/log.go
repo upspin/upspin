@@ -86,8 +86,11 @@ const (
 	version = "20170118"
 )
 
-// noAccessFile is used to indicate we did a WhichAccess and it returned no DirEntry.
-const noAccessFile = upspin.PathName("no known Access file")
+// noAccessFile indicates we did a WhichAccess and it returned no DirEntry.
+const noAccessFile = upspin.PathName("none")
+
+// unknownAccessFile indicates we don't know which access file pertains.
+const unknownAccessFile = upspin.PathName("")
 
 // clogEntry corresponds to a cached operation.
 type clogEntry struct {
@@ -460,10 +463,13 @@ func (l *clog) lookup(name upspin.PathName) (*upspin.DirEntry, error, bool) {
 
 	plock := l.pathLocks.lock(name)
 	e := l.getFromLRU(lruKey{name: name, glob: false})
-	plock.Unlock()
 	if e != nil {
-		return e.de, e.error, true
+		de := e.de
+		err := e.error
+		plock.Unlock()
+		return de, err, true
 	}
+	plock.Unlock()
 
 	// Look for a complete globReq. If there is one and it doesn't list
 	// this name, we can return a NotExist error.
@@ -552,26 +558,36 @@ func (l *clog) whichAccess(name upspin.PathName) (*upspin.DirEntry, bool) {
 	l.globalLock.RLock()
 	defer l.globalLock.RUnlock()
 
-	// Get name of access file.
-	dirName := path.DropPath(name, 1)
-	glock := l.globLocks.lock(dirName)
-	defer glock.Unlock()
-	e := l.getFromLRU(lruKey{name: dirName, glob: true})
-	if e == nil {
-		return nil, false
+	// Do we have a cached entry for name that refers to a known Access file?
+	var afn upspin.PathName
+	plock := l.pathLocks.lock(name)
+	e := l.getFromLRU(lruKey{name: name})
+	if e != nil && e.error != nil {
+		afn = e.access
+	}
+	plock.Unlock()
+	if afn == unknownAccessFile {
+		// Do we have a cached entry for name's directory that refers to a known Access file?
+		dirName := path.DropPath(name, 1)
+		glock := l.globLocks.lock(dirName)
+		e = l.getFromLRU(lruKey{name: dirName, glob: true})
+		if e != nil && e.error != nil {
+			afn = e.access
+		}
+		glock.Unlock()
+		if afn == unknownAccessFile {
+			return nil, false
+		}
 	}
 
-	// See if we have a directory entry for it.
-	if len(e.access) == 0 {
-		return nil, false
-	}
-	if e.access == noAccessFile {
+	// Is the Access file's entry cached?
+	if afn == noAccessFile {
 		return nil, true
 	}
-	plock := l.pathLocks.lock(e.access)
+	plock = l.pathLocks.lock(afn)
 	defer plock.Unlock()
-	e = l.getFromLRU(lruKey{name: e.access})
-	if e == nil {
+	e = l.getFromLRU(lruKey{name: afn})
+	if e == nil || e.de == nil || e.error != nil {
 		return nil, false
 	}
 	return e.de, true
@@ -842,68 +858,52 @@ func (l *clog) removeFromGlob(e *clogEntry) {
 	glock.Unlock()
 }
 
-// addAccess adds an access pointer to its directory and removes one
-// from all descendant directories that point to an ascendant of the
-// access file's directory.
-//
-// Since this walks through many entries in the LRU, it grabs the
-// global write lock to keep every other thread out.
 func (l *clog) addAccess(e *clogEntry) {
 	if !access.IsAccessFile(e.name) {
 		return
 	}
-
-	// Lock everyone else out while we run the LRU.
-	l.globalLock.RUnlock()
-	l.globalLock.Lock()
-	defer func() {
-		l.globalLock.Unlock()
-		l.globalLock.RLock()
-	}()
-
-	// Add the access reference to its immediate directory.
-	dirName := path.DropPath(e.name, 1)
-	ge := l.getFromLRU(lruKey{name: dirName, glob: true})
-	if ge != nil {
-		if ge.access != e.name {
-			ge.access = e.name
-		}
+	// If the Access file entry hasn't changed, don't do anything.
+	ne := l.getFromLRU(lruKey{name: e.name, glob: false})
+	if ne != nil && ne.de != nil && e.de != nil && ne.de.Sequence == e.de.Sequence && ne.de.Attr == e.de.Attr {
+		return
 	}
 
-	// Remove the access reference for any descendant that points at an ascendant.
-	iter := l.lru.NewIterator()
-	for {
-		_, v, ok := iter.GetAndAdvance()
-		if !ok {
-			break
-		}
-		ne := v.(*clogEntry)
-		if ne.request != globReq {
-			continue
-		}
-		if !strings.HasPrefix(string(ne.name), string(dirName)) {
-			continue
-		}
-		if len(ne.access) < len(e.name) {
-			// This is different than noAccessFile because the
-			// empty string means that we don't know.
-			if ne.access != "" {
-				ne.access = ""
-			}
-		}
-	}
+	l.changeAccess(e, true)
 }
 
-// removeAccess removes an access pointer from its directory and
-// from any descendant directory. Since it needs to run the LRU
-// it must lock out everyone else while it is doing it.
-//
-// removeAccess assumes that it was entered with globalLock.RLock held
-// and that it must upgrade that to globalLock.Lock to do its work.
 func (l *clog) removeAccess(e *clogEntry) {
 	if !access.IsAccessFile(e.name) {
 		return
 	}
+	l.changeAccess(e, false)
+}
+
+// changeAccess is called whenever the Access file, access, changes. It
+// updates the access pointer for any file that is a descendant of
+// access's directory and which doesn't have a more specific Access file.
+//
+// Since this walks through many entries in the LRU, it grabs the
+// global write lock to keep every other thread out.
+func (l *clog) changeAccess(access *clogEntry, add bool) {
+	const op = "dircache.changeAccess"
+
+	parsedAccess, err := path.Parse(access.name)
+	if err != nil {
+		log.Debug.Printf("%s: %s", op, err)
+		return
+	}
+	parsedAccessDir := parsedAccess.Drop(1)
+
+	// notMe is true if access's directory belongs to another user.
+	notMe := l.cfg.UserName() != parsedAccess.User()
+
+	// For unreadable Access files, the DirEntry will be incomplete.
+	unreadable := !add || access.de == nil || access.de.IsIncomplete()
+
+	newval := unknownAccessFile
+	if add {
+		newval = access.name
+	}
 
 	// Lock everyone else out while we run the LRU.
 	l.globalLock.RUnlock()
@@ -913,30 +913,67 @@ func (l *clog) removeAccess(e *clogEntry) {
 		l.globalLock.RLock()
 	}()
 
-	// Remove this access reference from its immediate directory.
-	dirName := path.DropPath(e.name, 1)
-	ge := l.getFromLRU(lruKey{name: dirName, glob: true})
-	if ge != nil {
-		ge.access = ""
-	}
-
-	// Remove this access reference from any descendant.
 	iter := l.lru.NewIterator()
 	for {
 		_, v, ok := iter.GetAndAdvance()
 		if !ok {
 			break
 		}
-		ne := v.(*clogEntry)
-		if ne.request != globReq {
+		entry := v.(*clogEntry)
+		parsedEntry, err := path.Parse(entry.name)
+		if err != nil {
+			log.Debug.Printf("%s: %s", op, err)
 			continue
 		}
-		if !strings.HasPrefix(string(ne.name), string(dirName)) {
+		if !parsedEntry.HasPrefix(parsedAccessDir) {
 			continue
 		}
-		if ne.access == e.name {
-			ne.access = ""
+		if parsedEntry.Equal(parsedAccessDir) {
+			entry.access = newval
+			// We may no longer be able to list
+			// elements of the other user's directory
+			// so mark it as incomplete.
+			if notMe {
+				entry.complete = false
+			}
+			continue
 		}
+		if parsedEntry.Drop(1).Equal(parsedAccessDir) {
+			entry.access = newval
+			// If we can't read the Access file in the
+			// other User's directory, we can't read any
+			// files in that directory.
+			if notMe && unreadable {
+				entry.invalidate()
+			}
+			continue
+		}
+		if len(entry.access) > len(access.name) {
+			// This file uses a more specific Access file.
+			// It is unaffected by the change.
+			continue
+		}
+
+		// entry is a descendent of access's directory and is not known to use
+		// a more specific Access file. Mark its Access file as unknown
+		// and, if the directory is not our own, invalidate entry since
+		// we no longer know our ability to access it.
+		entry.access = unknownAccessFile
+		if notMe {
+			entry.invalidate()
+		}
+	}
+}
+
+// invalidate invalidates an entry but leaves it in the LRU to remember
+// our interest in it.
+func (e *clogEntry) invalidate() {
+	// Remember that we are still intereseted should a watch
+	// return this entry but mark it invalid.
+	if e.request != globReq {
+		e.request = obsoleteReq
+	} else {
+		e.complete = false
 	}
 }
 
