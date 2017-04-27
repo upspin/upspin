@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "510f5cf1_9575bba6",
+        "filename": "dir/dircache/dump.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-04-27T15:55:50Z",
+      "side": 1,
+      "message": "this should also be //+build ignore or debug. no need for it to be in every binary\nencoding/gob in the standard library has a similar debug functionality you could see as an example",
+      "revId": "4fbc76c25f94ca44216709e90d0fc806b6d5ad43",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ad6f449f_090d2df8",
+        "filename": "dir/dircache/util/main.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-04-27T15:55:50Z",
+      "side": 1,
+      "message": "instead of making a subdirectory, put this in the main directory but protect it with\n\n//+build ignore\n\nthen to build it\n\ngo build -tags ignore main.go",
+      "revId": "4fbc76c25f94ca44216709e90d0fc806b6d5ad43",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
