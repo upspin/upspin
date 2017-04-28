@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "54d57550_d2cd4828",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-04-28T01:59:06Z",
+      "side": 1,
+      "message": "any empty PathName will \u003d\u003d this constant, you cool with that?",
+      "revId": "b39cd20523aea1cf43b42628c555f2b194ea0660",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bdd62aa4_794a9a94",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 856,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-04-28T01:59:06Z",
+      "side": 1,
+      "message": "an Access\ndrop quotes around e",
+      "range": {
+        "startLine": 856,
+        "startChar": 35,
+        "endLine": 856,
+        "endChar": 46
+      },
+      "revId": "b39cd20523aea1cf43b42628c555f2b194ea0660",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "841f5d64_e2e3f41f",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 857,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-04-28T01:59:06Z",
+      "side": 1,
+      "message": "it just removes them? doesn\u0027t it add them too?",
+      "revId": "b39cd20523aea1cf43b42628c555f2b194ea0660",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f5d3c87f_2488ee74",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 858,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-04-28T01:59:06Z",
+      "side": 1,
+      "message": "drop leading apostrophe here and on the next line please",
+      "revId": "b39cd20523aea1cf43b42628c555f2b194ea0660",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
