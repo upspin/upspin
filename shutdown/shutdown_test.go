@@ -142,8 +142,6 @@ func testShutdownChildProcess() {
 		}
 	}
 
-	fmt.Println(shutdownMessages[0])
-
 	Handle(func() {
 		fmt.Println(shutdownMessages[2])
 	})
@@ -155,6 +153,8 @@ func testShutdownChildProcess() {
 			select {} // Block forever, stalling Shutdown.
 		}
 	})
+
+	fmt.Println(shutdownMessages[0])
 
 	Now(0)
 
