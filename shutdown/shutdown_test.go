@@ -9,7 +9,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"syscall"
 	"testing"
 	"time"
 )
@@ -40,7 +39,7 @@ var shutdownMessages = []string{
 }
 
 func testShutdown(t *testing.T, clean bool) {
-	cmd := exec.Command(os.Args[0], "-test.run=TestShutdown")
+	cmd := exec.Command(os.Args[0], "-test.run=^TestShutdown$")
 	cmd.Env = []string{shutdownEnv + "=true"}
 	if !clean {
 		cmd.Env = append(cmd.Env, shutdownKillEnv+"=true")
@@ -108,11 +107,6 @@ func testShutdown(t *testing.T, clean bool) {
 		waitErr <- cmd.Wait()
 	}()
 
-	// Kill the process and wait for it to exit.
-	if err := syscall.Kill(cmd.Process.Pid, syscall.SIGTERM); err != nil {
-		t.Fatal(err)
-	}
-
 	// Check that the output was what we expected.
 	if err := <-readErr; err != nil {
 		cmd.Process.Kill()
@@ -142,8 +136,6 @@ func testShutdownChildProcess() {
 		}
 	}
 
-	fmt.Println(shutdownMessages[0])
-
 	Handle(func() {
 		fmt.Println(shutdownMessages[2])
 	})
@@ -155,6 +147,8 @@ func testShutdownChildProcess() {
 			select {} // Block forever, stalling Shutdown.
 		}
 	})
+
+	fmt.Println(shutdownMessages[0])
 
 	Now(0)
 
