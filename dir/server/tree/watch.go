@@ -169,7 +169,6 @@ func (w *watcher) sendCurrentAndWatch(clone, orig *Tree, p path.Parsed, offset i
 
 	n, _, err := clone.loadPath(p)
 	if err != nil && !errors.Match(errNotExist, err) {
-		log.Error.Printf("%s: error loading path: %s", op, err)
 		w.sendError(err)
 		w.close()
 		return
@@ -190,7 +189,6 @@ func (w *watcher) sendCurrentAndWatch(clone, orig *Tree, p path.Parsed, offset i
 		}
 		err = clone.traverse(n, 0, fn)
 		if err != nil {
-			log.Error.Printf("%s: error traversing tree: %s", op, err)
 			w.sendError(err)
 			w.close()
 			return
@@ -201,7 +199,6 @@ func (w *watcher) sendCurrentAndWatch(clone, orig *Tree, p path.Parsed, offset i
 	err = orig.addWatcher(p, w)
 	orig.mu.Unlock()
 	if err != nil {
-		log.Error.Printf("%s: error adding watcher: %s", op, err)
 		w.sendError(err)
 		w.close()
 		return
@@ -256,7 +253,7 @@ func (w *watcher) sendError(err error) {
 	case <-time.After(3 * watcherTimeout):
 		// Can't send another error since we timed out again. Log an
 		// error and close the watcher.
-		log.Error.Printf("dir/server/tree.sendError: %s", errTimeout)
+		log.Error.Printf("dir/server/tree: timed out sending error: %v", err)
 	}
 }
 
@@ -306,7 +303,6 @@ func (w *watcher) watch(offset int64) {
 		offset, err = w.sendEventFromLog(offset)
 		if err != nil {
 			if err != errTimeout && err != errClosed {
-				log.Error.Printf("watch: sending error to client: %s", err)
 				w.sendError(err)
 			}
 			return
