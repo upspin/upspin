@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6176a71b_671dc0ca",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 571,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-04-28T22:19:00Z",
+      "side": 1,
+      "message": "be consistent. it\u0027s \"Access file\" not \"access file\" elsewhere.",
+      "revId": "058d5e0fbb89272c272a5651e8ee946da8a1ce75",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8a95e95a_e868b88e",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 883,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-04-28T22:19:00Z",
+      "side": 1,
+      "message": "s/and/an/",
+      "revId": "058d5e0fbb89272c272a5651e8ee946da8a1ce75",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a0b649d6_4ebf54c8",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 919,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-04-28T22:19:00Z",
+      "side": 1,
+      "message": "use Parsed.HasPrefix to avoid all this trickery.",
+      "revId": "058d5e0fbb89272c272a5651e8ee946da8a1ce75",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
