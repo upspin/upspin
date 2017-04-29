@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "471e3342_0624d993",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-04-29T07:21:38Z",
+      "side": 1,
+      "message": "Yup.  I just defined the constant to make it more obvious what the empty string represents.",
+      "parentUuid": "54d57550_d2cd4828",
+      "revId": "b39cd20523aea1cf43b42628c555f2b194ea0660",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "bdd62aa4_794a9a94",
         "filename": "dir/dircache/log.go",
         "patchSetId": 1
@@ -42,6 +60,30 @@
     },
     {
       "key": {
+        "uuid": "cbdf0598_cfe176a6",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 856,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-04-29T07:21:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bdd62aa4_794a9a94",
+      "range": {
+        "startLine": 856,
+        "startChar": 35,
+        "endLine": 856,
+        "endChar": 46
+      },
+      "revId": "b39cd20523aea1cf43b42628c555f2b194ea0660",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "841f5d64_e2e3f41f",
         "filename": "dir/dircache/log.go",
         "patchSetId": 1
@@ -59,6 +101,24 @@
     },
     {
       "key": {
+        "uuid": "0ee7d688_d3a03ec8",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 857,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-04-29T07:21:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "841f5d64_e2e3f41f",
+      "revId": "b39cd20523aea1cf43b42628c555f2b194ea0660",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f5d3c87f_2488ee74",
         "filename": "dir/dircache/log.go",
         "patchSetId": 1
@@ -73,6 +133,24 @@
       "revId": "b39cd20523aea1cf43b42628c555f2b194ea0660",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0f8636cd_53ca81dd",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 858,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-04-29T07:21:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f5d3c87f_2488ee74",
+      "revId": "b39cd20523aea1cf43b42628c555f2b194ea0660",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
