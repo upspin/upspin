@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "dc4c7e56_09925e06",
+        "filename": "dir/dircache/dump.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-04-29T17:06:38Z",
+      "side": 1,
+      "message": "Thanks, didn\u0027t know about that.",
+      "parentUuid": "510f5cf1_9575bba6",
+      "revId": "4fbc76c25f94ca44216709e90d0fc806b6d5ad43",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "ad6f449f_090d2df8",
         "filename": "dir/dircache/util/main.go",
         "patchSetId": 3
