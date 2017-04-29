@@ -51,6 +51,24 @@
       "revId": "4fbc76c25f94ca44216709e90d0fc806b6d5ad43",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c5872403_49eafe45",
+        "filename": "dir/dircache/util/main.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-04-29T17:23:13Z",
+      "side": 1,
+      "message": "When I do that, it complains that:\n\nmain.go:15:2: found packages dircache (dump.go) and main (main.go) in /Users/presotto/gopath/src/upspin.io/dir/dircache\n\nI guess I\u0027m not sure what you meant by put it in the main directory.",
+      "parentUuid": "ad6f449f_090d2df8",
+      "revId": "4fbc76c25f94ca44216709e90d0fc806b6d5ad43",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
