@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "93bf12f2_060ae651",
+        "filename": "dir/dircache/dumpmain.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-04-29T18:27:39Z",
+      "side": 1,
+      "message": "to build this, you\u0027d need the package\u0027s tag and this binary\u0027s tag to be different. debug is fine for the package.\nhere the convention would be \u0027ignore\u0027\n\n//+build ignore\n\ngo build -tags ignore dumpmain.go",
+      "revId": "f7424ae2b252c19bf4cb430fee3741f5159ab6fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
