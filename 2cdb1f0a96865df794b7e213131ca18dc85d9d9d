@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a841260a_84e274c2",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 561,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-04-30T23:26:39Z",
+      "side": 1,
+      "message": "Access",
+      "revId": "2cdb1f0a96865df794b7e213131ca18dc85d9d9d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "854fbc1b_2420b10f",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 570,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-04-30T23:26:39Z",
+      "side": 1,
+      "message": "name\u0027s",
+      "revId": "2cdb1f0a96865df794b7e213131ca18dc85d9d9d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4d7df33d_1bcc5a2f",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 583,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-04-30T23:26:39Z",
+      "side": 1,
+      "message": "Access",
+      "range": {
+        "startLine": 583,
+        "startChar": 11,
+        "endLine": 583,
+        "endChar": 17
+      },
+      "revId": "2cdb1f0a96865df794b7e213131ca18dc85d9d9d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "335aabb2_1644380c",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 867,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-04-30T23:26:39Z",
+      "side": 1,
+      "message": "It seems to me that Sequence should be the only thing you need to check, but I guess it\u0027s possible to remove a file and re-create it as something else, and get the same sequence number back?\nThis seems like a gap in the upspin interface design.\nWhat do you think? Should I file an issue about this?",
+      "revId": "2cdb1f0a96865df794b7e213131ca18dc85d9d9d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
