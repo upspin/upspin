@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "537a503c_62a4a962",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 561,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-05-01T20:06:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a841260a_84e274c2",
+      "revId": "2cdb1f0a96865df794b7e213131ca18dc85d9d9d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "854fbc1b_2420b10f",
         "filename": "dir/dircache/log.go",
         "patchSetId": 11
@@ -33,6 +51,24 @@
       "revId": "2cdb1f0a96865df794b7e213131ca18dc85d9d9d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "05cd38fd_e86a2149",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 570,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-05-01T20:06:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "854fbc1b_2420b10f",
+      "revId": "2cdb1f0a96865df794b7e213131ca18dc85d9d9d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -59,6 +95,30 @@
     },
     {
       "key": {
+        "uuid": "aaa3ecb0_0fb7d475",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 583,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-05-01T20:06:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4d7df33d_1bcc5a2f",
+      "range": {
+        "startLine": 583,
+        "startChar": 11,
+        "endLine": 583,
+        "endChar": 17
+      },
+      "revId": "2cdb1f0a96865df794b7e213131ca18dc85d9d9d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "335aabb2_1644380c",
         "filename": "dir/dircache/log.go",
         "patchSetId": 11
@@ -70,6 +130,24 @@
       "writtenOn": "2017-04-30T23:26:39Z",
       "side": 1,
       "message": "It seems to me that Sequence should be the only thing you need to check, but I guess it\u0027s possible to remove a file and re-create it as something else, and get the same sequence number back?\nThis seems like a gap in the upspin interface design.\nWhat do you think? Should I file an issue about this?",
+      "revId": "2cdb1f0a96865df794b7e213131ca18dc85d9d9d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6fbc5aec_acc60507",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 867,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-05-01T20:06:35Z",
+      "side": 1,
+      "message": "I thought that too until real life.  The problem you state is indeed a hole in the design and should be issued.\n\nHowever, that isn\u0027t what this is about. If a file changes from readable to unreadable or vice versa, the seq number stays the same but the Attr gains or loses the Incomplete bit as returned to the non-owner. The owner sees no change.",
+      "parentUuid": "335aabb2_1644380c",
       "revId": "2cdb1f0a96865df794b7e213131ca18dc85d9d9d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
