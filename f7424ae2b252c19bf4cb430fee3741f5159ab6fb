@@ -16,6 +16,24 @@
       "revId": "f7424ae2b252c19bf4cb430fee3741f5159ab6fb",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7eb65c9b_d8cfb4d5",
+        "filename": "dir/dircache/dumpmain.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-05-02T19:30:08Z",
+      "side": 1,
+      "message": "When I do that, I get:\n\np-macbookair2; go build -tags ignore dumpmain.go\n../../config/initconfig.go:9:2: found packages x509 (cert_pool.go) and main (root_darwin_arm_gen.go) in /Users/p/go/src/crypto/x509\n../../user/user.go:11:2: found packages precis (benchmark_test.go) and main (gen.go) in /Users/p/gopath/src/golang.org/x/text/secure/precis\n/Users/p/go/src/math/big/arith.go:11:8: found packages bits (bits.go) and main (make_tables.go) in /Users/p/go/src/math/bits\n/Users/p/go/src/math/big/int.go:12:2: found packages rand (example_test.go) and main (gen_cooked.go) in /Users/p/go/src/math/rand\npackage main\n\timports runtime: found packages runtime (alg.go) and main (mkduff.go) in /Users/p/go/src/runtime\n/Users/p/go/src/regexp/syntax/parse.go:8:2: found packages sort (example_interface_test.go) and main (genzfunc.go) in /Users/p/go/src/sort\n/Users/p/go/src/reflect/type.go:20:2: found packages strconv (atob.go) and main (makeisprint.go) in /Users/p/go/src/strconv\n/Users/p/go/src/internal/poll/fd_poll_runtime.go:12:2: found packages syscall (bpf_bsd.go) and main (mkpost.go) in /Users/p/go/src/syscall\n/Users/p/go/src/internal/poll/fd_poll_runtime.go:13:2: found packages time (example_test.go) and main (genzabbrs.go) in /Users/p/go/src/time\n/Users/p/go/src/strings/strings.go:11:2: found packages unicode (casetables.go) and main (maketables.go) in /Users/p/go/src/unicode\ndumpmain.go:20:2: found packages dircache (dump.go) and main (dumpmain.go) in /Users/p/gopath/src/upspin.io/dir/dircache\n\nI\u0027m clearly doing something wrong but don\u0027t understand what.  It does look like ignore is too popular a tag to use in anything that is not standalone.",
+      "parentUuid": "93bf12f2_060ae651",
+      "revId": "f7424ae2b252c19bf4cb430fee3741f5159ab6fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
