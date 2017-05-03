@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ffdb88d3_00ec83af",
+        "filename": "config/initconfig.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-05-03T21:46:52Z",
+      "side": 1,
+      "message": "Or make the jump now.  Any non-empty string for vals[cache] would imply \"cacheserver\".    If you want, allow \"no\" as equivalent to empty / unset.",
+      "revId": "a8e64027aebcfd1585e8b566e59db3bd1dbf587f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
