@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "2a389fc4_623c145d",
+        "filename": "config/initconfig.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-05-09T22:32:44Z",
+      "side": 1,
+      "message": "I\u0027m leaving it till I\u0027m sure I\u0027m happy with the new stuff, i.e.,no surprises.",
+      "parentUuid": "ffdb88d3_00ec83af",
+      "revId": "a8e64027aebcfd1585e8b566e59db3bd1dbf587f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "44f03ca3_8bad8bf0",
         "filename": "netlocal/netlocal.go",
         "patchSetId": 6
@@ -33,6 +51,24 @@
       "revId": "a8e64027aebcfd1585e8b566e59db3bd1dbf587f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3be2e9b8_da335670",
+        "filename": "netlocal/netlocal.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-05-09T22:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "44f03ca3_8bad8bf0",
+      "revId": "a8e64027aebcfd1585e8b566e59db3bd1dbf587f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "4f7c5af6_c9a95b27",
+        "filename": "netlocal/netlocal.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-05-09T22:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d1c90bb3_2334b948",
+      "revId": "a8e64027aebcfd1585e8b566e59db3bd1dbf587f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e4b4c3c8_504dbaa0",
         "filename": "netlocal/netlocal.go",
         "patchSetId": 6
@@ -64,6 +118,24 @@
       "writtenOn": "2017-05-09T01:15:01Z",
       "side": 1,
       "message": "This stuck out at me as odd. Not because it\u0027s wrong, but because it\u0027s unusual.\n\nInstead, the more idiomatic way of doing this is\n\ntype Dialer struct {\n  net.Dialer\n}",
+      "revId": "a8e64027aebcfd1585e8b566e59db3bd1dbf587f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d7bf5e76_463b62f5",
+        "filename": "netlocal/netlocal.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-05-09T22:32:44Z",
+      "side": 1,
+      "message": "That\u0027s what I tried initially.  However, it makes the initializer in rpc/client.go not work:\n\nrpc/client.go:124: unknown field \u0027Timeout\u0027 in struct literal of type local.Dialer\nrpc/client.go:125: unknown field \u0027KeepAlive\u0027 in struct literal of type local.Dialer\n\nIt seems the initializers don\u0027t inherit the fields.  I\u0027d rather the use be a plugin for using net.Dialer than the usage here look usual.",
+      "parentUuid": "e4b4c3c8_504dbaa0",
       "revId": "a8e64027aebcfd1585e8b566e59db3bd1dbf587f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -101,6 +173,24 @@
       "revId": "a8e64027aebcfd1585e8b566e59db3bd1dbf587f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f5f257b4_c5dfc958",
+        "filename": "netlocal/netlocal_unix.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-05-09T22:32:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1293e082_9c3e997c",
+      "revId": "a8e64027aebcfd1585e8b566e59db3bd1dbf587f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
