@@ -10,16 +10,16 @@
 package testutil // import "upspin.io/test/testutil"
 
 import (
+	"go/build"
 	"log"
-	"os"
 	"path/filepath"
 )
 
 // Repo returns the local filename of a file in the Upspin repository.
 func Repo(dir ...string) string {
-	gopath := os.Getenv("GOPATH")
-	if len(gopath) == 0 {
-		log.Fatal("Environment variable $GOPATH is not set. See Go setup documents for more information.")
+	p, err := build.Import("upspin.io", "", build.FindOnly)
+	if err != nil {
+		log.Fatal(err)
 	}
-	return filepath.Join(gopath, "src", "upspin.io", filepath.Join(dir...))
+	return filepath.Join(p.Dir, filepath.Join(dir...))
 }
