@@ -34,6 +34,24 @@
       "revId": "f7424ae2b252c19bf4cb430fee3741f5159ab6fb",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ec0e1fa3_a0b356f9",
+        "filename": "dir/dircache/dumpmain.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-09T01:02:06Z",
+      "side": 1,
+      "message": "No, I think you\u0027re doing the right thing. I think +build dump is fine here.",
+      "parentUuid": "7eb65c9b_d8cfb4d5",
+      "revId": "f7424ae2b252c19bf4cb430fee3741f5159ab6fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
