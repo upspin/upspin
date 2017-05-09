@@ -10,10 +10,10 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
+	"go/build"
 	"html/template"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -75,7 +75,11 @@ var sourceRepo = map[string]string{
 }
 
 func defaultDocPath() string {
-	return filepath.Join(os.Getenv("GOPATH"), "src/upspin.io/doc")
+	p, err := build.Import("upspin.io/doc", "", build.FindOnly)
+	if err != nil {
+		return ""
+	}
+	return p.Dir
 }
 
 func redirectHTTP(w http.ResponseWriter, r *http.Request) {
