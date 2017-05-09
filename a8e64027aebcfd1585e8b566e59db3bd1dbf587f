@@ -72,6 +72,24 @@
     },
     {
       "key": {
+        "uuid": "e317b9b9_b74d51e0",
+        "filename": "netlocal/netlocal.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-05-09T22:33:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3be2e9b8_da335670",
+      "revId": "a8e64027aebcfd1585e8b566e59db3bd1dbf587f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d1c90bb3_2334b948",
         "filename": "netlocal/netlocal.go",
         "patchSetId": 6
@@ -101,6 +119,24 @@
       "side": 1,
       "message": "Done",
       "parentUuid": "d1c90bb3_2334b948",
+      "revId": "a8e64027aebcfd1585e8b566e59db3bd1dbf587f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "868858c9_606ac5ca",
+        "filename": "netlocal/netlocal.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-05-09T22:33:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4f7c5af6_c9a95b27",
       "revId": "a8e64027aebcfd1585e8b566e59db3bd1dbf587f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
@@ -153,6 +189,24 @@
       "writtenOn": "2017-05-09T01:15:01Z",
       "side": 1,
       "message": "with the suggested change to the Dialer type, this can be deleted and the next line becomes\n\nd.Dialer.DialContext(...)",
+      "revId": "a8e64027aebcfd1585e8b566e59db3bd1dbf587f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a2036ad1_b791c2ca",
+        "filename": "netlocal/netlocal.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-05-09T22:33:43Z",
+      "side": 1,
+      "message": "see comment above",
+      "parentUuid": "5f38b8a4_2dd8e4e8",
       "revId": "a8e64027aebcfd1585e8b566e59db3bd1dbf587f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
