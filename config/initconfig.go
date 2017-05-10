@@ -7,6 +7,8 @@ package config // import "upspin.io/config"
 
 import (
 	"crypto/x509"
+	"flag"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
@@ -42,6 +44,8 @@ func (base) DirEndpoint() upspin.Endpoint   { return upspin.Endpoint{} }
 func (base) StoreEndpoint() upspin.Endpoint { return upspin.Endpoint{} }
 func (base) CacheEndpoint() upspin.Endpoint { return upspin.Endpoint{} }
 func (base) CertPool() *x509.CertPool       { return nil }
+func (base) Flags(string) map[string]string { return nil }
+func (base) SetFlagValues(string) error     { return nil }
 
 // New returns a config with all fields set as defaults.
 func New() upspin.Config {
@@ -145,6 +149,7 @@ func InitConfig(r io.Reader) (upspin.Config, error) {
 		secrets:     "",
 		tlscerts:    "",
 	}
+	cmdFlagVals := make(map[string]map[string]string)
 
 	// If the provided reader is nil, try $HOME/upspin/config.
 	if r == nil {
@@ -165,7 +170,7 @@ func InitConfig(r io.Reader) (upspin.Config, error) {
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
-	if err := valsFromYAML(vals, data); err != nil {
+	if err := valsFromYAML(vals, cmdFlagVals, data); err != nil {
 		return nil, errors.E(op, err)
 	}
 
@@ -220,6 +225,10 @@ func InitConfig(r io.Reader) (upspin.Config, error) {
 		// This must be done before bind so that keys are ready for authenticating to servers.
 	}
 
+	if len(cmdFlagVals) != 0 {
+		cfg = SetFlags(cfg, cmdFlagVals)
+	}
+
 	cfg = SetKeyEndpoint(cfg, parseEndpoint(op, vals, keyserver, &err))
 	cfg = SetStoreEndpoint(cfg, parseEndpoint(op, vals, storeserver, &err))
 	cfg = SetDirEndpoint(cfg, parseEndpoint(op, vals, dirserver, &err))
@@ -239,16 +248,69 @@ func InitConfig(r io.Reader) (upspin.Config, error) {
 
 // valsFromYAML parses YAML from the given map and puts the values
 // into the provided map. Unrecognized keys generate an error.
-func valsFromYAML(vals map[string]string, data []byte) error {
-	newVals := map[string]string{}
+func valsFromYAML(vals map[string]string, cmdFlagVals map[string]map[string]string, data []byte) error {
+	newVals := map[string]interface{}{}
 	if err := yaml.Unmarshal(data, newVals); err != nil {
 		return errors.E(errors.Invalid, errors.Errorf("parsing YAML file: %v", err))
 	}
 	for k, v := range newVals {
+		if k == "cmdflags" {
+			if err := asFlags(v, cmdFlagVals); err != nil {
+				return err
+			}
+			continue
+		}
 		if _, ok := vals[k]; !ok {
 			return errors.E(errors.Invalid, errors.Errorf("unrecognized key %q", k))
 		}
-		vals[k] = v
+		if s, err := asString(v); err != nil {
+			return fmt.Errorf("%q: %v", k, err)
+		} else {
+			vals[k] = s
+		}
+	}
+	return nil
+}
+
+// asString tries to convert a value back into its original string. This will not
+// always be possible but should be for all our expected use cases.
+func asString(v interface{}) (string, error) {
+	switch vc := v.(type) {
+	case int, int32, int64, uint, uint32, uint64, float32, float64, bool:
+		return fmt.Sprintf("%v", vc), nil
+	case string:
+		return vc, nil
+	}
+	return "", errors.E(errors.Invalid, errors.Errorf("unrecognized value %T", v))
+}
+
+func asFlags(v interface{}, m map[string]map[string]string) error {
+	cmds, ok := v.(map[interface{}]interface{})
+	if !ok {
+		return errors.E(errors.Invalid, errors.Errorf("unrecognized cmdflags %v", v))
+	}
+	for k, v := range cmds {
+		cmd, err := asString(k)
+		if err != nil {
+			return errors.E(errors.Invalid, errors.Errorf("bad command %q %v", v, err))
+		}
+		flags, ok := v.(map[interface{}]interface{})
+		if !ok {
+			return errors.E(errors.Invalid, errors.Errorf("cmd %q has bad value: %v", cmd, v))
+		}
+		fm := make(map[string]string)
+		for k, v := range flags {
+			flag, err := asString(k)
+			if err != nil {
+				return errors.E(errors.Invalid, errors.Errorf("cmd %q has bad flag: %s", cmd, err))
+			}
+			val, err := asString(v)
+			if err != nil {
+				return errors.E(errors.Invalid, errors.Errorf("cmd %q flag %q has bad value: %s", cmd, flag, err))
+			}
+			fm[flag] = val
+		}
+		m[cmd] = fm
 	}
 	return nil
 }
@@ -484,6 +546,48 @@ func SetCertPool(cfg upspin.Config, pool *x509.CertPool) upspin.Config {
 		Config: cfg,
 		pool:   pool,
 	}
+}
+
+type cfgFlags struct {
+	upspin.Config
+	flags map[string]map[string]string
+}
+
+func (cfg cfgFlags) Flags(cmd string) map[string]string {
+	return cfg.flags[cmd]
+}
+
+func SetFlags(cfg upspin.Config, flags map[string]map[string]string) upspin.Config {
+	return cfgFlags{
+		Config: cfg,
+		flags:  flags,
+	}
+}
+
+// SetFlagValues updates any flag that is still at its default value. It will
+// apply all the flags possible and return the last error seen.
+func SetFlagValues(cfg upspin.Config, cmd string) error {
+	const op = "config.SetFlagValues"
+	flags := cfg.Flags(cmd)
+	if flags == nil {
+		return nil
+	}
+	var lasterr error
+	for k, v := range flags {
+		f := flag.Lookup(k)
+		if f == nil {
+			lasterr = errors.E(op, errors.Invalid, errors.Errorf("unknown flag %q", k))
+			continue
+		}
+		if f.Value.String() != f.DefValue {
+			continue
+		}
+		if err := flag.Set(k, v); err != nil {
+			lasterr = errors.E(op, err)
+			continue
+		}
+	}
+	return lasterr
 }
 
 // TODO(adg): move to osutil package?
