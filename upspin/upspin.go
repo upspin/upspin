@@ -727,6 +727,14 @@ type Config interface {
 	// connections. If the returned pointer is nil then the default system root
 	// certificates should be used.
 	CertPool() *x509.CertPool
+
+	// Flags returns the configured command flags for the named command.
+	Flags(cmd string) map[string]string
+
+	// SetFlagValues updates any flag that is still at its default value with the
+	// value from the configuration for cmd. It will return an error if any flags
+	// are not defined or if an error occurs setting a flag.
+	SetFlagValues(cmd string) error
 }
 
 // Dialer defines how to connect and authenticate to a server. Each
