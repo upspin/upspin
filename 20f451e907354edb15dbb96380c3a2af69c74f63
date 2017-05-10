@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dbd3ae05_abba723d",
+        "filename": "rpc/local/local_unix.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-10T00:22:16Z",
+      "side": 1,
+      "message": "I don\u0027t think that _unix.go is a special suffix in go, like _windows.go is.\n\nI think this file needs a build directive\n\n// +build !windows\n\nand the other file needs\n\n// +build windows",
+      "revId": "20f451e907354edb15dbb96380c3a2af69c74f63",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
