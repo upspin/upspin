@@ -68,7 +68,7 @@ func testWatchCurrent(t *testing.T, r *testenv.Runner) {
 
 	// Put an Access file; watch it appear on the channel.
 	r.Put(access, accessContent)
-	r.GetNEvents(1)
+	r.GetNEvents(2)
 	if !r.GotEvent(access, hasBlocks) {
 		t.Fatal(r.Diag())
 	}
@@ -175,7 +175,7 @@ func testWatchNonExistentFile(t *testing.T, r *testenv.Runner) {
 	if r.Failed() {
 		t.Fatal(r.Diag())
 	}
-	r.GetNEvents(1)
+	r.GetNEvents(2)
 	if !r.GotEvent(file, hasBlocks) {
 		t.Fatal(r.Diag())
 	}
@@ -213,7 +213,7 @@ func testWatchNonExistentDir(t *testing.T, r *testenv.Runner) {
 	if r.Failed() {
 		t.Fatal(r.Diag())
 	}
-	r.GetNEvents(1)
+	r.GetNEvents(2)
 	if !r.GotEvent(file, hasBlocks) {
 		t.Fatal(r.Diag())
 	}
