@@ -232,7 +232,7 @@ Storage users, so it is prudent to include your domain name in the bucket name.
 (We will use `example-com-upspin`.)
 
 ```
-local$ upspin -project=<project> setupstorage-gcp -domain=example.com example-com-upspin
+local$ upspin setupstorage-gcp -domain=example.com -project=<project> example-com-upspin
 ```
 
 It should produce output like this:

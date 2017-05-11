@@ -233,7 +233,7 @@ Once the DNS change propagates the key server will use the TXT record to verify
 that {{.UserName}} is authorized to register users under {{.Domain}}.
 To register the users listed above, run this command:
 
-	$ upspin -project={{.Project}} setupdomain -where={{.Where}} -cluster -put-users -domain={{.Domain}}
+	$ upspin setupdomain -project={{.Project}} -where={{.Where}} -cluster -put-users -domain={{.Domain}}
 
 `))
 
