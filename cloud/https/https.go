@@ -30,7 +30,7 @@ type Options struct {
 	Addr string
 
 	// AutocertCache provides a cache for use with Let's Encrypt.
-	// If non-nil, enables Let's Encrypt ceritficates for this server.
+	// If non-nil, enables Let's Encrypt certificates for this server.
 	AutocertCache autocert.Cache
 
 	// LetsEncryptCache specifies the cache file for Let's Encrypt.
