@@ -37,9 +37,25 @@ The keys identify settings, and there several defined:
 * `keyserver:` Which key server to use.
 * `dirserver:` Server that holds user's directory tree.
 * `storeserver:` Server to write new storage.
-* `cache:` Address of local cache server.
+* `cache:` `n[o]` for no cache server, `y[es]` for a cache server on the default address, otherwise an endpoint to use for the cache server.
 * `secrets:` Directory holding private keys.
 * `tlscerts:` Directory holding TLS certificates.
+
+In addition one can specify values for flags used by various commands.
+The syntax for this is:
+
+```
+cmdflags:
+ command-name:
+  flag-name: flag-value
+  ...
+```
+
+The cacheserver and upspinfs commands honor these settings. The flags
+must be in the command line flag set of the command or will generate
+an error. These flag values will supercede the value of any flags not
+set to their default. Thus one can override these settings in the command
+line.
 
 Not all of these settings must be present.
 In practice, you will likely need only `username`, `dirserver`, `storeserver`,
@@ -57,6 +73,10 @@ username: ann@example.com
 dirserver: dir.example.com
 storeserver: store.example.com
 cache: localhost:8888
+cmdflags:
+ cacheserver:
+  cachedir: /usr/augie/tmp
+  cachesize: 5000000000
 ```
 
 This should be mostly self-explanatory.
