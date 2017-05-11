@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "e5706e21_6e348a1d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-05-11T21:03:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c5930d68_8dfbc151",
+      "revId": "80479c642297e83c51182270d5977b2e5bf2e91b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b8f382cb_229a579b",
         "filename": "config/initconfig.go",
         "patchSetId": 1
