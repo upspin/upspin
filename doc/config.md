@@ -37,9 +37,25 @@ The keys identify settings, and there several defined:
 * `keyserver:` Which key server to use.
 * `dirserver:` Server that holds user's directory tree.
 * `storeserver:` Server to write new storage.
-* `cache:` Address of local cache server.
+* `cache:` Whether to use a local store and directory cache server.
 * `secrets:` Directory holding private keys.
 * `tlscerts:` Directory holding TLS certificates.
+
+One can also specify values for flags used by various commands.
+The syntax is:
+
+```
+cmdflags:
+ command-name:
+  flag-name: flag-value
+  ...
+```
+
+The `cacheserver` and `upspinfs` commands honor these settings.
+The flags must be in the command line flag set of the command or will generate
+an error. These flag values will supersede the value of any flags not
+set to their default. Thus one can override these settings in the command
+line.
 
 Not all of these settings must be present.
 In practice, you will likely need only `username`, `dirserver`, `storeserver`,
@@ -57,6 +73,10 @@ username: ann@example.com
 dirserver: dir.example.com
 storeserver: store.example.com
 cache: localhost:8888
+cmdflags:
+ cacheserver:
+  cachedir: /usr/augie/tmp
+  cachesize: 5000000000
 ```
 
 This should be mostly self-explanatory.
@@ -122,12 +142,15 @@ It must be set.
 new data created by the user.
 It must be set.
 
-* The **`cache`** setting names a (typically local) cache server that speeds up
+* The **`cache`** setting specifies a local cache server that speeds up
 interactions with Upspin by caching directories and storage blocks.
-It is usually run as a service on the local machine at some convenient address
-such as `localhost:8888`.
 If the cache is not set by the config file, none is used.
-For more information about the cache server, run
+The value can be:
+	* `y[es]` to run a cache server on a default address
+	* `n[o]` to not run a cache server
+	* the address of the cache server (normally used for debugging)
+
+	For more information about the cache server, run
 
 ```
 go doc upspin.io/cmd/cacheserver
