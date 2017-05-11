@@ -80,7 +80,7 @@ var (
 	// LetsEncryptCache ("letscache") is the location of a file in which
 	// the Let's Encrypt certificates are stored. The containing directory
 	// should be owner-accessible only (chmod 0700).
-	LetsEncryptCache = ""
+	LetsEncryptCache = defaultLetsEncryptCache
 
 	defaultLetsEncryptCache = filepath.Join(config.Home(), "upspin", "letsencrypt")
 
