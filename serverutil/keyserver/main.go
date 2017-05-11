@@ -68,7 +68,14 @@ func Main(setup func(upspin.KeyServer)) {
 		if f == nil {
 			log.Fatal("supplied config must include keys when -mail_config set")
 		}
-		h, err := newSignupHandler(f, key, *mailConfigFile, flags.Project)
+		project := ""
+		flag.Visit(func(f *flag.Flag) {
+			if f.Name != "project" {
+				return
+			}
+			project = f.Value.String()
+		})
+		h, err := newSignupHandler(f, key, *mailConfigFile, project)
 		if err != nil {
 			log.Fatal(err)
 		}
