@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b8f382cb_229a579b",
+        "filename": "config/initconfig.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-11T00:16:45Z",
+      "side": 1,
+      "message": "return fmt.Errorf(\"%q: %v\", k, err)",
+      "revId": "80479c642297e83c51182270d5977b2e5bf2e91b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cbb5ff38_f120aef6",
+        "filename": "config/initconfig.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-11T00:16:45Z",
+      "side": 1,
+      "message": "%q: %v",
+      "revId": "80479c642297e83c51182270d5977b2e5bf2e91b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "72fb15d9_9c9866c0",
+        "filename": "config/initconfig.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-11T00:16:45Z",
+      "side": 1,
+      "message": "command %q has bad value: %v",
+      "revId": "80479c642297e83c51182270d5977b2e5bf2e91b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4c2acdf7_40bfde40",
+        "filename": "config/initconfig.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 295,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-11T00:16:45Z",
+      "side": 1,
+      "message": "command %q has bad flag: %v",
+      "revId": "80479c642297e83c51182270d5977b2e5bf2e91b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a6a487d6_406e4a3f",
+        "filename": "config/initconfig.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-11T00:16:45Z",
+      "side": 1,
+      "message": "\"command %q flag %q has bad value: %v\"",
+      "revId": "80479c642297e83c51182270d5977b2e5bf2e91b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
