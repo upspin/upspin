@@ -231,6 +231,9 @@ func InitConfig(r io.Reader) (upspin.Config, error) {
 		vals[cache] = local.LocalName(cfg, "cacheserver")
 	case "n", "no":
 		vals[cache] = ""
+	default:
+		log.Info.Printf("config: bad cache value %s, only y[es] or n[o] allowed. Assuming no.", vals[cache])
+		vals[cache] = ""
 	}
 	cfg = SetCacheEndpoint(cfg, parseEndpoint(op, vals, cache, &err))
 
