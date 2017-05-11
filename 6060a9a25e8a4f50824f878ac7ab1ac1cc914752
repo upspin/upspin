@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f4bedf70_3e99f957",
+        "filename": "doc/server_implementers.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-05-11T17:37:08Z",
+      "side": 1,
+      "message": "This is the hardest thing to understand under your interfaces.  Basically, it is hard for a new user to understand what is dialing what by looking at the code given that they have to jump all over the place to see the flow.  For example, the main() in cmd/storeserver does nothing but call serverutil/storeserver.Main().  It in turn calls New() on the particular kind of store server and calls rpc/storeserver.New() passing it that store server instance.  Dials happen when new connections come in on the rpc interface to bind the user to the connection for following calls.\n\nI think a picture is really needed here of an instance with the layers and interfaces between the layers.  If not, people will be wandering around lost.\n\nAt the least some wording of what is Dialing what would be helpful. To a certain extent, the word DIal is misleading since it rarely results in dialing a connection except in the rpc client.",
+      "range": {
+        "startLine": 64,
+        "startChar": 0,
+        "endLine": 64,
+        "endChar": 23
+      },
+      "revId": "6060a9a25e8a4f50824f878ac7ab1ac1cc914752",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
