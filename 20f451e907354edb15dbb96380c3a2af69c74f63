@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "263fc3ef_c4fb1fde",
+        "filename": "config/initconfig.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-05-11T02:08:19Z",
+      "side": 1,
+      "message": "my bad above.  I settled on yes/no.  Fixed above.",
+      "parentUuid": "a502caba_44987011",
+      "revId": "20f451e907354edb15dbb96380c3a2af69c74f63",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "dbd3ae05_abba723d",
         "filename": "rpc/local/local_unix.go",
         "patchSetId": 8
@@ -30,6 +48,24 @@
       "writtenOn": "2017-05-10T00:22:16Z",
       "side": 1,
       "message": "I don\u0027t think that _unix.go is a special suffix in go, like _windows.go is.\n\nI think this file needs a build directive\n\n// +build !windows\n\nand the other file needs\n\n// +build windows",
+      "revId": "20f451e907354edb15dbb96380c3a2af69c74f63",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4e13053e_74bcf16a",
+        "filename": "rpc/local/local_unix.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-05-11T02:08:19Z",
+      "side": 1,
+      "message": "r@ told me it was, I used to have a build.  I\u0027ll go check.",
+      "parentUuid": "dbd3ae05_abba723d",
       "revId": "20f451e907354edb15dbb96380c3a2af69c74f63",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
