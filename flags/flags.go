@@ -91,10 +91,6 @@ var (
 	// server.
 	NetAddr = ""
 
-	// Project ("project") is the project name on GCP; used by servers,
-	// upspin-deploy, and cmd/upspin setupdomain.
-	Project = ""
-
 	// ServerConfig ("serverconfig") specifies configuration options for
 	// servers in "key=value" pairs.
 	ServerConfig []string
@@ -156,7 +152,6 @@ var flags = map[string]*flagVar{
 		},
 		arg: func() string { return strArg("log", Log.String(), defaultLog) },
 	},
-	"project": strVar(&Project, "project", Project, "GCP `project` name"),
 	"serverconfig": &flagVar{
 		set: func() {
 			flag.Var(configFlag{&ServerConfig}, "serverconfig", "comma-separated list of configuration options (key=value) for this server")

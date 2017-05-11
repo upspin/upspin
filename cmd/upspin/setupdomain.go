@@ -17,7 +17,6 @@ import (
 	yaml "gopkg.in/yaml.v2"
 
 	"upspin.io/config"
-	"upspin.io/flags"
 	"upspin.io/subcmd"
 	"upspin.io/upspin"
 )
@@ -48,6 +47,7 @@ If any state exists at the given location (-where) then the command aborts.
 	fs := flag.NewFlagSet("setupdomain", flag.ExitOnError)
 	whereFlag := fs.String("where", filepath.Join(config.Home(), "upspin", "deploy"), "`directory` to store private configuration files")
 	domain := fs.String("domain", "", "domain `name` for this Upspin installation")
+	project := fs.String("project", "", "GCP `project` name")
 	curveName := fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
 	putUsers := fs.Bool("put-users", false, "put server users to the key server")
 	cluster := fs.Bool("cluster", false, "generate keys for upspin-dir@domain and upspin-store@domain (default is upspin@domain only)")
@@ -75,6 +75,10 @@ If any state exists at the given location (-where) then the command aborts.
 		}
 		s.setuphost(where, *domain, *curveName)
 		return
+	}
+	if *project == "" {
+		s.Failf("the -project flag must be provided")
+		fs.Usage()
 	}
 
 	var (
@@ -174,7 +178,7 @@ If any state exists at the given location (-where) then the command aborts.
 		Dir:       baseDir,
 		Where:     where,
 		Domain:    *domain,
-		Project:   flags.Project,
+		Project:   *project,
 		UserName:  s.Config.UserName(),
 		Signature: fmt.Sprintf("%x-%x", sig.R, sig.S),
 
@@ -292,7 +296,6 @@ func (s *State) setuphost(where, domain, curve string) {
 		Dir:       cfgPath,
 		Where:     where,
 		Domain:    domain,
-		Project:   flags.Project,
 		UserName:  s.Config.UserName(),
 		Signature: fmt.Sprintf("%x-%x", sig.R, sig.S),
 
