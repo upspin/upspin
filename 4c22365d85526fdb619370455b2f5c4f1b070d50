@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "68ea6510_e70d004b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-05-12T03:16:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f95270e_cfd29f76",
+      "revId": "4c22365d85526fdb619370455b2f5c4f1b070d50",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3b868713_0aa613b8",
         "filename": "upspin/upspin.go",
         "patchSetId": 3
@@ -30,6 +48,24 @@
       "writtenOn": "2017-05-11T21:07:06Z",
       "side": 1,
       "message": "i know what you mean, but this comment doesn\u0027t say it well. \"apply flags\" sounds more like make them have effect, but this is more of a declaration, right? or is it? i\u0027m not sure without reading the code. since this is an interface specification, it must explain better.",
+      "revId": "4c22365d85526fdb619370455b2f5c4f1b070d50",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "398f5279_52bb2008",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 734,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-05-12T03:16:32Z",
+      "side": 1,
+      "message": "Trying SetFlagValues instead.  Look at the change.",
+      "parentUuid": "3b868713_0aa613b8",
       "revId": "4c22365d85526fdb619370455b2f5c4f1b070d50",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
