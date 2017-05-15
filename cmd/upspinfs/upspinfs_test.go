@@ -4,6 +4,7 @@
 //
 
 // +build !windows
+// +build !openbsd
 
 package main
 

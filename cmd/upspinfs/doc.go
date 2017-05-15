@@ -3,6 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // +build !windows
+// +build !openbsd
 
 /*
 Command upspinfs is a FUSE interface for Upspin. It presents Upspin

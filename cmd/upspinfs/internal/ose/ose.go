@@ -3,6 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // +build !windows
+// +build !openbsd
 
 /*
 Package ose is a version of the file ops from the os package using encrypted files.
