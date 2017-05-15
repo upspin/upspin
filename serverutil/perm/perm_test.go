@@ -68,7 +68,7 @@ func newStubs(t *testing.T) (wait, onUpdate, onRetry func(), ready chan struct{}
 		}
 		n++
 		select {
-		case <-time.After(2 * time.Second):
+		case <-time.After(10 * time.Second):
 			t.Fatalf("timed out waiting for update %d", n)
 		case update <- true:
 			// OK.

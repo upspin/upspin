@@ -13,6 +13,8 @@ import (
 	"time"
 )
 
+const timeout = 10 * time.Second
+
 // TestShutdown launches a child process, sends it SIGTERM, and, by reading its
 // standard output, checks that the process runs the required shutdown
 // functions. It also checks that the process will be forced to exit if a
@@ -77,7 +79,7 @@ func testShutdown(t *testing.T, clean bool) {
 			cmd.Process.Kill()
 			t.Fatal(err)
 		}
-	case <-time.After(2 * time.Second):
+	case <-time.After(timeout):
 		t.Fatal("timed out waiting for child process to say hello")
 	}
 
@@ -121,7 +123,7 @@ func testShutdown(t *testing.T, clean bool) {
 		} else if err == nil && !clean {
 			t.Fatal("child process exited cleanly, want non-zero status")
 		}
-	case <-time.After(2 * time.Second):
+	case <-time.After(timeout):
 		cmd.Process.Kill()
 		t.Fatal("timed out waiting for child process to exit")
 	}
