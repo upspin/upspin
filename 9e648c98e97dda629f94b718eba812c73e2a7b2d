@@ -16,6 +16,24 @@
       "revId": "9e648c98e97dda629f94b718eba812c73e2a7b2d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4493330e_8b4e3ad3",
+        "filename": "config/initconfig.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 567,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-05-15T17:24:18Z",
+      "side": 1,
+      "message": "I had considered that but this really has nothing to do with the flags package, only the go flag package. The flags package is all about common flags and flag sets and this is about all flags including those not defined by flags. While I see the pull, I\u0027m not convinced.",
+      "parentUuid": "f1a32371_9ddb582b",
+      "revId": "9e648c98e97dda629f94b718eba812c73e2a7b2d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
