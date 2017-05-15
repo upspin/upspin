@@ -330,6 +330,6 @@ At a later step, the 'upspin setupserver' command will register your server
 user for you automatically.
 
 After that, the next step is to run 'upspin setupstorage' (to configure a cloud
-storage provider) or 'uppsin setupserver' (if you want to store Upspin data on
+storage provider) or 'upspin setupserver' (if you want to store Upspin data on
 your server's local disk).
 `))

@@ -133,6 +133,12 @@ As a guide, here's what the DNS record looks like in Google Domains:
 Regardless of the registrar you use, it should be clear how to add the TXT
 records.
 
+You can check to see if the TXT record has propagated using `dig`:
+
+```
+dig -t txt +short example.com
+```
+
 Once the TXT record is in place, the key server will permit you to register the
 newly-created users that will identify the servers you will deploy (as well as
 any other users you may choose to give Upspin user names within `example.com`).
@@ -178,7 +184,7 @@ Install the components Upspin needs:
 local$ gcloud components install kubectl beta
 ```
 
-Ensure `gcloud`is authenticated by running
+Ensure `gcloud` is authenticated by running
 
 ```
 local$ gcloud auth login

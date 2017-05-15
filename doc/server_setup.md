@@ -91,22 +91,30 @@ It should produce output like this:
 
 ```
 Domain configuration and keys for the user
-  upspin@example.com
+	upspin@example.com
 were generated and placed under the directory:
-  /home/you/upspin/deploy/example.com
+	/Users/you/upspin/deploy/example.com
 If you lose the keys you can re-create them by running this command
-  $ upspin keygen -where /home/you/upspin/deploy/example.com -secretseed zapal-zuhiv-visop-gagil.dadij-lnjul-takiv-fomin
+	upspin keygen -where /Users/you/upspin/deploy/example.com -secretseed zapal-zuhiv-visop-gagil.dadij-lnjul-takiv-fomin
 Write this command down and store it in a secure, private place.
 Do not share your private key or this command with anyone.
 
-To prove that `you@gmail.com` is the owner of `example.com`,
+To prove that you@gmail.com is the owner of example.com,
 add the following record to example.com's DNS zone:
 
-  NAME  TYPE  TTL DATA
-  @ TXT 15m upspin:a82cb859ca2f40954b4d6-239f281ccb9159
+	NAME	TYPE	TTL	DATA
+	@	TXT	15m	upspin:aff6a1083da7f1cdb182d43aa3
+
+(Note that '@' here means root, not a literal '@' subdomain).
 
 Once the DNS change propagates the key server will use the TXT record to verify
 that you@gmail.com is authorized to register users under example.com.
+At a later step, the 'upspin setupserver' command will register your server
+user for you automatically.
+
+After that, the next step is to run 'upspin setupstorage' (to configure a cloud
+storage provider) or 'upspin setupserver' (if you want to store Upspin data on
+your server's local disk).
 ```
 
 Follow the instructions: place a new TXT field in the `example.com`'s DNS entry
@@ -166,83 +174,10 @@ TODO upspin-setupstorage stuff
 **If you choose to store your Upspin data on the your server's local disk then
 in the event of a disk failure all your Upspin data will be lost.**
 
+### Specific instructions for cloud services
 
-### Google Cloud Storage
-
-#### Build `upspinserver-gcp` and `upspin-setupstorage-gcp`
-
-To use Google Cloud Storage fetch the `gcp.upspin.io` repository and use the
-`upspinserver-gcp` and `upspin-setupstorage-gcp` variants.
-
-Fetch the repository and its dependencies:
-
-```
-local$ go get -d gcp.upspin.io/cmd/...
-```
-
-Install the `upspin-setupstorage-gcp` command:
-
-```
-local$ go install gcp.upspin.io/cmd/upspin-setupstorage-gcp
-```
-
-Build the `upspinserver-gcp` binary:
-
-```
-local$ GOOS=linux GOARCH=amd64 go build gcp.upspin.io/cmd/upspinserver-gcp
-```
-
-#### Create a Google Cloud Project
-
-First create a Google Cloud Project and associated Billing Account by visiting the
-[Cloud Console](https://cloud.google.com/console).
-See the corresponding documentation
-[here](https://support.google.com/cloud/answer/6251787?hl=en) and
-[here](https://support.google.com/cloud/answer/6288653?hl=en)
-for help.
-For the project name, we suggest you use a string similar to your domain.
-(We will use `example-com`.)
-
-Then, install the Google Cloud SDK by following
-[the official instructions](https://cloud.google.com/sdk/downloads).
-
-Finally, use the `gcloud` tool to enable the required APIs:
-
-```
-local$ gcloud components install beta
-local$ gcloud config set project example-com
-local$ gcloud auth login
-local$ gcloud beta service-management enable iam.googleapis.com
-local$ gcloud beta service-management enable storage_api
-```
-
-#### Create a Google Cloud Storage bucket
-
-Use the `gcloud` tool to obtain "application default credentials" so that the
-`upspin setupstorage-gcp` command can make changes to your Google Cloud Project:
-
-```
-local$ gcloud auth application-default login
-```
-
-Now use `upspin setupstorage-gcp` to create a storage bucket and an associated
-service account for accessing the bucket.
-Note that the bucket name must be globally unique among all Google Cloud
-Storage users, so it is prudent to include your domain name in the bucket name.
-(We will use `example-com-upspin`.)
-
-```
-local$ upspin setupstorage-gcp -domain=example.com -project=<project> example-com-upspin
-```
-
-It should produce output like this:
-
-```
-Service account "upspinstorage@example-com.iam.gserviceaccount.com" created.
-Bucket "example-com-upspin" created.
-You should now deploy the upspinserver binary and run 'upspin setupserver'.
-```
-
++ [Google Cloud Services](/doc/server_setup_gcp.md)
++ [Amazon Web Services](/doc/server_setup_aws.md)
 
 ## Set up a server and deploy the `upspinserver` binary
 
@@ -289,7 +224,6 @@ guides:
 
 - [Running `upspinserver` on Ubuntu 16.04](/doc/server_setup_ubuntu.md)
 - (More coming soon...)
-
 
 ## Test connectivity
 
