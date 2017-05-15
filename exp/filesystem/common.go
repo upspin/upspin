@@ -2,58 +2,80 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// This file is identical to upspin.io/dir/filesystem/common.go
-// Please keep them in sync.
-
-package filesystem // import "upspin.io/exp/store/filesystem"
+// Package filesystem provides a DirServer and StoreServer that serve
+// files from a local file system.
+package filesystem // import "upspin.io/exp/filesystem"
 
 import (
 	"io/ioutil"
 	"os"
 	gPath "path"
 	"path/filepath"
-	"strings"
 
 	"upspin.io/access"
+	"upspin.io/cache"
 	"upspin.io/errors"
 	"upspin.io/path"
 	"upspin.io/upspin"
 )
 
-// newRoot parses the given options for the file system "root"
-// and sets up a default access file.
-// It is used by server constructors.
-func newRoot(cfg upspin.Config, opts []string) (root string, defaultAccess *access.Access, err error) {
-	for _, o := range opts {
-		switch {
-		case strings.HasPrefix(o, "root="):
-			root = o[len("root="):]
-		default:
-			return "", nil, errors.E(errors.Invalid, errors.Errorf("bad option %q", o))
-		}
-	}
+const (
+	packing         = upspin.EEIntegrityPack
+	maxCacheEntries = 10000
+)
 
-	if root == "" {
-		return "", nil, errors.E(errors.Invalid, errors.Str("root must be set"))
-	}
+// Server provides DirServer and StoreServer implementations
+// that serve files from a local file system.
+type Server struct {
+	// Set by New.
+	server        upspin.Config
+	root          string
+	defaultAccess *access.Access
+	dirEntries    *cache.LRU
+
+	// Set by Dial.
+	user upspin.Config
+}
+
+// New creates a new filesystem Server instance serving the
+// given root with the provided server configuration.
+func New(cfg upspin.Config, root string) (*Server, error) {
+	const op = "exp/filesystem.New"
+
 	root = filepath.Clean(root)
 	if !filepath.IsAbs(root) {
-		return "", nil, errors.E(errors.Invalid, errors.Str("root must be an absolute path"))
+		return nil, errors.E(op, errors.Invalid, errors.Str("root must be an absolute path"))
 	}
 	if fi, err := os.Stat(root); os.IsNotExist(err) {
-		return "", nil, errors.E(errors.NotExist, err)
+		return nil, errors.E(op, errors.NotExist, err)
 	} else if err != nil {
-		return "", nil, errors.E(errors.IO, err)
+		return nil, errors.E(op, errors.IO, err)
 	} else if !fi.IsDir() {
-		return "", nil, errors.Str("root must be a directory")
+		return nil, errors.E(op, errors.Str("root must be a directory"))
 	}
 
-	defaultAccess, err = access.New(upspin.PathName(cfg.UserName()) + "/Access")
+	defaultAccess, err := access.New(upspin.PathName(cfg.UserName()) + "/Access")
 	if err != nil {
-		return "", nil, err
+		return nil, errors.E(op, err)
 	}
 
-	return root, defaultAccess, nil
+	return &Server{
+		server:        cfg,
+		root:          root,
+		defaultAccess: defaultAccess,
+		dirEntries:    cache.NewLRU(maxCacheEntries),
+	}, nil
+}
+
+func (s *Server) Ping() bool {
+	return true
+}
+
+func (s *Server) Close() {
+}
+
+func (s *Server) Endpoint() upspin.Endpoint {
+	return upspin.Endpoint{} // No endpoint.
 }
 
 // can reports whether the user associated with the given config has
