@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f1a32371_9ddb582b",
+        "filename": "config/initconfig.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 567,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-15T01:44:15Z",
+      "side": 1,
+      "message": "Why is this a method on Config?\nCouldn\u0027t it just be a function in package upspin.io/flags?\nI don\u0027t imagine anyone wanting to provide a different implementation of this function.",
+      "revId": "9e648c98e97dda629f94b718eba812c73e2a7b2d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
