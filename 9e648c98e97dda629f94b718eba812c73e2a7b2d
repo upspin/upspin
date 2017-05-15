@@ -34,6 +34,24 @@
       "revId": "9e648c98e97dda629f94b718eba812c73e2a7b2d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2cc5cc2d_e65f72a7",
+        "filename": "config/initconfig.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 567,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-15T21:33:08Z",
+      "side": 1,
+      "message": "Okay, fair enough. But it needn\u0027t be a method on Context. It can be like the other functions in this package that take a Context as an argument.",
+      "parentUuid": "4493330e_8b4e3ad3",
+      "revId": "9e648c98e97dda629f94b718eba812c73e2a7b2d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
