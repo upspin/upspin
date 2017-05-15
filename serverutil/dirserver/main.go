@@ -14,7 +14,6 @@ import (
 	"upspin.io/dir/inprocess"
 	"upspin.io/dir/server"
 	"upspin.io/errors"
-	"upspin.io/exp/dir/filesystem"
 	"upspin.io/flags"
 	"upspin.io/log"
 	"upspin.io/rpc/dirserver"
@@ -49,8 +48,6 @@ func Main() (ready chan<- struct{}) {
 	switch flags.ServerKind {
 	case "inprocess":
 		dir = inprocess.New(cfg)
-	case "filesystem":
-		dir, err = filesystem.New(cfg, flags.ServerConfig...)
 	case "server":
 		dir, err = server.New(cfg, flags.ServerConfig...)
 	default:
