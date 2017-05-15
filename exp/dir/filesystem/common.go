@@ -2,10 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// This file is identical to upspin.io/store/filesystem/common.go
-// Please keep them in sync.
-
-package filesystem // import "upspin.io/exp/dir/filesystem"
+package filesystem
 
 import (
 	"io/ioutil"
@@ -123,7 +120,7 @@ func readFile(root string, name upspin.PathName) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	localName := root + parsed.FilePath()
+	localName := root + "/" + parsed.FilePath()
 	info, err := os.Stat(localName)
 	if err != nil {
 		return nil, err
