@@ -9,6 +9,7 @@
 package filesystem
 
 import (
+	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -16,9 +17,13 @@ import (
 	"upspin.io/access"
 	"upspin.io/errors"
 	"upspin.io/log"
+	"upspin.io/pack"
 	"upspin.io/path"
 	"upspin.io/upspin"
 )
+
+// TODO: use EEIntegrityPack
+const packing = upspin.PlainPack
 
 type server struct {
 	// Set by New.
@@ -81,7 +86,14 @@ func (s *server) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 
 // entry returns the DirEntry for the named local file or directory.
 func (s *server) entry(file string) (*upspin.DirEntry, error) {
-	info, err := os.Stat(file)
+	// TODO: cache DirEntries and expire them based on the file's
+	// modification time.
+	f, err := os.Open(file)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+	info, err := f.Stat()
 	if err != nil {
 		return nil, err
 	}
@@ -93,24 +105,39 @@ func (s *server) entry(file string) (*upspin.DirEntry, error) {
 	if !strings.HasPrefix(file, s.root) {
 		return nil, errors.Str("internal error: not in root")
 	}
+	name := s.upspinPathFromLocal(file)
 	entry := upspin.DirEntry{
-		Name:     s.upspinPathFromLocal(file),
-		Packing:  upspin.PlainPack,
-		Time:     upspin.TimeFromGo(info.ModTime()),
-		Attr:     attr,
-		Sequence: 0,
-		Writer:   s.server.UserName(), // TODO: Is there a better answer?
+		Name:       name,
+		SignedName: name,
+		Packing:    packing,
+		Time:       upspin.TimeFromGo(info.ModTime()),
+		Attr:       attr,
+		Sequence:   0,
+		Writer:     s.server.UserName(), // TODO: Is there a better answer?
 	}
 	if !info.IsDir() {
-		block := upspin.DirBlock{
-			Location: upspin.Location{
-				Endpoint:  s.server.StoreEndpoint(),
-				Reference: upspin.Reference(file[len(s.root):]),
-			},
-			Offset: 0,
-			Size:   info.Size(),
+		p := pack.Lookup(packing)
+		bp, err := p.Pack(s.server, &entry)
+		if err != nil {
+			return nil, err
 		}
-		entry.Blocks = []upspin.DirBlock{block}
+		contents, err := ioutil.ReadAll(f)
+		if err != nil {
+			return nil, err
+		}
+		// Ignore the returned "ciphertext", as using the plain packer
+		// it is equivalent to the cleartext.
+		_, err = bp.Pack(contents)
+		if err != nil {
+			return nil, err
+		}
+		bp.SetLocation(upspin.Location{
+			Endpoint:  s.server.StoreEndpoint(),
+			Reference: upspin.Reference(file[len(s.root):]),
+		})
+		if err := bp.Close(); err != nil {
+			return nil, err
+		}
 	}
 	return &entry, nil
 }
