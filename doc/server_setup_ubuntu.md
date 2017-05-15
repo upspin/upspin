@@ -38,8 +38,16 @@ server# su upspin
 server% cd $HOME
 server% mkdir .ssh
 server% chmod 0700 .ssh
+server% touch .ssh/authorized_keys
+server% chmod 0600 .ssh/authorized_keys
 server% cat > .ssh/authorized_keys
 (Paste your SSH public key here and type Control-D and Enter)
+```
+
+Create the letsencrypt cache directory:
+
+```
+server% mkdir -p upspin/letsencrypt
 ```
 
 ## Copy the `upspinserver` binary to the server
