@@ -15,6 +15,7 @@ import (
 	"strings"
 
 	"upspin.io/access"
+	"upspin.io/cache"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/pack"
@@ -22,14 +23,17 @@ import (
 	"upspin.io/upspin"
 )
 
-// TODO: use EEIntegrityPack
-const packing = upspin.PlainPack
+const (
+	packing         = upspin.EEIntegrityPack
+	maxCacheEntries = 10000
+)
 
 type server struct {
 	// Set by New.
-	root          string
 	server        upspin.Config
+	root          string
 	defaultAccess *access.Access
+	dirEntries    *cache.LRU
 
 	// Set by Dial.
 	user upspin.Config
@@ -42,7 +46,10 @@ type server struct {
 func New(cfg upspin.Config, options ...string) (upspin.DirServer, error) {
 	const op = "dir/filesystem.New"
 
-	s := &server{server: cfg}
+	s := &server{
+		server:     cfg,
+		dirEntries: cache.NewLRU(maxCacheEntries),
+	}
 
 	var err error
 	s.root, s.defaultAccess, err = newRoot(cfg, options)
@@ -86,60 +93,72 @@ func (s *server) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 
 // entry returns the DirEntry for the named local file or directory.
 func (s *server) entry(file string) (*upspin.DirEntry, error) {
-	// TODO: cache DirEntries and expire them based on the file's
-	// modification time.
-	f, err := os.Open(file)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	info, err := f.Stat()
-	if err != nil {
-		return nil, err
-	}
-	attr := upspin.AttrNone
-	if info.IsDir() {
-		attr = upspin.AttrDirectory
-	}
 	// TODO(adg): handle symbolic links
 	if !strings.HasPrefix(file, s.root) {
 		return nil, errors.Str("internal error: not in root")
 	}
+
+	info, err := os.Stat(file)
+	if err != nil {
+		return nil, err
+	}
+	modTime := upspin.TimeFromGo(info.ModTime())
+
+	attr := upspin.AttrNone
+	if info.IsDir() {
+		attr = upspin.AttrDirectory
+	} else {
+		// If this is a file we may have a cached DirEntry for it.
+		v, ok := s.dirEntries.Get(file)
+		if ok {
+			entry := v.(*upspin.DirEntry)
+			if entry.Time == modTime {
+				return entry, nil
+			}
+			s.dirEntries.Remove(file)
+		}
+	}
+
 	name := s.upspinPathFromLocal(file)
-	entry := upspin.DirEntry{
+	entry := &upspin.DirEntry{
 		Name:       name,
 		SignedName: name,
 		Packing:    packing,
-		Time:       upspin.TimeFromGo(info.ModTime()),
+		Time:       modTime,
 		Attr:       attr,
 		Sequence:   0,
 		Writer:     s.server.UserName(), // TODO: Is there a better answer?
 	}
-	if !info.IsDir() {
-		p := pack.Lookup(packing)
-		bp, err := p.Pack(s.server, &entry)
-		if err != nil {
-			return nil, err
-		}
-		contents, err := ioutil.ReadAll(f)
-		if err != nil {
-			return nil, err
-		}
-		// Ignore the returned "ciphertext", as using the plain packer
-		// it is equivalent to the cleartext.
-		_, err = bp.Pack(contents)
-		if err != nil {
-			return nil, err
-		}
-		bp.SetLocation(upspin.Location{
-			Endpoint:  s.server.StoreEndpoint(),
-			Reference: upspin.Reference(file[len(s.root):]),
-		})
-		if err := bp.Close(); err != nil {
-			return nil, err
-		}
+	if info.IsDir() {
+		// Nothing left to do.
+		return entry, nil
 	}
-	return &entry, nil
+
+	p := pack.Lookup(packing)
+	bp, err := p.Pack(s.server, entry)
+	if err != nil {
+		return nil, err
+	}
+	contents, err := ioutil.ReadFile(file)
+	if err != nil {
+		return nil, err
+	}
+	// Ignore the returned "ciphertext", as using the plain packer
+	// it is equivalent to the cleartext.
+	_, err = bp.Pack(contents)
+	if err != nil {
+		return nil, err
+	}
+	bp.SetLocation(upspin.Location{
+		Endpoint:  s.server.StoreEndpoint(),
+		Reference: upspin.Reference(file[len(s.root):]),
+	})
+	if err := bp.Close(); err != nil {
+		return nil, err
+	}
+
+	s.dirEntries.Add(file, entry)
+	return entry, nil
 }
 
 // upspinPathFromLocal returns the upspin.PathName for
