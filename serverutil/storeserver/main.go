@@ -11,7 +11,6 @@ import (
 
 	"upspin.io/config"
 	"upspin.io/errors"
-	"upspin.io/exp/store/filesystem"
 	"upspin.io/flags"
 	"upspin.io/log"
 	"upspin.io/rpc/storeserver"
@@ -45,8 +44,6 @@ func Main() (ready chan<- struct{}) {
 		store = inprocess.New()
 	case "server":
 		store, err = server.New(flags.ServerConfig...)
-	case "filesystem":
-		store, err = filesystem.New(cfg, flags.ServerConfig...)
 	default:
 		err = errors.Errorf("bad -kind %q", flags.ServerKind)
 	}
