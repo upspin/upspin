@@ -12,14 +12,12 @@ import (
 
 	"upspin.io/cloud/https"
 	"upspin.io/config"
+	"upspin.io/exp/filesystem"
 	"upspin.io/flags"
 	"upspin.io/log"
 	"upspin.io/rpc/dirserver"
 	"upspin.io/rpc/storeserver"
 	"upspin.io/upspin"
-
-	filesystem_dir "upspin.io/exp/dir/filesystem"
-	filesystem_store "upspin.io/exp/store/filesystem"
 
 	_ "upspin.io/key/transports"
 	_ "upspin.io/pack/eeintegrity"
@@ -35,19 +33,14 @@ func main() {
 		log.Fatal(err)
 	}
 
-	opt := "root=" + *root
-	dir, err := filesystem_dir.New(cfg, opt)
-	if err != nil {
-		log.Fatal(err)
-	}
-	store, err := filesystem_store.New(cfg, opt)
+	s, err := filesystem.New(cfg, "root="+*root)
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	addr := upspin.NetAddr(flags.NetAddr)
-	http.Handle("/api/Store/", storeserver.New(cfg, store, addr))
-	http.Handle("/api/Dir/", dirserver.New(cfg, dir, addr))
+	http.Handle("/api/Store/", storeserver.New(cfg, s.StoreServer(), addr))
+	http.Handle("/api/Dir/", dirserver.New(cfg, s.DirServer(), addr))
 
 	https.ListenAndServeFromFlags(nil)
 }

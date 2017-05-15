@@ -2,7 +2,9 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package filesystem
+// Package filesystem provides a DirServer and StoreServer that serve
+// files from a local file system.
+package filesystem // import "upspin.io/exp/filesystem"
 
 import (
 	"io/ioutil"
@@ -12,10 +14,59 @@ import (
 	"strings"
 
 	"upspin.io/access"
+	"upspin.io/cache"
 	"upspin.io/errors"
 	"upspin.io/path"
 	"upspin.io/upspin"
 )
+
+const (
+	packing         = upspin.EEIntegrityPack
+	maxCacheEntries = 10000
+)
+
+type Server struct {
+	// Set by New.
+	server        upspin.Config
+	root          string
+	defaultAccess *access.Access
+	dirEntries    *cache.LRU
+
+	// Set by Dial.
+	user upspin.Config
+}
+
+// New creates a new filesystem Server instance with the
+// provided server configuration and options.
+// The only valid configuration option is "root", which
+// specifies a path to the file system root.
+func New(cfg upspin.Config, options ...string) (*Server, error) {
+	const op = "dir/filesystem.New"
+
+	s := &Server{
+		server:     cfg,
+		dirEntries: cache.NewLRU(maxCacheEntries),
+	}
+
+	var err error
+	s.root, s.defaultAccess, err = newRoot(cfg, options)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+
+	return s, nil
+}
+
+func (s *Server) Ping() bool {
+	return true
+}
+
+func (s *Server) Close() {
+}
+
+func (s *Server) Endpoint() upspin.Endpoint {
+	return upspin.Endpoint{} // No endpoint.
+}
 
 // newRoot parses the given options for the file system "root"
 // and sets up a default access file.
