@@ -123,7 +123,7 @@ func readFile(root string, name upspin.PathName) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	localName := root + parsed.FilePath()
+	localName := filepath.Join(root, parsed.FilePath())
 	info, err := os.Stat(localName)
 	if err != nil {
 		return nil, err

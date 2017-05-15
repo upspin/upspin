@@ -72,7 +72,7 @@ func (s *server) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	} else if !ok {
 		return nil, errors.E(op, access.ErrPermissionDenied)
 	}
-	e, err := s.entry(s.root + parsed.FilePath())
+	e, err := s.entry(filepath.Join(s.root, parsed.FilePath()))
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
