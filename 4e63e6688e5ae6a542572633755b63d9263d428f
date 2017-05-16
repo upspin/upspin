@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "60b52d63_4ffb9f71",
+        "filename": "config/initconfig.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-16T23:11:42Z",
+      "side": 1,
+      "message": "delete",
+      "revId": "4e63e6688e5ae6a542572633755b63d9263d428f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
