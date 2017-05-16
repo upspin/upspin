@@ -12,9 +12,9 @@ import (
 
 	"upspin.io/access"
 	"upspin.io/errors"
-	"upspin.io/log"
 	"upspin.io/pack"
 	"upspin.io/path"
+	"upspin.io/serverutil"
 	"upspin.io/upspin"
 )
 
@@ -45,7 +45,6 @@ func (s *Server) verifyUserRoot(parsed path.Parsed) error {
 
 func (s dirServer) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	const op = "dir/filesystem.Lookup"
-	log.Println(op, pathName)
 
 	parsed, err := path.Parse(pathName)
 	if err != nil {
@@ -54,10 +53,10 @@ func (s dirServer) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	if err := s.verifyUserRoot(parsed); err != nil {
 		return nil, errors.E(op, err)
 	}
-	if ok, err := can(s.root, s.defaultAccess, s.user.UserName(), access.List, parsed); err != nil {
+	if ok, err := s.can(access.List, parsed); err != nil {
 		return nil, errors.E(op, err)
 	} else if !ok {
-		return nil, errors.E(op, access.ErrPermissionDenied)
+		return nil, errors.E(op, errors.Private)
 	}
 	e, err := s.entry(filepath.Join(s.root, parsed.FilePath()))
 	if err != nil {
@@ -139,80 +138,70 @@ func (s dirServer) entry(file string) (*upspin.DirEntry, error) {
 // upspinPathFromLocal returns the upspin.PathName for
 // the given absolute local path name.
 func (s *Server) upspinPathFromLocal(local string) upspin.PathName {
-	return upspin.PathName(s.server.UserName()) + "/" + upspin.PathName(local[len(s.root):])
+	return upspin.PathName(s.server.UserName()) + upspin.PathName(local[len(s.root):])
 }
 
 func (s dirServer) Glob(pattern string) ([]*upspin.DirEntry, error) {
-	const op = "dir/filesystem.Glob"
-	log.Println(op, pattern)
+	const op = "exp/filesystem.Glob"
 
-	parsed, err := path.Parse(upspin.PathName(pattern))
-	if err != nil {
-		return nil, errors.E(op, err)
+	entries, err := serverutil.Glob(pattern, s.Lookup, s.listDir)
+	if err != nil && err != upspin.ErrFollowLink {
+		err = errors.E(op, err)
 	}
-	if err := s.verifyUserRoot(parsed); err != nil {
-		return nil, errors.E(op, err)
-	}
-
-	var (
-		matches []string
-		next    = []string{s.root}
-	)
-	for i := 0; i < parsed.NElem(); i++ {
-		elem := parsed.Elem(i)
-		matches, next = next, matches[:0]
-		for _, match := range matches {
-			if isGlobPattern(elem) || i == parsed.NElem()-1 {
-				parsed, err := path.Parse(s.upspinPathFromLocal(match))
-				if err != nil {
-					return nil, errors.E(op, err)
-				}
-				if ok, err := can(s.root, s.defaultAccess, s.user.UserName(), access.List, parsed); err != nil {
-					return nil, errors.E(op, err)
-				} else if !ok {
-					continue
-				}
-			}
-			names, err := filepath.Glob(filepath.Join(match, elem))
-			// TODO(r): remove this error check
-			if err != nil {
-				return nil, errors.E(op, err)
-			}
-			next = append(next, names...)
-		}
-	}
-	matches = next
-
-	var entries []*upspin.DirEntry
-	for _, match := range matches {
-		e, err := s.entry(match)
-		if err != nil {
-			return nil, errors.E(op, err)
-		}
-		parsed, err := path.Parse(upspin.PathName(s.upspinPathFromLocal(match)))
-		if err != nil {
-			return nil, errors.E(op, err)
-		}
-		if ok, err := can(s.root, s.defaultAccess, s.user.UserName(), access.Read, parsed); err != nil {
-			return nil, errors.E(op, err)
-		} else if !ok {
-			e.Blocks = nil
-			e.Packdata = nil
-		}
-		entries = append(entries, e)
-	}
-	return entries, nil
+	return entries, err
 }
 
-// isGlobPattern replies whether the given path element
-// contains a glob pattern.
-func isGlobPattern(elem string) bool {
-	return strings.ContainsAny(elem, `*?[]`)
+func (s dirServer) listDir(name upspin.PathName) ([]*upspin.DirEntry, error) {
+	parsed, err := path.Parse(name)
+	if err != nil {
+		return nil, err
+	}
+	if ok, err := s.can(access.List, parsed); err != nil {
+		return nil, err
+	} else if !ok {
+		return nil, errors.E(name, errors.Private)
+	}
+	dir := filepath.Join(s.root, parsed.FilePath())
+	var entries []*upspin.DirEntry
+	walk := func(name string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if name == dir {
+			return nil
+		}
+		mode := info.Mode()
+		if !mode.IsDir() && !mode.IsRegular() {
+			return nil
+		}
+		e, err := s.entry(name)
+		if err != nil {
+			return err
+		}
+		parsed, err := path.Parse(s.upspinPathFromLocal(name))
+		if err != nil {
+			return err
+		}
+		if ok, err := s.can(access.Read, parsed); err != nil {
+			return err
+		} else if !ok {
+			e.MarkIncomplete()
+		}
+		entries = append(entries, e)
+
+		if mode.IsDir() {
+			// Don't walk sub-directories.
+			return filepath.SkipDir
+		}
+		return nil
+	}
+	err = filepath.Walk(dir, walk)
+	// TODO(adg): Maybe we should actually be ignoring these errors?
+	return entries, err
 }
 
 func (s dirServer) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	const op = "dir/filesystem.WhichAccess"
-	log.Println(op, pathName)
 
 	parsed, err := path.Parse(pathName)
 	if err != nil {
@@ -222,12 +211,12 @@ func (s dirServer) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, erro
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
-	if ok, err := can(s.root, s.defaultAccess, s.user.UserName(), access.AnyRight, parsed); err != nil {
+	if ok, err := s.can(access.AnyRight, parsed); err != nil {
 		return nil, errors.E(op, err)
 	} else if !ok {
 		return nil, errors.E(op, access.ErrPermissionDenied)
 	}
-	accessPath, err := whichAccess(s.root, parsed)
+	accessPath, err := s.whichAccess(parsed)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
@@ -244,8 +233,6 @@ func (d dirServer) Watch(upspin.PathName, int64, <-chan struct{}) (<-chan upspin
 }
 
 // Methods that are not implemented.
-
-var errReadOnly = errors.Str("read-only name space")
 
 func (s dirServer) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	const op = "dir/filesystem.Delete"
