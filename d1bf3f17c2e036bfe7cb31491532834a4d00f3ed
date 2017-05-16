@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f878d11d_45820f58",
+        "filename": "exp/cmd/fileserver/main.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-05-16T17:19:45Z",
+      "side": 1,
+      "message": "os.Getenv(\"PWD\") is unix- and partly bash-specific. use os.Getwd instead.\n\nbut i think it\u0027s the wrong default anyway. i suggest requiring it to be set explicitly to an absolute path. you don\u0027t want it to be easy to publish something inadvertently. toy though this is, pushing to the network should be done with care.",
+      "revId": "d1bf3f17c2e036bfe7cb31491532834a4d00f3ed",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
