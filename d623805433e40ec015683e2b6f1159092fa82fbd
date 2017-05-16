@@ -19,6 +19,29 @@
     },
     {
       "key": {
+        "uuid": "8f984cb3_1990b7f5",
+        "filename": "grpc/dircacheserver/log.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 5770
+      },
+      "writtenOn": "2017-05-16T04:36:28Z",
+      "side": 1,
+      "message": "This break is inside a switch statement, at the end of the case. It doesn\u0027t do anything in Go. Did you mean to break out of the outer for loop instead? If not, the break statement can be removed without changing behavior.",
+      "range": {
+        "startLine": 318,
+        "startChar": 3,
+        "endLine": 318,
+        "endChar": 8
+      },
+      "revId": "d623805433e40ec015683e2b6f1159092fa82fbd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "da93cbd8_5b7103f7",
         "filename": "grpc/dircacheserver/log.go",
         "patchSetId": 5
