@@ -24,6 +24,8 @@ const (
 	maxCacheEntries = 10000
 )
 
+var errReadOnly = errors.Str("read-only name space")
+
 // Server provides DirServer and StoreServer implementations
 // that serve files from a local file system.
 type Server struct {
@@ -78,16 +80,16 @@ func (s *Server) Endpoint() upspin.Endpoint {
 	return upspin.Endpoint{} // No endpoint.
 }
 
-// can reports whether the user associated with the given config has
+// can reports whether the calling user has
 // the given right to access the given path.
-func can(root string, defaultAccess *access.Access, user upspin.UserName, right access.Right, parsed path.Parsed) (bool, error) {
-	a := defaultAccess
-	afn, err := whichAccess(root, parsed)
+func (s *Server) can(right access.Right, parsed path.Parsed) (bool, error) {
+	a := s.defaultAccess
+	afn, err := s.whichAccess(parsed)
 	if err != nil {
 		return false, err
 	}
 	if afn != "" {
-		data, err := readFile(root, afn)
+		data, err := s.readFile(afn)
 		if err != nil {
 			return false, err
 		}
@@ -96,17 +98,15 @@ func can(root string, defaultAccess *access.Access, user upspin.UserName, right 
 			return false, err
 		}
 	}
-	return a.Can(user, right, parsed.Path(), func(name upspin.PathName) ([]byte, error) {
-		return readFile(root, name)
-	})
+	return a.Can(s.user.UserName(), right, parsed.Path(), s.readFile)
 }
 
 // whichAccess is the core of the WhichAccess method,
 // factored out so it can be called from other locations.
-func whichAccess(root string, parsed path.Parsed) (upspin.PathName, error) {
+func (s *Server) whichAccess(parsed path.Parsed) (upspin.PathName, error) {
 	// Look for Access file starting at end of local path.
 	for i := 0; i <= parsed.NElem(); i++ {
-		dir := filepath.Join(root, filepath.FromSlash(parsed.Drop(i).FilePath()))
+		dir := filepath.Join(s.root, filepath.FromSlash(parsed.Drop(i).FilePath()))
 		if fi, err := os.Stat(dir); err != nil {
 			return "", err
 		} else if !fi.IsDir() {
@@ -140,12 +140,12 @@ func whichAccess(root string, parsed path.Parsed) (upspin.PathName, error) {
 
 // readFile returns the contents of the named file relative to the server root.
 // The file must be world-readable, or readFile returns a permissoin error.
-func readFile(root string, name upspin.PathName) ([]byte, error) {
+func (s *Server) readFile(name upspin.PathName) ([]byte, error) {
 	parsed, err := path.Parse(name)
 	if err != nil {
 		return nil, err
 	}
-	localName := filepath.Join(root, parsed.FilePath())
+	localName := filepath.Join(s.root, parsed.FilePath())
 	info, err := os.Stat(localName)
 	if err != nil {
 		return nil, err

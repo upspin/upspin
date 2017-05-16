@@ -9,7 +9,6 @@ import (
 
 	"upspin.io/access"
 	"upspin.io/errors"
-	"upspin.io/log"
 	"upspin.io/path"
 	"upspin.io/upspin"
 )
@@ -35,7 +34,6 @@ var errNotDialed = errors.E(errors.Internal, errors.Str("must Dial before making
 
 func (s storeServer) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Location, error) {
 	const op = "store/filesystem.Get"
-	log.Debug.Println(op, ref)
 
 	if s.user == nil {
 		return nil, nil, nil, errors.E(op, errNotDialed)
@@ -48,13 +46,13 @@ func (s storeServer) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspi
 	}
 
 	// Verify that the requesting user can access this file.
-	if ok, err := can(s.root, s.defaultAccess, s.user.UserName(), access.Read, parsed); err != nil {
+	if ok, err := s.can(access.Read, parsed); err != nil {
 		return nil, nil, nil, errors.E(op, err)
 	} else if !ok {
 		return nil, nil, nil, errors.E(op, parsed.Path(), access.ErrPermissionDenied)
 	}
 
-	data, err := readFile(s.root, pathName)
+	data, err := s.readFile(pathName)
 	if err != nil {
 		return nil, nil, nil, errors.E(op, err)
 	}
@@ -68,14 +66,12 @@ func (s storeServer) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspi
 
 // Methods that are not implemented.
 
-var errNotImplemented = errors.Str("not implemented")
-
 func (s storeServer) Put(ciphertext []byte) (*upspin.Refdata, error) {
 	const op = "store/filesystem.Put"
-	return nil, errors.E(op, errNotImplemented)
+	return nil, errors.E(op, errReadOnly)
 }
 
 func (s storeServer) Delete(ref upspin.Reference) error {
 	const op = "store/filesystem.Delete"
-	return errors.E(op, errNotImplemented)
+	return errors.E(op, errReadOnly)
 }
