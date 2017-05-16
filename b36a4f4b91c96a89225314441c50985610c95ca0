@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "7371d531_0a21858f",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-05-16T16:49:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2669aa00_b0f7711a",
+      "range": {
+        "startLine": 96,
+        "startChar": 2,
+        "endLine": 96,
+        "endChar": 7
+      },
+      "revId": "b36a4f4b91c96a89225314441c50985610c95ca0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba5ea3c7_9c83461a",
         "filename": "doc/server_setup_aws.md",
         "patchSetId": 2
@@ -45,6 +69,30 @@
       "revId": "b36a4f4b91c96a89225314441c50985610c95ca0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6a829069_c62f2b90",
+        "filename": "doc/server_setup_aws.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-05-16T16:49:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba5ea3c7_9c83461a",
+      "range": {
+        "startLine": 9,
+        "startChar": 7,
+        "endLine": 9,
+        "endChar": 27
+      },
+      "revId": "b36a4f4b91c96a89225314441c50985610c95ca0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "24df4a12_55ae2187",
+        "filename": "doc/server_setup_aws.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-05-16T16:49:13Z",
+      "side": 1,
+      "message": "Yup. The default is `upspinstorage`. Removed.",
+      "parentUuid": "69bdd2b2_ee25eed9",
+      "range": {
+        "startLine": 45,
+        "startChar": 32,
+        "endLine": 45,
+        "endChar": 60
+      },
+      "revId": "b36a4f4b91c96a89225314441c50985610c95ca0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8e6cd69a_f51cad0b",
         "filename": "doc/server_setup_aws.md",
         "patchSetId": 2
@@ -91,6 +163,30 @@
       "revId": "b36a4f4b91c96a89225314441c50985610c95ca0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "48bbe788_922511f3",
+        "filename": "doc/server_setup_aws.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5110
+      },
+      "writtenOn": "2017-05-16T16:49:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8e6cd69a_f51cad0b",
+      "range": {
+        "startLine": 52,
+        "startChar": 49,
+        "endLine": 52,
+        "endChar": 65
+      },
+      "revId": "b36a4f4b91c96a89225314441c50985610c95ca0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
