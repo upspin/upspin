@@ -47,6 +47,7 @@ See the description for rotate for information about updating keys.
 	s.ParseFlags(fs, args, help, "keygen [-curve=256] [-secretseed=seed] [-where=$HOME/.ssh]")
 	if fs.NArg() != 0 {
 		fs.Usage()
+		os.Exit(2)
 	}
 	s.keygenCommand(fs)
 }
@@ -59,6 +60,7 @@ func (s *State) keygenCommand(fs *flag.FlagSet) {
 	default:
 		log.Printf("no such curve %q", curve)
 		fs.Usage()
+		os.Exit(2)
 	}
 
 	secretFlag := subcmd.StringFlag(fs, "secretseed")

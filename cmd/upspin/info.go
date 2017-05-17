@@ -34,6 +34,7 @@ of the link.
 
 	if fs.NArg() == 0 {
 		fs.Usage()
+		os.Exit(2)
 	}
 	for _, name := range fs.Args() {
 		name := s.AtSign(name)

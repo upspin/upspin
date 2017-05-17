@@ -7,6 +7,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"os"
 
 	"upspin.io/errors"
 	"upspin.io/upspin"
@@ -21,6 +22,7 @@ that controls permissions for each of the argument paths.
 	s.ParseFlags(fs, args, help, "whichaccess path...")
 	if fs.NArg() == 0 {
 		fs.Usage()
+		os.Exit(2)
 	}
 	for _, name := range s.GlobAllUpspinPath(fs.Args()) {
 		acc, err := s.whichAccessFollowLinks(name)

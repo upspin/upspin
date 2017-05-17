@@ -6,6 +6,7 @@ package main
 
 import (
 	"flag"
+	"os"
 
 	"upspin.io/errors"
 	"upspin.io/path"
@@ -23,6 +24,7 @@ the directory server for the user's root supports them.
 	s.ParseFlags(fs, args, help, "snapshot")
 	if fs.NArg() > 0 {
 		fs.Usage()
+		os.Exit(2)
 	}
 
 	u, suffix, domain, err := user.Parse(s.Config.UserName())

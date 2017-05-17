@@ -31,7 +31,6 @@ func (s *State) ParseFlags(fs *flag.FlagSet, args []string, help, usage string) 
 		if s.Interactive {
 			panic("exit")
 		}
-		os.Exit(2)
 	}
 	fs.Usage = usageFn
 	err := fs.Parse(args)
@@ -40,6 +39,7 @@ func (s *State) ParseFlags(fs *flag.FlagSet, args []string, help, usage string) 
 	}
 	if *helpFlag {
 		fs.Usage()
+		os.Exit(2)
 	}
 }
 

@@ -6,6 +6,7 @@ package main
 
 import (
 	"flag"
+	"os"
 
 	"upspin.io/path"
 	"upspin.io/subcmd"
@@ -24,6 +25,7 @@ TODO: Delete in favor of cp?
 
 	if fs.NArg() != 1 {
 		fs.Usage()
+		os.Exit(2)
 	}
 
 	data := s.ReadAll(subcmd.Tilde(*inFile))

@@ -93,11 +93,13 @@ file and keys and only send the signup request to the key server.
 	if fs.NArg() != 1 {
 		s.Failf("after flags parsed, expected 1 argument but saw %d", fs.NArg())
 		fs.Usage()
+		os.Exit(2)
 	}
 	if *bothServer != "" {
 		if *dirServer != "" || *storeServer != "" {
 			s.Failf("if -server provided -dir and -store must not be set")
 			fs.Usage()
+			os.Exit(2)
 		}
 		*dirServer = *bothServer
 		*storeServer = *bothServer
@@ -105,6 +107,7 @@ file and keys and only send the signup request to the key server.
 	if *dirServer == "" || *storeServer == "" {
 		s.Failf("-dir and -store must both be provided")
 		fs.Usage()
+		os.Exit(2)
 	}
 
 	// Parse -dir and -store flags as addresses and construct remote endpoints.

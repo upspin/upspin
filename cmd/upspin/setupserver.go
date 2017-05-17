@@ -52,6 +52,7 @@ The calling user must be the same one that ran 'upspin setupdomain'.
 	if *domain == "" || *host == "" {
 		s.Failf("the -domain and -host flags must be provided")
 		fs.Usage()
+		os.Exit(2)
 	}
 
 	cfgPath := filepath.Join(subcmd.Tilde(*where), *domain)

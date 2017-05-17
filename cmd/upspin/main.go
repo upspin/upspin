@@ -144,7 +144,6 @@ func usage() {
 	printCommands()
 	fmt.Fprintf(os.Stderr, "Global flags:\n")
 	flag.PrintDefaults()
-	os.Exit(2)
 }
 
 // printCommands shows the available commands, including those installed

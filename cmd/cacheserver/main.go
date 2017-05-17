@@ -56,5 +56,4 @@ func usage() {
 	fmt.Fprintln(os.Stderr, "\tgo doc upspin.io/cmd/cacheserver")
 	fmt.Fprintln(os.Stderr, "")
 	flag.PrintDefaults()
-	os.Exit(2)
 }

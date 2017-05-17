@@ -6,6 +6,7 @@ package main
 
 import (
 	"flag"
+	"os"
 
 	"upspin.io/bind"
 	"upspin.io/upspin"
@@ -40,9 +41,11 @@ assumed to refer to the store defined in the user's configuration.
 	s.ParseFlags(fs, args, help, "deletestorage [-path path... | -ref reference...]")
 	if fs.NArg() == 0 {
 		fs.Usage()
+		os.Exit(2)
 	}
 	if *byRef == *byPath { // Exactly one must be set.
 		fs.Usage()
+		os.Exit(2)
 	}
 
 	if *byRef {
