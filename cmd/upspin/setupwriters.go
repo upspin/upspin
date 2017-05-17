@@ -37,11 +37,11 @@ the list, so the directory server can use the store for its own data storage.
 
 	if *where == "" {
 		s.Failf("the -where flag must not be empty")
-		fs.Usage()
+		usageAndExit(fs)
 	}
 	if *domain == "" {
 		s.Failf("the -domain must not be empty")
-		fs.Usage()
+		usageAndExit(fs)
 	}
 
 	var users []upspin.UserName

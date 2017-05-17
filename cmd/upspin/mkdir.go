@@ -13,7 +13,7 @@ Mkdir creates Upspin directories.
 	fs := flag.NewFlagSet("mkdir", flag.ExitOnError)
 	s.ParseFlags(fs, args, help, "mkdir directory...")
 	if fs.NArg() == 0 {
-		fs.Usage()
+		usageAndExit(fs)
 	}
 	for _, name := range s.GlobAllUpspinPath(fs.Args()) {
 		_, err := s.Client.MakeDirectory(name)

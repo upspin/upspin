@@ -35,7 +35,7 @@ TODO: Rotate and countersign are terms of art, not clear to users.
 	fs := flag.NewFlagSet("rotate", flag.ExitOnError)
 	s.ParseFlags(fs, args, help, "rotate")
 	if fs.NArg() != 0 {
-		fs.Usage()
+		usageAndExit(fs)
 	}
 
 	f := s.Config.Factotum()

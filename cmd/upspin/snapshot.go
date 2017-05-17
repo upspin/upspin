@@ -22,7 +22,7 @@ the directory server for the user's root supports them.
 	fs := flag.NewFlagSet("snapshot", flag.ExitOnError)
 	s.ParseFlags(fs, args, help, "snapshot")
 	if fs.NArg() > 0 {
-		fs.Usage()
+		usageAndExit(fs)
 	}
 
 	u, suffix, domain, err := user.Parse(s.Config.UserName())
