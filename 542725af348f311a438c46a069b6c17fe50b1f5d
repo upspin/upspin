@@ -97,6 +97,30 @@
     },
     {
       "key": {
+        "uuid": "152a0bfb_4bd6a143",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-05-17T16:54:10Z",
+      "side": 1,
+      "message": "You\u0027re right, wasn\u0027t thinking about snapshots. I was more worried about space constraints in the server since without it you don\u0027t have to keep the whole map in the server till you are done. Not a problem for a short lived solution but unplayable in the long run. As you say, this isn\u0027t the long run.",
+      "parentUuid": "041168f9_69125c17",
+      "range": {
+        "startLine": 211,
+        "startChar": 17,
+        "endLine": 211,
+        "endChar": 28
+      },
+      "revId": "542725af348f311a438c46a069b6c17fe50b1f5d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "686dc2ef_b858a468",
         "filename": "dir/server/server.go",
         "patchSetId": 1
@@ -227,6 +251,30 @@
       "side": 1,
       "message": "Yep.   I was struggling here to use some existing mechanism to send the data back to the client without touching protobuf definitions etc.\n\nI imagine the rewrite will introduce a new call that does this comparison of lists on the server rather than in the client.  But maybe we can learn a few things more easily on the client first.  I haven\u0027t thought much about links, for example.\n\nIf the error string is too big merely by a factor of two or four, set verbose\u003dfalse.    But for now I find I learn more with verbose\u003dtrue.",
       "parentUuid": "5d1ca223_a8e35e35",
+      "range": {
+        "startLine": 232,
+        "startChar": 0,
+        "endLine": 232,
+        "endChar": 38
+      },
+      "revId": "542725af348f311a438c46a069b6c17fe50b1f5d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3dd86317_bc664725",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-05-17T16:54:10Z",
+      "side": 1,
+      "message": "And by doing the Errorf, you are doubling the space yet again.  A lot to be said for just writing it to a file.",
+      "parentUuid": "870e33aa_04d1c33b",
       "range": {
         "startLine": 232,
         "startChar": 0,
