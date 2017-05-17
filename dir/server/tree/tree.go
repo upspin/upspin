@@ -877,3 +877,31 @@ type nodeSlice []*node
 func (p nodeSlice) Len() int           { return len(p) }
 func (p nodeSlice) Less(i, j int) bool { return p[i].entry.SignedName < p[j].entry.SignedName }
 func (p nodeSlice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+
+// RefList returns all backend Storage references for the user tree.
+func (t *Tree) RefList(verbose bool) (string, error) {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	var buf bytes.Buffer
+	refs := make(map[upspin.Reference]bool) // for duplicate elimination
+	t.loadRoot()
+	fn := func(n *node, level int) error {
+		if verbose {
+			fmt.Fprintf(&buf, " %q", n.entry.Name)
+		}
+		bl := n.entry.Blocks
+		for _, b := range bl {
+			ref := b.Location.Reference
+			if refs[ref] || verbose {
+				fmt.Fprintf(&buf, " %s", ref)
+			}
+			refs[ref] = true
+		}
+		return nil
+	}
+	err := t.traverse(t.root, 0, fn)
+	if err != nil {
+		return "", err
+	}
+	return buf.String(), nil
+}

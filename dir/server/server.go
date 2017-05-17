@@ -6,6 +6,8 @@
 package server
 
 import (
+	"bytes"
+	"fmt"
 	"io/ioutil"
 	"strconv"
 	"strings"
@@ -193,7 +195,71 @@ func (s *server) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 	const op = "dir/server.Lookup"
 	o, m := newOptMetric(op)
 	defer m.Done()
-	return s.lookupWithPermissions(op, name, o)
+	serveruser := string(s.serverConfig.UserName())
+	switch string(name) {
+	case serveruser + "/garbageList": // Ugly hack to return tree references via error.
+		return nil, s.garbageList(name, false, o)
+	case serveruser + "/garbageListVerbose":
+		return nil, s.garbageList(name, true, o)
+	default:
+		return s.lookupWithPermissions(op, name, o)
+	}
+}
+
+// garbageList enumerates all backend storage references from this dirserver.
+// This only succeeds for users allowed to read s.userName/ files.
+// TODO(adg,edpin) Please remove when you rewrite garbage collection.
+func (s *server) garbageList(name upspin.PathName, verbose bool, opts ...options) error {
+	const op = "dir/garbageList"
+	p, err := path.Parse(name)
+	if err != nil {
+		return errors.E(op, name, err)
+	}
+	canRead, _, err := s.hasRight(access.Read, p, opts...)
+	if !canRead || err != nil {
+		return errors.E(op, name, errors.Private)
+	}
+	users, err := tree.ListUsers("*@*", s.logDir)
+	if err != nil {
+		return err
+	}
+	var buf bytes.Buffer
+	for _, user := range users {
+		err = s.garbageListUser(&buf, upspin.UserName(user), verbose)
+		if err != nil {
+			return err
+		}
+	}
+	return fmt.Errorf("%s", buf.String())
+}
+
+func (s *server) garbageListUser(buf *bytes.Buffer, user upspin.UserName, verbose bool) error {
+	const op = "dir/garbageListUser"
+	_, err := s.loadTreeFor(user, options{}) // preload the cache
+	if err != nil {
+		return errors.E(op, err)
+	}
+	mu := s.userLock(user)
+	mu.Lock()
+	defer mu.Unlock()
+	val, found := s.userTrees.Get(user)
+	if !found {
+		return errors.E(op, "missing tree for %s", user)
+	}
+	t, ok := val.(*tree.Tree)
+	if !ok {
+		return errors.E(op, "userTrees contained value of unexpected type %T", val)
+	}
+	err = t.Flush()
+	if err != nil {
+		return errors.E(op, err)
+	}
+	refs, err := t.RefList(verbose)
+	if err != nil {
+		return errors.E(op, err)
+	}
+	fmt.Fprintf(buf, "%s", refs)
+	return nil
 }
 
 func (s *server) lookupWithPermissions(op string, name upspin.PathName, opts ...options) (*upspin.DirEntry, error) {
