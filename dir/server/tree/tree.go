@@ -10,6 +10,7 @@ package tree
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"runtime"
 	"sort"
 	"sync"
@@ -877,3 +878,29 @@ type nodeSlice []*node
 func (p nodeSlice) Len() int           { return len(p) }
 func (p nodeSlice) Less(i, j int) bool { return p[i].entry.SignedName < p[j].entry.SignedName }
 func (p nodeSlice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+
+type RefMap map[upspin.Reference]bool
+
+// RefList logs to a local file all backend Storage references for the user tree,
+// and updates a map for comparison with a store object listing.
+func (t *Tree) RefList(g *os.File, refs RefMap) error {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	t.loadRoot()
+	fn := func(n *node, level int) error {
+		fmt.Fprintf(g, "%q", n.entry.Name)
+		bl := n.entry.Blocks
+		for _, b := range bl {
+			ref := b.Location.Reference
+			fmt.Fprintf(g, " %s", ref)
+			refs[ref] = true
+		}
+		fmt.Fprintf(g, "\n")
+		return nil
+	}
+	err := t.traverse(t.root, 0, fn)
+	if err != nil {
+		return err
+	}
+	return nil
+}

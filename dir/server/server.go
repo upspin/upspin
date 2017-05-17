@@ -6,13 +6,18 @@
 package server
 
 import (
+	"bufio"
+	"bytes"
+	"fmt"
 	"io/ioutil"
+	"os"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 
 	"upspin.io/access"
+	"upspin.io/bind"
 	"upspin.io/cache"
 	"upspin.io/dir/server/tree"
 	"upspin.io/errors"
@@ -193,7 +198,109 @@ func (s *server) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 	const op = "dir/server.Lookup"
 	o, m := newOptMetric(op)
 	defer m.Done()
+	if strings.HasPrefix(string(name), string(s.serverConfig.UserName())+"/0000garbageList") {
+		// See upspin.io/exp/cmd/garbage/main.go for caller.
+		// TODO  Remove this (and garbageList, garbageListUser) when GC is rewritten someday.
+		// Possibly remove tree.go RefList then as well.
+		return nil, s.garbageList(name, o)
+	}
 	return s.lookupWithPermissions(op, name, o)
+}
+
+// garbageList enumerates all backend storage references from this dirserver.
+func (s *server) garbageList(name upspin.PathName, opts ...options) error {
+	const op = "dir/garbageList"
+	p, err := path.Parse(name)
+	if err != nil {
+		return errors.E(op, name, err)
+	}
+	canRead, _, err := s.hasRight(access.Read, p, opts...)
+	if !canRead || err != nil {
+		return errors.E(op, name, errors.Private)
+	}
+	garbageStore := upspin.Reference(p.FilePath())
+	users, err := tree.ListUsers("*@*", s.logDir)
+	if err != nil {
+		return errors.E(op, err)
+	}
+	g, err := ioutil.TempFile(s.logDir, "garbageList")
+	if err != nil {
+		return errors.E(op, err)
+	}
+	defer g.Close()
+	refs := make(tree.RefMap)
+
+	// Enumerate refs in all user trees on this dirserver.
+	for _, user := range users {
+		err = s.garbageListUser(g, refs, upspin.UserName(user))
+		if err != nil {
+			return errors.E(op, err)
+		}
+	}
+
+	// Now fetch list from storeserver and compare.
+	userBase, userSuffix, userDomain, err := user.Parse(s.serverConfig.UserName())
+	if err != nil {
+		return errors.E(op, err)
+	}
+	if userBase != "upspin" || userSuffix != "" {
+		return errors.E(op, "expected server running as upspin@...")
+	}
+	endpoint := upspin.Endpoint{
+		Transport: upspin.Remote,
+		NetAddr:   upspin.NetAddr("upspin." + userDomain + ":443"),
+	}
+	store, err := bind.StoreServer(s.serverConfig, endpoint)
+	if err != nil {
+		return errors.E(op, err)
+	}
+	list, _, locs, err := store.Get(garbageStore)
+	if err != nil {
+		return errors.E(op, err)
+	}
+	if len(locs) > 0 {
+		return errors.E(op, "expected empty locs")
+	}
+	scanner := bufio.NewScanner(bytes.NewReader(list))
+	for scanner.Scan() {
+		obj := scanner.Text()
+		if !refs[upspin.Reference(obj)] {
+			fmt.Fprintf(g, "del %s\n", obj)
+			err := store.Delete(upspin.Reference(obj))
+			if err != nil {
+				return errors.E(op, err)
+			}
+		}
+	}
+	return fmt.Errorf("verbose ref list is in %s", g.Name())
+}
+
+func (s *server) garbageListUser(g *os.File, refs tree.RefMap, user upspin.UserName) error {
+	const op = "dir/garbageListUser"
+	_, err := s.loadTreeFor(user, options{}) // preload the cache
+	if err != nil {
+		return errors.E(op, err)
+	}
+	mu := s.userLock(user)
+	mu.Lock()
+	defer mu.Unlock()
+	val, found := s.userTrees.Get(user)
+	if !found {
+		return errors.E(op, "missing tree for %s", user)
+	}
+	t, ok := val.(*tree.Tree)
+	if !ok {
+		return errors.E(op, "userTrees contained value of unexpected type %T", val)
+	}
+	err = t.Flush()
+	if err != nil {
+		return errors.E(op, err)
+	}
+	err = t.RefList(g, refs)
+	if err != nil {
+		return errors.E(op, err)
+	}
+	return nil
 }
 
 func (s *server) lookupWithPermissions(op string, name upspin.PathName, opts ...options) (*upspin.DirEntry, error) {
