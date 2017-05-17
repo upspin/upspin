@@ -23,7 +23,7 @@ When running the shell, the leading "upspin" is assumed on each command.
 	verbose := fs.Bool("v", false, "verbose; print to stderr each command before execution")
 	s.ParseFlags(fs, args, help, "shell [-v] [-prompt=<prompt_string>]")
 	if fs.NArg() != 0 {
-		fs.Usage()
+		usageAndExit(fs)
 	}
 	prompt := func() {
 		if len(*promptFlag) > 0 {

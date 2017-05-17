@@ -50,7 +50,7 @@ See the description for rotate for information about updating keys.
 	fs.Bool("q", false, "suppress output. Default is to show state for every file")
 	s.ParseFlags(fs, args, help, "share path...")
 	if fs.NArg() == 0 {
-		fs.Usage()
+		usageAndExit(fs)
 	}
 
 	if *recur {

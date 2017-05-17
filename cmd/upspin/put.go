@@ -23,7 +23,7 @@ TODO: Delete in favor of cp?
 	s.ParseFlags(fs, args, help, "put [-in=inputfile] path")
 
 	if fs.NArg() != 1 {
-		fs.Usage()
+		usageAndExit(fs)
 	}
 
 	data := s.ReadAll(subcmd.Tilde(*inFile))

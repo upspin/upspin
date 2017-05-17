@@ -33,7 +33,7 @@ of the link.
 	s.ParseFlags(fs, args, help, "info path...")
 
 	if fs.NArg() == 0 {
-		fs.Usage()
+		usageAndExit(fs)
 	}
 	for _, name := range fs.Args() {
 		name := s.AtSign(name)

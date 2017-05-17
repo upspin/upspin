@@ -22,7 +22,7 @@ the current state of the tree rooted at the given path.
 
 	names := s.GlobAllUpspinPath(fs.Args())
 	if len(names) != 1 {
-		fs.Usage()
+		usageAndExit(fs)
 	}
 	name := names[0]
 

@@ -144,6 +144,12 @@ func usage() {
 	printCommands()
 	fmt.Fprintf(os.Stderr, "Global flags:\n")
 	flag.PrintDefaults()
+}
+
+// usageAndExit prints usage message from provided FlagSet,
+// and exits the program with status code 2.
+func usageAndExit(fs *flag.FlagSet) {
+	fs.Usage()
 	os.Exit(2)
 }
 

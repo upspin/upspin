@@ -45,7 +45,7 @@ always be in Upspin.
 	s.ParseFlags(fs, args, help, "tar [-extract [-match prefix -replace substitution] ] upspin_directory local_file")
 	if !*extract {
 		if *match != "" || *replace != "" {
-			fs.Usage()
+			usageAndExit(fs)
 		}
 		s.tarCommand(fs)
 		return
@@ -70,7 +70,7 @@ type archiver struct {
 
 func (s *State) tarCommand(fs *flag.FlagSet) {
 	if fs.NArg() != 2 {
-		fs.Usage()
+		usageAndExit(fs)
 	}
 	a, err := s.newArchiver(subcmd.BoolFlag(fs, "v"))
 	if err != nil {
@@ -86,7 +86,7 @@ func (s *State) tarCommand(fs *flag.FlagSet) {
 
 func (s *State) untarCommand(fs *flag.FlagSet) {
 	if fs.NArg() != 1 {
-		fs.Usage()
+		usageAndExit(fs)
 	}
 	a, err := s.newArchiver(subcmd.BoolFlag(fs, "v"))
 	if err != nil {

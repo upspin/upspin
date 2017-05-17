@@ -39,10 +39,10 @@ assumed to refer to the store defined in the user's configuration.
 	byRef := fs.Bool("ref", false, "delete individual blocks with the specified references")
 	s.ParseFlags(fs, args, help, "deletestorage [-path path... | -ref reference...]")
 	if fs.NArg() == 0 {
-		fs.Usage()
+		usageAndExit(fs)
 	}
 	if *byRef == *byPath { // Exactly one must be set.
-		fs.Usage()
+		usageAndExit(fs)
 	}
 
 	if *byRef {

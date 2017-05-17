@@ -34,7 +34,7 @@ for more information.
 	fs.Bool("v", false, "verbose: log progress")
 	s.ParseFlags(fs, args, help, "repack [-pack ee] [flags] path...")
 	if fs.NArg() == 0 {
-		fs.Usage()
+		usageAndExit(fs)
 	}
 
 	s.repackCommand(fs)

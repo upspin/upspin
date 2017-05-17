@@ -24,7 +24,7 @@ See the description for rotate for information about updating keys.
 	fs := flag.NewFlagSet("countersign", flag.ExitOnError)
 	s.ParseFlags(fs, args, help, "countersign")
 	if fs.NArg() != 0 {
-		fs.Usage()
+		usageAndExit(fs)
 	}
 	s.countersignCommand(fs)
 }
