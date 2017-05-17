@@ -96,6 +96,30 @@
     },
     {
       "key": {
+        "uuid": "1650f399_3ef4e60c",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-05-17T14:53:31Z",
+      "side": 1,
+      "message": "Done.\n\nBut since I misunderstood this there is probably more that I did not yet grok.  Feel free to continue review, or not, while I study the code further.",
+      "parentUuid": "57c2ae95_7e3f9dc3",
+      "range": {
+        "startLine": 221,
+        "startChar": 0,
+        "endLine": 221,
+        "endChar": 46
+      },
+      "revId": "542725af348f311a438c46a069b6c17fe50b1f5d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "5d1ca223_a8e35e35",
         "filename": "dir/server/server.go",
         "patchSetId": 1
