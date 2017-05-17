@@ -49,6 +49,30 @@
     },
     {
       "key": {
+        "uuid": "ef51890f_675d9caa",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-05-17T16:10:59Z",
+      "side": 1,
+      "message": "My guess is more like a few months.\n\nSaving in s.logDir would be better.  If you are going to allow this only by the server user, then we\u0027ll be running it on the dirserver machine anyways.  It makes your command look less ugliferous vis a vis the error handling and you can write it out as you go.  No reason to do duplicate suppression in the dirserver.",
+      "parentUuid": "452e2341_ad3ebdbc",
+      "range": {
+        "startLine": 211,
+        "startChar": 17,
+        "endLine": 211,
+        "endChar": 28
+      },
+      "revId": "542725af348f311a438c46a069b6c17fe50b1f5d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "686dc2ef_b858a468",
         "filename": "dir/server/server.go",
         "patchSetId": 1
