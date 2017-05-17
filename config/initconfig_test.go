@@ -129,6 +129,7 @@ func TestSetFlagValues(t *testing.T) {
 	expectedWT := true
 
 	configuration := `
+secrets: ` + secretsDir + `
 cmdflags:
  cacheserver:
   cachesize: ` + fmt.Sprintf("%d", expectedSize) + `
@@ -150,6 +151,7 @@ cmdflags:
 
 	// Add an undefined flag and expect an error from the apply.
 	configuration = `
+secrets: ` + secretsDir + `
 cmdflags:
  cacheserver:
   cachesize: ` + fmt.Sprintf("%d", expectedSize) + `
