@@ -73,6 +73,30 @@
     },
     {
       "key": {
+        "uuid": "041168f9_69125c17",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-05-17T16:25:26Z",
+      "side": 1,
+      "message": "I run command \"garbage\" on my client machine to save going to the browser-ssh window.  I have to keep the deploy config and credentials around on my client anyway, since I don\u0027t trust that the VM files won\u0027t get wiped out.\n\nBut I agree that doing it all server-side is more efficient in network resources and involves less fighting with the upspin protocol design, at the cost of less convenient iteration of the garbage collection rules.   Are you reasonably happy with the GC itself as expressed here?\n\nI had forgotten how much duplication there is in snapshots until I looked.  Even server-side, I imagine it is worth doing the duplicate suppression.",
+      "parentUuid": "ef51890f_675d9caa",
+      "range": {
+        "startLine": 211,
+        "startChar": 17,
+        "endLine": 211,
+        "endChar": 28
+      },
+      "revId": "542725af348f311a438c46a069b6c17fe50b1f5d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "686dc2ef_b858a468",
         "filename": "dir/server/server.go",
         "patchSetId": 1
