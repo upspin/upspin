@@ -21,6 +21,8 @@ Configuration files must be in YAML format, of this general form:
 	  user: joe
 	- name: myserver
 	  importpath: github.com/user/myserver
+	  flags:
+	    debug: cockroach
 	keyserver: key.uspin.io
 	domain: exmaple.com
 
@@ -233,6 +235,9 @@ func (cfg *Config) Run() error {
 				"-test_user="+s.User,
 				"-test_secrets="+userDir(s.User),
 			)
+		}
+		for k, v := range s.Flags {
+			args = append(args, fmt.Sprintf("-%s=%v", k, v))
 		}
 		cmd := exec.Command(s.Name, args...)
 		cmd.Stdout = prefix(s.Name+":\t", os.Stdout)

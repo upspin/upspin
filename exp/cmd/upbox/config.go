@@ -59,6 +59,9 @@ type Server struct {
 	// "upspin.io/cmd/".
 	ImportPath string
 
+	// Flags specifies command-line flags to supply to this server.
+	Flags map[string]string
+
 	addr string // the host:port of this server; set by readConfig
 }
 
