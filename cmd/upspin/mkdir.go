@@ -4,7 +4,10 @@
 
 package main
 
-import "flag"
+import (
+	"flag"
+	"os"
+)
 
 func (s *State) mkdir(args ...string) {
 	const help = `
@@ -14,6 +17,7 @@ Mkdir creates Upspin directories.
 	s.ParseFlags(fs, args, help, "mkdir directory...")
 	if fs.NArg() == 0 {
 		fs.Usage()
+		os.Exit(2)
 	}
 	for _, name := range s.GlobAllUpspinPath(fs.Args()) {
 		_, err := s.Client.MakeDirectory(name)

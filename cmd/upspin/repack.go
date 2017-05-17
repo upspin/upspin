@@ -8,6 +8,7 @@ import (
 	"flag"
 	"io"
 	"log"
+	"os"
 
 	"upspin.io/client"
 	"upspin.io/config"
@@ -35,6 +36,7 @@ for more information.
 	s.ParseFlags(fs, args, help, "repack [-pack ee] [flags] path...")
 	if fs.NArg() == 0 {
 		fs.Usage()
+		os.Exit(2)
 	}
 
 	s.repackCommand(fs)

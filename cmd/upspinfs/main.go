@@ -31,7 +31,6 @@ import (
 func usage() {
 	fmt.Fprintf(os.Stderr, "Usage: %s <mountpoint>\n", os.Args[0])
 	flag.PrintDefaults()
-	os.Exit(2)
 }
 
 func main() {
@@ -40,6 +39,7 @@ func main() {
 
 	if flag.NArg() != 1 {
 		usage()
+		os.Exit(2)
 	}
 
 	// Normal setup, get configuration from file and push user cache onto config.

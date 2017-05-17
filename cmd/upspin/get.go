@@ -22,6 +22,7 @@ Get writes to standard output the contents identified by the Upspin path.
 	names := s.GlobAllUpspinPath(fs.Args())
 	if len(names) != 1 {
 		fs.Usage()
+		os.Exit(2)
 	}
 
 	data, err := s.Client.Get(names[0])

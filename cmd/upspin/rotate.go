@@ -6,6 +6,7 @@ package main
 
 import (
 	"flag"
+	"os"
 
 	"upspin.io/config"
 )
@@ -36,6 +37,7 @@ TODO: Rotate and countersign are terms of art, not clear to users.
 	s.ParseFlags(fs, args, help, "rotate")
 	if fs.NArg() != 0 {
 		fs.Usage()
+		os.Exit(2)
 	}
 
 	f := s.Config.Factotum()

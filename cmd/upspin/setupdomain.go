@@ -55,10 +55,12 @@ If any state exists at the given location (-where) then the command aborts.
 	if *whereFlag == "" {
 		s.Failf("the -where flag must not be empty")
 		fs.Usage()
+		os.Exit(2)
 	}
 	if *domain == "" {
 		s.Failf("the -domain flag must be provided")
 		fs.Usage()
+		os.Exit(2)
 	}
 	switch *curveName {
 	case "p256", "p384", "p521":
@@ -79,6 +81,7 @@ If any state exists at the given location (-where) then the command aborts.
 	if *project == "" {
 		s.Failf("the -project flag must be provided")
 		fs.Usage()
+		os.Exit(2)
 	}
 
 	var (

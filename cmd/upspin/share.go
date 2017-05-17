@@ -51,6 +51,7 @@ See the description for rotate for information about updating keys.
 	s.ParseFlags(fs, args, help, "share path...")
 	if fs.NArg() == 0 {
 		fs.Usage()
+		os.Exit(2)
 	}
 
 	if *recur {

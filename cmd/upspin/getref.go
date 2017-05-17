@@ -25,6 +25,7 @@ the user's default store server. It does not resolve redirections.
 
 	if fs.NArg() != 1 {
 		fs.Usage()
+		os.Exit(2)
 	}
 	ref := fs.Arg(0)
 
