@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "32c84a4c_cd516341",
+        "filename": "exp/cmd/garbage/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-05-17T16:22:48Z",
+      "side": 1,
+      "message": "Don\u0027t we want to get the list of extant blocks first?  If we get them second, there can have been file creations twixt the dir lookup and the store get.",
+      "range": {
+        "startLine": 72,
+        "startChar": 1,
+        "endLine": 87,
+        "endChar": 82
+      },
+      "revId": "18d7a7658a92cf572500a94703c9aab1a38ae1d5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
