@@ -79,3 +79,8 @@ func (cfg *simpleConfig) CacheEndpoint() upspin.Endpoint {
 func (cfg *simpleConfig) CertPool() *x509.CertPool {
 	return x509.NewCertPool()
 }
+
+// Flags implements upspin.Config.
+func (cfg *simpleConfig) Flags(string) map[string]string {
+	return nil
+}
