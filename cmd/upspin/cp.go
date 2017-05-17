@@ -67,7 +67,7 @@ the data itself.
 	}
 
 	if len(files) < 2 {
-		fs.Usage()
+		usageAndExit(fs)
 	}
 
 	nSrc := len(files) - 1
@@ -109,11 +109,11 @@ func (s *State) copyCommand(cs *copyState, srcFiles []cpFile, dstFile cpFile) {
 	}
 	if len(srcFiles) != 1 {
 		s.Failf("copying multiple files but %s is not a directory", dstFile.path)
-		cs.flagSet.Usage()
+		usageAndExit(cs.flagSet)
 	}
 	if cs.recur {
 		s.Failf("recursive copy requires that final argument (%s) be an existing directory", dstFile.path)
-		cs.flagSet.Usage()
+		usageAndExit(cs.flagSet)
 	}
 	reader, err := s.open(srcFiles[0])
 	if err != nil {

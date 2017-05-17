@@ -28,7 +28,7 @@ storage.
 	continueOnError := fs.Bool("f", false, "continue if errors occur")
 	s.ParseFlags(fs, args, help, "rm path...")
 	if fs.NArg() == 0 {
-		fs.Usage()
+		usageAndExit(fs)
 	}
 	exit := s.Exit
 	if *continueOnError {

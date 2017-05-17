@@ -54,11 +54,11 @@ If any state exists at the given location (-where) then the command aborts.
 	s.ParseFlags(fs, args, help, "setupdomain [-where=$HOME/upspin/deploy] [-cluster] -domain=<name>")
 	if *whereFlag == "" {
 		s.Failf("the -where flag must not be empty")
-		fs.Usage()
+		usageAndExit(fs)
 	}
 	if *domain == "" {
 		s.Failf("the -domain flag must be provided")
-		fs.Usage()
+		usageAndExit(fs)
 	}
 	switch *curveName {
 	case "p256", "p384", "p521":
@@ -78,7 +78,7 @@ If any state exists at the given location (-where) then the command aborts.
 	}
 	if *project == "" {
 		s.Failf("the -project flag must be provided")
-		fs.Usage()
+		usageAndExit(fs)
 	}
 
 	var (

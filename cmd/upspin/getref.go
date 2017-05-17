@@ -24,7 +24,7 @@ the user's default store server. It does not resolve redirections.
 	s.ParseFlags(fs, args, help, "getref [-out=outputfile] ref")
 
 	if fs.NArg() != 1 {
-		fs.Usage()
+		usageAndExit(fs)
 	}
 	ref := fs.Arg(0)
 

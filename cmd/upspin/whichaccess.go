@@ -20,7 +20,7 @@ that controls permissions for each of the argument paths.
 	fs := flag.NewFlagSet("whichaccess", flag.ExitOnError)
 	s.ParseFlags(fs, args, help, "whichaccess path...")
 	if fs.NArg() == 0 {
-		fs.Usage()
+		usageAndExit(fs)
 	}
 	for _, name := range s.GlobAllUpspinPath(fs.Args()) {
 		acc, err := s.whichAccessFollowLinks(name)
