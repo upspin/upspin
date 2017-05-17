@@ -24,6 +24,7 @@ When running the shell, the leading "upspin" is assumed on each command.
 	s.ParseFlags(fs, args, help, "shell [-v] [-prompt=<prompt_string>]")
 	if fs.NArg() != 0 {
 		fs.Usage()
+		os.Exit(2)
 	}
 	prompt := func() {
 		if len(*promptFlag) > 0 {

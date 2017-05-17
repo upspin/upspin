@@ -6,6 +6,7 @@ package main
 
 import (
 	"flag"
+	"os"
 
 	"upspin.io/upspin"
 )
@@ -29,6 +30,7 @@ storage.
 	s.ParseFlags(fs, args, help, "rm path...")
 	if fs.NArg() == 0 {
 		fs.Usage()
+		os.Exit(2)
 	}
 	exit := s.Exit
 	if *continueOnError {

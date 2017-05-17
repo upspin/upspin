@@ -8,6 +8,7 @@ package main // import "upspin.io/cmd/upspin"
 
 import (
 	"flag"
+	"os"
 
 	"upspin.io/config"
 	"upspin.io/upspin"
@@ -25,6 +26,7 @@ See the description for rotate for information about updating keys.
 	s.ParseFlags(fs, args, help, "countersign")
 	if fs.NArg() != 0 {
 		fs.Usage()
+		os.Exit(2)
 	}
 	s.countersignCommand(fs)
 }

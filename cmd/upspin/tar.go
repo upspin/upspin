@@ -46,6 +46,7 @@ always be in Upspin.
 	if !*extract {
 		if *match != "" || *replace != "" {
 			fs.Usage()
+			os.Exit(2)
 		}
 		s.tarCommand(fs)
 		return
@@ -71,6 +72,7 @@ type archiver struct {
 func (s *State) tarCommand(fs *flag.FlagSet) {
 	if fs.NArg() != 2 {
 		fs.Usage()
+		os.Exit(2)
 	}
 	a, err := s.newArchiver(subcmd.BoolFlag(fs, "v"))
 	if err != nil {
@@ -87,6 +89,7 @@ func (s *State) tarCommand(fs *flag.FlagSet) {
 func (s *State) untarCommand(fs *flag.FlagSet) {
 	if fs.NArg() != 1 {
 		fs.Usage()
+		os.Exit(2)
 	}
 	a, err := s.newArchiver(subcmd.BoolFlag(fs, "v"))
 	if err != nil {

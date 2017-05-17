@@ -6,6 +6,7 @@ package main
 
 import (
 	"flag"
+	"os"
 
 	"upspin.io/upspin"
 )
@@ -23,6 +24,7 @@ argument and points to the first path argument.
 	s.ParseFlags(fs, args, help, "link [-f] original_path link_path")
 	if fs.NArg() != 2 {
 		fs.Usage()
+		os.Exit(2)
 	}
 
 	originalPath := upspin.PathName(s.AtSign(fs.Arg(0)))
