@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "cadc644b_f174ba02",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-05-17T07:06:25Z",
+      "side": 1,
+      "message": "No, the canRead of upspin@example.com/garbageList on line 217 is intended to be true only for the upspinserver user, not ordinary users.\nThe glob on line 221 is just to get a full list of all the users with roots in this dirserver.",
+      "parentUuid": "686dc2ef_b858a468",
+      "range": {
+        "startLine": 221,
+        "startChar": 0,
+        "endLine": 221,
+        "endChar": 46
+      },
+      "revId": "542725af348f311a438c46a069b6c17fe50b1f5d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "5d1ca223_a8e35e35",
         "filename": "dir/server/server.go",
         "patchSetId": 1
@@ -36,6 +60,30 @@
       "writtenOn": "2017-05-17T06:54:32Z",
       "side": 1,
       "message": "That\u0027s one hell of a long error string. Granted this is a temporary hack but there should be a way to enable/disable it since this could eat all of memory.",
+      "range": {
+        "startLine": 232,
+        "startChar": 0,
+        "endLine": 232,
+        "endChar": 38
+      },
+      "revId": "542725af348f311a438c46a069b6c17fe50b1f5d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "870e33aa_04d1c33b",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-05-17T07:06:25Z",
+      "side": 1,
+      "message": "Yep.   I was struggling here to use some existing mechanism to send the data back to the client without touching protobuf definitions etc.\n\nI imagine the rewrite will introduce a new call that does this comparison of lists on the server rather than in the client.  But maybe we can learn a few things more easily on the client first.  I haven\u0027t thought much about links, for example.\n\nIf the error string is too big merely by a factor of two or four, set verbose\u003dfalse.    But for now I find I learn more with verbose\u003dtrue.",
+      "parentUuid": "5d1ca223_a8e35e35",
       "range": {
         "startLine": 232,
         "startChar": 0,
