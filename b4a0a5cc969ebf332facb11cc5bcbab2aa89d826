@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6afd1b43_8eb9cfe7",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 323,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-18T22:45:01Z",
+      "side": 1,
+      "message": "Special order values for Watch.",
+      "revId": "b4a0a5cc969ebf332facb11cc5bcbab2aa89d826",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3d6b7b43_dd800f72",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-18T22:45:01Z",
+      "side": 1,
+      "message": "If you make this -iota then you don\u0027t need the subsequent one",
+      "revId": "b4a0a5cc969ebf332facb11cc5bcbab2aa89d826",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a3c21dba_f79dfc4c",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-18T22:45:01Z",
+      "side": 1,
+      "message": "This list should probably also include WatchStart, which is 0",
+      "revId": "b4a0a5cc969ebf332facb11cc5bcbab2aa89d826",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "814d2222_b9bbad01",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 333,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-18T22:45:01Z",
+      "side": 1,
+      "message": "should this be WatchNew ?",
+      "revId": "b4a0a5cc969ebf332facb11cc5bcbab2aa89d826",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
