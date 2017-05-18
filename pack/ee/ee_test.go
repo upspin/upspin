@@ -364,7 +364,7 @@ func TestCountersign(t *testing.T) {
 	// Emulate Joe executing "upspin keygen -rotate".
 	f2, err := factotum.NewFromDir(testutil.Repo("key", "testdata", "joe2"))
 	if err != nil {
-		t.Fatal("cannot create second (key-rotated) factotum for joe: %v", err)
+		t.Fatalf("cannot create second (key-rotated) factotum for joe: %v", err)
 	}
 	joeConfig = config.SetFactotum(joeConfig, f2)
 
