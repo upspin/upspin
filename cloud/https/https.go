@@ -69,6 +69,14 @@ func (opt *Options) applyDefaults() {
 // OptionsFromFlags returns Options derived from the command-line flags present
 // in the upspin.io/flags package.
 func OptionsFromFlags() *Options {
+	var hosts []string
+	if host := string(flags.NetAddr); host != "" {
+		// Make an effort to trim the :port suffix.
+		if h, _, err := net.SplitHostPort(host); err == nil {
+			host = h
+		}
+		hosts = []string{host}
+	}
 	addr := flags.HTTPSAddr
 	if flags.InsecureHTTP {
 		addr = flags.HTTPAddr
@@ -76,6 +84,7 @@ func OptionsFromFlags() *Options {
 	return &Options{
 		Addr:             addr,
 		LetsEncryptCache: flags.LetsEncryptCache,
+		LetsEncryptHosts: hosts,
 		CertFile:         flags.TLSCertFile,
 		KeyFile:          flags.TLSKeyFile,
 		InsecureHTTP:     flags.InsecureHTTP,

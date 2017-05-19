@@ -62,8 +62,6 @@ func Main() (ready chan struct{}) {
 		http.Handle("/", newWeb(cfg, perm))
 	}
 
-	// TODO(adg): plumb through ServerConfig.Addr to https.Options.LetsEncryptHosts.
-
 	return readyCh
 }
 
@@ -139,6 +137,9 @@ func initServer(mode initMode) (*subcmd.ServerConfig, upspin.Config, *perm.Perm,
 	httpDir := dirserver.New(dirCfg, dir, serverConfig.Addr)
 	http.Handle("/api/Store/", httpStore)
 	http.Handle("/api/Dir/", httpDir)
+
+	// Set public-facing network address (used by Let's Encrypt).
+	flags.NetAddr = string(serverConfig.Addr)
 
 	log.Println("Store and Directory servers initialized.")
 	log.Printf("Store server configuration: %s", fmtStoreConfig(storeServerConfig))
