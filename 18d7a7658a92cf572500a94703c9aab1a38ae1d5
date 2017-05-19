@@ -2,6 +2,108 @@
   "comments": [
     {
       "key": {
+        "uuid": "b8474c04_54bc6d21",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-19T06:41:18Z",
+      "side": 1,
+      "message": "rather than this incredibly gross error return, I suggest adding a method GarbageList to *server\nThen in serverutil/upspinserver you can expose a hook that calls this method.\nIt can find the method using a type assertion to an interface that contains that method, something like this: https://github.com/upspin/upspin/blob/master/serverutil/keyserver/main.go#L63",
+      "revId": "18d7a7658a92cf572500a94703c9aab1a38ae1d5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1c81f960_f1ea74e2",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 882,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-19T06:41:18Z",
+      "side": 1,
+      "message": "Should this be a method on Tree? Probably",
+      "revId": "18d7a7658a92cf572500a94703c9aab1a38ae1d5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "841c8306_42aa9cdb",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 893,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-19T06:41:18Z",
+      "side": 1,
+      "message": "you should probably be checking that the Location.Endpoint is this server\u0027s endpoint\nyou might need to pass that in as an argument to this function, as i don\u0027t think the Tree knows its own Endpoint",
+      "revId": "18d7a7658a92cf572500a94703c9aab1a38ae1d5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3f71c767_25ebaa2c",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 894,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-19T06:41:18Z",
+      "side": 1,
+      "message": "if you make the map\n\nmap[upspin.Reference]bool\n\nthen you don\u0027t need the conversion here",
+      "revId": "18d7a7658a92cf572500a94703c9aab1a38ae1d5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3c8bedd1_912c84ff",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 895,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-19T06:41:18Z",
+      "side": 1,
+      "message": "delete",
+      "revId": "18d7a7658a92cf572500a94703c9aab1a38ae1d5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2d387b7c_dfe6cc44",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 896,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-19T06:41:18Z",
+      "side": 1,
+      "message": "if refs[ref] || verbose {",
+      "revId": "18d7a7658a92cf572500a94703c9aab1a38ae1d5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "32c84a4c_cd516341",
         "filename": "exp/cmd/garbage/main.go",
         "patchSetId": 2
