@@ -28,6 +28,8 @@ import (
 	"upspin.io/transports"
 )
 
+const cmdName = "upspinfs"
+
 func usage() {
 	fmt.Fprintf(os.Stderr, "Usage: %s <mountpoint>\n", os.Args[0])
 	flag.PrintDefaults()
@@ -47,6 +49,12 @@ func main() {
 	if err != nil {
 		log.Debug.Fatal(err)
 	}
+
+	// Set any flags contained in the config.
+	if err := config.SetFlagValues(cfg, cmdName); err != nil {
+		log.Fatalf("%s: %s", cmdName, err)
+	}
+
 	transports.Init(cfg)
 
 	// Start the cache if needed.
@@ -60,7 +68,7 @@ func main() {
 	done := do(cfg, mountpoint, flags.CacheDir)
 
 	// Serve expvar data.
-	ln, err := local.Listen("tcp", local.LocalName(cfg, "upspinfs"))
+	ln, err := local.Listen("tcp", local.LocalName(cfg, cmdName))
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -235,9 +235,9 @@ func InitConfig(r io.Reader) (upspin.Config, error) {
 	// A shorthand for the default local address.
 	// TODO(p): phase out the ability to specify an address, yes or no should suffice.
 	switch vals[cache] {
-	case "y", "yes":
+	case "y", "yes", "true":
 		vals[cache] = local.LocalName(cfg, "cacheserver")
-	case "n", "no":
+	case "n", "no", "false":
 		vals[cache] = ""
 	}
 	cfg = SetCacheEndpoint(cfg, parseEndpoint(op, vals, cache, &err))
