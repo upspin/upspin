@@ -16,6 +16,8 @@ import (
 )
 
 func main() {
-	ready := upspinserver.Main()
-	https.ListenAndServeFromFlags(ready)
+	server, ready := upspinserver.Main()
+	opt := https.OptionsFromFlags()
+	opt.LetsEncryptHosts = []string{string(server.Addr)}
+	https.ListenAndServe(ready, opt)
 }

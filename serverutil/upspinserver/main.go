@@ -49,10 +49,10 @@ var (
 	readyCh   = make(chan struct{})
 )
 
-func Main() (ready chan struct{}) {
+func Main() (server *subcmd.ServerConfig, ready chan struct{}) {
 	flags.Parse(flags.Server)
 
-	_, cfg, perm, err := initServer(startup)
+	server, cfg, perm, err := initServer(startup)
 	if err == noConfig {
 		log.Print("Configuration file not found. Running in setup mode.")
 		http.Handle("/", &setupHandler{})
@@ -62,9 +62,7 @@ func Main() (ready chan struct{}) {
 		http.Handle("/", newWeb(cfg, perm))
 	}
 
-	// TODO(adg): plumb through ServerConfig.Addr to https.Options.LetsEncryptHosts.
-
-	return readyCh
+	return server, readyCh
 }
 
 var noConfig = errors.Str("no configuration")
