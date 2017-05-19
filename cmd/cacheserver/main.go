@@ -16,7 +16,7 @@ import (
 	"upspin.io/upspin"
 )
 
-const serverName = "cacheserver"
+const cmdName = "cacheserver"
 
 func main() {
 	flag.Usage = usage
@@ -26,6 +26,11 @@ func main() {
 	cfg, err := config.FromFile(flags.Config)
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	// Set any flags contained in the config.
+	if err := config.SetFlagValues(cfg, cmdName); err != nil {
+		log.Fatalf("%s: %s", cmdName, err)
 	}
 
 	// Serving address comes from config with flag overriding.
