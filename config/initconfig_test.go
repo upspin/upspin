@@ -16,6 +16,7 @@ import (
 	"testing"
 
 	"upspin.io/pack"
+	"upspin.io/rpc/local"
 	"upspin.io/upspin"
 
 	_ "upspin.io/pack/ee"
@@ -165,6 +166,68 @@ cmdflags:
 	if err := SetFlagValues(config, "cacheserver"); err == nil {
 		t.Fatalf("SetFlagValues should have failed %v", configuration)
 	}
+
+}
+
+func TestCacheValues(t *testing.T) {
+	// Test values for cache:.
+	base := "secrets: " + secretsDir + "\n"
+	baseConfig, err := InitConfig(strings.NewReader(base))
+	if err != nil {
+		t.Fatalf("could not parse config %v: %v", base, err)
+	}
+	localAddr := local.LocalName(baseConfig, "cacheserver")
+	tests := []struct {
+		val    string
+		expect string
+	}{
+		{"y", localAddr},
+		{"yes", localAddr},
+		{"true", localAddr},
+		{"n", ""},
+		{"no", ""},
+		{"false", ""},
+		{"remote,server.example.com", "remote,server.example.com"},
+	}
+	for _, test := range tests {
+		configuration := base + "cache: " + test.val + "\n"
+		config, err := InitConfig(strings.NewReader(configuration))
+		if err != nil {
+			t.Fatalf("could not parse config %v: %v", configuration, err)
+		}
+		ep, err := parseTestEndpoint(test.expect)
+		if err != nil {
+			t.Fatalf("bad test: %v: %s", test, err)
+		}
+		if ep.String() != config.CacheEndpoint().String() {
+			t.Fatalf("expect %s got %s", ep, config.CacheEndpoint())
+		}
+	}
+}
+
+func parseTestEndpoint(text string) (upspin.Endpoint, error) {
+	if text == "" {
+		return upspin.Endpoint{}, nil
+	}
+
+	ep, err := upspin.ParseEndpoint(text)
+	// If no transport is provided, assume remote transport.
+	if err != nil && !strings.Contains(text, ",") {
+		var err2 error
+		if ep, err2 = upspin.ParseEndpoint("remote," + text); err2 == nil {
+			err = nil
+		}
+	}
+	if err != nil {
+		return upspin.Endpoint{}, err
+	}
+
+	// If it's a remote and the provided address does not include a port,
+	// assume port 443.
+	if ep.Transport == upspin.Remote && !strings.Contains(string(ep.NetAddr), ":") {
+		ep.NetAddr += ":443"
+	}
+	return *ep, nil
 }
 
 func TestEnv(t *testing.T) {
