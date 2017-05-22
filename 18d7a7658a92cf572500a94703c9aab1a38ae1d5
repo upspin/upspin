@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "3ed2ba09_ccf22f5a",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-05-22T23:13:40Z",
+      "side": 1,
+      "message": "Perhaps I misunderstand the suggestion, but since I wanted to avoid any change in the wire protocol, it seems inherently messy to get the data from dirserver to client.\n\nWe\u0027re agreed that instead of implementing policy (i.e. doing the diff) client-side, I\u0027ll try doing it in dirserver.   Or possibly I\u0027ll write a separate standalone program that runs on the server instance.",
+      "parentUuid": "b8474c04_54bc6d21",
+      "revId": "18d7a7658a92cf572500a94703c9aab1a38ae1d5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "1c81f960_f1ea74e2",
         "filename": "dir/server/tree/tree.go",
         "patchSetId": 2
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "860ddc8b_a42951e4",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 882,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-05-22T23:13:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1c81f960_f1ea74e2",
+      "revId": "18d7a7658a92cf572500a94703c9aab1a38ae1d5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "841c8306_42aa9cdb",
         "filename": "dir/server/tree/tree.go",
         "patchSetId": 2
@@ -47,6 +83,24 @@
       "writtenOn": "2017-05-19T06:41:18Z",
       "side": 1,
       "message": "you should probably be checking that the Location.Endpoint is this server\u0027s endpoint\nyou might need to pass that in as an argument to this function, as i don\u0027t think the Tree knows its own Endpoint",
+      "revId": "18d7a7658a92cf572500a94703c9aab1a38ae1d5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "82ad2d88_cc7f2614",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 893,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-05-22T23:13:40Z",
+      "side": 1,
+      "message": "My reasoning was that if we see a sha256 sum in the dirserver, let\u0027s leave that on the storeserver whether or not that storeserver is the official Endpoint.  It may be part of some coming replicated service.",
+      "parentUuid": "841c8306_42aa9cdb",
       "revId": "18d7a7658a92cf572500a94703c9aab1a38ae1d5",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "4581c278_9335f381",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 894,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-05-22T23:13:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f71c767_25ebaa2c",
+      "revId": "18d7a7658a92cf572500a94703c9aab1a38ae1d5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3c8bedd1_912c84ff",
         "filename": "dir/server/tree/tree.go",
         "patchSetId": 2
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "68be5bd2_62c96a6f",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 895,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-05-22T23:13:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3c8bedd1_912c84ff",
+      "revId": "18d7a7658a92cf572500a94703c9aab1a38ae1d5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2d387b7c_dfe6cc44",
         "filename": "dir/server/tree/tree.go",
         "patchSetId": 2
@@ -101,6 +191,24 @@
       "revId": "18d7a7658a92cf572500a94703c9aab1a38ae1d5",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4863dd4a_d0bfffd7",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 896,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-05-22T23:13:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2d387b7c_dfe6cc44",
+      "revId": "18d7a7658a92cf572500a94703c9aab1a38ae1d5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
