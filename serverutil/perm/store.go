@@ -63,7 +63,7 @@ func (s *storeWrapper) Put(data []byte) (*upspin.Refdata, error) {
 func (s *storeWrapper) Delete(ref upspin.Reference) error {
 	const op = "store/perm.Delete"
 
-	if !s.perm.IsWriter(s.user) {
+	if s.perm.targetUser != s.user {
 		return errors.E(op, s.user, errors.Permission, errors.Errorf("user not authorized"))
 	}
 	return s.StoreServer.Delete(ref)

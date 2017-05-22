@@ -249,11 +249,7 @@ func TestStoreIntegration(t *testing.T) {
 		ownerStore,
 		writerStore,
 	} {
-		ref, err := store.Put([]byte("data"))
-		if err != nil {
-			t.Fatal(err)
-		}
-		err = store.Delete(ref.Reference)
+		_, err := store.Put([]byte("data"))
 		if err != nil {
 			t.Fatal(err)
 		}
