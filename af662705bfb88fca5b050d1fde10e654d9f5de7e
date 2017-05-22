@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5eaa3da9_8d4474df",
+        "filename": "doc/config.md",
+        "patchSetId": 7
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-05-22T18:51:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8d4c41b6_16b3cd22",
+      "revId": "af662705bfb88fca5b050d1fde10e654d9f5de7e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "563a13d2_8ee55f6f",
         "filename": "doc/config.md",
         "patchSetId": 7
@@ -33,6 +51,24 @@
       "revId": "af662705bfb88fca5b050d1fde10e654d9f5de7e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4553e3f2_c4b38c3f",
+        "filename": "doc/config.md",
+        "patchSetId": 7
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-05-22T18:51:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "563a13d2_8ee55f6f",
+      "revId": "af662705bfb88fca5b050d1fde10e654d9f5de7e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
