@@ -244,19 +244,22 @@ func TestStoreIntegration(t *testing.T) {
 	}
 	writerStore := srv.(upspin.StoreServer)
 
-	// Everyone is allowed at first.
-	for _, store := range []upspin.StoreServer{
-		ownerStore,
-		writerStore,
-	} {
-		ref, err := store.Put([]byte("data"))
-		if err != nil {
-			t.Fatal(err)
-		}
-		err = store.Delete(ref.Reference)
-		if err != nil {
-			t.Fatal(err)
-		}
+	// Check writing and deleting when there are several writers.
+	ref, err := ownerStore.Put([]byte("data"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = ownerStore.Delete(ref.Reference)
+	if err != nil {
+		t.Fatal(err)
+	}
+	ref, err = writerStore.Put([]byte("data"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = writerStore.Delete(ref.Reference)
+	if err == nil {
+		t.Fatal("non-owner writer should not be able to delete")
 	}
 
 	// Allow only owner.
