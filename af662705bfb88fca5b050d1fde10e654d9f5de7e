@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8d4c41b6_16b3cd22",
+        "filename": "doc/config.md",
+        "patchSetId": 7
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-05-22T02:59:16Z",
+      "side": 1,
+      "message": "new sentence on new line please.",
+      "revId": "af662705bfb88fca5b050d1fde10e654d9f5de7e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "563a13d2_8ee55f6f",
+        "filename": "doc/config.md",
+        "patchSetId": 7
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-05-22T02:59:16Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "af662705bfb88fca5b050d1fde10e654d9f5de7e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
