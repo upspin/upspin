@@ -296,6 +296,16 @@ func (cfg *Config) Run() error {
 		}
 	}
 
+	// Wait for the other services to start.
+	for _, s := range cfg.Servers {
+		if s.addr == cfg.KeyServer {
+			continue
+		}
+		if err := waitReady(s.addr); err != nil {
+			return err
+		}
+	}
+
 	// Start a shell as the first user.
 	configFile, err = writeConfig("shell", cfg.Users[0].Name)
 	if err != nil {
