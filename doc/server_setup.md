@@ -347,7 +347,7 @@ You can do this anywhere you have authenticated as the account used
 to set up your Google Cloud instance.
 
 ```
-local$ gsutil -m rm gs://example-com-upspin/`**`
+local$ gsutil -m rm 'gs://example-com-upspin/**'
 ```
 
 The `-m` speeds things up by working in parallel.
