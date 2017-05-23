@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7d842594_0ebdee8e",
+        "filename": "exp/cmd/camserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-05-23T05:46:59Z",
+      "side": 1,
+      "message": "copyright notice",
+      "revId": "0f5f4078c04c934759415bd22810dc41a7a473a3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3311bcb0_6027a546",
+        "filename": "exp/cmd/camserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-05-23T05:46:59Z",
+      "side": 1,
+      "message": "doc comments\nalso explain the design and what it does.",
+      "revId": "0f5f4078c04c934759415bd22810dc41a7a473a3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "141d80b3_2e294972",
+        "filename": "exp/cmd/camserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-05-23T05:46:59Z",
+      "side": 1,
+      "message": "pack it as a single block",
+      "revId": "0f5f4078c04c934759415bd22810dc41a7a473a3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9a17dc87_4fc26a9f",
+        "filename": "exp/cmd/camserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-05-23T05:46:59Z",
+      "side": 1,
+      "message": "frame.jpg?",
+      "revId": "0f5f4078c04c934759415bd22810dc41a7a473a3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cfc46b95_05c808db",
+        "filename": "exp/cmd/camserver/noimpl.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-05-23T05:46:59Z",
+      "side": 1,
+      "message": "copyright notice",
+      "revId": "0f5f4078c04c934759415bd22810dc41a7a473a3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b3450b60_20ddea60",
+        "filename": "exp/cmd/camserver/noimpl.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-05-23T05:46:59Z",
+      "side": 1,
+      "message": "comment",
+      "revId": "0f5f4078c04c934759415bd22810dc41a7a473a3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ccd28f87_ecaa6605",
+        "filename": "exp/cmd/camserver/test.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-05-23T05:46:59Z",
+      "side": 1,
+      "message": "trailing space",
+      "revId": "0f5f4078c04c934759415bd22810dc41a7a473a3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
