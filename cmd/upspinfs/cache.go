@@ -23,6 +23,7 @@ import (
 	os "upspin.io/cmd/upspinfs/internal/ose"
 	"upspin.io/errors"
 	"upspin.io/pack"
+	"upspin.io/path"
 	"upspin.io/upspin"
 )
 
@@ -341,6 +342,18 @@ func (cf *cachedFile) writeback(h *handle) error {
 			break
 		}
 		if tries > 5 || !strings.Contains(err.Error(), "unreachable") {
+			if isXattrFile(n.uname) {
+				// A hack so every server doesn't have to handle
+				// xattr files. We pretend the Put worked and
+				// increase the ref count for the cached version
+				// so that the xattr at least lasts as long as
+				// upspinfs stays up. Not perfect but keeps
+				// MacOS finder happy.
+				// TODO(p): this might be improved by constraining
+				// to fewer error types.
+				cf.file.Pin()
+				break
+			}
 			return errors.E(op, err)
 		}
 		time.Sleep(100 * time.Millisecond)
@@ -373,4 +386,15 @@ func (c *cache) putRedirect(n *node, target upspin.PathName) error {
 		return errors.E(op, err)
 	}
 	return nil
+}
+
+// isXattrFile returns true if the path corresponds to an Xattr file.
+func isXattrFile(pathName upspin.PathName) bool {
+	p, err := path.Parse(pathName)
+	if err != nil {
+		return false
+	}
+	// Base file name must start with "._".
+	n := p.NElem()
+	return n >= 1 && strings.HasPrefix(p.Elem(n-1), "._")
 }

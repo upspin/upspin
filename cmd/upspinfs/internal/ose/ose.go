@@ -158,6 +158,13 @@ func (file *File) Close() error {
 	return file.f.Close()
 }
 
+// Pin increases the reference count so the file will not be removed.
+func (file *File) Pin() {
+	state.Lock()
+	file.refs++
+	state.Unlock()
+}
+
 // Stat returns the status of a file.
 func (file *File) Stat() (os.FileInfo, error) {
 	return file.f.Stat()
