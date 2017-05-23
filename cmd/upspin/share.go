@@ -82,7 +82,7 @@ type Sharer struct {
 	accessFiles map[upspin.PathName]*access.Access
 
 	// users caches per-directory user lists computed from Access files.
-	users map[upspin.PathName][]upspin.UserName
+	users map[upspin.PathName]userList
 
 	// userKeys holds the keys we've looked up for each user.
 	userKeys map[upspin.UserName]upspin.PublicKey
@@ -95,7 +95,7 @@ func newSharer(s *State) *Sharer {
 	return &Sharer{
 		state:       s,
 		accessFiles: make(map[upspin.PathName]*access.Access),
-		users:       make(map[upspin.PathName][]upspin.UserName),
+		users:       make(map[upspin.PathName]userList),
 		userKeys:    make(map[upspin.UserName]upspin.PublicKey),
 		userByHash:  make(map[[sha256.Size]byte]upspin.UserName),
 	}
@@ -132,14 +132,14 @@ func (s *State) shareCommand(fs *flag.FlagSet) {
 	if !s.sharer.quiet {
 		uNames := make(map[string][]string)
 		for _, u := range s.sharer.users {
-			uNames[userListToString(u)] = nil
+			uNames[u.String()] = nil
 		}
 		// Now group the files that match each user list.
 		for _, entry := range entries {
 			if entry.IsDir() {
 				continue
 			}
-			users := userListToString(s.sharer.users[path.DropPath(entry.Name, 1)])
+			users := s.sharer.users[path.DropPath(entry.Name, 1)].String()
 			uNames[users] = append(uNames[users], string(entry.Name))
 		}
 		fmt.Println("Read permissions defined by Access files:")
@@ -185,15 +185,15 @@ func (s *State) shareCommand(fs *flag.FlagSet) {
 				}
 			}
 		}
-		userList := userListToString(users)
-		if userList != keyUsers || self {
+		userNameList := users.String()
+		if userNameList != keyUsers || self {
 			if !s.sharer.quiet || !s.sharer.fix {
 				if !printedDiscrepancyHeader {
 					fmt.Fprintln(os.Stderr, "\nDiscrepancies between users in Access files and users in wrapped keys:")
 					printedDiscrepancyHeader = true
 				}
 				fmt.Fprintf(os.Stderr, "\n%s:\n", entry.Name)
-				fmt.Fprintf(os.Stderr, "\tAccess: %s\n", userList)
+				fmt.Fprintf(os.Stderr, "\tAccess: %s\n", users)
 				fmt.Fprintf(os.Stderr, "\tKeys:   %s\n", keyUsers)
 			}
 			entriesToFix = append(entriesToFix, entry)
@@ -216,13 +216,13 @@ func (s *State) shareCommand(fs *flag.FlagSet) {
 // access file, and the the pretty-printed string of user names recovered from
 // looking at the list of hashed keys in the packdata.
 // It also returns a boolean reporting whether key rewrapping is needed for self.
-func (s *Sharer) readers(entry *upspin.DirEntry) ([]upspin.UserName, string, bool, error) {
+func (s *Sharer) readers(entry *upspin.DirEntry) (userList, string, bool, error) {
 	self := false
 	if entry.IsDir() {
 		// Directories don't have readers.
 		return nil, "", self, nil
 	}
-	users := s.users[path.DropPath(entry.Name, 1)]
+	users := userList(s.users[path.DropPath(entry.Name, 1)])
 	for _, user := range users {
 		s.lookupKey(user)
 	}
@@ -237,7 +237,7 @@ func (s *Sharer) readers(entry *upspin.DirEntry) ([]upspin.UserName, string, boo
 	if err != nil {
 		return nil, "", self, err
 	}
-	var keyUsers string
+	var keyUsers userList
 	unknownUser := false
 	for _, hash := range hashes {
 		var thisUser upspin.UserName
@@ -283,20 +283,9 @@ func (s *Sharer) readers(entry *upspin.DirEntry) ([]upspin.UserName, string, boo
 			fmt.Fprintf(os.Stderr, "%q: unrecognized packing %s", entry.Name, packer)
 			continue
 		}
-		if keyUsers != "" {
-			keyUsers += " "
-		}
-		keyUsers += string(thisUser)
+		keyUsers = append(keyUsers, thisUser)
 	}
-	return users, keyUsers, self, nil
-}
-
-func userListToString(userList []upspin.UserName) string {
-	if userList == nil {
-		return "<nil>"
-	}
-	userString := fmt.Sprint(userList)
-	return userString[1 : len(userString)-1]
+	return users, keyUsers.String(), self, nil
 }
 
 // allEntries expands the arguments to find all the DirEntries identifying items to examine.
@@ -398,15 +387,15 @@ func (s *Sharer) addAccess(entry *upspin.DirEntry) {
 }
 
 // usersWithReadAccess returns the list of user names granted access by this access file.
-func (s *State) usersWithAccess(client upspin.Client, a *access.Access, right access.Right) []upspin.UserName {
+func (s *State) usersWithAccess(client upspin.Client, a *access.Access, right access.Right) userList {
 	if a == nil {
 		return nil
 	}
-	userList, err := a.Users(right, client.Get)
+	users, err := a.Users(right, client.Get)
 	if err != nil {
 		s.Exitf("getting user list: %s", err)
 	}
-	return userList
+	return userList(users)
 }
 
 // readOrExit returns the contents of the file. It exits if the file cannot be read.
@@ -433,7 +422,7 @@ func read(c upspin.Client, file upspin.PathName) ([]byte, error) {
 }
 
 // fixShare updates the packdata of the named file to contain wrapped keys for all the users.
-func (s *Sharer) fixShare(name upspin.PathName, users []upspin.UserName) {
+func (s *Sharer) fixShare(name upspin.PathName, users userList) {
 	directory := s.state.DirServer(name)
 	entry, err := directory.Lookup(name) // Guaranteed to have no links.
 	if err != nil {
@@ -550,4 +539,22 @@ func (s *Sharer) lookupKey(user upspin.UserName) upspin.PublicKey {
 
 func isWildcardUser(user upspin.UserName) bool {
 	return strings.HasPrefix(string(user), "*@")
+}
+
+// userList stores a list of users, and its string representation
+// presents them in sorted order for easy comparison.
+type userList []upspin.UserName
+
+func (u userList) Len() int           { return len(u) }
+func (u userList) Less(i, j int) bool { return u[i] < u[j] }
+func (u userList) Swap(i, j int)      { u[i], u[j] = u[j], u[i] }
+
+// String returns a canonically formatted, sorted list of the users.
+func (u userList) String() string {
+	if u == nil {
+		return "<nil>"
+	}
+	sort.Sort(u)
+	userString := fmt.Sprint([]upspin.UserName(u))
+	return userString[1 : len(userString)-1]
 }
