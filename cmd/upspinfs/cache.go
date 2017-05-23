@@ -390,10 +390,11 @@ func (c *cache) putRedirect(n *node, target upspin.PathName) error {
 
 // isXattrFile returns true if the path corresponds to an Xattr file.
 func isXattrFile(pathName upspin.PathName) bool {
-	parsed, err := path.Parse(pathName)
+	p, err := path.Parse(pathName)
 	if err != nil {
 		return false
 	}
 	// Base file name must start with "._".
-	return parsed.NElem() >= 1 && strings.HasPrefix(parsed.Elem(parsed.NElem()-1), "._")
+	n := p.NElem()
+	return n >= 1 && strings.HasPrefix(p.Elem(n-1), "._")
 }
