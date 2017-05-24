@@ -14,6 +14,18 @@ files.
 Note that your chosen username will become a matter of public record in our
 [key server log](https://key.upspin.io/log).
 
+Some technical details, included for completeness:
+Any valid email address is likely fine but since it will become as a user name
+within Upspin, the system applies some constraints that could
+invalidate some (very unusual) addresses.
+Also, within Upspin user names are case-sensitive,
+although in some email services the names are case-insensitive.
+The full story is a bit technical and irrelevant for most users, but
+if you are interested please see the description
+[here](https://godoc.org/upspin.io/user#Parse).
+
+To reiterate, any valid email address is almost certainly a valid Upspin user name.
+
 Next you need to decide whether you are going to deploy your own Upspin
 directory and store servers, or use those maintained by someone else.
 
