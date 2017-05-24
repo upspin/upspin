@@ -35,7 +35,7 @@ import (
 // - final token at least two characters
 // - whole name < 254 characters
 // - characters are case insensitive
-// - final period is OK.
+// - final period is OK, but we remove it.
 //
 // We ignore the rules of punycode, which is defined in https://tools.ietf.org/html/rfc3490 .
 //
@@ -73,6 +73,10 @@ func Parse(userName upspin.UserName) (user, suffix, domain string, err error) {
 	user, domain = name[:at], name[at+1:]
 	if user == "" {
 		return errUserName(userName, "missing user name")
+	}
+	// Final period in domain is legal but is dropped.
+	if strings.HasSuffix(domain, ".") {
+		domain = domain[:len(domain)-1]
 	}
 	if domain == "" {
 		return errUserName(userName, "missing domain name")

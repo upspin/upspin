@@ -32,6 +32,7 @@ func TestParse(t *testing.T) {
 	)
 	var tests = []cases{
 		{upspin.UserName("me@here.com"), "me", S, "here.com", ""},
+		{upspin.UserName("me@here.com."), "me", S, "here.com", ""},
 		{upspin.UserName("me+you@here.com"), "me+you", "you", "here.com", ""},
 		{upspin.UserName("me@HERE.com"), "me", S, "here.com", ""}, // Lower-case the domain.
 		{upspin.UserName("me.and.my.shadow@here.com"), "me.and.my.shadow", S, "here.com", ""},
@@ -49,8 +50,7 @@ func TestParse(t *testing.T) {
 		{upspin.UserName("a@b.co"), "a", S, "b.co", ""},
 		{upspin.UserName("a@b.c"), U, S, D, "invalid domain name"},
 		{upspin.UserName("me@here/.com"), U, S, D, "bad symbol in domain name"},
-		{upspin.UserName("me@here.com."), U, S, D, "invalid domain name"}, // We disallow the trailing dot.
-		{upspin.UserName("me@here.com.."), U, S, D, "invalid domain name"},
+		{upspin.UserName("me@here.com.."), U, S, D, "invalid domain name"}, // Two trailing dots.
 		{upspin.UserName("me+@here.com"), U, S, D, "empty +suffix in user name"},
 		{upspin.UserName("me+a+b@here.com"), U, S, D, "multiple +suffixes in user name"},
 		{upspin.UserName("me+/x@here.com"), U, S, D, "bad symbol in +suffix"},
