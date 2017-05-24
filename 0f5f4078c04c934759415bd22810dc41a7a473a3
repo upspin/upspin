@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "e873119c_715bfde8",
+        "filename": "exp/cmd/camserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-24T01:02:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7d842594_0ebdee8e",
+      "revId": "0f5f4078c04c934759415bd22810dc41a7a473a3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3311bcb0_6027a546",
         "filename": "exp/cmd/camserver/main.go",
         "patchSetId": 1
@@ -33,6 +51,24 @@
       "revId": "0f5f4078c04c934759415bd22810dc41a7a473a3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f0169709_14d74a48",
+        "filename": "exp/cmd/camserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-24T01:02:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3311bcb0_6027a546",
+      "revId": "0f5f4078c04c934759415bd22810dc41a7a473a3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -59,6 +95,30 @@
     },
     {
       "key": {
+        "uuid": "1a9a0694_796a473b",
+        "filename": "exp/cmd/camserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-24T01:02:45Z",
+      "side": 1,
+      "message": "It\u0027s a pretty common idiom to embed fields like this.\n\nI\u0027d prefer to just put the fields in the server struct, but the design of Dial confounds that.\n\nWhen I wrote this I was like \"ah, this is great.\"",
+      "parentUuid": "e4e65e58_1f16c1f9",
+      "range": {
+        "startLine": 75,
+        "startChar": 0,
+        "endLine": 83,
+        "endChar": 1
+      },
+      "revId": "0f5f4078c04c934759415bd22810dc41a7a473a3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8eebcb2e_c3a37d36",
         "filename": "exp/cmd/camserver/main.go",
         "patchSetId": 1
@@ -76,6 +136,24 @@
     },
     {
       "key": {
+        "uuid": "0a9fffbf_3372c81a",
+        "filename": "exp/cmd/camserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-24T01:02:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8eebcb2e_c3a37d36",
+      "revId": "0f5f4078c04c934759415bd22810dc41a7a473a3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "141d80b3_2e294972",
         "filename": "exp/cmd/camserver/main.go",
         "patchSetId": 1
@@ -90,6 +168,24 @@
       "revId": "0f5f4078c04c934759415bd22810dc41a7a473a3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "840f9ca1_a44d9296",
+        "filename": "exp/cmd/camserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-24T01:02:45Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "141d80b3_2e294972",
+      "revId": "0f5f4078c04c934759415bd22810dc41a7a473a3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -116,6 +212,30 @@
     },
     {
       "key": {
+        "uuid": "aab062c5_95c925da",
+        "filename": "exp/cmd/camserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-24T01:02:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9086bf49_35f111ca",
+      "range": {
+        "startLine": 137,
+        "startChar": 0,
+        "endLine": 138,
+        "endChar": 83
+      },
+      "revId": "0f5f4078c04c934759415bd22810dc41a7a473a3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9a17dc87_4fc26a9f",
         "filename": "exp/cmd/camserver/main.go",
         "patchSetId": 1
@@ -130,6 +250,24 @@
       "revId": "0f5f4078c04c934759415bd22810dc41a7a473a3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "03934eb4_70cba2ef",
+        "filename": "exp/cmd/camserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-24T01:02:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a17dc87_4fc26a9f",
+      "revId": "0f5f4078c04c934759415bd22810dc41a7a473a3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -150,6 +288,24 @@
     },
     {
       "key": {
+        "uuid": "1e3c8e49_401406e7",
+        "filename": "exp/cmd/camserver/noimpl.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-24T01:02:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cfc46b95_05c808db",
+      "revId": "0f5f4078c04c934759415bd22810dc41a7a473a3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b3450b60_20ddea60",
         "filename": "exp/cmd/camserver/noimpl.go",
         "patchSetId": 1
@@ -164,6 +320,24 @@
       "revId": "0f5f4078c04c934759415bd22810dc41a7a473a3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ca5bb782_1e670ad1",
+        "filename": "exp/cmd/camserver/noimpl.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-24T01:02:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b3450b60_20ddea60",
+      "revId": "0f5f4078c04c934759415bd22810dc41a7a473a3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
