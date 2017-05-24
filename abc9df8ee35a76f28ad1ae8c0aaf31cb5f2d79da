@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "aef8278b_e9a05aa9",
+        "filename": "user/user_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-24T05:11:35Z",
+      "side": 1,
+      "message": "s/Twot/Two t/",
+      "revId": "abc9df8ee35a76f28ad1ae8c0aaf31cb5f2d79da",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
