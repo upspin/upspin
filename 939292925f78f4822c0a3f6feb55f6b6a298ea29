@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da930d4b_f52b63f3",
+        "filename": "user/user_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-24T04:06:22Z",
+      "side": 1,
+      "message": "this is now identical to the test case on the next line?",
+      "revId": "939292925f78f4822c0a3f6feb55f6b6a298ea29",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
