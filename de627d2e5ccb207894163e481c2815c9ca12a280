@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f52d0b0d_aad7ab08",
+        "filename": "cmd/upspinfs/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 393,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-24T01:16:46Z",
+      "side": 1,
+      "message": "p",
+      "range": {
+        "startLine": 393,
+        "startChar": 1,
+        "endLine": 393,
+        "endChar": 7
+      },
+      "revId": "de627d2e5ccb207894163e481c2815c9ca12a280",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "408623b4_07d8b047",
+        "filename": "cmd/upspinfs/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-24T01:16:46Z",
+      "side": 1,
+      "message": "n :\u003d p.NElem()\nreturn n \u003e\u003d 1 \u0026\u0026 strings.HasPrefix(p.Elem(n-1), \"._\")",
+      "revId": "de627d2e5ccb207894163e481c2815c9ca12a280",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
