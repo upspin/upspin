@@ -961,3 +961,7 @@ func subspan(op string, opts []options) (options, *metric.Span) {
 	s := span(opts).StartSpan(op)
 	return options{span: s}, s
 }
+
+func (s *server) RefList() ([]upspin.Reference, error) {
+	// Return a list of active store References
+}

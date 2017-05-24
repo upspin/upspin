@@ -167,6 +167,19 @@ func (s *server) Delete(session rpc.Session, reqBytes []byte) (pb.Message, error
 	}
 	op := logf("Delete %q", req.Name)
 
+	if req.Name == "user@domain/Garbage" {
+		type refLister interface {
+			RefList() ([]upspin.Reference, error)
+		}
+		if rl, ok := s.dir.(refLister); ok {
+			refs, err := rl.RefList()
+			// bind to s.cfg.StoreEndpoint
+			// call store.Get("garbage")
+			// compare lists
+			// call store.Delete for unknown refs
+		}
+	}
+
 	return op.entryError(dir.Delete(upspin.PathName(req.Name)))
 }
 

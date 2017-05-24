@@ -68,6 +68,21 @@ func (s *server) Get(session rpc.Session, reqBytes []byte) (pb.Message, error) {
 	}
 	op := logf("Get %q", req.Reference)
 
+	if req.Reference == "garbage" {
+		type refLister interface {
+			RefList() ([]upspin.Reference, error)
+		}
+		if rl, ok := store.(refLister); ok {
+			if session.User() != cfg.UserName() {
+				return nil, errors.E(errors.Permission)
+			}
+			refs, err := rl.RefList()
+			// serialize ref list as text and
+			// return it as the data in a StoreGetResponse
+			// ...
+		}
+	}
+
 	data, refdata, locs, err := store.Get(upspin.Reference(req.Reference))
 	if err != nil {
 		op.log(err)

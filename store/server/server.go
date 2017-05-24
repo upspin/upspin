@@ -166,3 +166,14 @@ func (s *server) Close() {
 func (s *server) Endpoint() upspin.Endpoint {
 	return upspin.Endpoint{} // No endpoint.
 }
+
+func (s *server) RefList() ([]upspin.Reference, error) {
+	type refLister interface {
+		RefList() ([]string, error)
+	}
+	if rl, ok := s.(refLister); ok {
+		// call rl.RefList() and return as a slice of references
+		// ...
+	}
+	return nil, errors.Str("not available")
+}
