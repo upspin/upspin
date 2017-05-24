@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6ad6bcb7_fcb35701",
+        "filename": "user/user.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-05-24T06:52:48Z",
+      "side": 1,
+      "message": "why does only this line have a period?",
+      "range": {
+        "startLine": 38,
+        "startChar": 5,
+        "endLine": 38,
+        "endChar": 42
+      },
+      "revId": "56af3c62d1379c686e92b9d6816fe4a5e1ada927",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
