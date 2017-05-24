@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0e99ed10_882791fc",
+        "filename": "exp/cmd/camserver/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-05-24T01:23:39Z",
+      "side": 1,
+      "message": "frameData ?",
+      "revId": "5b1fe9a46cfe436b33cf73e81e4189948be8dec8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5ac8e9ae_b26030f5",
+        "filename": "exp/cmd/camserver/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-05-24T01:23:39Z",
+      "side": 1,
+      "message": "why rename this constant?",
+      "revId": "5b1fe9a46cfe436b33cf73e81e4189948be8dec8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f3e5dfe7_22b66f9e",
+        "filename": "exp/cmd/camserver/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-05-24T01:23:39Z",
+      "side": 1,
+      "message": "the name is poor. how about numFrames?",
+      "revId": "5b1fe9a46cfe436b33cf73e81e4189948be8dec8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "67cac0b1_55f59eeb",
+        "filename": "exp/cmd/camserver/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-05-24T01:23:39Z",
+      "side": 1,
+      "message": "// Read one frame to be sure ffmpeg is running correctly before starting the background goroutine.",
+      "revId": "5b1fe9a46cfe436b33cf73e81e4189948be8dec8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
