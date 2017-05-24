@@ -17,9 +17,9 @@ import (
 // Parse splits an upspin.UserName into user and domain and returns the pair.
 // It also returns the "+" suffix part of the user name, if it has one. For example,
 // given the user name
-//	joe+backup@blow.com
+//	ann+backup@example.com
 // it would return the strings
-// 	"joe+backup" "backup" "blow.com"
+// 	"ann+backup" "backup" "example.com"
 //
 // Parsed validates the name as an e-mail address and lower-cases the  domain
 // so it is canonical.
@@ -35,7 +35,7 @@ import (
 // - final token at least two characters
 // - whole name < 254 characters
 // - characters are case insensitive
-// - final period is OK.
+// - final period is OK, but we remove it
 //
 // We ignore the rules of punycode, which is defined in https://tools.ietf.org/html/rfc3490 .
 //
@@ -74,6 +74,10 @@ func Parse(userName upspin.UserName) (user, suffix, domain string, err error) {
 	if user == "" {
 		return errUserName(userName, "missing user name")
 	}
+	// Final period in domain is legal but is dropped.
+	if strings.HasSuffix(domain, ".") {
+		domain = domain[:len(domain)-1]
+	}
 	if domain == "" {
 		return errUserName(userName, "missing domain name")
 	}
@@ -86,8 +90,8 @@ func Parse(userName upspin.UserName) (user, suffix, domain string, err error) {
 	}
 	// Validate and canonicalize the user name - and maybe suffix, but
 	// the suffix is checked more thoroughly below. We include the suffix
-	// here because PRECIS will prevent things like "+" or "joe+" or
-	// "+joe" as the full name. That is, we do PRECIS validation on
+	// here because PRECIS will prevent things like "+" or "ann+" or
+	// "+ann" as the full name. That is, we do PRECIS validation on
 	// the full user+suffix.
 	user, err = canonicalize(user)
 	if err != nil {
