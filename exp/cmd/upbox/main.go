@@ -181,6 +181,7 @@ func (cfg *Config) Run() error {
 		u.secrets = dir
 	}
 
+	// TODO(adg): make these closures methods on *Config
 	writeConfig := func(server, user string) (string, error) {
 		u, ok := cfg.user[user]
 		if !ok {
@@ -212,13 +213,10 @@ func (cfg *Config) Run() error {
 		return configFile, nil
 	}
 
-	// Start servers.
-	for i := range cfg.Servers {
-		s := cfg.Servers[i]
-
+	startServer := func(s *Server) (*exec.Cmd, error) {
 		configFile, err := writeConfig(s.Name, s.User)
 		if err != nil {
-			return fmt.Errorf("writing config for %v: %v", s.Name, err)
+			return nil, fmt.Errorf("writing config for %v: %v", s.Name, err)
 		}
 
 		args := []string{
@@ -243,18 +241,24 @@ func (cfg *Config) Run() error {
 		cmd.Stdout = prefix(s.Name+":\t", os.Stdout)
 		cmd.Stderr = prefix(s.Name+":\t", os.Stderr)
 		if err := cmd.Start(); err != nil {
-			return fmt.Errorf("starting %v: %v", s.Name, err)
+			return nil, fmt.Errorf("starting %v: %v", s.Name, err)
 		}
-		defer kill(cmd)
+		return cmd, nil
 	}
 
-	// Wait for the keyserver to start and add the users to it.
-	if err := waitReady(cfg.KeyServer); err != nil {
-		return err
-	}
 	keyUser := cfg.Users[0].Name
 	if s, ok := cfg.server["keyserver"]; ok {
 		keyUser = s.User
+		// Start keyserver.
+		cmd, err := startServer(s)
+		if err != nil {
+			return err
+		}
+		defer kill(cmd)
+	}
+	// Wait for the keyserver to start and add the users to it.
+	if err := waitReady(cfg.KeyServer); err != nil {
+		return err
 	}
 	configFile, err := writeConfig("key-bootstrap", keyUser)
 	if err != nil {
@@ -296,9 +300,22 @@ func (cfg *Config) Run() error {
 		}
 	}
 
-	// Wait for the other services to start.
+	// Start other servers.
+	for i := range cfg.Servers {
+		s := cfg.Servers[i]
+		if s.Name == "keyserver" {
+			continue
+		}
+
+		cmd, err := startServer(s)
+		if err != nil {
+			return err
+		}
+		defer kill(cmd)
+	}
+	// Wait for the other servers to start.
 	for _, s := range cfg.Servers {
-		if s.addr == cfg.KeyServer {
+		if s.Name == "keyserver" {
 			continue
 		}
 		if err := waitReady(s.addr); err != nil {
