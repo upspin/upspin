@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "02dfeb3f_458a9356",
+        "filename": "exp/cmd/camserver/main.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 397,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-05-25T04:16:05Z",
+      "side": 1,
+      "message": "why send then Send? choose.\nyou could s/Send/It/ and avoid the issue",
+      "revId": "51b5ff07a29d81c6980fb95fd2c87b41fa7378a6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
