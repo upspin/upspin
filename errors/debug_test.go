@@ -23,8 +23,7 @@ var errorLines = strings.Split(strings.TrimSpace(`
 	.*/upspin.io/errors/debug_test.go:\d+: ...func3:
 	.*/upspin.io/errors/debug_test.go:\d+: ...func4:
 	.*/upspin.io/valid/valid.go:\d+: ...valid.UserName:
-	.*/upspin.io/user/user.go:\d+: ...user.Parse:
-	.*/upspin.io/user/user.go:\d+: ...errUserName: user@home/path: op: invalid operation:
+	.*/upspin.io/user/user.go:\d+: ...user.Parse: user@home/path: op: invalid operation:
 	valid.UserName:
 	user bad-username: user.Parse: user name must contain one @ symbol
 `), "\n")
