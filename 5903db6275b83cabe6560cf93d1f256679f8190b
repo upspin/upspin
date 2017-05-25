@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "64396828_64025c8f",
+        "filename": "dir/inprocess/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-05-25T18:03:45Z",
+      "side": 1,
+      "message": "I don\u0027t understand this sentence.",
+      "range": {
+        "startLine": 211,
+        "startChar": 12,
+        "endLine": 211,
+        "endChar": 61
+      },
+      "revId": "5903db6275b83cabe6560cf93d1f256679f8190b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "06f504f2_c9e89daf",
+        "filename": "dir/inprocess/directory.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-05-25T18:03:45Z",
+      "side": 1,
+      "message": "Thanks for the comment.",
+      "range": {
+        "startLine": 212,
+        "startChar": 41,
+        "endLine": 212,
+        "endChar": 65
+      },
+      "revId": "5903db6275b83cabe6560cf93d1f256679f8190b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
