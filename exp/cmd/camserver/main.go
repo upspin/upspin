@@ -9,6 +9,7 @@ package main
 
 import (
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
@@ -112,6 +113,7 @@ const (
 	accessRef         = upspin.Reference(accessFileName)
 	frameFileName     = "frame.jpg"
 	numFrames         = 100 // The number of frames to keep in memory.
+	framesPerSecond   = 30
 	watchEventTimeout = 5 * time.Second
 )
 
@@ -223,7 +225,7 @@ func (s *server) capture() error {
 		// Input from the FaceTime webcam (present in most Macs).
 		"-f", "avfoundation", "-pix_fmt", "0rgb", "-s", "1280x720", "-r", "30", "-i", "FaceTime",
 		// Output Motion JPEG at 2fps at high quality.
-		"-f", "mpjpeg", "-r", "2", "-b:v", "1M", "-")
+		"-f", "mpjpeg", "-r", fmt.Sprint(framesPerSecond), "-b:v", "1M", "-")
 	out, err := cmd.StdoutPipe()
 	if err != nil {
 		return err
