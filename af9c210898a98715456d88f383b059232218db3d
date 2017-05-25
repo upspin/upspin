@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9d05040d_c3237388",
+        "filename": "exp/cmd/camserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 353,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-05-25T04:02:28Z",
+      "side": 1,
+      "message": "shouldn\u0027t this be withheld, not notexist?",
+      "revId": "af9c210898a98715456d88f383b059232218db3d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
