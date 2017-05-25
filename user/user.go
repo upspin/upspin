@@ -62,69 +62,115 @@ import (
 // follow the "ignore" rules.
 //
 func Parse(userName upspin.UserName) (user, suffix, domain string, err error) {
+	const op = "user.Parse"
 	name := string(userName)
 	if len(userName) >= 254 {
-		return errUserName(userName, "name too long")
+		return "", "", "", errors.E(op, errors.Invalid, userName, errors.Str("name too long"))
 	}
 	if strings.Count(name, "@") != 1 {
-		return errUserName(userName, "user name must contain one @ symbol")
+		return "", "", "", errors.E(op, errors.Invalid, userName, errors.Str("user name must contain one @ symbol"))
 	}
 	at := strings.IndexByte(name, '@')
 	user, domain = name[:at], name[at+1:]
+	if user == "*" {
+		// An important special case:
+	} else {
+		user, suffix, err = parseUser(op, userName, user)
+		if err != nil {
+			return "", "", "", err
+		}
+	}
+	domain, err = parseDomain(op, userName, domain)
+	if err != nil {
+		return "", "", "", err
+	}
+	return user, suffix, domain, nil
+}
+
+// ParseUser parses the component of a user name before the '@', that is, the
+// user component of an email address. The rules are defined in the
+// documentation for Parse except that "*" is not a valid user and the user name
+// itself must be less than 255 bytes long.
+func ParseUser(user string) (userName, suffix string, err error) {
+	return parseUser("user.ParseUser", upspin.UserName(user), user)
+}
+
+// parseUser is the implementation of ParseUser, also called by Parse.
+// It takes the full UserName as well as the user component, to aid in error reporting.
+func parseUser(op string, userName upspin.UserName, user string) (string, string, error) {
+	if len(user) >= 255 {
+		return errParseUser(op, userName, "user name too long")
+	}
 	if user == "" {
-		return errUserName(userName, "missing user name")
-	}
-	// Final period in domain is legal but is dropped.
-	if strings.HasSuffix(domain, ".") {
-		domain = domain[:len(domain)-1]
-	}
-	if domain == "" {
-		return errUserName(userName, "missing domain name")
-	}
-	if strings.Count(domain, ".") == 0 {
-		return errUserName(userName, "domain name must contain a period")
+		return errParseUser(op, userName, "missing user name")
 	}
 	plus := strings.IndexByte(user, '+')
 	if plus == len(user)-1 { // Check first because PRECIS dislikes + at end of string.
-		return errUserName(userName, "empty +suffix in user name")
+		return errParseUser(op, userName, "empty +suffix in user name")
 	}
 	// Validate and canonicalize the user name - and maybe suffix, but
 	// the suffix is checked more thoroughly below. We include the suffix
 	// here because PRECIS will prevent things like "+" or "ann+" or
 	// "+ann" as the full name. That is, we do PRECIS validation on
 	// the full user+suffix.
-	user, err = canonicalize(user)
+	user, err := canonicalize(user)
 	if err != nil {
-		return "", "", "", errors.E("user.Parse", errors.Invalid, user, err)
+		return "", "", errors.E(op, errors.Invalid, user, err)
 	}
 	// Valid +suffix (if any)?
+	suffix := ""
 	if plus >= 0 {
 		if plus == 0 {
-			return errUserName(userName, "user name cannot start with +suffix")
+			return errParseUser(op, userName, "user name cannot start with +suffix")
 		}
 		suffix = user[plus+1:]
 		if strings.IndexByte(suffix, '+') > 0 {
-			return errUserName(userName, "multiple +suffixes in user name")
+			return errParseUser(op, userName, "multiple +suffixes in user name")
 		}
 		for _, c := range suffix {
 			if !okDomainChar(c) {
-				return errUserName(userName, "bad symbol in +suffix")
+				return errParseUser(op, userName, "bad symbol in +suffix")
 			}
 		}
+	}
+	return user, suffix, nil
+}
+
+// ParseDomain parses the component of a user name after the '@', that is, the
+// domain component of an email address. The rules are defined in the
+// documentation for Parse except the domain name itself must be less than 255
+// bytes long.
+func ParseDomain(domain string) (string, error) {
+	return parseDomain("user.ParseDomain", upspin.UserName(domain), domain)
+}
+
+// parseDomain is the implementation of ParseDomain, also called by Parse.
+// It takes the full UserName as well as the domain component, to aid in error reporting.
+func parseDomain(op string, userName upspin.UserName, domain string) (string, error) {
+	if len(domain) >= 255 {
+		return errParseDomain(op, userName, "domain name too long")
+	}
+	// Final period in domain is legal but is dropped.
+	domain = strings.TrimSuffix(domain, ".")
+	if domain == "" {
+		return errParseDomain(op, userName, "missing domain name")
+	}
+	if strings.Count(domain, ".") == 0 {
+		return errParseDomain(op, userName, "domain name must contain a period")
 	}
 	// Valid domain name?
 	period := -1 // First time through loop will fail if first byte is a period.
 	isUpper := false
 	for i, c := range domain {
 		if !okDomainChar(c) {
-			return errUserName(userName, "bad symbol in domain name")
+			return errParseDomain(op, userName, "bad symbol in domain name")
 		}
 		if c == '.' {
 			if i-1 >= period+64 {
-				return errUserName(userName, "invalid domain name element")
+				return errParseDomain(op, userName, "invalid domain name element")
 			}
 			if i-1 == period || i-1 >= period+64 {
-				return errUserName(userName, "invalid domain name element")
+				return errParseDomain(op, userName, "invalid domain name element")
 			}
 			period = i
 		}
@@ -134,27 +180,27 @@ func Parse(userName upspin.UserName) (user, suffix, domain string, err error) {
 	}
 	// Last domain element must be at least two bytes  (".co")
 	if period+2 >= len(domain) {
-		return errUserName(userName, "invalid domain name")
+		return errParseDomain(op, userName, "invalid domain name")
 	}
 	// Lower-case the domain name if necessary.
 	if isUpper {
 		domain = strings.ToLower(domain)
 	}
-	return user, suffix, domain, nil
+	return domain, nil
 }
 
-func errUserName(user upspin.UserName, msg string) (u, s, d string, err error) {
-	const op = "user.Parse"
-	return "", "", "", errors.E(op, errors.Invalid, user, errors.Str(msg))
+func errParseUser(op string, userName upspin.UserName, msg string) (u, s string, err error) {
+	return "", "", errors.E(op, errors.Invalid, userName, errors.Str(msg))
+}
+
+func errParseDomain(op string, userName upspin.UserName, msg string) (d string, err error) {
+	return "", errors.E(op, errors.Invalid, userName, errors.Str(msg))
 }
 
 func canonicalize(user string) (string, error) {
 	// PRECIS allows any ASCII character, but we are more restrictive.
 	// That's OK because the ASCII check is cheap and almost always
-	// sufficient. Plus there is an important special case:
-	if user == "*" {
-		return user, nil
-	}
+	// sufficient.
 	allPunct := true
 	simple := true
 	for _, r := range user {
@@ -193,9 +239,10 @@ func simpleUserNameChar(r rune) bool {
 }
 
 // illegalASCIIPunctuation reports whether the rune is an ASCII punctuation
-// character that is allowed by PRECIS but not by us.
+// character that is allowed by PRECIS but not by us within a user name.
+// We include @ because this does not look at the domain name, just the user part.
 func illegalASCIIPunctuation(r rune) bool {
-	return strings.ContainsRune(" \"(),:;<>[\\]`", r)
+	return strings.ContainsRune(" @\"(),:;<>[\\]`", r)
 }
 
 // legalASCIIPunctuation reports whether the rune is an ASCII punctuation
