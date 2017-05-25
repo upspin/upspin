@@ -16,6 +16,24 @@
       "revId": "af9c210898a98715456d88f383b059232218db3d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "180b11da_5f47962f",
+        "filename": "exp/cmd/camserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 353,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-25T04:10:12Z",
+      "side": 1,
+      "message": "As discussed this is fine as-is",
+      "parentUuid": "9d05040d_c3237388",
+      "revId": "af9c210898a98715456d88f383b059232218db3d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
