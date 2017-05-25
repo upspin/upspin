@@ -24,6 +24,7 @@ import (
 	"upspin.io/path"
 	"upspin.io/serverutil"
 	"upspin.io/upspin"
+	"upspin.io/user"
 	"upspin.io/valid"
 
 	_ "upspin.io/pack/ee"
@@ -203,6 +204,16 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		}
 		if entry.IsLink() {
 			return nil, errors.E(op, entry.Name, errors.Str("cannot create a link named Access or Group"))
+		}
+		if isGroup {
+			// Check that the name is a legal Group name.
+			// All elements must satisfy this condition, to protect Access file parsing.
+			// TODO: Is this the syntax we should require for any Upspin name?
+			for i := 1; i < parsed.NElem(); i++ { // Element 0 is "Group".
+				if _, _, err := user.ParseUser(parsed.Elem(i)); err != nil {
+					return nil, errors.E(op, entry.Name, err)
+				}
+			}
 		}
 	}
 
