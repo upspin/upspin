@@ -379,21 +379,37 @@ func parsedAppend(list []path.Parsed, owner upspin.UserName, users ...[]byte) ([
 			if err != nil {
 				return nil, nil, err
 			}
+			if err := isValidGroup(p); err != nil {
+				return nil, nil, err
+			}
 		}
 		// Check group syntax.
 		if !p.IsRoot() {
-			// First element must be group.
-			if p.Elem(0) != GroupDir {
-				return nil, nil, errors.Errorf("illegal group %q", user)
-			}
-			// Groups cannot be wild cards.
-			if bytes.HasPrefix(user, []byte("*@")) {
-				return nil, nil, errors.Errorf("cannot have wildcard for group name %q", user)
+			if err := isValidGroup(p); err != nil {
+				return nil, nil, err
 			}
 		}
 		list = append(list, p)
 	}
 	return list, all, nil
+}
+
+func isValidGroup(p path.Parsed) error {
+	// First element must be group.
+	if p.Elem(0) != GroupDir {
+		return errors.Errorf("illegal group %q", p)
+	}
+	// Groups cannot be wild cards.
+	if strings.HasPrefix(p.String(), "*@") {
+		return errors.Errorf("cannot have wildcard for group name %q", p)
+	}
+	// All name elements must be well-behaved to avoid parsing problems.
+	for i := 1; i < p.NElem(); i++ { // Element 0 is "Group".
+		if _, _, err := user.ParseUser(p.Elem(i)); err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // splitList parses a comma- or space-separated list, skipping other
