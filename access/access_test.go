@@ -623,7 +623,17 @@ func TestParseBadGroupFile(t *testing.T) {
 	// Multiple commas not allowed.
 	_, err = ParseGroup(parsed, []byte("joe@me.com ,, fred@me.com"))
 	if err == nil {
-		t.Fatal("expected error, got none")
+		t.Error("expected error with multiple commas, got none")
+	}
+	// Bad external group file name (invalid user).
+	_, err = ParseGroup(parsed, []byte("joe@me.com, fred@me.com/Group/fred@me.com"))
+	if err == nil {
+		t.Error("expected error for bad group file name, got none")
+	}
+	// Bad local group file name (invalid user).
+	_, err = ParseGroup(parsed, []byte("joe@me.com, *"))
+	if err == nil {
+		t.Error("expected error for bad local group file name, got none")
 	}
 }
 
