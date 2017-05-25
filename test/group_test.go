@@ -12,6 +12,7 @@ package test
 import (
 	"testing"
 
+	"upspin.io/errors"
 	"upspin.io/test/testenv"
 	"upspin.io/upspin"
 )
@@ -114,5 +115,45 @@ func TestGroupFileMultiDir(t *testing.T) {
 	}
 	if r.Data != fileContent {
 		t.Fatalf("got = %q, want = %q", r.Data, fileContent)
+	}
+}
+
+func TestInvalidGroupName(t *testing.T) {
+	ownerEnv, err := testenv.New(&testenv.Setup{
+		OwnerName: ownerName,
+		Packing:   upspin.PlainPack,
+		Kind:      "server",
+		Cleanup:   cleanup,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	r := testenv.NewRunner()
+	r.AddUser(ownerEnv.Config)
+
+	const (
+		base                  = ownerName + "/group-badname-test"
+		file                  = base + "/test"
+		ownerGroup            = ownerName + "/Group"
+		ownerGroupBad         = ownerGroup + "/**"
+		ownerGroupBadContents = "ann@example.com"
+		fileContent           = "tadda!"
+	)
+
+	// Owner creates a root and tries to create invalidly named Group file.
+	r.As(ownerName)
+	r.MakeDirectory(base)
+	r.MakeDirectory(ownerGroup)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+	r.Put(ownerGroupBad, ownerGroupBadContents)
+	err = r.Err()
+	if err == nil {
+		t.Fatalf("expected error putting Group file, got none")
+	}
+	if !errors.Match(errors.E(errors.Invalid), err) {
+		t.Fatal(err)
 	}
 }
