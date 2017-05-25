@@ -7,8 +7,6 @@
 // It only works with the built in camera on MacOS machines, for now.
 package main
 
-// TODO(adg): implement Watch.
-
 import (
 	"flag"
 	"io/ioutil"
@@ -73,6 +71,7 @@ type server struct {
 	// Set by newServer.
 	cfg          upspin.Config
 	ep           upspin.Endpoint
+	rootEntry    *upspin.DirEntry
 	accessEntry  *upspin.DirEntry
 	accessBytes  []byte
 	framePacking upspin.Packing
@@ -92,6 +91,7 @@ type state struct {
 	sequence  int64      // read/written only by capture method
 
 	mu         sync.Mutex
+	update     *sync.Cond
 	frameEntry *upspin.DirEntry // The current frame.
 }
 
@@ -108,10 +108,11 @@ type storeServer struct {
 }
 
 const (
-	accessFileName = access.AccessFile
-	accessRef      = upspin.Reference(accessFileName)
-	frameFileName  = "frame.jpg"
-	numFrames      = 100 // The number of frames to keep in memory.
+	accessFileName    = access.AccessFile
+	accessRef         = upspin.Reference(accessFileName)
+	frameFileName     = "frame.jpg"
+	numFrames         = 100 // The number of frames to keep in memory.
+	watchEventTimeout = 5 * time.Second
 )
 
 var (
@@ -130,10 +131,19 @@ func newServer(cfg upspin.Config, ep upspin.Endpoint, readers string) (*server, 
 			frameData: cache.NewLRU(numFrames),
 		},
 	}
+	s.update = sync.NewCond(&s.mu)
 
 	accessFile := []byte("Read, List: " + readers)
 	if readers == "all" {
 		s.framePacking = upspin.EEIntegrityPack
+	}
+
+	rootName := upspin.PathName(cfg.UserName() + "/")
+	s.rootEntry = &upspin.DirEntry{
+		Name:       rootName,
+		SignedName: rootName,
+		Attr:       upspin.AttrDirectory,
+		Time:       upspin.Now(),
 	}
 
 	var err error
@@ -232,6 +242,7 @@ func (s *server) capture() error {
 			return err
 		}
 		ref := upspin.Reference(sha256key.Of(b).String())
+		s.sequence++
 		de, cipher, err := s.pack(s.framePacking, frameFileName, ref, b, s.sequence)
 		if err != nil {
 			return err
@@ -241,11 +252,11 @@ func (s *server) capture() error {
 			packdata[0] = &de.Packdata
 			pack.Lookup(upspin.EEPack).Share(s.cfg, s.readerKeys, packdata)
 		}
-		s.sequence++
 		s.frameData.Add(ref, cipher)
 		s.mu.Lock()
 		s.frameEntry = de
 		s.mu.Unlock()
+		s.update.Broadcast()
 		return nil
 	}
 	// Read the first frame so that when this function returns
@@ -298,12 +309,7 @@ func (s dirServer) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 	fp := p.FilePath()
 	switch fp {
 	case "": // Root directory.
-		return &upspin.DirEntry{
-			Name:       p.Path(),
-			SignedName: p.Path(),
-			Attr:       upspin.AttrDirectory,
-			Time:       upspin.Now(),
-		}, nil
+		return s.rootEntry, nil
 	case accessFileName:
 		return s.accessEntry, nil
 	case frameFileName:
@@ -340,7 +346,80 @@ func (s dirServer) WhichAccess(upspin.PathName) (*upspin.DirEntry, error) {
 }
 
 func (s dirServer) Watch(name upspin.PathName, order int64, done <-chan struct{}) (<-chan upspin.Event, error) {
-	return nil, upspin.ErrNotSupported
+	p, err := path.Parse(name)
+	if err != nil {
+		return nil, err
+	}
+	if p.User() != s.cfg.UserName() {
+		return nil, errors.E(name, errors.NotExist)
+	}
+
+	var (
+		sendRoot   = false
+		sendAccess = false
+		sendFrame  = false
+	)
+	switch p.FilePath() {
+	case "":
+		sendRoot = true
+		sendAccess = true
+		sendFrame = true
+	case accessFileName:
+		sendAccess = true
+	case frameFileName:
+		sendFrame = true
+	}
+	switch order {
+	case upspin.WatchStart, upspin.WatchCurrent:
+		// OK to send everything.
+	default: // order >= 0 (includes upspin.WatchNew)
+		sendRoot = false
+		sendAccess = false
+	}
+
+	ch := make(chan upspin.Event)
+	timer := time.NewTimer(watchEventTimeout)
+	send := func(de *upspin.DirEntry) (isDone bool) {
+		if !timer.Stop() {
+			<-timer.C
+		}
+		timer.Reset(watchEventTimeout)
+		select {
+		case ch <- upspin.Event{Entry: de}:
+			return false
+		case <-done:
+			return true
+		case <-timer.C:
+			return true
+		}
+	}
+	go func() {
+		defer close(ch)
+		if sendRoot && send(s.rootEntry) {
+			return
+		}
+		if sendAccess && send(s.accessEntry) {
+			return
+		}
+		if !sendFrame {
+			<-done
+			return
+		}
+		for {
+			s.mu.Lock()
+			for s.frameEntry.Sequence <= order {
+				s.update.Wait()
+			}
+			de := s.frameEntry
+			s.mu.Unlock()
+
+			if send(de) {
+				return
+			}
+			order = de.Sequence
+		}
+	}()
+	return ch, nil
 }
 
 func (s dirServer) Put(*upspin.DirEntry) (*upspin.DirEntry, error) {
