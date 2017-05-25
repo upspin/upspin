@@ -7,10 +7,10 @@
 // It only works with the built in camera on MacOS machines, for now.
 package main
 
-// TODO(adg): configurable access controls.
 // TODO(adg): implement Watch.
 
 import (
+	"flag"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
@@ -19,7 +19,9 @@ import (
 	"time"
 
 	"upspin.io/access"
+	"upspin.io/bind"
 	"upspin.io/cache"
+	"upspin.io/client"
 	"upspin.io/cloud/https"
 	"upspin.io/config"
 	"upspin.io/errors"
@@ -38,6 +40,7 @@ import (
 )
 
 func main() {
+	readers := flag.String("readers", "all", "comma-separated list of users to be given read/list access")
 	flags.Parse(flags.Server)
 
 	cfg, err := config.FromFile(flags.Config)
@@ -51,7 +54,7 @@ func main() {
 		NetAddr:   addr,
 	}
 
-	s, err := newServer(cfg, ep)
+	s, err := newServer(cfg, ep, *readers)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -68,10 +71,12 @@ func main() {
 // As each new frame is read from the camera, it replaces frame.jpg.
 type server struct {
 	// Set by newServer.
-	cfg         upspin.Config
-	ep          upspin.Endpoint
-	accessEntry *upspin.DirEntry
-	accessBytes []byte
+	cfg          upspin.Config
+	ep           upspin.Endpoint
+	accessEntry  *upspin.DirEntry
+	accessBytes  []byte
+	framePacking upspin.Packing
+	readerKeys   []upspin.PublicKey
 
 	// Set by Dial.
 	user upspin.UserName
@@ -103,11 +108,9 @@ type storeServer struct {
 }
 
 const (
-	accessFile     = "Read, List: all\n"
 	accessFileName = access.AccessFile
 	accessRef      = upspin.Reference(accessFileName)
 	frameFileName  = "frame.jpg"
-	packing        = upspin.EEIntegrityPack
 	numFrames      = 100 // The number of frames to keep in memory.
 )
 
@@ -118,19 +121,52 @@ var (
 
 // newServer initializes a server with the given Config and Endpoint,
 // and starts ffmpeg to read frames from the built-in webcam.
-func newServer(cfg upspin.Config, ep upspin.Endpoint) (*server, error) {
+func newServer(cfg upspin.Config, ep upspin.Endpoint, readers string) (*server, error) {
 	s := &server{
-		cfg: cfg,
-		ep:  ep,
+		cfg:          cfg,
+		ep:           ep,
+		framePacking: upspin.EEPack,
 		state: &state{
 			frameData: cache.NewLRU(numFrames),
 		},
 	}
 
+	accessFile := []byte("Read, List: " + readers)
+	if readers == "all" {
+		s.framePacking = upspin.EEIntegrityPack
+	}
+
 	var err error
-	s.accessEntry, s.accessBytes, err = s.pack(accessFileName, accessRef, []byte(accessFile), 0)
+	s.accessEntry, s.accessBytes, err = s.pack(upspin.EEIntegrityPack, accessFileName, accessRef, accessFile, 0)
 	if err != nil {
 		return nil, err
+	}
+
+	if s.framePacking == upspin.EEPack {
+		a, err := access.Parse(s.accessEntry.Name, accessFile)
+		if err != nil {
+			return nil, err
+		}
+		users, err := a.Users(access.Read, client.New(cfg).Get)
+		if err != nil {
+			return nil, err
+		}
+		key, err := bind.KeyServer(cfg, cfg.KeyEndpoint())
+		if err != nil {
+			return nil, err
+		}
+		keys := []upspin.PublicKey{cfg.Factotum().PublicKey()}
+		for _, name := range users {
+			if name == cfg.UserName() {
+				continue
+			}
+			user, err := key.Lookup(name)
+			if err != nil {
+				return nil, err
+			}
+			keys = append(keys, user.PublicKey)
+		}
+		s.readerKeys = keys
 	}
 
 	if err := s.capture(); err != nil {
@@ -142,7 +178,7 @@ func newServer(cfg upspin.Config, ep upspin.Endpoint) (*server, error) {
 
 // pack packs the given file using packing
 // and returns the resulting DirEntry and ciphertext.
-func (s *server) pack(filePath string, ref upspin.Reference, data []byte, seq int64) (*upspin.DirEntry, []byte, error) {
+func (s *server) pack(packing upspin.Packing, filePath string, ref upspin.Reference, data []byte, seq int64) (*upspin.DirEntry, []byte, error) {
 	name := upspin.PathName(s.cfg.UserName()) + "/" + upspin.PathName(filePath)
 	de := &upspin.DirEntry{
 		Writer:     s.cfg.UserName(),
@@ -196,12 +232,17 @@ func (s *server) capture() error {
 			return err
 		}
 		ref := upspin.Reference(sha256key.Of(b).String())
-		de, data, err := s.pack(frameFileName, ref, b, s.sequence)
+		de, cipher, err := s.pack(s.framePacking, frameFileName, ref, b, s.sequence)
 		if err != nil {
 			return err
 		}
+		if s.framePacking == upspin.EEPack {
+			packdata := make([]*[]byte, 1)
+			packdata[0] = &de.Packdata
+			pack.Lookup(upspin.EEPack).Share(s.cfg, s.readerKeys, packdata)
+		}
 		s.sequence++
-		s.frameData.Add(ref, data)
+		s.frameData.Add(ref, cipher)
 		s.mu.Lock()
 		s.frameEntry = de
 		s.mu.Unlock()
