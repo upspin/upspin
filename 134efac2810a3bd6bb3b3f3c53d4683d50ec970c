@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "148d755e_143ae7c7",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 411,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-05-25T18:07:05Z",
+      "side": 1,
+      "message": "Why is this group name validity check so different than the other CL?  The other requires each element to be valid user and doesn\u0027t do the *@ check.",
+      "range": {
+        "startLine": 397,
+        "startChar": 0,
+        "endLine": 411,
+        "endChar": 1
+      },
+      "revId": "134efac2810a3bd6bb3b3f3c53d4683d50ec970c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
