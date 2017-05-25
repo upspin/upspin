@@ -338,6 +338,14 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		if err != nil {
 			return nil, errors.E(op, err)
 		}
+		// Check that the name is a legal Group name.
+		// All elements must satisfy this condition, to protect Access file parsing.
+		// TODO: Is this syntax the name of any legal Upspin name?
+		for i := 1; i < p.NElem(); i++ { // Element 0 is "Group".
+			if _, _, err := user.ParseUser(p.Elem(i)); err != nil {
+				return nil, errors.E(op, entry.Name, err)
+			}
+		}
 	}
 
 	// Check for links along the path.
