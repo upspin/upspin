@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e77efc42_01c2fd32",
+        "filename": "exp/cmd/camclient/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-05-26T00:14:01Z",
+      "side": 1,
+      "message": "Upspin",
+      "revId": "f4c81332d23728af9b5bdda922e06d0a82b48929",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e671dbca_65033d0b",
+        "filename": "exp/cmd/camclient/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-05-26T00:14:01Z",
+      "side": 1,
+      "message": "unusual use of the second person. not the usual style.\n\nalso this is flag.NArg() !\u003d 1. if there are two arguments, the error message would be wrong.\n\ncamclient: need exactly one path name argument",
+      "revId": "f4c81332d23728af9b5bdda922e06d0a82b48929",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b5f78037_38b7549d",
+        "filename": "exp/cmd/camclient/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-05-26T00:14:01Z",
+      "side": 1,
+      "message": "move this func outside please. it\u0027s too big to be inline.",
+      "revId": "f4c81332d23728af9b5bdda922e06d0a82b48929",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9c46a688_20c91db8",
+        "filename": "exp/cmd/camclient/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-05-26T00:14:01Z",
+      "side": 1,
+      "message": "need some comments about what\u0027s going on",
+      "revId": "f4c81332d23728af9b5bdda922e06d0a82b48929",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
