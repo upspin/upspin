@@ -414,8 +414,12 @@ Flags:
     	domain name for this Upspin installation
   -help
     	print more information about the command
+  -project project
+    	GCP project name
   -put-users
     	put server users to the key server
+  -secretseed string
+    	the seed containing a 128 bit secret in proquint format or a file that contains it
   -where directory
     	directory to store private configuration files (default "/home/user/upspin/deploy")
 
@@ -455,8 +459,17 @@ Flags:
 
 Sub-command setupstorage
 
-flag provided but not defined: -letscache
 Usage: upspin setupstorage -domain=<name> -path=<storage_dir>
+
+Setupstorage is the second step in establishing an upspinserver,
+It sets up storage for your Upspin installation.
+The first step is 'setupdomain' and the final step is 'setupserver'.
+
+This version of setupstorage configures local disk storage.
+Read the documentation at
+	https://upspin.io/doc/server_setup.md
+for information on configuring upspinserver to use cloud storage services.
+
 Flags:
   -domain name
     	domain name for this Upspin installation

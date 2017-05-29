@@ -49,6 +49,7 @@ If any state exists at the given location (-where) then the command aborts.
 	domain := fs.String("domain", "", "domain `name` for this Upspin installation")
 	project := fs.String("project", "", "GCP `project` name")
 	curveName := fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
+	seed := fs.String("secretseed", "", "the seed containing a 128 bit secret in proquint format or a file that contains it")
 	putUsers := fs.Bool("put-users", false, "put server users to the key server")
 	cluster := fs.Bool("cluster", false, "generate keys for upspin-dir@domain and upspin-store@domain (default is upspin@domain only)")
 	s.ParseFlags(fs, args, help, "setupdomain [-where=$HOME/upspin/deploy] [-cluster] -domain=<name>")
@@ -73,7 +74,7 @@ If any state exists at the given location (-where) then the command aborts.
 		if *putUsers {
 			s.Exitf("the -put-users flag requires -cluster")
 		}
-		s.setuphost(where, *domain, *curveName)
+		s.setuphost(where, *domain, *curveName, *seed)
 		return
 	}
 	if *project == "" {
@@ -263,14 +264,13 @@ func writeUserFile(configFile string) (userFile string, u upspin.UserName, err e
 	return f.Name(), cfg.UserName(), nil
 }
 
-func (s *State) setuphost(where, domain, curve string) {
+func (s *State) setuphost(where, domain, curve, proquint string) {
 	cfgPath := filepath.Join(where, domain)
 	s.ShouldNotExist(cfgPath)
 	s.MkdirAllLocal(cfgPath)
 
 	// Generate and write keys for the server user.
-	var noProquint string
-	pub, pri, proquint, err := s.createKeys(curve, noProquint)
+	pub, pri, proquint, err := s.createKeys(curve, proquint)
 	if err != nil {
 		s.Exit(err)
 	}
