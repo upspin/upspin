@@ -50,7 +50,7 @@ func (d *Dialer) DialContext(ctx context.Context, network, address string) (net.
 // to use a local IPC for host names ending in localSuffix.
 func Listen(network, address string) (net.Listener, error) {
 	if IsLocal(address) {
-		return ListenLocal(address)
+		return ListenLocal("", address)
 	}
 	return net.Listen(network, address)
 }
