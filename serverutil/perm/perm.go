@@ -140,6 +140,9 @@ func (p *Perm) updateLoop(op string) {
 			events, err = p.watch(upspin.PathName(p.targetUser)+"/", -1, doneCh)
 			if err != nil {
 				log.Error.Printf("%s: watch: %s", op, err)
+				if err == upspin.ErrNotSupported {
+					return
+				}
 				p.onRetry()
 				continue
 			}
