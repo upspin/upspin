@@ -218,6 +218,10 @@ func (s *server) parseDocs(path string) error {
 func docTitle(b []byte) string {
 	if len(b) > 2 && b[0] == '#' {
 		if i := bytes.IndexByte(b, '\n'); i != -1 {
+			// On Windows we need to strip out the '\r as well
+			if b[i-1] == '\r' {
+				i--
+			}
 			return string(b[2:i])
 		}
 	}
