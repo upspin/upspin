@@ -7,6 +7,7 @@ package subcmd
 import (
 	"fmt"
 	"os/user"
+	"path/filepath"
 	"testing"
 )
 
@@ -14,11 +15,11 @@ func testingUserLookup(who string) (*user.User, error) {
 	switch who {
 	case "":
 		return &user.User{
-			HomeDir: "/usr/default",
+			HomeDir: filepath.Join("/usr", "default"),
 		}, nil
 	case "ann":
 		return &user.User{
-			HomeDir: "/usr/ann",
+			HomeDir: filepath.Join("/usr", "ann"),
 		}, nil
 	}
 	return nil, fmt.Errorf("no such user")
@@ -26,15 +27,15 @@ func testingUserLookup(who string) (*user.User, error) {
 
 var tildeTests = []struct{ in, out string }{
 	{"", ""},
-	{"~", "/usr/default"},
-	{"~/", "/usr/default"},
-	{"~/x", "/usr/default/x"},
-	{"~ann", "/usr/ann"},
-	{"~ann/", "/usr/ann"},
-	{"~ann/x", "/usr/ann/x"},
+	{"~", filepath.Join("/usr", "default")},
+	{"~/", filepath.Join("/usr", "default")},
+	{"~/x", filepath.Join("/usr", "default", "x")},
+	{"~ann", filepath.Join("/usr", "ann")},
+	{"~ann/", filepath.Join("/usr", "ann")},
+	{"~ann/x", filepath.Join("/usr", "ann", "x")},
 	{"~xxx", "~xxx"},
 	{"~xxx/", "~xxx"},
-	{"~xxx/x", "~xxx/x"},
+	{"~xxx/x", filepath.Join("~xxx", "x")},
 }
 
 func TestTilde(t *testing.T) {
