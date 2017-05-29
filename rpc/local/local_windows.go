@@ -8,10 +8,8 @@ package local
 
 import (
 	"context"
-	"crypto/sha1"
 	"fmt"
 	"net"
-	"strings"
 )
 
 func nameToPort(name string) uint16 {
@@ -37,7 +35,7 @@ func (d *Dialer) DialContextLocal(ctx context.Context, network, address string) 
 	return d.DialContext(ctx, "tcp", fmt.Sprintf("127.0.0.1:%d", nameToPort(address)))
 }
 
-// Listen listens on the a tcp loopback port.
-func ListenLocal(network, address string) (net.Conn, error) {
+// ListenLocal listens on the a tcp loopback port.
+func ListenLocal(address string) (net.Listener, error) {
 	return net.Listen("tcp", fmt.Sprintf("127.0.0.1:%d", nameToPort(address)))
 }
