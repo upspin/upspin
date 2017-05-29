@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d45d99d9_b94fafeb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-05-29T21:57:11Z",
+      "side": 1,
+      "message": "For next time,\ncommit messages should begin with the affected packages.\nIn this case, this line should be:\n\nrpc/local: fix windows compilation error",
+      "revId": "ac0d816327aabfa9debab149b68eaa0232928b1a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
