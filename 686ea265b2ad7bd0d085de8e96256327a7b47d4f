@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "66290037_62806d90",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-05-30T00:41:08Z",
+      "side": 1,
+      "message": "all: fix some Windows unit tests\n\nIn this case it\u0027s several packages, so use \"all\". Also no leading capitals please.\nI know it\u0027s fussy but consistent formatting makes search easier.",
+      "revId": "686ea265b2ad7bd0d085de8e96256327a7b47d4f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "35518e99_8cf75dcf",
+        "filename": "serverutil/frontend/frontend.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-05-30T00:41:08Z",
+      "side": 1,
+      "message": "\"Windows\". It\u0027s a proper noun.\ns/CR/carriage return/ or even just \u0027\\r\u0027.",
+      "revId": "686ea265b2ad7bd0d085de8e96256327a7b47d4f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
