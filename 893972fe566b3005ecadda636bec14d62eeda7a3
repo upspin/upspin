@@ -22,6 +22,30 @@
       "revId": "893972fe566b3005ecadda636bec14d62eeda7a3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "40308e69_0b2e6c10",
+        "filename": "cloud/storage/disk/disk.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-05-30T20:53:51Z",
+      "side": 1,
+      "message": "I had originally suggested that, but Andrew pushed back. I don\u0027t remember his reasons.\n\nThe clean property of using base64 is that the reference is actually recoverable from the name, which is not true for sha256.",
+      "parentUuid": "5067dcca_f7022822",
+      "range": {
+        "startLine": 90,
+        "startChar": 63,
+        "endLine": 98,
+        "endChar": 39
+      },
+      "revId": "893972fe566b3005ecadda636bec14d62eeda7a3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
