@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5067dcca_f7022822",
+        "filename": "cloud/storage/disk/disk.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-05-30T18:07:12Z",
+      "side": 1,
+      "message": "You could just sha256 the reference...  Easier than having to worry about edge cases and characters.  Also gives you a guaranteed number of chars in the name.  Then you can have a constant depth tree, which might also be easier to deal with.\n\nJust a suggestion...",
+      "range": {
+        "startLine": 90,
+        "startChar": 63,
+        "endLine": 98,
+        "endChar": 39
+      },
+      "revId": "893972fe566b3005ecadda636bec14d62eeda7a3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
