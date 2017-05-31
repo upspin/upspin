@@ -19,7 +19,6 @@ import (
 	"strings"
 
 	"upspin.io/errors"
-	"upspin.io/log"
 	"upspin.io/upspin"
 )
 
@@ -95,7 +94,6 @@ func newFactotum(op string, public, private, archived []byte) (upspin.Factotum, 
 	fm := make(map[keyHashArray]factotumKey)
 	var h keyHashArray
 	copy(h[:], pfk.keyHash)
-	log.Debug.Printf("%s: %x", op, h)
 	fm[h] = *pfk
 	f := &factotum{
 		current:  h,
@@ -112,7 +110,7 @@ func newFactotum(op string, public, private, archived []byte) (upspin.Factotum, 
 		if len(lines) < 5 {
 			break // This is not enough for a complete key pair.
 		}
-		if strings.TrimSpace(lines[0]) != "# EE" {
+		if !strings.HasPrefix(lines[0], "# EE") {
 			break // This is not a kind of key we recognize.
 		}
 		// lines[0] "# EE "     Joe's key
@@ -120,14 +118,17 @@ func newFactotum(op string, public, private, archived []byte) (upspin.Factotum, 
 		// lines[2] "1042...6334" public X
 		// lines[3] "2694...192"  public Y
 		// lines[4] "8220...5934" private D
+		suffix := strings.Index(lines[4], " ")
+		if suffix > 0 {
+			lines[4] = lines[4][:suffix]
+		}
 		pfk, err := makeKey(upspin.PublicKey(lines[1]+"\n"+lines[2]+"\n"+lines[3]+"\n"), lines[4]+"\n")
-		lines = lines[5:]
 		if err != nil {
 			return f, errors.E(op, err)
 		}
+		lines = lines[5:]
 		var h keyHashArray
 		copy(h[:], pfk.keyHash)
-		log.Debug.Printf("%s: %x (older)", op, h)
 		_, ok := f.keys[h]
 		if ok { // Duplicate.
 			continue
