@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6394fbe0_8d3ff72a",
+        "filename": "cmd/upspin/countersign.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-05-31T03:48:18Z",
+      "side": 1,
+      "message": "for further clarity, i suggest newState and oldState.",
+      "revId": "ac0c84b3e5b9c7289b3283b08cf4acf63452dc9f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4b044303_2c2bd03c",
+        "filename": "cmd/upspin/countersign.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-05-31T03:48:18Z",
+      "side": 1,
+      "message": "o is not a great character choice variable name, and it carries little information about what it is. how about oldState?",
+      "revId": "ac0c84b3e5b9c7289b3283b08cf4acf63452dc9f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d452e00c_1f06e7e2",
+        "filename": "cmd/upspin/countersign.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-05-31T03:48:18Z",
+      "side": 1,
+      "message": "do we want enableMetrics here? what is it measuring?",
+      "revId": "ac0c84b3e5b9c7289b3283b08cf4acf63452dc9f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f4fccc36_e33de9fd",
+        "filename": "cmd/upspin/countersign.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-05-31T03:48:18Z",
+      "side": 1,
+      "message": "please don\u0027t reuse a variable like this",
+      "revId": "ac0c84b3e5b9c7289b3283b08cf4acf63452dc9f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e5be263b_04981853",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-05-31T03:48:18Z",
+      "side": 1,
+      "message": "this functionality change should be tested in factotum_test.go",
+      "revId": "ac0c84b3e5b9c7289b3283b08cf4acf63452dc9f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
