@@ -10,6 +10,8 @@ import (
 	"flag"
 
 	"upspin.io/config"
+	"upspin.io/factotum"
+	"upspin.io/log"
 	"upspin.io/upspin"
 )
 
@@ -29,47 +31,46 @@ See the description for rotate for information about updating keys.
 	s.countersignCommand(fs)
 }
 
-// Countersigner holds the state for the countersign calculation.
+// Countersigner holds the new and old states for the countersign calculation.
 type Countersigner struct {
-	state  *State
-	oldKey upspin.PublicKey
+	state    *State // state.Config.Factotum() holds new key as primary, old keys in archive
+	oldState *State // oldState.Config.Factotum() holds the old as primary, new in archive
 }
 
 // countersignCommand is the main function for the countersign subcommand.
 func (s *State) countersignCommand(fs *flag.FlagSet) {
-	u, err := s.KeyServer().Lookup(s.Config.UserName())
-	if err != nil || len(u.PublicKey) == 0 {
-		s.Exitf("can't find old key for %q: %s\n", s.Config.UserName(), err)
-	}
+	// o = copy(s) with adjusted factotum, analogous to init() in main.go
+	o := newState(s.Name)
+	o.State.Init(config.SetFactotum(s.Config, s.Config.Factotum().Pop()))
+	o.sharer = newSharer(o)
+	o.enableMetrics()
+
+	pub := s.Config.Factotum().PublicKey()
+	log.Debug.Printf("countersign new\n  hash %x\n  key %s", factotum.KeyHash(pub), pub)
+	pub = o.Config.Factotum().PublicKey()
+	log.Debug.Printf("countersign old\n  hash %x\n  key %s", factotum.KeyHash(pub), pub)
 	c := &Countersigner{
-		state:  s,
-		oldKey: u.PublicKey,
+		state:    s,
+		oldState: o,
 	}
-	newF := s.Config.Factotum()
-	if newF == nil {
-		s.Exitf("no factotum available")
-	}
-
-	lastCfg := s.Config
-	s.Config = config.SetFactotum(s.Config, s.Config.Factotum().Pop())
-	defer func() { s.Config = lastCfg }()
-
 	root := upspin.PathName(string(s.Config.UserName()) + "/")
 	entries := c.entriesFromDirectory(root)
 	for _, e := range entries {
-		c.countersign(e, newF)
+		c.countersign(e)
 	}
 }
 
 // countersign adds a second signature using factotum.
-func (c *Countersigner) countersign(entry *upspin.DirEntry, newF upspin.Factotum) {
+func (c *Countersigner) countersign(entry *upspin.DirEntry) {
 	packer := lookupPacker(entry)
-	err := packer.Countersign(c.oldKey, newF, entry)
+	newF := c.state.Config.Factotum()
+	oldKey := c.oldState.Config.Factotum().PublicKey()
+	err := packer.Countersign(oldKey, newF, entry)
 	if err != nil {
 		c.state.Fail(err)
 		return
 	}
-	_, err = c.state.DirServer(entry.Name).Put(entry)
+	_, err = c.oldState.DirServer(entry.Name).Put(entry)
 	if err != nil {
 		// If we get ErrFollowLink, the item changed underfoot, so reporting
 		// an error in that case is OK.
@@ -80,7 +81,7 @@ func (c *Countersigner) countersign(entry *upspin.DirEntry, newF upspin.Factotum
 // entriesFromDirectory returns the list of relevant entries in the directory, recursively.
 func (c *Countersigner) entriesFromDirectory(dir upspin.PathName) []*upspin.DirEntry {
 	// Get list of files for this directory.
-	thisDir, err := c.state.DirServer(dir).Glob(upspin.AllFilesGlob(dir)) // Do not want to follow links.
+	thisDir, err := c.oldState.DirServer(dir).Glob(upspin.AllFilesGlob(dir)) // Do not want to follow links.
 	if err != nil {
 		c.state.Exitf("globbing %q: %s", dir, err)
 	}
