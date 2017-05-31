@@ -149,7 +149,7 @@ func (c *httpClient) makeAuthenticatedRequest(op, method string, req pb.Message)
 		// Otherwise prepare an auth request.
 		authMsg, err := signUser(c.config, clientAuthMagic, serverAddr(c))
 		if err != nil {
-			log.Error.Printf("%s: signUser: %s", op, err)
+			log.Error.Printf("%s: signUser: %s using key %s", op, err, c.config.Factotum().PublicKey())
 			return nil, false, errors.E(op, err)
 		}
 		header.Set(authRequestHeader, strings.Join(authMsg, ","))
