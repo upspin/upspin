@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "0a22b2e3_33733fad",
+        "filename": "cmd/upspin/countersign.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-05-31T04:09:15Z",
+      "side": 1,
+      "message": "Done.   I picked nState and oState to avoid the overlap with newState and NewState functions.   The compiler can distinguish, but it is harder on humans.",
+      "parentUuid": "6394fbe0_8d3ff72a",
+      "revId": "ac0c84b3e5b9c7289b3283b08cf4acf63452dc9f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "4b044303_2c2bd03c",
         "filename": "cmd/upspin/countersign.go",
         "patchSetId": 1
@@ -53,6 +71,24 @@
     },
     {
       "key": {
+        "uuid": "04445462_258a0c08",
+        "filename": "cmd/upspin/countersign.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-05-31T04:09:15Z",
+      "side": 1,
+      "message": "No idea;  removed.\n\nDo I need sharer?    I\u0027m not using it at the moment as far as I know.  But it makes me nervous about future edits to have this half-initialized structure.   Anyway, removed that as well.",
+      "parentUuid": "d452e00c_1f06e7e2",
+      "revId": "ac0c84b3e5b9c7289b3283b08cf4acf63452dc9f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f4fccc36_e33de9fd",
         "filename": "cmd/upspin/countersign.go",
         "patchSetId": 1
@@ -64,6 +100,24 @@
       "writtenOn": "2017-05-31T03:48:18Z",
       "side": 1,
       "message": "please don\u0027t reuse a variable like this",
+      "revId": "ac0c84b3e5b9c7289b3283b08cf4acf63452dc9f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ca3873c5_712560e7",
+        "filename": "cmd/upspin/countersign.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-05-31T04:09:15Z",
+      "side": 1,
+      "message": "Gone.  If we need it for debugging someday, we can add it back in.",
+      "parentUuid": "f4fccc36_e33de9fd",
       "revId": "ac0c84b3e5b9c7289b3283b08cf4acf63452dc9f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -84,6 +138,24 @@
       "revId": "ac0c84b3e5b9c7289b3283b08cf4acf63452dc9f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "22f23157_fb5d0c67",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-05-31T04:09:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e5be263b_04981853",
+      "revId": "ac0c84b3e5b9c7289b3283b08cf4acf63452dc9f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
