@@ -6,12 +6,12 @@
 package disk // import "upspin.io/cloud/storage/disk"
 
 import (
-	"encoding/base64"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 
 	"upspin.io/cloud/storage"
+	"upspin.io/cloud/storage/disk/internal/local"
 	"upspin.io/errors"
 	"upspin.io/upspin"
 )
@@ -86,11 +86,6 @@ func (s *storageImpl) Delete(ref string) error {
 
 // path returns the absolute path that should contain ref.
 func (s *storageImpl) path(ref string) string {
-	// The provided reference may not be safe so base64-encode it.
-	enc := base64.RawURLEncoding.EncodeToString([]byte(ref))
-	var sub string
-	if len(enc) > 1 {
-		sub = enc[:2]
-	}
-	return filepath.Join(s.base, sub, enc)
+	// TODO: Use local.Path once conversion tool is ready.
+	return local.OldPath(s.base, ref)
 }
