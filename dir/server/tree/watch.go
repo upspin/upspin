@@ -55,9 +55,9 @@ type watcher struct {
 	// goroutine to look for work at the end of the log.
 	hasWork chan bool
 
-	// log is a read-only cloned instance of the Tree's log that keeps track
-	// of this watcher's progress.
-	log *Log
+	// log is a reader instance of the Tree's log that keeps track of this
+	// watcher's progress.
+	log *Reader
 
 	// closed indicates whether the watcher is closed (1) or open (0).
 	// It must be loaded and stored atomically.
@@ -80,10 +80,7 @@ func (t *Tree) Watch(p path.Parsed, order int64, done <-chan struct{}) (<-chan *
 
 	// Clone the logs so we can keep reading it while the current tree
 	// continues to be updated (we're about to unlock this tree).
-	cLog, err := t.log.Clone()
-	if errors.Match(errors.E(errors.NotExist), err) {
-		return nil, errors.E(op, errors.NotExist, errors.Str("no root for user"))
-	}
+	cLog, err := t.log.NewReader()
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
@@ -112,9 +109,6 @@ func (t *Tree) Watch(p path.Parsed, order int64, done <-chan struct{}) (<-chan *
 		// Make a copy of the tree so we have an immutable tree in
 		// memory, at a fixed log position.
 		cIndex, err := t.logIndex.Clone()
-		if errors.Match(errors.E(errors.NotExist), err) {
-			return nil, errors.E(op, errors.NotExist, errors.Str("no root for user"))
-		}
 		if err != nil {
 			return nil, errors.E(op, err)
 		}
@@ -123,7 +117,7 @@ func (t *Tree) Watch(p path.Parsed, order int64, done <-chan struct{}) (<-chan *
 			user:     t.user,
 			config:   t.config,
 			packer:   t.packer,
-			log:      cLog,
+			log:      nil, // Cloned tree is read-only.
 			logIndex: cIndex,
 		}
 		// Start sending the current state of the cloned tree and setup
@@ -181,6 +175,7 @@ func (w *watcher) sendCurrentAndWatch(clone, orig *Tree, p path.Parsed, offset i
 
 	n, _, err := clone.loadPath(p)
 	if err != nil && !errors.Match(errNotExist, err) {
+		log.Error.Printf("%s: error loading path: %s", op, err)
 		w.sendError(err)
 		w.close()
 		return
@@ -201,6 +196,7 @@ func (w *watcher) sendCurrentAndWatch(clone, orig *Tree, p path.Parsed, offset i
 		}
 		err = clone.traverse(n, 0, fn)
 		if err != nil {
+			log.Error.Printf("%s: error traversing tree: %s", op, err)
 			w.sendError(err)
 			w.close()
 			return
@@ -211,6 +207,7 @@ func (w *watcher) sendCurrentAndWatch(clone, orig *Tree, p path.Parsed, offset i
 	err = orig.addWatcher(p, w)
 	orig.mu.Unlock()
 	if err != nil {
+		log.Error.Printf("%s: error adding watcher: %s", op, err)
 		w.sendError(err)
 		w.close()
 		return
@@ -265,7 +262,7 @@ func (w *watcher) sendError(err error) {
 	case <-time.After(3 * watcherTimeout):
 		// Can't send another error since we timed out again. Log an
 		// error and close the watcher.
-		log.Error.Printf("dir/server/tree: timed out sending error: %v", err)
+		log.Error.Printf("dir/server/tree.sendError: %s", errTimeout)
 	}
 }
 
@@ -315,6 +312,7 @@ func (w *watcher) watch(offset int64) {
 		offset, err = w.sendEventFromLog(offset)
 		if err != nil {
 			if err != errTimeout && err != errClosed {
+				log.Error.Printf("watch: sending error to client: %s", err)
 				w.sendError(err)
 			}
 			return
