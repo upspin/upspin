@@ -55,7 +55,7 @@ type Tree struct {
 	user     upspin.UserName
 	config   upspin.Config
 	packer   upspin.Packer
-	log      *Log
+	log      *Writer
 	logIndex *LogIndex
 	root     *node
 	// dirtyNodes is the set of dirty nodes, grouped by path length.
@@ -80,7 +80,7 @@ func (n *node) String() string {
 // the Log, the Tree's state is recovered from it.
 // TODO: Maybe new is doing too much work. Figure out how to break in two without
 // returning an inconsistent new tree if log is unprocessed.
-func New(config upspin.Config, log *Log, logIndex *LogIndex) (*Tree, error) {
+func New(config upspin.Config, log *Writer, logIndex *LogIndex) (*Tree, error) {
 	const op = "dir/server/tree.New"
 	if config == nil {
 		return nil, errors.E(op, errors.Invalid, errors.Str("config is nil"))
@@ -721,8 +721,10 @@ func (t *Tree) Close() error {
 		}
 	}
 
-	check(t.flush())
-	check(t.log.Close())
+	if t.log != nil { // A nil log doesn't need to be flushed nor closed.
+		check(t.flush())
+		check(t.log.Close())
+	}
 	check(t.logIndex.Close())
 
 	if firstErr != nil {
@@ -752,11 +754,15 @@ func (t *Tree) recoverFromLog() error {
 	}
 
 	// Tree is not current. Replay all entries from the log.
+	lrd, err := t.log.NewReader()
+	if err != nil {
+		return errors.E(op, err)
+	}
 	recovered := 0
 	curr := lastProcessed
 	for {
 		log.Debug.Printf("%s: Recovering from log... %d", op, curr)
-		logEntry, next, err := t.log.ReadAt(curr)
+		logEntry, next, err := lrd.ReadAt(curr)
 		if err != nil {
 			log.Error.Printf("%s: Error in log recovery, possible data loss at offset %d: %s", op, lastProcessed, err)
 			err = t.log.Truncate(curr)
