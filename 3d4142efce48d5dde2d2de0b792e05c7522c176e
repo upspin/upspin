@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "49914c50_e77bc87e",
+        "filename": "cloud/storage/disk/convert.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-01T00:35:01Z",
+      "side": 1,
+      "message": "\"%q is not a directory or regular file\" ?\n\nalso return fmt.Errorf(...) ?",
+      "revId": "3d4142efce48d5dde2d2de0b792e05c7522c176e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4431d474_7b266653",
+        "filename": "cloud/storage/disk/convert.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-01T00:35:01Z",
+      "side": 1,
+      "message": "these could all be returned errors instead of log.Fatal\nthen line 83 could be\n\nreturn copy(path)\n\nInstead of \n\ncopy(path)\nreturn nil",
+      "revId": "3d4142efce48d5dde2d2de0b792e05c7522c176e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "64d30d8a_2f8e80e7",
+        "filename": "cloud/storage/disk/convert.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-01T00:35:01Z",
+      "side": 1,
+      "message": "maybe this should just be a log message, not a fatal error?",
+      "revId": "3d4142efce48d5dde2d2de0b792e05c7522c176e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "96eb236b_da89efee",
+        "filename": "cloud/storage/disk/convert.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-01T00:35:01Z",
+      "side": 1,
+      "message": "considering I assume you\u0027ve already debugged this, I suggest not checking this in.\nit\u0027ll be in this cl forever if we need it",
+      "revId": "3d4142efce48d5dde2d2de0b792e05c7522c176e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
