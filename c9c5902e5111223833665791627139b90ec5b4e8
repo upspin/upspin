@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "30d2f9b5_08c64ac6",
+        "filename": "cloud/storage/disk/convert.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-06-02T19:03:20Z",
+      "side": 1,
+      "message": "Might be helpful to show what the old and new encodings are.",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 32
+      },
+      "revId": "c9c5902e5111223833665791627139b90ec5b4e8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
