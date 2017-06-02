@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9faf9c72_d6e8fc04",
+        "filename": "cloud/storage/disk/disk.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-06-02T16:25:25Z",
+      "side": 1,
+      "message": "It\u0027s weird for a library to print error messages. \n\nAlso, it\u0027s currently used in servers, but the word \"server\" here seems a bit misplaced. It\u0027s not even clear this alone can prevent the server from starting (currently, yes, but going forward, is this the right approach?).",
+      "revId": "0eecd73b2c70d10f994c23f1e54ce2cdec20f22f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
