@@ -16,6 +16,29 @@
       "revId": "f674677198e218df42dca925396575d32c1a2608",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fc2ce40a_c4de4841",
+        "filename": "cloud/storage/disk/internal/local/path.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-06-02T19:24:18Z",
+      "side": 1,
+      "message": "Not sure I understand.  len(buf)%2 makes is checking for a last element that is two bytes long which causes the confusion since that could clash with a directory name.  Hence the padding.  I don\u0027t understand the rest.  It seems like the predicate should be len(buf) \u003c 2*numDirs+1 since only the first numDirs elements can be ambiguous.  Everything after that is a file.\n\nAlso, I\u0027m not sure numElems is making this any clearer but that\u0027s probably just me.",
+      "range": {
+        "startLine": 40,
+        "startChar": 1,
+        "endLine": 40,
+        "endChar": 83
+      },
+      "revId": "f674677198e218df42dca925396575d32c1a2608",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
