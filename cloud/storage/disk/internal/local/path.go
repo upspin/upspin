@@ -9,11 +9,18 @@ import (
 	"path/filepath"
 )
 
-// Path returns the file path to hold the contents of the blob
-// with the specified reference. The returned path is rooted
-// in the provided base directory.
-// The method used here will replace the OldPath function once
-// a conversion tool is in place, as OldPath has several problems.
+// Both encodings compute the base64 encoding of the reference.
+// The old one then takes an encoding like abcdef and creates file
+//	ab/abcdef
+// The new one does better balancing by creating a multi-level
+// hierarchy to avoid huge directories:
+//	ab/cd/de/ef+
+// Here the + is used as a pad to guarantee the file is not confusable
+// with a directory. The tree is never longer than 5 levels.
+
+// Path returns the file path to hold the contents of the blob with the
+// specified reference. The returned path is rooted in the provided base
+// directory.
 func Path(base, ref string) string {
 	// The provided reference may not be safe so base64-encode it.
 	// We divide the structure into subdirectories with two-byte names
@@ -57,10 +64,15 @@ func Path(base, ref string) string {
 	return filepath.Join(elems...)
 }
 
-// OldPath returns the file path to hold the contents of the blob
-// with the specified reference. The returned path is rooted
-// in the provided base directory.
-// Deprecated: (Or soon to be.) Use Path.
+// OldPath returns the file path to hold the contents of the blob with the
+// specified reference. The returned path is rooted in the provided base
+// directory.
+//
+// This is the prior encoding and can no longer be deployed. It is maintained
+// because ../../convert.go uses it to convert old disk trees that still have
+// it.
+//
+// Deprecated: Use Path.
 func OldPath(base, ref string) string {
 	// The provided reference may not be safe so base64-encode it.
 	enc := base64.RawURLEncoding.EncodeToString([]byte(ref))
