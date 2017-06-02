@@ -48,6 +48,30 @@
     },
     {
       "key": {
+        "uuid": "d0d16dfd_ca5b4ee0",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-06-02T20:56:37Z",
+      "side": 1,
+      "message": "Ignore that, I\u0027m an idiot.",
+      "parentUuid": "9cad441c_e6d059ef",
+      "range": {
+        "startLine": 340,
+        "startChar": 1,
+        "endLine": 340,
+        "endChar": 34
+      },
+      "revId": "6f2a637aafd14caf7ecfacbb70b67c5499a91f66",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "2cdb42a4_1e580c5a",
         "filename": "dir/server/tree/log.go",
         "patchSetId": 3
@@ -64,6 +88,29 @@
         "startChar": 1,
         "endLine": 447,
         "endChar": 21
+      },
+      "revId": "6f2a637aafd14caf7ecfacbb70b67c5499a91f66",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "360093fb_25f55315",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-06-02T20:56:37Z",
+      "side": 1,
+      "message": "You need to merge with changes from while you were gone.  In particular, these offsets are now names, and a new one has ben defined.",
+      "range": {
+        "startLine": 100,
+        "startChar": 1,
+        "endLine": 100,
+        "endChar": 17
       },
       "revId": "6f2a637aafd14caf7ecfacbb70b67c5499a91f66",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
