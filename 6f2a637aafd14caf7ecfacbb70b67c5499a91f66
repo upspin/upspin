@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a20f05a5_2142af7d",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-06-02T20:23:52Z",
+      "side": 1,
+      "message": "Specify that it is a descending list of offsets.  That would make your use of f.offsets[0] easier to understand.",
+      "range": {
+        "startLine": 85,
+        "startChar": 1,
+        "endLine": 85,
+        "endChar": 72
+      },
+      "revId": "6f2a637aafd14caf7ecfacbb70b67c5499a91f66",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9cad441c_e6d059ef",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-06-02T20:23:52Z",
+      "side": 1,
+      "message": "shouldn\u0027t this be \u003c\u003d ?",
+      "range": {
+        "startLine": 340,
+        "startChar": 1,
+        "endLine": 340,
+        "endChar": 34
+      },
+      "revId": "6f2a637aafd14caf7ecfacbb70b67c5499a91f66",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2cdb42a4_1e580c5a",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 447,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-06-02T20:23:52Z",
+      "side": 1,
+      "message": "Why doesn\u0027t this check if the file currently open is the correct one?",
+      "range": {
+        "startLine": 445,
+        "startChar": 1,
+        "endLine": 447,
+        "endChar": 21
+      },
+      "revId": "6f2a637aafd14caf7ecfacbb70b67c5499a91f66",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
