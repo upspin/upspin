@@ -22,15 +22,68 @@ import (
 func New(opts *storage.Opts) (storage.Storage, error) {
 	const op = "cloud/storage/disk.New"
 
-	p, ok := opts.Opts["basePath"]
+	base, ok := opts.Opts["basePath"]
 	if !ok {
 		return nil, errors.E(op, errors.Str("the basePath option must be specified"))
 	}
-	if err := os.MkdirAll(p, 0700); err != nil {
+	if err := os.MkdirAll(base, 0700); err != nil {
 		return nil, errors.E(op, errors.IO, err)
 	}
 
-	return &storageImpl{base: p}, nil
+	if err := guaranteeNewEncoding(base); err != nil {
+		return nil, errors.E(op, errors.IO, err)
+	}
+
+	return &storageImpl{base: base}, nil
+}
+
+// guaranteeNewEncoding makes sure we are using the new, safe path encoding.
+// If we're not, it prints a recipe to update it and errors out.
+func guaranteeNewEncoding(base string) error {
+	// Make sure the disk tree is or will be using the new path encoding.
+	// Three cases:
+	// 1) Directory is empty. Use new encoding, and add "++" directory.
+	// 2) Directory contains subdirectory "++". Use new encoding.
+	// 3) Directory is non-empty and does not contain "++". Give error.
+
+	// The "++" directory is used as an indicator that we are using the new
+	// encoding. This might hold storage one day but will never exist if
+	// using the old one, so it serves as a good marker.
+	plusDir := filepath.Join(base, "++")
+	empty, err := isEmpty(base)
+	if err != nil {
+		return err
+	}
+	if empty {
+		// New directory tree. Create the "++" directory as a marker.
+		return os.MkdirAll(plusDir, 0700)
+	}
+	// Directory is not empty. It must contain "++".
+	if _, err := os.Stat(plusDir); err != nil {
+		// Return a very long error explaining what to do.
+		format := "Base directory %[1]q uses a deprecated path encoding.\n" +
+			"It must be updated before serving again.\n" +
+			"To update, move the tree aside to a backup location, and run:\n" +
+			"\tgo run upspin.io/cloud/storage/disk/convert.go -old=<backup-location> -new=%[1]q\n" +
+			"Then restart the server.\n"
+		return errors.Errorf(format, base)
+	}
+	return nil
+}
+
+// isEmpty reports whether the directory is empty.
+// The directory must exist; we have already created it if we needed to.
+func isEmpty(dir string) (bool, error) {
+	fd, err := os.Open(dir)
+	if err != nil {
+		return true, err
+	}
+	defer fd.Close()
+	names, err := fd.Readdirnames(0)
+	if err != nil {
+		return true, err
+	}
+	return len(names) == 0, nil
 }
 
 func init() {
@@ -86,6 +139,5 @@ func (s *storageImpl) Delete(ref string) error {
 
 // path returns the absolute path that should contain ref.
 func (s *storageImpl) path(ref string) string {
-	// TODO: Use local.Path once conversion tool is ready.
-	return local.OldPath(s.base, ref)
+	return local.Path(s.base, ref)
 }
