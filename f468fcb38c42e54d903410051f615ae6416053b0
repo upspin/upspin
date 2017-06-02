@@ -16,6 +16,24 @@
       "revId": "f468fcb38c42e54d903410051f615ae6416053b0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "88218aa0_94940f25",
+        "filename": "cloud/storage/disk/internal/local/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-02T02:43:19Z",
+      "side": 1,
+      "message": "Done, but the new name will be Path as local.Path reads better than local.New.",
+      "parentUuid": "eb24606c_029db800",
+      "revId": "f468fcb38c42e54d903410051f615ae6416053b0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
