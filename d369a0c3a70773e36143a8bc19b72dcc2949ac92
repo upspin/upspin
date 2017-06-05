@@ -16,6 +16,24 @@
       "revId": "d369a0c3a70773e36143a8bc19b72dcc2949ac92",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f35f2c62_5bc60cc8",
+        "filename": "exp/cmd/camserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-05T21:56:20Z",
+      "side": 1,
+      "message": "I understand the second part of your sentence but not the first. Why is it fragile?",
+      "parentUuid": "f8502e95_b296ce20",
+      "revId": "d369a0c3a70773e36143a8bc19b72dcc2949ac92",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
