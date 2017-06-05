@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4c59b056_e7f329c7",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-05T23:20:13Z",
+      "side": 0,
+      "message": "Please restore this. It is part of this fix: https://upspin-review.googlesource.com/8867",
+      "revId": "795e83e529411fd323427b537e142169a762fe17",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
