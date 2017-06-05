@@ -1,0 +1,248 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ac28ae6a_88fb638b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-05T23:20:13Z",
+      "side": 1,
+      "message": "Can we see change 2 of 2?",
+      "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "543dad57_8718a841",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-05T23:20:13Z",
+      "side": 1,
+      "message": "what is a \"commit point\" ?",
+      "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c400d6b9_1be24130",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-05T23:20:13Z",
+      "side": 1,
+      "message": "what does \"processed\" mean?",
+      "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "da57e81c_8b3a34e4",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-05T23:20:13Z",
+      "side": 1,
+      "message": "I do not understand this line and the next one. Can you be more explicit?",
+      "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "698d3cf8_1dbf281b",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-05T23:20:13Z",
+      "side": 1,
+      "message": "mention that it is not in the log directory, first. I know it\u0027s implied by the second part of the sentence but this sentence appears under a heading \"...realtive to a log directory:\"",
+      "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ba996c6a_427a4330",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-05T23:20:13Z",
+      "side": 1,
+      "message": "Is there a plan to deprecate this?",
+      "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "730acd75_9ee11c14",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-05T23:20:13Z",
+      "side": 1,
+      "message": "why is this a pointer field? it should not be",
+      "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "93df3870_ab8cf3f5",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-05T23:20:13Z",
+      "side": 1,
+      "message": "i suggest putting this in a separate function",
+      "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c141d10b_b16af21f",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-05T23:20:13Z",
+      "side": 1,
+      "message": "Does this need to be called with a writer lock held?",
+      "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "39d828b9_5cc3bfee",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-05T23:20:13Z",
+      "side": 1,
+      "message": "Why is this up for debate? It worries me that the locking semantics are undecided at this point.",
+      "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cbfb12e8_1d5864da",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-05T23:20:13Z",
+      "side": 1,
+      "message": "why?",
+      "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "487ec999_5996bf36",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 379,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-05T23:20:13Z",
+      "side": 1,
+      "message": "By interleaving the Reader and Writer methods in this way, it is very easy for a reader to mistake which type the method is declared on.\nPlease keep the methods for each type together.\n(As an aside, I think it\u0027s fine to have other declarations between methods declared on the same type, it\u0027s just not a good idea to colocate methods on different types.)\n\nI think it\u0027s okay if you want to put these LastOffset methods together at the end, just don\u0027t do it for all the other methods",
+      "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "98e9267a_9bbab640",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 449,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-05T23:20:13Z",
+      "side": 1,
+      "message": "should directory be a field of Reader and Writer, instead of passing it around like this?",
+      "range": {
+        "startLine": 449,
+        "startChar": 47,
+        "endLine": 449,
+        "endChar": 56
+      },
+      "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1e19da91_409e7f3a",
+        "filename": "dir/server/tree/log_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 503,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-05T23:20:13Z",
+      "side": 1,
+      "message": "why not call it what it is, mkTmpDir ?",
+      "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
