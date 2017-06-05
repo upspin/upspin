@@ -76,6 +76,7 @@ type server struct {
 	accessEntry  *upspin.DirEntry
 	accessBytes  []byte
 	framePacking upspin.Packing
+	readers      []upspin.UserName // If empty, all users are readers.
 	readerKeys   []upspin.PublicKey
 
 	// Set by Dial.
@@ -154,15 +155,21 @@ func newServer(cfg upspin.Config, ep upspin.Endpoint, readers string) (*server, 
 		return nil, err
 	}
 
+	a, err := access.Parse(s.accessEntry.Name, accessFile)
+	if err != nil {
+		return nil, err
+	}
+	users, err := a.Users(access.Read, client.New(cfg).Get)
+	if err != nil {
+		return nil, err
+	}
+	for _, n := range users {
+		if n == s.cfg.UserName() || n == access.AllUsers {
+			continue
+		}
+		s.readers = append(s.readers, n)
+	}
 	if s.framePacking == upspin.EEPack {
-		a, err := access.Parse(s.accessEntry.Name, accessFile)
-		if err != nil {
-			return nil, err
-		}
-		users, err := a.Users(access.Read, client.New(cfg).Get)
-		if err != nil {
-			return nil, err
-		}
 		key, err := bind.KeyServer(cfg, cfg.KeyEndpoint())
 		if err != nil {
 			return nil, err
@@ -292,6 +299,18 @@ func (s *server) capture() error {
 	return nil
 }
 
+func (s *server) isReader(name upspin.UserName) bool {
+	if len(s.readers) == 0 || name == s.cfg.UserName() {
+		return true
+	}
+	for _, n := range s.readers {
+		if name == n {
+			return true
+		}
+	}
+	return false
+}
+
 // upspin.Service and upspin.Dialer methods.
 
 func (s dirServer) Endpoint() upspin.Endpoint { return s.ep }
@@ -313,6 +332,9 @@ func (s storeServer) Dial(cfg upspin.Config, ep upspin.Endpoint) (upspin.Service
 // upspin.DirServer methods.
 
 func (s dirServer) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
+	if !s.isReader(s.user) {
+		return nil, errors.E(name, errors.Private)
+	}
 	p, err := path.Parse(name)
 	if err != nil {
 		return nil, err
@@ -337,6 +359,9 @@ func (s dirServer) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 }
 
 func (s dirServer) Glob(pattern string) ([]*upspin.DirEntry, error) {
+	if !s.isReader(s.user) {
+		return nil, errors.E(errors.Private)
+	}
 	return serverutil.Glob(pattern, s.Lookup, s.listDir)
 }
 
@@ -356,11 +381,17 @@ func (s dirServer) listDir(name upspin.PathName) ([]*upspin.DirEntry, error) {
 	}, nil
 }
 
-func (s dirServer) WhichAccess(upspin.PathName) (*upspin.DirEntry, error) {
+func (s dirServer) WhichAccess(name upspin.PathName) (*upspin.DirEntry, error) {
+	if !s.isReader(s.user) {
+		return nil, errors.E(name, errors.Private)
+	}
 	return s.accessEntry, nil
 }
 
 func (s dirServer) Watch(name upspin.PathName, order int64, done <-chan struct{}) (<-chan upspin.Event, error) {
+	if !s.isReader(s.user) {
+		return nil, errors.E(name, errors.Private)
+	}
 	p, err := path.Parse(name)
 	if err != nil {
 		return nil, err
@@ -455,6 +486,9 @@ func (s dirServer) Delete(upspin.PathName) (*upspin.DirEntry, error) {
 // upspin.StoreServer methods.
 
 func (s storeServer) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Location, error) {
+	if !s.isReader(s.user) {
+		return nil, nil, nil, errors.E(errors.Private)
+	}
 	if ref == accessRef {
 		return s.accessBytes, &accessRefdata, nil, nil
 	}
