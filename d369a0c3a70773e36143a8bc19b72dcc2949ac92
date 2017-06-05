@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f8502e95_b296ce20",
+        "filename": "exp/cmd/camserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-06-05T17:28:12Z",
+      "side": 1,
+      "message": "A bit fragile but works because if present \"all\" in Access should be by itself, hence in that case readers list will be empty.",
+      "revId": "d369a0c3a70773e36143a8bc19b72dcc2949ac92",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
