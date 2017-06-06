@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "abf2845a_47d8c19d",
+        "filename": "cloud/storage/disk/disk.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-06T01:44:39Z",
+      "side": 1,
+      "message": "is",
+      "range": {
+        "startLine": 48,
+        "startChar": 17,
+        "endLine": 48,
+        "endChar": 21
+      },
+      "revId": "0eecd73b2c70d10f994c23f1e54ce2cdec20f22f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "9faf9c72_d6e8fc04",
         "filename": "cloud/storage/disk/disk.go",
         "patchSetId": 1
@@ -13,6 +36,75 @@
       "writtenOn": "2017-06-02T16:25:25Z",
       "side": 1,
       "message": "It\u0027s weird for a library to print error messages. \n\nAlso, it\u0027s currently used in servers, but the word \"server\" here seems a bit misplaced. It\u0027s not even clear this alone can prevent the server from starting (currently, yes, but going forward, is this the right approach?).",
+      "revId": "0eecd73b2c70d10f994c23f1e54ce2cdec20f22f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "359e55c3_e5fa97a2",
+        "filename": "cloud/storage/disk/disk.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-06T01:44:39Z",
+      "side": 1,
+      "message": "I think the big error should be returned as an error string, one that can be printed by the server when it fails. I agree that it needn\u0027t begin with \"Error starting server\".\n\nBut it doesn\u0027t matter whether this prevents a server from starting or not. It just needs to make sure that the storage isn\u0027t initialized if it hasn\u0027t been converted to the new file name mapping. Because we return an error here, that is ensured.",
+      "parentUuid": "9faf9c72_d6e8fc04",
+      "revId": "0eecd73b2c70d10f994c23f1e54ce2cdec20f22f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4a88a082_4d99353a",
+        "filename": "cloud/storage/disk/disk.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-06T01:44:39Z",
+      "side": 1,
+      "message": "this shouldn\u0027t be special-cased because the directory should have been successfully created by the time empty() is invoked",
+      "revId": "0eecd73b2c70d10f994c23f1e54ce2cdec20f22f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d6178c59_43038923",
+        "filename": "cloud/storage/disk/disk.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-06T01:44:39Z",
+      "side": 1,
+      "message": "don\u0027t log.fatal here. return the error",
+      "revId": "0eecd73b2c70d10f994c23f1e54ce2cdec20f22f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "aeaa8427_b58a026e",
+        "filename": "cloud/storage/disk/disk.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-06T01:44:39Z",
+      "side": 1,
+      "message": "ditto",
       "revId": "0eecd73b2c70d10f994c23f1e54ce2cdec20f22f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
