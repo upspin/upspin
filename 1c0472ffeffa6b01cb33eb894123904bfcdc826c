@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "25d11cd1_5d80ef4e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-06-06T15:47:32Z",
+      "side": 1,
+      "message": "Not ready yet. It depends on 1.5 of 2 that I sent before this one was reverted. Once that one is in, I\u0027ll send out 2 of 2.",
+      "parentUuid": "ac28ae6a_88fb638b",
+      "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "543dad57_8718a841",
         "filename": "dir/server/tree/log.go",
         "patchSetId": 4
@@ -30,6 +48,24 @@
       "writtenOn": "2017-06-05T23:20:13Z",
       "side": 1,
       "message": "what is a \"commit point\" ?",
+      "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e4abe649_52454e88",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-06-06T15:47:32Z",
+      "side": 1,
+      "message": "It\u0027s the point where the tree has been flushed to the Store.",
+      "parentUuid": "543dad57_8718a841",
       "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "de9172b2_3b3f35f5",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-06-06T15:47:32Z",
+      "side": 1,
+      "message": "It\u0027s what the logindex stores. It adds no value, so I removed it.",
+      "parentUuid": "c400d6b9_1be24130",
+      "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "da57e81c_8b3a34e4",
         "filename": "dir/server/tree/log.go",
         "patchSetId": 4
@@ -67,6 +121,24 @@
       "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "233ddbc0_b01b40b0",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-06-06T15:47:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da57e81c_8b3a34e4",
+      "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "699e63a9_3b8d8525",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-06-06T15:47:32Z",
+      "side": 1,
+      "message": "Not sure what you\u0027re saying. This is a new paragraph.",
+      "parentUuid": "698d3cf8_1dbf281b",
+      "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba996c6a_427a4330",
         "filename": "dir/server/tree/log.go",
         "patchSetId": 4
@@ -101,6 +191,24 @@
       "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "309261be_034dc067",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-06-06T15:47:32Z",
+      "side": 1,
+      "message": "No. It\u0027s not safe.",
+      "parentUuid": "ba996c6a_427a4330",
+      "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "038df814_fc858d42",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-06-06T15:47:32Z",
+      "side": 1,
+      "message": "It\u0027s a reminder that it\u0027s shared with the Reader (and on copy, it won\u0027t trigger vet errors).",
+      "parentUuid": "730acd75_9ee11c14",
+      "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "93df3870_ab8cf3f5",
         "filename": "dir/server/tree/log.go",
         "patchSetId": 4
@@ -135,6 +261,24 @@
       "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "70f9fce6_12db34d4",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-06-06T15:47:32Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "93df3870_ab8cf3f5",
+      "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -155,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "414cac7b_59199387",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-06-06T15:47:32Z",
+      "side": 1,
+      "message": "No.",
+      "parentUuid": "c141d10b_b16af21f",
+      "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "39d828b9_5cc3bfee",
         "filename": "dir/server/tree/log.go",
         "patchSetId": 4
@@ -169,6 +331,24 @@
       "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0b4d3fa0_e7ad2dff",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-06-06T15:47:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "39d828b9_5cc3bfee",
+      "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -189,6 +369,24 @@
     },
     {
       "key": {
+        "uuid": "991ce382_7af2e74d",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-06-06T15:47:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cbfb12e8_1d5864da",
+      "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "487ec999_5996bf36",
         "filename": "dir/server/tree/log.go",
         "patchSetId": 4
@@ -203,6 +401,24 @@
       "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a736fa0c_10431e23",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 379,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-06-06T15:47:32Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "487ec999_5996bf36",
+      "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -229,6 +445,30 @@
     },
     {
       "key": {
+        "uuid": "f1b3f5b4_a0f8f32f",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 449,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-06-06T15:47:32Z",
+      "side": 1,
+      "message": "Not sure it\u0027s worth the storage.",
+      "parentUuid": "98e9267a_9bbab640",
+      "range": {
+        "startLine": 449,
+        "startChar": 47,
+        "endLine": 449,
+        "endChar": 56
+      },
+      "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1e19da91_409e7f3a",
         "filename": "dir/server/tree/log_test.go",
         "patchSetId": 4
@@ -240,6 +480,24 @@
       "writtenOn": "2017-06-05T23:20:13Z",
       "side": 1,
       "message": "why not call it what it is, mkTmpDir ?",
+      "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7eab903d_12d0bb61",
+        "filename": "dir/server/tree/log_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 503,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-06-06T15:47:32Z",
+      "side": 1,
+      "message": "preference. (Also, I wouldn\u0027t expect mkTmpDir to return a cleanup function)",
+      "parentUuid": "1e19da91_409e7f3a",
       "revId": "1c0472ffeffa6b01cb33eb894123904bfcdc826c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
