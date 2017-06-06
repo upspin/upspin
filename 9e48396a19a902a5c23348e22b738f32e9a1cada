@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1fc0d9c6_3475eff8",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-06-06T16:43:51Z",
+      "side": 1,
+      "message": "Just a suggestion but why not have this point to the Writer struct and always say\n\nr.writer.mu.Lock()\n\n?  It makes it a little bit more obvious what is happening.  Plus mu in Writer can stop being a pointer that needs to be allocated.",
+      "range": {
+        "startLine": 72,
+        "startChar": 1,
+        "endLine": 72,
+        "endChar": 16
+      },
+      "revId": "9e48396a19a902a5c23348e22b738f32e9a1cada",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
