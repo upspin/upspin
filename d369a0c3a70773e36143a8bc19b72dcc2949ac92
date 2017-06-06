@@ -34,6 +34,24 @@
       "revId": "d369a0c3a70773e36143a8bc19b72dcc2949ac92",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "22480f0b_86830e60",
+        "filename": "exp/cmd/camserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-06-06T00:01:47Z",
+      "side": 1,
+      "message": "Given the amount of refactoring in this project, I wouldn\u0027t be surprised to see a reversal of the decision that \"all must be by itself\".  Suppose so, i.e. Access contains  \"r: all adg\" and then ehg comes along.  isReader(\"ehg\") returns false but you meant for everyone to have read permission, correct?\n\nI gave a +2 because even if that happens someday, the diagnosis will be easy.",
+      "parentUuid": "f35f2c62_5bc60cc8",
+      "revId": "d369a0c3a70773e36143a8bc19b72dcc2949ac92",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
