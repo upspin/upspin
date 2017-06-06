@@ -52,6 +52,24 @@
       "revId": "d369a0c3a70773e36143a8bc19b72dcc2949ac92",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d5e01354_50da79d3",
+        "filename": "exp/cmd/camserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-06T00:47:43Z",
+      "side": 1,
+      "message": "If someone does that it\u0027ll actually be broken on startup, I think, because EEPack will selected and so the keys will not be found for the \u0027all\u0027 user.",
+      "parentUuid": "22480f0b_86830e60",
+      "revId": "d369a0c3a70773e36143a8bc19b72dcc2949ac92",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
