@@ -48,9 +48,6 @@ func main() {
 
 	s.ParseFlags(flag.CommandLine, os.Args[1:], help,
 		"setupstorage -domain=<name> -path=<storage_dir>")
-	if flag.NArg() != 1 {
-		s.Exitf("a single bucket name must be provided")
-	}
 	if *domain == "" {
 		s.Exitf("the -domain flag must be provided")
 	}
