@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d172946d_816c70e6",
+        "filename": "cmd/cacheserver/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-06T20:57:16Z",
+      "side": 1,
+      "message": "put a minus before each bullet item:\n\n\t\u0027yes\u0027 (or \u0027y\u0027) to use a default endpoint for the cacheserver\n\t- \u0027no\u0027 (or \u0027n\u0027) to specify no cacheserver (the default)\n\t- a local TCP port (e.g. localhost:9999) to specify a particular port",
+      "revId": "af825f89bbadb73f602de382b01047ecb30b7409",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
