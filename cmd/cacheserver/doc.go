@@ -16,7 +16,13 @@ to store data it has read or written. The size of the local disk area is
 configurable with a flag.
 
 The 'cache:' key should be set in the config file to enable the cacheserver.
-It will be started automatically by the upspin command or upspinfs if it is
+It takes a single value that can be:
+
+	'yes' (or 'y') to use a default endpoint for the cacheserver
+	'no' (or 'n') to specify no cacheserver (the default)
+	a local TCP port (e.g. localhost:9999) to specify a particular port
+
+The cacheserver will be started automatically by the upspin command or upspinfs if it is
 not already running, and continues to run once the program that started it
 has exited.
 
@@ -36,6 +42,6 @@ The flags are:
 
 Example $HOME/upspin/config entry:
 
-	cache: localhost:9999
+	cache: yes
 */
 package main // import "upspin.io/cmd/cacheserver"
