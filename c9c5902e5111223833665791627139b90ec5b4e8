@@ -22,6 +22,30 @@
       "revId": "c9c5902e5111223833665791627139b90ec5b4e8",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "052f1188_9b3f30cb",
+        "filename": "cloud/storage/disk/convert.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-06T03:16:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30d2f9b5_08c64ac6",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 32
+      },
+      "revId": "c9c5902e5111223833665791627139b90ec5b4e8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
