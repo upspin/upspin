@@ -16,6 +16,24 @@
       "revId": "c100b1023246e15fb87b71fe62050162accb09e5",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b831650c_a809d325",
+        "filename": "cloud/storage/disk/disk.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-06T04:50:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "81334232_8bcb7d27",
+      "revId": "c100b1023246e15fb87b71fe62050162accb09e5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
