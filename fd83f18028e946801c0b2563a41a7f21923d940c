@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "f5e33973_0ac9c434",
+        "filename": "cmd/upspinfs/internal/ose/ose.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-06-07T18:27:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5d393016_687c7718",
+      "revId": "fd83f18028e946801c0b2563a41a7f21923d940c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e6078489_6be947a2",
         "filename": "cmd/upspinfs/internal/ose/ose.go",
         "patchSetId": 2
@@ -33,6 +51,24 @@
       "revId": "fd83f18028e946801c0b2563a41a7f21923d940c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0b653376_e2c31b84",
+        "filename": "cmd/upspinfs/internal/ose/ose.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-06-07T18:27:04Z",
+      "side": 1,
+      "message": "Done.  Pity gofmt doesn\u0027t multiple line it.",
+      "parentUuid": "e6078489_6be947a2",
+      "revId": "fd83f18028e946801c0b2563a41a7f21923d940c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
