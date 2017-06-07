@@ -25,6 +25,7 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"encoding/binary"
+	"upspin.io/cache"
 
 	"fmt"
 	"os"
@@ -40,12 +41,19 @@ const (
 	O_EXCL   = os.O_EXCL   // used with O_CREATE, file must not exist
 	O_SYNC   = os.O_SYNC   // open for synchronous I/O.
 	O_TRUNC  = os.O_TRUNC  // if possible, truncate file when opened.
+
+	// maxUnopenedCached is the maximum number of unopened files cached.
+	maxUnopenedCached = 200
 )
 
 var state = struct {
 	sync.Mutex
-	mapping map[string]*File
-}{mapping: make(map[string]*File)}
+	nameToFile map[string]*File
+	toRemove   *cache.LRU
+}{
+	nameToFile: make(map[string]*File),
+	toRemove:   cache.NewLRU(maxUnopenedCached),
+}
 
 // File represents an encrypted file.
 type File struct {
@@ -63,7 +71,7 @@ func OpenFile(name string, flag int, mode os.FileMode) (*File, error) {
 	}
 	state.Lock()
 	defer state.Unlock()
-	file, ok := state.mapping[name]
+	file, ok := state.nameToFile[name]
 	if ok {
 		file.f.Close()
 	} else {
@@ -72,10 +80,11 @@ func OpenFile(name string, flag int, mode os.FileMode) (*File, error) {
 			return nil, err
 		}
 		file = &File{name: name, benc: benc}
-		state.mapping[name] = file
+		state.nameToFile[name] = file
 	}
 	file.f = f
 	file.refs++
+	state.toRemove.Remove(file.name)
 	return file, nil
 }
 
@@ -87,7 +96,7 @@ func Create(name string) (*File, error) {
 	}
 	state.Lock()
 	defer state.Unlock()
-	file, ok := state.mapping[name]
+	file, ok := state.nameToFile[name]
 	if ok {
 		file.f.Close()
 	} else {
@@ -96,10 +105,11 @@ func Create(name string) (*File, error) {
 			return nil, err
 		}
 		file = &File{name: name, benc: benc}
-		state.mapping[name] = file
+		state.nameToFile[name] = file
 	}
 	file.f = f
 	file.refs++
+	state.toRemove.Remove(file.name)
 	return file, nil
 }
 
@@ -107,16 +117,17 @@ func Create(name string) (*File, error) {
 func Rename(from, to string) error {
 	state.Lock()
 	defer state.Unlock()
-	file, ok := state.mapping[from]
+	file, ok := state.nameToFile[from]
 	if !ok {
 		return fmt.Errorf("old file doesn't exist: %s", from)
 	}
 	if err := os.Rename(from, to); err != nil {
 		return err
 	}
-	delete(state.mapping, from)
-	state.mapping[to] = file
+	delete(state.nameToFile, from)
+	state.nameToFile[to] = file
 	file.name = to
+	state.toRemove.Remove(file.name)
 	return nil
 }
 
@@ -132,7 +143,7 @@ func MkdirAll(name string, mode os.FileMode) error {
 
 // Remove removes the named file.
 func Remove(name string) error {
-	delete(state.mapping, name)
+	delete(state.nameToFile, name)
 	return os.Remove(name)
 }
 
@@ -154,7 +165,7 @@ func (file *File) Close() error {
 	if file.refs != 0 {
 		return nil
 	}
-	os.Remove(file.name)
+	state.toRemove.Add(file.name, evictable(true))
 	return file.f.Close()
 }
 
@@ -219,4 +230,12 @@ func (file *File) xor(b []byte, off int64) {
 		}
 		b[i] ^= mask[x]
 	}
+}
+
+// A type for LRU to call when evicting an entry.
+type evictable bool
+
+func (e evictable) OnEviction(key interface{}) {
+	// TODO(p): figure out where we might log errors.
+	os.Remove(key.(string))
 }
