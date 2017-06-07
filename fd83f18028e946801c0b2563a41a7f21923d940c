@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5d393016_687c7718",
+        "filename": "cmd/upspinfs/internal/ose/ose.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-07T05:33:09Z",
+      "side": 1,
+      "message": "s/$/./\nand probably\ns/m/M/",
+      "revId": "fd83f18028e946801c0b2563a41a7f21923d940c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e6078489_6be947a2",
+        "filename": "cmd/upspinfs/internal/ose/ose.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-07T05:33:09Z",
+      "side": 1,
+      "message": "multiple lines. open it up.\n\np.s. mapping is a lousy name. mapping what to what?",
+      "revId": "fd83f18028e946801c0b2563a41a7f21923d940c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
