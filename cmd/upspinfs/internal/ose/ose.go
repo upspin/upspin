@@ -25,6 +25,7 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"encoding/binary"
+	"upspin.io/cache"
 
 	"fmt"
 	"os"
@@ -40,12 +41,16 @@ const (
 	O_EXCL   = os.O_EXCL   // used with O_CREATE, file must not exist
 	O_SYNC   = os.O_SYNC   // open for synchronous I/O.
 	O_TRUNC  = os.O_TRUNC  // if possible, truncate file when opened.
+
+	// maximum number of unopened cached files
+	maxCachedUnopened = 200
 )
 
 var state = struct {
 	sync.Mutex
-	mapping map[string]*File
-}{mapping: make(map[string]*File)}
+	mapping  map[string]*File
+	toRemove *cache.LRU
+}{mapping: make(map[string]*File), toRemove: cache.NewLRU(maxCachedUnopened)}
 
 // File represents an encrypted file.
 type File struct {
@@ -76,6 +81,7 @@ func OpenFile(name string, flag int, mode os.FileMode) (*File, error) {
 	}
 	file.f = f
 	file.refs++
+	state.toRemove.Remove(file.name)
 	return file, nil
 }
 
@@ -100,6 +106,7 @@ func Create(name string) (*File, error) {
 	}
 	file.f = f
 	file.refs++
+	state.toRemove.Remove(file.name)
 	return file, nil
 }
 
@@ -117,6 +124,7 @@ func Rename(from, to string) error {
 	delete(state.mapping, from)
 	state.mapping[to] = file
 	file.name = to
+	state.toRemove.Remove(file.name)
 	return nil
 }
 
@@ -154,7 +162,7 @@ func (file *File) Close() error {
 	if file.refs != 0 {
 		return nil
 	}
-	os.Remove(file.name)
+	state.toRemove.Add(file.name, evictable(true))
 	return file.f.Close()
 }
 
@@ -219,4 +227,12 @@ func (file *File) xor(b []byte, off int64) {
 		}
 		b[i] ^= mask[x]
 	}
+}
+
+// A type for LRU to call when evicting an entry.
+type evictable bool
+
+func (e evictable) OnEviction(key interface{}) {
+	// TODO(p): figure out where we might log errors.
+	os.Remove(key.(string))
 }
