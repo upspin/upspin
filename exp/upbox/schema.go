@@ -164,7 +164,7 @@ type Server struct {
 	// Flags specifies command-line flags to supply to this server.
 	Flags map[string]string
 
-	addr string // the host:port of this server; set by readConfig
+	addr string // the host:port of this server; set by SchemaFromFile
 }
 
 // DefaultSchema is the schema that is used if none is provided.
@@ -181,18 +181,23 @@ domain: example.com
 // SchemaFromFile parses a Schema from the named file.
 // If no name is provided the DefaultSchema is used.
 func SchemaFromFile(name string, basePort int) (*Schema, error) {
-	var data []byte
+	var doc string
 	if name == "" {
-		data = []byte(DefaultSchema)
+		doc = DefaultSchema
 	} else {
-		var err error
-		data, err = ioutil.ReadFile(name)
+		data, err := ioutil.ReadFile(name)
 		if err != nil {
 			return nil, err
 		}
+		doc = string(data)
 	}
+	return SchemaFromYAML(doc, basePort)
+}
+
+// SchemaFromYAML parses a Schema from the given YAML document.
+func SchemaFromYAML(doc string, basePort int) (*Schema, error) {
 	var sc Schema
-	if err := yaml.Unmarshal(data, &sc); err != nil {
+	if err := yaml.Unmarshal([]byte(doc), &sc); err != nil {
 		return nil, err
 	}
 
