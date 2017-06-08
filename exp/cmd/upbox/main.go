@@ -3,11 +3,10 @@
 // license that can be found in the LICENSE file.
 
 /*
-Command upbox builds and runs Upspin servers as specified by a configuration
-file and provides an upspin shell acting as the first user specified by the
-configuration.
+Command upbox builds and runs Upspin servers as specified by a schema and
+provides an upspin shell acting as the first user specified by the schema.
 
-Configuration files must be in YAML format, of this general form:
+Schema files must be in YAML format, of this general form:
 
 	users:
 	- name: joe
@@ -28,7 +27,7 @@ Configuration files must be in YAML format, of this general form:
 
 
 The Users and Servers lists specify the users and servers to create within this
-configuration.
+schema.
 
 Users
 
@@ -54,7 +53,7 @@ defaults.
 User specifies the user to run this server as.
 It can be a full email address, or just the user component.
 If empty, the Name of the server is combined with the
-Config's Domain and a user is created with that name.
+Schema's Domain and a user is created with that name.
 In the latter cases, the top-level Domain field must be set.
 
 ImportPath specifies the import path for this server that is built before
@@ -73,9 +72,9 @@ not include a domain component.
 Domain must be specified if any domain suffixes are omitted from
 User Names or if a Servers is specified with an empty User field.
 
-Default configuration
+Default schema
 
-If no config is specified, the default configuration is used:
+If no schema is specified, the default schema is used:
 
 	users:
 	  - name: user
@@ -116,15 +115,15 @@ import (
 var (
 	logLevel = flag.String("log", "info", "log `level`")
 	basePort = flag.Int("port", 8000, "base `port` number for upspin servers")
-	config   = flag.String("config", "", "configuration `file` name")
+	schema   = flag.String("schema", "", "schema `file` name")
 )
 
 func main() {
 	flag.Parse()
 
-	cfg, err := ConfigFromFile(*config)
+	cfg, err := SchemaFromFile(*schema)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "upbox: error parsing config:", err)
+		fmt.Fprintln(os.Stderr, "upbox: error parsing schema:", err)
 		os.Exit(1)
 	}
 
@@ -134,10 +133,10 @@ func main() {
 	}
 }
 
-func (cfg *Config) Run() error {
+func (sc *Schema) Run() error {
 	// Build servers and commands.
 	args := []string{"install", "upspin.io/cmd/upspin"}
-	for _, s := range cfg.Servers {
+	for _, s := range sc.Servers {
 		args = append(args, s.ImportPath)
 	}
 	cmd := exec.Command("go", args...)
@@ -166,7 +165,7 @@ func (cfg *Config) Run() error {
 	if err := ioutil.WriteFile(configKeygen, []byte("secrets: none"), 0644); err != nil {
 		return err
 	}
-	for _, u := range cfg.Users {
+	for _, u := range sc.Users {
 		fmt.Fprintf(os.Stderr, "upbox: generating keys for user %q\n", u.Name)
 		dir := userDir(u.Name)
 		if err := os.MkdirAll(dir, 0700); err != nil {
@@ -181,9 +180,9 @@ func (cfg *Config) Run() error {
 		u.secrets = dir
 	}
 
-	// TODO(adg): make these closures methods on *Config
+	// TODO(adg): make these closures methods on *Schema
 	writeConfig := func(server, user string) (string, error) {
-		u, ok := cfg.user[user]
+		u, ok := sc.user[user]
 		if !ok {
 			return "", fmt.Errorf("unknown user %q", user)
 		}
@@ -203,7 +202,7 @@ func (cfg *Config) Run() error {
 			)
 		default:
 			configContent = append(configContent,
-				"keyserver: remote,"+cfg.KeyServer,
+				"keyserver: remote,"+sc.KeyServer,
 			)
 		}
 		configFile := filepath.Join(tmpDir, "config."+server)
@@ -246,8 +245,8 @@ func (cfg *Config) Run() error {
 		return cmd, nil
 	}
 
-	keyUser := cfg.Users[0].Name
-	if s, ok := cfg.server["keyserver"]; ok {
+	keyUser := sc.Users[0].Name
+	if s, ok := sc.server["keyserver"]; ok {
 		keyUser = s.User
 		// Start keyserver.
 		cmd, err := startServer(s)
@@ -257,14 +256,14 @@ func (cfg *Config) Run() error {
 		defer kill(cmd)
 	}
 	// Wait for the keyserver to start and add the users to it.
-	if err := waitReady(cfg.KeyServer); err != nil {
+	if err := waitReady(sc.KeyServer); err != nil {
 		return err
 	}
 	configFile, err := writeConfig("key-bootstrap", keyUser)
 	if err != nil {
 		return err
 	}
-	for _, u := range cfg.Users {
+	for _, u := range sc.Users {
 		pk, err := ioutil.ReadFile(filepath.Join(userDir(u.Name), "public.upspinkey"))
 		if err != nil {
 			return err
@@ -301,8 +300,8 @@ func (cfg *Config) Run() error {
 	}
 
 	// Start other servers.
-	for i := range cfg.Servers {
-		s := cfg.Servers[i]
+	for i := range sc.Servers {
+		s := sc.Servers[i]
 		if s.Name == "keyserver" {
 			continue
 		}
@@ -314,7 +313,7 @@ func (cfg *Config) Run() error {
 		defer kill(cmd)
 	}
 	// Wait for the other servers to start.
-	for _, s := range cfg.Servers {
+	for _, s := range sc.Servers {
 		if s.Name == "keyserver" {
 			continue
 		}
@@ -324,7 +323,7 @@ func (cfg *Config) Run() error {
 	}
 
 	// Start a shell as the first user.
-	configFile, err = writeConfig("shell", cfg.Users[0].Name)
+	configFile, err = writeConfig("shell", sc.Users[0].Name)
 	if err != nil {
 		return err
 	}
