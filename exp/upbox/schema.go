@@ -127,8 +127,14 @@ type Schema struct {
 	// LogLevel specifies the logging level that each server should use.
 	LogLevel string
 
+	// user and server are mappings of user names into the Users and
+	// Servers slices. They are set by SchemaFromYAML.
 	user   map[string]*User
 	server map[string]*Server
+
+	// dir specifies the temporary directory in which the
+	// user config files and keys were written by Start.
+	dir string
 }
 
 // User defines an Upspin user to be created and used within a schema.
@@ -164,7 +170,9 @@ type Server struct {
 	// Flags specifies command-line flags to supply to this server.
 	Flags map[string]string
 
-	addr string // the host:port of this server; set by SchemaFromFile
+	addr string // the host:port of this server; set by SchemaFromYAML
+
+	cmd *exec.Cmd // the running process; set by Start
 }
 
 // DefaultSchema is the schema that is used if none is provided.
@@ -327,9 +335,8 @@ func setServer(sc *Schema, field *string, kind string) error {
 	return nil
 }
 
-// Run sets up the Users and Servers specified by the Schema
-// and runs an upspin shell as the first user in the Schema.
-func (sc *Schema) Run() error {
+// Start sets up the Users and Servers specified by the Schema.
+func (sc *Schema) Start() error {
 	// Build servers and commands.
 	args := []string{"install", "upspin.io/cmd/upspin"}
 	for _, s := range sc.Servers {
@@ -347,22 +354,30 @@ func (sc *Schema) Run() error {
 	if err != nil {
 		return err
 	}
-	defer os.RemoveAll(tmpDir)
+	sc.dir = tmpDir
+
+	// If anything below fails, we should clean up.
+	cleanup := true
+	defer func() {
+		if cleanup {
+			sc.Stop()
+		}
+	}()
 
 	// Generate TLS certificates.
-	if err := generateCert(tmpDir); err != nil {
+	if err := generateCert(sc.dir); err != nil {
 		return err
 	}
 
 	// Generate keys.
 	// Write an empty  file for use by 'upspin keygen'.
-	configKeygen := filepath.Join(tmpDir, "config.keygen")
+	configKeygen := sc.Config("keygen")
 	if err := ioutil.WriteFile(configKeygen, []byte("secrets: none"), 0644); err != nil {
 		return err
 	}
 	for _, u := range sc.Users {
 		fmt.Fprintf(os.Stderr, "upbox: generating keys for user %q\n", u.Name)
-		dir := filepath.Join(tmpDir, u.Name)
+		dir := filepath.Join(sc.dir, u.Name)
 		if err := os.MkdirAll(dir, 0700); err != nil {
 			return err
 		}
@@ -381,15 +396,14 @@ func (sc *Schema) Run() error {
 	if s, ok := sc.server["keyserver"]; ok {
 		keyUser = s.User
 		// Start keyserver.
-		_, err := sc.writeConfig(tmpDir, keyUser)
+		if err := sc.writeConfig(keyUser); err != nil {
+			return err
+		}
+		cmd, err := sc.startServer(s)
 		if err != nil {
 			return err
 		}
-		cmd, err := sc.startServer(tmpDir, s)
-		if err != nil {
-			return err
-		}
-		defer kill(cmd)
+		s.cmd = cmd
 	}
 	// Wait for the keyserver to start and add the users to it.
 	if err := waitReady(sc.KeyServer); err != nil {
@@ -400,14 +414,14 @@ func (sc *Schema) Run() error {
 			continue
 		}
 
-		if _, err := sc.writeConfig(tmpDir, u.Name); err != nil {
+		if err := sc.writeConfig(u.Name); err != nil {
 			return fmt.Errorf("writing config for %v: %v", u.Name, err)
 		}
 
 		if keyUser == "" {
 			continue
 		}
-		pk, err := ioutil.ReadFile(filepath.Join(tmpDir, u.Name, "public.upspinkey"))
+		pk, err := ioutil.ReadFile(filepath.Join(sc.dir, u.Name, "public.upspinkey"))
 		if err != nil {
 			return err
 		}
@@ -430,7 +444,7 @@ func (sc *Schema) Run() error {
 			return err
 		}
 		cmd := exec.Command("upspin",
-			"-config="+filepath.Join(tmpDir, "config."+keyUser),
+			"-config="+sc.Config(keyUser),
 			"-log="+sc.logLevel(),
 			"user", "-put",
 		)
@@ -449,11 +463,11 @@ func (sc *Schema) Run() error {
 			continue
 		}
 
-		cmd, err := sc.startServer(tmpDir, s)
+		cmd, err := sc.startServer(s)
 		if err != nil {
 			return err
 		}
-		defer kill(cmd)
+		s.cmd = cmd
 	}
 	// Wait for the other servers to start.
 	for _, s := range sc.Servers {
@@ -465,31 +479,40 @@ func (sc *Schema) Run() error {
 		}
 	}
 
-	// Start a shell as the first user.
-	args = []string{
-		"-config=" + filepath.Join(tmpDir, "config."+sc.Users[0].Name),
-		"-log=" + sc.logLevel(),
-		"shell",
+	cleanup = false // Exiting successfully, so don't clean up.
+	return nil
+}
+
+// Stop terminates any running server processes and deletes
+// any temporary config files and keys.
+func (sc *Schema) Stop() error {
+	if sc.dir == "" {
+		return errors.New("cannot stop; not started")
 	}
-	fmt.Fprintf(os.Stderr, "upbox: upspin %s\n", strings.Join(args, " "))
-	shell := exec.Command("upspin", args...)
-	shell.Stdin = os.Stdin
-	shell.Stdout = os.Stdout
-	shell.Stderr = os.Stderr
-	return shell.Run()
+	for _, s := range sc.Servers {
+		if s.cmd != nil && s.cmd.Process != nil {
+			s.cmd.Process.Kill()
+		}
+	}
+	return os.RemoveAll(sc.dir)
+}
+
+// Config returns the path to the config for the given user.
+func (sc *Schema) Config(user string) string {
+	return filepath.Join(sc.dir, "config."+user)
 }
 
 // writeConfig writes a config file for user named "config.name" inside dir.
-func (sc *Schema) writeConfig(dir, user string) (string, error) {
+func (sc *Schema) writeConfig(user string) error {
 	u, ok := sc.user[user]
 	if !ok {
-		return "", fmt.Errorf("unknown user %q", user)
+		return fmt.Errorf("unknown user %q", user)
 	}
 
 	configContent := []string{
 		"username: " + u.Name,
-		"secrets: " + filepath.Join(dir, user),
-		"tlscerts: " + dir,
+		"secrets: " + filepath.Join(sc.dir, u.Name),
+		"tlscerts: " + sc.dir,
 		"packing: " + u.Packing,
 		"storeserver: " + u.StoreServer,
 		"dirserver: " + u.DirServer,
@@ -504,20 +527,16 @@ func (sc *Schema) writeConfig(dir, user string) (string, error) {
 			"keyserver: remote,"+sc.KeyServer,
 		)
 	}
-	configFile := filepath.Join(dir, "config."+u.Name)
-	if err := ioutil.WriteFile(configFile, []byte(strings.Join(configContent, "\n")), 0644); err != nil {
-		return "", err
-	}
-	return configFile, nil
+	return ioutil.WriteFile(sc.Config(u.Name), []byte(strings.Join(configContent, "\n")), 0644)
 }
 
 // startServer starts the given server, returning the running exec.Cmd.
-func (sc *Schema) startServer(dir string, s *Server) (*exec.Cmd, error) {
+func (sc *Schema) startServer(s *Server) (*exec.Cmd, error) {
 	args := []string{
-		"-config=" + filepath.Join(dir, "config."+s.User),
+		"-config=" + sc.Config(s.User),
 		"-log=" + sc.logLevel(),
-		"-tls_cert=" + filepath.Join(dir, "cert.pem"),
-		"-tls_key=" + filepath.Join(dir, "key.pem"),
+		"-tls_cert=" + filepath.Join(sc.dir, "cert.pem"),
+		"-tls_key=" + filepath.Join(sc.dir, "key.pem"),
 		"-letscache=", // disable
 		"-https=" + s.addr,
 		"-addr=" + s.addr,
@@ -525,7 +544,7 @@ func (sc *Schema) startServer(dir string, s *Server) (*exec.Cmd, error) {
 	if s.Name == "keyserver" {
 		args = append(args,
 			"-test_user="+s.User,
-			"-test_secrets="+filepath.Join(dir, s.User),
+			"-test_secrets="+filepath.Join(sc.dir, s.User),
 		)
 	}
 	for k, v := range s.Flags {
@@ -545,12 +564,6 @@ func (sc *Schema) logLevel() string {
 		return l
 	}
 	return "info"
-}
-
-func kill(cmd *exec.Cmd) {
-	if cmd.Process != nil {
-		cmd.Process.Kill()
-	}
 }
 
 func prefix(p string, out io.Writer) io.Writer {

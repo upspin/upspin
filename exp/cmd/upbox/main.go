@@ -15,6 +15,8 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"os/exec"
+	"strings"
 
 	"upspin.io/exp/upbox"
 )
@@ -30,13 +32,36 @@ func main() {
 
 	sc, err := upbox.SchemaFromFile(*schema, *basePort)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "upbox: error parsing schema:", err)
-		os.Exit(1)
+		fail(fmt.Errorf("parsing schema: %v", err))
 	}
 	sc.LogLevel = *logLevel
 
-	if err := sc.Run(); err != nil {
-		fmt.Fprintln(os.Stderr, "upbox:", err)
-		os.Exit(1)
+	if err := sc.Start(); err != nil {
+		fail(err)
 	}
+
+	// Start a shell as the first user.
+	args := []string{
+		"-config=" + sc.Config(sc.Users[0].Name),
+		"-log=" + *logLevel,
+		"shell",
+	}
+	fmt.Fprintf(os.Stderr, "upbox: upspin %s\n", strings.Join(args, " "))
+	shell := exec.Command("upspin", args...)
+	shell.Stdin = os.Stdin
+	shell.Stdout = os.Stdout
+	shell.Stderr = os.Stderr
+	err = shell.Run()
+	err2 := sc.Stop()
+	if err != nil {
+		fail(err)
+	}
+	if err2 != nil {
+		fail(err2)
+	}
+}
+
+func fail(err error) {
+	fmt.Fprintln(os.Stderr, "upbox:", err)
+	os.Exit(1)
 }
