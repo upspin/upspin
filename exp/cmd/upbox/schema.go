@@ -13,8 +13,8 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-// Config defines an Upspin configuration of Users and Servers.
-type Config struct {
+// Schema defines a set of Upspin Users and Servers.
+type Schema struct {
 	Users   []*User
 	Servers []*Server
 
@@ -29,7 +29,7 @@ type Config struct {
 	server map[string]*Server
 }
 
-// User defines an Upspin user to be created and used within a configuration.
+// User defines an Upspin user to be created and used within a schema.
 type User struct {
 	// Name specifies the user name of this user.
 	Name string
@@ -45,7 +45,7 @@ type User struct {
 	secrets string // path to user's public and private keys; set by Run
 }
 
-// Server defines an Upspin server to be created and used within a configuration.
+// Server defines an Upspin server to be created and used within a schema.
 type Server struct {
 	// Name specifies a short name for this server.
 	Name string
@@ -65,8 +65,8 @@ type Server struct {
 	addr string // the host:port of this server; set by readConfig
 }
 
-// DefaultConfig is the configuration that is used if no configuration is provided.
-const DefaultConfig = `
+// DefaultSchema is the schema that is used if none is provided.
+const DefaultSchema = `
 users:
   - name: user
 servers:
@@ -76,12 +76,12 @@ servers:
 domain: example.com
 `
 
-// ConfigFromFile parses a Config from the named file.
-// If no name is provided the DefaultConfig is used.
-func ConfigFromFile(name string) (*Config, error) {
+// SchemaFromFile parses a Schema from the named file.
+// If no name is provided the DefaultSchema is used.
+func SchemaFromFile(name string) (*Schema, error) {
 	var data []byte
 	if name == "" {
-		data = []byte(DefaultConfig)
+		data = []byte(DefaultSchema)
 	} else {
 		var err error
 		data, err = ioutil.ReadFile(name)
@@ -89,7 +89,7 @@ func ConfigFromFile(name string) (*Config, error) {
 			return nil, err
 		}
 	}
-	var cfg Config
+	var cfg Schema
 	if err := yaml.Unmarshal(data, &cfg); err != nil {
 		return nil, err
 	}
@@ -202,16 +202,16 @@ func newUserFor(s *Server) *User {
 	return u
 }
 
-func setServer(cfg *Config, field *string, kind string) error {
+func setServer(sc *Schema, field *string, kind string) error {
 	if *field == "" {
-		s, ok := cfg.server[kind]
+		s, ok := sc.server[kind]
 		if !ok {
 			return fmt.Errorf("needs default %s, but none found", kind)
 		}
 		*field = "remote," + s.addr
 	} else if (*field)[0] == '$' {
 		name := (*field)[1:]
-		s, ok := cfg.server[name]
+		s, ok := sc.server[name]
 		if !ok {
 			return fmt.Errorf("specifies %v %q, but none found", kind, name)
 		}
