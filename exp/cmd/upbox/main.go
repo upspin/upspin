@@ -3,11 +3,10 @@
 // license that can be found in the LICENSE file.
 
 /*
-Command upbox builds and runs Upspin servers as specified by a configuration
-file and provides an upspin shell acting as the first user specified by the
-configuration.
+Command upbox builds and runs Upspin servers as specified by a schema and
+provides an upspin shell acting as the first user specified by the schema.
 
-Configuration files must be in YAML format, of this general form:
+Schema files must be in YAML format, of this general form:
 
 	users:
 	- name: joe
@@ -28,7 +27,7 @@ Configuration files must be in YAML format, of this general form:
 
 
 The Users and Servers lists specify the users and servers to create within this
-configuration.
+schema.
 
 Users
 
@@ -54,7 +53,7 @@ defaults.
 User specifies the user to run this server as.
 It can be a full email address, or just the user component.
 If empty, the Name of the server is combined with the
-Config's Domain and a user is created with that name.
+Schema's Domain and a user is created with that name.
 In the latter cases, the top-level Domain field must be set.
 
 ImportPath specifies the import path for this server that is built before
@@ -73,9 +72,9 @@ not include a domain component.
 Domain must be specified if any domain suffixes are omitted from
 User Names or if a Servers is specified with an empty User field.
 
-Default configuration
+Default schema
 
-If no config is specified, the default configuration is used:
+If no schema is specified, the default schema is used:
 
 	users:
 	  - name: user
@@ -116,15 +115,15 @@ import (
 var (
 	logLevel = flag.String("log", "info", "log `level`")
 	basePort = flag.Int("port", 8000, "base `port` number for upspin servers")
-	config   = flag.String("config", "", "configuration `file` name")
+	schema   = flag.String("schema", "", "schema `file` name")
 )
 
 func main() {
 	flag.Parse()
 
-	cfg, err := ConfigFromFile(*config)
+	cfg, err := SchemaFromFile(*schema)
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "upbox: error parsing config:", err)
+		fmt.Fprintln(os.Stderr, "upbox: error parsing schema:", err)
 		os.Exit(1)
 	}
 
@@ -134,7 +133,7 @@ func main() {
 	}
 }
 
-func (cfg *Config) Run() error {
+func (cfg *Schema) Run() error {
 	// Build servers and commands.
 	args := []string{"install", "upspin.io/cmd/upspin"}
 	for _, s := range cfg.Servers {
@@ -181,7 +180,7 @@ func (cfg *Config) Run() error {
 		u.secrets = dir
 	}
 
-	// TODO(adg): make these closures methods on *Config
+	// TODO(adg): make these closures methods on *Schema
 	writeConfig := func(server, user string) (string, error) {
 		u, ok := cfg.user[user]
 		if !ok {
