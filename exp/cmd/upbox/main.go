@@ -33,8 +33,9 @@ func main() {
 		fmt.Fprintln(os.Stderr, "upbox: error parsing schema:", err)
 		os.Exit(1)
 	}
+	sc.LogLevel = *logLevel
 
-	if err := sc.Run(*logLevel); err != nil {
+	if err := sc.Run(); err != nil {
 		fmt.Fprintln(os.Stderr, "upbox:", err)
 		os.Exit(1)
 	}

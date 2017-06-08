@@ -124,6 +124,9 @@ type Schema struct {
 	// KeyServer specifies the KeyServer used by each user in the cluster.
 	KeyServer string
 
+	// LogLevel specifies the logging level that each server should use.
+	LogLevel string
+
 	user   map[string]*User
 	server map[string]*Server
 }
@@ -321,7 +324,7 @@ func setServer(sc *Schema, field *string, kind string) error {
 
 // Run sets up the Users and Servers specified by the Schema
 // and runs an upspin shell as the first user in the Schema.
-func (sc *Schema) Run(logLevel string) error {
+func (sc *Schema) Run() error {
 	// Build servers and commands.
 	args := []string{"install", "upspin.io/cmd/upspin"}
 	for _, s := range sc.Servers {
@@ -371,7 +374,7 @@ func (sc *Schema) Run(logLevel string) error {
 	if s, ok := sc.server["keyserver"]; ok {
 		keyUser = s.User
 		// Start keyserver.
-		cmd, err := sc.startServer(tmpDir, logLevel, s)
+		cmd, err := sc.startServer(tmpDir, s)
 		if err != nil {
 			return err
 		}
@@ -410,7 +413,7 @@ func (sc *Schema) Run(logLevel string) error {
 		}
 		cmd := exec.Command("upspin",
 			"-config="+configFile,
-			"-log="+logLevel,
+			"-log="+sc.logLevel(),
 			"user", "-put",
 		)
 		cmd.Stdin = bytes.NewReader(userYAML)
@@ -428,7 +431,7 @@ func (sc *Schema) Run(logLevel string) error {
 			continue
 		}
 
-		cmd, err := sc.startServer(tmpDir, logLevel, s)
+		cmd, err := sc.startServer(tmpDir, s)
 		if err != nil {
 			return err
 		}
@@ -451,7 +454,7 @@ func (sc *Schema) Run(logLevel string) error {
 	}
 	args = []string{
 		"-config=" + configFile,
-		"-log=" + logLevel,
+		"-log=" + sc.logLevel(),
 		"shell",
 	}
 	fmt.Fprintf(os.Stderr, "upbox: upspin %s\n", strings.Join(args, " "))
@@ -496,7 +499,7 @@ func (sc *Schema) writeConfig(dir, name, user string) (string, error) {
 
 // startServer writes a config file for the given server's user
 // and starts the server, returning the running exec.Cmd.
-func (sc *Schema) startServer(dir, logLevel string, s *Server) (*exec.Cmd, error) {
+func (sc *Schema) startServer(dir string, s *Server) (*exec.Cmd, error) {
 	configFile, err := sc.writeConfig(dir, s.Name, s.User)
 	if err != nil {
 		return nil, fmt.Errorf("writing config for %v: %v", s.Name, err)
@@ -504,7 +507,7 @@ func (sc *Schema) startServer(dir, logLevel string, s *Server) (*exec.Cmd, error
 
 	args := []string{
 		"-config=" + configFile,
-		"-log=" + logLevel,
+		"-log=" + sc.logLevel(),
 		"-tls_cert=" + filepath.Join(dir, "cert.pem"),
 		"-tls_key=" + filepath.Join(dir, "key.pem"),
 		"-letscache=", // disable
@@ -527,6 +530,13 @@ func (sc *Schema) startServer(dir, logLevel string, s *Server) (*exec.Cmd, error
 		return nil, fmt.Errorf("starting %v: %v", s.Name, err)
 	}
 	return cmd, nil
+}
+
+func (sc *Schema) logLevel() string {
+	if l := sc.LogLevel; l != "" {
+		return l
+	}
+	return "info"
 }
 
 func kill(cmd *exec.Cmd) {
