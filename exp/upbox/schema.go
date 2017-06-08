@@ -322,9 +322,7 @@ func setServer(sc *Schema, field *string, kind string) error {
 	return nil
 }
 
-// Run sets up the Users and Servers specified by the Schema
-// and runs an upspin shell as the first user in the Schema.
-func (sc *Schema) Run() error {
+func (sc *Schema) Run(fn func(sc *Schema, configDir string) error) error {
 	// Build servers and commands.
 	args := []string{"install", "upspin.io/cmd/upspin"}
 	for _, s := range sc.Servers {
@@ -447,22 +445,30 @@ func (sc *Schema) Run() error {
 		}
 	}
 
-	// Start a shell as the first user.
-	configFile, err = sc.writeConfig(tmpDir, "shell", sc.Users[0].Name)
-	if err != nil {
-		return err
-	}
-	args = []string{
-		"-config=" + configFile,
-		"-log=" + sc.logLevel(),
-		"shell",
-	}
-	fmt.Fprintf(os.Stderr, "upbox: upspin %s\n", strings.Join(args, " "))
-	shell := exec.Command("upspin", args...)
-	shell.Stdin = os.Stdin
-	shell.Stdout = os.Stdout
-	shell.Stderr = os.Stderr
-	return shell.Run()
+	return fn(sc, tmpDir)
+}
+
+// RunShell sets up the Users and Servers specified by the Schema
+// and runs an upspin shell as the first user in the Schema.
+func (sc *Schema) RunShell() error {
+	return sc.Run(func(sc *Schema, dir string) error {
+		// Start a shell as the first user.
+		configFile, err := sc.writeConfig(dir, "shell", sc.Users[0].Name)
+		if err != nil {
+			return err
+		}
+		args := []string{
+			"-config=" + configFile,
+			"-log=" + sc.logLevel(),
+			"shell",
+		}
+		fmt.Fprintf(os.Stderr, "upbox: upspin %s\n", strings.Join(args, " "))
+		shell := exec.Command("upspin", args...)
+		shell.Stdin = os.Stdin
+		shell.Stdout = os.Stdout
+		shell.Stderr = os.Stderr
+		return shell.Run()
+	})
 }
 
 func (sc *Schema) writeConfig(dir, name, user string) (string, error) {

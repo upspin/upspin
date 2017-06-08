@@ -35,7 +35,7 @@ func main() {
 	}
 	sc.LogLevel = *logLevel
 
-	if err := sc.Run(); err != nil {
+	if err := sc.RunShell(); err != nil {
 		fmt.Fprintln(os.Stderr, "upbox:", err)
 		os.Exit(1)
 	}
