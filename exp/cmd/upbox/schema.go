@@ -13,8 +13,8 @@ import (
 	yaml "gopkg.in/yaml.v2"
 )
 
-// Config defines an Upspin configuration of Users and Servers.
-type Config struct {
+// Schema defines a set of Upspin Users and Servers.
+type Schema struct {
 	Users   []*User
 	Servers []*Server
 
@@ -29,7 +29,7 @@ type Config struct {
 	server map[string]*Server
 }
 
-// User defines an Upspin user to be created and used within a configuration.
+// User defines an Upspin user to be created and used within a schema.
 type User struct {
 	// Name specifies the user name of this user.
 	Name string
@@ -45,7 +45,7 @@ type User struct {
 	secrets string // path to user's public and private keys; set by Run
 }
 
-// Server defines an Upspin server to be created and used within a configuration.
+// Server defines an Upspin server to be created and used within a schema.
 type Server struct {
 	// Name specifies a short name for this server.
 	Name string
@@ -65,8 +65,8 @@ type Server struct {
 	addr string // the host:port of this server; set by readConfig
 }
 
-// DefaultConfig is the configuration that is used if no configuration is provided.
-const DefaultConfig = `
+// DefaultSchema is the schema that is used if none is provided.
+const DefaultSchema = `
 users:
   - name: user
 servers:
@@ -76,12 +76,12 @@ servers:
 domain: example.com
 `
 
-// ConfigFromFile parses a Config from the named file.
-// If no name is provided the DefaultConfig is used.
-func ConfigFromFile(name string) (*Config, error) {
+// SchemaFromFile parses a Schema from the named file.
+// If no name is provided the DefaultSchema is used.
+func SchemaFromFile(name string) (*Schema, error) {
 	var data []byte
 	if name == "" {
-		data = []byte(DefaultConfig)
+		data = []byte(DefaultSchema)
 	} else {
 		var err error
 		data, err = ioutil.ReadFile(name)
@@ -89,65 +89,65 @@ func ConfigFromFile(name string) (*Config, error) {
 			return nil, err
 		}
 	}
-	var cfg Config
-	if err := yaml.Unmarshal(data, &cfg); err != nil {
+	var sc Schema
+	if err := yaml.Unmarshal(data, &sc); err != nil {
 		return nil, err
 	}
 
-	cfg.user = map[string]*User{}
-	cfg.server = map[string]*Server{}
+	sc.user = map[string]*User{}
+	sc.server = map[string]*Server{}
 
-	if len(cfg.Users) == 0 {
+	if len(sc.Users) == 0 {
 		return nil, errors.New("at least one user must be specified")
 	}
 
 	// Add domain to usernames without domains,
 	// and default user names for servers.
-	for i, u := range cfg.Users {
+	for i, u := range sc.Users {
 		if u.Name == "" {
 			return nil, fmt.Errorf("user[%d] must specify a name", i)
 		}
 
 		// Add domain to bare user name.
 		if !strings.Contains(u.Name, "@") {
-			if cfg.Domain == "" {
+			if sc.Domain == "" {
 				return nil, fmt.Errorf("user %q implies domain suffix, but domain not set", u.Name)
 			}
-			u.Name += "@" + cfg.Domain
+			u.Name += "@" + sc.Domain
 		}
 		if u.Packing == "" {
 			u.Packing = "ee"
 		}
 
 		// Add to map only after name has been normalized.
-		cfg.user[u.Name] = u
+		sc.user[u.Name] = u
 	}
 
 	port := *basePort
-	for i, s := range cfg.Servers {
+	for i, s := range sc.Servers {
 		if s.Name == "" {
 			return nil, fmt.Errorf("server[%d] must specify a name", i)
 		}
-		cfg.server[s.Name] = s
+		sc.server[s.Name] = s
 
 		if s.User == "" {
 			// If no user specified, default to server@domain.
-			if cfg.Domain == "" {
+			if sc.Domain == "" {
 				return nil, fmt.Errorf("server %q specifies no user, but domain must be specified to create default user", s.Name)
 			}
-			s.User = s.Name + "@" + cfg.Domain
+			s.User = s.Name + "@" + sc.Domain
 			// If the user isn't otherwise provided, create it.
-			if _, ok := cfg.user[s.User]; !ok {
+			if _, ok := sc.user[s.User]; !ok {
 				u := newUserFor(s)
-				cfg.Users = append(cfg.Users, u)
-				cfg.user[u.Name] = u
+				sc.Users = append(sc.Users, u)
+				sc.user[u.Name] = u
 			}
 		} else if !strings.Contains(s.User, "@") {
 			// Add the domain name if user is specified.
-			if cfg.Domain == "" {
+			if sc.Domain == "" {
 				return nil, fmt.Errorf("server %q specifies user %q without domain suffix, but domain not set", s.Name, s.User)
 			}
-			s.User += "@" + cfg.Domain
+			s.User += "@" + sc.Domain
 		}
 
 		// Pick address for this service.
@@ -155,8 +155,8 @@ func ConfigFromFile(name string) (*Config, error) {
 		port++
 
 		// Set the global keyserver, if none provided.
-		if s.Name == "keyserver" && cfg.KeyServer == "" {
-			cfg.KeyServer = s.addr
+		if s.Name == "keyserver" && sc.KeyServer == "" {
+			sc.KeyServer = s.addr
 		}
 
 		// Default to an Upspin command if no import path provided.
@@ -166,21 +166,21 @@ func ConfigFromFile(name string) (*Config, error) {
 	}
 
 	// Check for KeyServer only after we may have set it as "keyserver" above.
-	if cfg.KeyServer == "" {
+	if sc.KeyServer == "" {
 		return nil, errors.New("no keyserver in configuration")
 	}
 
 	// Set or evaluate DirServer and StoreServer fields.
-	for _, u := range cfg.Users {
-		if err := setServer(&cfg, &u.DirServer, "dirserver"); err != nil {
+	for _, u := range sc.Users {
+		if err := setServer(&sc, &u.DirServer, "dirserver"); err != nil {
 			return nil, fmt.Errorf("user %q: %v", u.Name, err)
 		}
-		if err := setServer(&cfg, &u.StoreServer, "storeserver"); err != nil {
+		if err := setServer(&sc, &u.StoreServer, "storeserver"); err != nil {
 			return nil, fmt.Errorf("user %q: %v", u.Name, err)
 		}
 	}
 
-	return &cfg, nil
+	return &sc, nil
 }
 
 func newUserFor(s *Server) *User {
@@ -202,16 +202,16 @@ func newUserFor(s *Server) *User {
 	return u
 }
 
-func setServer(cfg *Config, field *string, kind string) error {
+func setServer(sc *Schema, field *string, kind string) error {
 	if *field == "" {
-		s, ok := cfg.server[kind]
+		s, ok := sc.server[kind]
 		if !ok {
 			return fmt.Errorf("needs default %s, but none found", kind)
 		}
 		*field = "remote," + s.addr
 	} else if (*field)[0] == '$' {
 		name := (*field)[1:]
-		s, ok := cfg.server[name]
+		s, ok := sc.server[name]
 		if !ok {
 			return fmt.Errorf("specifies %v %q, but none found", kind, name)
 		}
