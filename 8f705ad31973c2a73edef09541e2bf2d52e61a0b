@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "590c817b_ba41d589",
+        "filename": "exp/cmd/upbox/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-08T02:39:45Z",
+      "side": 1,
+      "message": "upspin.io/exp/upbox/schema ?",
+      "revId": "8f705ad31973c2a73edef09541e2bf2d52e61a0b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "a8f74fd9_26496f2e",
         "filename": "exp/schema/schema.go",
         "patchSetId": 1
@@ -16,6 +33,24 @@
       "revId": "8f705ad31973c2a73edef09541e2bf2d52e61a0b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5e651207_2aba6419",
+        "filename": "exp/schema/schema.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-08T02:39:45Z",
+      "side": 1,
+      "message": "shouldn\u0027t this be exp/upbox/schema?",
+      "parentUuid": "a8f74fd9_26496f2e",
+      "revId": "8f705ad31973c2a73edef09541e2bf2d52e61a0b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
