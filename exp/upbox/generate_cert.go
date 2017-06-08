@@ -6,7 +6,7 @@
 
 // Generate a self-signed X.509 certificate for a TLS server.
 
-package main
+package upbox
 
 import (
 	"crypto/ecdsa"
