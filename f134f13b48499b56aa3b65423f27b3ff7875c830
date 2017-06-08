@@ -16,6 +16,24 @@
       "revId": "f134f13b48499b56aa3b65423f27b3ff7875c830",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "72bd84e9_daf6138f",
+        "filename": "exp/upbox/schema.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-08T05:51:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0d786422_c9a4978b",
+      "revId": "f134f13b48499b56aa3b65423f27b3ff7875c830",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
