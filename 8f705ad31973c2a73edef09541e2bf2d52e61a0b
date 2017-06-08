@@ -54,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "62a18d91_ad77cee9",
+        "filename": "exp/schema/schema.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-08T02:40:21Z",
+      "side": 1,
+      "message": "by which i mean, it seems a top-level thing called \"schema\" is too generic.",
+      "parentUuid": "5e651207_2aba6419",
+      "revId": "8f705ad31973c2a73edef09541e2bf2d52e61a0b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f463566d_241aa08b",
         "filename": "exp/schema/schema.go",
         "patchSetId": 1
