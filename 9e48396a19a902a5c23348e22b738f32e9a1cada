@@ -22,6 +22,30 @@
       "revId": "9e48396a19a902a5c23348e22b738f32e9a1cada",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6096f306_b423a40c",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-06-08T00:13:24Z",
+      "side": 1,
+      "message": "I\u0027d rather not make too many changes from the original CL here. I\u0027m still underwater given the revert and I think it\u0027s safer if I can make changes later, possibly when my next CL lands. This one has been big and disruptive as it is.",
+      "parentUuid": "1fc0d9c6_3475eff8",
+      "range": {
+        "startLine": 72,
+        "startChar": 1,
+        "endLine": 72,
+        "endChar": 16
+      },
+      "revId": "9e48396a19a902a5c23348e22b738f32e9a1cada",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
