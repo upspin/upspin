@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a8f74fd9_26496f2e",
+        "filename": "exp/schema/schema.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-08T02:22:59Z",
+      "side": 1,
+      "message": "The contents of this file are essentially a copy and paste of the original main.go and schema.go files. I will highlight a couple of changes below.",
+      "revId": "8f705ad31973c2a73edef09541e2bf2d52e61a0b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f463566d_241aa08b",
+        "filename": "exp/schema/schema.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-08T02:22:59Z",
+      "side": 1,
+      "message": "This is renamed to FromFile (dropping the redundant Schema prefix).\nAlso add a basePort argument, which was previously a flag.",
+      "revId": "8f705ad31973c2a73edef09541e2bf2d52e61a0b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "18ee76eb_e86d1532",
+        "filename": "exp/schema/schema.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-08T02:22:59Z",
+      "side": 1,
+      "message": "Added a logLevel argument.",
+      "revId": "8f705ad31973c2a73edef09541e2bf2d52e61a0b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
