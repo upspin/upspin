@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cc7b6e0a_ade191f7",
+        "filename": "exp/upbox/schema.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 465,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-08T04:10:58Z",
+      "side": 1,
+      "message": "need doc comments here and below.",
+      "revId": "f013be9206163bafca488b19799223eaa31a26a3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
