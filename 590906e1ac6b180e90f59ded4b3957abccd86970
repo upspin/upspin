@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "16624b1d_ccfb9fa1",
+        "filename": "exp/upbox/schema.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-08T07:27:13Z",
+      "side": 1,
+      "message": "it doesn\u0027t specify them, it just is.",
+      "revId": "590906e1ac6b180e90f59ded4b3957abccd86970",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "edc1c65c_7080d185",
+        "filename": "exp/upbox/schema.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 487,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-08T07:27:13Z",
+      "side": 1,
+      "message": "s/any/all/",
+      "revId": "590906e1ac6b180e90f59ded4b3957abccd86970",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
