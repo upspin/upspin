@@ -375,10 +375,14 @@ func (sc *Schema) Run() error {
 		u.secrets = dir
 	}
 
-	keyUser := sc.Users[0].Name
+	keyUser := ""
 	if s, ok := sc.server["keyserver"]; ok {
 		keyUser = s.User
 		// Start keyserver.
+		_, err := sc.writeConfig(tmpDir, keyUser)
+		if err != nil {
+			return err
+		}
 		cmd, err := sc.startServer(tmpDir, s)
 		if err != nil {
 			return err
@@ -389,11 +393,18 @@ func (sc *Schema) Run() error {
 	if err := waitReady(sc.KeyServer); err != nil {
 		return err
 	}
-	configFile, err := sc.writeConfig(tmpDir, "key-bootstrap", keyUser)
-	if err != nil {
-		return err
-	}
 	for _, u := range sc.Users {
+		if u.Name == keyUser {
+			continue
+		}
+
+		if _, err := sc.writeConfig(tmpDir, u.Name); err != nil {
+			return fmt.Errorf("writing config for %v: %v", u.Name, err)
+		}
+
+		if keyUser == "" {
+			continue
+		}
 		pk, err := ioutil.ReadFile(filepath.Join(tmpDir, u.Name, "public.upspinkey"))
 		if err != nil {
 			return err
@@ -417,7 +428,7 @@ func (sc *Schema) Run() error {
 			return err
 		}
 		cmd := exec.Command("upspin",
-			"-config="+configFile,
+			"-config="+filepath.Join(tmpDir, "config."+keyUser),
 			"-log="+sc.logLevel(),
 			"user", "-put",
 		)
@@ -453,12 +464,8 @@ func (sc *Schema) Run() error {
 	}
 
 	// Start a shell as the first user.
-	configFile, err = sc.writeConfig(tmpDir, "shell", sc.Users[0].Name)
-	if err != nil {
-		return err
-	}
 	args = []string{
-		"-config=" + configFile,
+		"-config=" + filepath.Join(tmpDir, "config."+sc.Users[0].Name),
 		"-log=" + sc.logLevel(),
 		"shell",
 	}
@@ -471,7 +478,7 @@ func (sc *Schema) Run() error {
 }
 
 // writeConfig writes a config file for user named "config.name" inside dir.
-func (sc *Schema) writeConfig(dir, name, user string) (string, error) {
+func (sc *Schema) writeConfig(dir, user string) (string, error) {
 	u, ok := sc.user[user]
 	if !ok {
 		return "", fmt.Errorf("unknown user %q", user)
@@ -485,7 +492,7 @@ func (sc *Schema) writeConfig(dir, name, user string) (string, error) {
 		"storeserver: " + u.StoreServer,
 		"dirserver: " + u.DirServer,
 	}
-	switch name {
+	switch user {
 	case "keyserver":
 		configContent = append(configContent,
 			"keyserver: inprocess,",
@@ -495,23 +502,17 @@ func (sc *Schema) writeConfig(dir, name, user string) (string, error) {
 			"keyserver: remote,"+sc.KeyServer,
 		)
 	}
-	configFile := filepath.Join(dir, "config."+name)
+	configFile := filepath.Join(dir, "config."+u.Name)
 	if err := ioutil.WriteFile(configFile, []byte(strings.Join(configContent, "\n")), 0644); err != nil {
 		return "", err
 	}
 	return configFile, nil
 }
 
-// startServer writes a config file for the given server's user
-// and starts the server, returning the running exec.Cmd.
+// startServer starts the given server, returning the running exec.Cmd.
 func (sc *Schema) startServer(dir string, s *Server) (*exec.Cmd, error) {
-	configFile, err := sc.writeConfig(dir, s.Name, s.User)
-	if err != nil {
-		return nil, fmt.Errorf("writing config for %v: %v", s.Name, err)
-	}
-
 	args := []string{
-		"-config=" + configFile,
+		"-config=" + filepath.Join(dir, "config."+s.User),
 		"-log=" + sc.logLevel(),
 		"-tls_cert=" + filepath.Join(dir, "cert.pem"),
 		"-tls_key=" + filepath.Join(dir, "key.pem"),
