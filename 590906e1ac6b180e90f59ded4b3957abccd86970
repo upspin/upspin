@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "a9e0a1d2_c4bf3fe9",
+        "filename": "exp/upbox/schema.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-08T21:55:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "16624b1d_ccfb9fa1",
+      "revId": "590906e1ac6b180e90f59ded4b3957abccd86970",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "edc1c65c_7080d185",
         "filename": "exp/upbox/schema.go",
         "patchSetId": 1
@@ -33,6 +51,24 @@
       "revId": "590906e1ac6b180e90f59ded4b3957abccd86970",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e758c69d_7d8d874d",
+        "filename": "exp/upbox/schema.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 487,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-08T21:55:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "edc1c65c_7080d185",
+      "revId": "590906e1ac6b180e90f59ded4b3957abccd86970",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
