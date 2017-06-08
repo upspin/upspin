@@ -366,10 +366,12 @@ func (sc *Schema) Run() error {
 		if err := os.MkdirAll(dir, 0700); err != nil {
 			return err
 		}
+		var buf bytes.Buffer
 		keygen := exec.Command("upspin", "-config="+configKeygen, "keygen", "-where="+dir)
-		keygen.Stdout = prefix("keygen: ", os.Stdout)
-		keygen.Stderr = prefix("keygen: ", os.Stderr)
+		keygen.Stdout = prefix("keygen: ", &buf)
+		keygen.Stderr = prefix("keygen: ", &buf)
 		if err := keygen.Run(); err != nil {
+			fmt.Fprintf(os.Stderr, "%s", buf.Bytes())
 			return err
 		}
 		u.secrets = dir
