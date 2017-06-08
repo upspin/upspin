@@ -24,7 +24,7 @@ Configuration files must be in YAML format, of this general form:
 	  flags:
 	    debug: cockroach
 	keyserver: key.uspin.io
-	domain: exmaple.com
+	domain: example.com
 
 
 The Users and Servers lists specify the users and servers to create within this
