@@ -32,7 +32,36 @@ If an error occurs while processing a request, the server returns a 500
 Internal Server Error status code and the response body contains the error
 string.
 
-TODO: Describe auth tokens in HTTP headers.
+Authentication
+
+The client authenticates itself to the server using special HTTP headers.
+
+In its first request to a given Upspin server, the client presents a signed
+authentication request as a series of HTTP headers with key
+'Upspin-Auth-Request'. The header values are, in order:
+       the user name,
+       the server host name,
+       the current time, and
+       the R part of an upspin.Signature,
+       the S part of an upspin.Signature.
+The current time is formatted using Go's time.ANSIC presentation:
+	"Mon Jan _2 15:04:05 2006"
+To generate the upspin.Signature, the client concatenates the user name, host
+name, and formatted time, each string prefixed by its length as a big
+endian-encoded uint32:
+	[len(username)][username][len(hostname)][hostname][len(time)][time]
+The client then SHA256-hashes that string and signs it using its Factotum.
+
+The server checks the signature and, if valid, returns an authentication token
+that represents the current session in the 'Upspin-Auth-Token' response header.
+
+In subsequent requests, the client presents that authentication token to the
+server using the 'Upspin-Auth-Token' request header.
+
+If there is an error validating an authentication request or token, the server
+returns an error message in the 'Upspin-Auth-Error' response header.
+
+TODO: document the 'Upspin-Proxy-Request' header.
 
 Encoding
 
