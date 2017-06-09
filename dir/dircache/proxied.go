@@ -38,6 +38,8 @@ type proxiedDir struct {
 
 	die   chan bool // channel used to tell watcher to die
 	dying chan bool // channel used to confirm watcher is dying
+
+	retryInterval time.Duration
 }
 
 // proxiedDirs is used to translate between a user name and the relevant cached directory.
@@ -139,18 +141,23 @@ func (d *proxiedDir) close() {
 	}
 }
 
+const (
+	initialRetryInterval = 10 * time.Second
+	maxRetryInterval     = time.Minute
+)
+
 // watcher watches a directory and caches any changes to something already in the LRU.
 func (d *proxiedDir) watcher(ep upspin.Endpoint) {
 	log.Debug.Printf("dircache.Watcher %s %s", d.user, ep)
 	defer close(d.dying)
-	nextLogTime := time.Now()
-	// If we don't no better, always read in the whole state. It
+
+	// If we don't know better, always read in the whole state. It
 	// is shorter than the the history of all operations.
 	if d.order == 0 {
 		d.order = -1
 	}
-	lastErr := ""
-	seen := 0
+
+	d.retryInterval = initialRetryInterval
 	for {
 		err := d.watch(ep)
 		if err == nil {
@@ -168,21 +175,13 @@ func (d *proxiedDir) watcher(ep upspin.Endpoint) {
 			// Reread current state.
 			d.order = -1
 		}
-		// Rate limit repeat messages. Otherwise the log will get pretty
-		// full when disconnected.
-		newErr := err.Error()
-		if lastErr == newErr {
-			seen++
-			if seen > 10 && !time.Now().After(nextLogTime) {
-				continue
-			}
-		} else {
-			seen = 0
-		}
 		log.Info.Printf("dir/dircache.watcher: %s: %s", d.user, err)
-		nextLogTime = time.Now().Add(time.Minute)
-		lastErr = newErr
-		time.Sleep(time.Second)
+
+		time.Sleep(d.retryInterval)
+		d.retryInterval *= 2
+		if d.retryInterval > maxRetryInterval {
+			d.retryInterval = maxRetryInterval
+		}
 	}
 }
 
@@ -199,6 +198,9 @@ func (d *proxiedDir) watch(ep upspin.Endpoint) error {
 	if err != nil {
 		return err
 	}
+
+	// If Watch succeeds, go back to the initial interval.
+	d.retryInterval = initialRetryInterval
 
 	// Loop receiving events until we are told to stop or the event stream is closed.
 	for {
