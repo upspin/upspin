@@ -562,7 +562,7 @@ func (sc *Schema) logLevel() string {
 	if l := sc.LogLevel; l != "" {
 		return l
 	}
-	return "info"
+	return "error"
 }
 
 func prefix(p string, out io.Writer) io.Writer {
