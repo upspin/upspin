@@ -9,6 +9,7 @@ package flags // import "upspin.io/flags"
 import (
 	"flag"
 	"fmt"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -190,6 +191,13 @@ var flags = map[string]*flagVar{
 // 	flags.Parse(nil) // Register all flags.
 // 	flags.Parse(flags.None, "config", "endpoint") // Register only config and endpoint.
 func Parse(defaultList []string, extras ...string) {
+	ParseArgs(os.Args[1:], defaultList, extras...)
+}
+
+// ParseArgs is the same as Parse but uses the provided argument list
+// instead of those provided on the command line. For ParseArgs, the
+// initial command name should not be provided.
+func ParseArgs(args, defaultList []string, extras ...string) {
 	if len(defaultList) == 0 && len(extras) == 0 {
 		Register()
 	} else {
@@ -200,7 +208,7 @@ func Parse(defaultList []string, extras ...string) {
 			Register(extras...)
 		}
 	}
-	flag.Parse()
+	flag.CommandLine.Parse(args)
 }
 
 // Register registers the command-line flags for the given flag names.
