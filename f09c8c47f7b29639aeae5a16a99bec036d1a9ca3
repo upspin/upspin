@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1b2cfe35_69fbe4d7",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 575,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-06-09T17:24:46Z",
+      "side": 1,
+      "message": "I think this is a bad idea for these reasons:\n\n1) 1MB is an awfully small limit. It\u0027s very easy to go over this size, especially with large metadata, which can be accomplished by sharing a small file with lots of users (several wrapped keys) or just saving a large file or a directory entry with lots of files in it (either one will create lots of DirBlocks).\n\n2) Making this a much larger limit, say X, would mean a DirEntry of size X+1 can be saved, but not read back. If we\u0027re going to have a limit, it must apply to the storing or a DirEntry too.\n\n3) The way this limit is documented is virtually non-existent. It\u0027s buried in a constant in an auxiliary method. Any hard limit like this ought to be more visible.\n\nGiven the rationale above and that this was a quick-fix without discussion, I propose reverting it. I\u0027m re-opening issue #347 to discuss better solutions. As is, this causes more harm than it solves, as explained above.",
+      "revId": "f09c8c47f7b29639aeae5a16a99bec036d1a9ca3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
