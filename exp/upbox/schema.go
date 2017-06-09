@@ -376,7 +376,6 @@ func (sc *Schema) Start() error {
 		return err
 	}
 	for _, u := range sc.Users {
-		fmt.Fprintf(os.Stderr, "upbox: generating keys for user %q\n", u.Name)
 		dir := filepath.Join(sc.dir, u.Name)
 		if err := os.MkdirAll(dir, 0700); err != nil {
 			return err
