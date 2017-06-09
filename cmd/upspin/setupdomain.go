@@ -103,7 +103,7 @@ If any state exists at the given location (-where) then the command aborts.
 		os.Remove(dirFile)
 		s.user("-put", "-in", storeFile)
 		os.Remove(storeFile)
-		fmt.Fprintf(os.Stderr, "Successfully put %q and %q to the key server.\n", dirUser, storeUser)
+		fmt.Fprintf(s.stderr, "Successfully put %q and %q to the key server.\n", dirUser, storeUser)
 		return
 	}
 

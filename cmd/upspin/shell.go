@@ -67,7 +67,7 @@ func (s *State) exec(line string, verbose bool) {
 	}
 	fn := s.getCommand(strings.ToLower(words[0]))
 	if fn == nil {
-		fmt.Fprintf(os.Stderr, "upspin: no such command %q\n", words[0])
+		fmt.Fprintf(s.stderr, "upspin: no such command %q\n", words[0])
 		return
 	}
 	if verbose {

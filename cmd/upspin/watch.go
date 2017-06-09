@@ -7,7 +7,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"os"
 )
 
 func (s *State) watch(args ...string) {
@@ -38,7 +37,7 @@ the current state of the tree rooted at the given path.
 	}
 	for e := range events {
 		if e.Error != nil {
-			fmt.Fprintf(os.Stderr, "watch: error: %s\n", e.Error) // TODO: Failf? Set exitCode?
+			fmt.Fprintf(s.stderr, "watch: error: %s\n", e.Error) // TODO: Failf? Set exitCode?
 			continue
 		}
 
@@ -59,6 +58,6 @@ the current state of the tree rooted at the given path.
 			d, _ := de.Size()
 			size = fmt.Sprintf("%10d", d)
 		}
-		fmt.Printf("%s [%s] %s %s\n", de.Time, attr, size, de.Name)
+		s.Printf("%s [%s] %s %s\n", de.Time, attr, size, de.Name)
 	}
 }

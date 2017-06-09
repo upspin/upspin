@@ -15,7 +15,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"os"
 	"strings"
 
 	"flag"
@@ -56,6 +55,9 @@ always be in Upspin.
 // archiver implements archiving and unarchiving to/from Upspin tree and a local
 // file system.
 type archiver struct {
+	// state holds the current upspin state.
+	state *State
+
 	// client is the Upspin client to use for read or write.
 	client upspin.Client
 
@@ -101,6 +103,7 @@ func (s *State) untarCommand(fs *flag.FlagSet) {
 
 func (s *State) newArchiver(verbose bool) (*archiver, error) {
 	return &archiver{
+		state:   s,
 		client:  s.Client,
 		verbose: verbose,
 	}, nil
@@ -137,7 +140,7 @@ func (a *archiver) doArchive(pathName upspin.PathName, tw *tar.Writer, dst io.Wr
 			ModTime: e.Time.Go(),
 		}
 		if a.verbose {
-			fmt.Fprintf(os.Stderr, "Archiving %q\n", e.Name)
+			fmt.Fprintf(a.state.stderr, "Archiving %q\n", e.Name)
 		}
 		switch {
 		case e.IsDir():
@@ -215,7 +218,7 @@ func (a *archiver) unarchive(src io.ReadCloser) error {
 		}
 
 		if a.verbose {
-			fmt.Fprintf(os.Stderr, "Extracting %q into %q\n", hdr.Name, name)
+			fmt.Fprintf(a.state.stderr, "Extracting %q into %q\n", hdr.Name, name)
 		}
 
 		switch hdr.Typeflag {

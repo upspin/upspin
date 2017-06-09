@@ -9,6 +9,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"sort"
@@ -100,42 +101,53 @@ var commands = map[string]func(*State, ...string){
 
 type State struct {
 	*subcmd.State
+	stdin        io.ReadCloser
+	stdout       io.Writer
+	stderr       io.Writer
 	sharer       *Sharer
 	metricsSaver metric.Saver
 }
 
 func main() {
+	state, args := setup(os.Args[1:])
+	// Shell cannot be in commands because of the initialization loop,
+	// and anyway we should avoid recursion in the interpreter.
+	if state.Name == "shell" {
+		state.shell(args[1:]...)
+		state.ExitNow()
+		os.Exit(0)
+	}
+	state.run(args)
+	state.ExitNow()
+}
+
+// setup initializes the upspin command given the full command-line argument
+// list, args. It applies any global flags set on the command line and returns
+// the initialized State and the arg list after the global flags, starting with
+// the subcommand ("ls", "info", etc.) that will be run.
+func setup(args []string) (*State, []string) {
 	log.SetFlags(0)
 	log.SetPrefix("upspin: ")
 	flag.Usage = usage
-	flags.Parse(flags.Client)
-
+	flags.ParseArgs(args, flags.Client)
 	if len(flag.Args()) < 1 {
 		fmt.Fprintln(os.Stderr, intro)
 		os.Exit(2)
 	}
-
-	op := strings.ToLower(flag.Arg(0))
-	state := newState(op)
-	args := flag.Args()[1:]
-
+	state := newState(strings.ToLower(flag.Arg(0)))
+	// Start the cache if needed.
 	if !strings.Contains(state.Name, "setup") && !strings.Contains(state.Name, "signup") {
 		cacheutil.Start(state.Config)
 	}
-
-	// Shell cannot be in commands because of the initialization loop,
-	// and anyway we should avoid recursion in the interpreter.
-	if state.Name == "shell" {
-		// Start the cache if needed.
-		state.init()
-		state.shell(args...)
-		state.ExitNow()
-		return
-	}
-	cmd := state.getCommand(state.Name)
 	state.init()
-	cmd(state, args...)
-	state.ExitNow()
+	return state, flag.Args()
+}
+
+// run runs a single command specified by the arguments, which should begin with
+// the subcommand ("ls", "info", etc.).
+func (state *State) run(args []string) {
+	cmd := state.getCommand(args[0])
+	cmd(state, args[1:]...)
 }
 
 func usage() {
@@ -186,6 +198,7 @@ func printCommands() {
 // If the command still can't be found, it exits after listing the
 // commands that do exist.
 func (s *State) getCommand(op string) func(*State, ...string) {
+	op = strings.ToLower(op)
 	fn := commands[op]
 	if fn != nil {
 		return fn
@@ -216,7 +229,10 @@ func (s *State) runCommand(path string, args ...string) {
 // It does not contain a Config.
 func newState(name string) *State {
 	s := &State{
-		State: subcmd.NewState(name),
+		stdin:  os.Stdin,
+		stdout: os.Stdout,
+		stderr: os.Stderr,
+		State:  subcmd.NewState(name),
 	}
 	return s
 }
@@ -237,4 +253,18 @@ func (s *State) init() {
 	}
 	s.enableMetrics()
 	return
+}
+
+func (s *State) Printf(format string, args ...interface{}) {
+	fmt.Fprintf(s.stdout, format, args...)
+}
+
+func (s *State) SetIO(stdin io.ReadCloser, stdout, stderr io.Writer) {
+	s.stdin = stdin
+	s.stdout = stdout
+	s.stderr = stderr
+}
+
+func (s *State) DefaultIO() {
+	s.SetIO(s.stdin, os.Stdout, os.Stderr)
 }

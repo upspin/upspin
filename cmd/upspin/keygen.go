@@ -82,12 +82,12 @@ func (s *State) keygenCommand(fs *flag.FlagSet) {
 		s.Exitf("writing keys: %v", err)
 	}
 	fmt.Fprintln(os.Stderr, "Upspin private/public key pair written to:")
-	fmt.Fprintf(os.Stderr, "\t%s\n", filepath.Join(where, "public.upspinkey"))
-	fmt.Fprintf(os.Stderr, "\t%s\n", filepath.Join(where, "secret.upspinkey"))
+	fmt.Fprintf(s.stderr, "\t%s\n", filepath.Join(where, "public.upspinkey"))
+	fmt.Fprintf(s.stderr, "\t%s\n", filepath.Join(where, "secret.upspinkey"))
 	fmt.Fprintln(os.Stderr, "This key pair provides access to your Upspin identity and data.")
 	if secretFlag == "" {
 		fmt.Fprintln(os.Stderr, "If you lose the keys you can re-create them by running this command:")
-		fmt.Fprintf(os.Stderr, "\tupspin keygen -secretseed %s\n", secretStr)
+		fmt.Fprintf(s.stderr, "\tupspin keygen -secretseed %s\n", secretStr)
 		fmt.Fprintln(os.Stderr, "Write this command down and store it in a secure, private place.")
 		fmt.Fprintln(os.Stderr, "Do not share your private key or this command with anyone.")
 	}
@@ -231,6 +231,6 @@ func (s *State) saveKeys(where string, rotate bool, newPublic, newPrivate string
 	if err != nil {
 		return err
 	}
-	fmt.Fprintf(os.Stderr, "Saved previous key pair to:\n\t%s\n", archiveFile)
+	fmt.Fprintf(s.stderr, "Saved previous key pair to:\n\t%s\n", archiveFile)
 	return nil
 }
