@@ -22,7 +22,7 @@ import (
 )
 
 var (
-	logLevel = flag.String("log", "info", "log `level`")
+	logLevel = flag.String("log", "error", "log `level`")
 	basePort = flag.Int("port", 8000, "base `port` number for upspin servers")
 	schema   = flag.String("schema", "", "schema `file` name")
 )
