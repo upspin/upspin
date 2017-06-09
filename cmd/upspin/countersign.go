@@ -51,7 +51,7 @@ func (s *State) countersignCommand(fs *flag.FlagSet) {
 
 // countersign adds a second signature using factotum.
 func (c *Countersigner) countersign(entry *upspin.DirEntry) {
-	packer := lookupPacker(entry)
+	packer := c.oState.lookupPacker(entry)
 	newF := c.nState.Config.Factotum()
 	oldKey := c.oState.Config.Factotum().PublicKey()
 	err := packer.Countersign(oldKey, newF, entry)

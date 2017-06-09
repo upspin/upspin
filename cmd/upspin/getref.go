@@ -32,16 +32,16 @@ the user's default store server. It does not resolve redirections.
 	if err != nil {
 		s.Exit(err)
 	}
-	fmt.Fprintf(os.Stderr, "Using store server at %s\n", s.Config.StoreEndpoint())
+	fmt.Fprintf(s.stderr, "Using store server at %s\n", s.Config.StoreEndpoint())
 
 	data, _, locs, err := store.Get(upspin.Reference(ref))
 	if err != nil {
 		s.Exit(err)
 	}
 	if len(locs) > 0 {
-		fmt.Fprintf(os.Stderr, "Redirection detected:\n")
+		fmt.Fprintf(s.stderr, "Redirection detected:\n")
 		for _, loc := range locs {
-			fmt.Fprintf(os.Stderr, "%+v\n", loc)
+			fmt.Fprintf(s.stderr, "%+v\n", loc)
 		}
 		return
 	}

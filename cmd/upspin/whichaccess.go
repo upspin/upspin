@@ -6,7 +6,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 
 	"upspin.io/errors"
 	"upspin.io/upspin"
@@ -28,9 +27,9 @@ that controls permissions for each of the argument paths.
 			s.Exit(err)
 		}
 		if acc == nil {
-			fmt.Printf("%s: owner only\n", name)
+			s.Printf("%s: owner only\n", name)
 		} else {
-			fmt.Printf("%s: %s\n", name, acc.Name)
+			s.Printf("%s: %s\n", name, acc.Name)
 		}
 	}
 }

@@ -77,7 +77,7 @@ To install new users see the signup command.
 			// TODO(adg): better error message?
 			s.Exit(err)
 		}
-		fmt.Printf("%s\n", blob)
+		s.Printf("%s\n", blob)
 		if name != s.Config.UserName() {
 			continue
 		}

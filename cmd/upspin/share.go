@@ -144,10 +144,10 @@ func (s *State) shareCommand(fs *flag.FlagSet) {
 		}
 		fmt.Println("Read permissions defined by Access files:")
 		for users, names := range uNames {
-			fmt.Printf("\nfiles readable by:\n%s:\n", users)
+			s.Printf("\nfiles readable by:\n%s:\n", users)
 			sort.Strings(names)
 			for _, name := range names {
-				fmt.Printf("\t%s\n", name)
+				s.Printf("\t%s\n", name)
 			}
 		}
 	}
@@ -164,13 +164,13 @@ func (s *State) shareCommand(fs *flag.FlagSet) {
 			entriesToFix = append(entriesToFix, entry)
 			continue
 		}
-		packer := lookupPacker(entry)
+		packer := s.lookupPacker(entry)
 		if packer.Packing() == upspin.PlainPack || packer.Packing() == upspin.EEIntegrityPack {
 			continue
 		}
 		users, keyUsers, self, err := s.sharer.readers(entry)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "looking up users for %q: %s", entry.Name, err)
+			fmt.Fprintf(s.stderr, "looking up users for %q: %s", entry.Name, err)
 			continue
 		}
 		if !s.sharer.quiet && !s.sharer.fix {
@@ -178,8 +178,8 @@ func (s *State) shareCommand(fs *flag.FlagSet) {
 			// no way to get all the world's keys. If -fix is set, we'll report below.
 			for _, user := range users {
 				if user == access.AllUsers {
-					fmt.Fprintf(os.Stderr, "%s:\n\tWarning: file readable by \"all\" but encrypted. Cannot add keys.", entry.Name)
-					fmt.Fprintf(os.Stderr, "\n\tTo decrypt and make readable by \"all\", run share -fix -unencryptforall %q", entry.Name)
+					fmt.Fprintf(s.stderr, "%s:\n\tWarning: file readable by \"all\" but encrypted. Cannot add keys.", entry.Name)
+					fmt.Fprintf(s.stderr, "\n\tTo decrypt and make readable by \"all\", run share -fix -unencryptforall %q", entry.Name)
 					s.ExitCode = 1
 					break
 				}
@@ -192,9 +192,9 @@ func (s *State) shareCommand(fs *flag.FlagSet) {
 					fmt.Fprintln(os.Stderr, "\nDiscrepancies between users in Access files and users in wrapped keys:")
 					printedDiscrepancyHeader = true
 				}
-				fmt.Fprintf(os.Stderr, "\n%s:\n", entry.Name)
-				fmt.Fprintf(os.Stderr, "\tAccess: %s\n", users)
-				fmt.Fprintf(os.Stderr, "\tKeys:   %s\n", keyUsers)
+				fmt.Fprintf(s.stderr, "\n%s:\n", entry.Name)
+				fmt.Fprintf(s.stderr, "\tAccess: %s\n", users)
+				fmt.Fprintf(s.stderr, "\tKeys:   %s\n", keyUsers)
 			}
 			entriesToFix = append(entriesToFix, entry)
 		}
@@ -226,7 +226,7 @@ func (s *Sharer) readers(entry *upspin.DirEntry) (userList, string, bool, error)
 	for _, user := range users {
 		s.lookupKey(user)
 	}
-	packer := lookupPacker(entry)
+	packer := s.state.lookupPacker(entry)
 	if packer == nil {
 		return users, "", self, errors.Errorf("no packer registered for packer %s", entry.Packing)
 	}
@@ -244,7 +244,7 @@ func (s *Sharer) readers(entry *upspin.DirEntry) (userList, string, bool, error)
 		switch packer.Packing() {
 		case upspin.EEPack:
 			if len(hash) != sha256.Size {
-				fmt.Fprintf(os.Stderr, "%q hash size is %d; expected %d", entry.Name, len(hash), sha256.Size)
+				fmt.Fprintf(s.state.stderr, "%q hash size is %d; expected %d", entry.Name, len(hash), sha256.Size)
 				s.state.ExitCode = 1
 				continue
 			}
@@ -275,12 +275,12 @@ func (s *Sharer) readers(entry *upspin.DirEntry) (userList, string, bool, error)
 				// but if that user still has the reference, the user could read the file.
 				// Someone should run "upspin share -fix" soon to repair the packing.
 				unknownUser = true
-				fmt.Fprintf(os.Stderr, "%q: cannot find user for key(s); rerun with -fix\n", entry.Name)
+				fmt.Fprintf(s.state.stderr, "%q: cannot find user for key(s); rerun with -fix\n", entry.Name)
 				s.state.ExitCode = 1
 				continue
 			}
 		default:
-			fmt.Fprintf(os.Stderr, "%q: unrecognized packing %s", entry.Name, packer)
+			fmt.Fprintf(s.state.stderr, "%q: unrecognized packing %s", entry.Name, packer)
 			continue
 		}
 		keyUsers = append(keyUsers, thisUser)
@@ -310,7 +310,7 @@ func (s *Sharer) allEntries(names []upspin.PathName) []*upspin.DirEntry {
 		if !s.isDir {
 			s.state.Exitf("%q is a directory; use -r or -d", name)
 		}
-		if entry.IsDir() || lookupPacker(entry) != nil {
+		if entry.IsDir() || s.state.lookupPacker(entry) != nil {
 			// Only work on entries we can pack. Those we can't will be logged.
 			entries = append(entries, s.entriesFromDirectory(entry.Name)...)
 		}
@@ -329,7 +329,7 @@ func (s *Sharer) entriesFromDirectory(dir upspin.PathName) []*upspin.DirEntry {
 	// Add plain files.
 	for _, e := range thisDir {
 		if !e.IsDir() && !e.IsLink() {
-			if lookupPacker(e) != nil {
+			if s.state.lookupPacker(e) != nil {
 				// Only work on entries we can pack. Those we can't will be logged.
 				entries = append(entries, e)
 			}
@@ -348,14 +348,14 @@ func (s *Sharer) entriesFromDirectory(dir upspin.PathName) []*upspin.DirEntry {
 
 // lookupPacker returns the Packer implementation for the entry, or
 // nil if none is available.
-func lookupPacker(entry *upspin.DirEntry) upspin.Packer {
+func (s *State) lookupPacker(entry *upspin.DirEntry) upspin.Packer {
 	if entry.IsDir() {
 		// Directories are not packed.
 		return nil
 	}
 	packer := pack.Lookup(entry.Packing)
 	if packer == nil {
-		fmt.Fprintf(os.Stderr, "%q has no registered packer for %d; ignoring\n", entry.Name, entry.Packing)
+		fmt.Fprintf(s.stderr, "%q has no registered packer for %d; ignoring\n", entry.Name, entry.Packing)
 	}
 	return packer
 }
@@ -426,20 +426,20 @@ func (s *Sharer) fixShare(name upspin.PathName, users userList) {
 	directory := s.state.DirServer(name)
 	entry, err := directory.Lookup(name) // Guaranteed to have no links.
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "looking up %q: %s", name, err)
+		fmt.Fprintf(s.state.stderr, "looking up %q: %s", name, err)
 		s.state.ExitCode = 1
 		return
 	}
 	if entry.IsDir() {
 		s.state.Exitf("internal error: fixShare called on directory %q", name)
 	}
-	packer := lookupPacker(entry) // Won't be nil.
+	packer := s.state.lookupPacker(entry) // Won't be nil.
 	switch packer.Packing() {
 	case upspin.EEPack:
 		// Will repack below.
 	default:
 		if !s.quiet {
-			fmt.Fprintf(os.Stderr, "%q has %s packing, does not need wrapped keys\n", name, packer)
+			fmt.Fprintf(s.state.stderr, "%q has %s packing, does not need wrapped keys\n", name, packer)
 		}
 		return
 	}
@@ -449,8 +449,8 @@ func (s *Sharer) fixShare(name upspin.PathName, users userList) {
 		// If user is "all", we need to decrypt the file to make progress. We know the file is encrypted.
 		if user == access.AllUsers {
 			if !s.unencryptForAll {
-				fmt.Fprintf(os.Stderr, "Encrypted file %q has read:all access; cannot add keys.\n", name)
-				fmt.Fprintf(os.Stderr, "To fix for everyone, rerun with -unencryptforall flag.\n")
+				fmt.Fprintf(s.state.stderr, "Encrypted file %q has read:all access; cannot add keys.\n", name)
+				fmt.Fprintf(s.state.stderr, "To fix for everyone, rerun with -unencryptforall flag.\n")
 				s.state.ExitCode = 1
 				return
 			}
@@ -463,21 +463,21 @@ func (s *Sharer) fixShare(name upspin.PathName, users userList) {
 			keys = append(keys, k)
 			continue
 		}
-		fmt.Fprintf(os.Stderr, "%q: user %q has no key for packing %s\n", entry.Name, user, packer)
+		fmt.Fprintf(s.state.stderr, "%q: user %q has no key for packing %s\n", entry.Name, user, packer)
 		s.state.ExitCode = 1
 		return
 	}
 	packdatas := []*[]byte{&entry.Packdata}
 	packer.Share(s.state.Config, keys, packdatas)
 	if packdatas[0] == nil {
-		fmt.Fprintf(os.Stderr, "packing skipped for %q\n", entry.Name)
+		fmt.Fprintf(s.state.stderr, "packing skipped for %q\n", entry.Name)
 		s.state.ExitCode = 1
 		return
 	}
 	_, err = directory.Put(entry)
 	if err != nil {
 		// TODO: implement links.
-		fmt.Fprintf(os.Stderr, "error putting entry back for %q: %s\n", name, err)
+		fmt.Fprintf(s.state.stderr, "error putting entry back for %q: %s\n", name, err)
 		s.state.ExitCode = 1
 	}
 }
@@ -518,7 +518,7 @@ func (s *Sharer) lookupKey(user upspin.UserName) upspin.PublicKey {
 	}
 	u, err := s.state.KeyServer().Lookup(user)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "can't find key for %q: %s\n", user, err)
+		fmt.Fprintf(s.state.stderr, "can't find key for %q: %s\n", user, err)
 		s.state.ExitCode = 1
 		s.userKeys[user] = ""
 		return ""
@@ -526,7 +526,7 @@ func (s *Sharer) lookupKey(user upspin.UserName) upspin.PublicKey {
 	// Remember the lookup, failed or otherwise.
 	key = u.PublicKey
 	if len(key) == 0 {
-		fmt.Fprintf(os.Stderr, "no key for %q\n", user)
+		fmt.Fprintf(s.state.stderr, "no key for %q\n", user)
 		s.state.ExitCode = 1
 		s.userKeys[user] = ""
 		return ""

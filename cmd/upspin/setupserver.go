@@ -86,14 +86,14 @@ The calling user must be the same one that ran 'upspin setupdomain'.
 	if err == nil {
 		// TODO(adg): compare local and remote for discrepancies.
 		_ = remote
-		fmt.Fprintf(os.Stderr, "User %q already exists on key server.\n", cfg.User)
+		fmt.Fprintf(s.stderr, "User %q already exists on key server.\n", cfg.User)
 	} else {
 		if err := key.Put(local); err != nil {
 			// TODO(adg): Check whether the TXT record for this
 			// domain is in place.
 			s.Exit(err)
 		}
-		fmt.Fprintf(os.Stderr, "Successfully put %q to the key server.\n", cfg.User)
+		fmt.Fprintf(s.stderr, "Successfully put %q to the key server.\n", cfg.User)
 	}
 
 	// Create Writers file.
@@ -151,22 +151,22 @@ The calling user must be the same one that ran 'upspin setupdomain'.
 
 	// Put server config to the remote upspinserver.
 	s.configureServer(cfgPath, cfg)
-	fmt.Fprintf(os.Stderr, "Configured upspinserver at %q.\n", cfg.Addr)
+	fmt.Fprintf(s.stderr, "Configured upspinserver at %q.\n", cfg.Addr)
 
 	// Check that the current configuration points to our new server.
 	// If not, ask the user to change it and update the key server.
 	if s.Config.DirEndpoint() != ep || s.Config.StoreEndpoint() != ep {
-		fmt.Fprintf(os.Stderr, "Your current configuration in %q has these values:\n", flags.Config)
-		fmt.Fprintf(os.Stderr, "\tdirserver: %v\n\tstoreserver: %v\n\n", s.Config.DirEndpoint(), s.Config.StoreEndpoint())
-		fmt.Fprintf(os.Stderr, "To use the server we are setting up now, these values should be\n")
-		fmt.Fprintf(os.Stderr, "\tdirserver: %v\n\tstoreserver: %v\n\n", ep, ep)
+		fmt.Fprintf(s.stderr, "Your current configuration in %q has these values:\n", flags.Config)
+		fmt.Fprintf(s.stderr, "\tdirserver: %v\n\tstoreserver: %v\n\n", s.Config.DirEndpoint(), s.Config.StoreEndpoint())
+		fmt.Fprintf(s.stderr, "To use the server we are setting up now, these values should be\n")
+		fmt.Fprintf(s.stderr, "\tdirserver: %v\n\tstoreserver: %v\n\n", ep, ep)
 		return
 	}
 
 	// Make the current user root.
 	root := string(s.Config.UserName())
 	s.mkdir(root)
-	fmt.Fprintf(os.Stderr, "Created root %q.\n", root)
+	fmt.Fprintf(s.stderr, "Created root %q.\n", root)
 }
 
 func userFor(cfgPath string, cfg *subcmd.ServerConfig) (*upspin.User, error) {
