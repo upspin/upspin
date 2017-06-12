@@ -860,9 +860,13 @@ func (le *LogEntry) unmarshal(r *checker) error {
 	if err != nil {
 		return errors.E(op, errors.IO, errors.Errorf("reading entry size: %s", err))
 	}
-	const reasonableEntrySize = 1 << 20 // 1MB
-	if 0 >= entrySize || entrySize > reasonableEntrySize {
+	// TODO: document this properly. See issue #347.
+	const reasonableEntrySize = 1 << 26 // 64MB
+	if entrySize <= 0 {
 		return errors.E(op, errors.IO, errors.Errorf("invalid entry size: %d", entrySize))
+	}
+	if entrySize > reasonableEntrySize {
+		return errors.E(op, errors.IO, errors.Errorf("entry size too large: %d", entrySize))
 	}
 	// Read exactly entrySize bytes.
 	data := make([]byte, entrySize)
