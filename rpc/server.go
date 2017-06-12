@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"math/big"
+	"net"
 	"net/http"
 	"strings"
 	"time"
@@ -139,6 +140,33 @@ func generateRandomToken() (string, error) {
 	return fmt.Sprintf("%X", buf), nil
 }
 
+var dirServerIP map[string]bool
+
+func initDirServerIP(netaddr upspin.NetAddr) {
+	h, _, err := net.SplitHostPort(string(netaddr))
+	if err != nil {
+		return
+	}
+	addrs, err := net.LookupHost(h)
+	if err != nil {
+		return
+	}
+	// addrs are as seen by outside world and reported in http req.RemoteAddr
+	dirServerIP = make(map[string]bool, len(addrs))
+	for _, a := range addrs {
+		dirServerIP[a] = true
+	}
+}
+
+func isDirServerAddr(addr string) bool {
+	h, _, err := net.SplitHostPort(addr)
+	if err != nil {
+		return false
+	}
+	_, ok := dirServerIP[h]
+	return ok
+}
+
 // ServeHTTP exposes the configured Service as an HTTP API.
 func (s *serverImpl) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	d := &s.service
@@ -163,6 +191,14 @@ func (s *serverImpl) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		session, err = s.SessionForRequest(w, r)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
+		if dirServerIP == nil {
+			initDirServerIP(s.config.DirEndpoint().NetAddr)
+		}
+		if session.User() == s.config.UserName() && !isDirServerAddr(r.RemoteAddr) {
+			log.Error.Printf("attempted access by admin from %s", r.RemoteAddr)
+			http.Error(w, "local use only", http.StatusUnauthorized)
 			return
 		}
 	}
