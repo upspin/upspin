@@ -155,6 +155,14 @@ func (s *server) hasRight(right access.Right, p path.Parsed, opts ...options) (b
 	o, ss := subspan("hasRight", opts)
 	defer ss.End()
 
+	// The directory server owner itself is limited only by crypto, not by Access rules.
+	// userName has been authenticated and confirmed local if the server owner.
+	// As for SnapshotUser, our imagined use case does not require ErrFollowLink.
+	if s.userName == s.serverConfig.UserName() {
+		// TODO(ehg)  log once per hour?
+		return true, nil, nil
+	}
+
 	// The owner of a snapshot has r,l rights over it and can create the
 	// root, but nothing else. No one else has any rights.
 	if isSnapshotUser(p.User()) {

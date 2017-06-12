@@ -165,6 +165,15 @@ func (s *serverImpl) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusUnauthorized)
 			return
 		}
+
+		// TODO  The admin user should only make local connections; how to enforce?
+		if session.User() == s.config.UserName() {
+			log.Info.Printf("Sadmin %s %s", session.User(), r.RemoteAddr)
+		}
+		// if session.User()==s.config.UserName() && r.RemoteAddr!="127.0.0.1" {
+		//	http.Error(w, err.Error(), http.StatusUnauthorized)
+		//	return
+		// }
 	}
 
 	body, err := ioutil.ReadAll(r.Body)
