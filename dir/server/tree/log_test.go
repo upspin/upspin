@@ -320,6 +320,69 @@ func TestReadRotatedLog(t *testing.T) {
 	}
 }
 
+func TestRotateLogAndTruncate(t *testing.T) {
+	const user = "bob@example.com"
+	dir, err := ioutil.TempDir("", "TestRotateLog")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(dir)
+
+	prevMaxLogSize := maxLogSize
+	maxLogSize = 100
+	defer func() {
+		maxLogSize = prevMaxLogSize
+	}()
+
+	log, _, err := NewLogs(user, dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for i := 0; i < 10; i++ {
+		entry := newLogEntry(upspin.PathName(user+"/testing-testing"), 1)
+		err := log.Append(entry)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	// Verify we have logs of roughly at the expected offsets.
+	offsets := logOffsetsFor(logSubDir(user, dir))
+	expectedOffs := []int64{464, 348, 232, 116, 0}
+	if got, want := len(offsets), len(expectedOffs); got != want {
+		t.Fatalf("Expected %d offsets, got %d", want, got)
+	}
+	if !reflect.DeepEqual(offsets, expectedOffs) {
+		t.Fatalf("Expected\n%+v\nGot:\n%+v", expectedOffs, offsets)
+	}
+
+	// Check that truncation works.
+	err = log.Truncate(300)
+	if err != nil {
+		t.Fatal(err)
+	}
+	offsets = logOffsetsFor(logSubDir(user, dir))
+	expectedOffs = []int64{232, 116, 0}
+	if got, want := len(offsets), len(expectedOffs); got != want {
+		t.Fatalf("Expected %d offsets, got %d", want, got)
+	}
+	if !reflect.DeepEqual(offsets, expectedOffs) {
+		t.Fatalf("Expected\n%+v\nGot:\n%+v", expectedOffs, offsets)
+	}
+
+	r, err := log.NewReader()
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Read at a valid offset and verify there's a next record.
+	_, next, err := r.ReadAt(232)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if next <= 232 {
+		t.Fatalf("Expected next > 232, got %d", next)
+	}
+}
+
 func TestLogIndex(t *testing.T) {
 	dir, err := ioutil.TempDir("", "TestAppendRead")
 	if err != nil {
