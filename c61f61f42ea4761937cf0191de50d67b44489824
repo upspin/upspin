@@ -46,6 +46,30 @@
       "revId": "c61f61f42ea4761937cf0191de50d67b44489824",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ed25f9ec_8829c03d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-06-13T20:00:56Z",
+      "side": 1,
+      "message": "Thanks.   I reconfigured my server to run the new way, but now see RemoteAddr\u003d104.196.244.5:51292, where 104.196.244.5 is the address of dirserver.  So it seems there\u0027s yet another layer of proxy to unwind.\n\nAnyway, let\u0027s wait until Rob settles issue #391 before spending time on this.",
+      "parentUuid": "4a7c4430_c3d5dce2",
+      "range": {
+        "startLine": 18,
+        "startChar": 37,
+        "endLine": 19,
+        "endChar": 36
+      },
+      "revId": "c61f61f42ea4761937cf0191de50d67b44489824",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
