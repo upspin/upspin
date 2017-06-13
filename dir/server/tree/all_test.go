@@ -1009,6 +1009,9 @@ func TestMain(m *testing.M) {
 		panic(err)
 	}
 
+	// Make the logs rotate frequently.
+	maxLogSize = 100
+
 	code := m.Run()
 
 	os.RemoveAll(topDir)

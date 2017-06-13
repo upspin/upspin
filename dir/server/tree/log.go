@@ -49,6 +49,9 @@ const (
 	Delete
 )
 
+// Not const; changed by tests.
+var maxLogSize = int64(100 * 1024 * 1024) // 100 MB
+
 // LogEntry is the unit of logging.
 type LogEntry struct {
 	Op    Operation
@@ -315,6 +318,24 @@ func (w *Writer) Append(e *LogEntry) error {
 
 	prevOffs := lastOffset(w.file)
 
+	// Is it time to move to a new log file?
+	if prevOffs >= maxLogSize {
+		dir := filepath.Dir(w.file.Name())
+		// Close the current underlying log file.
+		err = w.close()
+		if err != nil {
+			return errors.E(op, errors.IO, err)
+		}
+		// Create a new log file where the previous one left off.
+		w.fileOffset += prevOffs
+		loc := filepath.Join(dir, fmt.Sprintf("%d", w.fileOffset))
+		w.file, err = os.OpenFile(loc, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+		if err != nil {
+			return errors.E(op, errors.IO, err)
+		}
+		prevOffs = 0
+	}
+
 	// File is append-only, so this is guaranteed to write to the tail.
 	n, err := w.file.Write(buf)
 	if err != nil {
@@ -324,7 +345,8 @@ func (w *Writer) Append(e *LogEntry) error {
 	if err != nil {
 		return errors.E(op, errors.IO, err)
 	}
-	// Sanity check: flush worked and the new offset is the expected one.
+	// Sanity check: flush worked and the new offset relative to the
+	// beginning of this file is the expected one.
 	newOffs := prevOffs + int64(n)
 	if newOffs != lastOffset(w.file) {
 		// This might indicate a race somewhere, despite the locks.
@@ -346,7 +368,7 @@ func (r *Reader) ReadAt(offset int64) (le LogEntry, next int64, err error) {
 
 	// Is the requested offset outside the bounds of the current log file?
 	before := offset < r.fileOffset
-	after := offset > maxOff
+	after := offset >= maxOff
 	if before || after {
 		if after {
 			// Load new file offsets in case there was a log rotation.
@@ -405,7 +427,7 @@ func (r *Reader) readOffet(offset int64) int64 {
 func (w *Writer) LastOffset() int64 {
 	w.mu.Lock()
 	defer w.mu.Unlock()
-	return lastOffset(w.file)
+	return w.fileOffset + lastOffset(w.file)
 }
 
 // LastOffset returns the offset of the end of the file or -1 on error.
@@ -420,7 +442,7 @@ func (r *Reader) LastOffset() int64 {
 		defer r.wmu.Unlock()
 	}
 
-	return lastOffset(r.file)
+	return r.fileOffset + lastOffset(r.file)
 }
 
 // lastOffset returns the offset of the end of the file or -1 on error.
@@ -439,7 +461,37 @@ func (w *Writer) Truncate(offset int64) error {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 
-	err := w.file.Truncate(offset)
+	// Are we truncating the tail file?
+	if offset >= w.fileOffset {
+		err := w.file.Truncate(w.fileOffset - offset)
+		if err != nil {
+			return errors.E(op, err)
+		}
+		return nil
+	}
+
+	// Otherwise, locate the existing offsets and delete everything from
+	// this point on.
+	base := filepath.Dir(w.file.Name())
+	offsets := logOffsetsFor(base)
+
+	err := w.close()
+	if err != nil {
+		return errors.E(op, errors.IO, err)
+	}
+
+	var i int
+	for i = 0; i < len(offsets) && offsets[i] >= offset; i++ {
+		os.Remove(filepath.Join(base, fmt.Sprintf("%d", offsets[i])))
+	}
+
+	loc := filepath.Join(base, fmt.Sprintf("%d", offsets[i]))
+	w.file, err = os.OpenFile(loc, os.O_APPEND|os.O_WRONLY, 0600)
+	if err != nil {
+		return errors.E(op, errors.IO, err)
+	}
+	w.fileOffset = offsets[i]
+	err = w.file.Truncate(offset - w.fileOffset)
 	if err != nil {
 		return errors.E(op, err)
 	}
@@ -495,7 +547,11 @@ func (r *Reader) openLogAtOffset(offset int64, directory string) error {
 func (w *Writer) Close() error {
 	w.mu.Lock()
 	defer w.mu.Unlock()
+	return w.close()
+}
 
+// close closes the writer. w.mu must be held.
+func (w *Writer) close() error {
 	if w.file != nil {
 		err := w.file.Close()
 		w.file = nil

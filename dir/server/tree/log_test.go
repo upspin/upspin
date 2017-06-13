@@ -320,6 +320,42 @@ func TestReadRotatedLog(t *testing.T) {
 	}
 }
 
+func TestRotateLog(t *testing.T) {
+	const user = "bob@test.com"
+	dir, err := ioutil.TempDir("", "TestRotateLog")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(dir)
+
+	prevMaxLogSize := maxLogSize
+	maxLogSize = 100
+	defer func() {
+		maxLogSize = prevMaxLogSize
+	}()
+
+	log, _, err := NewLogs(user, dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for i := 0; i < 100; i++ {
+		entry := newLogEntry(upspin.PathName(user+"/testing-testing"), 1)
+		err := log.Append(entry)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	// Verify we have logs of roughly at the expected offsets.
+	offsets := logOffsetsFor(filepath.Join(dir, user))
+	expectedOffs := []int64{0, 100, 200, 300}
+	if got, want := len(offsets), 5; got != want {
+		t.Fatalf("Expected %d offsets, got %d", want, got)
+	}
+	if !reflect.DeepEqual(offsets, expectedOffs) {
+		t.Fatalf("Expected\n%+v\nGot:\n%+v", expectedOffs, offsets)
+	}
+}
+
 func TestLogIndex(t *testing.T) {
 	dir, err := ioutil.TempDir("", "TestAppendRead")
 	if err != nil {
