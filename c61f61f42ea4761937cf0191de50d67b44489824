@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2a54cba9_65d255fd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-06-13T17:10:58Z",
+      "side": 1,
+      "message": "That is a result of the /etc/xinetd.d/upspinserver which we originally used to set up our servers. It receives all calls to 443 and then trampolines them to the local address, localhost:8443. That way we didn\u0027t need to add a capability to the binary to announce on a port less than 1024. That has changed since. It is now suggested to do:\n\nsetcap cap_net_bind_service\u003d+ep /home/upspin/upspinserver\n\neaxh time you deploy a new binary. A bit of a pain when deploying a lot but more honest and actually more efficient.",
+      "range": {
+        "startLine": 18,
+        "startChar": 37,
+        "endLine": 19,
+        "endChar": 36
+      },
+      "revId": "c61f61f42ea4761937cf0191de50d67b44489824",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
