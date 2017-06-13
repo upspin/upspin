@@ -22,6 +22,30 @@
       "revId": "c61f61f42ea4761937cf0191de50d67b44489824",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4a7c4430_c3d5dce2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-06-13T17:13:35Z",
+      "side": 1,
+      "message": "Ah, yeah, I forgot about xinetd. I don\u0027t use it, hence why mine does not do this unless I load haproxy in front of it.",
+      "parentUuid": "2a54cba9_65d255fd",
+      "range": {
+        "startLine": 18,
+        "startChar": 37,
+        "endLine": 19,
+        "endChar": 36
+      },
+      "revId": "c61f61f42ea4761937cf0191de50d67b44489824",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
