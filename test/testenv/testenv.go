@@ -226,8 +226,6 @@ func (e *Env) Exit() error {
 		check(e.Setup.Cleanup(e))
 	}
 
-	check(e.rmTmpDir())
-
 	if e.DirServer != nil {
 		e.DirServer.Close()
 	}
@@ -237,6 +235,8 @@ func (e *Env) Exit() error {
 	if e.KeyServer != nil {
 		e.KeyServer.Close()
 	}
+
+	check(e.rmTmpDir())
 
 	return firstErr
 }

@@ -95,6 +95,9 @@ type server struct {
 	// now returns the time now. It's usually just upspin.Now but is
 	// overridden for tests.
 	now func() upspin.Time
+
+	// dialed reports whether this server instance was Dialed or Newed.
+	dialed bool
 }
 
 var _ upspin.DirServer = (*server)(nil)
@@ -764,6 +767,7 @@ func (s *server) Dial(ctx upspin.Config, e upspin.Endpoint) (upspin.Service, err
 	cp := *s // copy of the generator instance.
 	// Overwrite the userName and its sub-components (base, suffix, domain).
 	cp.userName = ctx.UserName()
+	cp.dialed = true
 	var err error
 	cp.userBase, cp.userSuffix, cp.userDomain, err = user.Parse(cp.userName)
 	if err != nil {
@@ -800,6 +804,10 @@ func (s *server) Close() {
 	if err := s.closeTree(s.userName); err != nil {
 		// TODO: return an error when Close expects it.
 		log.Error.Printf("%s: Error closing user tree %q: %q", op, s.userName, err)
+	}
+	
+	if !s.dialed {
+		s.shutdown()
 	}
 }
 
@@ -929,16 +937,12 @@ func (s *server) errLink(op string, link *upspin.DirEntry, opts ...options) (*up
 func (s *server) shutdown() {
 	it := s.userTrees.NewIterator()
 	for {
-		k, v, next := it.GetAndAdvance()
+		k, _, next := it.GetAndAdvance()
 		if !next {
 			break
 		}
 		user := k.(upspin.UserName)
-		tree := v.(*tree.Tree)
-		err := tree.Close()
-		if err != nil {
-			log.Error.Printf("dir/server.shutdown: Error closing tree for user %s: %s", user, err)
-		}
+		s.closeTree(user)
 	}
 }
 
