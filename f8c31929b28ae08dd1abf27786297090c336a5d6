@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ea83df75_81bd9743",
+        "filename": "rpc/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-06-14T03:12:47Z",
+      "side": 1,
+      "message": "I\u0027m confused as to why this would ever be the caller\u0027s address. Does GCE make all calls out of the system be the external service address?",
+      "range": {
+        "startLine": 197,
+        "startChar": 0,
+        "endLine": 197,
+        "endChar": 50
+      },
+      "revId": "f8c31929b28ae08dd1abf27786297090c336a5d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
