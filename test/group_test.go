@@ -29,6 +29,7 @@ func TestGroupFileMultiDir(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer ownerEnv.Exit()
 	readerEnv, err := testenv.New(&testenv.Setup{
 		OwnerName: readerName,
 		Packing:   upspin.PlainPack,
@@ -38,6 +39,7 @@ func TestGroupFileMultiDir(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer readerEnv.Exit()
 	middleEnv, err := testenv.New(&testenv.Setup{
 		OwnerName: middleName,
 		Packing:   upspin.PlainPack,
@@ -47,6 +49,7 @@ func TestGroupFileMultiDir(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer middleEnv.Exit()
 
 	// Assert env1, env2 and env3 talk to different DirServers.
 	if ownerEnv.Config.DirEndpoint() == readerEnv.Config.DirEndpoint() {
@@ -128,6 +131,7 @@ func TestInvalidGroupName(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer ownerEnv.Exit()
 
 	r := testenv.NewRunner()
 	r.AddUser(ownerEnv.Config)
