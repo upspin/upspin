@@ -22,6 +22,30 @@
       "revId": "f8c31929b28ae08dd1abf27786297090c336a5d6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "acce4aaa_01c4205b",
+        "filename": "rpc/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-06-14T03:58:37Z",
+      "side": 1,
+      "message": "Empirically, it seems to be.  I wouldn\u0027t count on this as a primary line of defense.  If it is easy enough for an attacker to get a VM instance with the same external gateway address, maybe it is not worth the complexity?  For sure, I\u0027ll run some more experiments before we proceed.\n\nAlso, I have not yet started to look at AWS.",
+      "parentUuid": "ea83df75_81bd9743",
+      "range": {
+        "startLine": 197,
+        "startChar": 0,
+        "endLine": 197,
+        "endChar": 50
+      },
+      "revId": "f8c31929b28ae08dd1abf27786297090c336a5d6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
