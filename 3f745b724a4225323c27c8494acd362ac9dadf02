@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0930d9e5_29b01d3d",
+        "filename": "cmd/upspin/cmd_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-06-14T16:01:21Z",
+      "side": 1,
+      "message": "For a future CL, it looks like most of this will be re-used and could be encapsulated in a testRunner type or a series of helper functions.",
+      "revId": "3f745b724a4225323c27c8494acd362ac9dadf02",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    }
+  ]
+}
