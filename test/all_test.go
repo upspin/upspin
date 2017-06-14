@@ -23,7 +23,9 @@ import (
 func TestClientFile(t *testing.T) {
 	for _, p := range []upspin.Packing{upspin.PlainPack, upspin.EEIntegrityPack, upspin.EEPack} {
 		t.Run(fmt.Sprintf("packing=%v", p), func(t *testing.T) {
-			testFileSequentialAccess(t, newEnv(t, p))
+			env := newEnv(t, p)
+			defer env.Exit()
+			testFileSequentialAccess(t, env)
 		})
 	}
 }
