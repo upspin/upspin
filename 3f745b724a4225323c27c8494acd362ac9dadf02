@@ -16,6 +16,24 @@
       "revId": "3f745b724a4225323c27c8494acd362ac9dadf02",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "e5875c7c_b54d07dd",
+        "filename": "cmd/upspin/cmd_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-14T20:01:51Z",
+      "side": 1,
+      "message": "That is exactly the plan.",
+      "parentUuid": "0930d9e5_29b01d3d",
+      "revId": "3f745b724a4225323c27c8494acd362ac9dadf02",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
