@@ -129,7 +129,7 @@ func setup(args []string) (*State, []string) {
 	log.SetFlags(0)
 	log.SetPrefix("upspin: ")
 	flag.Usage = usage
-	flags.ParseArgs(args, flags.Client)
+	flags.Parse(flags.Client)
 	if len(flag.Args()) < 1 {
 		fmt.Fprintln(os.Stderr, intro)
 		os.Exit(2)
