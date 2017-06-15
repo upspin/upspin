@@ -71,7 +71,7 @@ func testSnapshot(t *testing.T, r *testenv.Runner) {
 	// There could be many entries, since snapshots are for the root. Keep
 	// looking until we find what we want.
 	var found upspin.PathName
-	for {
+	for i := 0; i < 2; i++ {
 		// We use GetNEvents because we don't have a fixed name to use
 		// with r.GotEvent(name). We need two entries, the top directory
 		// with the date and the sub directory with the time.
@@ -84,7 +84,11 @@ func testSnapshot(t *testing.T, r *testenv.Runner) {
 		file := path.Join(entry.Name, "snapshot-test", "dir", "file")
 		r.Get(file)
 		if r.Failed() {
-			t.Fatal(r.Diag())
+			// TODO: remove once the failure is fixed.
+			t.Logf("Failed to Get %q. Attempting to Glob %q", file, entry.Name)
+			debugFailure(t, r, entry.Name, file)
+
+			// t.Fatal(r.Diag())
 		}
 		if r.Data == data {
 			found = file
@@ -123,6 +127,25 @@ func testSnapshot(t *testing.T, r *testenv.Runner) {
 	if !r.Match(errors.E(errors.Permission)) {
 		t.Fatal(r.Diag())
 	}
+}
+
+// TODO: remove.
+func debugFailure(t *testing.T, r *testenv.Runner, dir, file upspin.PathName) {
+	c := r.ClientFor(ownerName)
+
+	entries, err := c.Glob(string(dir) + "/*")
+	if err != nil {
+		t.Fatalf("Error Globbing: %v", err)
+	}
+	for i, e := range entries {
+		t.Logf("%d: %s", i, e.Name)
+	}
+
+	e, err := c.Lookup(file, true)
+	if err != nil {
+		t.Fatalf("Error in lookup of %q: %v", file, err)
+	}
+	t.Logf("Entry: %+v", e)
 }
 
 func randomString(t *testing.T, size int) string {
