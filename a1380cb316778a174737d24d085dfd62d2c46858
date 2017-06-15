@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bfc9cc39_a3e3e291",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-15T01:40:22Z",
+      "side": 1,
+      "message": "\"Newed\" is gross!\n\ndialed reports whether the instance was created using Dial, not New.",
+      "revId": "a1380cb316778a174737d24d085dfd62d2c46858",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
