@@ -1,0 +1,11 @@
+users:
+  - name: projectserver
+    dirserver: $projectserver
+    storeserver: $projectserver
+
+servers:
+  - name: keyserver
+  - name: projectserver
+    importpath: upspin.io/exp/cmd/projectserver
+
+domain: example.com
