@@ -1,0 +1,412 @@
+// Copyright 2017 The Upspin Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+package main
+
+import (
+	"context"
+	"flag"
+	"fmt"
+	"io/ioutil"
+	"log"
+	"net/http"
+	"os"
+	"path/filepath"
+	"runtime"
+	"sort"
+	"strings"
+	"time"
+
+	"golang.org/x/build/maintner"
+
+	"upspin.io/access"
+	"upspin.io/cloud/https"
+	"upspin.io/config"
+	"upspin.io/errors"
+	"upspin.io/flags"
+	"upspin.io/pack"
+	"upspin.io/path"
+	"upspin.io/rpc/dirserver"
+	"upspin.io/rpc/storeserver"
+	"upspin.io/serverutil"
+	"upspin.io/upspin"
+
+	_ "upspin.io/key/transports"
+	_ "upspin.io/pack/eeintegrity"
+)
+
+var (
+	verbose     = flag.Bool("verbose", false, "enable verbose debug output")
+	genMut      = flag.Bool("generate-mutations", true, "whether this instance should read from upstream git/gerrit/github and generate new mutations to the end of the log. This requires network access and only one instance can be generating mutation")
+	watchGithub = flag.String("watch-github", "", "Comma-separated list of owner/repo pairs to slurp")
+	watchGerrit = flag.String("watch-gerrit", "", `Comma-separated list of Gerrit projects to watch, each of form "hostname/project" (e.g. "go.googlesource.com/go")`)
+	dataDir     = flag.String("data-dir", "", "Local directory to write protobuf files to (default $HOME/var/maintnerd)")
+	debug       = flag.Bool("debug", false, "Print debug logging information")
+)
+
+func main() {
+	flags.Parse(flags.Server)
+
+	if *dataDir == "" {
+		*dataDir = filepath.Join(os.Getenv("HOME"), "var", "maintnerd")
+	}
+
+	type storage interface {
+		maintner.MutationSource
+		maintner.MutationLogger
+	}
+	var logger storage
+
+	corpus := new(maintner.Corpus)
+	if *genMut {
+		logger = maintner.NewDiskMutationLogger(*dataDir)
+		corpus.EnableLeaderMode(logger, *dataDir)
+	}
+	if *debug {
+		corpus.SetDebug()
+	}
+	corpus.SetVerbose(*verbose)
+
+	if *watchGithub != "" {
+		for _, pair := range strings.Split(*watchGithub, ",") {
+			splits := strings.SplitN(pair, "/", 2)
+			if len(splits) != 2 || splits[1] == "" {
+				log.Fatalf("Invalid github repo: %s. Should be 'owner/repo,owner2/repo2'", pair)
+			}
+			token, err := getGithubToken()
+			if err != nil {
+				log.Fatalf("getting github token: %v", err)
+			}
+			corpus.TrackGithub(splits[0], splits[1], token)
+		}
+	}
+	if *watchGerrit != "" {
+		for _, project := range strings.Split(*watchGerrit, ",") {
+			// token may be empty, that's OK.
+			corpus.TrackGerrit(project)
+		}
+	}
+
+	addr := upspin.NetAddr(flags.NetAddr)
+	ep := upspin.Endpoint{
+		Transport: upspin.Remote,
+		NetAddr:   addr,
+	}
+	cfg, err := config.FromFile(flags.Config)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	s, err := newServer(ep, cfg, corpus)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	http.Handle("/api/Store/", storeserver.New(cfg, storeServer{s}, addr))
+	http.Handle("/api/Dir/", dirserver.New(cfg, dirServer{s}, addr))
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	if logger != nil {
+		t0 := time.Now()
+		if err := corpus.Initialize(ctx, logger); err != nil {
+			// TODO: if Initialize only partially syncs the data, we need to delete
+			// whatever files it created, since Github returns events newest first
+			// and we use the issue updated dates to check whether we need to keep
+			// syncing.
+			log.Fatal(err)
+		}
+		initDur := time.Since(t0)
+
+		runtime.GC()
+		var ms runtime.MemStats
+		runtime.ReadMemStats(&ms)
+		log.Printf("Loaded data in %v. Memory: %v MB (%v bytes)", initDur, ms.HeapAlloc>>20, ms.HeapAlloc)
+	}
+
+	//if *genMut {
+	//	go func() { log.Fatal(fmt.Errorf("Corpus.SyncLoop = %v", corpus.SyncLoop(ctx))) }()
+	//}
+
+	https.ListenAndServeFromFlags(nil)
+}
+
+func getGithubToken() (string, error) {
+	tokenFile := filepath.Join(os.Getenv("HOME"), ".github-issue-token")
+	slurp, err := ioutil.ReadFile(tokenFile)
+	if err != nil {
+		return "", err
+	}
+	f := strings.SplitN(strings.TrimSpace(string(slurp)), ":", 2)
+	if len(f) != 2 || f[0] == "" || f[1] == "" {
+		return "", fmt.Errorf("Expected token file %s to be of form <username>:<token>", tokenFile)
+	}
+	token := f[1]
+	return token, nil
+}
+
+// server provides implementations of upspin.DirServer and upspin.StoreServer
+// (accessed by calling the respective methods) that serve a tree containing
+// ...
+type server struct {
+	ep  upspin.Endpoint
+	cfg upspin.Config
+
+	accessEntry *upspin.DirEntry
+	accessBytes []byte
+
+	corpus *maintner.Corpus
+}
+
+type dirServer struct {
+	*server
+}
+
+type storeServer struct {
+	*server
+}
+
+const (
+	accessRef  = upspin.Reference(access.AccessFile)
+	accessFile = "read,list:all\n"
+)
+
+var accessRefdata = upspin.Refdata{Reference: accessRef}
+
+func newServer(ep upspin.Endpoint, cfg upspin.Config, c *maintner.Corpus) (*server, error) {
+	s := &server{
+		ep:     ep,
+		cfg:    cfg,
+		corpus: c,
+	}
+
+	var err error
+	s.accessEntry, s.accessBytes, err = s.pack(access.AccessFile, []byte(accessFile))
+	if err != nil {
+		return nil, err
+	}
+
+	return s, nil
+}
+
+const packing = upspin.EEIntegrityPack
+
+func (s *server) pack(filePath string, data []byte) (*upspin.DirEntry, []byte, error) {
+	name := upspin.PathName(s.cfg.UserName()) + "/" + upspin.PathName(filePath)
+	de := &upspin.DirEntry{
+		Writer:     s.cfg.UserName(),
+		Name:       name,
+		SignedName: name,
+		Packing:    packing,
+		Time:       upspin.Now(),
+		Sequence:   1,
+	}
+
+	bp, err := pack.Lookup(packing).Pack(s.cfg, de)
+	if err != nil {
+		return nil, nil, err
+	}
+	cipher, err := bp.Pack(data)
+	if err != nil {
+		return nil, nil, err
+	}
+	bp.SetLocation(upspin.Location{
+		Endpoint:  s.ep,
+		Reference: upspin.Reference(filePath),
+	})
+	return de, cipher, bp.Close()
+}
+
+// These methods implement upspin.Service.
+
+func (s *server) Endpoint() upspin.Endpoint { return s.ep }
+func (*server) Ping() bool                  { return true }
+func (*server) Close()                      {}
+
+// These methods implement upspin.Dialer.
+
+func (s storeServer) Dial(upspin.Config, upspin.Endpoint) (upspin.Service, error) { return s, nil }
+func (s dirServer) Dial(upspin.Config, upspin.Endpoint) (upspin.Service, error)   { return s, nil }
+
+// These methods implement upspin.DirServer.
+
+func (s dirServer) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
+	p, err := path.Parse(name)
+	if err != nil {
+		return nil, err
+	}
+
+	fp := p.FilePath()
+	switch fp {
+	case "": // Root directory.
+		return &upspin.DirEntry{
+			Name:       p.Path(),
+			SignedName: p.Path(),
+			Attr:       upspin.AttrDirectory,
+			Time:       upspin.Now(),
+		}, nil
+	case access.AccessFile:
+		return s.accessEntry, nil
+	}
+
+	switch p.NElem() {
+	case 1:
+		ok := false
+		s.corpus.GitHub().ForeachRepo(func(repo *maintner.GitHubRepo) error {
+			if repo.ID().Owner == p.Elem(0) {
+				ok = true
+			}
+			return nil
+		})
+		if ok {
+			return &upspin.DirEntry{
+				Name:       p.Path(),
+				SignedName: p.Path(),
+				Attr:       upspin.AttrDirectory,
+				Time:       upspin.Now(),
+			}, nil
+		}
+	case 2:
+		ok := false
+		s.corpus.GitHub().ForeachRepo(func(repo *maintner.GitHubRepo) error {
+			if repo.ID().Owner == p.Elem(0) && repo.ID().Repo == p.Elem(1) {
+				ok = true
+			}
+			return nil
+		})
+		if ok {
+			return &upspin.DirEntry{
+				Name:       p.Path(),
+				SignedName: p.Path(),
+				Attr:       upspin.AttrDirectory,
+				Time:       upspin.Now(),
+			}, nil
+		}
+	}
+
+	return nil, errors.E(name, errors.NotExist)
+}
+
+func (s dirServer) Glob(pattern string) ([]*upspin.DirEntry, error) {
+	return serverutil.Glob(pattern, s.Lookup, s.listDir)
+}
+
+func (s dirServer) listDir(name upspin.PathName) ([]*upspin.DirEntry, error) {
+	p, err := path.Parse(name)
+	if err != nil {
+		return nil, err
+	}
+	if p.User() != s.cfg.UserName() {
+		return nil, errors.E(name, errors.NotExist)
+	}
+	var des []*upspin.DirEntry
+
+	switch p.NElem() {
+	case 0:
+		owners := map[string]bool{}
+		s.corpus.GitHub().ForeachRepo(func(repo *maintner.GitHubRepo) error {
+			owners[repo.ID().Owner] = true
+			return nil
+		})
+		var ownerNames []string
+		for owner := range owners {
+			ownerNames = append(ownerNames, owner)
+		}
+		sort.Strings(ownerNames)
+		for _, owner := range ownerNames {
+			name := p.Path() + upspin.PathName(owner)
+			log.Println(name)
+			des = append(des, &upspin.DirEntry{
+				Name:       name,
+				SignedName: name,
+				Attr:       upspin.AttrDirectory,
+				Time:       upspin.Now(),
+			})
+		}
+	case 1:
+		repos := map[string]bool{}
+		s.corpus.GitHub().ForeachRepo(func(repo *maintner.GitHubRepo) error {
+			id := repo.ID()
+			if id.Owner == p.Elem(0) {
+				repos[id.Repo] = true
+			}
+			return nil
+		})
+		var repoNames []string
+		for repo := range repos {
+			repoNames = append(repoNames, repo)
+		}
+		sort.Strings(repoNames)
+		for _, repo := range repoNames {
+			name := p.Path() + upspin.PathName("/"+repo)
+			des = append(des, &upspin.DirEntry{
+				Name:       name,
+				SignedName: name,
+				Attr:       upspin.AttrDirectory,
+				Time:       upspin.Now(),
+			})
+		}
+	case 2:
+		var repo *maintner.GitHubRepo
+		s.corpus.GitHub().ForeachRepo(func(r *maintner.GitHubRepo) error {
+			if r.ID().Owner == p.Elem(0) && r.ID().Repo == p.Elem(1) {
+				repo = r
+			}
+			return nil
+		})
+		if repo == nil {
+			break
+		}
+		repo.ForeachIssue(func(issue *maintner.GitHubIssue) error {
+			name := p.Path() + upspin.PathName(fmt.Sprintf("/%d", issue.Number))
+			des = append(des, &upspin.DirEntry{
+				Name:       name,
+				SignedName: name,
+				Attr:       upspin.AttrDirectory,
+				Time:       upspin.Now(),
+			})
+			return nil
+		})
+	}
+
+	return des, nil
+}
+
+func (s dirServer) WhichAccess(name upspin.PathName) (*upspin.DirEntry, error) {
+	return s.accessEntry, nil
+}
+
+// This method implements upspin.StoreServer.
+
+func (s storeServer) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Location, error) {
+	if ref == accessRef {
+		return s.accessBytes, &accessRefdata, nil, nil
+	}
+	return nil, nil, nil, errors.E(errors.NotExist)
+}
+
+// The DirServer and StoreServer methods below are not implemented.
+
+var errNotImplemented = errors.E(errors.Permission, errors.Str("method not implemented: demoserver is read-only"))
+
+func (dirServer) Watch(name upspin.PathName, order int64, done <-chan struct{}) (<-chan upspin.Event, error) {
+	return nil, upspin.ErrNotSupported
+}
+
+func (dirServer) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
+	return nil, errNotImplemented
+}
+
+func (dirServer) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
+	return nil, errNotImplemented
+}
+
+func (storeServer) Put(data []byte) (*upspin.Refdata, error) {
+	return nil, errNotImplemented
+}
+
+func (storeServer) Delete(ref upspin.Reference) error {
+	return errNotImplemented
+}
