@@ -1,0 +1,13 @@
+users:
+  - name: issueserver
+    dirserver: $issueserver
+    storeserver: $issueserver
+
+servers:
+  - name: keyserver
+  - name: issueserver
+    importpath: upspin.io/exp/cmd/issueserver
+    flags:
+     watch-github: upspin/upspin
+
+domain: example.com
