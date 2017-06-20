@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "a5d276d3_2b04e7aa",
+        "filename": "exp/cmd/issueserver/main.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-20T21:37:45Z",
+      "side": 1,
+      "message": "Should have renamed it to issueserver; this code was copied from somewhere else. Done.",
+      "parentUuid": "784b3d35_42da0f43",
+      "revId": "510e4445605f12e450d0142e1536722ba4086e80",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "1ae7918f_48268f14",
         "filename": "exp/cmd/issueserver/main.go",
         "patchSetId": 10
@@ -30,6 +48,24 @@
       "writtenOn": "2017-06-20T17:32:38Z",
       "side": 1,
       "message": "Maybe this should be $HOME/upspin/issueserver? Do you need persistence or can it even be $TMPDIR?",
+      "revId": "510e4445605f12e450d0142e1536722ba4086e80",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b0559dc4_da6af12d",
+        "filename": "exp/cmd/issueserver/main.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-20T21:37:45Z",
+      "side": 1,
+      "message": "We do need persistence. Again, the choice of \"var\" was from another piece of code (golang.org/x/build/maintner/maintnerd). Switched to upspin, following your suggestion.",
+      "parentUuid": "1ae7918f_48268f14",
       "revId": "510e4445605f12e450d0142e1536722ba4086e80",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "8de21aa1_9e580d38",
+        "filename": "exp/cmd/issueserver/main.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-20T21:37:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cec0950a_11e10342",
+      "revId": "510e4445605f12e450d0142e1536722ba4086e80",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3721dcd4_9a22d39f",
         "filename": "exp/cmd/issueserver/main.go",
         "patchSetId": 10
@@ -64,6 +118,24 @@
       "writtenOn": "2017-06-20T17:32:38Z",
       "side": 1,
       "message": "You used ifs below, why not the more concise\n\nif state !\u003d \"open\" \u0026\u0026 state !\u003d \"closed\" \u0026\u0026 state !\u003d \"all\" {\n     return ...\n}",
+      "revId": "510e4445605f12e450d0142e1536722ba4086e80",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1c2f5768_4fc21d8c",
+        "filename": "exp/cmd/issueserver/main.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-20T21:37:45Z",
+      "side": 1,
+      "message": "Even better, I made it function validState. Thanks.",
+      "parentUuid": "3721dcd4_9a22d39f",
       "revId": "510e4445605f12e450d0142e1536722ba4086e80",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
