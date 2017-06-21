@@ -54,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "b0ceec4c_ac4bd584",
+        "filename": "exp/cmd/issueserver/main.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-21T03:00:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c20faad7_fe3302b2",
+      "revId": "af09c6e135eaf48d3ee2b71ac11bde2f195a473d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d716dcef_c4b3c0d6",
         "filename": "exp/cmd/issueserver/main.go",
         "patchSetId": 11
@@ -71,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "3b84fb10_2617bd64",
+        "filename": "exp/cmd/issueserver/main.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-21T03:00:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d716dcef_c4b3c0d6",
+      "revId": "af09c6e135eaf48d3ee2b71ac11bde2f195a473d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "48113f62_0bfa436c",
         "filename": "exp/cmd/issueserver/main.go",
         "patchSetId": 11
@@ -82,6 +118,24 @@
       "writtenOn": "2017-06-21T02:36:50Z",
       "side": 1,
       "message": "i already have a working .github-issue-token file for rsc\u0027s reader and it doesn\u0027t have this format.\nit\u0027s just a hex number",
+      "revId": "af09c6e135eaf48d3ee2b71ac11bde2f195a473d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f99dd0f1_e0cb2934",
+        "filename": "exp/cmd/issueserver/main.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-21T03:00:48Z",
+      "side": 1,
+      "message": "changed it to $HOME/.issueserver-github-token",
+      "parentUuid": "48113f62_0bfa436c",
       "revId": "af09c6e135eaf48d3ee2b71ac11bde2f195a473d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
