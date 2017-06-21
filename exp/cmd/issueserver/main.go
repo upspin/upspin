@@ -109,7 +109,7 @@ func main() {
 // $HOME/upspin/issueserver-github-token of the format "token".
 func getGithubToken() (string, error) {
 	file := filepath.Join(config.Home(), "upspin", "issueserver-github-token")
-	slurp, err := ioutil.ReadFile(file)
+	token, err := ioutil.ReadFile(file)
 	if err != nil {
 		return "", err
 	}
