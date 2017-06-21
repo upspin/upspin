@@ -54,8 +54,21 @@ type Options struct {
 }
 
 var defaultOptions = &Options{
-	CertFile: filepath.Join(build.Default.GOPATH, "/src/upspin.io/rpc/testdata/cert.pem"),
-	KeyFile:  filepath.Join(build.Default.GOPATH, "/src/upspin.io/rpc/testdata/key.pem"),
+	CertFile: filepath.Join(testKeyDir, "cert.pem"),
+	KeyFile:  filepath.Join(testKeyDir, "key.pem"),
+}
+
+var testKeyDir = findTestKeyDir() // Do this just once.
+
+// findTestKeyDir locates the "rpc/testdata" directory within the upspin.io
+// repository in a Go workspace and returns its absolute path.
+// If the upspin.io repository cannot be found, it returns ".".
+func findTestKeyDir() string {
+	p, err := build.Import("upspin.io/rpc/testdata", "", build.FindOnly)
+	if err != nil {
+		return "."
+	}
+	return p.Dir
 }
 
 func (opt *Options) applyDefaults() {
