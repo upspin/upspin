@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9dba2c41_31369467",
+        "filename": "exp/cmd/issueserver/issueserver.upbox",
+        "patchSetId": 11
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-21T02:58:20Z",
+      "side": 1,
+      "message": "It means to use issueserver\u0027s address for those endpoints.",
+      "parentUuid": "8a05b9b5_f164c82c",
+      "revId": "af09c6e135eaf48d3ee2b71ac11bde2f195a473d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "c20faad7_fe3302b2",
         "filename": "exp/cmd/issueserver/main.go",
         "patchSetId": 11
@@ -87,6 +105,24 @@
     },
     {
       "key": {
+        "uuid": "29af8af4_2da14b10",
+        "filename": "exp/cmd/issueserver/main.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-21T02:58:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f282c01f_bc4039e8",
+      "revId": "af09c6e135eaf48d3ee2b71ac11bde2f195a473d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "07f58034_3b56cfed",
         "filename": "exp/cmd/issueserver/main.go",
         "patchSetId": 11
@@ -101,6 +137,24 @@
       "revId": "af09c6e135eaf48d3ee2b71ac11bde2f195a473d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a96f914d_5c3fc354",
+        "filename": "exp/cmd/issueserver/main.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-21T02:58:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "07f58034_3b56cfed",
+      "revId": "af09c6e135eaf48d3ee2b71ac11bde2f195a473d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -121,6 +175,24 @@
     },
     {
       "key": {
+        "uuid": "c8273f0a_4008e549",
+        "filename": "exp/cmd/issueserver/main.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-21T02:58:20Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "b07bdd79_b0aa205d",
+      "revId": "af09c6e135eaf48d3ee2b71ac11bde2f195a473d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "706252d1_2d9f3b8a",
         "filename": "exp/cmd/issueserver/main.go",
         "patchSetId": 11
@@ -138,6 +210,24 @@
     },
     {
       "key": {
+        "uuid": "9b777485_fa646cbd",
+        "filename": "exp/cmd/issueserver/main.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 409,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-21T02:58:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "706252d1_2d9f3b8a",
+      "revId": "af09c6e135eaf48d3ee2b71ac11bde2f195a473d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "39a123ec_bf684e49",
         "filename": "exp/cmd/issueserver/main.go",
         "patchSetId": 11
@@ -152,6 +242,24 @@
       "revId": "af09c6e135eaf48d3ee2b71ac11bde2f195a473d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7a5f2f7f_702196c5",
+        "filename": "exp/cmd/issueserver/main.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 418,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-21T02:58:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "39a123ec_bf684e49",
+      "revId": "af09c6e135eaf48d3ee2b71ac11bde2f195a473d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
