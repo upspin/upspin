@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8a05b9b5_f164c82c",
+        "filename": "exp/cmd/issueserver/issueserver.upbox",
+        "patchSetId": 11
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-21T02:36:50Z",
+      "side": 1,
+      "message": "what does the $ mean?",
+      "revId": "af09c6e135eaf48d3ee2b71ac11bde2f195a473d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c20faad7_fe3302b2",
+        "filename": "exp/cmd/issueserver/main.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-21T02:36:50Z",
+      "side": 1,
+      "message": "maintner\n\nwhatever that is",
+      "revId": "af09c6e135eaf48d3ee2b71ac11bde2f195a473d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d716dcef_c4b3c0d6",
+        "filename": "exp/cmd/issueserver/main.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-21T02:36:50Z",
+      "side": 1,
+      "message": "s/toke/token/",
+      "revId": "af09c6e135eaf48d3ee2b71ac11bde2f195a473d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "48113f62_0bfa436c",
+        "filename": "exp/cmd/issueserver/main.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-21T02:36:50Z",
+      "side": 1,
+      "message": "i already have a working .github-issue-token file for rsc\u0027s reader and it doesn\u0027t have this format.\nit\u0027s just a hex number",
+      "revId": "af09c6e135eaf48d3ee2b71ac11bde2f195a473d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f282c01f_bc4039e8",
+        "filename": "exp/cmd/issueserver/main.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-21T02:36:50Z",
+      "side": 1,
+      "message": "comments",
+      "revId": "af09c6e135eaf48d3ee2b71ac11bde2f195a473d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "07f58034_3b56cfed",
+        "filename": "exp/cmd/issueserver/main.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-21T02:36:50Z",
+      "side": 1,
+      "message": "this is ok because it\u0027s a toy but you\u0027re doing crypto under lock and don\u0027t need to",
+      "revId": "af09c6e135eaf48d3ee2b71ac11bde2f195a473d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b07bdd79_b0aa205d",
+        "filename": "exp/cmd/issueserver/main.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-21T02:36:50Z",
+      "side": 1,
+      "message": "i disagree with the whiners. i like our format strings. i can instantly see what the result will be",
+      "revId": "af09c6e135eaf48d3ee2b71ac11bde2f195a473d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "706252d1_2d9f3b8a",
+        "filename": "exp/cmd/issueserver/main.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 409,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-21T02:36:50Z",
+      "side": 1,
+      "message": "this is repetitive and concise and ultimately confusing. took me a few tries.\n// directory returns a DirEntry for the directory with the given name.",
+      "revId": "af09c6e135eaf48d3ee2b71ac11bde2f195a473d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "39a123ec_bf684e49",
+        "filename": "exp/cmd/issueserver/main.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 418,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-21T02:36:50Z",
+      "side": 1,
+      "message": "ditto, sorta",
+      "revId": "af09c6e135eaf48d3ee2b71ac11bde2f195a473d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
