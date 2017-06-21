@@ -32,6 +32,20 @@ const (
 	defaultServerKind = "inprocess"
 )
 
+var (
+	defaultCacheDir         = upspinDir("")
+	defaultLetsEncryptCache = upspinDir("letsencrypt")
+	defaultConfig           = upspinDir("config")
+)
+
+func upspinDir(subdir string) string {
+	home, err := config.Homedir()
+	if err != nil {
+		home = "."
+	}
+	return filepath.Join(home, "upspin", subdir)
+}
+
 // None is the set of no flags. It is rarely needed as most programs
 // use either the Server or Client set.
 var None = []string{}
@@ -59,12 +73,8 @@ var (
 	// caches.
 	CacheDir = defaultCacheDir
 
-	defaultCacheDir = filepath.Join(config.Home(), "upspin")
-
 	// Config ("config") names the Upspin configuration file to use.
 	Config = defaultConfig
-
-	defaultConfig = filepath.Join(config.Home(), "upspin", "config")
 
 	// HTTPAddr ("http") is the network address on which to listen for
 	// incoming insecure network connections.
@@ -82,8 +92,6 @@ var (
 	// the Let's Encrypt certificates are stored. The containing directory
 	// should be owner-accessible only (chmod 0700).
 	LetsEncryptCache = defaultLetsEncryptCache
-
-	defaultLetsEncryptCache = filepath.Join(config.Home(), "upspin", "letsencrypt")
 
 	// Log ("log") sets the level of logging (implements flag.Value).
 	Log logFlag
