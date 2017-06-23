@@ -19,9 +19,6 @@ import (
 	"upspin.io/upspin/proto"
 )
 
-// requireAuthentication specifies whether the connection demands TLS.
-const requireAuthentication = true
-
 // dialConfig contains the destination and authenticated user of the dial.
 type dialConfig struct {
 	endpoint upspin.Endpoint

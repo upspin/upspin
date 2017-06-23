@@ -21,9 +21,8 @@ var (
 	testResponse = "ok"
 	testDocPath  = "testdata/doc"
 
-	testServer http.Handler
-	addr       string
-	once       sync.Once
+	addr string
+	once sync.Once
 )
 
 func startServer() {

@@ -31,7 +31,6 @@ import (
 )
 
 var (
-	zeroEndpoint      upspin.Endpoint
 	inprocessEndpoint = upspin.Endpoint{
 		Transport: upspin.InProcess,
 		NetAddr:   "", // ignored

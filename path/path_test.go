@@ -114,7 +114,6 @@ var nelemTests = []nelemTest{
 }
 
 func TestNelem(t *testing.T) {
-	const want = "a@b.co"
 	for _, test := range nelemTests {
 		p, err := Parse(test.path)
 		if err != nil {

@@ -17,9 +17,8 @@ import (
 )
 
 const (
-	expectedRef   = "978F93921702F861CF941AAACE56B83AE17C8F6845FD674263FFF374A2696A4F"
-	serverBaseURL = "http://go-download-from-gcp.goog.com"
-	contents      = "contents of our file"
+	expectedRef = "978F93921702F861CF941AAACE56B83AE17C8F6845FD674263FFF374A2696A4F"
+	contents    = "contents of our file"
 )
 
 func TestPutAndGet(t *testing.T) {
@@ -117,10 +116,6 @@ func newStoreServer(s storage.Storage) *server {
 	return &server{
 		storage: s,
 	}
-}
-
-type storeTestServer struct {
-	server *server
 }
 
 type testGCP struct {

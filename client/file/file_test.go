@@ -15,16 +15,6 @@ func create(name upspin.PathName) upspin.File {
 	return Writable(&dummyClient{}, name)
 }
 
-func setupFileIO(fileName upspin.PathName, max int, t *testing.T) (upspin.File, []byte) {
-	f := create(fileName)
-	// Create a data set with each byte equal to its offset.
-	data := make([]byte, max)
-	for i := range data {
-		data[i] = uint8(i)
-	}
-	return f, data
-}
-
 const (
 	dummyData = "This is some dummy data."
 )
@@ -58,7 +48,6 @@ func TestFileOverflow(t *testing.T) {
 	defer func() { maxInt = int64(^uint(0) >> 1) }()
 	const (
 		user     = "overflow@google.com"
-		root     = user + "/"
 		fileName = user + "/" + "file"
 	)
 	// Write.
@@ -113,8 +102,6 @@ func TestFileOverflow(t *testing.T) {
 		t.Fatal("seek maxint+1 filex: expected error")
 	}
 }
-
-var loc0 upspin.Location
 
 type dummyClient struct {
 	putData []byte

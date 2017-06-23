@@ -60,22 +60,15 @@ const (
 
 func init() {
 	pack.Register(ee{})
-	ellipticNames = map[string]string{
-		elliptic.P256().Params().Name: "p256",
-		elliptic.P384().Params().Name: "p384",
-		elliptic.P521().Params().Name: "p521",
-	}
 }
 
 var (
-	errTooShort         = errors.Str("destination slice too short")
 	errVerify           = errors.Str("does not verify")
 	errWriter           = errors.Str("empty Writer in Metadata")
 	errNoWrappedKey     = errors.Str("no wrapped key for me")
 	errKeyLength        = errors.Str("wrong key length for AES-256")
 	errSignedNameNotSet = errors.Str("empty SignedName")
-	sig0                upspin.Signature  // for returning error of correct type
-	ellipticNames       map[string]string // ellipticNames maps ECDSA curve names to upspin-friendly curve names.
+	sig0                upspin.Signature // for returning error of correct type
 )
 
 var errNotOnCurve = errors.Str("a crypto attack was attempted against you; see safecurves.cr.yp.to/twist.html for details")
@@ -202,7 +195,6 @@ func (bp *blockPacker) Close() error {
 	// Zero out encryption key when we're done.
 	defer zeroSlice(&bp.dkey)
 
-	const Pack = "Pack"
 	if err := internal.CheckLocationSet(bp.entry); err != nil {
 		return err
 	}

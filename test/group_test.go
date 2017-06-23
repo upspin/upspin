@@ -138,7 +138,6 @@ func TestInvalidGroupName(t *testing.T) {
 
 	const (
 		base                  = ownerName + "/group-badname-test"
-		file                  = base + "/test"
 		ownerGroup            = ownerName + "/Group"
 		ownerGroupBad         = ownerGroup + "/**"
 		ownerGroupBadContents = "ann@example.com"
