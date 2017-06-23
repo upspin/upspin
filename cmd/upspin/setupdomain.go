@@ -114,10 +114,12 @@ If any state exists at the given location (-where) then the command aborts.
 
 	// Generate keys for the dirserver and the storeserver.
 	var noProquint string
+	dirCurve := *curveName
 	dirPublic, dirPrivate, dirProquint, err := s.createKeys(*curveName, noProquint)
 	if err != nil {
 		s.Exit(err)
 	}
+	storeCurve := *curveName
 	storePublic, storePrivate, storeProquint, err := s.createKeys(*curveName, noProquint)
 	if err != nil {
 		s.Exit(err)
@@ -183,6 +185,8 @@ If any state exists at the given location (-where) then the command aborts.
 		UserName:  s.Config.UserName(),
 		Signature: fmt.Sprintf("%x-%x", sig.R, sig.S),
 
+		DirCurve:        dirCurve,
+		StoreCurve:      storeCurve,
 		DirProquint:     dirProquint,
 		StoreProquint:   storeProquint,
 		DirServerPath:   dirServerPath,
@@ -201,12 +205,15 @@ type setupDomainData struct {
 	Signature  string
 
 	// Used by setupDomain.
+	DirCurve        string
+	StoreCurve      string
 	DirProquint     string
 	StoreProquint   string
 	DirServerPath   string
 	StoreServerPath string
 
 	// Used by setupHost.
+	Curve    string
 	Proquint string
 }
 
@@ -217,8 +224,8 @@ Keys and config files for the users
 were generated and placed under the directory:
 	{{.Dir}}
 If you lose the keys you can re-create them by running these commands
-	upspin keygen -where {{.DirServerPath}} -secretseed {{.DirProquint}}
-	upspin keygen -where {{.StoreServerPath}} -secretseed {{.StoreProquint}}
+	upspin keygen -where {{.DirServerPath}} -curve {{.DirCurve}} -secretseed {{.DirProquint}}
+	upspin keygen -where {{.StoreServerPath}} -curve {{.StoreCurve}} -secretseed {{.StoreProquint}}
 Write them down and store them in a secure, private place.
 Do not share your private keys or these commands with anyone.
 
@@ -299,6 +306,7 @@ func (s *State) setuphost(where, domain, curve, proquint string) {
 		UserName:  s.Config.UserName(),
 		Signature: fmt.Sprintf("%x-%x", sig.R, sig.S),
 
+		Curve:    curve,
 		Proquint: proquint,
 	})
 	if err != nil {
@@ -312,7 +320,7 @@ Domain configuration and keys for the user
 were generated and placed under the directory:
 	{{.Dir}}
 If you lose the keys you can re-create them by running this command
-	upspin keygen -where {{.Dir}} -secretseed {{.Proquint}}
+	upspin keygen -where {{.Dir}} -curve {{.Curve}} -secretseed {{.Proquint}}
 Write this command down and store it in a secure, private place.
 Do not share your private key or this command with anyone.
 
