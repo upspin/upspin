@@ -87,7 +87,7 @@ func (s *State) keygenCommand(fs *flag.FlagSet) {
 	fmt.Fprintln(os.Stderr, "This key pair provides access to your Upspin identity and data.")
 	if secretFlag == "" {
 		fmt.Fprintln(os.Stderr, "If you lose the keys you can re-create them by running this command:")
-		fmt.Fprintf(s.stderr, "\tupspin keygen -secretseed %s\n", secretStr)
+		fmt.Fprintf(s.stderr, "\tupspin keygen -curve %s -secretseed %s\n", curve, secretStr)
 		fmt.Fprintln(os.Stderr, "Write this command down and store it in a secure, private place.")
 		fmt.Fprintln(os.Stderr, "Do not share your private key or this command with anyone.")
 	}
