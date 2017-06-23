@@ -98,8 +98,6 @@ type writebackQueue struct {
 }
 
 func newWritebackQueue(sc *storeCache) *writebackQueue {
-	const op = "store/storecache.newWritebackQueue"
-
 	wbq := &writebackQueue{
 		sc:           sc,
 		byEndpoint:   make(map[upspin.Endpoint]*endpointQueue),

@@ -205,11 +205,10 @@ func BenchmarkPackUnpack256_1Mbyte(b *testing.B) {
 func TestSharing(t *testing.T) {
 	// joe@google.com is the owner of a file that is shared with bob@foo.com.
 	const (
-		joesUserName   upspin.UserName = "joe@google.com"
-		pathName                       = upspin.PathName(joesUserName + "/secret_file_shared_with_bob")
-		bobsUserName   upspin.UserName = "bob@foo.com"
-		carlasUserName upspin.UserName = "carla@baz.edu"
-		text                           = "bob, here's the secret file. Sincerely, The Joe."
+		joesUserName upspin.UserName = "joe@google.com"
+		pathName                     = upspin.PathName(joesUserName + "/secret_file_shared_with_bob")
+		bobsUserName upspin.UserName = "bob@foo.com"
+		text                         = "bob, here's the secret file. Sincerely, The Joe."
 	)
 
 	// Set up Joe as the creator/owner.

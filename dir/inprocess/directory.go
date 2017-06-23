@@ -12,7 +12,6 @@ package inprocess // import "upspin.io/dir/inprocess"
 // For the purposes of the Merkle tree, the reference is stored in entry.Blocks[0].Location.
 
 import (
-	"strings"
 	"sync"
 
 	"upspin.io/access"
@@ -45,10 +44,7 @@ func New(config upspin.Config) upspin.DirServer {
 
 // Used to store directory entries.
 // All directories are encoded with this packing.
-var (
-	dirPacking = upspin.EEPack
-	dirPacker  = pack.Lookup(dirPacking)
-)
+var dirPacking = upspin.EEPack
 
 // server implements the upspin.DirServer interface. It is a multiplexed
 // by user onto a database.
@@ -141,18 +137,6 @@ func newDirEntry(config upspin.Config, packing upspin.Packing, name upspin.PathN
 // It is called for directories only.
 func (s *server) newDirEntry(name upspin.PathName, cleartext []byte, seq int64) (*upspin.DirEntry, error) {
 	return newDirEntry(s.db.dirConfig, dirPacking, name, cleartext, upspin.AttrDirectory, "", seq)
-}
-
-// dirBlock constructs an upspin.DirBlock with the appropriate fields.
-func dirBlock(config upspin.Config, ref upspin.Reference, offset int64, blob []byte) upspin.DirBlock {
-	return upspin.DirBlock{
-		Location: upspin.Location{
-			Endpoint:  config.StoreEndpoint(),
-			Reference: ref,
-		},
-		Offset: offset,
-		Size:   int64(len(blob)),
-	}
 }
 
 // makeRoot creates a new user root.
@@ -603,10 +587,6 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 		err = errors.E(op, err)
 	}
 	return entries, err
-}
-
-func isGlobPattern(elem string) bool {
-	return strings.ContainsAny(elem, `*?[]`)
 }
 
 // listDir implements serverutil.ListFunc.

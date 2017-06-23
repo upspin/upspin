@@ -12,7 +12,6 @@ import (
 	"path/filepath"
 	"reflect"
 	"strings"
-	"sync"
 	"testing"
 
 	"upspin.io/pack"
@@ -26,8 +25,6 @@ import (
 func init() {
 	inTest = true
 }
-
-var once sync.Once
 
 type expectations struct {
 	username    upspin.UserName
