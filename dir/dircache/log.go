@@ -162,7 +162,6 @@ const LRUMax = 10000
 // - maxDisk is an approximate limit on disk space for log files
 // - userToDirServer is a map from user names to directory endpoints, maintained by the server
 func openLog(cfg upspin.Config, dir string, maxDisk int64) (*clog, error) {
-	const op = "rpc/dircache.openLog"
 	if err := os.MkdirAll(dir, 0700); err != nil {
 		return nil, err
 	}
@@ -257,7 +256,6 @@ func (l *clog) rotateLog() {
 // were most recently interested in. The watcher should eventually
 // replace them with trusted information.
 func (l *clog) wipeLog(user upspin.UserName) {
-	const op = "rpc/dircache.wipeLog"
 	l.globalLock.Lock()
 	defer l.globalLock.Unlock()
 
@@ -704,8 +702,6 @@ func (l *clog) logGlobRequest(pattern upspin.PathName, err error, entries []*ups
 
 // append appends a clogEntry to the end of the clog and replaces existing in the LRU.
 func (l *clog) append(e *clogEntry) error {
-	const op = "rpc/dircache.append"
-
 	l.updateLRU(e)
 	l.appendToLogFile(e)
 

@@ -26,10 +26,6 @@ const (
 	packing = upspin.PlainPack
 )
 
-var (
-	globalConfig = config.New()
-)
-
 func TestRegister(t *testing.T) {
 	p := pack.Lookup(upspin.PlainPack)
 	if p == nil {

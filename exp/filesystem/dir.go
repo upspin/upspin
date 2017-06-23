@@ -28,8 +28,6 @@ type dirServer struct {
 }
 
 func (s dirServer) Dial(cfg upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
-	const op = "store/filesystem.Dial"
-
 	dialed := *s.Server
 	dialed.user = cfg
 	return dirServer{&dialed}, nil

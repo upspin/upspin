@@ -151,7 +151,6 @@ func setupFileIO(user upspin.UserName, fileName upspin.PathName, max int, t *tes
 func TestFileSequentialAccess(t *testing.T) {
 	const (
 		user     = "user3@google.com"
-		root     = user + "/"
 		fileName = user + "/" + "file"
 	)
 	client, f, data := setupFileIO(user, fileName, Max, t)

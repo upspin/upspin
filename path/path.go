@@ -95,7 +95,6 @@ func (p Parsed) FilePath() string {
 // the trailing slash is optional. The name is 'cleaned' (see the Clean
 // function) to canonicalize it.
 func Parse(pathName upspin.PathName) (Parsed, error) {
-	const op = "path.Parse"
 	name := string(pathName)
 	// Pull off the user name.
 	var userName string

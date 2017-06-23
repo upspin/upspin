@@ -350,8 +350,6 @@ func TestHasAccessWithGroups(t *testing.T) {
 	groups = make(map[upspin.PathName][]path.Parsed) // Forget any existing groups in the cache.
 
 	const (
-		owner = upspin.UserName("me@here.com")
-
 		// This access file defines readers and writers but no other rights.
 		accessText = "r: reader@r.com, reader@foo.bar, family\n" +
 			"w: writer@foo.bar\n" +
@@ -359,10 +357,6 @@ func TestHasAccessWithGroups(t *testing.T) {
 
 		// This access file mentions a group that does not exist.
 		missingGroupAccessText = "r: aMissingGroup, family\n"
-
-		// This is a simple group for a family.
-		groupName = upspin.PathName("me@here.com/Group/family")
-		groupText = "# My family\n sister@me.com, brother@me.com\n"
 
 		missingGroupName = upspin.PathName("me@here.com/Group/aMissingGroup")
 	)
@@ -870,14 +864,6 @@ func match(t *testing.T, want []path.Parsed, expect []string) {
 			t.Errorf("User %s not found in at position %d in list", compare, i)
 			t.Errorf("expect: %q; got %q", expect, want)
 		}
-	}
-}
-
-// expectState checks whether the results of IsAccessFile match with expectations and if not it fails the test.
-func expectState(t *testing.T, expectIsFile bool, pathName upspin.PathName) {
-	isFile := IsAccessFile(pathName)
-	if expectIsFile != isFile {
-		t.Fatalf("Expected %v, got %v", expectIsFile, isFile)
 	}
 }
 

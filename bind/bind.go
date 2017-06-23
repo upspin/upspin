@@ -92,8 +92,6 @@ var (
 	inflightDials = make(map[dialKey]*inflightDial)
 )
 
-const allowOverwrite = true // for documentation purposes
-
 // RegisterKeyServer registers a KeyServer interface for the transport.
 // There must be no previous registration.
 func RegisterKeyServer(transport upspin.Transport, key upspin.KeyServer) error {

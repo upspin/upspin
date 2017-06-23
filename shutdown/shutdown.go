@@ -61,7 +61,6 @@ var killSleep = time.Sleep
 
 var shutdown struct {
 	mu       sync.Mutex
-	c        chan os.Signal
 	sequence []func()
 	once     sync.Once
 }
