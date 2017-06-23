@@ -16,6 +16,24 @@
       "revId": "bb06383aaf837d10cd4289b6d24f553105314de2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7f33019e_6a126175",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-06-23T17:00:58Z",
+      "side": 1,
+      "message": "Yes, by design.   The first version of my change suppressed -curve if p256, but I realized that we may eventually want to change the default curve to 25519 or some quantum-resistant hybrid.  So for an long-lifetime message like this, best to be explicit.\n\nBut you\u0027re right that we\u0027ve gotten away with this so far because almost everyone has been using the default.  And shorter user advice is better user advice.\n\nSo it was a judgment call.  I picked the path of least user surprise in the long term.",
+      "parentUuid": "297b2d33_93fabb5c",
+      "revId": "bb06383aaf837d10cd4289b6d24f553105314de2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
