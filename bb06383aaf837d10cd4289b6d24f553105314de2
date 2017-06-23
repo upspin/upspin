@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "297b2d33_93fabb5c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-06-23T16:53:03Z",
+      "side": 1,
+      "message": "But the code prints it even if the curve *is* the default.",
+      "revId": "bb06383aaf837d10cd4289b6d24f553105314de2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
