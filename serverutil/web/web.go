@@ -4,7 +4,9 @@
 
 // TODO(adg,andybons): make the HTML pages prettier
 
-package upspinserver
+// Package web provides an http.Handler implementation that serves content from
+// the Upspin namespace.
+package web
 
 import (
 	"fmt"
@@ -19,27 +21,35 @@ import (
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/path"
-	"upspin.io/serverutil/perm"
 	"upspin.io/upspin"
 )
 
-type web struct {
-	cfg  upspin.Config
-	cli  upspin.Client
-	perm *perm.Perm
+// IsWriter is a method provided by serverutil/perm.Perm, but in the context of
+// this package the method determines whether a user's Upspin tree should be
+// served through this web interface.
+type IsWriter interface {
+	IsWriter(upspin.UserName) bool
 }
 
-func newWeb(cfg upspin.Config, perm *perm.Perm) http.Handler {
-	if !*enableWeb {
-		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			http.NotFound(w, r)
-		})
-	}
+// New returns an http.Handler that serves the Upspin names identified
+// by the request path. For example, a request for a URL with the path
+// "/user@example.com/file" returns the content available at that Upspin
+// path (without the leading slash).
+//
+// The handler will only serve the Upspin trees of users that are considered
+// Writers by the given IsWriter.
+func New(cfg upspin.Config, perm IsWriter) http.Handler {
 	return &web{
 		cfg:  cfg,
 		cli:  client.New(cfg),
 		perm: perm,
 	}
+}
+
+type web struct {
+	cfg  upspin.Config
+	cli  upspin.Client
+	perm IsWriter
 }
 
 func (s *web) ServeHTTP(w http.ResponseWriter, r *http.Request) {
