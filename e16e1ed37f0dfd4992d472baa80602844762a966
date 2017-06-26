@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d1533dff_ddf552b0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-06-26T17:34:25Z",
+      "side": 1,
+      "message": "What\u0027s Upspin space? Storage bytes? Isn\u0027t everything accessible through an HTTP handler? What\u0027s different here?",
+      "revId": "e16e1ed37f0dfd4992d472baa80602844762a966",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1c795b4f_d0913a79",
+        "filename": "serverutil/web/web.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-06-26T17:34:25Z",
+      "side": 1,
+      "message": "Why? What is this buying us? Seems arbitrary.",
+      "revId": "e16e1ed37f0dfd4992d472baa80602844762a966",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
