@@ -30,6 +30,7 @@ import (
 	"upspin.io/rpc/dirserver"
 	"upspin.io/rpc/storeserver"
 	"upspin.io/serverutil/perm"
+	"upspin.io/serverutil/web"
 	storeServer "upspin.io/store/server"
 	"upspin.io/subcmd"
 	"upspin.io/upspin"
@@ -58,8 +59,8 @@ func Main() (ready chan struct{}) {
 		http.Handle("/", &setupHandler{})
 	} else if err != nil {
 		log.Fatal(err)
-	} else {
-		http.Handle("/", newWeb(cfg, perm))
+	} else if *enableWeb {
+		http.Handle("/", web.New(cfg, perm))
 	}
 
 	return readyCh
@@ -234,7 +235,9 @@ func (h *setupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "OK")
 
 	h.done = true
-	h.web = newWeb(cfg, perm)
+	if *enableWeb {
+		h.web = web.New(cfg, perm)
+	}
 }
 
 func setupWriters(cfg upspin.Config) error {
