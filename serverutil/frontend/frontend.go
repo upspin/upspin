@@ -21,9 +21,17 @@ import (
 	"github.com/NYTimes/gziphandler"
 	"github.com/russross/blackfriday"
 
+	"upspin.io/config"
 	"upspin.io/flags"
 	"upspin.io/log"
+	"upspin.io/serverutil/web"
+	"upspin.io/upspin"
+
+	_ "upspin.io/pack/eeintegrity"
+	_ "upspin.io/transports"
 )
+
+const releaseUser = "release@upspin.io"
 
 var (
 	docPath = flag.String("docpath", defaultDocPath(), "location of folder containing documentation")
@@ -36,7 +44,12 @@ func Main() {
 		log.Fatalf("error parsing templates: %v", err)
 	}
 
-	http.Handle("/", newServer())
+	cfg, err := config.FromFile(flags.Config)
+	if err != nil {
+		log.Fatal(err)
+	}
+	http.Handle("/", newServer(cfg))
+
 	if !flags.InsecureHTTP {
 		go func() {
 			log.Printf("Serving HTTP->HTTPS redirect on %q", flags.HTTPAddr)
@@ -61,8 +74,9 @@ func parseTemplates(dir string) (err error) {
 }
 
 const (
-	extMarkdown = ".md"
-	docHostname = "upspin.io" // redirect doc requests to this URL
+	extMarkdown  = ".md"
+	docHostname  = "upspin.io"      // redirect doc requests to this host
+	testHostname = "test.upspin.io" // don't redirect requests to this host
 )
 
 // sourceRepo is a map from each custom domain their repo base URLs.
@@ -103,24 +117,27 @@ type server struct {
 	docTitle map[string]string
 }
 
-// newServer allocates and returns a new HTTP server.
-func newServer() http.Handler {
+// newServer initializes and returns a new HTTP server.
+func newServer(cfg upspin.Config) http.Handler {
 	s := &server{mux: http.NewServeMux()}
 	s.handlers = goGetHandler{gziphandler.GzipHandler(canonicalHostHandler{s.mux})}
-	s.init()
-	return s
-}
+	s.mux.Handle("/", http.HandlerFunc(s.handleRoot))
+	s.mux.Handle("/doc/", http.HandlerFunc(s.handleDoc))
+	s.mux.Handle("/images/", http.FileServer(http.Dir(*docPath)))
+	s.mux.Handle("/"+releaseUser+"/", web.New(cfg, isWriter(releaseUser)))
 
-// init sets up a server by performing tasks like mapping path endpoints to
-// handler functions.
-func (s *server) init() {
 	if err := s.parseDocs(*docPath); err != nil {
 		log.Error.Fatalf("Could not parse docs in %s: %s", *docPath, err)
 	}
+	return s
+}
 
-	s.mux.Handle("/", goGetHandler{canonicalHostHandler{http.HandlerFunc(s.handleRoot)}})
-	s.mux.Handle("/doc/", canonicalHostHandler{http.HandlerFunc(s.handleDoc)})
-	s.mux.Handle("/images/", canonicalHostHandler{http.FileServer(http.Dir(*docPath))})
+// isWriter is a serverutil/web.IsWriter implementation.
+type isWriter upspin.UserName
+
+// IsWriter reports whether the given user matches isWriter.
+func (w isWriter) IsWriter(u upspin.UserName) bool {
+	return upspin.UserName(w) == u
 }
 
 type pageData struct {
@@ -167,8 +184,7 @@ func (s *server) renderDoc(w http.ResponseWriter, fn string) {
 	}
 }
 
-// ServeHTTP satisfies the http.Handler interface for a server. It
-// will compress all responses if the appropriate request headers are set.
+// ServeHTTP satisfies the http.Handler interface for a server.
 func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.TLS != nil {
 		w.Header().Set("Strict-Transport-Security", "max-age=86400; includeSubDomains")
@@ -247,7 +263,7 @@ type canonicalHostHandler struct {
 
 func (h canonicalHostHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Redirect requests to foo.upspin.io to upspin.io.
-	if r.Host != docHostname && strings.HasSuffix(r.Host, "."+docHostname) {
+	if r.Host != docHostname && r.Host != testHostname && strings.HasSuffix(r.Host, "."+docHostname) {
 		u := *r.URL
 		u.Host = docHostname
 		http.Redirect(w, r, u.String(), http.StatusFound)
