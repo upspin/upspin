@@ -234,11 +234,9 @@ func DeleteLogs(user upspin.UserName, directory string) error {
 	return nil
 }
 
-// ListUsers lists all known users in directory.
-// TODO: do not allow a pattern; it's error-prone and exposes too much internal
-// state that can lead to had-to-refactor code in the future.
-func ListUsers(pattern string, directory string) ([]upspin.UserName, error) {
-	const op = "dir/server/tree.ListUsers"
+// userGlob   returns the set of users in the directory that match the pattern.
+// The pattern is as per filePath.Glob, applied to the directory.
+func userGlob(op, pattern string, directory string) ([]upspin.UserName, error) {
 	prefix := rootFile("", directory)
 	matches, err := filepath.Glob(rootFile(upspin.UserName(pattern), directory))
 	if err != nil {
@@ -249,6 +247,20 @@ func ListUsers(pattern string, directory string) ([]upspin.UserName, error) {
 		users[i] = upspin.UserName(strings.TrimPrefix(m, prefix))
 	}
 	return users, nil
+}
+
+// ListUsers returns all user names found in the given log directory.
+func ListUsers(directory string) ([]upspin.UserName, error) {
+	const op = "dir/server/tree.ListUsers"
+	return userGlob(op, "*@*", directory)
+}
+
+// ListUsersWithSuffix returns a list is user names found in the given log
+// directory that contain the required suffix, without the leading "+".
+// The special suffix "*" matches all users with a non-empty suffix.
+func ListUsersWithSuffix(suffix, directory string) ([]upspin.UserName, error) {
+	const op = "dir/server/tree.ListUsers"
+	return userGlob(op, "*+"+suffix+"@*", directory)
 }
 
 func logFile(user upspin.UserName, offset int64, directory string) string {
