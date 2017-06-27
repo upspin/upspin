@@ -18,6 +18,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/NYTimes/gziphandler"
 	"github.com/russross/blackfriday"
 
 	"upspin.io/flags"
@@ -95,6 +96,7 @@ func redirectHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 type server struct {
+	handlers http.Handler // stack of wrapped http.Handlers
 	mux      *http.ServeMux
 	docList  []string
 	docHTML  map[string][]byte
@@ -104,6 +106,7 @@ type server struct {
 // newServer allocates and returns a new HTTP server.
 func newServer() http.Handler {
 	s := &server{mux: http.NewServeMux()}
+	s.handlers = goGetHandler{gziphandler.GzipHandler(canonicalHostHandler{s.mux})}
 	s.init()
 	return s
 }
@@ -170,15 +173,7 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.TLS != nil {
 		w.Header().Set("Strict-Transport-Security", "max-age=86400; includeSubDomains")
 	}
-
-	if !strings.Contains(r.Header.Get("Accept-Encoding"), "gzip") {
-		s.mux.ServeHTTP(w, r)
-		return
-	}
-	w.Header().Set("Content-Encoding", "gzip")
-	gzw := newGzipResponseWriter(w)
-	defer gzw.Close()
-	s.mux.ServeHTTP(gzw, r)
+	s.handlers.ServeHTTP(w, r)
 }
 
 func (s *server) parseDocs(path string) error {
