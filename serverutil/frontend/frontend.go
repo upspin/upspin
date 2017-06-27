@@ -20,6 +20,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/NYTimes/gziphandler"
 	"github.com/russross/blackfriday"
 
 	"upspin.io/config"
@@ -50,7 +51,7 @@ func Main() {
 		log.Fatal(err)
 	}
 	s := newServer(cfg)
-	http.Handle("/", goGetHandler{canonicalHostHandler{s}})
+	http.Handle("/", goGetHandler{gziphandler.GzipHandler(canonicalHostHandler{s})})
 
 	if !flags.InsecureHTTP {
 		go func() {
