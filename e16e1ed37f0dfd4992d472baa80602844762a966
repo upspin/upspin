@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "ce335dfe_74793321",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-27T01:25:35Z",
+      "side": 1,
+      "message": "serverutil/upspinserver: move Upspin web server into new package serverutil/web",
+      "revId": "e16e1ed37f0dfd4992d472baa80602844762a966",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "d1533dff_ddf552b0",
         "filename": "/COMMIT_MSG",
         "patchSetId": 2
@@ -49,6 +66,23 @@
       "side": 1,
       "message": "i don\u0027t understand how this description matches the change itself",
       "parentUuid": "c7f695a7_205514d8",
+      "revId": "e16e1ed37f0dfd4992d472baa80602844762a966",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a747ed75_b33f806b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-27T01:25:35Z",
+      "side": 1,
+      "message": "The new serverutil/web package makes ...",
       "revId": "e16e1ed37f0dfd4992d472baa80602844762a966",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
