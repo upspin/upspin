@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3b8b41a7_f25ebc90",
+        "filename": "upspin/code.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 5770
+      },
+      "writtenOn": "2017-06-27T17:23:33Z",
+      "side": 1,
+      "message": "Nitpick, but I\u0027d check n \u003c\u003d 0 before u \u003c 0. n is binary.Varint\u0027s way of reporting errors, and it\u0027s common practice to check error before checking data.",
+      "range": {
+        "startLine": 324,
+        "startChar": 13,
+        "endLine": 324,
+        "endChar": 19
+      },
+      "revId": "1d89a310e81f115d5fdb3fb4d362ce98900de5ce",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
