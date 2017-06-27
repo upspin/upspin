@@ -22,6 +22,30 @@
       "revId": "5e11630af895ed5188865c48e9be38b100a698f3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f4504529_ba46f2cc",
+        "filename": "serverutil/web/web.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-27T22:35:14Z",
+      "side": 1,
+      "message": "See how it\u0027s used here:\nhttps://github.com/upspin/upspin/blob/master/serverutil/frontend/frontend.go#L127",
+      "parentUuid": "8be51839_4cb61afe",
+      "range": {
+        "startLine": 30,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 0
+      },
+      "revId": "5e11630af895ed5188865c48e9be38b100a698f3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
