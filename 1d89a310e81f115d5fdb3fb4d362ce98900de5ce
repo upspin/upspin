@@ -22,6 +22,23 @@
       "revId": "1d89a310e81f115d5fdb3fb4d362ce98900de5ce",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "66267084_c544f166",
+        "filename": "upspin/marshal_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-27T20:01:40Z",
+      "side": 1,
+      "message": "this should be TestDirEntUnmarshalNoPanic, for consistency.",
+      "revId": "1d89a310e81f115d5fdb3fb4d362ce98900de5ce",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
