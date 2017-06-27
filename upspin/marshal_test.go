@@ -176,3 +176,13 @@ func TestDirEntMarshalAppendNoMalloc(t *testing.T) {
 		t.Fatalf("MarshalAppend allocated")
 	}
 }
+
+func TestDirEntUnmarshalNoPanic(t *testing.T) {
+	data, err := dirEnt.Unmarshal([]byte{0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x2})
+	if err != ErrTooShort {
+		t.Fatal(err)
+	}
+	if data != nil {
+		t.Fatalf("Expected no data, got %d bytes", len(data))
+	}
+}
