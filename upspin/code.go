@@ -324,7 +324,7 @@ func getBytes(b []byte) (data, remaining []byte) {
 	if u < 0 {
 		return nil, nil
 	}
-	if n == 0 || len(b) < n+int(u) {
+	if n <= 0 || len(b) < n+int(u) {
 		return nil, nil
 	}
 	return getNBytes(b[n:], int(u))
