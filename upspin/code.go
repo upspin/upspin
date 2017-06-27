@@ -321,10 +321,9 @@ func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
 // If there is insufficient data, both return values will be nil.
 func getBytes(b []byte) (data, remaining []byte) {
 	u, n := binary.Varint(b)
-	if u < 0 {
-		return nil, nil
-	}
-	if n == 0 || len(b) < n+int(u) {
+	// If n <= 0, Varint returned an error. Otherwise we know n <= len(b).
+	// We also test that u is good and u bytes remain in the buffer after the count.
+	if n <= 0 || u < 0 || len(b[n:]) < int(u) {
 		return nil, nil
 	}
 	return getNBytes(b[n:], int(u))
