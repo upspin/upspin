@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0db3919e_5591f5d0",
+        "filename": "upspin/code.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 5770
+      },
+      "writtenOn": "2017-06-27T16:36:52Z",
+      "side": 1,
+      "message": "n+int(u) can overflow for large values of u.\n\nHowever, it seems to be fine. n can never be larger than len(b) because of binary.Varint guarantees. And then getNBytes checks if len(b) \u003c n { return nil, nil } (which cannot overflow) before slicing b.\n\nSo, it doesn\u0027t seem like it could cause a panic, but I wanted to point it out.\n\nYou could consider rewriting len(b) \u003c n+int(u) into len(b)-n \u003c int(u) to avoid overflow. Although that wouldn\u0027t help with potential truncation from int64 to int on 32-bit architectures.",
+      "range": {
+        "startLine": 327,
+        "startChar": 14,
+        "endLine": 327,
+        "endChar": 31
+      },
+      "revId": "590d51e4f70215245385784c2db55d9f9ca8b5d7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cd314e76_8bd0ae70",
+        "filename": "upspin/code.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 5770
+      },
+      "writtenOn": "2017-06-27T16:36:52Z",
+      "side": 1,
+      "message": "Also, style-wise, it\u0027s unclear to me why u \u003c 0 is being checked separately in its own if statement, but n \u003c\u003d 0 and len(b) \u003c n+int(u) checks are grouped together in their own if statement. They don\u0027t seem very logically related to me.\n\nIf this were written as:\n\n    if u \u003c 0 || n \u003c\u003d 0 || len(b) \u003c n+int(u) {\n        return nil, nil\n    }\n\nOr:\n\n    if u \u003c 0 {\n        return nil, nil\n    }\n    if n \u003c\u003d 0 {\n        return nil, nil\n    }\n    if len(b) \u003c n+int(u) {\n        return nil, nil\n    }\n\nThat would read more consistently to me. If there\u0027s a reason for the current arrangement, maybe a comment explaining it would help.\n\nBut this is just a minor style question.",
+      "revId": "590d51e4f70215245385784c2db55d9f9ca8b5d7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ad04e886_e8cfd385",
+        "filename": "upspin/marshal_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 5770
+      },
+      "writtenOn": "2017-06-27T16:36:52Z",
+      "side": 1,
+      "message": "/go/got",
+      "revId": "590d51e4f70215245385784c2db55d9f9ca8b5d7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
