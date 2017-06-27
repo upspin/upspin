@@ -42,6 +42,48 @@
     },
     {
       "key": {
+        "uuid": "9303af95_2ba4d0f6",
+        "filename": "upspin/code.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-06-27T17:11:11Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "0db3919e_5591f5d0",
+      "range": {
+        "startLine": 327,
+        "startChar": 14,
+        "endLine": 327,
+        "endChar": 31
+      },
+      "revId": "590d51e4f70215245385784c2db55d9f9ca8b5d7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "a9f9b748_527890ac",
+        "filename": "upspin/code.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 327,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-06-27T17:11:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cd314e76_8bd0ae70",
+      "revId": "590d51e4f70215245385784c2db55d9f9ca8b5d7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ad04e886_e8cfd385",
         "filename": "upspin/marshal_test.go",
         "patchSetId": 1
@@ -56,6 +98,24 @@
       "revId": "590d51e4f70215245385784c2db55d9f9ca8b5d7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5102d773_e655a62d",
+        "filename": "upspin/marshal_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-06-27T17:11:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ad04e886_e8cfd385",
+      "revId": "590d51e4f70215245385784c2db55d9f9ca8b5d7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
