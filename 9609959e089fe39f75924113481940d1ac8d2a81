@@ -16,6 +16,57 @@
       "revId": "9609959e089fe39f75924113481940d1ac8d2a81",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dfe9f87b_7ee3531c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-27T23:16:10Z",
+      "side": 1,
+      "message": "do noT",
+      "revId": "9609959e089fe39f75924113481940d1ac8d2a81",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "121d41b0_d524f04f",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 240,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-27T23:16:10Z",
+      "side": 1,
+      "message": "this is not a good description. what is the return value? you want something like\n// listUsersPattern returns the set of users in the directory that match the pattern.\n\nbut you need to say what the pattern is.\n\nthe name is odd too. i might go with usersGlob, which helps explain what\u0027s going on.",
+      "revId": "9609959e089fe39f75924113481940d1ac8d2a81",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "25cd3636_a868909d",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-27T23:16:10Z",
+      "side": 1,
+      "message": "change the last sentence to something like\n\nThe special suffix \"*\" matches all users with a non-empty suffix.\n\ncomment needs to say the + is not included in the suffix (or change the code to accept it either way, which may be better)",
+      "revId": "9609959e089fe39f75924113481940d1ac8d2a81",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
