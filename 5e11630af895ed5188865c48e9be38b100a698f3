@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8be51839_4cb61afe",
+        "filename": "serverutil/web/web.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-06-27T21:40:16Z",
+      "side": 1,
+      "message": "I\u0027m a bit confused by the logic behind this, not because it is wrong but I don\u0027t get the intent.",
+      "range": {
+        "startLine": 30,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 0
+      },
+      "revId": "5e11630af895ed5188865c48e9be38b100a698f3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
