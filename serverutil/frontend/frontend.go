@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// TODO(adg): gzip compress responses
-
 // Package frontend provides a web server that serves documentation and meta
 // tags to instruct "go get" where to find the Upspin source repository.
 package frontend // import "upspin.io/serverutil/frontend"
@@ -20,6 +18,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/NYTimes/gziphandler"
 	"github.com/russross/blackfriday"
 
 	"upspin.io/config"
@@ -50,7 +49,7 @@ func Main() {
 		log.Fatal(err)
 	}
 	s := newServer(cfg)
-	http.Handle("/", goGetHandler{canonicalHostHandler{s}})
+	http.Handle("/", goGetHandler{gziphandler.GzipHandler(canonicalHostHandler{s})})
 
 	if !flags.InsecureHTTP {
 		go func() {
