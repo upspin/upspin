@@ -23,7 +23,6 @@ import (
 // Snapshots are automatically taken every 12 hours.
 const (
 	snapshotSuffix          = "snapshot"
-	snapshotGlob            = "*+" + snapshotSuffix + "@*"
 	snapshotControlFile     = "TakeSnapshot"
 	snapshotDateFormat      = "2006/01/02/"
 	snapshotTimeFormat      = "15:04"
@@ -103,7 +102,7 @@ func (s *server) snapshotLoop() {
 // it's time to perform a new snapshot for them and if so snapshots them.
 func (s *server) snapshotAll() error {
 	const op = "dir/server.snapshotAll"
-	users, err := tree.ListUsers(snapshotGlob, s.logDir)
+	users, err := tree.ListUsersWithSuffix(snapshotSuffix, s.logDir)
 	if err != nil {
 		log.Error.Printf("%s: error listing snapshot users: %s", op, err)
 		return err
