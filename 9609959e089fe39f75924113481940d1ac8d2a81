@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d6e77f70_b4424546",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-27T22:28:11Z",
+      "side": 1,
+      "message": "...: replace ListUsers with two safer functions\n\n?",
+      "revId": "9609959e089fe39f75924113481940d1ac8d2a81",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
