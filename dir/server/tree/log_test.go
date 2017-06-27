@@ -462,6 +462,7 @@ func TestLogIndex(t *testing.T) {
 }
 
 func TestListUsers(t *testing.T) {
+	const op = "TestListUsers"
 	dir, cleanup := setup(t, "ListUsers")
 	defer cleanup()
 
@@ -480,7 +481,7 @@ func TestListUsers(t *testing.T) {
 		}
 	}
 	// Glob for snapshot users only.
-	users, err := ListUsers("*+snapshot@*", dir)
+	users, err := ListUsersWithSuffix("snapshot", dir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -488,7 +489,7 @@ func TestListUsers(t *testing.T) {
 		t.Fatal("users don't match")
 	}
 	// Glob for .jp users only.
-	users, err = ListUsers("*.jp", dir)
+	users, err = listUsersPattern(op, "*.jp", dir)
 	if !sameUsers(t, users, []upspin.UserName{
 		"morihei+snapshot@ueshiba.jp",
 		"kishomaru@ueshiba.jp",
@@ -498,10 +499,22 @@ func TestListUsers(t *testing.T) {
 		t.Fatal("users don't match")
 	}
 	// Glob for users with suffix only.
-	users, err = ListUsers("*+*@*", dir)
+	users, err = ListUsersWithSuffix("*", dir)
 	if !sameUsers(t, users, []upspin.UserName{
 		"morihei+snapshot@ueshiba.jp",
 		"jose+photos@ortega.com",
+	}) {
+		t.Fatal("users don't match")
+	}
+	// Get all users.
+	users, err = ListUsers(dir)
+	if !sameUsers(t, users, []upspin.UserName{
+		"morihei@ueshiba.jp",
+		"kishomaru@ueshiba.jp",
+		"moriteru@ueshiba.jp",
+		"shiohira@shihan.com",
+		"jose+photos@ortega.com",
+		"morihei+snapshot@ueshiba.jp",
 	}) {
 		t.Fatal("users don't match")
 	}
