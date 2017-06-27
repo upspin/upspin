@@ -1,0 +1,21 @@
+<!--
+Copyright 2017 The Upspin Authors. All rights reserved.
+Use of this source code is governed by a BSD-style
+license that can be found in the LICENSE file.
+-->
+{{define "title"}}Download Upspin{{end}}
+{{define "content"}}
+	<h1>Download Upspin</h1>
+	<p>Choose an Upspin release for your operating system and processor architecture:</p>
+	<ul>
+	{{range .Content}}
+		<li>
+			<a href="{{.FileName}}">{{.FileName}}</a>
+			{{with .OSArch}}({{.}}){{end}}
+			{{with .Size}}({{.}}){{end}}
+		</li>
+	{{else}}
+		<li>No releases are available. Please try again later.</li>
+	{{end}}
+	</ul>
+{{end}}
