@@ -62,17 +62,15 @@ type LogEntry struct {
 type Writer struct {
 	user upspin.UserName // user for whom this log is intended.
 
-	mu         *sync.Mutex // protects fields below.
-	file       *os.File    // file descriptor for the log.
-	fileOffset int64       // offset of the first record from the file.
+	mu         sync.Mutex // protects fields below.
+	file       *os.File   // file descriptor for the log.
+	fileOffset int64      // offset of the first record from the file.
 }
 
 // Reader reads LogEntries from the log.
 type Reader struct {
-	// wmu is a copy of the writer's lock, for use when reading from the
-	// same file as the write log. It must be held after mu if it will be
-	// held.
-	wmu *sync.Mutex
+	// writer is the Writer who owns the log.
+	writer *Writer
 
 	// mu protects the fields below. If wmu must be held, it must be
 	// held after mu.
@@ -147,7 +145,6 @@ func NewLogs(user upspin.UserName, directory string) (*Writer, *LogIndex, error)
 
 	l := &Writer{
 		user:       user,
-		mu:         &sync.Mutex{},
 		file:       loggerFile,
 		fileOffset: off[0],
 	}
@@ -387,8 +384,8 @@ func (r *Reader) ReadAt(offset int64) (le LogEntry, next int64, err error) {
 	// If we're reading from the tail file (max r.readOffsets), then we
 	// must lock wmu to avoid reading partially-written data.
 	if r.offsets[0] == r.fileOffset {
-		r.wmu.Lock()
-		defer r.wmu.Unlock()
+		r.writer.mu.Lock()
+		defer r.writer.mu.Unlock()
 	}
 
 	// Are we past the end of the current file?
@@ -438,8 +435,8 @@ func (r *Reader) LastOffset() int64 {
 	// If we're reading from the same file as the current Writer, lock it.
 	// Order is important.
 	if r.fileOffset == r.offsets[0] {
-		r.wmu.Lock()
-		defer r.wmu.Unlock()
+		r.writer.mu.Lock()
+		defer r.writer.mu.Unlock()
 	}
 
 	return r.fileOffset + lastOffset(r.file)
@@ -510,7 +507,7 @@ func (w *Writer) NewReader() (*Reader, error) {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 
-	r.wmu = w.mu
+	r.writer = w
 	r.offsets = logOffsetsFor(filepath.Dir(w.file.Name()))
 
 	dir := filepath.Dir(w.file.Name())
