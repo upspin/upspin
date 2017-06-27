@@ -31,8 +31,6 @@ import (
 	_ "upspin.io/transports"
 )
 
-const releaseUser = "release@upspin.io"
-
 var (
 	docPath = flag.String("docpath", defaultDocPath(), "location of folder containing documentation")
 )
@@ -58,7 +56,7 @@ func Main() {
 	}
 }
 
-var baseTmpl, docTmpl, doclistTmpl *template.Template
+var baseTmpl, docTmpl, doclistTmpl, downloadTmpl *template.Template
 
 func parseTemplates(dir string) (err error) {
 	baseTmpl, err = template.ParseFiles(filepath.Join(dir, "base.tmpl"))
@@ -70,6 +68,10 @@ func parseTemplates(dir string) (err error) {
 		return err
 	}
 	doclistTmpl, err = template.ParseFiles(filepath.Join(dir, "base.tmpl"), filepath.Join(dir, "doclist.tmpl"))
+	if err != nil {
+		return err
+	}
+	downloadTmpl, err = template.ParseFiles(filepath.Join(dir, "base.tmpl"), filepath.Join(dir, "download.tmpl"))
 	return err
 }
 
@@ -127,7 +129,10 @@ func newServer(cfg upspin.Config) http.Handler {
 	s.mux.Handle("/", http.HandlerFunc(s.handleRoot))
 	s.mux.Handle("/doc/", http.HandlerFunc(s.handleDoc))
 	s.mux.Handle("/images/", http.FileServer(http.Dir(*docPath)))
-	s.mux.Handle("/"+releaseUser+"/", web.New(cfg, isWriter(releaseUser)))
+	if cfg != nil {
+		s.mux.Handle(downloadPath, newDownloadHandler(cfg))
+		s.mux.Handle("/"+releaseUser+"/", web.New(cfg, isWriter(releaseUser)))
+	}
 	return s
 }
 
