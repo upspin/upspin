@@ -1052,6 +1052,13 @@ func testGlobLinkErrors(t *testing.T, r *testenv.Runner) {
 	} else if len(e1.Blocks) > 0 {
 		t.Fatalf("entry 1 (%q) has %d blocks, want 0", e1.Name, len(e1.Blocks))
 	}
+
+	// Test that a Glob through a link works.
+	r.As(ownerName)
+	r.Glob(dir2link + "/*")
+	if !r.GotEntries(true, dir2access, dir2file) {
+		t.Fatal(r.Diag())
+	}
 }
 
 func testDeleteErrors(t *testing.T, r *testenv.Runner) {
