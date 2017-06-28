@@ -16,6 +16,24 @@
       "revId": "5c635260ff2bd9be1b41563fd29b8cba3b738937",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c26175a9_b7d058f7",
+        "filename": "upspin/code.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-06-28T22:09:04Z",
+      "side": 1,
+      "message": "Done.\n\n(Or we could convert everything to int64 and be done with it)",
+      "parentUuid": "99c5c8ae_042486e8",
+      "revId": "5c635260ff2bd9be1b41563fd29b8cba3b738937",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
