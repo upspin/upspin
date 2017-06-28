@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "99c5c8ae_042486e8",
+        "filename": "upspin/code.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-28T21:39:35Z",
+      "side": 1,
+      "message": "i think this can still be problematic because of overflow especially on 32-bit machines. if u is MaxInt32-n, then n+u is zero and getNBytes will succeed incorrectly.\n\nbut i always have to think hard about these and i am low on caffeine so i could be wrong. we know n is safe, so it would be i think safer to do len(b)-n \u003c int(u).",
+      "revId": "5c635260ff2bd9be1b41563fd29b8cba3b738937",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
