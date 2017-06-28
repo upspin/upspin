@@ -105,6 +105,15 @@ func TestGlob(t *testing.T) {
 				},
 			}, nil
 		default:
+			if name == link || strings.HasPrefix(string(name), string(link+"/")) {
+				return []*upspin.DirEntry{
+					{
+						Name: link,
+						Link: link,
+						Attr: upspin.AttrLink,
+					},
+				}, upspin.ErrFollowLink
+			}
 			return nil, errNotExist
 		}
 	}
@@ -132,6 +141,9 @@ func TestGlob(t *testing.T) {
 	testGlob(user+"/dir/p*/*/*", nil, pubDirFile)
 	testGlob(user+"/dir/private/*", errPermission)
 	testGlob(user+"/dir/*/dir/*", errLink, link, pubDirFile)
+	testGlob(link, nil, link)
+	testGlob(link+"/*", errLink, link)
+	testGlob(link+"/foo/*", errLink, link)
 }
 
 func matchEntries(entries []*upspin.DirEntry, names ...upspin.PathName) error {
