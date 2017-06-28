@@ -462,12 +462,14 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	o, m := newOptMetric(op)
 	defer m.Done()
 
+	// lookup implements serverutil.LookupFunc. It checks permissions.
 	lookup := func(name upspin.PathName) (*upspin.DirEntry, error) {
 		const op = "dir/server.Lookup"
 		o, ss := subspan(op, []options{o})
 		defer ss.End()
 		return s.lookupWithPermissions(op, name, o)
 	}
+	// lookup implements serverutil.ListFunc. It checks permissions.
 	listDir := func(dirName upspin.PathName) ([]*upspin.DirEntry, error) {
 		const op = "dir/server.listDir"
 		o, ss := subspan(op, []options{o})
@@ -482,11 +484,16 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	return entries, err
 }
 
+// globWithoutPermissions is an implementation of DirServer.Glob that does not do
+// permission checking. It is used by the snapshot code.
+//
+// TODO(adg): tidy this up (at least move it below the listDir method that follows).
 func (s *server) globWithoutPermissions(pattern string) ([]*upspin.DirEntry, error) {
 	const op = "dir/server.globWithoutPermissions"
 	o, m := newOptMetric(op)
 	defer m.Done()
 
+	// lookup implements serverutil.LookupFunc. It does not check permissions.
 	lookup := func(name upspin.PathName) (*upspin.DirEntry, error) {
 		const op = "dir/server.Lookup"
 		o, ss := subspan(op, []options{o})
@@ -497,6 +504,7 @@ func (s *server) globWithoutPermissions(pattern string) ([]*upspin.DirEntry, err
 		}
 		return s.lookup(op, p, !entryMustBeClean, o)
 	}
+	// listDir implements serverutil.ListFunc. It does not check permissions.
 	listDir := func(dirName upspin.PathName) ([]*upspin.DirEntry, error) {
 		const op = "dir/server.listDir"
 		o, ss := subspan(op, []options{o})
@@ -504,6 +512,12 @@ func (s *server) globWithoutPermissions(pattern string) ([]*upspin.DirEntry, err
 		p, err := path.Parse(dirName)
 		if err != nil {
 			return nil, errors.E(op, dirName, err)
+		}
+		if de, err := s.lookup(op, p, !entryMustBeClean, o); err != nil {
+			if de != nil {
+				return []*upspin.DirEntry{de}, err
+			}
+			return nil, err
 		}
 		tree, err := s.loadTreeFor(p.User(), o)
 		if err != nil {
@@ -524,8 +538,16 @@ func (s *server) globWithoutPermissions(pattern string) ([]*upspin.DirEntry, err
 }
 
 // listDir implements serverutil.ListFunc, with an additional options variadic.
-// dirName should always be a directory.
+// dirName should always be a directory. It checks permissions.
 func (s *server) listDir(op string, dirName upspin.PathName, opts ...options) ([]*upspin.DirEntry, error) {
+	// Look up the entry, as there might be a link somewhere in the path.
+	if de, err := s.lookupWithPermissions(op, dirName, opts...); err != nil {
+		if de != nil {
+			return []*upspin.DirEntry{de}, err
+		}
+		return nil, err
+	}
+
 	parsed, err := path.Parse(dirName)
 	if err != nil {
 		return nil, errors.E(op, err)
