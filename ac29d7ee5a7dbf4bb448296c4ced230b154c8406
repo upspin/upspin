@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "92b9481e_65301205",
+        "filename": "upspin/code.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-28T22:15:00Z",
+      "side": 1,
+      "message": "this really needs a comment now, plus i have a prettier, safe variant.\n// If n \u003c\u003d 0, Varint returned an error. Otherwise we know n \u003c\u003d len(b).\n// We also need to test that u is good and u bytes remain in the buffer after the count.\nif n \u003c\u003d 0 || u \u003c 0 || len(b[n:]) \u003c int(u) {\n\ni put the n test first to mirror the comment.\nslicing avoids the overflow issue completely.",
+      "revId": "ac29d7ee5a7dbf4bb448296c4ced230b154c8406",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
