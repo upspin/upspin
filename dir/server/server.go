@@ -505,6 +505,12 @@ func (s *server) globWithoutPermissions(pattern string) ([]*upspin.DirEntry, err
 		if err != nil {
 			return nil, errors.E(op, dirName, err)
 		}
+		if de, err := s.lookup(op, p, !entryMustBeClean, o); err != nil {
+			if de != nil {
+				return []*upspin.DirEntry{de}, err
+			}
+			return nil, err
+		}
 		tree, err := s.loadTreeFor(p.User(), o)
 		if err != nil {
 			return nil, errors.E(op, err)
@@ -557,6 +563,14 @@ func (s *server) listDir(op string, dirName upspin.PathName, opts ...options) ([
 		if err != nil {
 			return nil, errors.E(op, err)
 		}
+	}
+
+	// Look up the entry, as there might be a link somewhere in the path.
+	if de, err := s.lookupWithPermissions(op, parsed.Path(), options{}); err != nil {
+		if de != nil {
+			return []*upspin.DirEntry{de}, err
+		}
+		return nil, err
 	}
 
 	// Fetch the directory's contents.
