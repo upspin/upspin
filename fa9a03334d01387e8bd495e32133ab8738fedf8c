@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bb997135_40b23e44",
+        "filename": "dir/server/server.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 500,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-29T00:44:24Z",
+      "side": 1,
+      "message": "it\u0027s confusing that this closure has the same name as the method immediately below. the op is even confusing. all these (undocumented!) closures just make the code hard to follow, too.\n\nwe can tidy this up in another CL. add a TODO for now please.",
+      "revId": "fa9a03334d01387e8bd495e32133ab8738fedf8c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8fb62bba_0a8dcb1c",
+        "filename": "dir/server/server.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 508,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-29T00:44:24Z",
+      "side": 1,
+      "message": "why is this here now? doesn\u0027t loadTreeFor do a lookup?",
+      "revId": "fa9a03334d01387e8bd495e32133ab8738fedf8c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "48371bad_0de3c862",
+        "filename": "dir/server/server.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 548,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-29T00:44:24Z",
+      "side": 1,
+      "message": "doesn\u0027t this check for links?",
+      "revId": "fa9a03334d01387e8bd495e32133ab8738fedf8c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
