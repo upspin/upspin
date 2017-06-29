@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5b90244b_4a0154ab",
+        "filename": "serverutil/frontend/download.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-29T03:47:19Z",
+      "side": 1,
+      "message": "no error checks on writes or closes?",
+      "revId": "89155ccfb84716909a1c1da7299e8f37b3347563",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
