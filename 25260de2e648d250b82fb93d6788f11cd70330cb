@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "88825c13_0b72ebec",
+        "filename": "doc/signup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-06-29T19:45:04Z",
+      "side": 1,
+      "message": "upspinfs currently works on MacOS and Linux but not Windows or OpenBSD though grosse@gmail is working on getting that up. This need sot be mentioned. I don\u0027t mind this section here but I don\u0027t want people banging their heads against the wall wondering why it doesn\u0027t work on their system.",
+      "range": {
+        "startLine": 232,
+        "startChar": 3,
+        "endLine": 232,
+        "endChar": 24
+      },
+      "revId": "25260de2e648d250b82fb93d6788f11cd70330cb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c62fefcd_2a9cd464",
+        "filename": "doc/signup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-06-29T19:45:04Z",
+      "side": 1,
+      "message": "Umount is very system specific. For example, the -l option doesn\u0027t exist on MacOS or OpenBSD though I sometimes which it did.",
+      "range": {
+        "startLine": 256,
+        "startChar": 2,
+        "endLine": 256,
+        "endChar": 58
+      },
+      "revId": "25260de2e648d250b82fb93d6788f11cd70330cb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
