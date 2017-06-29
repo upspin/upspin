@@ -11,7 +11,7 @@ import (
 	"strings"
 	"testing"
 
-	"upspin.io/exp/upbox"
+	"upspin.io/upbox"
 )
 
 const upboxSchema = `

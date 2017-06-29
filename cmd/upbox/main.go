@@ -9,7 +9,7 @@ provides an upspin shell acting as the first user specified by the schema.
 For information on defining a schema, see the documentation for package
 upspin.io/exp/upbox.
 */
-package main
+package upbox
 
 import (
 	"flag"
@@ -18,7 +18,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"upspin.io/exp/upbox"
+	"upspin.io/upbox"
 )
 
 var (
