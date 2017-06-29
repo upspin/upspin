@@ -229,10 +229,44 @@ cache server that improves performance. The cache server is particularly
 important, and the setup instructions are in the [Upspin configuration](/doc/config.md)
 document.
 
-For details about `upspinfs`, run
+## Browsing Upspin Files
+
+Upspin includes a tool called `upspinfs` which creates a virtual filesystem where you can browse files as if they were on disc.
+This section explains simple usage.
+
+First make a directory for your upspin files:
+
+```
+$ mkdir myupspin/
+```
+
+Then run the `upspinfs` tool with the directory created above:
+
+```
+$ upspinfs myupspin/
+```
+
+This is the blocking command. You don't have to wait for command to return.
+
+Now you can open `myupspin` in a file browser and browse the directory!
+
+Above command will return if `myupspin` is un-mounted successfully. Run `umount` to un-mount.
+
+```
+$ umount -l myupspin/ #you may need to be root to do this.
+```
+
+If you encounter an error when you run `upspinfs` the second time such as:
+
+```
+mount helper error: fusermount: failed to open mountpoint for reading: Transport endpoint is not connected
+fuse.Mount failed: fusermount: exit status 1
+```
+
+Just un-mount and try again.
+
+To know more about `upspinfs`, run
 
 ```
 $ go doc upspinfs
 ```
-
-TODO: There should be more about `upspinfs`.
