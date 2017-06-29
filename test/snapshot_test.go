@@ -58,6 +58,7 @@ func testSnapshot(t *testing.T, r *testenv.Runner) {
 		}
 		t.Fatalf("Non-empty snapshot control file: %q.", r.Data)
 	}
+	t.Log("Snapshot command issued")
 
 	// Verify snapshot was taken today and has the correct data in it.
 	r.As(ownerName)
@@ -143,7 +144,7 @@ func debugFailure(t *testing.T, r *testenv.Runner, dir, file upspin.PathName) {
 
 	e, err := c.Lookup(file, true)
 	if err != nil {
-		t.Fatalf("Error in lookup of %q: %v", file, err)
+		t.Errorf("Error in lookup of %q: %v", file, err)
 	}
 	t.Logf("Entry: %+v", e)
 }
