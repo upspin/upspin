@@ -18,7 +18,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"upspin.io/exp/upbox"
+	"upspin.io/upbox"
 )
 
 var (
