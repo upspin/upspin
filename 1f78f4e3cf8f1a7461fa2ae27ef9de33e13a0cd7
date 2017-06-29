@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c6cb5cb0_6d779db8",
+        "filename": "dir/server/server.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 472,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-06-29T21:26:45Z",
+      "side": 1,
+      "message": "do you mean listDir?",
+      "range": {
+        "startLine": 472,
+        "startChar": 4,
+        "endLine": 472,
+        "endChar": 10
+      },
+      "revId": "1f78f4e3cf8f1a7461fa2ae27ef9de33e13a0cd7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
