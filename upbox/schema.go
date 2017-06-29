@@ -90,7 +90,7 @@ the servers keyserver, storeserver, and dirserver (running as their
 respective users), and runs "upspin shell" as user@example.com.
 
 */
-package upbox // import "upspin.io/exp/upbox"
+package upbox // import "upspin.io/upbox"
 
 import (
 	"bufio"
