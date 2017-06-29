@@ -5,12 +5,11 @@
 // This file contains an http.Handler implementation that serves Upspin release
 // archives (tar.gz and zip files).
 
-// TODO(adg): serve Windows binaries as a zip file.
-
 package frontend
 
 import (
 	"archive/tar"
+	"archive/zip"
 	"bytes"
 	"compress/gzip"
 	"fmt"
@@ -35,6 +34,13 @@ var osArchHuman = map[string]string{
 	"windows_amd64": "Windows 64-bit x86",
 }
 
+// osArchFormat associates archive formats with os/arch combinations.
+var osArchFormat = map[string]string{
+	"darwin_amd64":  "tar.gz",
+	"linux_amd64":   "tar.gz",
+	"windows_amd64": "zip",
+}
+
 const (
 	// updateDownloadsInterval is the interval between refreshing the list
 	// of available binary releases.
@@ -50,11 +56,11 @@ const (
 	downloadPath = "/dl/"
 
 	// archiveExpr defines the file name for the release archives.
-	archiveExpr = `^upspin\.([a-z0-9]+_[a-z0-9]+).tar.gz$`
+	archiveExpr = `^upspin\.([a-z0-9]+_[a-z0-9]+).(tar\.gz|zip)$`
 
 	// archiveFormat is a format string that formats a release archives file
-	// name. Its only argument is the os_arch combination for the release.
-	archiveFormat = "upspin.%s.tar.gz"
+	// name. Its arguments are the os_arch combination and archive format.
+	archiveFormat = "upspin.%s.%s"
 )
 
 var archiveRE = regexp.MustCompile(archiveExpr)
@@ -124,7 +130,7 @@ func (h *downloadHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.mu.RLock()
 	a := h.archive[osArch]
 	h.mu.RUnlock()
-	if a == nil {
+	if a == nil || p != a.FileName() {
 		http.NotFound(w, r)
 		return
 	}
@@ -206,7 +212,7 @@ type archive struct {
 
 // FileName returns the file name of the archive.
 func (a *archive) FileName() string {
-	return fmt.Sprintf(archiveFormat, a.osArch)
+	return fmt.Sprintf(archiveFormat, a.osArch, osArchFormat[a.osArch])
 }
 
 // OSArch returns the operating system and processor architecture for this
@@ -223,28 +229,47 @@ func (a *archive) Size() string {
 // newArchive fetches DirEntries using the given Client and assembles a gzipped
 // tar file containing those files, and returns the resulting archive.
 func newArchive(osArch string, c upspin.Client, des []*upspin.DirEntry) (*archive, error) {
+	var buf bytes.Buffer
+
 	// No need to check zw and tw write errors
 	// as they cannnot fail writing to a bytes.Buffer.
-	var buf bytes.Buffer
-	zw := gzip.NewWriter(&buf)
-	tw := tar.NewWriter(zw)
-	for _, de := range des {
-		b, err := c.Get(de.Name)
-		if err != nil {
-			return nil, err
-		}
+	switch osArchFormat[osArch] {
+	case "tar.gz":
+		zw := gzip.NewWriter(&buf)
+		tw := tar.NewWriter(zw)
+		for _, de := range des {
+			b, err := c.Get(de.Name)
+			if err != nil {
+				return nil, err
+			}
 
-		p, _ := path.Parse(de.Name)
-		tw.WriteHeader(&tar.Header{
-			Name:    p.Elem(p.NElem() - 1),
-			Mode:    0755,
-			Size:    int64(len(b)),
-			ModTime: de.Time.Go(),
-		})
-		tw.Write(b)
+			p, _ := path.Parse(de.Name)
+			tw.WriteHeader(&tar.Header{
+				Name:    p.Elem(p.NElem() - 1),
+				Mode:    0755,
+				Size:    int64(len(b)),
+				ModTime: de.Time.Go(),
+			})
+			tw.Write(b)
+		}
+		tw.Close()
+		zw.Close()
+	case "zip":
+		zw := zip.NewWriter(&buf)
+		for _, de := range des {
+			b, err := c.Get(de.Name)
+			if err != nil {
+				return nil, err
+			}
+
+			p, _ := path.Parse(de.Name)
+			w, _ := zw.Create(p.Elem(p.NElem() - 1))
+			w.Write(b)
+		}
+		zw.Close()
+	default:
+		return nil, fmt.Errorf("no known archive format %v", osArch)
 	}
-	tw.Close()
-	zw.Close()
 
 	return &archive{osArch: osArch, data: buf.Bytes()}, nil
 }
