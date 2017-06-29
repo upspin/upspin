@@ -228,9 +228,18 @@ guides:
 
 ## Test connectivity
 
-Using your web browser, navigate to the URL of your `upspinserver`
-(`https://upspin.example.com/`).
-You should see the text:
+At this point, you should have an `upspinserver` running on your server in
+"setup mode", which means that it is ready to be configured by the `upspin
+setupserver` command.
+This state is indicated by a log message printed on startup:
+
+```
+Configuration file not found. Running in setup mode.
+```
+
+Test that the `upspinserver` is accessible from the outside by making an HTTP
+request to it. Using your web browser, navigate to the URL of your
+`upspinserver` (`https://upspin.example.com/`). You should see the text:
 
 ```
 Unconfigured Upspin Server
