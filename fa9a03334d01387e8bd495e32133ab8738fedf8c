@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "6e510824_1356c2bd",
+        "filename": "dir/server/server.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 500,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-29T00:58:57Z",
+      "side": 1,
+      "message": "I added some comments and a TODO.\nIt would be nice if we could remove this globWithPermissions entirely.\nIt\u0027s only used in one place, so maybe we can.",
+      "parentUuid": "bb997135_40b23e44",
+      "revId": "fa9a03334d01387e8bd495e32133ab8738fedf8c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "8fb62bba_0a8dcb1c",
         "filename": "dir/server/server.go",
         "patchSetId": 4
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "368dd3f6_638b042e",
+        "filename": "dir/server/server.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 508,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-29T00:58:57Z",
+      "side": 1,
+      "message": "loadTreeFor just loads the tree for the user, nothing to do with the path",
+      "parentUuid": "8fb62bba_0a8dcb1c",
+      "revId": "fa9a03334d01387e8bd495e32133ab8738fedf8c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "48371bad_0de3c862",
         "filename": "dir/server/server.go",
         "patchSetId": 4
@@ -47,6 +83,24 @@
       "writtenOn": "2017-06-29T00:44:24Z",
       "side": 1,
       "message": "doesn\u0027t this check for links?",
+      "revId": "fa9a03334d01387e8bd495e32133ab8738fedf8c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a5aed410_74d5ca4f",
+        "filename": "dir/server/server.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 548,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-29T00:58:57Z",
+      "side": 1,
+      "message": "It just loads the tree for the user, nothing to do with the path",
+      "parentUuid": "48371bad_0de3c862",
       "revId": "fa9a03334d01387e8bd495e32133ab8738fedf8c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
