@@ -230,11 +230,45 @@ cache server that improves performance. The cache server is particularly
 important, and the setup instructions are in the [Upspin configuration](/doc/config.md)
 document.
 
-For details about `upspinfs`, run
+## Browsing Upspin Files on Linux and macOS
+
+Upspin includes a tool called `upspinfs` that creates a virtual filesystem
+where you can browse Upspin trees as if they were on disk.
+
+Here is an example of its use.
+
+Make a directory in which to mount the Upspin namespace:
 
 ```
-$ go doc upspinfs
+$ mkdir $HOME/up
 ```
 
-TODO: Talk about about `upspinfs`.
+Then run the `upspinfs` daemon with the directory created above:
+
+```
+$ upspinfs $HOME/up
+```
+
+Now you have access to the full Upspin name space:
+
+```
+$ ls $HOME/up/you@gmail.com
+```
+
+The `upspinfs` daemon will exit when the file system is unmounted.
+
+If you encounter an error when you run `upspinfs` the second time such as:
+
+```
+mount helper error: fusermount: failed to open mountpoint for reading: Transport endpoint is not connected
+fuse.Mount failed: fusermount: exit status 1
+```
+
+just un-mount and try again.
+
+To learn more about `upspinfs`, run
+
+```
+$ go doc upspin.io/cmd/upspinfs
+```
 TODO: Talk about `cacheserver`.
