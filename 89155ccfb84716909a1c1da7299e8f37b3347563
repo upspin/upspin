@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "15c93ffb_aedf628f",
+        "filename": "serverutil/frontend/download.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-29T04:56:18Z",
+      "side": 1,
+      "message": "not very forthcoming though, is it? it\u0027s the difference between \u0027x can\u0027t overflow\u0027 and \u0027the foo method of package p guarantees x can\u0027t overflow.\u0027\n\n// The Write and Close methods of gzip and zip do not return errors.",
+      "parentUuid": "dc9428fb_bfd37f7d",
+      "revId": "89155ccfb84716909a1c1da7299e8f37b3347563",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "5b90244b_4a0154ab",
         "filename": "serverutil/frontend/download.go",
         "patchSetId": 1
