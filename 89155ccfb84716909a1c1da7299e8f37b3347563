@@ -34,6 +34,24 @@
       "revId": "89155ccfb84716909a1c1da7299e8f37b3347563",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "273fb2ee_9a07b147",
+        "filename": "serverutil/frontend/download.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-29T04:08:55Z",
+      "side": 1,
+      "message": "intuitively it\u0027s not obvious that or tw.Close zw.Close cannot error, so it needs a check or a comment.",
+      "parentUuid": "40a1d3cb_682d2198",
+      "revId": "89155ccfb84716909a1c1da7299e8f37b3347563",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
