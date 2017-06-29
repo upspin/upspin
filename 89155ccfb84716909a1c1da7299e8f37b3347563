@@ -16,6 +16,24 @@
       "revId": "89155ccfb84716909a1c1da7299e8f37b3347563",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "40a1d3cb_682d2198",
+        "filename": "serverutil/frontend/download.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-29T03:49:03Z",
+      "side": 1,
+      "message": "I guess I could, but they\u0027re writing to a bytes.Buffer so I\u0027m not sure what could go wrong.\n\nWhat do you think? I guess it\u0027s not much effort to add the checks.",
+      "parentUuid": "5b90244b_4a0154ab",
+      "revId": "89155ccfb84716909a1c1da7299e8f37b3347563",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
