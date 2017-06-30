@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3ea1f330_be41cbf0",
+        "filename": "doc/signup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-30T03:38:42Z",
+      "side": 1,
+      "message": "includes",
+      "revId": "430ccde377faa90f4f0401616ef0f8e428ae8bd3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dddfc66a_5ba71e9f",
+        "filename": "doc/signup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-30T03:38:42Z",
+      "side": 1,
+      "message": "file system",
+      "revId": "430ccde377faa90f4f0401616ef0f8e428ae8bd3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
