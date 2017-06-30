@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c22b7dd2_a61789db",
+        "filename": "doc/signup.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-30T22:43:11Z",
+      "side": 1,
+      "message": "say Linux and macOS. The slash implies some hybrid.",
+      "revId": "dca5928d40e7eb3e425f49fe3ba92e0e6984b339",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "68175441_179a91f5",
+        "filename": "doc/signup.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-30T22:43:11Z",
+      "side": 1,
+      "message": "s/which/that/ it\u0027s a restrictive clause.",
+      "revId": "dca5928d40e7eb3e425f49fe3ba92e0e6984b339",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f69f92d4_2be1d7e4",
+        "filename": "doc/signup.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-30T22:43:11Z",
+      "side": 1,
+      "message": "s/upspin/Upspin/ it\u0027s a proper noun.",
+      "revId": "dca5928d40e7eb3e425f49fe3ba92e0e6984b339",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "531af7d9_fec3ca00",
+        "filename": "doc/signup.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-30T22:43:11Z",
+      "side": 1,
+      "message": "Here is an example of its use.",
+      "revId": "dca5928d40e7eb3e425f49fe3ba92e0e6984b339",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ed575144_91639306",
+        "filename": "doc/signup.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 240,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-30T22:43:11Z",
+      "side": 1,
+      "message": "s/$/:/",
+      "revId": "dca5928d40e7eb3e425f49fe3ba92e0e6984b339",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3e91f8e8_07e44992",
+        "filename": "doc/signup.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-30T22:43:11Z",
+      "side": 1,
+      "message": "you probably should use a full path here.\nalso that\u0027s not really a good name. the \u0027my\u0027 is silly (whose else would it be) and noisy.\nbe succinct.\n\n$ mkdir $HOME/up",
+      "revId": "dca5928d40e7eb3e425f49fe3ba92e0e6984b339",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6158c95b_c1164730",
+        "filename": "doc/signup.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-30T22:43:11Z",
+      "side": 1,
+      "message": "$ upspinfs $HOME/up",
+      "revId": "dca5928d40e7eb3e425f49fe3ba92e0e6984b339",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b06aee5a_2db9922d",
+        "filename": "doc/signup.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 252,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-30T22:43:11Z",
+      "side": 1,
+      "message": "give an example!\n\n$ ls $HOME/up/ann@example.com\n\nalso it\u0027s not that you\u0027re browsing \u0027the directory\u0027. it\u0027s not that you\u0027re browsing at all.\nit\u0027s that you have access to the full Upspin name space.",
+      "revId": "dca5928d40e7eb3e425f49fe3ba92e0e6984b339",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "18096e64_01c21f85",
+        "filename": "doc/signup.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-06-30T22:43:11Z",
+      "side": 1,
+      "message": "s/know/learn/",
+      "revId": "dca5928d40e7eb3e425f49fe3ba92e0e6984b339",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
