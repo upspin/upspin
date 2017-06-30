@@ -46,6 +46,40 @@
       "revId": "1f78f4e3cf8f1a7461fa2ae27ef9de33e13a0cd7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "894746ef_ccc5d98e",
+        "filename": "dir/server/server.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 544,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-06-30T16:49:50Z",
+      "side": 1,
+      "message": "hasRight already checks for links and returns ErrFollowLink. The fix could simply be to not wrap the error.",
+      "revId": "1f78f4e3cf8f1a7461fa2ae27ef9de33e13a0cd7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "89180e8d_e4e5bc15",
+        "filename": "dir/server/server.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 566,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-06-30T16:49:50Z",
+      "side": 1,
+      "message": "Don\u0027t wrap the error if it\u0027s ErrFollowLink.",
+      "revId": "1f78f4e3cf8f1a7461fa2ae27ef9de33e13a0cd7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
