@@ -783,7 +783,7 @@ func (n *node) Rename(ctx gContext.Context, req *fuse.RenameRequest, newDir fs.N
 }
 
 // The following Xattr calls exist to short circuit any xattr calls.  Without them,
-// the MacOS kernel will constantly look for ._ files.
+// the macOS kernel will constantly look for ._ files.
 
 // Getxattr implements fs.NodeGetxattrer.Getxattr.
 func (n *node) Getxattr(ctx gContext.Context, req *fuse.GetxattrRequest, resp *fuse.GetxattrResponse) error {

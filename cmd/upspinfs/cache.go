@@ -348,7 +348,7 @@ func (cf *cachedFile) writeback(h *handle) error {
 				// increase the ref count for the cached version
 				// so that the xattr at least lasts as long as
 				// upspinfs stays up. Not perfect but keeps
-				// MacOS finder happy.
+				// macOS finder happy.
 				// TODO(p): this might be improved by constraining
 				// to fewer error types.
 				cf.file.Pin()

@@ -185,11 +185,11 @@ Now provision a server and deploy the `upspinserver` binary to it.
 
 ### Provision a server
 
-You can run an `upspinserver` on any server, including Linux, MacOS, Windows,
+You can run an `upspinserver` on any server, including Linux, macOS, Windows,
 and [more](https://golang.org/doc/install#requirements), as long as it has a
 publicly-accessible IP address and can run Go programs.
 
-> Note that Upspin has been mostly developed under Linux and MacOS.
+> Note that Upspin has been mostly developed under Linux and macOS.
 > You may encounter issues running it on other platforms.
 
 For a personal Upspin installation, a server with 1 CPU core, 2GB of memory,
