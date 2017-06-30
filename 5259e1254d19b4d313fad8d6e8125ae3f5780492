@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "222d0a0e_bd0cd9a0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-06-30T19:12:57Z",
+      "side": 1,
+      "message": "Not sure how this prevents it or if I was likely to do it regardless but sure, why not.",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 37
+      },
+      "revId": "5259e1254d19b4d313fad8d6e8125ae3f5780492",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
