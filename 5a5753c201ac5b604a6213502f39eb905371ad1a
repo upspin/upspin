@@ -22,6 +22,30 @@
       "revId": "5a5753c201ac5b604a6213502f39eb905371ad1a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0c9cf966_91abe60e",
+        "filename": "serverutil/frontend/download.go",
+        "patchSetId": 20
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-06-30T04:20:46Z",
+      "side": 1,
+      "message": "Oh, Apple. Wanna send a CL to change it throughout? Otherwise I can.",
+      "parentUuid": "39bcd7f1_f2c9deeb",
+      "range": {
+        "startLine": 33,
+        "startChar": 19,
+        "endLine": 33,
+        "endChar": 24
+      },
+      "revId": "5a5753c201ac5b604a6213502f39eb905371ad1a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
