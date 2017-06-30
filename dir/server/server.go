@@ -469,65 +469,12 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 		defer ss.End()
 		return s.lookupWithPermissions(op, name, o)
 	}
-	// lookup implements serverutil.ListFunc. It checks permissions.
+	// listDir implements serverutil.ListFunc. It checks permissions.
 	listDir := func(dirName upspin.PathName) ([]*upspin.DirEntry, error) {
 		const op = "dir/server.listDir"
 		o, ss := subspan(op, []options{o})
 		defer ss.End()
 		return s.listDir(op, dirName, o)
-	}
-
-	entries, err := serverutil.Glob(pattern, lookup, listDir)
-	if err != nil && err != upspin.ErrFollowLink {
-		err = errors.E(op, err)
-	}
-	return entries, err
-}
-
-// globWithoutPermissions is an implementation of DirServer.Glob that does not do
-// permission checking. It is used by the snapshot code.
-//
-// TODO(adg): tidy this up (at least move it below the listDir method that follows).
-func (s *server) globWithoutPermissions(pattern string) ([]*upspin.DirEntry, error) {
-	const op = "dir/server.globWithoutPermissions"
-	o, m := newOptMetric(op)
-	defer m.Done()
-
-	// lookup implements serverutil.LookupFunc. It does not check permissions.
-	lookup := func(name upspin.PathName) (*upspin.DirEntry, error) {
-		const op = "dir/server.Lookup"
-		o, ss := subspan(op, []options{o})
-		defer ss.End()
-		p, err := path.Parse(name)
-		if err != nil {
-			return nil, errors.E(op, name, err)
-		}
-		return s.lookup(op, p, !entryMustBeClean, o)
-	}
-	// listDir implements serverutil.ListFunc. It does not check permissions.
-	listDir := func(dirName upspin.PathName) ([]*upspin.DirEntry, error) {
-		const op = "dir/server.listDir"
-		o, ss := subspan(op, []options{o})
-		defer ss.End()
-		p, err := path.Parse(dirName)
-		if err != nil {
-			return nil, errors.E(op, dirName, err)
-		}
-		if de, err := s.lookup(op, p, !entryMustBeClean, o); err != nil {
-			if de != nil {
-				return []*upspin.DirEntry{de}, err
-			}
-			return nil, err
-		}
-		tree, err := s.loadTreeFor(p.User(), o)
-		if err != nil {
-			return nil, errors.E(op, err)
-		}
-		entries, _, err := tree.List(p)
-		if err != nil {
-			return nil, errors.E(op, err)
-		}
-		return entries, nil
 	}
 
 	entries, err := serverutil.Glob(pattern, lookup, listDir)
@@ -592,6 +539,57 @@ func (s *server) listDir(op string, dirName upspin.PathName, opts ...options) ([
 		}
 	}
 	return entries, nil
+}
+
+// globWithoutPermissions is an implementation of DirServer.Glob that does not do
+// permission checking. It is used by the snapshot code.
+func (s *server) globWithoutPermissions(pattern string) ([]*upspin.DirEntry, error) {
+	const op = "dir/server.globWithoutPermissions"
+	o, m := newOptMetric(op)
+	defer m.Done()
+
+	// lookup implements serverutil.LookupFunc. It does not check permissions.
+	lookup := func(name upspin.PathName) (*upspin.DirEntry, error) {
+		const op = "dir/server.Lookup"
+		o, ss := subspan(op, []options{o})
+		defer ss.End()
+		p, err := path.Parse(name)
+		if err != nil {
+			return nil, errors.E(op, name, err)
+		}
+		return s.lookup(op, p, !entryMustBeClean, o)
+	}
+	// listDir implements serverutil.ListFunc. It does not check permissions.
+	listDir := func(dirName upspin.PathName) ([]*upspin.DirEntry, error) {
+		const op = "dir/server.listDir"
+		o, ss := subspan(op, []options{o})
+		defer ss.End()
+		p, err := path.Parse(dirName)
+		if err != nil {
+			return nil, errors.E(op, dirName, err)
+		}
+		if de, err := s.lookup(op, p, !entryMustBeClean, o); err != nil {
+			if de != nil {
+				return []*upspin.DirEntry{de}, err
+			}
+			return nil, err
+		}
+		tree, err := s.loadTreeFor(p.User(), o)
+		if err != nil {
+			return nil, errors.E(op, err)
+		}
+		entries, _, err := tree.List(p)
+		if err != nil {
+			return nil, errors.E(op, err)
+		}
+		return entries, nil
+	}
+
+	entries, err := serverutil.Glob(pattern, lookup, listDir)
+	if err != nil && err != upspin.ErrFollowLink {
+		err = errors.E(op, err)
+	}
+	return entries, err
 }
 
 // Delete implements upspin.DirServer.
