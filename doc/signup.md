@@ -47,23 +47,24 @@ instructions below.
 
 ## Install the Upspin commands
 
-Upspin is written in Go, so the first step is to install the Go tool chain.
-You will need Go version 1.8 or later.
-You can get it from
-[https://golang.org/doc/install](https://golang.org/doc/install).
+Download an archive of the Upspin command-line tools from [the download
+page](/dl/), and extract it to a directory that's in your system `PATH`.
 
-Once you have Go installed, Upspin can be fetched by running, in a terminal,
-the command
+The archive include the `upspin` command-line tool (to create, access, share,
+and administer data stored in Upspin), the `cacheserver` daemon (a cache for
+remote Upspin data), and, on MacOS and Linux systems, the `upspinfs` program (a
+[FUSE](https://github.com/libfuse/libfuse) filesystem, to mount the Upspin name
+space in your local file tree).
 
+> If your operating system is not listed on the download page, you can obtain
+> the binaries by installing Upspin from source.
+> First [install Go](https://golang.org/doc/install) and then use `go get` to
+> fetch Upspin and its dependencies and build them:
+> ```
+$ go get upspin.io/cmd/...
 ```
-$ go get -u upspin.io/...
-```
-
-This will install all the libraries, plus tools such as the `upspin` command
-that provides a command-line interface to create, access, share, and administer
-data stored in Upspin.
-If you are on a Unix system, it will also install the `upspinfs` program, which
-uses FUSE to connect the Upspin name space to your local file tree.
+> This will install the Upspin commands to `$GOPATH/bin`, which you should add
+> to your system `PATH` if you haven't already.
 
 ## Generating keys and registering your identity
 
@@ -235,4 +236,5 @@ For details about `upspinfs`, run
 $ go doc upspinfs
 ```
 
-TODO: There should be more about `upspinfs`.
+TODO: Talk about about `upspinfs`.
+TODO: Talk about `cacheserver`.
