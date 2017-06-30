@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "cd7a3880_83669009",
+        "filename": "doc/signup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 5875
+      },
+      "writtenOn": "2017-06-30T17:59:58Z",
+      "side": 1,
+      "message": "Thats true. Can we rename to \"Browsing Upspin Files on Linux/MacOS\"?. So that we can add separate section for windows once its done.?\n\nWhat you think? Any suggestions?",
+      "parentUuid": "88825c13_0b72ebec",
+      "range": {
+        "startLine": 232,
+        "startChar": 3,
+        "endLine": 232,
+        "endChar": 24
+      },
+      "revId": "25260de2e648d250b82fb93d6788f11cd70330cb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "212b209d_6ed797f1",
         "filename": "doc/signup.md",
         "patchSetId": 1
@@ -122,6 +146,24 @@
     },
     {
       "key": {
+        "uuid": "43f7cafe_9dfda8db",
+        "filename": "doc/signup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 5875
+      },
+      "writtenOn": "2017-06-30T17:59:58Z",
+      "side": 1,
+      "message": "I think I didn\u0027t get it properly. are you suggesting to replace \"First make a directory for your upspin files\" with \"Make a directory in which to mount the Upspin namespace\"?\n\nIf yes, \"To use upspinfs, first make\" is not needed. Correct?",
+      "parentUuid": "02868dae_e5bbfeae",
+      "revId": "25260de2e648d250b82fb93d6788f11cd70330cb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "7fa97918_dc98c187",
         "filename": "doc/signup.md",
         "patchSetId": 1
@@ -136,6 +178,24 @@
       "revId": "25260de2e648d250b82fb93d6788f11cd70330cb",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "80ca896a_df5a154f",
+        "filename": "doc/signup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 5875
+      },
+      "writtenOn": "2017-06-30T17:59:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7fa97918_dc98c187",
+      "revId": "25260de2e648d250b82fb93d6788f11cd70330cb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -156,6 +216,24 @@
     },
     {
       "key": {
+        "uuid": "ae79e1f7_5ddb0d49",
+        "filename": "doc/signup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 5875
+      },
+      "writtenOn": "2017-06-30T17:59:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "51b5a983_7ec163bf",
+      "revId": "25260de2e648d250b82fb93d6788f11cd70330cb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3559d20b_3fc2df16",
         "filename": "doc/signup.md",
         "patchSetId": 1
@@ -173,6 +251,24 @@
     },
     {
       "key": {
+        "uuid": "a28c0a45_d5d08d75",
+        "filename": "doc/signup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 5875
+      },
+      "writtenOn": "2017-06-30T17:59:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3559d20b_3fc2df16",
+      "revId": "25260de2e648d250b82fb93d6788f11cd70330cb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ba70eb82_867c8940",
         "filename": "doc/signup.md",
         "patchSetId": 1
@@ -187,6 +283,24 @@
       "revId": "25260de2e648d250b82fb93d6788f11cd70330cb",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b5d1e4bd_4e9a8171",
+        "filename": "doc/signup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 5875
+      },
+      "writtenOn": "2017-06-30T17:59:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba70eb82_867c8940",
+      "revId": "25260de2e648d250b82fb93d6788f11cd70330cb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -213,6 +327,30 @@
     },
     {
       "key": {
+        "uuid": "1f89a9b6_fdad3306",
+        "filename": "doc/signup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 5875
+      },
+      "writtenOn": "2017-06-30T17:59:58Z",
+      "side": 1,
+      "message": "yea right. May be will just stop with \"The `upspinfs` daemon will exit when the file system is unmounted.\" and remove the command.\n\nWhat do you think?",
+      "parentUuid": "c62fefcd_2a9cd464",
+      "range": {
+        "startLine": 256,
+        "startChar": 2,
+        "endLine": 256,
+        "endChar": 58
+      },
+      "revId": "25260de2e648d250b82fb93d6788f11cd70330cb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "9444d0a2_d5cc161f",
         "filename": "doc/signup.md",
         "patchSetId": 1
@@ -227,6 +365,24 @@
       "revId": "25260de2e648d250b82fb93d6788f11cd70330cb",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6d4b28f8_c9161dc3",
+        "filename": "doc/signup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 5875
+      },
+      "writtenOn": "2017-06-30T17:59:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9444d0a2_d5cc161f",
+      "revId": "25260de2e648d250b82fb93d6788f11cd70330cb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
