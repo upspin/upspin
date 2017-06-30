@@ -52,7 +52,7 @@ page](/dl/), and extract it to a directory that's in your system `PATH`.
 
 The archive includes the `upspin` command-line tool (to create, access, share,
 and administer data stored in Upspin), the `cacheserver` daemon (a cache for
-remote Upspin data), and, on MacOS and Linux systems, the `upspinfs` program (a
+remote Upspin data), and, on macOS and Linux systems, the `upspinfs` program (a
 [FUSE](https://github.com/libfuse/libfuse) filesystem, to mount the Upspin file
 system in your local file tree).
 

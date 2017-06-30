@@ -29,7 +29,7 @@ import (
 // osArchHuman describes operating system and processor architectures
 // in human-readable form.
 var osArchHuman = map[string]string{
-	"darwin_amd64":  "MacOS 64-bit x86",
+	"darwin_amd64":  "macOS 64-bit x86",
 	"linux_amd64":   "Linux 64-bit x86",
 	"windows_amd64": "Windows 64-bit x86",
 }
