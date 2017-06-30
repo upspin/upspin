@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"strings"
+
 	"upspin.io/dir/server/tree"
 	"upspin.io/errors"
 	"upspin.io/log"
@@ -153,6 +154,8 @@ func (s *server) snapshotDir(cfg *snapshotConfig) (path.Parsed, error) {
 // It also returns the parsed path of where the snapshot will be made.
 func (s *server) shouldSnapshot(cfg *snapshotConfig) (bool, path.Parsed, error) {
 	const op = "dir/server.shouldSnapshot"
+	o, m := newOptMetric(op)
+	defer m.Done()
 
 	p, err := s.snapshotDir(cfg)
 	if err != nil {
@@ -160,37 +163,43 @@ func (s *server) shouldSnapshot(cfg *snapshotConfig) (bool, path.Parsed, error) 
 	}
 
 	// List today's snapshot directory, including any suffixed snapshot.
-	entries, err := s.globWithoutPermissions(p.String() + "/*")
+	tree, err := s.loadTreeFor(p.User(), o)
 	if err != nil {
-		if err == upspin.ErrFollowLink {
-			// We need to get the real entry and we cannot resolve links on our own.
-			return false, path.Parsed{}, errors.E(op, errors.Internal, p.Path(), errors.Str("cannot follow a link to snapshot"))
-		}
-		if !errors.Match(errNotExist, err) {
-			// Some other error. Abort.
-			return false, path.Parsed{}, errors.E(op, err)
-		}
-		// Ok, proceed.
-	} else {
-		var mostRecent time.Time
-		for _, e := range entries {
-			parsed, _ := path.Parse(e.Name) // can't be an error.
-			t, err := time.Parse(snapshotFullDateFormat, parsed.FilePath())
-			if err != nil {
-				// Not a valid name. Ignore.
-				continue
-			}
-			if t.After(mostRecent) {
-				mostRecent = t
-			}
-		}
-		// Is the last entry so old that a new snapshot is now warranted?
-		if mostRecent.Add(cfg.interval).After(s.now().Go()) {
-			// Not time yet. Nothing to do.
-			return false, p, nil
-		}
-		// Ok, proceed.
+		return false, p, errors.E(op, err)
 	}
+	_, _, err = tree.Lookup(p)
+	if errors.Match(errNotExist, err) {
+		// The snapshot directory doesn't exist,
+		// so we're clear to go ahead and create one.
+		return true, p, nil
+	} else if err == upspin.ErrFollowLink {
+		// We need to get the real entry and we cannot resolve links on our own.
+		return false, p, errors.E(op, errors.Internal, p.Path(), errors.Str("cannot follow a link to snapshot"))
+	} else if err != nil {
+		return false, p, errors.E(op, err)
+	}
+	entries, _, err := tree.List(p)
+	if err != nil {
+		return false, p, errors.E(op, err)
+	}
+	var mostRecent time.Time
+	for _, e := range entries {
+		parsed, _ := path.Parse(e.Name) // can't be an error.
+		t, err := time.Parse(snapshotFullDateFormat, parsed.FilePath())
+		if err != nil {
+			// Not a valid name. Ignore.
+			continue
+		}
+		if t.After(mostRecent) {
+			mostRecent = t
+		}
+	}
+	// Is the last entry so old that a new snapshot is now warranted?
+	if mostRecent.Add(cfg.interval).After(s.now().Go()) {
+		// Not time yet. Nothing to do.
+		return false, p, nil
+	}
+	// Ok, proceed.
 	return true, p, nil
 }
 
