@@ -6,7 +6,16 @@ license that can be found in the LICENSE file.
 {{define "title"}}Download Upspin{{end}}
 {{define "content"}}
 	<h1>Download Upspin</h1>
-	<p>Choose an Upspin release for your operating system and processor architecture:</p>
+	<p>
+		This page provides binary downloads of the <code>upspin</code>
+		command-line tool and the <code>upspinfs</code> and
+		<code>cacheserver</code> daemons.
+		Read the <a href="/doc/signup.md">Signing up a new user</a>
+		document for a guide to getting started with these tools.
+	</p>
+	<p>
+		Choose a build for your operating system and processor architecture:
+	</p>
 	<ul>
 	{{range .Content}}
 		<li>
@@ -15,7 +24,11 @@ license that can be found in the LICENSE file.
 			{{with .Size}}({{.}}){{end}}
 		</li>
 	{{else}}
-		<li>No releases are available. Please try again later.</li>
+		<li>No builds are available. Please try again later.</li>
 	{{end}}
 	</ul>
+	<p>
+		You can find the full list of past builds in the
+		<a href="/release@upspin.io">release@upspin.io</a> Upspin tree.
+	</p>
 {{end}}
