@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "39bcd7f1_f2c9deeb",
+        "filename": "serverutil/frontend/download.go",
+        "patchSetId": 20
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5770
+      },
+      "writtenOn": "2017-06-30T04:11:19Z",
+      "side": 1,
+      "message": "The case of this operating system brand name is \"macOS\" [0][1] rather than MacOS.\n\n[0] https://www.apple.com/macos/sierra/\n[1] https://en.wikipedia.org/wiki/MacOS#macOS",
+      "range": {
+        "startLine": 33,
+        "startChar": 19,
+        "endLine": 33,
+        "endChar": 24
+      },
+      "revId": "5a5753c201ac5b604a6213502f39eb905371ad1a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
