@@ -289,7 +289,7 @@ func (w *watcher) sendEventFromLog(offset int64) (int64, error) {
 			return curr, nil
 		}
 		curr = next
-		path := logEntry.Entry.SignedName
+		path := logEntry.Entry.Name
 		if !isPrefixPath(path, w.path) {
 			// Not a log of interest.
 			continue
