@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7bc3d364_db353737",
+        "filename": "test/snapshot_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5770
+      },
+      "writtenOn": "2017-07-01T06:08:15Z",
+      "side": 1,
+      "message": "Is this comment out of date, given the GetNEvents(2) -\u003e GetNEvents(1) change below?",
+      "range": {
+        "startLine": 76,
+        "startChar": 28,
+        "endLine": 76,
+        "endChar": 47
+      },
+      "revId": "639aa8d6edfa74a07f5778370f5dd2453384f8a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
