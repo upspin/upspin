@@ -251,13 +251,23 @@ func (t *Tree) PutDir(dstDir path.Parsed, de *upspin.DirEntry) (*upspin.DirEntry
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
+	de = n.entry.Copy()
+	// Generate log entry.
+	logEntry := &LogEntry{
+		Op:    Put,
+		Entry: *de,
+	}
+	err = t.log.Append(logEntry)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
 	notifyWatchers(watchers)
 	// Flush now to create a new version of the root.
 	err = t.flush() // TODO: avoid this. Create a log operation PutDir.
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
-	return n.entry.Copy(), nil
+	return de, nil
 }
 
 // addKid adds a node n with path nodePath as the kid of parent, whose path is parentPath.
