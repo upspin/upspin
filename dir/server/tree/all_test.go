@@ -9,6 +9,7 @@ import (
 	"os"
 	"reflect"
 	"testing"
+	"time"
 
 	"upspin.io/bind"
 	"upspin.io/config"
@@ -758,6 +759,14 @@ func TestPutDirSameTreeNonRoot(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	// Try to PutDir again, it should fail with an "exists" error.
+	_, err = tree.PutDir(mkpath(t, userName+"/snapshot/new"), entry)
+	if err == nil {
+		t.Fatal("PutDir of existing target: expected error, got nil")
+	} else if !errors.Match(errors.E(errors.Exist), err) {
+		t.Fatalf("PutDir of existing target: expected 'exists' error, got %v", err)
+	}
+
 	// Create a new tree (simulate a crash).
 	tree, err = New(config, log, logIndex)
 	if err != nil {
@@ -900,6 +909,95 @@ func TestPutDirOtherTreeRoot(t *testing.T) {
 	err = checkDirList(entries, expected)
 	if err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestPutDirLog(t *testing.T) {
+	config, log, logIndex := newConfigForTesting(t, userName)
+	tree, err := New(config, log, logIndex)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Build a simple tree.
+	buildTree(t, tree, config)
+
+	dstDir := mkpath(t, userName+"/snapshot/new")
+
+	// Look up "/orig" and put it to dstDir ("/snapshot/new").
+	entry, _, err := tree.Lookup(mkpath(t, userName+"/orig"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = tree.PutDir(dstDir, entry)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Find a log entry for "/snapshot/new".
+	r, err := log.NewReader()
+	if err != nil {
+		t.Fatal(err)
+	}
+	var offset, last int64 = 0, r.LastOffset()
+	for offset < last {
+		le, next, err := r.ReadAt(offset)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if le.Entry.Name == dstDir.Path() {
+			// Found.
+			return
+		}
+		offset = next
+	}
+	t.Fatalf("could not find log entry for %q", dstDir)
+
+}
+
+func TestPutDirWatch(t *testing.T) {
+	config, log, logIndex := newConfigForTesting(t, userName)
+	tree, err := New(config, log, logIndex)
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Build a simple tree.
+	buildTree(t, tree, config)
+
+	// The directory to create with PutDir.
+	dstDir := mkpath(t, userName+"/snapshot/new")
+
+	// Watch the destination directory.
+	done := make(chan struct{})
+	defer close(done)
+	events, err := tree.Watch(dstDir, 0, done)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Look up "/orig" and put it to dstDir ("/snapshot/new").
+	entry, _, err := tree.Lookup(mkpath(t, userName+"/orig"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = tree.PutDir(dstDir, entry)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Wait for an Event for the creation of dstDir.
+	select {
+	case <-time.After(5 * time.Second):
+		t.Error("timed out waiting for event")
+	case e := <-events:
+		if e.Error != nil {
+			t.Fatal(err)
+		}
+		if e.Entry == nil {
+			t.Fatal("got Event with nil Entry")
+		}
+		if got, want := e.Entry.Name, dstDir.Path(); got != want {
+			t.Errorf("got Event with Name %q, want %q", got, want)
+		}
 	}
 }
 

@@ -233,6 +233,17 @@ func (t *Tree) PutDir(dstDir path.Parsed, de *upspin.DirEntry) (*upspin.DirEntry
 		return nil, errors.E(op, errors.Invalid, errors.Str("can't PutDir at the root"))
 	}
 
+	// The destination must not exist nor cross a link.
+	if node, _, err := t.loadPath(dstDir); errors.Match(errors.E(errors.NotExist), err) {
+		// Destination does not exist; OK.
+	} else if err == upspin.ErrFollowLink {
+		return nil, errors.E(op, dstDir.Path(), errors.Errorf("destination path crosses link: %s", node.entry.Name))
+	} else if err != nil {
+		return nil, errors.E(op, err)
+	} else {
+		return nil, errors.E(op, dstDir.Path(), errors.Exist)
+	}
+
 	// Create a synthetic node and load its kids.
 	existingEntryNode := &node{
 		entry: *de,
@@ -251,13 +262,23 @@ func (t *Tree) PutDir(dstDir path.Parsed, de *upspin.DirEntry) (*upspin.DirEntry
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
+	de = n.entry.Copy()
+	// Generate log entry.
+	logEntry := &LogEntry{
+		Op:    Put,
+		Entry: *de,
+	}
+	err = t.log.Append(logEntry)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
 	notifyWatchers(watchers)
 	// Flush now to create a new version of the root.
 	err = t.flush() // TODO: avoid this. Create a log operation PutDir.
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
-	return n.entry.Copy(), nil
+	return de, nil
 }
 
 // addKid adds a node n with path nodePath as the kid of parent, whose path is parentPath.

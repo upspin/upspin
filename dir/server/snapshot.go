@@ -247,8 +247,8 @@ func (s *server) takeSnapshot(dstDir path.Parsed, srcDir upspin.PathName) error 
 	return nil
 }
 
-// makeSnapshotPath makes the full path name, creating any necessary
-// subdirectories.
+// makeSnapshotPath makes all directories leading up to (but not including)
+// name.
 func (s *server) makeSnapshotPath(name upspin.PathName) error {
 	p, err := path.Parse(name)
 	if err != nil {
@@ -256,7 +256,7 @@ func (s *server) makeSnapshotPath(name upspin.PathName) error {
 	}
 	// Traverse the path one element of a time making each subdir. We start
 	// from 1 as we don't try to make the root.
-	for i := 1; i <= p.NElem(); i++ {
+	for i := 1; i < p.NElem(); i++ {
 		err = s.mkDirIfNotExist(p.First(i))
 		if err != nil {
 			return err
