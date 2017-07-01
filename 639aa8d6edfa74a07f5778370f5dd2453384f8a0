@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "1cc08615_32a856f9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5770
+      },
+      "writtenOn": "2017-07-01T06:13:31Z",
+      "side": 1,
+      "message": "This is a question that comes to mind, I\u0027d like to ask it.\n\nThis CL seems to fix pretty significant issues, yet the tests only failed on CI servers, and only sometimes. Is there anything that could be done to improve the tests and make them catch these issues (if they were to regress) even when run on our local dev machines (where they currently pass every time)?",
+      "revId": "639aa8d6edfa74a07f5778370f5dd2453384f8a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "7bc3d364_db353737",
         "filename": "test/snapshot_test.go",
         "patchSetId": 4
