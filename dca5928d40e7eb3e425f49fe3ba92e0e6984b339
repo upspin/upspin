@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "54f2e03b_3e1a1d6a",
+        "filename": "doc/signup.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 5875
+      },
+      "writtenOn": "2017-07-01T04:23:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c22b7dd2_a61789db",
+      "revId": "dca5928d40e7eb3e425f49fe3ba92e0e6984b339",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "68175441_179a91f5",
         "filename": "doc/signup.md",
         "patchSetId": 4
@@ -33,6 +51,24 @@
       "revId": "dca5928d40e7eb3e425f49fe3ba92e0e6984b339",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "44ccef19_cf9da131",
+        "filename": "doc/signup.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 5875
+      },
+      "writtenOn": "2017-07-01T04:23:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "68175441_179a91f5",
+      "revId": "dca5928d40e7eb3e425f49fe3ba92e0e6984b339",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "e09bb29d_e442a60b",
+        "filename": "doc/signup.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 5875
+      },
+      "writtenOn": "2017-07-01T04:23:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f69f92d4_2be1d7e4",
+      "revId": "dca5928d40e7eb3e425f49fe3ba92e0e6984b339",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "531af7d9_fec3ca00",
         "filename": "doc/signup.md",
         "patchSetId": 4
@@ -67,6 +121,24 @@
       "revId": "dca5928d40e7eb3e425f49fe3ba92e0e6984b339",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a623e599_d3eb29eb",
+        "filename": "doc/signup.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 5875
+      },
+      "writtenOn": "2017-07-01T04:23:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "531af7d9_fec3ca00",
+      "revId": "dca5928d40e7eb3e425f49fe3ba92e0e6984b339",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "676dc087_2cde2a9d",
+        "filename": "doc/signup.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 240,
+      "author": {
+        "id": 5875
+      },
+      "writtenOn": "2017-07-01T04:23:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ed575144_91639306",
+      "revId": "dca5928d40e7eb3e425f49fe3ba92e0e6984b339",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3e91f8e8_07e44992",
         "filename": "doc/signup.md",
         "patchSetId": 4
@@ -98,6 +188,24 @@
       "writtenOn": "2017-06-30T22:43:11Z",
       "side": 1,
       "message": "you probably should use a full path here.\nalso that\u0027s not really a good name. the \u0027my\u0027 is silly (whose else would it be) and noisy.\nbe succinct.\n\n$ mkdir $HOME/up",
+      "revId": "dca5928d40e7eb3e425f49fe3ba92e0e6984b339",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "53872fcc_be8c1419",
+        "filename": "doc/signup.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 5875
+      },
+      "writtenOn": "2017-07-01T04:23:53Z",
+      "side": 1,
+      "message": "Right. Agreed.",
+      "parentUuid": "3e91f8e8_07e44992",
       "revId": "dca5928d40e7eb3e425f49fe3ba92e0e6984b339",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "91cd7e1d_9c124ce9",
+        "filename": "doc/signup.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 5875
+      },
+      "writtenOn": "2017-07-01T04:23:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6158c95b_c1164730",
+      "revId": "dca5928d40e7eb3e425f49fe3ba92e0e6984b339",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b06aee5a_2db9922d",
         "filename": "doc/signup.md",
         "patchSetId": 4
@@ -132,6 +258,24 @@
       "writtenOn": "2017-06-30T22:43:11Z",
       "side": 1,
       "message": "give an example!\n\n$ ls $HOME/up/ann@example.com\n\nalso it\u0027s not that you\u0027re browsing \u0027the directory\u0027. it\u0027s not that you\u0027re browsing at all.\nit\u0027s that you have access to the full Upspin name space.",
+      "revId": "dca5928d40e7eb3e425f49fe3ba92e0e6984b339",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8af15299_10f1cc65",
+        "filename": "doc/signup.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 252,
+      "author": {
+        "id": 5875
+      },
+      "writtenOn": "2017-07-01T04:23:53Z",
+      "side": 1,
+      "message": "totally agree.\n\nI have replaced the line with \"Now you have access to your full Upspin name space:\" with an example. I\u0027m using \"you@gmail.com\" as username to remain consistent with rest of the document.",
+      "parentUuid": "b06aee5a_2db9922d",
       "revId": "dca5928d40e7eb3e425f49fe3ba92e0e6984b339",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -152,6 +296,24 @@
       "revId": "dca5928d40e7eb3e425f49fe3ba92e0e6984b339",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "97256b25_09521843",
+        "filename": "doc/signup.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 5875
+      },
+      "writtenOn": "2017-07-01T04:23:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "18096e64_01c21f85",
+      "revId": "dca5928d40e7eb3e425f49fe3ba92e0e6984b339",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
