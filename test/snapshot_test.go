@@ -75,10 +75,10 @@ func testSnapshot(t *testing.T, r *testenv.Runner) {
 		// We use GetNEvents because we don't have a fixed name to use
 		// with r.GotEvent(name). We need two entries, the top directory
 		// with the date and the sub directory with the time.
-		if !r.GetNEvents(2) {
+		if !r.GetNEvents(1) {
 			t.Fatal(r.Diag())
 		}
-		entry := r.Events[1].Entry
+		entry := r.Events[0].Entry
 
 		// Check  entry contents and name.
 		file := path.Join(entry.Name, "snapshot-test", "dir", "file")
@@ -143,7 +143,7 @@ func debugFailure(t *testing.T, r *testenv.Runner, dir, file upspin.PathName) {
 
 	e, err := c.Lookup(file, true)
 	if err != nil {
-		t.Fatalf("Error in lookup of %q: %v", file, err)
+		t.Logf("Error in lookup of %q: %v", file, err)
 	}
 	t.Logf("Entry: %+v", e)
 }
