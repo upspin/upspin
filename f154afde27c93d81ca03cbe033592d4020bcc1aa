@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2b34202b_7ae7c4f1",
+        "filename": "dir/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 553,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-02T20:48:04Z",
+      "side": 1,
+      "message": "Do we need to do a permission check here? It seems this could leak a name that the user isn\u0027t allowed to know about. Is the fix to use errLink here?",
+      "revId": "f154afde27c93d81ca03cbe033592d4020bcc1aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
