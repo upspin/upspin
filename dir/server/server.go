@@ -513,17 +513,14 @@ func (s *server) globWithoutPermissions(pattern string) ([]*upspin.DirEntry, err
 		if err != nil {
 			return nil, errors.E(op, dirName, err)
 		}
-		if de, err := s.lookup(op, p, !entryMustBeClean, o); err != nil {
-			if de != nil {
-				return []*upspin.DirEntry{de}, err
-			}
-			return nil, err
-		}
 		tree, err := s.loadTreeFor(p.User(), o)
 		if err != nil {
 			return nil, errors.E(op, err)
 		}
 		entries, _, err := tree.List(p)
+		if err == upspin.ErrFollowLink {
+			return entries, err
+		}
 		if err != nil {
 			return nil, errors.E(op, err)
 		}
@@ -540,20 +537,21 @@ func (s *server) globWithoutPermissions(pattern string) ([]*upspin.DirEntry, err
 // listDir implements serverutil.ListFunc, with an additional options variadic.
 // dirName should always be a directory. It checks permissions.
 func (s *server) listDir(op string, dirName upspin.PathName, opts ...options) ([]*upspin.DirEntry, error) {
-	// Look up the entry, as there might be a link somewhere in the path.
-	if de, err := s.lookupWithPermissions(op, dirName, opts...); err != nil {
-		if de != nil {
-			return []*upspin.DirEntry{de}, err
-		}
-		return nil, err
-	}
-
 	parsed, err := path.Parse(dirName)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
 
 	tree, err := s.loadTreeFor(parsed.User(), opts...)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+
+	// Fetch the directory's contents.
+	entries, _, err := tree.List(parsed)
+	if err == upspin.ErrFollowLink {
+		return entries, err
+	}
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
@@ -579,12 +577,6 @@ func (s *server) listDir(op string, dirName upspin.PathName, opts ...options) ([
 		if err != nil {
 			return nil, errors.E(op, err)
 		}
-	}
-
-	// Fetch the directory's contents.
-	entries, _, err := tree.List(parsed)
-	if err != nil {
-		return nil, errors.E(op, err)
 	}
 	if !canRead {
 		for _, e := range entries {
