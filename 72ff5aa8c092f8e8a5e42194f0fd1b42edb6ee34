@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "defa8b29_79feb5ae",
+        "filename": "doc/signup.md",
+        "patchSetId": 8
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-02T23:46:36Z",
+      "side": 1,
+      "message": "where you can access the Upspin name space as a regular mounted file system.\n\n(i don\u0027t like \u0027browse\u0027 in this context and disk is irrelevant.)",
+      "revId": "72ff5aa8c092f8e8a5e42194f0fd1b42edb6ee34",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "68116eda_c4718dcf",
+        "filename": "doc/signup.md",
+        "patchSetId": 8
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-02T23:46:36Z",
+      "side": 1,
+      "message": "Then run the `upspinfs` command giving that directory as its sole argument:",
+      "revId": "72ff5aa8c092f8e8a5e42194f0fd1b42edb6ee34",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ece3b30c_0a8023d6",
+        "filename": "doc/signup.md",
+        "patchSetId": 8
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-02T23:46:36Z",
+      "side": 1,
+      "message": "s/time/time,/",
+      "revId": "72ff5aa8c092f8e8a5e42194f0fd1b42edb6ee34",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "763994af_7dbbbc1e",
+        "filename": "doc/signup.md",
+        "patchSetId": 8
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-02T23:46:36Z",
+      "side": 1,
+      "message": "s/un-mount/unmount the directory/",
+      "revId": "72ff5aa8c092f8e8a5e42194f0fd1b42edb6ee34",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
