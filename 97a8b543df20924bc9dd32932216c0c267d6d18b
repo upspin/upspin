@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "aed59154_acb1d0ba",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-02T23:58:02Z",
+      "side": 1,
+      "message": "This clause replaces the errfollowlink with a friendlier message that includes the link entry\u0027s name. It\u0027s not strictly necessary for correctness but it would make diagnosing future bugs easier.",
+      "parentUuid": "6d241f48_1ff2c75f",
+      "revId": "97a8b543df20924bc9dd32932216c0c267d6d18b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "14aa14f1_5c4bd617",
         "filename": "dir/server/tree/tree.go",
         "patchSetId": 5
