@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "62c46712_0ee00980",
+        "filename": "doc/signup.md",
+        "patchSetId": 6
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-02T10:36:58Z",
+      "side": 1,
+      "message": "lowercase j, since it continues the sentence?",
+      "revId": "5c379721dcb03b76f207226725feee20caf43ad4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
