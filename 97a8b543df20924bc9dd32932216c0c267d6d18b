@@ -16,6 +16,24 @@
       "revId": "97a8b543df20924bc9dd32932216c0c267d6d18b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c60e29cb_1d553ad7",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-02T21:13:31Z",
+      "side": 1,
+      "message": "Makes sense. In the interest of forward progress, how about I move the log.Append after the flush in this CL, and we can add the new log operation in a future CL? (ie, fix the todo)",
+      "parentUuid": "14aa14f1_5c4bd617",
+      "revId": "97a8b543df20924bc9dd32932216c0c267d6d18b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
