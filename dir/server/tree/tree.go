@@ -529,6 +529,9 @@ func (t *Tree) List(prefix path.Parsed) ([]*upspin.DirEntry, bool, error) {
 	if err != nil {
 		return nil, false, errors.E(op, err)
 	}
+	if node.entry.IsLink() {
+		return []*upspin.DirEntry{node.entry.Copy()}, node.dirty, upspin.ErrFollowLink
+	}
 	if !node.entry.IsDir() {
 		return []*upspin.DirEntry{node.entry.Copy()}, node.dirty, nil
 	}
