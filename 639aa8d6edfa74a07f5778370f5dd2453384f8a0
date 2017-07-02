@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "8e7f6685_f4e848bc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5770
+      },
+      "writtenOn": "2017-07-02T21:25:57Z",
+      "side": 1,
+      "message": "Thanks for doing that. I can confirm all 3 tests/changes you\u0027ve made in dir/server/tree/all_test.go reliably fail for me on master on macOS, yet they\u0027re passing on this branch. That helps with confidence.",
+      "parentUuid": "eca59375_0dac1360",
+      "revId": "639aa8d6edfa74a07f5778370f5dd2453384f8a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7bc3d364_db353737",
         "filename": "test/snapshot_test.go",
         "patchSetId": 4
@@ -81,6 +99,23 @@
       "revId": "639aa8d6edfa74a07f5778370f5dd2453384f8a0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cf9fd8c9_fbeb1fee",
+        "filename": "test/snapshot_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 5770
+      },
+      "writtenOn": "2017-07-02T21:25:57Z",
+      "side": 1,
+      "message": "Andrew, can you explain the motivation for change on this line please?\n\nI ask because I have a potential concern about it, but I can\u0027t tell if it\u0027s real because I don\u0027t understand what\u0027s meant to be done here. debugFailure is not documented, aside from \"// TODO: remove.\", and I read the entire commit message but did not find an explanation for this change.",
+      "revId": "639aa8d6edfa74a07f5778370f5dd2453384f8a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
