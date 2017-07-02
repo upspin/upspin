@@ -134,6 +134,24 @@
       "revId": "639aa8d6edfa74a07f5778370f5dd2453384f8a0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ed21dc31_a4e9564f",
+        "filename": "test/snapshot_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 5770
+      },
+      "writtenOn": "2017-07-02T21:33:23Z",
+      "side": 1,
+      "message": "I think I can see from looking at commit message of https://github.com/upspin/upspin/commit/e9d1f956632790d5dfb45ecbdfbd9b7d3de04387.\n\nIn that case, let me ask this differently. Since this CL says \"Fix #389\", I understand #389 will be completely resolved as part of this CL. If that\u0027s the case, should it not revert https://github.com/upspin/upspin/commit/e9d1f956632790d5dfb45ecbdfbd9b7d3de04387 (and have tests succeed)? Or is this CL meant to only partially resolve #389 and doesn\u0027t plan to revert e9d1f956632790d5dfb45ecbdfbd9b7d3de04387?",
+      "parentUuid": "cf9fd8c9_fbeb1fee",
+      "revId": "639aa8d6edfa74a07f5778370f5dd2453384f8a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
