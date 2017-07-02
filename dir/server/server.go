@@ -513,17 +513,14 @@ func (s *server) globWithoutPermissions(pattern string) ([]*upspin.DirEntry, err
 		if err != nil {
 			return nil, errors.E(op, dirName, err)
 		}
-		if de, err := s.lookup(op, p, !entryMustBeClean, o); err != nil {
-			if de != nil {
-				return []*upspin.DirEntry{de}, err
-			}
-			return nil, err
-		}
 		tree, err := s.loadTreeFor(p.User(), o)
 		if err != nil {
 			return nil, errors.E(op, err)
 		}
 		entries, _, err := tree.List(p)
+		if err == upspin.ErrFollowLink {
+			return entries, err
+		}
 		if err != nil {
 			return nil, errors.E(op, err)
 		}
@@ -540,20 +537,21 @@ func (s *server) globWithoutPermissions(pattern string) ([]*upspin.DirEntry, err
 // listDir implements serverutil.ListFunc, with an additional options variadic.
 // dirName should always be a directory. It checks permissions.
 func (s *server) listDir(op string, dirName upspin.PathName, opts ...options) ([]*upspin.DirEntry, error) {
-	// Look up the entry, as there might be a link somewhere in the path.
-	if de, err := s.lookupWithPermissions(op, dirName, opts...); err != nil {
-		if de != nil {
-			return []*upspin.DirEntry{de}, err
-		}
-		return nil, err
-	}
-
 	parsed, err := path.Parse(dirName)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
 
 	tree, err := s.loadTreeFor(parsed.User(), opts...)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
+
+	// Fetch the directory's contents.
+	entries, isDirty, err := tree.List(parsed)
+	if err == upspin.ErrFollowLink {
+		return entries, err
+	}
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
@@ -570,21 +568,14 @@ func (s *server) listDir(op string, dirName upspin.PathName, opts ...options) ([
 	}
 	canRead, _, _ = s.hasRight(access.Read, parsed, opts...)
 
-	if canRead {
+	if canRead && isDirty {
 		// User wants DirEntries with valid blocks, so we must flush
-		// the Tree (we could check if !dirty first, but flush when
-		// nothing is dirty is cheap and doing everything again if it
-		// was dirty is expensive, so flush now).
+		// the Tree if something is dirty and try again.
 		err = tree.Flush()
 		if err != nil {
 			return nil, errors.E(op, err)
 		}
-	}
-
-	// Fetch the directory's contents.
-	entries, _, err := tree.List(parsed)
-	if err != nil {
-		return nil, errors.E(op, err)
+		entries, _, _ = tree.List(parsed) // Known to work.
 	}
 	if !canRead {
 		for _, e := range entries {

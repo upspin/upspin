@@ -1054,7 +1054,7 @@ func testGlobLinkErrors(t *testing.T, r *testenv.Runner) {
 	}
 
 	// Test that a Glob through a link works.
-	r.As(ownerName)
+	r.As(readerName)
 	r.Glob(dir2link + "/*")
 	if !r.GotEntries(true, dir2access, dir2file) {
 		t.Fatal(r.Diag())
