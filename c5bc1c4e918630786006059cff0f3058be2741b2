@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a93b22bb_e80c204a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-03T22:34:30Z",
+      "side": 1,
+      "message": "It\u0027s a small thing, but can you please capitalize the first letters of teach of these sentences, and add a period to the end of the second one? Thanks.",
+      "revId": "c5bc1c4e918630786006059cff0f3058be2741b2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
