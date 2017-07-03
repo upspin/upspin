@@ -105,6 +105,24 @@
       "revId": "97a8b543df20924bc9dd32932216c0c267d6d18b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a216edc4_867ea7b6",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-07-03T16:54:25Z",
+      "side": 1,
+      "message": "Yes, I can live with that.",
+      "parentUuid": "fa8b16fa_ea8a5a9d",
+      "revId": "97a8b543df20924bc9dd32932216c0c267d6d18b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
