@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "85884ab2_6397fed1",
+        "filename": "doc/signup.md",
+        "patchSetId": 8
+      },
+      "lineNbr": 236,
+      "author": {
+        "id": 5875
+      },
+      "writtenOn": "2017-07-03T16:57:42Z",
+      "side": 1,
+      "message": "sure. this looks better.",
+      "parentUuid": "defa8b29_79feb5ae",
+      "revId": "72ff5aa8c092f8e8a5e42194f0fd1b42edb6ee34",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "68116eda_c4718dcf",
         "filename": "doc/signup.md",
         "patchSetId": 8
@@ -30,6 +48,24 @@
       "writtenOn": "2017-07-02T23:46:36Z",
       "side": 1,
       "message": "Then run the `upspinfs` command giving that directory as its sole argument:",
+      "revId": "72ff5aa8c092f8e8a5e42194f0fd1b42edb6ee34",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a9b01361_efa29ab3",
+        "filename": "doc/signup.md",
+        "patchSetId": 8
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 5875
+      },
+      "writtenOn": "2017-07-03T16:57:42Z",
+      "side": 1,
+      "message": "I think somewhere we need to mention that `upspinfs` will block and\nshould be treated as daemon.\n\nThis is not obvious unless you look into the code.\n\nany suggestions?",
+      "parentUuid": "68116eda_c4718dcf",
       "revId": "72ff5aa8c092f8e8a5e42194f0fd1b42edb6ee34",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "fdf23bef_211e4ebc",
+        "filename": "doc/signup.md",
+        "patchSetId": 8
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 5875
+      },
+      "writtenOn": "2017-07-03T16:57:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ece3b30c_0a8023d6",
+      "revId": "72ff5aa8c092f8e8a5e42194f0fd1b42edb6ee34",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "763994af_7dbbbc1e",
         "filename": "doc/signup.md",
         "patchSetId": 8
@@ -67,6 +121,24 @@
       "revId": "72ff5aa8c092f8e8a5e42194f0fd1b42edb6ee34",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9df250f7_c1449d33",
+        "filename": "doc/signup.md",
+        "patchSetId": 8
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 5875
+      },
+      "writtenOn": "2017-07-03T16:57:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "763994af_7dbbbc1e",
+      "revId": "72ff5aa8c092f8e8a5e42194f0fd1b42edb6ee34",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
