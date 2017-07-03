@@ -69,6 +69,24 @@
       "revId": "97a8b543df20924bc9dd32932216c0c267d6d18b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "251254e7_2e900531",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 267,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-07-03T05:20:00Z",
+      "side": 1,
+      "message": "Actually, I thought a bit more about this. It won\u0027t work. You can\u0027t log a PutDir. I will attempt to explain it here, but it might be easier to talk in person. The short story is that the playback for Put will create a new *empty* entry. This one comes with contents. The playback will not be what you expect.\n\nSince this is not really part of fixing the race condition anyway, I would just drop it from this CL for now.\n\nFile a bug against me to have this fixed if it needs fixing. (I say \"if\" here because snapshots have historically been special and I made them a little less special by making them appear in Watch partially -- the parent directory at least. We can choose to make them even less special by adding a PutDir log entry and that should effectively make them behave just like a normal entry).",
+      "parentUuid": "c60e29cb_1d553ad7",
+      "revId": "97a8b543df20924bc9dd32932216c0c267d6d18b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
