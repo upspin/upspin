@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d31f441b_059d5d5f",
+        "filename": "dir/server/server.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 582,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-03T05:33:17Z",
+      "side": 1,
+      "message": "You should probably check this error. Who knows what could have happened between the previous call to List and this one? There\u0027s no lock being held, as far as I can tell.",
+      "revId": "75063d3c0cd19c0211c01744df1fe7d6812f9488",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
