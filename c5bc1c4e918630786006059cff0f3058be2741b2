@@ -16,6 +16,23 @@
       "revId": "c5bc1c4e918630786006059cff0f3058be2741b2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4265fff9_a370cd86",
+        "filename": "doc/signup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-03T23:44:39Z",
+      "side": 1,
+      "message": "but this is the first time you use that term, and it\u0027s misused. a daemon, in unix terms, is more like a program is launched into the background by a command that returns immediately. that is not what upspinfs does.\n\nso i would prefer s/daemon/command/",
+      "revId": "c5bc1c4e918630786006059cff0f3058be2741b2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
