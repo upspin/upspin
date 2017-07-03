@@ -81,13 +81,14 @@ const (
 	testHostname = "test.upspin.io" // don't redirect requests to this host
 )
 
-// sourceRepo is a map from each custom domain their repo base URLs.
+// sourceRepo is a map from each custom domain to their repo base URLs.
 var sourceRepo = map[string]string{
 	"upspin.io": "https://upspin.googlesource.com/upspin",
 
 	"android.upspin.io": "https://upspin.googlesource.com/android",
 	"augie.upspin.io":   "https://upspin.googlesource.com/augie",
 	"aws.upspin.io":     "https://upspin.googlesource.com/aws",
+	"exp.upspin.io":     "https://upspin.googlesource.com/exp",
 	"gcp.upspin.io":     "https://upspin.googlesource.com/gcp",
 }
 
