@@ -233,7 +233,7 @@ document.
 ## Browsing Upspin Files on Linux and macOS
 
 Upspin includes a tool called `upspinfs` that creates a virtual filesystem
-where you can browse Upspin trees as if they were on disk.
+where you can access the Upspin name space as a regular mounted file system.
 
 Here is an example of its use.
 
@@ -257,14 +257,14 @@ $ ls $HOME/up/you@gmail.com
 
 The `upspinfs` daemon will exit when the file system is unmounted.
 
-If you encounter an error when you run `upspinfs` the second time such as:
+If you encounter an error when you run `upspinfs` the second time, such as:
 
 ```
 mount helper error: fusermount: failed to open mountpoint for reading: Transport endpoint is not connected
 fuse.Mount failed: fusermount: exit status 1
 ```
 
-just un-mount and try again.
+just unmount the directory and try again.
 
 To learn more about `upspinfs`, run
 
