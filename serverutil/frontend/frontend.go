@@ -88,6 +88,7 @@ var sourceRepo = map[string]string{
 	"android.upspin.io": "https://upspin.googlesource.com/android",
 	"augie.upspin.io":   "https://upspin.googlesource.com/augie",
 	"aws.upspin.io":     "https://upspin.googlesource.com/aws",
+	"exp.upspin.io":     "https://upspin.googlesource.com/exp",
 	"gcp.upspin.io":     "https://upspin.googlesource.com/gcp",
 }
 
