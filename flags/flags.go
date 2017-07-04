@@ -19,9 +19,9 @@ import (
 
 // flagVar represents a flag in this package.
 type flagVar struct {
-	set  func()        // Set the value at parse time.
-	arg  func() string // Return the argument to set the flag.
-	arg2 func() string // Return the argument to set the second flag; usually nil.
+	set  func(fs *flag.FlagSet) // Set the value at parse time.
+	arg  func() string          // Return the argument to set the flag.
+	arg2 func() string          // Return the argument to set the second flag; usually nil.
 }
 
 const (
@@ -128,8 +128,8 @@ var (
 var flags = map[string]*flagVar{
 	"addr": strVar(&NetAddr, "addr", NetAddr, "publicly accessible network address (`host:port`)"),
 	"blocksize": &flagVar{
-		set: func() {
-			flag.IntVar(&BlockSize, "blocksize", BlockSize, "`size` of blocks when writing large files")
+		set: func(fs *flag.FlagSet) {
+			fs.IntVar(&BlockSize, "blocksize", BlockSize, "`size` of blocks when writing large files")
 		},
 		arg: func() string {
 			if BlockSize == defaultBlockSize {
@@ -143,8 +143,8 @@ var flags = map[string]*flagVar{
 	"http":     strVar(&HTTPAddr, "http", HTTPAddr, "`address` for incoming insecure network connections"),
 	"https":    strVar(&HTTPSAddr, "https", HTTPSAddr, "`address` for incoming secure network connections"),
 	"insecure": &flagVar{
-		set: func() {
-			flag.BoolVar(&InsecureHTTP, "insecure", false, "whether to serve insecure HTTP instead of HTTPS")
+		set: func(fs *flag.FlagSet) {
+			fs.BoolVar(&InsecureHTTP, "insecure", false, "whether to serve insecure HTTP instead of HTTPS")
 		},
 		arg: func() string {
 			if InsecureHTTP {
@@ -156,21 +156,21 @@ var flags = map[string]*flagVar{
 	"kind":      strVar(&ServerKind, "kind", ServerKind, "server implementation `kind` (inprocess, gcp)"),
 	"letscache": strVar(&LetsEncryptCache, "letscache", defaultLetsEncryptCache, "Let's Encrypt cache `directory`"),
 	"log": &flagVar{
-		set: func() {
+		set: func(fs *flag.FlagSet) {
 			Log.Set("info")
-			flag.Var(&Log, "log", "`level` of logging: debug, info, error, disabled")
+			fs.Var(&Log, "log", "`level` of logging: debug, info, error, disabled")
 		},
 		arg: func() string { return strArg("log", Log.String(), defaultLog) },
 	},
 	"serverconfig": &flagVar{
-		set: func() {
-			flag.Var(configFlag{&ServerConfig}, "serverconfig", "comma-separated list of configuration options (key=value) for this server")
+		set: func(fs *flag.FlagSet) {
+			fs.Var(configFlag{&ServerConfig}, "serverconfig", "comma-separated list of configuration options (key=value) for this server")
 		},
 		arg: func() string { return strArg("serverconfig", configFlag{&ServerConfig}.String(), "") },
 	},
 	"prudent": &flagVar{
-		set: func() {
-			flag.BoolVar(&Prudent, "prudent", false, "protect against malicious directory server")
+		set: func(fs *flag.FlagSet) {
+			fs.BoolVar(&Prudent, "prudent", false, "protect against malicious directory server")
 		},
 		arg: func() string {
 			if !Prudent {
@@ -180,9 +180,9 @@ var flags = map[string]*flagVar{
 		},
 	},
 	"tls": &flagVar{
-		set: func() {
-			flag.StringVar(&TLSCertFile, "tls_cert", "", "TLS Certificate `file` in PEM format")
-			flag.StringVar(&TLSKeyFile, "tls_key", "", "TLS Key `file` in PEM format")
+		set: func(fs *flag.FlagSet) {
+			fs.StringVar(&TLSCertFile, "tls_cert", "", "TLS Certificate `file` in PEM format")
+			fs.StringVar(&TLSKeyFile, "tls_key", "", "TLS Key `file` in PEM format")
 		},
 		arg:  func() string { return strArg("tls_cert", TLSCertFile, "") },
 		arg2: func() string { return strArg("tls_key", TLSKeyFile, "") },
@@ -200,24 +200,36 @@ var flags = map[string]*flagVar{
 // 	flags.Parse(nil) // Register all flags.
 // 	flags.Parse(flags.None, "config", "endpoint") // Register only config and endpoint.
 func Parse(defaultList []string, extras ...string) {
-	ParseArgs(os.Args[1:], defaultList, extras...)
+	ParseArgsInto(flag.CommandLine, os.Args[1:], defaultList, extras...)
+}
+
+// ParseInto is the same as Parse but accepts a FlagSet argument instead of
+// using the default flag.CommandLine FlagSet.
+func ParseInto(fs *flag.FlagSet, defaultList []string, extras ...string) {
+	ParseArgsInto(fs, os.Args[1:], defaultList, extras...)
 }
 
 // ParseArgs is the same as Parse but uses the provided argument list
 // instead of those provided on the command line. For ParseArgs, the
 // initial command name should not be provided.
 func ParseArgs(args, defaultList []string, extras ...string) {
+	ParseArgsInto(flag.CommandLine, args, defaultList, extras...)
+}
+
+// ParseArgsInto is the same as ParseArgs but accepts a FlagSet argument instead of
+// using the default flag.CommandLine FlagSet.
+func ParseArgsInto(fs *flag.FlagSet, args, defaultList []string, extras ...string) {
 	if len(defaultList) == 0 && len(extras) == 0 {
-		Register()
+		RegisterInto(fs)
 	} else {
 		if len(defaultList) > 0 {
-			Register(defaultList...)
+			RegisterInto(fs, defaultList...)
 		}
 		if len(extras) > 0 {
-			Register(extras...)
+			RegisterInto(fs, extras...)
 		}
 	}
-	flag.CommandLine.Parse(args)
+	fs.Parse(args)
 }
 
 // Register registers the command-line flags for the given flag names.
@@ -230,18 +242,24 @@ func ParseArgs(args, defaultList []string, extras ...string) {
 // or
 // 	flags.Register() // Register all flags.
 func Register(names ...string) {
+	RegisterInto(flag.CommandLine, names...)
+}
+
+// RegisterInto  is the same as Register but accepts a FlagSet argument instead of
+// using the default flag.CommandLine FlagSet.
+func RegisterInto(fs *flag.FlagSet, names ...string) {
 	if len(names) == 0 {
 		// Register all flags if no names provided.
-		for _, flag := range flags {
-			flag.set()
+		for _, f := range flags {
+			f.set(fs)
 		}
 	} else {
 		for _, n := range names {
-			flag, ok := flags[n]
+			f, ok := flags[n]
 			if !ok {
 				panic(fmt.Sprintf("unknown flag %q", n))
 			}
-			flag.set()
+			f.set(fs)
 		}
 	}
 }
@@ -250,14 +268,14 @@ func Register(names ...string) {
 // the state of the flags. Flags set to their default value are elided.
 func Args() []string {
 	var args []string
-	for _, flag := range flags {
-		arg := flag.arg()
+	for _, f := range flags {
+		arg := f.arg()
 		if arg == "" {
 			continue
 		}
 		args = append(args, arg)
-		if flag.arg2 != nil {
-			args = append(args, flag.arg2())
+		if f.arg2 != nil {
+			args = append(args, f.arg2())
 		}
 	}
 	return args
@@ -266,8 +284,8 @@ func Args() []string {
 // strVar returns a flagVar for the given string flag.
 func strVar(value *string, name, _default, usage string) *flagVar {
 	return &flagVar{
-		set: func() {
-			flag.StringVar(value, name, _default, usage)
+		set: func(fs *flag.FlagSet) {
+			fs.StringVar(value, name, _default, usage)
 		},
 		arg: func() string {
 			return strArg(name, *value, _default)
