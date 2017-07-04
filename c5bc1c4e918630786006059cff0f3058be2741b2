@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "f1f950bc_64890cb2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5875
+      },
+      "writtenOn": "2017-07-04T04:49:55Z",
+      "side": 1,
+      "message": "Sure.",
+      "parentUuid": "a93b22bb_e80c204a",
+      "revId": "c5bc1c4e918630786006059cff0f3058be2741b2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "4265fff9_a370cd86",
         "filename": "doc/signup.md",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2017-07-03T23:44:39Z",
       "side": 1,
       "message": "but this is the first time you use that term, and it\u0027s misused. a daemon, in unix terms, is more like a program is launched into the background by a command that returns immediately. that is not what upspinfs does.\n\nso i would prefer s/daemon/command/",
+      "revId": "c5bc1c4e918630786006059cff0f3058be2741b2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "59229eb6_f15e40b5",
+        "filename": "doc/signup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 5875
+      },
+      "writtenOn": "2017-07-04T04:49:55Z",
+      "side": 1,
+      "message": "that make sense. updated.",
+      "parentUuid": "4265fff9_a370cd86",
       "revId": "c5bc1c4e918630786006059cff0f3058be2741b2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
