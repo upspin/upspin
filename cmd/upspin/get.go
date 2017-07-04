@@ -6,9 +6,6 @@ package main
 
 import (
 	"flag"
-	"os"
-
-	"upspin.io/subcmd"
 )
 
 func (s *State) get(args ...string) {
@@ -28,16 +25,5 @@ Get writes to standard output the contents identified by the Upspin path.
 	if err != nil {
 		s.Exit(err)
 	}
-	// Write to outfile or to stdout if none set
-	var output *os.File
-	if *outFile == "" {
-		output = os.Stdout
-	} else {
-		output = s.CreateLocal(subcmd.Tilde(*outFile))
-		defer output.Close()
-	}
-	_, err = output.Write(data)
-	if err != nil {
-		s.Exitf("Copying to output failed: %v", err)
-	}
+	s.writeOut(*outFile, data)
 }
