@@ -7,10 +7,8 @@ package main
 import (
 	"flag"
 	"fmt"
-	"os"
 
 	"upspin.io/bind"
-	"upspin.io/subcmd"
 	"upspin.io/upspin"
 )
 
@@ -32,30 +30,19 @@ the user's default store server. It does not resolve redirections.
 	if err != nil {
 		s.Exit(err)
 	}
-	fmt.Fprintf(s.stderr, "Using store server at %s\n", s.Config.StoreEndpoint())
+	fmt.Fprintf(s.Stderr, "Using store server at %s\n", s.Config.StoreEndpoint())
 
 	data, _, locs, err := store.Get(upspin.Reference(ref))
 	if err != nil {
 		s.Exit(err)
 	}
 	if len(locs) > 0 {
-		fmt.Fprintf(s.stderr, "Redirection detected:\n")
+		fmt.Fprintf(s.Stderr, "Redirection detected:\n")
 		for _, loc := range locs {
-			fmt.Fprintf(s.stderr, "%+v\n", loc)
+			fmt.Fprintf(s.Stderr, "%+v\n", loc)
 		}
 		return
 	}
 
-	// Write to outfile or to stdout if none set.
-	var output *os.File
-	if *outFile == "" {
-		output = os.Stdout
-	} else {
-		output = s.CreateLocal(subcmd.Tilde(*outFile))
-		defer output.Close()
-	}
-	_, err = output.Write(data)
-	if err != nil {
-		s.Exitf("Copying to output failed: %v", err)
-	}
+	s.writeOut(*outFile, data)
 }
