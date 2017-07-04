@@ -26,7 +26,7 @@ TODO: Delete in favor of cp?
 		usageAndExit(fs)
 	}
 
-	data := s.ReadAll(subcmd.Tilde(*inFile))
+	data := s.ReadAll(*inFile)
 	// Must be a valid Upspin name.
 	parsed, err := path.Parse(s.AtSign(fs.Arg(0)))
 	if err != nil {

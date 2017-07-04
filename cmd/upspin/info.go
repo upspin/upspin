@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"os"
 	"text/tabwriter"
 	"text/template"
 	"time"
@@ -160,11 +159,11 @@ func (d *infoDirEntry) WhichAccess() string {
 		accFile = string(accEntry.Name)
 		data, err := read(d.state.Client, accEntry.Name)
 		if err != nil {
-			fmt.Fprintf(d.state.stderr, "cannot open access file %q: %s\n", accFile, err)
+			fmt.Fprintf(d.state.Stderr, "cannot open access file %q: %s\n", accFile, err)
 		}
 		acc, err = access.Parse(accEntry.Name, data)
 		if err != nil {
-			fmt.Fprintf(d.state.stderr, "cannot parse access file %q: %s\n", accFile, err)
+			fmt.Fprintf(d.state.Stderr, "cannot parse access file %q: %s\n", accFile, err)
 		}
 	}
 	d.access = acc
@@ -181,7 +180,7 @@ func (s *State) printInfo(entry *upspin.DirEntry) {
 		state:    s,
 		DirEntry: entry,
 	}
-	writer := tabwriter.NewWriter(os.Stdout, 4, 4, 1, ' ', 0)
+	writer := tabwriter.NewWriter(s.Stdout, 4, 4, 1, ' ', 0)
 	err := infoTmpl.Execute(writer, infoDir)
 	if err != nil {
 		s.Exitf("executing info template: %v", err)
