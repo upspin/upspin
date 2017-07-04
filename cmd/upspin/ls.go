@@ -146,7 +146,7 @@ func (s *State) printLongDirEntries(de []*upspin.DirEntry) {
 func (s *State) sizeOf(e *upspin.DirEntry) int64 {
 	size, err := e.Size()
 	if err != nil {
-		fmt.Fprintf(s.stderr, "%q: %s\n", e.Name, err)
+		fmt.Fprintf(s.Stderr, "%q: %s\n", e.Name, err)
 	}
 	return size
 }

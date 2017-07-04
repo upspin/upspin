@@ -9,7 +9,6 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io"
 	"os"
 	"os/exec"
 	"sort"
@@ -101,15 +100,16 @@ var commands = map[string]func(*State, ...string){
 
 type State struct {
 	*subcmd.State
-	stdin        io.ReadCloser
-	stdout       io.Writer
-	stderr       io.Writer
 	sharer       *Sharer
 	metricsSaver metric.Saver
 }
 
 func main() {
-	state, args := setup(os.Args[1:])
+	state, args, ok := setup(flag.CommandLine, os.Args[1:])
+	if !ok {
+		fmt.Fprintln(os.Stderr, intro)
+		os.Exit(2)
+	}
 	// Shell cannot be in commands because of the initialization loop,
 	// and anyway we should avoid recursion in the interpreter.
 	if state.Name == "shell" {
@@ -125,22 +125,21 @@ func main() {
 // list, args. It applies any global flags set on the command line and returns
 // the initialized State and the arg list after the global flags, starting with
 // the subcommand ("ls", "info", etc.) that will be run.
-func setup(args []string) (*State, []string) {
+func setup(fs *flag.FlagSet, args []string) (*State, []string, bool) {
 	log.SetFlags(0)
 	log.SetPrefix("upspin: ")
-	flag.Usage = usage
-	flags.ParseArgs(args, flags.Client)
-	if len(flag.Args()) < 1 {
-		fmt.Fprintln(os.Stderr, intro)
-		os.Exit(2)
+	fs.Usage = usage
+	flags.ParseArgsInto(fs, args, flags.Client)
+	if len(fs.Args()) < 1 {
+		return nil, nil, false
 	}
-	state := newState(strings.ToLower(flag.Arg(0)))
+	state := newState(strings.ToLower(fs.Arg(0)))
 	// Start the cache if needed.
 	if !strings.Contains(state.Name, "setup") && !strings.Contains(state.Name, "signup") {
 		cacheutil.Start(state.Config)
 	}
 	state.init()
-	return state, flag.Args()
+	return state, fs.Args(), true
 }
 
 // run runs a single command specified by the arguments, which should begin with
@@ -229,10 +228,7 @@ func (s *State) runCommand(path string, args ...string) {
 // It does not contain a Config.
 func newState(name string) *State {
 	s := &State{
-		stdin:  os.Stdin,
-		stdout: os.Stdout,
-		stderr: os.Stderr,
-		State:  subcmd.NewState(name),
+		State: subcmd.NewState(name),
 	}
 	return s
 }
@@ -256,15 +252,25 @@ func (s *State) init() {
 }
 
 func (s *State) Printf(format string, args ...interface{}) {
-	fmt.Fprintf(s.stdout, format, args...)
+	fmt.Fprintf(s.Stdout, format, args...)
 }
 
-func (s *State) SetIO(stdin io.ReadCloser, stdout, stderr io.Writer) {
-	s.stdin = stdin
-	s.stdout = stdout
-	s.stderr = stderr
-}
-
-func (s *State) DefaultIO() {
-	s.SetIO(s.stdin, os.Stdout, os.Stderr)
+// writeOut writes to the named file or to stdout if it is empty
+func (s *State) writeOut(file string, data []byte) {
+	// Write to outfile or to stdout if none set
+	if file == "" {
+		_, err := s.Stdout.Write(data)
+		if err != nil {
+			s.Exitf("copying to output failed: %v", err)
+		}
+		return
+	}
+	output := s.CreateLocal(subcmd.Tilde(file))
+	_, err := output.Write(data)
+	if err != nil {
+		s.Exitf("copying to output failed: %v", err)
+	}
+	if err := output.Close(); err != nil {
+		s.Exitf("closing to output failed: %v", err)
+	}
 }
