@@ -82,16 +82,15 @@ func Tilde(file string) string {
 // ReadAll reads all contents from a local input file or from stdin if
 // the input file name is empty
 func (s *State) ReadAll(fileName string) []byte {
-	var input *os.File
-	var err error
-	fileName = Tilde(fileName)
 	if fileName == "" {
-		input = os.Stdin
-	} else {
-		input = s.OpenLocal(fileName)
-		defer input.Close()
+		data, err := ioutil.ReadAll(s.Stdin)
+		if err != nil {
+			s.Exit(err)
+		}
+		return data
 	}
-
+	input := s.OpenLocal(Tilde(fileName))
+	defer input.Close()
 	data, err := ioutil.ReadAll(input)
 	if err != nil {
 		s.Exit(err)
