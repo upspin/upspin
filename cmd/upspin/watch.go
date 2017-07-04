@@ -37,7 +37,7 @@ the current state of the tree rooted at the given path.
 	}
 	for e := range events {
 		if e.Error != nil {
-			fmt.Fprintf(s.stderr, "watch: error: %s\n", e.Error) // TODO: Failf? Set exitCode?
+			fmt.Fprintf(s.Stderr, "watch: error: %s\n", e.Error) // TODO: Failf? Set exitCode?
 			continue
 		}
 

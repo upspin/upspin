@@ -81,20 +81,20 @@ func (s *State) keygenCommand(fs *flag.FlagSet) {
 	if err != nil {
 		s.Exitf("writing keys: %v", err)
 	}
-	fmt.Fprintln(os.Stderr, "Upspin private/public key pair written to:")
-	fmt.Fprintf(s.stderr, "\t%s\n", filepath.Join(where, "public.upspinkey"))
-	fmt.Fprintf(s.stderr, "\t%s\n", filepath.Join(where, "secret.upspinkey"))
-	fmt.Fprintln(os.Stderr, "This key pair provides access to your Upspin identity and data.")
+	fmt.Fprintln(s.Stderr, "Upspin private/public key pair written to:")
+	fmt.Fprintf(s.Stderr, "\t%s\n", filepath.Join(where, "public.upspinkey"))
+	fmt.Fprintf(s.Stderr, "\t%s\n", filepath.Join(where, "secret.upspinkey"))
+	fmt.Fprintln(s.Stderr, "This key pair provides access to your Upspin identity and data.")
 	if secretFlag == "" {
-		fmt.Fprintln(os.Stderr, "If you lose the keys you can re-create them by running this command:")
-		fmt.Fprintf(s.stderr, "\tupspin keygen -curve %s -secretseed %s\n", curve, secretStr)
-		fmt.Fprintln(os.Stderr, "Write this command down and store it in a secure, private place.")
-		fmt.Fprintln(os.Stderr, "Do not share your private key or this command with anyone.")
+		fmt.Fprintln(s.Stderr, "If you lose the keys you can re-create them by running this command:")
+		fmt.Fprintf(s.Stderr, "\tupspin keygen -curve %s -secretseed %s\n", curve, secretStr)
+		fmt.Fprintln(s.Stderr, "Write this command down and store it in a secure, private place.")
+		fmt.Fprintln(s.Stderr, "Do not share your private key or this command with anyone.")
 	}
 	if rotate {
-		fmt.Fprintln(os.Stderr, "\nTo install new keys in the key server, see 'upspin rotate -help'.")
+		fmt.Fprintln(s.Stderr, "\nTo install new keys in the key server, see 'upspin rotate -help'.")
 	}
-	fmt.Fprintln(os.Stderr)
+	fmt.Fprintln(s.Stderr)
 }
 
 func (s *State) createKeys(curveName, secretFlag string) (public, private, secretStr string, err error) {
@@ -231,6 +231,6 @@ func (s *State) saveKeys(where string, rotate bool, newPublic, newPrivate string
 	if err != nil {
 		return err
 	}
-	fmt.Fprintf(s.stderr, "Saved previous key pair to:\n\t%s\n", archiveFile)
+	fmt.Fprintf(s.Stderr, "Saved previous key pair to:\n\t%s\n", archiveFile)
 	return nil
 }

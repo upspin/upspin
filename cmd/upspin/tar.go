@@ -140,7 +140,7 @@ func (a *archiver) doArchive(pathName upspin.PathName, tw *tar.Writer, dst io.Wr
 			ModTime: e.Time.Go(),
 		}
 		if a.verbose {
-			fmt.Fprintf(a.state.stderr, "Archiving %q\n", e.Name)
+			fmt.Fprintf(a.state.Stderr, "Archiving %q\n", e.Name)
 		}
 		switch {
 		case e.IsDir():
@@ -218,7 +218,7 @@ func (a *archiver) unarchive(src io.ReadCloser) error {
 		}
 
 		if a.verbose {
-			fmt.Fprintf(a.state.stderr, "Extracting %q into %q\n", hdr.Name, name)
+			fmt.Fprintf(a.state.Stderr, "Extracting %q into %q\n", hdr.Name, name)
 		}
 
 		switch hdr.Typeflag {

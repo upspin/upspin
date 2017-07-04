@@ -6,7 +6,6 @@ package main
 
 import (
 	"flag"
-	"os"
 
 	"upspin.io/subcmd"
 )
@@ -28,16 +27,25 @@ Get writes to standard output the contents identified by the Upspin path.
 	if err != nil {
 		s.Exit(err)
 	}
+	s.writeOut(*outFile, data)
+}
+
+// writeOut writes to the named file or to stdout if it is empty
+func (s *State) writeOut(file string, data []byte) {
 	// Write to outfile or to stdout if none set
-	var output *os.File
-	if *outFile == "" {
-		output = os.Stdout
-	} else {
-		output = s.CreateLocal(subcmd.Tilde(*outFile))
-		defer output.Close()
+	if file == "" {
+		_, err := s.Stdout.Write(data)
+		if err != nil {
+			s.Exitf("copying to output failed: %v", err)
+		}
+		return
 	}
-	_, err = output.Write(data)
+	output := s.CreateLocal(subcmd.Tilde(file))
+	_, err := output.Write(data)
 	if err != nil {
-		s.Exitf("Copying to output failed: %v", err)
+		s.Exitf("copying to output failed: %v", err)
+	}
+	if err := output.Close(); err != nil {
+		s.Exitf("closing to output failed: %v", err)
 	}
 }

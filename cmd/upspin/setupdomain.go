@@ -103,7 +103,7 @@ If any state exists at the given location (-where) then the command aborts.
 		os.Remove(dirFile)
 		s.user("-put", "-in", storeFile)
 		os.Remove(storeFile)
-		fmt.Fprintf(s.stderr, "Successfully put %q and %q to the key server.\n", dirUser, storeUser)
+		fmt.Fprintf(s.Stderr, "Successfully put %q and %q to the key server.\n", dirUser, storeUser)
 		return
 	}
 
@@ -177,7 +177,7 @@ If any state exists at the given location (-where) then the command aborts.
 		s.Exit(err)
 	}
 
-	err = setupDomainTemplate.Execute(os.Stdout, setupDomainData{
+	err = setupDomainTemplate.Execute(s.Stdout, setupDomainData{
 		Dir:       baseDir,
 		Where:     where,
 		Domain:    *domain,
@@ -299,7 +299,7 @@ func (s *State) setuphost(where, domain, curve, proquint string) {
 		User: upspin.UserName("upspin@" + domain),
 	})
 
-	err = setupHostTemplate.Execute(os.Stdout, setupDomainData{
+	err = setupHostTemplate.Execute(s.Stdout, setupDomainData{
 		Dir:       cfgPath,
 		Where:     where,
 		Domain:    domain,
