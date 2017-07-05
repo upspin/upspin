@@ -16,6 +16,24 @@
       "revId": "07af1775252004ba88ebacf9a0ff2c731b74628c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "87a2824a_f43bfa92",
+        "filename": "subcmd/state.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-05T00:11:28Z",
+      "side": 1,
+      "message": "you need to be able to produce an EOF, which means it must have a Close method.",
+      "parentUuid": "977af8f1_a18038cd",
+      "revId": "07af1775252004ba88ebacf9a0ff2c731b74628c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
