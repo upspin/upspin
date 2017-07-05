@@ -34,6 +34,24 @@
       "revId": "07af1775252004ba88ebacf9a0ff2c731b74628c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a943576b_cd40dbaa",
+        "filename": "subcmd/state.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-05T00:12:42Z",
+      "side": 1,
+      "message": "Who produces the EOF? Presumably it\u0027s whoever is providing the data for the Reader, who would be holding a concrete type with a Close method. Why does the Close method need to be exposed here? It seems like it could only ever be misused.",
+      "parentUuid": "87a2824a_f43bfa92",
+      "revId": "07af1775252004ba88ebacf9a0ff2c731b74628c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
