@@ -78,6 +78,11 @@ To register your details with the key server takes two steps.
 
 First, the `upspin signup` command generates a key pair, saves it locally, and
 sends the user details and the public key to the key server.
+The locations provided to the `server`, `dir`, or `store` parameters when
+creating an identity are persisted to the key server.
+This ensures that when other users reference the registered identities
+namespace, they are provided with your specific instances of directory and store
+endpoints.
 It also creates a local copy of the information called a "config" file that
 it stores in a local directory, typically `$HOME/upspin`.
 Config files are discussed in detail in [Upspin configuration](/doc/config.md).
@@ -155,13 +160,20 @@ requests it.
 (Your public key is needed for securing and sharing Upspin files, and it's safe
 to share.)
 
+If you decide to change the location of your directory and/or store servers at a
+later date, you can update the values stored within the key server by updating
+the values in $HOME/config and running:
+
+```
+$ upspin user | upspin user -put
+```
+
 **Pay attention to the text in the output about remembering your "secret seed".
 It provides a way to regenerate your keys if you lose them.**
 
 _Note: If used interactively with a shell that keeps a command history,
 using `keygen` with the `-secretseed` option may cause the secret to be saved in the history file.
 If so, the history file should be cleared after running `keygen`._
-
 
 ## Creating your Upspin directory
 
