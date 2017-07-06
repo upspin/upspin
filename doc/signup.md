@@ -158,10 +158,30 @@ to share.)
 **Pay attention to the text in the output about remembering your "secret seed".
 It provides a way to regenerate your keys if you lose them.**
 
-_Note: If used interactively with a shell that keeps a command history,
-using `keygen` with the `-secretseed` option may cause the secret to be saved in the history file.
-If so, the history file should be cleared after running `keygen`._
+_Note: If used interactively with a shell that keeps a command history, using
+`keygen` with the `-secretseed` option may cause the secret to be saved in
+the history file. If so, the history file should be cleared after running
+`keygen`._
 
+### Updating Store and Directory Servers
+
+The values provided to the `server`, `dir`, or `store` parameters when
+creating an identity are persisted to the key server. This ensures that when
+other users reference the registered identities namespace, they are
+provided with your specific instances of directory and store endpoints. If
+the hostname for your store or directory server changes the references stored
+within the key server must be updated. This can be done by modifying the
+Upspin config file with the new values and using the `upspin user` command.
+
+```
+$ upspin user | upspin user -put
+```
+
+This will update the key server with the updated local values ensuring other
+users will utilize the updated values when interacting with your identities
+namespace. See `upspin user -help` for more details. You should be able to
+see the change request within the Upspin key server log at
+[https://key.upspin.io/log](https://key.upspin.io/log).
 
 ## Creating your Upspin directory
 
