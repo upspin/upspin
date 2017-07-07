@@ -7,17 +7,17 @@ package main
 import (
 	"bytes"
 	"flag"
+	"fmt"
 	"io"
 	"io/ioutil"
-	"regexp"
 	"strings"
 	"testing"
 
 	"upspin.io/upbox"
 )
 
-// TestCommands runs the tests defined in cmdTests as subtests.
-func TestCommands(t *testing.T) {
+// testCommands runs the tests defined in cmdTests as subtests.
+func testCommands(t *testing.T, cmdTests *[]cmdTest) {
 	// Set up upbox.
 	schema, err := upbox.SchemaFromYAML(upboxSchema, 8000)
 	if err != nil {
@@ -40,12 +40,16 @@ func TestCommands(t *testing.T) {
 	r.state = state
 
 	// Loop over the tests in sequence, building state as we go.
-	for _, test := range cmdTests {
+	for _, test := range *cmdTests {
 		t.Run(test.name, r.run(&test))
 	}
 
 	// Tear down upbox.
 	schema.Stop()
+}
+
+func TestBasicCommands(t *testing.T) {
+	testCommands(t, &basicCmdTests)
 }
 
 const upboxSchema = `
@@ -142,17 +146,15 @@ func expect(words ...string) func(t *testing.T, r *runner, cmd *cmdTest, stdout,
 			t.Fatalf("%q: unexpected error:\n\t%q", cmd.name, stderr)
 		}
 		// Stdout should contain all words, in order, non-abutting.
-		quotedWords := make([]string, len(words))
-		for i, w := range words {
-			quotedWords[i] = regexp.QuoteMeta(w)
-		}
-		pat := strings.Join(quotedWords, ".+")
-		matched, err := regexp.MatchString(pat, stdout)
-		if err != nil {
-			t.Fatalf("compiling pattern for %q: %v", cmd.name, err)
-		}
-		if !matched {
-			t.Fatalf("%q: output did not match %q:\n\t%q", cmd.name, pat, stdout)
+		for _, word := range words {
+			index := strings.Index(stdout, word)
+			prev := "beginning"
+			if index < 0 {
+				t.Fatalf("%q: output did not contain %q after %q:\n\t%q", cmd.name, word, prev, stdout)
+				return
+			}
+			prev = word
+			stdout = stdout[index:]
 		}
 	}
 }
@@ -172,4 +174,18 @@ func fail(errStr string) func(t *testing.T, r *runner, cmd *cmdTest, stdout, std
 // do is just a shorthand to make the cmdTests format more neatly.
 func do(s ...string) []string {
 	return s
+}
+
+// putFile is a cmdTest to add the named file with the given contents and
+// check that it is created.
+func putFile(name, contents string) cmdTest {
+	return cmdTest{
+		name: fmt.Sprintf("add %s", name),
+		cmds: do(
+			"put "+name,
+			"get "+name,
+		),
+		stdin: contents,
+		post:  expect(contents),
+	}
 }
