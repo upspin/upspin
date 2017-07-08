@@ -393,7 +393,7 @@ func UnmarshalError(b []byte) error {
 		err.UnmarshalBinary(b)
 		return &err
 	default:
-		log.Printf("Unmarshal error: corrup data %q", b)
+		log.Printf("Unmarshal error: corrupt data %q", b)
 		return Str(string(b))
 	}
 }
