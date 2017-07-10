@@ -7,6 +7,7 @@ package test
 import (
 	"crypto/rand"
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -71,7 +72,7 @@ func testSnapshot(t *testing.T, r *testenv.Runner) {
 	}
 	// We need should see two entries: the top directory
 	// with the date, and the subdirectory with the time.
-	var found upspin.PathName
+	var snapshot upspin.PathName
 	for i := 0; i < 2; i++ {
 		// We use GetNEvents because we don't have a fixed name to use
 		// with r.GotEvent(name).
@@ -79,31 +80,22 @@ func testSnapshot(t *testing.T, r *testenv.Runner) {
 			t.Fatal(r.Diag())
 		}
 		entry := r.Events[0].Entry
-
-		// Check  entry contents and name.
-		file := path.Join(entry.Name, "snapshot-test", "dir", "file")
-		r.Get(file)
-		if r.Failed() {
-			// TODO: remove once the failure is fixed.
-			t.Logf("Failed to Get %q. Attempting to Glob %q", file, entry.Name)
-			debugFailure(t, r, entry.Name, file)
-
-			// t.Fatal(r.Diag())
+		if !strings.Contains(string(entry.Name), ":") {
+			// This is not the snapshot directory.
+			continue
 		}
-		if r.Data == data {
-			found = file
-			break
-		}
+		snapshot = entry.Name
 	}
 	close(done)
-	if found == "" {
+	if snapshot == "" {
 		t.Fatalf("Unable to find a snapshot in %s", snapPattern)
 	}
+	fileInSnapshot := path.Join(snapshot, "snapshot-test", "dir", "file")
 
 	// Ensure no one else can read this snapshotted file, even with a
 	// permissive Access file.
 	r.As(readerName)
-	r.DirLookup(found)
+	r.DirLookup(fileInSnapshot)
 	if !r.Match(errors.E(errors.Private)) {
 		t.Fatal(r.Diag())
 	}
@@ -111,41 +103,22 @@ func testSnapshot(t *testing.T, r *testenv.Runner) {
 	// WhichAccess for a snapshotted name returns nothing, even if the
 	// Access file exists in the path, which is the case here.
 	r.As(ownerName)
-	r.DirWhichAccess(found)
+	r.DirWhichAccess(fileInSnapshot)
 	if !r.GotNilEntry() {
 		t.Fatal(r.Diag())
 	}
 
 	// No one can delete snapshots.
-	r.Delete(found)
+	r.Delete(fileInSnapshot)
 	if !r.Match(errors.E(errors.Permission)) {
 		t.Fatal(r.Diag())
 	}
 
 	// No one can overwrite a snapshot.
-	r.Put(found, "yo")
+	r.Put(fileInSnapshot, "yo")
 	if !r.Match(errors.E(errors.Permission)) {
 		t.Fatal(r.Diag())
 	}
-}
-
-// TODO: remove.
-func debugFailure(t *testing.T, r *testenv.Runner, dir, file upspin.PathName) {
-	c := r.ClientFor(ownerName)
-
-	entries, err := c.Glob(string(dir) + "/*")
-	if err != nil {
-		t.Fatalf("Error Globbing: %v", err)
-	}
-	for i, e := range entries {
-		t.Logf("%d: %s", i, e.Name)
-	}
-
-	e, err := c.Lookup(file, true)
-	if err != nil {
-		t.Logf("Error in lookup of %q: %v", file, err)
-	}
-	t.Logf("Entry: %+v", e)
 }
 
 func randomString(t *testing.T, size int) string {
