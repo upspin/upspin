@@ -66,8 +66,8 @@ func setupTestUser(key upspin.KeyServer) {
 	if key.Endpoint().Transport != upspin.InProcess {
 		log.Fatalf("cannot use testuser for endpoint %q", key.Endpoint())
 	}
-	if !isLocal(flags.HTTPSAddr) {
-		log.Fatal("cannot use -testuser flag except on localhost:port")
+	if !isLocal(flags.HTTPAddr) {
+		log.Fatal("cannot use -test_user flag except on localhost:port")
 	}
 
 	f, err := factotum.NewFromDir(*testSecrets)
