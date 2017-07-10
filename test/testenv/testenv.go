@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"upspin.io/bind"
@@ -247,7 +248,15 @@ func (e *Env) rmTmpDir() error {
 	}
 	d := e.tmpDir
 	e.tmpDir = ""
-	return os.RemoveAll(d)
+	if err := os.RemoveAll(d); err != nil {
+		log.Println("testenv.Exit.rmTmpDir(%q) failed: %v. Its contents:", err)
+		filepath.Walk(d, func(path string, _ os.FileInfo, _ error) error {
+			log.Printf("\t%s", path)
+			return nil
+		})
+		return err
+	}
+	return nil
 }
 
 // NewUser creates a new client for a user.  The new user will not
