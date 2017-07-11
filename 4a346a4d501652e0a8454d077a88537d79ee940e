@@ -16,6 +16,24 @@
       "revId": "4a346a4d501652e0a8454d077a88537d79ee940e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8e630750_68469126",
+        "filename": "dir/server/tree/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 292,
+      "author": {
+        "id": 5275
+      },
+      "writtenOn": "2017-07-11T17:07:05Z",
+      "side": 0,
+      "message": "The dir/server doesn\u0027t shut down any open watches on Close, so there could be log Readers still calling ReadAt which calls this function, which creates a directory. There\u0027s nowhere else in the log code that calls Mkdir, so it has to be at least related. \n\nEven if you don\u0027t think it fixes the problem, could you please review the change?",
+      "parentUuid": "5cf42c7b_c62ed6a2",
+      "revId": "4a346a4d501652e0a8454d077a88537d79ee940e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
