@@ -112,6 +112,13 @@ func NewLogs(user upspin.UserName, directory string) (*Writer, *LogIndex, error)
 	const op = "dir/server/tree.NewLogs"
 
 	subdir := logSubDir(user, directory) // user's sub directory.
+
+	// Make the log directory if it doesn't exist.
+	// (MkdirAll returns a nil error if the directory exists.)
+	if err := os.MkdirAll(subdir, 0700); err != nil {
+		return nil, nil, errors.E(op, errors.IO, err)
+	}
+
 	off := logOffsetsFor(subdir)
 	if off[0] == 0 { // Possibly starting a new log.
 		// Is there an existing, old-style log file? If so, hard link it
@@ -280,20 +287,11 @@ func rootFile(user upspin.UserName, directory string) string {
 }
 
 // logOffsetsFor returns in descending order a list of log offsets in a log
-// directory for a user. If no log directory exists, one is created and the only
-// offset returned is 0.
+// directory for a user.
+// If no log directory exists, the only offset returned is 0.
 func logOffsetsFor(directory string) []int64 {
 	offs, err := filepath.Glob(filepath.Join(directory, "*"))
-	if err != nil {
-		return []int64{0}
-	}
-	if len(offs) == 0 {
-		// No log directory. Create it now.
-		err := os.MkdirAll(directory, 0700)
-		if err != nil {
-			log.Error.Printf("dir/server/tree.logOffsetsFor: %s", err)
-			// Ignore the error. We will error out later again.
-		}
+	if err != nil || len(offs) == 0 {
 		return []int64{0}
 	}
 	var offsets []int64
