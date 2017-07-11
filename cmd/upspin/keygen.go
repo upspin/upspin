@@ -150,7 +150,13 @@ func validSecretSeed(seed string) bool {
 
 // writeKeyFile writes a single key to its file, removing the file
 // beforehand if necessary due to permission errors.
+// If the file's parent directory does not exist, writeKeyFile creates it.
 func (s *State) writeKeyFile(name, key string) error {
+	// Make the directory if it does not exist.
+	if err := os.MkdirAll(filepath.Dir(name), 0700); err != nil {
+		return err
+	}
+	// Create the file.
 	const create = os.O_RDWR | os.O_CREATE | os.O_TRUNC
 	fd, err := os.OpenFile(name, create, 0400)
 	if os.IsPermission(err) && os.Remove(name) == nil {
@@ -161,9 +167,13 @@ func (s *State) writeKeyFile(name, key string) error {
 	if err != nil {
 		return err
 	}
-	defer fd.Close()
+	// Write the key.
 	_, err = fd.WriteString(key)
-	return err
+	if err != nil {
+		fd.Close()
+		return err
+	}
+	return fd.Close()
 
 }
 
