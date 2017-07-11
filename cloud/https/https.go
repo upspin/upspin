@@ -126,6 +126,10 @@ func ListenAndServe(ready chan<- struct{}, opt *Options) {
 		opt.applyDefaults()
 	}
 
+	hasLetsEncryptCache := opt.LetsEncryptCache != ""
+	hasAutocertCache := opt.AutocertCache != nil
+	hasCert := opt.CertFile != defaultOptions.CertFile || opt.KeyFile != defaultOptions.KeyFile
+
 	var m autocert.Manager
 	m.Prompt = autocert.AcceptTOS
 	if h := opt.LetsEncryptHosts; len(h) > 0 {
@@ -134,7 +138,8 @@ func ListenAndServe(ready chan<- struct{}, opt *Options) {
 
 	addr := opt.Addr
 	var config *tls.Config
-	if opt.InsecureHTTP {
+	switch {
+	case opt.InsecureHTTP:
 		log.Info.Printf("https: serving insecure HTTP on %q", addr)
 		host, _, err := net.SplitHostPort(addr)
 		if err != nil {
@@ -143,20 +148,24 @@ func ListenAndServe(ready chan<- struct{}, opt *Options) {
 		if host != "localhost" && host != "127.0.0.1" && host != "::1" {
 			log.Fatalf("https: cannot serve insecure HTTP on non-loopback address %q", addr)
 		}
-	} else if dir := opt.LetsEncryptCache; dir != "" {
+	case hasLetsEncryptCache && !hasAutocertCache && !hasCert:
+		// The -letscache has a default value, so only take this path
+		// if the other options are not selected.
+		dir := opt.LetsEncryptCache
 		log.Info.Printf("https: serving HTTPS on %q using Let's Encrypt certificates", addr)
+		log.Info.Printf("https: caching Let's Encrypt certificates in %v", dir)
 		if err := os.MkdirAll(dir, 0700); err != nil {
 			log.Fatalf("https: could not create or read -letscache directory: %v", err)
 		}
 		m.Cache = autocert.DirCache(dir)
 		config = &tls.Config{GetCertificate: m.GetCertificate}
-	} else if cache := opt.AutocertCache; cache != nil {
+	case hasAutocertCache:
 		addr = ":443"
 		log.Info.Printf("https: serving HTTPS on %q using Let's Encrypt certificates", addr)
-		m.Cache = cache
+		m.Cache = opt.AutocertCache
 		config = &tls.Config{GetCertificate: m.GetCertificate}
-	} else {
-		log.Info.Printf("https: not on GCE; serving HTTPS on %q using provided certificates", addr)
+	default:
+		log.Info.Printf("https: serving HTTPS on %q using provided certificates", addr)
 		if opt.CertFile == defaultOptions.CertFile || opt.KeyFile == defaultOptions.KeyFile {
 			log.Error.Print("https: WARNING: using self-signed test certificates.")
 		}
