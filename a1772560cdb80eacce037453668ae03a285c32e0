@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f88c8100_0f89f287",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-12T00:55:37Z",
+      "side": 1,
+      "message": "explanation\n\nalso please make the \u0027Add\u0027 lowercase",
+      "range": {
+        "startLine": 7,
+        "startChar": 9,
+        "endLine": 7,
+        "endChar": 20
+      },
+      "revId": "a1772560cdb80eacce037453668ae03a285c32e0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "42806770_3c9912fd",
+        "filename": "doc/signup.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-12T00:55:37Z",
+      "side": 1,
+      "message": "please unwrap this. We deliberately start new sentences on new lines to make it easier to edit/review.",
+      "revId": "a1772560cdb80eacce037453668ae03a285c32e0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9454b993_104f06f4",
+        "filename": "doc/signup.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-12T00:55:37Z",
+      "side": 1,
+      "message": "I think we need to make this point earlier in the document. (that the dirserver is recorded by the key server, and that people locate the dirserver for a particular user by using the key server) \n\nThen this section can be something simple like:\n\nIf you decide to change the location of your directory and/or store servers at a later date, you can update the values in your $HOME/config file and run\n\n$ upspin user | upspin user -put",
+      "revId": "a1772560cdb80eacce037453668ae03a285c32e0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
