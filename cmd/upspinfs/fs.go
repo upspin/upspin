@@ -342,8 +342,7 @@ func (n *node) openDir(context gContext.Context, req *fuse.OpenRequest, resp *fu
 	if err != nil {
 		return nil, e2e(errors.E(op, err))
 	}
-	pattern := path.Join(n.uname, "*")
-	de, err := dir.Glob(string(pattern))
+	de, err := dir.Glob(upspin.AllFilesGlob(n.uname))
 	if err != nil {
 		return nil, e2e(errors.E(op, err, n.uname))
 	}
