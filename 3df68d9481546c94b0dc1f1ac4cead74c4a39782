@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6d04d90f_6eba270e",
+        "filename": "doc/signup.md",
+        "patchSetId": 7
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-12T04:25:51Z",
+      "side": 1,
+      "message": "convoluted phrasing, unclear referent for \"This\".\n\nOther users can then look up your name in the key server to learn\nthe locations of your directory and store servers.",
+      "revId": "3df68d9481546c94b0dc1f1ac4cead74c4a39782",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "15bcd1ab_84af1f37",
+        "filename": "doc/signup.md",
+        "patchSetId": 7
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-12T04:25:51Z",
+      "side": 1,
+      "message": "If one day you change the location of your directory and store servers,\nyou must update the values stored in the key server.\nOne easy way to do this is to update the ...",
+      "revId": "3df68d9481546c94b0dc1f1ac4cead74c4a39782",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "247ae291_4d1309ac",
+        "filename": "doc/signup.md",
+        "patchSetId": 7
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-12T04:25:51Z",
+      "side": 1,
+      "message": "put `` around $HOME/config",
+      "revId": "3df68d9481546c94b0dc1f1ac4cead74c4a39782",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bb62b7cc_ba9a89d6",
+        "filename": "doc/signup.md",
+        "patchSetId": 7
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-12T04:25:51Z",
+      "side": 1,
+      "message": "this is now in the wrong place. it should appear after line 160.",
+      "revId": "3df68d9481546c94b0dc1f1ac4cead74c4a39782",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
