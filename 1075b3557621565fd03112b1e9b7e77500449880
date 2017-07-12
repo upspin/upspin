@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d2311886_0de3a4db",
+        "filename": "serverutil/glob.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-12T07:03:02Z",
+      "side": 1,
+      "message": "return !esc?\nwrite a test case for this",
+      "revId": "1075b3557621565fd03112b1e9b7e77500449880",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
