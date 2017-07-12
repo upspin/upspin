@@ -70,6 +70,24 @@
     },
     {
       "key": {
+        "uuid": "2f55258e_257cbef6",
+        "filename": "doc/signup.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 5990
+      },
+      "writtenOn": "2017-07-12T03:35:56Z",
+      "side": 1,
+      "message": "I would imagine it would be more appropriate to use the term \"Upspin path name\" as described the [overview documentation](https://github.com/upspin/upspin/blob/master/doc/overview.md#naming)? \n\n\"This ensures that when other users reference your Upspin path name, they are provided with your specific instances of directory and store endpoints.\"",
+      "parentUuid": "8132487a_cc91c536",
+      "revId": "0991fc5a40026d9a751ffbfd6c8601154f5788c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "39e5e9cb_e697d5c9",
         "filename": "doc/signup.md",
         "patchSetId": 4
