@@ -141,7 +141,7 @@ func (h *downloadHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // and updates the latest and archive maps appropriately.
 func (h *downloadHandler) updateArchives() error {
 	// Fetch the available os_arch combinations.
-	des, err := h.client.Glob(releasePath + "/*")
+	des, err := h.client.Glob(upspin.AllFilesGlob(releasePath))
 	if err != nil {
 		return err
 	}
@@ -151,7 +151,7 @@ func (h *downloadHandler) updateArchives() error {
 		p, _ := path.Parse(de.Name)
 		osArch := p.Elem(p.NElem() - 1)
 
-		des, err := h.client.Glob(releasePath + osArch + "/*")
+		des, err := h.client.Glob(upspin.AllFilesGlob(upspin.PathName(releasePath + osArch)))
 		if err != nil {
 			return err
 		}
