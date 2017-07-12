@@ -40,7 +40,7 @@ func Glob(pattern string, lookup LookupFunc, ls ListFunc) ([]*upspin.DirEntry, e
 
 	// If there are no glob meta-characters in the pattern, just do a lookup.
 	if !hasMeta(p.FilePath()) {
-		de, err := lookup(p.Path())
+		de, err := lookup(unquote(p.String()))
 		if de == nil {
 			return nil, err
 		}
@@ -58,8 +58,11 @@ func Glob(pattern string, lookup LookupFunc, ls ListFunc) ([]*upspin.DirEntry, e
 		}
 	}
 
-	basePath := p.First(firstMeta)                 // Path without the meta component.
-	basePattern := p.First(firstMeta + 1).String() // Pattern including first meta component.
+	// Path without the first meta component.
+	basePath := unquote(p.First(firstMeta).String())
+	// Pattern including first meta component.
+	basePattern := p.First(firstMeta + 1).String()
+	// Tail of the patterm starting with the first meta component.
 	patternTail := strings.TrimPrefix(p.String(), basePattern)
 
 	// The return values of this function.
@@ -68,12 +71,12 @@ func Glob(pattern string, lookup LookupFunc, ls ListFunc) ([]*upspin.DirEntry, e
 
 	var toGlob []string // Additional patterns to glob.
 
-	entries, err := ls(basePath.Path())
+	entries, err := ls(basePath)
 	if err != nil {
 		if err == upspin.ErrFollowLink {
 			return entries, err
 		}
-		return nil, errors.E(basePath.Path(), err)
+		return nil, errors.E(basePath, err)
 	}
 	for _, e := range entries {
 		// Match the entire entry name against our base pattern as we
@@ -92,7 +95,7 @@ func Glob(pattern string, lookup LookupFunc, ls ListFunc) ([]*upspin.DirEntry, e
 				// ...and this is a directory, then append the
 				// pattern tail to this name and add it to the
 				// list of globs yet to try.
-				toGlob = append(toGlob, string(path.Join(e.Name, patternTail)))
+				toGlob = append(toGlob, string(path.Join(upspin.QuoteGlob(e.Name), patternTail)))
 				continue
 			}
 			if !e.IsLink() {
@@ -129,6 +132,43 @@ func Glob(pattern string, lookup LookupFunc, ls ListFunc) ([]*upspin.DirEntry, e
 	return result, errLink
 }
 
+// hasMeta reports whether the given path element contains unescaped glob
+// metacharacters.
 func hasMeta(elem string) bool {
-	return strings.ContainsAny(elem, "*?[^")
+	esc := false
+	for _, r := range elem {
+		if esc {
+			esc = false
+			continue
+		}
+		switch r {
+		case '\\':
+			esc = true
+		case '*', '[', '?':
+			return true
+		}
+	}
+	return false
+}
+
+// unquote removes the escaping from the given pattern and returns the
+// resulting path.
+func unquote(pat string) upspin.PathName {
+	if !strings.Contains(pat, "\\") {
+		return upspin.PathName(pat)
+	}
+	b := make([]byte, 0, len(pat))
+	esc := false
+	for _, c := range []byte(pat) {
+		if !esc && c == '\\' {
+			esc = true
+			continue
+		}
+		esc = false
+		b = append(b, c)
+	}
+	if esc {
+		b = append(b, '\\')
+	}
+	return upspin.PathName(b)
 }
