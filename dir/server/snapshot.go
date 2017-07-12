@@ -5,9 +5,9 @@
 package server
 
 import (
+	"strings"
 	"time"
 
-	"strings"
 	"upspin.io/dir/server/tree"
 	"upspin.io/errors"
 	"upspin.io/log"
@@ -160,18 +160,19 @@ func (s *server) shouldSnapshot(cfg *snapshotConfig) (bool, path.Parsed, error) 
 	}
 
 	// List today's snapshot directory, including any suffixed snapshot.
-	entries, err := s.globWithoutPermissions(p.String() + "/*")
+	tree, err := s.loadTreeFor(p.User())
 	if err != nil {
-		if err == upspin.ErrFollowLink {
-			// We need to get the real entry and we cannot resolve links on our own.
-			return false, path.Parsed{}, errors.E(op, errors.Internal, p.Path(), errors.Str("cannot follow a link to snapshot"))
-		}
-		if !errors.Match(errNotExist, err) {
-			// Some other error. Abort.
-			return false, path.Parsed{}, errors.E(op, err)
-		}
-		// Ok, proceed.
-	} else {
+		return false, path.Parsed{}, errors.E(op, err)
+	}
+	entries, _, err := tree.List(p)
+	if err == upspin.ErrFollowLink {
+		// We need to get the real entry and we cannot resolve links on our own.
+		return false, path.Parsed{}, errors.E(op, errors.Internal, p.Path(), errors.Str("cannot follow a link to snapshot"))
+	} else if err != nil && !errors.Match(errNotExist, err) {
+		// Some other error. Abort.
+		return false, path.Parsed{}, errors.E(op, err)
+	}
+	if len(entries) > 0 {
 		var mostRecent time.Time
 		for _, e := range entries {
 			parsed, _ := path.Parse(e.Name) // can't be an error.
