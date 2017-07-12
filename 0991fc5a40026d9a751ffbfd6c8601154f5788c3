@@ -88,6 +88,24 @@
     },
     {
       "key": {
+        "uuid": "f6084e00_61754ca4",
+        "filename": "doc/signup.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-12T03:49:50Z",
+      "side": 1,
+      "message": "s/name space/Upspin tree/\n\nthe name space is usually the term that applies to the whole world. users just have trees.",
+      "parentUuid": "2f55258e_257cbef6",
+      "revId": "0991fc5a40026d9a751ffbfd6c8601154f5788c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "39e5e9cb_e697d5c9",
         "filename": "doc/signup.md",
         "patchSetId": 4
