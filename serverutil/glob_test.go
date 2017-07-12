@@ -16,28 +16,36 @@ var errLink = upspin.ErrFollowLink
 
 func TestGlob(t *testing.T) {
 	const (
-		user       = "user@example.com"
-		root       = user + "/"
-		dir        = user + "/dir"
-		file       = dir + "/file"
-		link       = dir + "/link"
-		linkTarget = "user@example.org/somewhere"
-		private    = dir + "/private"
-		public     = dir + "/public"
-		pubFile    = public + "/file"
-		pubDir     = public + "/dir"
-		pubDirFile = pubDir + "/file"
+		user        = "user@example.com"
+		root        = user + "/"
+		dir         = user + "/dir"
+		file        = dir + "/file"
+		link        = dir + "/link"
+		linkTarget  = "user@example.org/somewhere"
+		private     = dir + "/private"
+		public      = dir + "/public"
+		pubFile     = public + "/file"
+		pubDir      = public + "/dir"
+		pubDirFile  = pubDir + "/file"
+		globDir     = public + "/gl[o]bdir"
+		globDirFile = globDir + "/file"
 	)
-	lookup := func(name upspin.PathName) (*upspin.DirEntry, error) {
-		t.Logf("lookup(%q)", name)
-		de := &upspin.DirEntry{
+	lookup := func(name upspin.PathName) (de *upspin.DirEntry, err error) {
+		defer func() {
+			var deName upspin.PathName
+			if de != nil {
+				deName = de.Name
+			}
+			t.Logf("lookup(%q) = (%v, %v)", name, deName, err)
+		}()
+		de = &upspin.DirEntry{
 			Name: name,
 			Attr: upspin.AttrDirectory,
 		}
 		switch name {
-		case root, dir, private, public, pubDir:
+		case root, dir, private, public, pubDir, globDir:
 			return de, nil
-		case file, pubFile, pubDirFile:
+		case file, pubFile, pubDirFile, globDirFile:
 			de.Attr = upspin.AttrNone
 			return de, nil
 		case link:
@@ -55,8 +63,14 @@ func TestGlob(t *testing.T) {
 			return nil, errNotExist
 		}
 	}
-	ls := func(name upspin.PathName) ([]*upspin.DirEntry, error) {
-		t.Logf("ls(%q)", name)
+	ls := func(name upspin.PathName) (des []*upspin.DirEntry, err error) {
+		defer func() {
+			var names []upspin.PathName
+			for _, de := range des {
+				names = append(names, de.Name)
+			}
+			t.Logf("ls(%q) = (%v, %v)", name, names, err)
+		}()
 		switch name {
 		case root:
 			return []*upspin.DirEntry{
@@ -104,6 +118,12 @@ func TestGlob(t *testing.T) {
 					Name: pubDirFile,
 				},
 			}, nil
+		case globDir:
+			return []*upspin.DirEntry{
+				{
+					Name: globDirFile,
+				},
+			}, nil
 		default:
 			if name == link || strings.HasPrefix(string(name), string(link+"/")) {
 				return []*upspin.DirEntry{
@@ -122,10 +142,10 @@ func TestGlob(t *testing.T) {
 		t.Logf("Glob(%q)", pattern)
 		entries, err := Glob(pattern, lookup, ls)
 		if err != matchErr && !errors.Match(matchErr, err) {
-			t.Fatalf("Glob(%q): error: %v, want %v", pattern, err, matchErr)
+			t.Errorf("Glob(%q): error: %v, want %v", pattern, err, matchErr)
 		}
 		if err := matchEntries(entries, names...); err != nil {
-			t.Fatalf("Glob(%q): %v", pattern, err)
+			t.Errorf("Glob(%q): %v", pattern, err)
 		}
 	}
 
@@ -144,6 +164,7 @@ func TestGlob(t *testing.T) {
 	testGlob(link, nil, link)
 	testGlob(link+"/*", errLink, link)
 	testGlob(link+"/foo/*", errLink, link)
+	testGlob(upspin.AllFilesGlob(globDir), nil, globDirFile)
 }
 
 func matchEntries(entries []*upspin.DirEntry, names ...upspin.PathName) error {
@@ -157,4 +178,41 @@ func matchEntries(entries []*upspin.DirEntry, names ...upspin.PathName) error {
 	}
 
 	return nil
+}
+
+func TestHasMeta(t *testing.T) {
+	cases := []struct {
+		in   string
+		want bool
+	}{
+		{"foo*", true},
+		{"fo?", true},
+		{"foo", false},
+		{"f\\*oo", false},
+		{"f\\[o]o", false},
+	}
+	for _, c := range cases {
+		got := hasMeta(c.in)
+		if got != c.want {
+			t.Errorf("hasMeta(%q) = %v, want %v", c.in, got, c.want)
+		}
+	}
+}
+
+func TestUnquote(t *testing.T) {
+	cases := []struct {
+		in   string
+		want upspin.PathName
+	}{
+		{"foo", "foo"},
+		{"f[o]o", "f[o]o"},
+		{"f\\[o]o", "f[o]o"},
+		{"foo\\", "foo\\"},
+	}
+	for _, c := range cases {
+		got := unquote(c.in)
+		if got != c.want {
+			t.Errorf("unquote(%q) = %q, want %q", c.in, got, c.want)
+		}
+	}
 }
