@@ -50,3 +50,25 @@ func TestTilde(t *testing.T) {
 		}
 	}
 }
+
+func TestHasGlobChar(t *testing.T) {
+	cases := []struct {
+		in   string
+		want bool
+	}{
+		{`foo*`, true},
+		{`fo?`, true},
+		{`foo`, false},
+		{`f\*oo`, false},
+		{`f\[o]o`, false},
+		{`f\[o]o`, false},
+		{`foo\\`, false},
+		{`foo\/a`, false}, // TODO: OK?
+	}
+	for _, c := range cases {
+		got := HasGlobChar(c.in)
+		if got != c.want {
+			t.Errorf("HasGlobChar(%q) = %t, want %t", c.in, got, c.want)
+		}
+	}
+}
