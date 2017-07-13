@@ -530,6 +530,8 @@ func (l *clog) lookupGlob(pattern upspin.PathName) ([]*upspin.DirEntry, error, b
 
 // complete returns true if (1) this was the result of a '*' glob and if
 // all its children are still valid in the LRU.
+//
+// Called with the glob entry locked.
 func (l *clog) complete(e *clogEntry) bool {
 	if !e.complete {
 		return false
@@ -618,7 +620,8 @@ func (l *clog) logRequestWithOrder(op request, name upspin.PathName, err error, 
 		de:      de,
 		order:   order,
 	}
-	l.append(e)
+	l.appendToLogFile(e)
+	l.updateLRU(e)
 
 	// Optimization: when creating a directory, fake a complete globReq entry since
 	// we know that the directory is empty and don't have to ask the server.
@@ -630,7 +633,8 @@ func (l *clog) logRequestWithOrder(op request, name upspin.PathName, err error, 
 			children: make(map[string]bool),
 			complete: true,
 		}
-		l.append(e)
+		l.appendToLogFile(e)
+		l.updateLRU(e)
 	}
 }
 
@@ -680,7 +684,6 @@ func (l *clog) logGlobRequest(pattern upspin.PathName, err error, entries []*ups
 			}
 		}
 	}
-	glock.Unlock()
 
 	// The deleted files may have been recreated while we were doing this. Just forget
 	// what we know about them.
@@ -697,15 +700,9 @@ func (l *clog) logGlobRequest(pattern upspin.PathName, err error, entries []*ups
 		children: children,
 		complete: true,
 	}
-	l.append(e)
-}
-
-// append appends a clogEntry to the end of the clog and replaces existing in the LRU.
-func (l *clog) append(e *clogEntry) error {
-	l.updateLRU(e)
 	l.appendToLogFile(e)
-
-	return nil
+	glock.Unlock()
+	l.updateLRU(e)
 }
 
 // updateLRU adds the entry to the in core LRU version of the clog. We don't remember errors
@@ -724,18 +721,6 @@ func (l *clog) updateLRU(e *clogEntry) {
 		if !errors.Match(notExist, e.error) {
 			log.Debug.Printf("updateLRU %s error %s", e.name, e.error)
 			return
-		}
-		// Recursively remove from everywhere possible.
-		if e.request == globReq {
-			for k := range e.children {
-				ae := &clogEntry{
-					request: globReq,
-					name:    path.Join(e.name, k),
-					error:   e.error,
-					de:      e.de,
-				}
-				l.updateLRU(ae)
-			}
 		}
 		l.removeFromLRU(e, true)
 		l.removeFromLRU(e, false)
