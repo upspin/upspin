@@ -38,11 +38,16 @@ the -unencryptforall flag in combination with -fix will rewrite the file
 using the EEIntegrity packing, decrypting it and making its contents
 visible to anyone.
 
+The -glob flag can be set to false to have share skip Glob processing,
+treating its arguments as literal text even if they contain special
+characters. (Leading @ signs are always expanded.)
+
 See the description for rotate for information about updating keys.
 `
 	fs := flag.NewFlagSet("share", flag.ExitOnError)
 	fix := fs.Bool("fix", false, "repair incorrect share settings")
 	force := fs.Bool("force", false, "replace wrapped keys regardless of current state")
+	fs.Bool("glob", true, "apply glob processing to the arguments")
 	isDir := fs.Bool("d", false, "do all files in directory; path must be a directory")
 	recur := fs.Bool("r", false, "recur into subdirectories; path must be a directory. assumes -d")
 	unencryptForAll := fs.Bool("unencryptforall", false, "for currently encrypted read:all files only, rewrite using EEIntegrity; requires -fix or -force")
@@ -102,7 +107,7 @@ func newSharer(s *State) *Sharer {
 
 // shareCommand is the main function for the share subcommand.
 func (s *State) shareCommand(fs *flag.FlagSet) {
-	names := s.GlobAllUpspinPath(fs.Args())
+	names := s.expandUpspin(fs.Args(), subcmd.BoolFlag(fs, "glob"))
 	s.sharer.fix = subcmd.BoolFlag(fs, "fix")
 	s.sharer.force = subcmd.BoolFlag(fs, "force")
 	s.sharer.isDir = subcmd.BoolFlag(fs, "d")

@@ -24,6 +24,7 @@ import (
 	"upspin.io/flags"
 	"upspin.io/metric"
 	"upspin.io/subcmd"
+	"upspin.io/upspin"
 
 	// Load useful packers
 	_ "upspin.io/pack/ee"
@@ -273,4 +274,23 @@ func (s *State) writeOut(file string, data []byte) {
 	if err := output.Close(); err != nil {
 		s.Exitf("closing to output failed: %v", err)
 	}
+}
+
+// globFlag sets a "-glob=true" flag in the FlagSet.
+func globFlag(fs *flag.FlagSet) *bool {
+	return fs.Bool("glob", true, "apply glob processing to the arguments")
+}
+
+// expandUpspin turns the list of string arguments into Upspin path names.
+// If glob is true, it "globs" and @-expands the arguments.
+// Otherwise, it interprets leading @ symbols but does no other processing.
+func (s *State) expandUpspin(args []string, doGlob bool) []upspin.PathName {
+	if doGlob {
+		return s.GlobAllUpspinPath(args)
+	}
+	paths := make([]upspin.PathName, len(args))
+	for i, arg := range args {
+		paths[i] = upspin.PathName(s.AtSign(arg))
+	}
+	return paths
 }
