@@ -250,6 +250,44 @@ func testDelete(t *testing.T, r *testenv.Runner) {
 	}
 }
 
+// testMetacharacters checks that we can handle files whose names
+// contain Glob metacharacters.
+func testMetacharacters(t *testing.T, r *testenv.Runner) {
+	const (
+		dir            = ownerName + "/foo[*]bar"
+		subDir         = dir + "/inner?"
+		subDirFile     = subDir + "/file[]"
+		subDirFilePath = ownerName + "/foo???bar/in*/file??"
+		contents       = "some text"
+	)
+	r.As(ownerName)
+	r.MakeDirectory(dir)
+	r.MakeDirectory(subDir)
+	r.Put(subDirFile, contents)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+	r.Get(subDirFile)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+	if r.Data != contents {
+		t.Errorf("Expected contents %q, got %q", contents, r.Data)
+	}
+
+	// Use Glob to access file a different way to verify it's as we expect.
+	r.Glob(subDirFilePath)
+	checkDirEntry(t, r.Entries[0], subDirFile, hasLocation, len(contents))
+
+	// Now clean up.
+	r.Delete(subDirFile)
+	r.Delete(subDir)
+	r.Delete(dir)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+}
+
 func testRootDeletion(t *testing.T, r *testenv.Runner) {
 	r.As(readerName)
 
@@ -303,6 +341,7 @@ var integrationTests = []struct {
 	{"ReadAccess", testReadAccess},
 	{"GroupAccess", testGroupAccess},
 	{"WriteReadAllAccessFile", testWriteReadAllAccessFile},
+	{"Metacharacters", testMetacharacters},
 
 	{"Watch", testWatchCurrent},
 	{"WatchErrors", testWatchErrors},
