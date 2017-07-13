@@ -186,3 +186,30 @@ func TestDirEntUnmarshalNoPanic(t *testing.T) {
 		t.Fatalf("Expected no data, got %d bytes", len(data))
 	}
 }
+
+// Test inputs that caused crashes with go-fuzz.
+func TestDirEntryUnmarshalCrashers(t *testing.T) {
+	inputs := []string{
+		"*0000000000000000000" +
+			"0000\x00\b0000\x00\x1200000000" +
+			"0\x13",
+		"*u@foo.co\xbdm/a/direct" +
+			"ory\x14\x80�\x04��",
+		"\x0000\x80�\x04",
+		"*0000000000000000000" +
+			"0000\x90�@",
+		"*@foo.com/a/director" +
+			"y\x14\x80\x89\x0e\xfe�\x16~��$\xef\xbf" +
+			"\xbd\x12\x02\x18foo.com:1234\fCin" +
+			"{er\x00\x80\x80\xae\xbfｿｿｿｿ" +
+			"\xef",
+		"*0000000000000000000" +
+			"000000\x18000000000000\x06" +
+			"000���0",
+		"\x000\xbd\xbd\xbfｿ\u07fd\xbf0",
+	}
+	for _, s := range inputs {
+		var de DirEntry
+		de.Unmarshal([]byte(s))
+	}
+}
