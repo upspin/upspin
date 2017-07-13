@@ -239,7 +239,9 @@ func (s *server) lookupWithPermissions(op string, name upspin.PathName, opts ...
 		if !canAny {
 			return nil, s.errPerm(op, p, opts...)
 		}
-		entry.MarkIncomplete()
+		if !access.IsAccessFile(name) && !access.IsGroupFile(name) {
+			entry.MarkIncomplete()
+		}
 	}
 	return entry, nil
 }
