@@ -14,6 +14,13 @@ import (
 	"time"
 )
 
+const (
+	// maxDirBlocks specifies a theoretical upper limit for the number of
+	// DirBlocks in a DirEntry. It should be high enough that the limit
+	// will never be reached in practice. 1 million seems okay.
+	maxDirBlocks = 1e6
+)
+
 // This file contains implementations of things like marshaling of the
 // basic Upspin types.
 
@@ -83,16 +90,22 @@ func (d *DirBlock) Unmarshal(b []byte) ([]byte, error) {
 
 	// Offset.
 	offset, n := binary.Varint(b)
-	if n == 0 {
+	switch {
+	case n == 0:
 		return nil, ErrTooShort
+	case n < 0:
+		return nil, errors.New("DirBlock Offset overflow")
 	}
 	d.Offset = offset
 	b = b[n:]
 
 	// Size.
 	size, n := binary.Varint(b)
-	if n == 0 {
+	switch {
+	case n == 0:
 		return nil, ErrTooShort
+	case n < 0:
+		return nil, errors.New("DirBlock Size overflow")
 	}
 	d.Size = size
 	b = b[n:]
@@ -245,7 +258,10 @@ func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
 	}
 	b = b[n:]
 	d.Blocks = nil
-	if nBlocks > 0 {
+	switch {
+	case nBlocks > maxDirBlocks, nBlocks < 0:
+		return nil, fmt.Errorf("invalid DirBlock count: %d", nBlocks)
+	case nBlocks > 0:
 		d.Blocks = make([]DirBlock, nBlocks)
 		for i := range d.Blocks {
 			var err error
@@ -283,14 +299,20 @@ func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
 	// Name: count N followed by N bytes.
 	// If N is -1 Name equals SignedName.
 	length, n := binary.Varint(b)
-	if n == 0 {
+	switch {
+	case n == 0:
 		return nil, ErrTooShort
+	case n < 0:
+		return nil, errors.New("DirEntry Name length overflow")
 	}
 	b = b[n:]
-	if length == -1 {
+	switch {
+	case length == -1:
 		// -1 is a special code that indicates Name == SignedName
 		d.Name = d.SignedName
-	} else {
+	case length < 0:
+		return nil, errors.New("bad name length")
+	default:
 		bytes, b = getNBytes(b, int(length))
 		if bytes == nil {
 			return nil, ErrTooShort
@@ -307,8 +329,11 @@ func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
 
 	// Sequence.
 	seq, n := binary.Varint(b)
-	if n == 0 {
+	switch {
+	case n == 0:
 		return nil, ErrTooShort
+	case n < 0:
+		return nil, errors.New("DirEntry Sequence overflow")
 	}
 	d.Sequence = seq
 	b = b[n:]
