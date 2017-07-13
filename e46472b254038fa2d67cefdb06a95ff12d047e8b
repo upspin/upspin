@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "398c18ad_2801a128",
+        "filename": "cmd/upspin/put.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-13T04:35:09Z",
+      "side": 1,
+      "message": "the string is different (including even plurality) in every case.\ni could edit it so it\u0027s not, at some loss of clarity.",
+      "parentUuid": "7b7cd2c5_dd0f07b4",
+      "revId": "e46472b254038fa2d67cefdb06a95ff12d047e8b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "710b5233_b2c6f24e",
         "filename": "cmd/upspin/put.go",
         "patchSetId": 1
@@ -33,6 +51,24 @@
       "revId": "e46472b254038fa2d67cefdb06a95ff12d047e8b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fb6520d1_9bafd80f",
+        "filename": "cmd/upspin/put.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-13T04:35:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "710b5233_b2c6f24e",
+      "revId": "e46472b254038fa2d67cefdb06a95ff12d047e8b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
