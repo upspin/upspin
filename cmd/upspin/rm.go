@@ -14,6 +14,10 @@ func (s *State) rm(args ...string) {
 	const help = `
 Rm removes Upspin files and directories from the name space.
 
+The -glob flag can be set to false to have rm skip Glob processing,
+treating its arguments as literal text even if they contain special
+characters. (Leading @ signs are always expanded.)
+
 Rm does not delete the associated storage, which is rarely necessary
 or wise: storage can be shared between items and unused storage is
 better recovered by automatic means.
@@ -26,6 +30,7 @@ storage.
 	fs := flag.NewFlagSet("rm", flag.ExitOnError)
 	recur := fs.Bool("R", false, "recur into subdirectories")
 	continueOnError := fs.Bool("f", false, "continue if errors occur")
+	glob := globFlag(fs)
 	s.ParseFlags(fs, args, help, "rm path...")
 	if fs.NArg() == 0 {
 		usageAndExit(fs)
@@ -34,7 +39,7 @@ storage.
 	if *continueOnError {
 		exit = s.Fail
 	}
-	for _, name := range s.GlobAllUpspinPath(fs.Args()) {
+	for _, name := range s.expandUpspin(fs.Args(), *glob) {
 		entry, err := s.Client.Lookup(name, false)
 		if err != nil {
 			exit(err)
