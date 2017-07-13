@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "eba2d01f_04832656",
+        "filename": "test/integration_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 255,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-13T02:52:20Z",
+      "side": 1,
+      "message": "What about performing some glob operations?",
+      "revId": "9a6e94285a6954a9775e43c78cad934b2f94b98e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
