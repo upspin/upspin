@@ -16,8 +16,13 @@ import (
 	"upspin.io/upbox"
 )
 
-// testCommands runs the tests defined in cmdTests as subtests.
-func testCommands(t *testing.T, cmdTests *[]cmdTest) {
+var allCmdTests = []*[]cmdTest{
+	&basicCmdTests,
+	&globTests,
+}
+
+// TestCommands runs the tests defined in cmdTests as subtests.
+func TestCommands(t *testing.T) {
 	// Set up upbox.
 	schema, err := upbox.SchemaFromYAML(upboxSchema, 8000)
 	if err != nil {
@@ -40,16 +45,14 @@ func testCommands(t *testing.T, cmdTests *[]cmdTest) {
 	r.state = state
 
 	// Loop over the tests in sequence, building state as we go.
-	for _, test := range *cmdTests {
-		t.Run(test.name, r.run(&test))
+	for _, testSuite := range allCmdTests {
+		for _, test := range *testSuite {
+			t.Run(test.name, r.run(&test))
+		}
 	}
 
 	// Tear down upbox.
 	schema.Stop()
-}
-
-func TestBasicCommands(t *testing.T) {
-	testCommands(t, &basicCmdTests)
 }
 
 const upboxSchema = `

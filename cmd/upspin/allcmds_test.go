@@ -132,3 +132,29 @@ var basicCmdTests = []cmdTest{
 		expect("this is public.jpg"),
 	},
 }
+
+// globTests tests glob processing, and the ability to disable it.
+// TODO: Test lots more.
+var globTests = []cmdTest{
+	// Verify that Glob processing can be disabled.
+	{
+		"erroneous mkdir with glob char",
+		do(
+			"mkdir @/a*b",
+		),
+		"",
+		fail("no path matches"),
+	},
+	{
+		"successful mkdir with glob char",
+		do(
+			"mkdir -glob=false @/a[1]b",
+			"mkdir -glob=false @/a[1]b/c**d",
+			"put -glob=false @/a[1]b/c**d/file1",
+			"get @/a?1?b/c??d/file1", // Note: globbing enabled here.
+			"rm -R -glob=false @/a[1]b",
+		),
+		"text of file1",
+		expect("text of file1"),
+	},
+}
