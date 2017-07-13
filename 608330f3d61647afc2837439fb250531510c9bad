@@ -16,6 +16,24 @@
       "revId": "608330f3d61647afc2837439fb250531510c9bad",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e39a0a6d_4ff3ac12",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-07-13T22:18:44Z",
+      "side": 1,
+      "message": "If I got an error doing a glob of a directory, I was removing everything cached about nodes below that directory. That recursive descent had unprotected access of the children map, another possible concurrency bug. However, when I looked at fixing it, I realized it was a mistake to be doing it at all. I could easily have a permission error globing a directory but still have access to descendants below it so I was throwing away information needlessly. If stuff down there changes or disappears, the Watch interface will take care of cleaning up anything cached. So for a glob error, all I really have to do is remove cached info about the glob\u0027d directory.",
+      "parentUuid": "11ce0eb9_c41456f8",
+      "revId": "608330f3d61647afc2837439fb250531510c9bad",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
