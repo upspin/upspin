@@ -14,6 +14,7 @@ import (
 	"testing"
 
 	"upspin.io/upbox"
+	"upspin.io/upspin"
 )
 
 var allCmdTests = []*[]cmdTest{
@@ -33,20 +34,25 @@ func TestCommands(t *testing.T) {
 		t.Fatalf("starting schema: %v", err)
 	}
 
-	// Create a single runner for all commands.
-	r := &runner{
-		fs:     flag.NewFlagSet("test", flag.PanicOnError), // panic if there's trouble.
-		schema: schema,
+	// Each user gets a runner for all his commands.
+	runners := make(map[upspin.UserName]*runner)
+	for _, user := range testUsers {
+		r := &runner{
+			fs:     flag.NewFlagSet("test", flag.PanicOnError), // panic if there's trouble.
+			schema: schema,
+		}
+		state, _, ok := setup(r.fs, []string{"-config=" + r.config(user), "test"})
+		if !ok {
+			t.Fatal("setup failed; bad arg list?")
+		}
+		r.state = state
+		runners[user] = r
 	}
-	state, _, ok := setup(r.fs, []string{"-config=" + r.config(), "test"})
-	if !ok {
-		t.Fatal("setup failed; bad arg list?")
-	}
-	r.state = state
 
 	// Loop over the tests in sequence, building state as we go.
 	for _, testSuite := range allCmdTests {
 		for _, test := range *testSuite {
+			r := runners[test.user]
 			t.Run(test.name, r.run(&test))
 		}
 	}
@@ -58,12 +64,20 @@ func TestCommands(t *testing.T) {
 const upboxSchema = `
 users:
   - name: ann@example.com
+  - name: chris@example.com
 servers:
   - name: keyserver
   - name: storeserver
   - name: dirserver
 domain: example.com
 `
+
+const (
+	ann   = upspin.UserName("ann@example.com")
+	chris = upspin.UserName("chris@example.com")
+)
+
+var testUsers = []upspin.UserName{ann, chris}
 
 // devNull gives EOF on read and absorbs anything error-free on write, like Unix's /dev/null.
 type devNull struct{}
@@ -136,9 +150,9 @@ func (r *runner) run(cmd *cmdTest) func(t *testing.T) {
 	}
 }
 
-// config returns the file name of the config file for the zeroth user.
-func (r *runner) config() string {
-	return r.schema.Config(r.schema.Users[0].Name)
+// config returns the file name of the config file for the given user.
+func (r *runner) config(userName upspin.UserName) string {
+	return r.schema.Config(string(userName))
 }
 
 // expect is a post function that verifies that standard output from the
@@ -181,9 +195,10 @@ func do(s ...string) []string {
 
 // putFile is a cmdTest to add the named file with the given contents and
 // check that it is created.
-func putFile(name, contents string) cmdTest {
+func putFile(user upspin.UserName, name, contents string) cmdTest {
 	return cmdTest{
 		name: fmt.Sprintf("add %s", name),
+		user: user,
 		cmds: do(
 			"put "+name,
 			"get "+name,
