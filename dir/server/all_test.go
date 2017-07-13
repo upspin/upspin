@@ -875,6 +875,24 @@ func TestPermissionDenied(t *testing.T) {
 	}
 }
 
+func TestAccessAndGroupFilesNotIncomplete(t *testing.T) {
+	s, userCtx := newDirServerForTesting(t, userName)
+	// Access file permits List rights for otherUser.
+	_, err := putAccessOrGroupFile(t, s, userCtx, userName+"/Access", "l:"+otherUser)
+	if err != nil {
+		t.Fatal(err)
+	}
+	sOther, _ := newDirServerForTesting(t, otherUser)
+
+	entry, err := sOther.Lookup(userName + "/Access")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if entry.IsIncomplete() {
+		t.Fatalf("Got incomplete entry, expected blocks")
+	}
+}
+
 func TestOverwriteFileWithWrongSequence(t *testing.T) {
 	s, userCtx := newDirServerForTesting(t, userName)
 	_, err := putAccessOrGroupFile(t, s, userCtx, userName+"/Access", "*:"+userName)
