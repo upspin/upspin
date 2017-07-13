@@ -134,11 +134,11 @@ func setup(fs *flag.FlagSet, args []string) (*State, []string, bool) {
 		return nil, nil, false
 	}
 	state := newState(strings.ToLower(fs.Arg(0)))
+	state.init()
 	// Start the cache if needed.
 	if !strings.Contains(state.Name, "setup") && !strings.Contains(state.Name, "signup") {
 		cacheutil.Start(state.Config)
 	}
-	state.init()
 	return state, fs.Args(), true
 }
 
