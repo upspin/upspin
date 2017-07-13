@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7b7cd2c5_dd0f07b4",
+        "filename": "cmd/upspin/put.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-13T03:29:51Z",
+      "side": 1,
+      "message": "Put this common usage in a string constant and concatenate it here and elsewhere?\n` + globFlagUsage",
+      "revId": "e46472b254038fa2d67cefdb06a95ff12d047e8b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "710b5233_b2c6f24e",
+        "filename": "cmd/upspin/put.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-13T03:29:51Z",
+      "side": 1,
+      "message": "make this a function that takes a flagset?\nglob :\u003d globFlag(fs)",
+      "revId": "e46472b254038fa2d67cefdb06a95ff12d047e8b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
