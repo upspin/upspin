@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "11ce0eb9_c41456f8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-13T21:49:48Z",
+      "side": 1,
+      "message": "simultaneous\n\nalso what\u0027s with that deleted code?",
+      "revId": "608330f3d61647afc2837439fb250531510c9bad",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
