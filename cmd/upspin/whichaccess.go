@@ -15,13 +15,18 @@ func (s *State) whichAccess(args ...string) {
 	const help = `
 Whichaccess reports the Upspin path of the Access file
 that controls permissions for each of the argument paths.
+
+The -glob flag can be set to false to have watchaccess skip Glob
+processing, treating its arguments as literal text even if they
+contain special characters. (Leading @ signs are always expanded.)
 `
 	fs := flag.NewFlagSet("whichaccess", flag.ExitOnError)
+	glob := fs.Bool("glob", true, "apply glob processing to the arguments")
 	s.ParseFlags(fs, args, help, "whichaccess path...")
 	if fs.NArg() == 0 {
 		usageAndExit(fs)
 	}
-	for _, name := range s.GlobAllUpspinPath(fs.Args()) {
+	for _, name := range s.expandUpspin(fs.Args(), *glob) {
 		acc, err := s.whichAccessFollowLinks(name)
 		if err != nil {
 			s.Exit(err)

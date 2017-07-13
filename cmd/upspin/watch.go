@@ -14,12 +14,17 @@ func (s *State) watch(args ...string) {
 Watch watches the given Upspin path beginning with the specified order and
 prints the events to standard output. An order of -1, the default, will send
 the current state of the tree rooted at the given path.
+
+The -glob flag can be set to false to have watch skip Glob processing,
+treating its arguments as literal text even if they contain special
+characters. (Leading @ signs are always expanded.)
 `
 	fs := flag.NewFlagSet("watch", flag.ExitOnError)
+	glob := fs.Bool("glob", true, "apply glob processing to the arguments")
 	order := fs.Int64("order", -1, "order")
 	s.ParseFlags(fs, args, help, "watch [-order=n] path")
 
-	names := s.GlobAllUpspinPath(fs.Args())
+	names := s.expandUpspin(fs.Args(), *glob)
 	if len(names) != 1 {
 		usageAndExit(fs)
 	}

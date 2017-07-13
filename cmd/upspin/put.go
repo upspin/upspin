@@ -16,10 +16,13 @@ func (s *State) put(args ...string) {
 Put writes its input to the store server and installs a directory
 entry with the given path name to refer to the data.
 
-TODO: Delete in favor of cp?
+The -glob flag can be set to false to have put skip Glob processing,
+treating its arguments as literal text even if they contain special
+characters. (Leading @ signs are always expanded.)
 `
 	fs := flag.NewFlagSet("put", flag.ExitOnError)
 	inFile := fs.String("in", "", "input file (default standard input)")
+	glob := fs.Bool("glob", true, "apply glob processing to the arguments")
 	s.ParseFlags(fs, args, help, "put [-in=inputfile] path")
 
 	if fs.NArg() != 1 {
@@ -33,7 +36,7 @@ TODO: Delete in favor of cp?
 		s.Exit(err)
 	}
 	name := parsed.Path()
-	if subcmd.HasGlobChar(parsed.String()) {
+	if *glob && subcmd.HasGlobChar(parsed.String()) {
 		// If there is a metacharacter in the last element, the whole path
 		// must exist. Otherwise, only the path up to the last element (its
 		// directory) must exist. We call Glob appropriately.
