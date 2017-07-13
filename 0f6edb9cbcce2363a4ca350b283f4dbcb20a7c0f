@@ -16,6 +16,24 @@
       "revId": "0f6edb9cbcce2363a4ca350b283f4dbcb20a7c0f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9c9aeab6_7f9f1c20",
+        "filename": "cmd/upspin/allcmds_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-13T06:59:30Z",
+      "side": 1,
+      "message": "went with chris",
+      "parentUuid": "ab758574_45799b7a",
+      "revId": "0f6edb9cbcce2363a4ca350b283f4dbcb20a7c0f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
