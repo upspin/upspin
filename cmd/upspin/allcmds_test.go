@@ -6,15 +6,18 @@ package main
 
 import (
 	"testing"
+
+	"upspin.io/upspin"
 )
 
 // cmdTest describes one sequence of subcommands to be run in order.
 // These are run by the callers of testCommands in cmd_test.go
 // The tests must be run sequentially. They build state as they run.
 type cmdTest struct {
-	name  string   // The name of the test set. This appears in the -v output.
-	cmds  []string // The subcommands to run.
-	stdin string   // The text to provide to standard input.
+	name  string          // The name of the test set. This appears in the -v output.
+	user  upspin.UserName // The user to run this as.
+	cmds  []string        // The subcommands to run.
+	stdin string          // The text to provide to standard input.
 	// post is run after the subcommands complete. It can be used to verify
 	// correct state results from their execution.
 	post func(t *testing.T, r *runner, c *cmdTest, stdout, stderr string)
@@ -24,13 +27,22 @@ type cmdTest struct {
 var basicCmdTests = []cmdTest{
 	// A couple of basic checks, mostly to test the test scaffolding itself.
 	{
-		"user",
+		"user ann",
+		ann,
 		do("user"),
 		"",
 		expect("name: ann@example.com"),
 	},
 	{
+		"user pat",
+		pat,
+		do("user"),
+		"",
+		expect("name: pat@example.com"),
+	},
+	{
 		"make user root",
+		ann,
 		do(
 			"mkdir ann@example.com",
 			"put ann@example.com/foo",
@@ -46,6 +58,7 @@ var basicCmdTests = []cmdTest{
 	},
 	{
 		"list nonexistent file",
+		ann,
 		do("ls ann@example.com/bar"),
 		"",
 		fail("item does not exist"),
@@ -53,6 +66,7 @@ var basicCmdTests = []cmdTest{
 	// Now the tests proper. Build some state and use it.
 	{
 		"build directories",
+		ann,
 		do(
 			"mkdir @/Group",
 			"mkdir @/Friends @/Friends/Photo",
@@ -70,16 +84,19 @@ var basicCmdTests = []cmdTest{
 		),
 	},
 	putFile(
+		ann,
 		"@/Group/friends",
 		"pat@example.com chris@example.com\n",
 	),
 	putFile(
+		ann,
 		"@/Friends/Access",
 		"r,l: friends\n*:ann@example.com\n",
 	),
 	// Create and build a Public directory, but do it wrong first to check failure.
 	{
 		"prevent read:all after content",
+		ann,
 		do(
 			"mkdir @/BadPublic @/BadPublic/Photo",
 			"put @/BadPublic/Access",
@@ -89,6 +106,7 @@ var basicCmdTests = []cmdTest{
 	},
 	{
 		"make public directory",
+		ann,
 		do(
 			"rm -R @/BadPublic",
 			"mkdir @/Public",
@@ -100,19 +118,23 @@ var basicCmdTests = []cmdTest{
 		expect("r,l: all\n*:ann@example.com\n"),
 	},
 	putFile(
+		ann,
 		"@/Friends/Photo/friends.jpg",
 		"this is friends.jpg",
 	),
 	putFile(
+		ann,
 		"@/Private/Photo/private.jpg",
 		"this is private.jpg",
 	),
 	putFile(
+		ann,
 		"@/Public/Photo/public.jpg",
 		"this is public.jpg",
 	),
 	{
 		"link to a file",
+		ann,
 		do(
 			"link @/Public/Photo/public.jpg @/tmp.jpg",
 			"get @/tmp.jpg",
@@ -123,6 +145,7 @@ var basicCmdTests = []cmdTest{
 	},
 	{
 		"link to a directory",
+		ann,
 		do(
 			"link @/Public/Photo @/tmpdir",
 			"get @/tmpdir/public.jpg",
@@ -139,6 +162,7 @@ var globTests = []cmdTest{
 	// Verify that Glob processing can be disabled.
 	{
 		"erroneous mkdir with glob char",
+		ann,
 		do(
 			"mkdir @/a*b",
 		),
@@ -147,6 +171,7 @@ var globTests = []cmdTest{
 	},
 	{
 		"successful mkdir with glob char",
+		ann,
 		do(
 			"mkdir -glob=false @/a[1]b",
 			"mkdir -glob=false @/a[1]b/c**d",
