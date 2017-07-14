@@ -62,6 +62,10 @@ type watcher struct {
 	// closed indicates whether the watcher is closed (1) or open (0).
 	// It must be loaded and stored atomically.
 	closed int32
+
+	// shutdown is closed by Tree.Close to signal that the watcher should
+	// exit. It is never closed by the watcher itself.
+	shutdown chan struct{}
 }
 
 // Watch implements upspin.DirServer.Watch.
@@ -70,6 +74,13 @@ func (t *Tree) Watch(p path.Parsed, order int64, done <-chan struct{}) (<-chan *
 
 	t.mu.Lock()
 	defer t.mu.Unlock()
+
+	// First, ensure the tree is not shutting down.
+	select {
+	case <-t.shutdown:
+		return nil, errors.Str("can't start Watch; tree shutting down")
+	default:
+	}
 
 	// Watch can watch non-existent files, but not non-existent roots.
 	// Therefore, we ensure the root exists before we proceed.
@@ -87,14 +98,14 @@ func (t *Tree) Watch(p path.Parsed, order int64, done <-chan struct{}) (<-chan *
 
 	// Create a watcher, but do not attach it to any node yet.
 	// TODO: limit number of watchers on any given node/tree?
-	ch := make(chan *upspin.Event)
 	w := &watcher{
-		path:    p,
-		events:  ch,
-		done:    done,
-		hasWork: make(chan bool, 1),
-		log:     cLog,
-		closed:  0,
+		path:     p,
+		events:   make(chan *upspin.Event),
+		done:     done,
+		hasWork:  make(chan bool, 1),
+		log:      cLog,
+		closed:   0,
+		shutdown: t.shutdown,
 	}
 
 	if order == upspin.WatchCurrent {
@@ -119,7 +130,10 @@ func (t *Tree) Watch(p path.Parsed, order int64, done <-chan struct{}) (<-chan *
 			packer:   t.packer,
 			log:      nil, // Cloned tree is read-only.
 			logIndex: cIndex,
+			shutdown: make(chan struct{}),
+			// there are no watchers on the clone.
 		}
+
 		// Start sending the current state of the cloned tree and setup
 		// the watcher for this tree once the current state is sent.
 		go w.sendCurrentAndWatch(clone, t, p, offset)
@@ -161,12 +175,14 @@ func (t *Tree) addWatcher(p path.Parsed, w *watcher) error {
 	}
 	// Add watcher to node, or to an ancestor.
 	n.watchers = append(n.watchers, w)
+
 	return nil
 }
 
 // sendCurrentAndWatch takes an original tree and its clone and sends the state
 // of the clone starting from the subtree rooted at p. The offset refers to the
-// last log offset saved by the original tree.
+// last log offset saved by the original tree. When sendCurrentAndWatch returns,
+// the watcher and the cloned tree are closed.
 // It must run in a goroutine. Errors are logged.
 func (w *watcher) sendCurrentAndWatch(clone, orig *Tree, p path.Parsed, offset int64) {
 	const op = "dir/server/tree.sendCurrentAndWatch"
@@ -239,12 +255,14 @@ func (w *watcher) sendEvent(logEntry *LogEntry, offset int64) error {
 		}
 	}
 	select {
-	case w.events <- event:
-		// Event was sent.
-		return nil
+	case <-w.shutdown:
+		return errClosed
 	case <-w.done:
 		// Client is done receiving events.
 		return errClosed
+	case w.events <- event:
+		// Event was sent.
+		return nil
 	case <-time.After(watcherTimeout):
 		// TODO: time.After leaks. Use NewTimer.
 		// Oops. Client didn't read fast enough.
@@ -274,9 +292,12 @@ func (w *watcher) sendEventFromLog(offset int64) (int64, error) {
 	const op = "dir/server/tree.sendEventFromLog"
 	curr := offset
 	for {
-		// Is the receiver still interested in reading events?
+		// Is the receiver still interested in reading events and the
+		// tree still open for business?
 		select {
 		case <-w.done:
+			return 0, errClosed
+		case <-w.shutdown:
 			return 0, errClosed
 		default:
 		}
@@ -321,6 +342,9 @@ func (w *watcher) watch(offset int64) {
 		case <-w.done:
 			// Done channel was closed. Close watcher and quit this
 			// goroutine.
+			return
+		case <-w.shutdown:
+			// Tree has closed, nothing else to do.
 			return
 		case <-w.hasWork:
 			// Wake up and work from where we left off.
