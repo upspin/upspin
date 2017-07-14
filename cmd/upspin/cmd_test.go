@@ -10,11 +10,9 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"strconv"
 	"strings"
 	"testing"
 
-	"upspin.io/test/testutil"
 	"upspin.io/upbox"
 	"upspin.io/upspin"
 )
@@ -27,14 +25,8 @@ var allCmdTests = []*[]cmdTest{
 
 // TestCommands runs the tests defined in cmdTests as subtests.
 func TestCommands(t *testing.T) {
-	portString, err := testutil.PickPort()
-	if err != nil {
-		t.Fatal(err)
-	}
-	port, _ := strconv.Atoi(portString)
-
 	// Set up upbox.
-	schema, err := upbox.SchemaFromYAML(upboxSchema, port)
+	schema, err := upbox.SchemaFromYAML(upboxSchema, 8000)
 	if err != nil {
 		t.Fatalf("setting up schema: %v", err)
 	}
@@ -75,6 +67,7 @@ users:
   - name: ann@example.com
   - name: chris@example.com
   - name: kelly@example.com
+  - name: lee@example.com
 servers:
   - name: keyserver
   - name: storeserver
@@ -86,9 +79,10 @@ const (
 	ann   = upspin.UserName("ann@example.com")
 	chris = upspin.UserName("chris@example.com")
 	kelly = upspin.UserName("kelly@example.com")
+	lee   = upspin.UserName("lee@example.com")
 )
 
-var testUsers = []upspin.UserName{ann, chris, kelly}
+var testUsers = []upspin.UserName{ann, chris, kelly, lee}
 
 // devNull gives EOF on read and absorbs anything error-free on write, like Unix's /dev/null.
 type devNull struct{}
