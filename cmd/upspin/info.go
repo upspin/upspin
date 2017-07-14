@@ -34,6 +34,7 @@ of the link.
 	if fs.NArg() == 0 {
 		usageAndExit(fs)
 	}
+
 	for _, name := range fs.Args() {
 		name := s.AtSign(name)
 		entries, err := s.DirServer(name).Glob(string(name))
