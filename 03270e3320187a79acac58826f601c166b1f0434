@@ -16,6 +16,24 @@
       "revId": "03270e3320187a79acac58826f601c166b1f0434",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "45431811_fcf9c44f",
+        "filename": "cmd/upspin/cmd_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-14T07:04:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "39a271fa_3f7dda1d",
+      "revId": "03270e3320187a79acac58826f601c166b1f0434",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
