@@ -114,6 +114,7 @@ func (s *State) shareCommand(fs *flag.FlagSet) {
 	s.sharer.recur = subcmd.BoolFlag(fs, "r")
 	s.sharer.quiet = subcmd.BoolFlag(fs, "q")
 	s.sharer.unencryptForAll = subcmd.BoolFlag(fs, "unencryptforall")
+
 	// To change things, User must be the owner of every file.
 	if s.sharer.fix {
 		for _, name := range names {
@@ -146,7 +147,7 @@ func (s *State) shareCommand(fs *flag.FlagSet) {
 			users := s.sharer.users[path.DropPath(entry.Name, 1)].String()
 			uNames[users] = append(uNames[users], string(entry.Name))
 		}
-		fmt.Println("Read permissions defined by Access files:")
+		s.Printf("Read permissions defined by Access files:\n")
 		for users, names := range uNames {
 			s.Printf("\nfiles readable by:\n%s:\n", users)
 			sort.Strings(names)

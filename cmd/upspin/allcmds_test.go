@@ -86,7 +86,7 @@ var basicCmdTests = []cmdTest{
 	putFile(
 		ann,
 		"@/Group/friends",
-		"pat@example.com chris@example.com\n",
+		"chris@example.com\n", // We will add kelly@ in the share test.
 	),
 	putFile(
 		ann,
@@ -181,5 +181,56 @@ var globTests = []cmdTest{
 		),
 		"text of file1",
 		expect("text of file1"),
+	},
+}
+
+// shareTests tests share processing,.
+// TODO: Test lots more.
+var shareTests = []cmdTest{
+	// Make sure that kelly@ cannot read the Friends directory.
+	{
+		"kelly can't read friends yet",
+		kelly,
+		do(
+			"get ann@example.com/Friends/Photo/friends.jpg",
+		),
+		"",
+		fail("information withheld"),
+	},
+	// Add kelly@ to the friends group.
+	putFile(
+		ann,
+		"@/Group/friends",
+		"chris@example.com kelly@example.com\n",
+	),
+	// kelly@ still can't read it (although this might be fixed one day).
+	{
+		"kelly can't read friends.jpg yet",
+		kelly,
+		do(
+			"get ann@example.com/Friends/Photo/friends.jpg",
+		),
+		"",
+		fail("no wrapped key for user"),
+	},
+	// Do the share; that should fix it.
+	{
+		"ann shares @/Friends",
+		ann,
+		do(
+			"share -q -fix -r @/Friends",
+		),
+		"",
+		expect(""),
+	},
+	// Now kelly@ can read it.
+	{
+		"kelly can read friends.jpg now",
+		kelly,
+		do(
+			"get ann@example.com/Friends/Photo/friends.jpg",
+		),
+		"",
+		expect("this is friends.jpg"),
 	},
 }
