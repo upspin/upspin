@@ -455,49 +455,46 @@ func TestGlob(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected := []upspin.PathName{
-		userName + "/Access",
-		userName + "/dir",
-		userName + "/file1.txt",
-		userName + "/mylink",
+	const incomplete = true
+	type expected struct {
+		name       upspin.PathName
+		incomplete bool
+	}
+	exp := []expected{
+		{userName + "/Access", !incomplete},   // available with any right.
+		{userName + "/dir", incomplete},       // marked incomplete (no read rights).
+		{userName + "/file1.txt", incomplete}, // marked incomplete (no read rights).
+		{userName + "/mylink", incomplete},    // links never have blocks nor metadata.
 	}
 	for _, e := range ents {
 		t.Logf("got: %q", e.Name)
 	}
 
-	if got, want := len(ents), len(expected); got != want {
-		t.Fatalf("len(ents) = %d, want = %d", got, want)
+	verify := func(ents []*upspin.DirEntry, exp []expected) {
+		for _, e := range ents {
+			t.Logf("got: %q", e.Name)
+		}
+		if got, want := len(ents), len(exp); got != want {
+			t.Fatalf("len(ents) = %d, want = %d", got, want)
+		}
+		for i, e := range ents {
+			if got, want := e.Name, exp[i].name; got != want {
+				t.Errorf("%d: e.Name = %q, want = %q", i, got, want)
+			}
+			// Verify whether entry is marked incomplete.
+			if got, want := e.IsIncomplete(), exp[i].incomplete; got != want {
+				t.Errorf("%s: incomplete = %v, want = %v", e.Name, got, want)
+			}
+		}
 	}
-	for i, e := range ents {
-		if got, want := e.Name, expected[i]; got != want {
-			t.Errorf("%d: e.Name = %q, want = %q", i, got, want)
-		}
-		// Verify that Blocks and Packdata are nil, since we don't have
-		// Read rights.
-		if len(e.Blocks) != 0 {
-			t.Errorf("len(e.Blocks) = %d, want = 0", len(e.Blocks))
-		}
-		if len(e.Packdata) != 0 {
-			t.Errorf("len(e.Packdata) = %d, want = 0", len(e.Packdata))
-		}
-	}
+	verify(ents, exp)
 
 	// Try globbing a specific file.
 	ents, err = s.Glob(userName + "/file1.txt")
-	for _, e := range ents {
-		t.Logf("got: %q", e.Name)
+	exp = []expected{
+		{userName + "/file1.txt", incomplete},
 	}
-	expected = []upspin.PathName{
-		userName + "/file1.txt",
-	}
-	if got, want := len(ents), len(expected); got != want {
-		t.Fatalf("len(ents) = %d, want = %d", got, want)
-	}
-	for i, e := range ents {
-		if got, want := e.Name, expected[i]; got != want {
-			t.Errorf("%d: e.Name = %q, want = %q", i, got, want)
-		}
-	}
+	verify(ents, exp)
 
 	//
 	// Second subtest: globber has Read permissions and Glob is more complex.
@@ -529,47 +526,18 @@ func TestGlob(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected = []upspin.PathName{
-		userName + "/dir/subdir",
-		userName + "/dir/subway",
+	exp = []expected{
+		{userName + "/dir/subdir", !incomplete},
+		{userName + "/dir/subway", !incomplete},
 	}
-	for _, e := range ents {
-		t.Logf("got: %q", e.Name)
-	}
-	if got, want := len(ents), len(expected); got != want {
-		t.Fatalf("len(ents) = %d, want = %d", got, want)
-	}
-	for i, e := range ents {
-		if got, want := e.Name, expected[i]; got != want {
-			t.Errorf("%d: e.Name = %q, want = %q", i, got, want)
-		}
-		// Since both dirs contain subdirs, verify that Blocks is not
-		// nil, because we have Read rights.
-		if len(e.Blocks) == 0 {
-			t.Errorf("len(e.Blocks) = %d, want > 0", len(e.Blocks))
-		}
-		// Packadata shouldn't be nil unless Packing is Plain.
-		if e.Packing != upspin.PlainPack && len(e.Packdata) == 0 {
-			t.Errorf("len(e.Packdata) = %d, want > 0", len(e.Packdata))
-		}
-	}
+	verify(ents, exp)
 
 	// Try globbing a specific directory not directly in the root.
 	ents, err = s.Glob(userName + "/dir/foo")
-	for _, e := range ents {
-		t.Logf("got: %q", e.Name)
+	exp = []expected{
+		{userName + "/dir/foo", !incomplete},
 	}
-	expected = []upspin.PathName{
-		userName + "/dir/foo",
-	}
-	if got, want := len(ents), len(expected); got != want {
-		t.Fatalf("len(ents) = %d, want = %d", got, want)
-	}
-	for i, e := range ents {
-		if got, want := e.Name, expected[i]; got != want {
-			t.Errorf("%d: e.Name = %q, want = %q", i, got, want)
-		}
-	}
+	verify(ents, exp)
 
 	//
 	// Third subtest: More complex regex.
@@ -580,21 +548,11 @@ func TestGlob(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected = []upspin.PathName{
-		userName + "/dir/subdir",
-		userName + "/dir/subway",
+	exp = []expected{
+		{userName + "/dir/subdir", !incomplete},
+		{userName + "/dir/subway", !incomplete},
 	}
-	for _, e := range ents {
-		t.Logf("got: %q", e.Name)
-	}
-	if got, want := len(ents), len(expected); got != want {
-		t.Fatalf("len(ents) = %d, want = %d", got, want)
-	}
-	for i, e := range ents {
-		if got, want := e.Name, expected[i]; got != want {
-			t.Errorf("%d: e.Name = %q, want = %q", i, got, want)
-		}
-	}
+	verify(ents, exp)
 
 	//
 	// Fourth subtest: A deep regex by directory owner, now matching a link
@@ -620,38 +578,18 @@ func TestGlob(t *testing.T) {
 	if err != upspin.ErrFollowLink {
 		t.Fatalf("err = %q, want = %q (ErrFollowLink)", err, upspin.ErrFollowLink)
 	}
-	expected = []upspin.PathName{
-		userName + "/dir/subdir/sub",
-		userName + "/dir/sublinkdir", // Causes ErrFollowLink above.
+	exp = []expected{
+		{userName + "/dir/subdir/sub", !incomplete},
+		{userName + "/dir/sublinkdir", !incomplete}, // Causes ErrFollowLink above.
 	}
-	for _, e := range ents {
-		t.Logf("got: %q", e.Name)
-	}
-	if got, want := len(ents), len(expected); got != want {
-		t.Fatalf("len(ents) = %d, want = %d", got, want)
-	}
-	for i, e := range ents {
-		if got, want := e.Name, expected[i]; got != want {
-			t.Errorf("%d: e.Name = %q, want = %q", i, got, want)
-		}
-	}
+	verify(ents, exp)
 
 	// Glob the link itself.
 	ents, err = sOwner.Glob(userName + "/dir/sublinkdir")
-	expected = []upspin.PathName{
-		userName + "/dir/sublinkdir",
+	exp = []expected{
+		{userName + "/dir/sublinkdir", !incomplete},
 	}
-	for _, e := range ents {
-		t.Logf("got: %q", e.Name)
-	}
-	if got, want := len(ents), len(expected); got != want {
-		t.Fatalf("len(ents) = %d, want = %d", got, want)
-	}
-	for i, e := range ents {
-		if got, want := e.Name, expected[i]; got != want {
-			t.Errorf("%d: e.Name = %q, want = %q", i, got, want)
-		}
-	}
+	verify(ents, exp)
 
 	//
 	// Fifth subtest: globber can't list part of the path; only the first
@@ -669,20 +607,10 @@ func TestGlob(t *testing.T) {
 	if err != upspin.ErrFollowLink {
 		t.Fatalf("err = %q, want = %q (ErrFollowLink)", err, upspin.ErrFollowLink)
 	}
-	expected = []upspin.PathName{
-		userName + "/mylink", // Causes ErrFollowLink above.
+	exp = []expected{
+		{userName + "/mylink", incomplete}, // Causes ErrFollowLink above.
 	}
-	for _, e := range ents {
-		t.Logf("got: %q", e.Name)
-	}
-	if got, want := len(ents), len(expected); got != want {
-		t.Fatalf("len(ents) = %d, want = %d", got, want)
-	}
-	for i, e := range ents {
-		if got, want := e.Name, expected[i]; got != want {
-			t.Errorf("%d: e.Name = %q, want = %q", i, got, want)
-		}
-	}
+	verify(ents, exp)
 
 	// Test syntax error.
 	_, err = s.Glob(userName + "/[]")

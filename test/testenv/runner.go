@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"upspin.io/access"
 	"upspin.io/client"
 	"upspin.io/errors"
 	"upspin.io/upspin"
@@ -298,7 +299,8 @@ func (r *Runner) GotEntryWithSequenceVersion(p upspin.PathName, seq int64) bool 
 
 // GotEntries reports whether the names of the Entries match the provided
 // list (in order). It also checks that the presence of block data in
-// those entries matches the boolean.
+// those entries matches the boolean, except it tolerates Access and Group files
+// having blocks even if wantBlockData is false.
 // If not, it notes the discrepancy as the last error state.
 func (r *Runner) GotEntries(wantBlockData bool, ps ...upspin.PathName) bool {
 	if r.Failed() {
@@ -326,6 +328,10 @@ func (r *Runner) GotEntries(wantBlockData bool, ps ...upspin.PathName) bool {
 		}
 		nBlocks := len(r.Entries[i].Blocks)
 		if nBlocks > 0 == wantBlockData || r.Entries[i].IsLink() {
+			continue
+		}
+		if nBlocks > 0 && !wantBlockData && (access.IsAccessFile(r.Entries[i].Name) || access.IsGroupFile(r.Entries[i].Name)) {
+			// Access and Group file can have blocks in case the reader has any right.
 			continue
 		}
 		if wantBlockData {

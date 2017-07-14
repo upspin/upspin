@@ -534,7 +534,9 @@ func (s *server) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 		if !canAny {
 			return nil, s.errPerm(op, parsed)
 		}
-		entry.MarkIncomplete()
+		if !access.IsAccessFile(entry.SignedName) && !access.IsGroupFile(entry.SignedName) {
+			entry.MarkIncomplete()
+		}
 	}
 	return entry, nil
 }
@@ -636,7 +638,9 @@ func (s *server) listDir(dirName upspin.PathName) ([]*upspin.DirEntry, error) {
 			return nil, errors.E(op, dir.Name, err)
 		}
 		if !canRead {
-			e.MarkIncomplete()
+			if !access.IsAccessFile(e.SignedName) && !access.IsGroupFile(e.SignedName) {
+				e.MarkIncomplete()
+			}
 		}
 		results = append(results, &e)
 	}
