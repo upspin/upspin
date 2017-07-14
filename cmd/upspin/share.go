@@ -114,6 +114,7 @@ func (s *State) shareCommand(fs *flag.FlagSet) {
 	s.sharer.recur = subcmd.BoolFlag(fs, "r")
 	s.sharer.quiet = subcmd.BoolFlag(fs, "q")
 	s.sharer.unencryptForAll = subcmd.BoolFlag(fs, "unencryptforall")
+
 	// To change things, User must be the owner of every file.
 	if s.sharer.fix {
 		for _, name := range names {
@@ -146,7 +147,7 @@ func (s *State) shareCommand(fs *flag.FlagSet) {
 			users := s.sharer.users[path.DropPath(entry.Name, 1)].String()
 			uNames[users] = append(uNames[users], string(entry.Name))
 		}
-		fmt.Println("Read permissions defined by Access files:")
+		s.Printf("Read permissions defined by Access files:\n")
 		for users, names := range uNames {
 			s.Printf("\nfiles readable by:\n%s:\n", users)
 			sort.Strings(names)
@@ -366,6 +367,7 @@ func (s *State) lookupPacker(entry *upspin.DirEntry) upspin.Packer {
 
 // addAccess loads an access file.
 func (s *Sharer) addAccess(entry *upspin.DirEntry) {
+	s.state.Printf("addAccess for %q\n", entry.Name)
 	name := entry.Name
 	if !entry.IsDir() {
 		name = path.DropPath(name, 1) // Directory name for this file.
@@ -396,6 +398,7 @@ func (s *State) usersWithAccess(client upspin.Client, a *access.Access, right ac
 		return nil
 	}
 	users, err := a.Users(right, client.Get)
+	s.Printf("USERS FOR %s: %s\n", a.Path(), users)
 	if err != nil {
 		s.Exitf("getting user list: %s", err)
 	}
@@ -408,6 +411,7 @@ func (s *State) readOrExit(c upspin.Client, file upspin.PathName) []byte {
 	if err != nil {
 		s.Exitf("%q: %s", file, err)
 	}
+	s.Printf("DATA for %q: %s\n", file, data)
 	return data
 }
 

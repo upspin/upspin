@@ -7,6 +7,7 @@ package main
 import (
 	"flag"
 
+	"upspin.io/access"
 	"upspin.io/path"
 	"upspin.io/subcmd"
 )
@@ -50,5 +51,9 @@ characters. (Leading @ signs are always expanded.)
 	_, err = s.Client.Put(name, data)
 	if err != nil {
 		s.Exit(err)
+	}
+	// If this is a Group file, need to remove any stored info about it.
+	if access.IsGroupFile(name) {
+		_ = access.RemoveGroup(name) // Ignore errors; file might not be cached.
 	}
 }

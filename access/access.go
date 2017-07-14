@@ -537,6 +537,7 @@ func AddGroup(pathName upspin.PathName, contents []byte) error {
 }
 
 // RemoveGroup undoes the installation of a group added by AddGroup.
+// It returns an error if the path is bad or the group is not present.
 func RemoveGroup(pathName upspin.PathName) error {
 	const op = "access.RemoveGroup"
 	parsed, err := path.Parse(pathName)
