@@ -52,8 +52,13 @@ characters. (Leading @ signs are always expanded.)
 	if err != nil {
 		s.Exit(err)
 	}
-	// If this is a Group file, need to remove any stored info about it.
-	if access.IsGroupFile(name) {
-		_ = access.RemoveGroup(name) // Ignore errors; file might not be cached.
+	// If this is an Access or Group file, need to remove any stored info about it.
+	// It's all cached in the Sharer, so just wipe that.
+	if access.IsAccessFile(name) || access.IsGroupFile(name) {
+		s.sharer = newSharer(s)
+		// If this is a Group file, there is also information within the access package.
+		if access.IsGroupFile(name) {
+			_ = access.RemoveGroup(name) // Ignore errors; file might not be cached.
+		}
 	}
 }
