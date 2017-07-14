@@ -8,7 +8,6 @@ import (
 	"crypto/x509"
 	"fmt"
 	"io/ioutil"
-	"net"
 	"net/http"
 	"os"
 	"testing"
@@ -164,7 +163,7 @@ func startCombinedServer(cfg upspin.Config) (*upspin.Endpoint, error) {
 	http.Handle("/api/Store/", ss)
 	http.Handle("/api/Dir/", ds)
 
-	port, err := pickPort()
+	port, err := testutil.PickPort()
 	if err != nil {
 		return nil, err
 	}
@@ -186,7 +185,7 @@ func startCacheServer(cfg upspin.Config) (*upspin.Endpoint, error) {
 	}
 
 	// Find a free port.
-	port, err := pickPort()
+	port, err := testutil.PickPort()
 	if err != nil {
 		return nil, err
 	}
@@ -233,17 +232,4 @@ func setUpCertPool(cfg upspin.Config) (upspin.Config, error) {
 	}
 	cfg = config.SetCertPool(cfg, pool)
 	return cfg, err
-}
-
-func pickPort() (string, error) {
-	listener, err := net.Listen("tcp", "localhost:0")
-	if err != nil {
-		return "", err
-	}
-	defer listener.Close()
-	_, port, err := net.SplitHostPort(listener.Addr().String())
-	if err != nil {
-		return "", err
-	}
-	return port, err
 }

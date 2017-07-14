@@ -12,6 +12,7 @@ package testutil // import "upspin.io/test/testutil"
 import (
 	"go/build"
 	"log"
+	"net"
 	"path/filepath"
 )
 
@@ -22,4 +23,20 @@ func Repo(dir ...string) string {
 		log.Fatal(err)
 	}
 	return filepath.Join(p.Dir, filepath.Join(dir...))
+}
+
+// PickPort listens to an available port on localhost, closes the listener, and
+// returns the port number. This function may be used for finding an available
+// port for tests that use the network.
+func PickPort() (string, error) {
+	listener, err := net.Listen("tcp", "localhost:0")
+	if err != nil {
+		return "", err
+	}
+	defer listener.Close()
+	_, port, err := net.SplitHostPort(listener.Addr().String())
+	if err != nil {
+		return "", err
+	}
+	return port, err
 }

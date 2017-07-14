@@ -8,7 +8,6 @@ import (
 	"crypto/x509"
 	"fmt"
 	"io/ioutil"
-	"net"
 	"net/http"
 	"testing"
 	"time"
@@ -47,19 +46,6 @@ func lookup(user upspin.UserName) (upspin.PublicKey, error) {
 	return "", errors.E(errors.NotExist, errors.Str("No user here"))
 }
 
-func pickPort() (port string) {
-	listener, err := net.Listen("tcp", "localhost:0")
-	if err != nil {
-		log.Fatalf("Failed to listen: %v", err)
-	}
-	_, port, err = net.SplitHostPort(listener.Addr().String())
-	if err != nil {
-		log.Fatalf("Failed to parse listener address: %v", err)
-	}
-	listener.Close()
-	return port
-}
-
 type server struct {
 	t         *testing.T
 	iteration int
@@ -67,7 +53,11 @@ type server struct {
 
 func startServer(t *testing.T) (port string) {
 	srv = &server{t: t}
-	port = pickPort()
+	var err error
+	port, err = testutil.PickPort()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	cfg := config.SetUserName(config.New(), "server@upspin.io")
 	cfg = config.SetKeyEndpoint(cfg, upspin.Endpoint{Transport: upspin.InProcess})
