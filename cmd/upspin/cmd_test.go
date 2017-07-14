@@ -10,9 +10,11 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"strconv"
 	"strings"
 	"testing"
 
+	"upspin.io/test/testutil"
 	"upspin.io/upbox"
 	"upspin.io/upspin"
 )
@@ -24,8 +26,14 @@ var allCmdTests = []*[]cmdTest{
 
 // TestCommands runs the tests defined in cmdTests as subtests.
 func TestCommands(t *testing.T) {
+	portString, err := testutil.PickPort()
+	if err != nil {
+		t.Fatal(err)
+	}
+	port, _ := strconv.Atoi(portString)
+
 	// Set up upbox.
-	schema, err := upbox.SchemaFromYAML(upboxSchema, 8000)
+	schema, err := upbox.SchemaFromYAML(upboxSchema, port)
 	if err != nil {
 		t.Fatalf("setting up schema: %v", err)
 	}
