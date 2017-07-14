@@ -233,4 +233,51 @@ var shareTests = []cmdTest{
 		"",
 		expect("this is friends.jpg"),
 	},
+	// Now a similar dance but using an Access file and new reader lee@.
+	// Make sure that lee@ cannot read the Friends directory.
+	{
+		"lee can't read friends yet",
+		lee,
+		do(
+			"get ann@example.com/Friends/Photo/friends.jpg",
+		),
+		"",
+		fail("information withheld"),
+	},
+	// Add lee@ to the Access file.
+	putFile(
+		ann,
+		"@/Friends/Access",
+		"r,l: friends lee@example.com\n*:ann@example.com\n",
+	),
+	// lee@ still can't read it (although this might be fixed one day).
+	{
+		"lee can't read friends.jpg yet",
+		lee,
+		do(
+			"get ann@example.com/Friends/Photo/friends.jpg",
+		),
+		"",
+		fail("no wrapped key for user"),
+	},
+	// Do the share; that should fix it.
+	{
+		"ann shares @/Friends (2)",
+		ann,
+		do(
+			"share -q -fix -r @/Friends",
+		),
+		"",
+		expect(""),
+	},
+	// Now lee@ can read it.
+	{
+		"lee can read friends.jpg now",
+		lee,
+		do(
+			"get ann@example.com/Friends/Photo/friends.jpg",
+		),
+		"",
+		expect("this is friends.jpg"),
+	},
 }
