@@ -62,6 +62,15 @@ type Tree struct {
 	// The index of the slice is the path length of the nodes therein.
 	// The value of the map is ignored.
 	dirtyNodes []map[*node]bool
+
+	// shutdown is closed when the tree is closed. Any goroutine that needs
+	// to exit can select on it. Specially useful for watchers.
+	shutdown chan struct{}
+
+	// watchers tracks the number of running watchers.
+	// Its Add method should be called with mu held,
+	// and only if the shutdown channel is not closed.
+	watchers sync.WaitGroup
 }
 
 // String implements fmt.Stringer.
@@ -122,6 +131,7 @@ func New(config upspin.Config, log *Writer, logIndex *LogIndex) (*Tree, error) {
 		packer:   packer,
 		log:      log,
 		logIndex: logIndex,
+		shutdown: make(chan struct{}),
 	}
 	// Do we have entries in the log to process, to recover from a crash?
 	err := t.recoverFromLog()
@@ -735,6 +745,14 @@ func (t *Tree) flush() error {
 // results.
 func (t *Tree) Close() error {
 	const op = "dir/server/tree.Close"
+
+	// Notify watchers and any other goroutine that the tree is closing
+	// immediately.
+	t.mu.Lock()
+	close(t.shutdown)
+	t.mu.Unlock()
+	t.watchers.Wait()
+
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
