@@ -239,7 +239,7 @@ func (s *server) lookupWithPermissions(op string, name upspin.PathName, opts ...
 		if !canAny {
 			return nil, s.errPerm(op, p, opts...)
 		}
-		if !access.IsAccessFile(name) && !access.IsGroupFile(name) {
+		if !access.IsAccessFile(entry.SignedName) && !access.IsGroupFile(entry.SignedName) {
 			entry.MarkIncomplete()
 		}
 	}
@@ -538,7 +538,9 @@ func (s *server) listDir(op string, dirName upspin.PathName, opts ...options) ([
 	}
 	if !canRead {
 		for _, e := range entries {
-			e.MarkIncomplete()
+			if !access.IsAccessFile(e.SignedName) && !access.IsGroupFile(e.SignedName) {
+				e.MarkIncomplete()
+			}
 		}
 	}
 	return entries, nil
