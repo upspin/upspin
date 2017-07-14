@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "39a271fa_3f7dda1d",
+        "filename": "cmd/upspin/cmd_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-14T06:42:11Z",
+      "side": 1,
+      "message": "revert this reversion? git sync?",
+      "revId": "03270e3320187a79acac58826f601c166b1f0434",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
