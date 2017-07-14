@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0437776e_b88689a9",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 879,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-14T01:57:54Z",
+      "side": 1,
+      "message": "it\u0027s a config now",
+      "range": {
+        "startLine": 879,
+        "startChar": 4,
+        "endLine": 879,
+        "endChar": 11
+      },
+      "revId": "c7ac74b11868446d0a8538f9fc7486a0c2ea44a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e6a76f6c_c51a466b",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 881,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-14T01:57:54Z",
+      "side": 1,
+      "message": "make this a constant?",
+      "range": {
+        "startLine": 881,
+        "startChar": 47,
+        "endLine": 881,
+        "endChar": 65
+      },
+      "revId": "c7ac74b11868446d0a8538f9fc7486a0c2ea44a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "52ded312_6b70b67b",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-14T01:57:54Z",
+      "side": 1,
+      "message": "I wonder if this logic should be in listDir too?",
+      "revId": "c7ac74b11868446d0a8538f9fc7486a0c2ea44a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
