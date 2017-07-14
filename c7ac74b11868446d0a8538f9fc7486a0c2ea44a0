@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "710381ea_75c261f2",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 879,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-07-14T15:59:29Z",
+      "side": 1,
+      "message": "no other test uses \u0027config\u0027 here. why start now?",
+      "parentUuid": "0437776e_b88689a9",
+      "range": {
+        "startLine": 879,
+        "startChar": 4,
+        "endLine": 879,
+        "endChar": 11
+      },
+      "revId": "c7ac74b11868446d0a8538f9fc7486a0c2ea44a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "e6a76f6c_c51a466b",
         "filename": "dir/server/all_test.go",
         "patchSetId": 1
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "3e813ed0_c9e51462",
+        "filename": "dir/server/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 881,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-07-14T15:59:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e6a76f6c_c51a466b",
+      "range": {
+        "startLine": 881,
+        "startChar": 47,
+        "endLine": 881,
+        "endChar": 65
+      },
+      "revId": "c7ac74b11868446d0a8538f9fc7486a0c2ea44a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "52ded312_6b70b67b",
         "filename": "dir/server/server.go",
         "patchSetId": 1
@@ -59,6 +107,24 @@
       "writtenOn": "2017-07-14T01:57:54Z",
       "side": 1,
       "message": "I wonder if this logic should be in listDir too?",
+      "revId": "c7ac74b11868446d0a8538f9fc7486a0c2ea44a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "db669f1c_08c53d2f",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-07-14T15:59:29Z",
+      "side": 1,
+      "message": "Yes. Will add in another CL.",
+      "parentUuid": "52ded312_6b70b67b",
       "revId": "c7ac74b11868446d0a8538f9fc7486a0c2ea44a0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
