@@ -454,6 +454,43 @@ func TestMoveDownWatchers(t *testing.T) {
 	}
 }
 
+func TestClosingTreeTerminatesWatcher(t *testing.T) {
+	config, log, logIndex := newConfigForTesting(t, userName)
+	tree, err := New(config, log, logIndex)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	buildTree(t, tree, config)
+
+	// Get a watcher at the root
+	done := make(chan struct{})
+	ch, err := tree.Watch(mkpath(t, userName+"/"), upspin.WatchNew, done)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Find the watcher internally.
+	if len(tree.root.watchers) != 1 {
+		t.Fatalf("Expected exactly one watcher, got %d", len(tree.root.watchers))
+	}
+	w := tree.root.watchers[0]
+
+	tree.Close()
+
+	// Wait for watcher to close itself.
+	select {
+	case <-ch:
+		// Ok
+	case <-time.After(time.Minute):
+		// Don't wait forever or test will abort without a helpful error message.
+		t.Error("Watcher did not close fast enough")
+	}
+	if !w.isClosed() {
+		t.Fatal("Watcher did not close")
+	}
+}
+
 func checkEvent(e *upspin.Event, expectedName upspin.PathName, expectDelete bool, expectBlocks bool) error {
 	if e == nil {
 		return errors.Str("nil event")
