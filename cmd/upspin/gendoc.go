@@ -50,6 +50,8 @@ func (s *State) gendoc(args ...string) {
 		names = append(names, name)
 	}
 	names = append(names, externalCommands...)
+	// Shell is not in "commands" to prevent init loops.
+	names = append(names, "shell")
 	sort.Strings(names)
 
 	var b bytes.Buffer
@@ -68,7 +70,10 @@ func (s *State) gendoc(args ...string) {
 
 	// Generate subcommands.
 	for _, name := range names {
-		s.getCommand(name) // Make sure command exists; this will error and exit if not.
+		if name != "shell" {
+			// Make sure command exists; this will error and exit if not.
+			s.getCommand(name)
+		}
 		var docs bytes.Buffer
 		s.helpDocs(&docs, upspin, name, "-help")
 
@@ -92,6 +97,7 @@ func (s *State) helpDocs(out io.Writer, command string, args ...string) {
 	var b bytes.Buffer
 	cmd.Stdout = &b
 	cmd.Stderr = &b
+	cmd.Env = append(os.Environ(), "UPSPIN_GENDOC=yes")
 	cmd.Run()
 	// Command should have exited with status 2, which we ignore,
 	// but if it's an external command the output may end with a line
