@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d330a0aa_885a05ca",
+        "filename": "cmd/upspin/shell.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-15T04:14:13Z",
+      "side": 1,
+      "message": "remove the double spaces after each period\nalso start this sentence on a new line.",
+      "revId": "05f375dbc48f3d18187fa1c0988064ce7c4c5f95",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
