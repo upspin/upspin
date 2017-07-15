@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9b6dde92_f0c47227",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-15T01:57:38Z",
+      "side": 1,
+      "message": "As commented in the other file, I think \"shutdown\" is a clearer name for what this does. It is a signal to all parts of the tree that they should exit.\n\n\u003e shutdown is closed by the Close method. Anything that needs to be shut down on Close can select on it (watchers, for example).",
+      "revId": "6a078669f93a7dbaae33793205905454cbef6342",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4581eef7_28010da0",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 757,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-15T01:57:38Z",
+      "side": 1,
+      "message": "To prevent races in the tests, I think we also need to wait for the watchers to shutdown before returning from this method.\n\nTo do this you can add a sync.WaitGroup to the Tree struct:\n\n   // watchers tracks the number of running watchers.\n   // Its Add method should be called with mu held,\n   // and only if the shutdown channel is not closed.\n   watchers sync.WaitGroup\n\nThen in the Watch method, with t.mu held, just before launching the watch goroutine:\n\n   select {\n   case \u003c-t.shutdown:\n     return errors.Str(\"can\u0027t start Watch; tree shutting down\")\n   default:\n   }\n   t.watchers.Add(1)\n   go ...\n\nThen you need to store the WaitGroup\u0027s Done method in watcher the struct:\n\n   // done must be called by this watcher before it exits its watch loop.\n   done func()\n\nAnd when you populate the struct:\n\n   w :\u003d \u0026watcher{\n     ...\n     done: t.watchers.Done,\n   }\n\nAnd in the watcher.close method, call it:\n\n   w.done()\n\nAnd, finally, here, you wait for any running Watchers to shutdown before returning from Close:\n\n   close(t.shutdown)\n   t.watchers.Wait()",
+      "revId": "6a078669f93a7dbaae33793205905454cbef6342",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ecf25fa3_ea247313",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-15T01:57:38Z",
+      "side": 1,
+      "message": "I think \"shutdown\" might be a clearer name for what this is.\nAlso it\u0027s not a reference to a channel; it\u0027s a channel.\n\n\u003e shutdown is closed by Tree.Close to signal that the watcher should exit.",
+      "revId": "6a078669f93a7dbaae33793205905454cbef6342",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
