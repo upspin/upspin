@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "74e89049_27be10b9",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-15T23:38:12Z",
+      "side": 1,
+      "message": "wait group",
+      "revId": "c580240fe70cf88f1cfd4a0610dddffd732d0c8f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4b017aaa_1a9a8fc2",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-15T23:38:12Z",
+      "side": 1,
+      "message": "why doneWait? It\u0027s not waiting for anything.",
+      "revId": "c580240fe70cf88f1cfd4a0610dddffd732d0c8f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a40a1fcf_7fae6b08",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-15T23:38:12Z",
+      "side": 1,
+      "message": "if you do the Add here, and one of the error returns below happen, then the corresponding Done call will never happen and a Close of the Tree will hang.\n\nYou should do t.watchers.Add(1) before each \u0027go\u0027 statement, instead.",
+      "revId": "c580240fe70cf88f1cfd4a0610dddffd732d0c8f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d823cff9_b3a3b704",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-15T23:38:12Z",
+      "side": 1,
+      "message": "just put this in the struct literal?",
+      "revId": "c580240fe70cf88f1cfd4a0610dddffd732d0c8f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0a954fa6_07559290",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-15T23:38:12Z",
+      "side": 1,
+      "message": "also return here\ncases in go don\u0027t fall through",
+      "revId": "c580240fe70cf88f1cfd4a0610dddffd732d0c8f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
