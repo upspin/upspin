@@ -176,10 +176,16 @@ func printCommands() {
 		}
 		cmdStrs = append(cmdStrs, cmd)
 	}
-	// Now find all the binaries in the $PATH.
-	cmdStrs = append(cmdStrs, findUpspinBinaries()...)
-	sort.Strings(cmdStrs)
+	// Now find all the binaries in the $PATH,
+	// but only if we're not generating doc.go.
+	if os.Getenv("UPSPIN_GENDOC") == "" {
+		cmdStrs = append(cmdStrs, findUpspinBinaries()...)
+	} else {
+		cmdStrs = append(cmdStrs, externalCommands...)
+	}
+	// Display "shell" first as it's not in "commands".
 	fmt.Fprintf(os.Stderr, "\tshell (Interactive mode)\n")
+	sort.Strings(cmdStrs)
 	// There may be dups; filter them.
 	prev := ""
 	for _, cmd := range cmdStrs {

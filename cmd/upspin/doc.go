@@ -50,11 +50,8 @@ Upspin commands:
 	countersign
 	cp
 	deletestorage
-	deploy
-	deploy-gcp
 	get
 	getref
-	github
 	info
 	keygen
 	link
@@ -67,7 +64,6 @@ Upspin commands:
 	setupdomain
 	setupserver
 	setupstorage
-	setupstorage-gcp
 	setupwriters
 	share
 	signup
@@ -176,7 +172,13 @@ Usage: upspin get [-out=outputfile] path
 
 Get writes to standard output the contents identified by the Upspin path.
 
+The -glob flag can be set to false to have get skip Glob processing,
+treating its argument as literal text even if it contains special
+characters. (A leading @ sign is always expanded.)
+
 Flags:
+  -glob
+    	apply glob processing to the arguments (default true)
   -help
     	print more information about the command
   -out string
@@ -284,7 +286,13 @@ Usage: upspin mkdir directory...
 
 Mkdir creates Upspin directories.
 
+The -glob flag can be set to false to have mkdir skip Glob processing,
+treating its arguments as literal text even if they contain special
+characters. (Leading @ signs are always expanded.)
+
 Flags:
+  -glob
+    	apply glob processing to the arguments (default true)
   -help
     	print more information about the command
 
@@ -297,9 +305,13 @@ Usage: upspin put [-in=inputfile] path
 Put writes its input to the store server and installs a directory
 entry with the given path name to refer to the data.
 
-TODO: Delete in favor of cp?
+The -glob flag can be set to false to have put skip Glob processing,
+treating its arguments as literal text even if they contain special
+characters. (Leading @ signs are always expanded.)
 
 Flags:
+  -glob
+    	apply glob processing to the arguments (default true)
   -help
     	print more information about the command
   -in string
@@ -337,6 +349,10 @@ Usage: upspin rm path...
 
 Rm removes Upspin files and directories from the name space.
 
+The -glob flag can be set to false to have rm skip Glob processing,
+treating its arguments as literal text even if they contain special
+characters. (Leading @ signs are always expanded.)
+
 Rm does not delete the associated storage, which is rarely necessary
 or wise: storage can be shared between items and unused storage is
 better recovered by automatic means.
@@ -349,6 +365,8 @@ storage.
 Flags:
   -R	recur into subdirectories
   -f	continue if errors occur
+  -glob
+    	apply glob processing to the arguments (default true)
   -help
     	print more information about the command
 
@@ -522,6 +540,10 @@ the -unencryptforall flag in combination with -fix will rewrite the file
 using the EEIntegrity packing, decrypting it and making its contents
 visible to anyone.
 
+The -glob flag can be set to false to have share skip Glob processing,
+treating its arguments as literal text even if they contain special
+characters. (Leading @ signs are always expanded.)
+
 See the description for rotate for information about updating keys.
 
 Flags:
@@ -530,12 +552,30 @@ Flags:
     	repair incorrect share settings
   -force
     	replace wrapped keys regardless of current state
+  -glob
+    	apply glob processing to the arguments (default true)
   -help
     	print more information about the command
   -q	suppress output. Default is to show state for every file
   -r	recur into subdirectories; path must be a directory. assumes -d
   -unencryptforall
     	for currently encrypted read:all files only, rewrite using EEIntegrity; requires -fix or -force
+
+
+
+Sub-command shell
+
+Usage: upspin shell [-v] [-prompt=<prompt_string>]
+
+Shell runs an interactive session for Upspin subcommands.
+When running the shell, the leading "upspin" is assumed on each command.
+
+Flags:
+  -help
+    	print more information about the command
+  -prompt prompt
+    	interactive prompt (default "<username>")
+  -v	verbose; print to stderr each command before execution
 
 
 
@@ -681,7 +721,13 @@ Watch watches the given Upspin path beginning with the specified order and
 prints the events to standard output. An order of -1, the default, will send
 the current state of the tree rooted at the given path.
 
+The -glob flag can be set to false to have watch skip Glob processing,
+treating its arguments as literal text even if they contain special
+characters. (Leading @ signs are always expanded.)
+
 Flags:
+  -glob
+    	apply glob processing to the arguments (default true)
   -help
     	print more information about the command
   -order int
@@ -696,7 +742,13 @@ Usage: upspin whichaccess path...
 Whichaccess reports the Upspin path of the Access file
 that controls permissions for each of the argument paths.
 
+The -glob flag can be set to false to have watchaccess skip Glob
+processing, treating its arguments as literal text even if they
+contain special characters. (Leading @ signs are always expanded.)
+
 Flags:
+  -glob
+    	apply glob processing to the arguments (default true)
   -help
     	print more information about the command
 
