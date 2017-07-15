@@ -570,6 +570,12 @@ Usage: upspin shell [-v] [-prompt=<prompt_string>]
 Shell runs an interactive session for Upspin subcommands.
 When running the shell, the leading "upspin" is assumed on each command.
 
+The shell has a simple interface, free of quoting or other features usually
+associated with interactive shells.  It is intended only for testing and is kept
+simple for reasons of comprehensibility, portability, and maintainability.  Those
+who need quoting or line editing or other such features should use their regular
+shell and run upspinfs or invoke the upspin command line-by-line.
+
 Flags:
   -help
     	print more information about the command
