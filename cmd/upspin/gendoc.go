@@ -18,13 +18,6 @@ import (
 	"strings"
 )
 
-// externalCommands lists the commands that are considered part of
-// the upspin command itself but are implemented as separate binaries.
-// We show their documentation when we generate doc.go
-var externalCommands = []string{
-	"setupstorage",
-}
-
 func init() {
 	commands["gendoc"] = (*State).gendoc
 }

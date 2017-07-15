@@ -99,6 +99,13 @@ var commands = map[string]func(*State, ...string){
 	"whichaccess":   (*State).whichAccess,
 }
 
+// externalCommands lists the commands that are considered part of
+// the upspin command itself but are implemented as separate binaries.
+// We show their documentation when we generate doc.go
+var externalCommands = []string{
+	"setupstorage",
+}
+
 type State struct {
 	*subcmd.State
 	sharer       *Sharer
