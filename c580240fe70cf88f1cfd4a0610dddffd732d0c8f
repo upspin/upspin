@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "efd7ad11_9aed51df",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-07-16T02:07:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "74e89049_27be10b9",
+      "revId": "c580240fe70cf88f1cfd4a0610dddffd732d0c8f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4b017aaa_1a9a8fc2",
         "filename": "dir/server/tree/watch.go",
         "patchSetId": 2
@@ -33,6 +51,24 @@
       "revId": "c580240fe70cf88f1cfd4a0610dddffd732d0c8f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e0daaedb_5bcadf73",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-07-16T02:07:25Z",
+      "side": 1,
+      "message": "It\u0027s the done func from the waitgroup. \"done\", as you suggested, is already used for the done channel and it makes sense.\n\nChanged to doneFunc.\n\nDone.",
+      "parentUuid": "4b017aaa_1a9a8fc2",
+      "revId": "c580240fe70cf88f1cfd4a0610dddffd732d0c8f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "869ee91e_3b0f2323",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-07-16T02:07:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a40a1fcf_7fae6b08",
+      "revId": "c580240fe70cf88f1cfd4a0610dddffd732d0c8f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d823cff9_b3a3b704",
         "filename": "dir/server/tree/watch.go",
         "patchSetId": 2
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "71828de9_e73af619",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-07-16T02:07:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d823cff9_b3a3b704",
+      "revId": "c580240fe70cf88f1cfd4a0610dddffd732d0c8f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0a954fa6_07559290",
         "filename": "dir/server/tree/watch.go",
         "patchSetId": 2
@@ -84,6 +156,24 @@
       "revId": "c580240fe70cf88f1cfd4a0610dddffd732d0c8f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2e91004d_9f0560a9",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 5308
+      },
+      "writtenOn": "2017-07-16T02:07:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0a954fa6_07559290",
+      "revId": "c580240fe70cf88f1cfd4a0610dddffd732d0c8f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
