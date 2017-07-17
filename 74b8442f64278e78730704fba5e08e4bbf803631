@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "80b9d730_bb2bf5f3",
+        "filename": "cmd/upspin/cmd_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-07-17T20:43:36Z",
+      "side": 1,
+      "message": "why not an exact comparison? don\u0027t want to parse the file?",
+      "range": {
+        "startLine": 303,
+        "startChar": 1,
+        "endLine": 305,
+        "endChar": 2
+      },
+      "revId": "74b8442f64278e78730704fba5e08e4bbf803631",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
