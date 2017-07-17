@@ -16,6 +16,24 @@
       "revId": "b6d5f293b2b1f8b3003ecf3688adeff72d20cd94",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7596c15e_0bb20459",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 275,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-17T22:49:39Z",
+      "side": 1,
+      "message": "see defer timer.Stop on line 265",
+      "parentUuid": "a4a83ea2_277f34a7",
+      "revId": "b6d5f293b2b1f8b3003ecf3688adeff72d20cd94",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
