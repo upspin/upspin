@@ -818,7 +818,51 @@ func TestAccessAndGroupFilesNotIncomplete(t *testing.T) {
 		t.Fatal(err)
 	}
 	if entry.IsIncomplete() {
-		t.Fatalf("Got incomplete entry, expected blocks")
+		t.Fatal("Got incomplete entry, expected blocks")
+	}
+}
+
+func TestAccessAndGroupFilesNotIncompleteFromWatch(t *testing.T) {
+	const userAccess = userName + "/Access"
+	s, userCtx := newDirServerForTesting(t, userName)
+	// Access file permits List rights for otherUser.
+	_, err := putAccessOrGroupFile(t, s, userCtx, userAccess, "l:"+otherUser)
+	if err != nil {
+		t.Fatal(err)
+	}
+	sOther, _ := newDirServerForTesting(t, otherUser)
+
+	done := make(chan struct{})
+	defer close(done)
+	events, err := sOther.Watch(userName+"/", -1, done)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, exp := range []struct {
+		name       upspin.PathName
+		incomplete bool
+	}{
+		{userName + "/", true},
+		{userName + "/Access", false},
+	} {
+		var event upspin.Event
+		select {
+		case event = <-events:
+			// Ok
+		case <-time.After(time.Minute):
+			t.Errorf("Timed out waiting for event")
+		}
+		entry := event.Entry
+
+		if entry.SignedName != exp.name {
+			t.Fatalf("got %s, want = %s", entry.SignedName, exp.name)
+		}
+		if entry.IsIncomplete() && !exp.incomplete {
+			t.Fatalf("Got incomplete entry (%s), expected blocks", event.Entry.Name)
+		} else if !entry.IsIncomplete() && exp.incomplete {
+			t.Fatalf("Got complete entry (%s), expected incomplete", event.Entry.Name)
+		}
 	}
 }
 
