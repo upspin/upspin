@@ -759,7 +759,6 @@ func (s *server) Dial(ctx upspin.Config, e upspin.Endpoint) (upspin.Service, err
 
 // Endpoint implements upspin.Service.
 func (s *server) Endpoint() upspin.Endpoint {
-	// TODO: to be removed.
 	return s.serverConfig.DirEndpoint()
 }
 
@@ -776,7 +775,6 @@ func (s *server) Close() {
 	// garbage-collected even if other servers have pointers into the
 	// cache (which at least one will have, the one created with New).
 	if err := s.closeTree(s.userName); err != nil {
-		// TODO: return an error when Close expects it.
 		log.Error.Printf("%s: Error closing user tree %q: %q", op, s.userName, err)
 	}
 
