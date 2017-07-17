@@ -9,6 +9,9 @@ import (
 	"os/user"
 	"path/filepath"
 	"testing"
+
+	"upspin.io/config"
+	"upspin.io/upspin"
 )
 
 func testingUserLookup(who string) (*user.User, error) {
@@ -49,6 +52,54 @@ func TestTilde(t *testing.T) {
 			t.Errorf("Tilde(%q) = %q; expected %q", test.in, out, test.out)
 		}
 	}
+}
+
+type atSignTest struct {
+	in  string
+	out upspin.PathName
+}
+
+var atSignTests = []atSignTest{
+	{"", ""},
+	{"ann@example.com", "ann@example.com"},
+	{"joe@example.com", "joe@example.com"},
+	{"@", "ann@example.com/"},
+	{"@/", "ann@example.com/"},
+	{"@/boo", "ann@example.com/boo"},
+	{"@+suffix", "ann+suffix@example.com/"},
+	{"@+suffix/", "ann+suffix@example.com/"},
+	{"@+suffix/boo", "ann+suffix@example.com/boo"},
+}
+
+var atSignTestsWithSuffix = []atSignTest{
+	{"@", "ann+suffix@example.com/"},
+	{"@/", "ann+suffix@example.com/"},
+	{"@/boo", "ann+suffix@example.com/boo"},
+	{"@+extra", "ann+suffix+extra@example.com/"},
+	{"@+extra/", "ann+suffix+extra@example.com/"},
+	{"@+extra/boo", "ann+suffix+extra@example.com/boo"},
+}
+
+func testAtSign(t *testing.T, user upspin.UserName, tests []atSignTest) {
+	// Hackily build a State sufficient to invoke the method.
+	cfg := config.New()
+	cfg = config.SetUserName(cfg, user)
+	state := NewState("atsign")
+	state.Config = cfg
+	for _, test := range tests {
+		out := state.AtSign(test.in)
+		if out != test.out {
+			t.Errorf("AtSign(%q) = %q; expected %q", test.in, out, test.out)
+		}
+	}
+}
+
+func TestAtSign(t *testing.T) {
+	testAtSign(t, "ann@example.com", atSignTests)
+}
+
+func TestAtSignWithSuffix(t *testing.T) {
+	testAtSign(t, "ann+suffix@example.com", atSignTestsWithSuffix)
 }
 
 func TestHasGlobChar(t *testing.T) {
