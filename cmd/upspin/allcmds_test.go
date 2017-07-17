@@ -10,6 +10,11 @@ import (
 	"upspin.io/upspin"
 )
 
+const (
+	deleteOld = false
+	keepOld   = true
+)
+
 // cmdTest describes one sequence of subcommands to be run in order.
 // These are run by the callers of testCommands in cmd_test.go
 // The tests must be run sequentially. They build state as they run.
@@ -321,5 +326,38 @@ var shareTests = []cmdTest{
 		),
 		"",
 		expect("this is friends.jpg"),
+	},
+}
+
+// keygenTests involves a user (keyloser@) whose only purpose is this test, because
+// when we are done we have rotated the user's keys but not updated the keyserver.
+// We can't use ann@ because we don't know her proquint so we can't restore.
+var keygenTests = []cmdTest{
+	{
+		"create a temporary key",
+		keyloser,
+		do(
+			"keygen -secretseed deter-gonad-pivot-rotor.visit-roman-widow-woman -where " + testTempDir("key", deleteOld),
+		),
+		"",
+		keygenVerify(testTempDir("key", keepOld), "p256\n3078263077187835", "1623258616618034", "", keepOld),
+	},
+	{
+		"keygen again will fail",
+		keyloser,
+		do(
+			"keygen -secretseed desex-fetid-pecan-fakir.color-civil-comet-haven -where " + testTempDir("key", keepOld),
+		),
+		"",
+		fail("prior keys exist"),
+	},
+	{
+		"keygen rotate",
+		keyloser,
+		do(
+			"keygen -rotate -secretseed desex-fetid-pecan-fakir.color-civil-comet-haven -where " + testTempDir("key", keepOld),
+		),
+		"",
+		keygenVerify(testTempDir("key", keepOld), "p256\n1048813400173469", "7863414033373202", "1623258616618034", deleteOld),
 	},
 }
