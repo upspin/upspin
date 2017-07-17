@@ -472,9 +472,3 @@ func (r *Runner) Diag() string {
 	}
 	return fmt.Sprintf("%s:%d: %v", filepath.Base(r.errFile), r.errLine, r.lastErr)
 }
-
-// ClientFor returns the client for a user if it exists, otherwise nil.
-// TODO: this is for debugging tests only. Remove when done.
-func (r *Runner) ClientFor(u upspin.UserName) upspin.Client {
-	return r.clients[u]
-}
