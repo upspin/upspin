@@ -147,12 +147,54 @@ var basicCmdTests = []cmdTest{
 		"link to a directory",
 		ann,
 		do(
-			"link @/Public/Photo @/tmpdir",
-			"get @/tmpdir/public.jpg",
-			"rm @/tmpdir",
+			"link @/Public/Photo @/linkdir",
+			"get @/linkdir/public.jpg",
 		),
 		"",
 		expect("this is public.jpg"),
+	},
+	{
+		"whichaccess",
+		ann,
+		do(
+			"whichaccess @/",
+			"whichaccess @/Group",
+			"whichaccess @/Public/Photo",
+			"whichaccess @/Public/Photo/public.jpg",
+			"whichaccess @/linkdir",
+			"whichaccess @/linkdir/public.jpg",
+		),
+		"",
+		expect(
+			"owner only",
+			"owner only",
+			"/Public/Access",
+			"/Public/Access",
+			"/Public/Access",
+			"/Public/Access",
+		),
+	},
+	{
+		"no snapshot yet",
+		ann,
+		do(
+			"ls ann+snapshot@example.com", // TODO: Use @+ when available.
+		),
+		"",
+		fail("item does not exist"),
+	},
+	{
+		"create snapshot",
+		ann,
+		do(
+			"snapshot",
+			"ls @",
+			"ls @",
+			"ls ann+snapshot@example.com",
+		),
+		"",
+		// TODO: Because of #428, can't do this directly.
+		snapshotVerify(),
 	},
 }
 
