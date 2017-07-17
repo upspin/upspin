@@ -720,7 +720,9 @@ func (s *server) watch(op string, treeEvents <-chan *upspin.Event, outEvents cha
 			return
 		}
 		if !hasRead {
-			e.Entry.MarkIncomplete()
+			if !access.IsAccessFile(e.Entry.SignedName) && !access.IsGroupFile(e.Entry.SignedName) {
+				e.Entry.MarkIncomplete()
+			}
 		}
 		if !sendEvent(e) {
 			return
