@@ -261,6 +261,8 @@ func (w *watcher) sendEvent(logEntry *LogEntry, offset int64) error {
 			Entry:  &logEntry.Entry, // already a copy.
 		}
 	}
+	timer := time.NewTimer(watcherTimeout)
+	defer timer.Stop()
 	select {
 	case <-w.shutdown:
 		return errClosed
@@ -270,8 +272,7 @@ func (w *watcher) sendEvent(logEntry *LogEntry, offset int64) error {
 	case w.events <- event:
 		// Event was sent.
 		return nil
-	case <-time.After(watcherTimeout):
-		// TODO: time.After leaks. Use NewTimer.
+	case <-timer.C:
 		// Oops. Client didn't read fast enough.
 		return errTimeout
 	}
