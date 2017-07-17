@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0be7b0f2_2fd0b481",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-17T21:18:12Z",
+      "side": 0,
+      "message": "I\u0027m not sure if I\u0027m recalling this correctly, but I think the implication of this todo is that there should be a single time.Timer owned by the watcher that is re-used for each sendEvent call.\n\nWhat we have here is better, though. Maybe add *another* todo at line 264 \n\n// TODO: re-use this timer?",
+      "revId": "74b8442f64278e78730704fba5e08e4bbf803631",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}

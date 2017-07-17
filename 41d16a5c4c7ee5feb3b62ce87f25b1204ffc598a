@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7fdb54f7_54ec8eb9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-17T21:18:12Z",
+      "side": 1,
+      "message": "Is this what you meant to say? It seems wrong. Perhaps:\n\ndir/server: use NewTimer in sendEvent instead of time.After",
+      "revId": "41d16a5c4c7ee5feb3b62ce87f25b1204ffc598a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
