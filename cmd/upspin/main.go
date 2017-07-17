@@ -114,9 +114,11 @@ type State struct {
 
 func main() {
 	state, args, ok := setup(flag.CommandLine, os.Args[1:])
-	if !ok {
+	if !ok || len(args) == 0 {
 		fmt.Fprintln(os.Stderr, intro)
-		os.Exit(2)
+	}
+	if args[0] == "help" {
+		state.help(args[1:]...)
 	}
 	// Shell cannot be in commands because of the initialization loop,
 	// and anyway we should avoid recursion in the interpreter.
@@ -169,6 +171,29 @@ func usage() {
 // and exits the program with status code 2.
 func usageAndExit(fs *flag.FlagSet) {
 	fs.Usage()
+	os.Exit(2)
+}
+
+// help prints the help for the arguments provided, or if there is none,
+// for the command itself.
+func (s *State) help(args ...string) {
+	// Find the first non-flag argument.
+	cmd := ""
+	for _, arg := range args {
+		if !strings.HasPrefix(arg, "-") {
+			cmd = arg
+			break
+		}
+	}
+	if cmd == "" {
+		fmt.Fprintln(os.Stderr, intro)
+	} else {
+		// Simplest solution is re-execing.
+		command := exec.Command("upspin", cmd, "-help")
+		command.Stdout = os.Stdout
+		command.Stderr = os.Stderr
+		command.Run()
+	}
 	os.Exit(2)
 }
 
