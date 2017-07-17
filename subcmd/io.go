@@ -9,16 +9,17 @@ package subcmd
 import (
 	"io/ioutil"
 	"os"
-	"os/user"
+	osUser "os/user"
 	"path/filepath"
 	"strings"
 
 	"upspin.io/config"
 	"upspin.io/path"
 	"upspin.io/upspin"
+	"upspin.io/user"
 )
 
-var userLookup = user.Lookup
+var userLookup = osUser.Lookup
 
 var home string // Main user's home directory.
 
@@ -40,8 +41,11 @@ func homeDir(who string) string {
 }
 
 // AtSign processes a leading at sign, if any, in the Upspin file name and replaces it
-// with the current user name. The name must be strictly "@" or begin with "@/";
-// unlike Tilde, it does not look up other user's roots.
+// with the current user name. The name must be strictly "@" or begin with "@/",
+// possibly with a suffix ("@+snapshot", "@+camera/").
+// (If the user name ready has a suffix and the file starts @+suffix,
+// the returned user name appends the suffix from the argument.)
+// Unlike Tilde, it does not look up others user's roots.
 // The argument is of type string; once a file becomes an upspin.PathName it should
 // not be passed to this function.
 // If the file name does not begin with an at sign, AtSign returns the argument
@@ -51,11 +55,24 @@ func (s *State) AtSign(file string) upspin.PathName {
 	if s.Config == nil || file == "" || file[0] != '@' {
 		return upspin.PathName(file)
 	}
+	userStr := string(s.Config.UserName())
 	if file == "@" {
-		return upspin.PathName(s.Config.UserName() + "/")
+		return upspin.PathName(userStr + "/")
 	}
 	if strings.HasPrefix(file, "@/") {
-		return upspin.PathName(string(s.Config.UserName()) + file[1:])
+		return upspin.PathName(userStr + file[1:])
+	}
+	if strings.HasPrefix(file, "@+") {
+		// Need to split the user name.
+		usr, _, domain, err := user.Parse(s.Config.UserName())
+		if err != nil { // Can't happen.
+			return upspin.PathName(file)
+		}
+		slash := strings.IndexByte(file, '/')
+		if slash < 0 {
+			return upspin.PathName(usr + file[1:] + "@" + domain + "/")
+		}
+		return upspin.PathName(usr + file[1:slash] + "@" + domain + file[slash:])
 	}
 	return upspin.PathName(file)
 }
