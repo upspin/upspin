@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "58c607ce_e69937d0",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-17T21:24:32Z",
+      "side": 1,
+      "message": "zero size?",
+      "range": {
+        "startLine": 54,
+        "startChar": 45,
+        "endLine": 54,
+        "endChar": 57
+      },
+      "revId": "f4bd0da29d36a6969bf5e54fbc92a5452a93ae75",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b179d599_de039bb3",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-17T21:24:32Z",
+      "side": 1,
+      "message": "put this test outside the loop?\n\nif len(kid.kids) \u003e 0 {\n  for _, b :\u003d range kid.entry.Blocks {\n    if b.Location.Reference \u003d\u003d \"\" || b.Size \u003d\u003d 0 {\n      return errors...",
+      "range": {
+        "startLine": 57,
+        "startChar": 6,
+        "endLine": 57,
+        "endChar": 24
+      },
+      "revId": "f4bd0da29d36a6969bf5e54fbc92a5452a93ae75",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "22fc1e04_8b9587de",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-17T21:24:32Z",
+      "side": 1,
+      "message": "directory",
+      "range": {
+        "startLine": 58,
+        "startChar": 71,
+        "endLine": 58,
+        "endChar": 79
+      },
+      "revId": "f4bd0da29d36a6969bf5e54fbc92a5452a93ae75",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
