@@ -95,7 +95,7 @@ func testWatchCurrent(t *testing.T, r *testenv.Runner) {
 	if !r.GotEvent(base, !hasBlocks) {
 		t.Fatal(r.Diag())
 	}
-	if !r.GotEvent(access, !hasBlocks) {
+	if !r.GotEvent(access, hasBlocks) {
 		t.Fatal(r.Diag())
 	}
 	if !r.GotEvent(file, !hasBlocks) {

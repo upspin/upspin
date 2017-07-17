@@ -350,6 +350,7 @@ var integrationTests = []struct {
 	{"WatchForbiddenFile", testWatchForbiddenFile},
 	{"WatchSubtree", testWatchSubtree},
 	{"WatchNonExistentRoot", testWatchNonExistentRoot},
+
 	{"CopyEntries", testCopyEntries},
 	{"Snapshot", testSnapshot},
 	{"DeleteErrors", testDeleteErrors},

@@ -239,7 +239,7 @@ func (s *server) lookupWithPermissions(op string, name upspin.PathName, opts ...
 		if !canAny {
 			return nil, s.errPerm(op, p, opts...)
 		}
-		if !access.IsAccessFile(entry.SignedName) && !access.IsGroupFile(entry.SignedName) {
+		if !isAccessControlFile(entry.SignedName) {
 			entry.MarkIncomplete()
 		}
 	}
@@ -720,7 +720,9 @@ func (s *server) watch(op string, treeEvents <-chan *upspin.Event, outEvents cha
 			return
 		}
 		if !hasRead {
-			e.Entry.MarkIncomplete()
+			if !access.IsAccessFile(e.Entry.SignedName) && !access.IsGroupFile(e.Entry.SignedName) {
+				e.Entry.MarkIncomplete()
+			}
 		}
 		if !sendEvent(e) {
 			return
@@ -916,6 +918,10 @@ func (s *server) shutdown() {
 		user := k.(upspin.UserName)
 		s.closeTree(user)
 	}
+}
+
+func isAccessControlFile(name upspin.PathName) bool {
+	return access.IsAccessFile(name) || access.IsGroupFile(name)
 }
 
 // newOptMetric creates a new options populated with a metric for operation op.
