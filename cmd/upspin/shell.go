@@ -60,7 +60,6 @@ func (s *State) exec(line string, verbose bool) {
 			}
 		}
 	}()
-	// TODO: quoting.
 	line = strings.TrimSpace(line)
 	sharp := strings.IndexByte(line, '#')
 	if sharp >= 0 {
