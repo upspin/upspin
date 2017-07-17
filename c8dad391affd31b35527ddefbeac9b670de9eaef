@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8ab7da21_c1e59588",
+        "filename": "cmd/upspin/allcmds_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-17T06:19:40Z",
+      "side": 1,
+      "message": "This will just make our tests flaky; no amount of delay here will ensure that the snapshot has been created. In short, we can\u0027t commit this test.",
+      "revId": "c8dad391affd31b35527ddefbeac9b670de9eaef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
