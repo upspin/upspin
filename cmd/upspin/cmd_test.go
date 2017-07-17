@@ -69,6 +69,8 @@ func TestCommands(t *testing.T) {
 	schema.Stop()
 }
 
+// TODO: Loop over server implementations?
+
 const upboxSchema = `
 users:
   - name: ann@example.com
@@ -79,6 +81,8 @@ servers:
   - name: keyserver
   - name: storeserver
   - name: dirserver
+    flags:
+      kind: server
 domain: example.com
 `
 
