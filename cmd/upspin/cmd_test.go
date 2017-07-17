@@ -10,6 +10,8 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"testing"
@@ -23,6 +25,7 @@ import (
 var allCmdTests = []*[]cmdTest{
 	&basicCmdTests,
 	&globTests,
+	&keygenTests,
 	&shareTests,
 }
 
@@ -78,6 +81,7 @@ users:
   - name: chris@example.com
   - name: kelly@example.com
   - name: lee@example.com
+  - name: keyloser@example.com
 servers:
   - name: keyserver
   - name: storeserver
@@ -88,13 +92,14 @@ domain: example.com
 `
 
 const (
-	ann   = upspin.UserName("ann@example.com")
-	chris = upspin.UserName("chris@example.com")
-	kelly = upspin.UserName("kelly@example.com")
-	lee   = upspin.UserName("lee@example.com")
+	ann      = upspin.UserName("ann@example.com")
+	chris    = upspin.UserName("chris@example.com")
+	kelly    = upspin.UserName("kelly@example.com")
+	lee      = upspin.UserName("lee@example.com")
+	keyloser = upspin.UserName("keyloser@example.com")
 )
 
-var testUsers = []upspin.UserName{ann, chris, kelly, lee}
+var testUsers = []upspin.UserName{ann, chris, kelly, lee, keyloser}
 
 // devNull gives EOF on read and absorbs anything error-free on write, like Unix's /dev/null.
 type devNull struct{}
@@ -253,5 +258,49 @@ func snapshotVerify() func(t *testing.T, r *runner, cmd *cmdTest, stdout, stderr
 			time.Sleep(100 * time.Millisecond)
 		}
 		t.Fatal(err)
+	}
+}
+
+// testTempDir creates, if not already present, a temporary directory
+// with basename dir. It panics if it does not exist and cannot be created.
+func testTempDir(dir string, keepOld bool) string {
+	dir = filepath.Join(os.TempDir(), dir)
+	if !keepOld {
+		if err := os.RemoveAll(dir); err != nil {
+			panic(err)
+		}
+	}
+	err := os.Mkdir(dir, 0700)
+	if err != nil && !os.IsExist(err) {
+		panic(err)
+	}
+	return dir
+}
+
+// keygenVerify is a post function for keygen itself.
+// It verifies that the keys were created correctly,
+// and removes the directory if persist is false.
+func keygenVerify(dir, public, secret, secret2 string, persist bool) func(t *testing.T, r *runner, cmd *cmdTest, stdout, stderr string) {
+	return func(t *testing.T, r *runner, cmd *cmdTest, stdout, stderr string) {
+		t.Log("stdout:", stdout)
+		t.Log("stderr:", stdout)
+		keyVerify(t, filepath.Join(dir, "public.upspinkey"), public)
+		keyVerify(t, filepath.Join(dir, "secret.upspinkey"), secret)
+		if secret2 != "" {
+			keyVerify(t, filepath.Join(dir, "secret2.upspinkey"), secret2)
+		}
+		if !persist {
+			os.RemoveAll(dir)
+		}
+	}
+}
+
+func keyVerify(t *testing.T, name, prefix string) {
+	key, err := ioutil.ReadFile(name)
+	if err != nil {
+		t.Errorf("cannot read key %q: %v", name, err)
+	}
+	if !strings.Contains(string(key), prefix) {
+		t.Errorf("invalid key: got %q...; expected %q...", key[:16], prefix)
 	}
 }
