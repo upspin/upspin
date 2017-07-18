@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7a5be6a9_b30d7f72",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-07-18T17:27:11Z",
+      "side": 1,
+      "message": "This is now out of date. Maybe remove everything starting from \"Possible...\"?",
+      "revId": "574fcc6d6e30d81abe0f56b483292aa6bf866b65",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "12c8a0cb_c7b7f498",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 5015
+      },
+      "writtenOn": "2017-07-18T17:27:11Z",
+      "side": 1,
+      "message": "// Returns status of snapshot? Or delete?",
+      "range": {
+        "startLine": 319,
+        "startChar": 27,
+        "endLine": 319,
+        "endChar": 28
+      },
+      "revId": "574fcc6d6e30d81abe0f56b483292aa6bf866b65",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
