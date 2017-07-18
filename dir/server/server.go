@@ -90,7 +90,7 @@ type server struct {
 	// snapshotControl is a channel for passing control messages to the
 	// snapshot loop. Possible control messages are: the username to
 	// snapshot or close the channel to stop the snapshot loop.
-	snapshotControl chan upspin.UserName
+	snapshotControl chan snapshotCreate
 
 	// now returns the time now. It's usually just upspin.Now but is
 	// overridden for tests.
@@ -98,6 +98,12 @@ type server struct {
 
 	// dialed reports whether the instance was created using Dial, not New.
 	dialed bool
+}
+
+// snapshotCreate is used to create a snapshot and report its success.
+type snapshotCreate struct {
+	userName upspin.UserName
+	created  chan error
 }
 
 var _ upspin.DirServer = (*server)(nil)
@@ -305,8 +311,12 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 			return nil, errors.E(op, err)
 		}
 		// Start a snapshot for this user.
-		s.snapshotControl <- p.User()
-		return entry, nil // Confirm snapshot has been started.
+		errorC := make(chan error)
+		s.snapshotControl <- snapshotCreate{
+			userName: p.User(),
+			created:  errorC,
+		}
+		return entry, <-errorC // Confirm snapshot has been started.
 	}
 
 	isAccess := access.IsAccessFile(p.Path())
