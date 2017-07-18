@@ -24,6 +24,7 @@ import (
 
 var allCmdTests = []*[]cmdTest{
 	&basicCmdTests,
+	&cpTests,
 	&globTests,
 	&keygenTests,
 	&shareTests,
@@ -198,6 +199,19 @@ func expect(words ...string) func(t *testing.T, r *runner, cmd *cmdTest, stdout,
 	}
 }
 
+// expectNoOutput is a post function that verifies that standard output from the
+// command is empty.
+func expectNoOutput() func(t *testing.T, r *runner, cmd *cmdTest, stdout, stderr string) {
+	return func(t *testing.T, r *runner, cmd *cmdTest, stdout, stderr string) {
+		if stderr != "" {
+			t.Fatalf("%q: unexpected error:\n\t%q", cmd.name, stderr)
+		}
+		if stdout != "" {
+			t.Fatalf("%q: unexpected output:\n\t%q", cmd.name, stdout)
+		}
+	}
+}
+
 // fail is a post function that verifies that standard error contains the text of errStr.
 func fail(errStr string) func(t *testing.T, r *runner, cmd *cmdTest, stdout, stderr string) {
 	return func(t *testing.T, r *runner, cmd *cmdTest, stdout, stderr string) {
@@ -275,6 +289,12 @@ func testTempDir(dir string, keepOld bool) string {
 		panic(err)
 	}
 	return dir
+}
+
+// testTempGlob calls testTempDir(dir, keepOld) and returns
+// its name appended with "/*".
+func testTempGlob(dir string) string {
+	return filepath.Join(testTempDir(dir, keepOld), "*")
 }
 
 // keygenVerify is a post function for keygen itself.

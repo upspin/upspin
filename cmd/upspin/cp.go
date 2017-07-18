@@ -108,12 +108,11 @@ func (s *State) copyCommand(cs *copyState, srcFiles []cpFile, dstFile cpFile) {
 		return
 	}
 	if len(srcFiles) != 1 {
-		s.Failf("copying multiple files but %s is not a directory", dstFile.path)
+		s.Exitf("copying multiple files but %s is not a directory", dstFile.path)
 		usageAndExit(cs.flagSet)
 	}
 	if cs.recur {
-		s.Failf("recursive copy requires that final argument (%s) be an existing directory", dstFile.path)
-		usageAndExit(cs.flagSet)
+		s.Exitf("recursive copy requires that final argument (%s) be an existing directory", dstFile.path)
 	}
 	reader, err := s.open(srcFiles[0])
 	if err != nil {
