@@ -15,7 +15,6 @@ import (
 	"strconv"
 	"strings"
 	"testing"
-	"time"
 
 	"upspin.io/test/testutil"
 	"upspin.io/upbox"
@@ -254,24 +253,6 @@ func putFile(user upspin.UserName, name, contents string) cmdTest {
 		),
 		stdin: contents,
 		post:  expect(contents),
-	}
-}
-
-// Because of issue #428, we must wait for the snapshot to be created.
-// This should be fixed. It should take just a few milliseconds. Here we
-// allow 10 seconds in 100ms increments.
-// TODO: Remove this when #428 is fixed.
-func snapshotVerify() func(t *testing.T, r *runner, cmd *cmdTest, stdout, stderr string) {
-	return func(t *testing.T, r *runner, cmd *cmdTest, stdout, stderr string) {
-		var err error
-		for i := 0; i < 100; i++ {
-			_, err := r.state.Client.Lookup("ann+snapshot@example.com", false)
-			if err == nil {
-				return
-			}
-			time.Sleep(100 * time.Millisecond)
-		}
-		t.Fatal(err)
 	}
 }
 

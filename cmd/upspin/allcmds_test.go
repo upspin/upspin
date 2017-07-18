@@ -219,7 +219,7 @@ var basicCmdTests = []cmdTest{
 		"no snapshot yet",
 		ann,
 		do(
-			"ls ann+snapshot@example.com", // TODO: Use @+ when available.
+			"ls @+snapshot",
 		),
 		"",
 		fail("item does not exist"),
@@ -229,10 +229,10 @@ var basicCmdTests = []cmdTest{
 		ann,
 		do(
 			"snapshot",
+			"ls @+snapshot",
 		),
 		"",
-		// TODO: Because of #428, can't do this directly.
-		snapshotVerify(),
+		expect("ann+snapshot@example.com/2"), // "/2" for "/2017" - or maybe later.
 	},
 }
 

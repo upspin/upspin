@@ -66,7 +66,7 @@ func (s *server) startSnapshotLoop() {
 		log.Error.Printf("dir/server.startSnapshotLoop: attempting to restart snapshot worker")
 		return
 	}
-	s.snapshotControl = make(chan upspin.UserName)
+	s.snapshotControl = make(chan snapshotCreate)
 	go s.snapshotLoop()
 }
 
@@ -76,7 +76,9 @@ func (s *server) stopSnapshotLoop() {
 	}
 }
 
-// snapshotLoop runs in a goroutine and performs periodic snapshots.
+// snapshotLoop runs in a goroutine and performs snapshots.
+// We call takeSnapshotFor only from here to serialize requests with
+// time-triggered snapshot.
 func (s *server) snapshotLoop() {
 	// Run once upon starting.
 	s.snapshotAll() // returned error is already logged.
@@ -88,12 +90,12 @@ func (s *server) snapshotLoop() {
 		select {
 		case <-ticker.C:
 			s.snapshotAll() // returned error is already logged.
-		case userName := <-s.snapshotControl:
-			if userName == "" {
-				// Closing the channel.
+		case sc := <-s.snapshotControl:
+			if sc.userName == "" {
+				// Closing the ticker channel.
 				return
 			}
-			s.takeSnapshotFor(userName)
+			sc.created <- s.takeSnapshotFor(sc.userName)
 		}
 	}
 }
@@ -196,6 +198,7 @@ func (s *server) shouldSnapshot(cfg *snapshotConfig) (bool, path.Parsed, error) 
 }
 
 // takeSnapshotFor takes a snapshot for a user.
+// Other than in tests, it is called only from the snapshotLoop goroutine.
 func (s *server) takeSnapshotFor(user upspin.UserName) error {
 	cfg, err := s.getSnapshotConfig(user)
 	if err != nil {
