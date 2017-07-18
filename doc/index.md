@@ -13,6 +13,10 @@ and other storage services to the name space.
 
 Performance is not a primary goal. Uniformity and security are.
 
+## Download binaries
+- [Download Upspin](https://upspin.io/dl). Binary releases for Mac, Linux,
+  Windows.
+
 ## Documentation
 
 - The [Upspin Overview](/doc/overview.md) document provides a high-level
