@@ -62,6 +62,30 @@
       "revId": "574fcc6d6e30d81abe0f56b483292aa6bf866b65",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a7367666_16c1109f",
+        "filename": "dir/server/snapshot.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-18T21:36:20Z",
+      "side": 1,
+      "message": "or just \"performs snapshots\"",
+      "parentUuid": "869c15b5_35e72b63",
+      "range": {
+        "startLine": 79,
+        "startChar": 49,
+        "endLine": 79,
+        "endChar": 67
+      },
+      "revId": "574fcc6d6e30d81abe0f56b483292aa6bf866b65",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
