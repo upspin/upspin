@@ -5,7 +5,6 @@
 package server
 
 import (
-	"strings"
 	"testing"
 
 	"upspin.io/cloud/storage"
@@ -13,6 +12,8 @@ import (
 	"upspin.io/errors"
 
 	// Import needed storage backend.
+	"io/ioutil"
+	"os"
 	_ "upspin.io/cloud/storage/disk"
 )
 
@@ -81,24 +82,29 @@ func TestNew(t *testing.T) {
 	if err == nil {
 		t.Fatalf("Expected error")
 	}
-	expected := "invalid operation"
-	if !strings.Contains(err.Error(), expected) {
-		t.Errorf("Expected %q, got %q", expected, err)
+	expErr := errors.E(errors.Invalid)
+	if !errors.Match(expErr, err) {
+		t.Errorf("Expected %v, got %v", expErr, err)
 	}
 
-	_, err = New("backend=disk,dance=the macarena")
+	_, err = New("backend=Disk", "basePath=/tmp", "dance=the macarena")
 	if err == nil {
 		t.Fatalf("Expected error")
 	}
-	expected = "invalid operation"
-	if !strings.Contains(err.Error(), expected) {
-		t.Errorf("Expected %q, got %q", expected, err)
+	expErr = errors.E(errors.IO)
+	if !errors.Match(expErr, err) {
+		t.Errorf("Expected %v, got %v", expErr, err)
 	}
 
 	if testing.Short() {
 		t.Skip("skipping part of test when network unavailable; depends on credential availability")
 	}
-	_, err = New("backend=Disk")
+	dir, err := ioutil.TempDir("", "test-store")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(dir)
+	_, err = New("backend=Disk", "basePath="+dir)
 	if err != nil {
 		t.Fatal(err)
 	}
