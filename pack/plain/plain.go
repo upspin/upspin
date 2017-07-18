@@ -220,6 +220,9 @@ func (p plainPack) Countersign(oldKey upspin.PublicKey, f upspin.Factotum, d *up
 	if d.IsDir() {
 		return errors.E(op, d.Name, errors.IsDir, "cannot sign directory")
 	}
+	if d.IsLink() && d.Packdata == nil {
+		return errors.E(op, d.Name, errors.BrokenLink, "unsigned link")
+	}
 
 	// Get ECDSA form of old key.
 	oldPubKey, err := factotum.ParsePublicKey(oldKey)

@@ -18,6 +18,7 @@ import (
 
 	"upspin.io/config"
 	"upspin.io/errors"
+	"upspin.io/factotum"
 	"upspin.io/key/proquint"
 	"upspin.io/pack/ee"
 	"upspin.io/subcmd"
@@ -41,10 +42,9 @@ See the description for rotate for information about updating keys.
 	fs := flag.NewFlagSet("keygen", flag.ExitOnError)
 	fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
 	fs.String("secretseed", "", "the seed containing a 128 bit secret in proquint format or a file that contains it")
-	fs.String("where", filepath.Join(config.Home(), ".ssh"), "`directory` to store keys")
 	// TODO: We do not what rotate to appear in the usage message.
 	fs.Bool("rotate", false, "rotate existing keys and replace them with new ones")
-	s.ParseFlags(fs, args, help, "keygen [-curve=256] [-secretseed=seed] [-where=$HOME/.ssh]")
+	s.ParseFlags(fs, args, help, "keygen [-curve=256] [-secretseed=seed]")
 	if fs.NArg() != 0 {
 		usageAndExit(fs)
 	}
@@ -52,6 +52,11 @@ See the description for rotate for information about updating keys.
 }
 
 func (s *State) keygenCommand(fs *flag.FlagSet) {
+	f := s.Config.Factotum()
+	if f == nil || f.SecretsDir() == "" {
+		s.Exitf("keygen needs a directory in which to write secrets")
+	}
+	where := f.SecretsDir()
 	curve := subcmd.StringFlag(fs, "curve")
 	switch curve {
 	case "p256", "p384", "p521":
@@ -67,10 +72,6 @@ func (s *State) keygenCommand(fs *flag.FlagSet) {
 		s.Exitf("creating keys: %v", err)
 	}
 
-	where := subcmd.Tilde(subcmd.StringFlag(fs, "where"))
-	if where == "" {
-		s.Exitf("-where must not be empty")
-	}
 	rotate := subcmd.BoolFlag(fs, "rotate")
 	err = s.saveKeys(where, rotate, public, private)
 	if err != nil {
@@ -95,6 +96,14 @@ func (s *State) keygenCommand(fs *flag.FlagSet) {
 		fmt.Fprintln(s.Stderr, "\nTo install new keys in the key server, see 'upspin rotate -help'.")
 	}
 	fmt.Fprintln(s.Stderr)
+
+	// Update s factotum for succeeding subcmds.
+	fac, err := factotum.NewFromDir(where)
+	if err != nil {
+		// can't happen?
+		s.Exitf("keygen updated keys on disk, but unable to update factotum: %s", err)
+	}
+	s.State.Config = config.SetFactotum(s.State.Config, fac)
 }
 
 func (s *State) createKeys(curveName, secretFlag string) (public, private, secretStr string, err error) {

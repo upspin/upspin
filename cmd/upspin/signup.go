@@ -138,13 +138,20 @@ file and keys and only send the signup request to the key server.
 		s.Exitf("%s already exists", flags.Config)
 	}
 
+	// Verify that SecretDir exists.
+	secretsDir := subcmd.Tilde(*where)
+	fi, err := os.Stat(secretsDir)
+	if err != nil || !fi.IsDir() {
+		s.Exitf("cannot store secrets in %s", secretsDir)
+	}
+
 	// Write the config file.
 	var configContents bytes.Buffer
 	err = configTemplate.Execute(&configContents, configData{
 		UserName:  userName,
 		Dir:       dirEndpoint,
 		Store:     storeEndpoint,
-		SecretDir: subcmd.Tilde(*where),
+		SecretDir: secretsDir,
 		Packing:   "ee",
 	})
 	if err != nil {
@@ -228,7 +235,7 @@ func makeSignupURL(cfg upspin.Config) (string, error) {
 type configData struct {
 	UserName   upspin.UserName
 	Store, Dir *upspin.Endpoint
-	SecretDir  string
+	SecretDir  string // TODO elsewhere we spell as secretsDir
 	Packing    string
 }
 

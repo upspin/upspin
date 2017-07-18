@@ -33,9 +33,10 @@ func TestNewFromDir(t *testing.T) {
 		// When we fail to parse the archived keys
 		// we should see the current key as the previous key.
 		{"bad-archived", true, newPubKey, newSecKey, newPubKey, newSecKey},
+		// This returns a nearly empty factotum, recording only the directory.
+		{"empty", true, "", "", "", ""},
 		// These should outright fail.
 		{"bad", false, "", "", "", ""},
-		{"empty", false, "", "", "", ""},
 		{"mismatched", false, pubKey, secKey, "", ""},
 	}
 	for _, c := range cases {

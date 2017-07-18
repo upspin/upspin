@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -28,9 +29,10 @@ var allCmdTests = []*[]cmdTest{
 	&globTests,
 	&keygenTests,
 	&shareTests,
+	&rekeyTests,
 }
 
-// TestCommands runs the tests defined in cmdTests as subtests.
+// TestCommands runs the tests defined in allCmdTests as subtests.
 func TestCommands(t *testing.T) {
 	// Set up upbox.
 	portString, err := testutil.PickPort()
@@ -115,7 +117,7 @@ func (devNull) Close() error                { return nil }
 // are modified and available to subsequent subcommands.
 // It's a little bit like the upspin shell command, but through
 // upbox can start the test services and provides mechanisms
-// to valid results and test state.
+// to validate results and test state.
 type runner struct {
 	// fs, not flag.CommandLine, holds the flags for the upspin state.
 	fs *flag.FlagSet
@@ -297,20 +299,35 @@ func testTempGlob(dir string) string {
 	return filepath.Join(testTempDir(dir, keepOld), "*")
 }
 
-// keygenVerify is a post function for keygen itself.
-// It verifies that the keys were created correctly,
-// and removes the directory if persist is false.
-func keygenVerify(dir, public, secret, secret2 string, persist bool) func(t *testing.T, r *runner, cmd *cmdTest, stdout, stderr string) {
+// TODO(ehg)   no longer needed?
+// printKeys is a debug tool to show the current state of SecretsDir.
+func printKeys() func(t *testing.T, r *runner, cmd *cmdTest, stdout, stderr string) {
 	return func(t *testing.T, r *runner, cmd *cmdTest, stdout, stderr string) {
-		t.Log("stdout:", stdout)
-		t.Log("stderr:", stdout)
+		dir := r.state.Config.Factotum().SecretsDir()
+		log.Printf("dir=%s", dir)
+		debugKey(dir, "public.upspinkey")
+		debugKey(dir, "secret.upspinkey")
+		debugKey(dir, "secret2.upspinkey")
+	}
+}
+
+func debugKey(dir, name string) {
+	buf, err := ioutil.ReadFile(filepath.Join(dir, name))
+	if err != nil {
+		log.Printf("err reading %s: %s", name, err)
+		return
+	}
+	log.Printf("%s=%q", name, buf)
+}
+
+// keygenVerify verifies keys were created correctly by keygen.
+func keygenVerify(public, secret, secret2 string) func(t *testing.T, r *runner, cmd *cmdTest, stdout, stderr string) {
+	return func(t *testing.T, r *runner, cmd *cmdTest, stdout, stderr string) {
+		dir := r.state.Config.Factotum().SecretsDir()
 		keyVerify(t, filepath.Join(dir, "public.upspinkey"), public)
 		keyVerify(t, filepath.Join(dir, "secret.upspinkey"), secret)
 		if secret2 != "" {
 			keyVerify(t, filepath.Join(dir, "secret2.upspinkey"), secret2)
-		}
-		if !persist {
-			os.RemoveAll(dir)
 		}
 	}
 }
@@ -319,6 +336,9 @@ func keyVerify(t *testing.T, name, prefix string) {
 	key, err := ioutil.ReadFile(name)
 	if err != nil {
 		t.Errorf("cannot read key %q: %v", name, err)
+	}
+	if len(key) < 16 {
+		t.Errorf("short key in %q", name)
 	}
 	if !strings.Contains(string(key), prefix) {
 		t.Errorf("invalid key: got %q...; expected %q...", key[:16], prefix)

@@ -32,9 +32,10 @@ type factotumKey struct {
 type keyHashArray [sha256.Size]byte
 
 type factotum struct {
-	current  keyHashArray
-	previous keyHashArray
-	keys     map[keyHashArray]factotumKey
+	current    keyHashArray
+	previous   keyHashArray
+	keys       map[keyHashArray]factotumKey
+	secretsDir string
 }
 
 var _ upspin.Factotum = factotum{}
@@ -58,6 +59,10 @@ func NewFromDir(dir string) (upspin.Factotum, error) {
 
 	privBytes, err := readFile(op, dir, "secret.upspinkey")
 	if err != nil {
+		if errors.Match(errors.E(errors.NotExist), err) {
+			// for example, before initial keygen
+			return &factotum{secretsDir: dir}, nil
+		}
 		return nil, errors.E(op, err)
 	}
 	privBytes = stripCR(privBytes)
@@ -74,7 +79,7 @@ func NewFromDir(dir string) (upspin.Factotum, error) {
 	}
 	s2 = stripCR(s2)
 
-	return newFactotum(fmt.Sprintf("%s(%q)", op, dir), pubBytes, privBytes, s2)
+	return newFactotum(fmt.Sprintf("%s(%q)", op, dir), pubBytes, privBytes, s2, dir)
 }
 
 // NewFromKeys returns a new Factotum by providing it with the raw
@@ -82,11 +87,11 @@ func NewFromDir(dir string) (upspin.Factotum, error) {
 // keys.
 func NewFromKeys(public, private, archived []byte) (upspin.Factotum, error) {
 	const op = "factotum.NewFromKeys"
-	return newFactotum(op, public, private, archived)
+	return newFactotum(op, public, private, archived, "")
 }
 
 // newFactotum creates a new Factotum using the given keys.
-func newFactotum(op string, public, private, archived []byte) (upspin.Factotum, error) {
+func newFactotum(op string, public, private, archived []byte, dir string) (upspin.Factotum, error) {
 	pfk, err := makeKey(upspin.PublicKey(public), string(private))
 	if err != nil {
 		return nil, errors.E(op, err)
@@ -96,9 +101,10 @@ func newFactotum(op string, public, private, archived []byte) (upspin.Factotum, 
 	copy(h[:], pfk.keyHash)
 	fm[h] = *pfk
 	f := &factotum{
-		current:  h,
-		previous: h,
-		keys:     fm,
+		current:    h,
+		previous:   h,
+		keys:       fm,
+		secretsDir: dir,
 	}
 
 	// Current file format is "# EE date" concatenated with old public.upspinkey
@@ -302,6 +308,11 @@ func (f factotum) PublicKeyFromHash(keyHash []byte) (upspin.PublicKey, error) {
 		return "", errors.E(op, errors.NotExist, errors.Errorf("no such key"))
 	}
 	return fk.public, nil
+}
+
+// SecretsDir returns the directory containing *.upspinkey, or "" if none.
+func (f factotum) SecretsDir() string {
+	return f.secretsDir
 }
 
 // clean removes comments and starting and leading space.

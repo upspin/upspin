@@ -370,18 +370,18 @@ func (sc *Schema) Start() error {
 	}
 
 	// Generate keys.
-	// Write an empty  file for use by 'upspin keygen'.
-	configKeygen := sc.Config("keygen")
-	if err := ioutil.WriteFile(configKeygen, []byte("secrets: none"), 0644); err != nil {
-		return err
-	}
 	for _, u := range sc.Users {
 		dir := filepath.Join(sc.dir, u.Name)
 		if err := os.MkdirAll(dir, 0700); err != nil {
 			return err
 		}
+		// TODO(ehg) Avoid this duplicate config by merging with loop below.
+		configKeygen := filepath.Join(dir, "keygenconfig")
+		if err := ioutil.WriteFile(configKeygen, []byte("secrets: "+dir), 0644); err != nil {
+			return err
+		}
 		var buf bytes.Buffer
-		keygen := exec.Command("upspin", "-config="+configKeygen, "keygen", "-where="+dir)
+		keygen := exec.Command("upspin", "-config="+configKeygen, "keygen")
 		keygen.Stdout = prefix("keygen: ", &buf)
 		keygen.Stderr = prefix("keygen: ", &buf)
 		if err := keygen.Run(); err != nil {

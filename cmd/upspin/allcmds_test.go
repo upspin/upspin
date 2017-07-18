@@ -427,35 +427,122 @@ var shareTests = []cmdTest{
 	},
 }
 
+// Continuing from shareTests, check the key rotation sequence described in "upspin help rotate" and upspin.io/doc/security.md.
+// At this point, ann holds her initial key and kelly can read friends.jpg.
+var rekeyTests = []cmdTest{
+	// Ann generates a new key.
+	{
+		"ann rekeys",
+		ann,
+		do(
+			"keygen -rotate -secretseed deter-gonad-pivot-rotor.visit-roman-widow-woman",
+		),
+		"",
+		keygenVerify("p256\n3078263077187835", "1623258616618034", ""),
+	},
+	// Ann can still read her existing files.
+	{
+		"sanity check after rekey",
+		ann,
+		do(
+			"get ann@example.com/Friends/Photo/friends.jpg",
+		),
+		"",
+		expect("this is friends.jpg"),
+	},
+	// Ann countersigns her files.
+	{
+		"ann countersigns",
+		ann,
+		do(
+			"countersign",
+		),
+		"",
+		expectNoOutput(),
+	},
+	// Ann can still read her files after countersign.
+	{
+		"sanity check after countersign",
+		ann,
+		do(
+			"get ann@example.com/Friends/Photo/friends.jpg",
+		),
+		"",
+		expect("this is friends.jpg"),
+	},
+	// Kelly can still verify using the old key from keyserver.
+	{
+		"kelly can still verify friends.jpg",
+		kelly,
+		do(
+			"get ann@example.com/Friends/Photo/friends.jpg",
+		),
+		"",
+		expect("this is friends.jpg"),
+	},
+	// Ann uploads her new key to the keyserver.
+	{
+		"ann rotate",
+		ann,
+		do(
+			"rotate",
+		),
+		"",
+		expectNoOutput(),
+	},
+	// Kelly can still verify, now using the new key.
+	// TODO(ehg)  Does kelly need to flush a cache of keys?
+	{
+		"kelly verifies friends.jpg with new key",
+		kelly,
+		do(
+			"get ann@example.com/Friends/Photo/friends.jpg",
+		),
+		"",
+		expect("this is friends.jpg"),
+	},
+	// Ann rewraps her files for her new key, just for cleanliness.  No change in access.
+	{
+		"ann rewraps",
+		ann,
+		do(
+			"share -q -fix -r @/Friends",
+			"get ann@example.com/Friends/Photo/friends.jpg",
+		),
+		"",
+		expect("this is friends.jpg"),
+	},
+}
+
 // keygenTests involves a user (keyloser@) whose only purpose is this test, because
 // when we are done we have rotated the user's keys but not updated the keyserver.
 // We can't use ann@ because we don't know her proquint so we can't restore.
 var keygenTests = []cmdTest{
 	{
-		"create a temporary key",
+		"keygen will fail",
 		keyloser,
 		do(
-			"keygen -secretseed deter-gonad-pivot-rotor.visit-roman-widow-woman -where " + testTempDir("key", deleteOld),
-		),
-		"",
-		keygenVerify(testTempDir("key", keepOld), "p256\n3078263077187835", "1623258616618034", "", keepOld),
-	},
-	{
-		"keygen again will fail",
-		keyloser,
-		do(
-			"keygen -secretseed desex-fetid-pecan-fakir.color-civil-comet-haven -where " + testTempDir("key", keepOld),
+			"keygen",
 		),
 		"",
 		fail("prior keys exist"),
 	},
 	{
+		"create a known new key",
+		keyloser,
+		do(
+			"keygen -rotate -secretseed deter-gonad-pivot-rotor.visit-roman-widow-woman",
+		),
+		"",
+		keygenVerify("p256\n3078263077187835", "1623258616618034", ""),
+	},
+	{
 		"keygen rotate",
 		keyloser,
 		do(
-			"keygen -rotate -secretseed desex-fetid-pecan-fakir.color-civil-comet-haven -where " + testTempDir("key", keepOld),
+			"keygen -rotate -secretseed desex-fetid-pecan-fakir.color-civil-comet-haven",
 		),
 		"",
-		keygenVerify(testTempDir("key", keepOld), "p256\n1048813400173469", "7863414033373202", "1623258616618034", deleteOld),
+		keygenVerify("p256\n1048813400173469", "7863414033373202", "1623258616618034"),
 	},
 }

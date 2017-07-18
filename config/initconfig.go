@@ -125,10 +125,9 @@ func FromFile(name string) (upspin.Config, error) {
 //
 // The default value for packing is "ee".
 //
-// The default value for secrets is "$HOME/.ssh".
-// The special value "none" indicates there are no secrets to load;
-// in this case, the returned config will not include a Factotum
-// and the returned error is ErrNoFactotum.
+// The special value "none" for secrets indicates there are no secrets to load;
+// in this case, the returned config will not include a Factotum and the
+// returned error is ErrNoFactotum.
 //
 // The tlscerts key specifies a directory containing PEM certificates define
 // the certificate pool used for verifying client TLS connections,
@@ -207,14 +206,9 @@ func InitConfig(r io.Reader) (upspin.Config, error) {
 	}
 
 	dir := vals[secrets]
-	if dir == "" {
-		dir, err = sshdir()
-		if err != nil {
-			return nil, errors.E(op, errors.Errorf("cannot find .ssh directory: %v", err))
-		}
-	}
-	if dir == "none" {
+	if dir == "" || dir == "none" {
 		err = ErrNoFactotum
+		// TODO(ehg) For compatibility with very old config files, use .ssh if it exists and has upspinkeys?
 	} else {
 		f, err := factotum.NewFromDir(dir)
 		if err != nil {
@@ -620,18 +614,6 @@ func Home() string {
 		panic(err)
 	}
 	return home
-}
-
-func sshdir() (string, error) {
-	h, err := Homedir()
-	if err != nil {
-		return "", err
-	}
-	p := filepath.Join(h, ".ssh")
-	if err := isDir(p); err != nil {
-		return "", err
-	}
-	return p, nil
 }
 
 func isDir(p string) error {

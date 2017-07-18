@@ -123,6 +123,9 @@ type Factotum interface {
 
 	// PublicKeyFromHash returns the matching public key or an error.
 	PublicKeyFromHash(keyHash []byte) (PublicKey, error)
+
+	// SecretsDir returns the directory containing *.upspinkey, or "" if none.
+	SecretsDir() string
 }
 
 // A Packing identifies the technique for turning the data pointed to by
