@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b6bdbe29_b4bd0b02",
+        "filename": "store/server/server_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-18T21:32:19Z",
+      "side": 1,
+      "message": "fix this",
+      "revId": "8d26c5cd1c5d62e61535d8f7e3774381f2ceeaa2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "453bcbb1_4abef15f",
+        "filename": "store/server/server_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-18T21:32:19Z",
+      "side": 1,
+      "message": "Don\u0027t defer this, just put it directly after the call to New, but before the error check.\nIf Fatal is called then the defer won\u0027t run.",
+      "revId": "8d26c5cd1c5d62e61535d8f7e3774381f2ceeaa2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
