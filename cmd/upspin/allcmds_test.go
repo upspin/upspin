@@ -159,6 +159,42 @@ var basicCmdTests = []cmdTest{
 		expect("this is public.jpg"),
 	},
 	{
+		"info Friends",
+		ann,
+		do(
+			"info @/Friends",
+		),
+		"",
+		expect(
+			"ann@example.com/Friends",
+			"packing:", "ee",
+			"writer:", "dirserver@example.com",
+			"attributes:", "directory",
+			"key holders:", "is a directory",
+			"can read:", "ann@example.com chris@example.com",
+			"can write:", "ann@example.com",
+			"can list:", "ann@example.com chris@example.com",
+			"can create:", "ann@example.com",
+			"can delete:", "(same)",
+		),
+	},
+	{
+		"info link",
+		ann,
+		do(
+			"info @/linkdir",
+		),
+		"",
+		expect(
+			"ann@example.com/linkdir",
+			"attributes:", "link",
+			"access file:", "ann@example.com/Public/Access",
+			"key holders:", "all@upspin.io ann@example.com",
+			"Target of link", "ann@example.com/linkdir:",
+			"ann@example.com/Public/Photo",
+		),
+	},
+	{
 		"whichaccess",
 		ann,
 		do(
@@ -228,6 +264,71 @@ var globTests = []cmdTest{
 	},
 }
 
+// cpTests tests the cp command. There are four basic cases:
+// upspin to Upspin, local to Upspin, Upspin to local, and local to local.
+var cpTests = []cmdTest{
+	// Build a little local tree.
+	{
+		"build tree to cp, part 1",
+		ann,
+		do(
+			"mkdir @/cp",
+			"put @/cp/file",
+		),
+		"this is @/cp/file",
+		expectNoOutput(),
+	},
+	{
+		"build tree to cp, part 2",
+		ann,
+		do(
+			"mkdir @/cp/subdir",
+			"put @/cp/subdir/file",
+		),
+		"this is @/cp/subdir/file",
+		expectNoOutput(),
+	},
+	// Now tests.
+	{
+		"cannot cp to non-existent directory",
+		ann,
+		do(
+			"cp -R @/cp @/cp2",
+		),
+		"",
+		fail("existing directory"),
+	},
+	// Copy tree recursively four ways.
+	{
+		"cp Upspin to Upspin",
+		ann,
+		do(
+			"mkdir @/cp2",
+			"cp -R @/cp/* @/cp2",
+			"get @/cp2/file",
+			"get @/cp2/subdir/file",
+		),
+		"",
+		expect("this is @/cp/file", "this is @/cp/subdir/file"),
+	},
+	{
+		// Do the rest in one big hit so we test all cases but can use get
+		// for the final check.
+		"cp Upspin to local and back",
+		ann,
+		do(
+			"mkdir @/cp3",
+			"cp -R @/cp/* "+testTempDir("cp", deleteOld),
+			"cp -R "+testTempGlob("cp")+" "+testTempDir("cp2", deleteOld),
+			"cp -R "+testTempGlob("cp2")+" @/cp3",
+			"get @/cp3/file",
+			"get @/cp3/subdir/file",
+		),
+		"",
+		expect("this is @/cp/file", "this is @/cp/subdir/file"),
+	},
+}
+
 // shareTests tests share processing,.
 // TODO: Test lots more.
 var shareTests = []cmdTest{
@@ -265,7 +366,7 @@ var shareTests = []cmdTest{
 			"share -q -fix -r @/Friends",
 		),
 		"",
-		expect(""),
+		expectNoOutput(),
 	},
 	// Now kelly@ can read it.
 	{
@@ -312,7 +413,7 @@ var shareTests = []cmdTest{
 			"share -q -fix -r @/Friends",
 		),
 		"",
-		expect(""),
+		expectNoOutput(),
 	},
 	// Now lee@ can read it.
 	{
