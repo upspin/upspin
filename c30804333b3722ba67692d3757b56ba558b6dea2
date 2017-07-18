@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "aa176556_094f4c6a",
+        "filename": "doc/index.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-18T21:00:50Z",
+      "side": 1,
+      "message": "## Download",
+      "revId": "c30804333b3722ba67692d3757b56ba558b6dea2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4fdfdd50_edf6a2fa",
+        "filename": "doc/index.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-18T21:00:50Z",
+      "side": 1,
+      "message": "Add a blank line above\n\n- [Binary releases](/dl/) for Linux, MacOS, and Windows.",
+      "revId": "c30804333b3722ba67692d3757b56ba558b6dea2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
