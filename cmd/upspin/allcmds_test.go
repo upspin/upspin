@@ -427,6 +427,74 @@ var shareTests = []cmdTest{
 	},
 }
 
+// Continuing from shareTests, check the key rotation sequence described in "upspin help rotate" and upspin.io/doc/security.md.
+var rekeyTests = []cmdTest{
+	// At this point, ann holds her initial key and kelly can read friends.jpg.
+	{
+		"sanity check",
+		ann,
+		do(
+			"get ann@example.com/Friends/Photo/friends.jpg",
+		),
+		"",
+		expect("this is friends.jpg"),
+	},
+	// Ann generates a new key and countersigns her files, which she can still read afterwards.
+	{
+		"ann rekeys and countersigns",
+		ann,
+		do(
+			"keygen -rotate",
+			"countersign",
+			"get ann@example.com/Friends/Photo/friends.jpg",
+		),
+		"",
+		expect("this is friends.jpg"),
+	},
+	// Kelly can still verify using the old key from keyserver.
+	{
+		"kelly can still verify friends.jpg",
+		kelly,
+		do(
+			"get ann@example.com/Friends/Photo/friends.jpg",
+		),
+		"",
+		expect("this is friends.jpg"),
+	},
+	// Ann uploads her new key to the keyserver.
+	{
+		"ann rotate",
+		ann,
+		do(
+			"rotate",
+		),
+		"",
+		expectNoOutput(),
+	},
+	// Kelly can still verify, now using the new key.
+	// TODO(ehg)  Should kelly flush a key cache?
+	{
+		"kelly verifies friends.jpg with new key",
+		kelly,
+		do(
+			"get ann@example.com/Friends/Photo/friends.jpg",
+		),
+		"",
+		expect("this is friends.jpg"),
+	},
+	// Ann rewraps her files for her new key, just for cleanliness.  No change in access.
+	{
+		"ann rewraps",
+		ann,
+		do(
+			"share -q -fix -r @/Friends",
+			"get ann@example.com/Friends/Photo/friends.jpg",
+		),
+		"",
+		expect("this is friends.jpg"),
+	},
+}
+
 // keygenTests involves a user (keyloser@) whose only purpose is this test, because
 // when we are done we have rotated the user's keys but not updated the keyserver.
 // We can't use ann@ because we don't know her proquint so we can't restore.

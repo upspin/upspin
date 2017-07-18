@@ -28,9 +28,10 @@ var allCmdTests = []*[]cmdTest{
 	&globTests,
 	&keygenTests,
 	&shareTests,
+	&rekeyTests,
 }
 
-// TestCommands runs the tests defined in cmdTests as subtests.
+// TestCommands runs the tests defined in allCmdTests as subtests.
 func TestCommands(t *testing.T) {
 	// Set up upbox.
 	portString, err := testutil.PickPort()
@@ -115,7 +116,7 @@ func (devNull) Close() error                { return nil }
 // are modified and available to subsequent subcommands.
 // It's a little bit like the upspin shell command, but through
 // upbox can start the test services and provides mechanisms
-// to valid results and test state.
+// to validate results and test state.
 type runner struct {
 	// fs, not flag.CommandLine, holds the flags for the upspin state.
 	fs *flag.FlagSet
