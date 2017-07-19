@@ -11,7 +11,6 @@ import (
 	"encoding/json"
 	"math/big"
 	"net"
-	"strconv"
 	"strings"
 	"sync"
 
@@ -26,44 +25,11 @@ import (
 	"upspin.io/valid"
 )
 
-// New initializes an instance of the key service.
-// Required configuration options are:
-//   gcpBucketName=<BUCKET_NAME>
-// Optional configuration options are:
-//   defaultACL=<ACL>, as defined in storage.Storage (e.g. "projectPrivate")
-//   cacheSize=<number>
-func New(options ...string) (upspin.KeyServer, error) {
-	const op = "key/server.New"
+const cacheSize = 10000
 
-	cacheSize := 10000
-
-	// All options are for the Storage layer.
-	var storageOpts []storage.DialOpts
-	for _, o := range options {
-		vals := strings.Split(o, "=")
-		if len(vals) != 2 {
-			return nil, errors.E(op, "config options must be in the format 'key=value'")
-		}
-		k, v := vals[0], vals[1]
-		switch k {
-		case "cacheSize":
-			cacheSize, err := strconv.ParseInt(v, 10, 32)
-			if err != nil {
-				return nil, errors.E(op, errors.Invalid, errors.Errorf("invalid cache size %q: %s", v, err))
-			}
-			if cacheSize < 1 {
-				return nil, errors.E(op, errors.Invalid, errors.Errorf("%s: cache size too small: %d", k, cacheSize))
-			}
-		default:
-			storageOpts = append(storageOpts, storage.WithOptions(o))
-		}
-	}
-
-	s, err := storage.Dial("GCS", storageOpts...)
-	if err != nil {
-		return nil, errors.E(op, err)
-	}
-	log.Debug.Printf("Configured GCP user: %v", options)
+// New initializes an instance of the KeyServer
+// that stores its data in the given Storage implementation.
+func New(s storage.Storage) upspin.KeyServer {
 	return &server{
 		storage:   s,
 		refCount:  &refCount{count: 1},
@@ -71,7 +37,7 @@ func New(options ...string) (upspin.KeyServer, error) {
 		logger:    &loggerImpl{storage: s},
 		cache:     cache.NewLRU(cacheSize),
 		negCache:  cache.NewLRU(cacheSize),
-	}, nil
+	}
 }
 
 // server is the implementation of the KeyServer Service on GCP.
