@@ -67,8 +67,7 @@ func Main(setup func(upspin.KeyServer)) {
 		setup(key)
 	}
 
-	httpStore := keyserver.New(cfg, key, upspin.NetAddr(flags.NetAddr))
-	http.Handle("/api/Key/", httpStore)
+	http.Handle("/api/Key/", keyserver.New(cfg, key, upspin.NetAddr(flags.NetAddr)))
 
 	if logger, ok := key.(server.Logger); ok {
 		http.Handle("/log", logHandler{logger: logger})
