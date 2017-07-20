@@ -89,28 +89,23 @@ func Main(setup func(upspin.KeyServer)) {
 			}
 			project = f.Value.String()
 		})
-		apiKey, _, _, err := parseMailConfig(*mailConfigFile)
+		apiKey, err := parseMailConfig(*mailConfigFile)
 		if err != nil {
 			log.Fatalf("keyserver: %v", err)
 		}
-		m := sendgrid.New(apiKey, "upspin.io")
+		m := sendgrid.New(apiKey)
 		http.Handle("/signup", signup.NewHandler(f, key, m, project))
 	} else {
 		log.Println("keyserver: -mail_config not set, /signup deactivated")
 	}
 }
 
-func parseMailConfig(name string) (apiKey, userName, password string, err error) {
+func parseMailConfig(name string) (apiKey string, err error) {
 	data, err := ioutil.ReadFile(name)
 	if err != nil {
-		return "", "", "", errors.E(errors.IO, err)
+		return "", errors.E(errors.IO, err)
 	}
-	lines := strings.Split(strings.TrimSpace(string(data)), "\n")
-	if len(lines) != 3 {
-		return "", "", "", errors.E(errors.IO, errors.Str("config file must have 3 entries: api key, user name, password"))
-	}
+	lines := strings.SplitN(strings.TrimSpace(string(data)), "\n", 2)
 	apiKey = strings.TrimSpace(lines[0])
-	userName = strings.TrimSpace(lines[1])
-	password = strings.TrimSpace(lines[2])
 	return
 }
