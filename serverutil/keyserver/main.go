@@ -78,6 +78,7 @@ func Main(setup func(upspin.KeyServer)) {
 	}
 
 	if *mailConfigFile != "" {
+		signupURL := "https://" + flags.NetAddr + "/signup"
 		f := cfg.Factotum()
 		if f == nil {
 			log.Fatal("keyserver: supplied config must include keys when -mail_config set")
@@ -94,7 +95,7 @@ func Main(setup func(upspin.KeyServer)) {
 			log.Fatalf("keyserver: %v", err)
 		}
 		m := sendgrid.New(apiKey)
-		http.Handle("/signup", signup.NewHandler(f, key, m, project))
+		http.Handle("/signup", signup.NewHandler(signupURL, f, key, m, project))
 	} else {
 		log.Println("keyserver: -mail_config not set, /signup deactivated")
 	}
