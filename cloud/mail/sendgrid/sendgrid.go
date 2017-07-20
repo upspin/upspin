@@ -8,7 +8,6 @@ package sendgrid // import "upspin.io/cloud/mail/sendgrid"
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 
@@ -16,21 +15,17 @@ import (
 	"upspin.io/errors"
 )
 
-// sendgrid implements cloud.mail.Mail using SendGrid as the underlying
+// sendgrid implements cloud/mail.Mail using SendGrid as the underlying
 // substratum.
 type sendgrid struct {
 	apiKey string
-	domain string
 }
 
 var _ mail.Mail = (*sendgrid)(nil)
 
-// New allocates a Mail type for sending email with SendGrid.
-func New(apiKey, domain string) mail.Mail {
-	return &sendgrid{
-		apiKey: apiKey,
-		domain: domain,
-	}
+// New returns a mail.Mail that sends email with SendGrid.
+func New(apiKey string) mail.Mail {
+	return &sendgrid{apiKey: apiKey}
 }
 
 // apiSend is the endpoint for requests. It's a var so tests can change it.
@@ -67,26 +62,18 @@ type message struct {
 	Content          []content
 }
 
-// Send implements cloud.mail.Mail.
+// Send implements cloud/mail.Mail.
 func (s *sendgrid) Send(to, from, subject, text, html string) error {
 	const op = "cloud/mail/sendgrid.Send"
 	if text == "" && html == "" {
 		return errors.E(op, errors.Invalid, errors.Str("text or html body must be provided"))
 	}
 	msg := message{
-		Personalizations: []personalizations{
-			{
-				To: []addr{
-					{
-						Email: to,
-					},
-				},
-				Subject: subject,
-			},
-		},
-		From: addr{
-			Email: fmt.Sprintf("%s@%s", from, s.domain),
-		},
+		Personalizations: []personalizations{{
+			To:      []addr{{Email: to}},
+			Subject: subject,
+		}},
+		From: addr{Email: from},
 	}
 	// The order of Content must be: plain, html.
 	if text != "" {
@@ -127,9 +114,4 @@ func (s *sendgrid) Send(to, from, subject, text, html string) error {
 	}
 
 	return nil
-}
-
-// Domain implements cloud.mail.Mail.
-func (s *sendgrid) Domain() string {
-	return s.domain
 }

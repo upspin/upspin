@@ -15,8 +15,4 @@ type Mail interface {
 	// expected. Subject is required and at least one of text or
 	// html must be present.
 	Send(to, from, subject, text, html string) error
-
-	// Domain returns the domain name of the server providing mail service.
-	// It is set during initialization and cannot be changed.
-	Domain() string
 }
