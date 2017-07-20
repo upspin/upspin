@@ -505,7 +505,7 @@ func IsAccessFile(pathName upspin.PathName) bool {
 		return false
 	}
 	// Must end "/Access".
-	return parsed.NElem() >= 1 && parsed.Elem(parsed.NElem()-1) == "Access"
+	return parsed.NElem() >= 1 && parsed.Elem(parsed.NElem()-1) == AccessFile
 }
 
 // IsGroupFile reports whether the pathName contains a directory in the root named Group, which is special.
@@ -527,7 +527,7 @@ func IsAccessControlFile(pathName upspin.PathName) bool {
 	}
 	nElem := parsed.NElem()
 	// To be an Access file, must end "/Access".
-	if nElem >= 1 && parsed.Elem(parsed.NElem()-1) == "Access" {
+	if nElem >= 1 && parsed.Elem(parsed.NElem()-1) == AccessFile {
 		return true
 	}
 	// To be a Group file, need "a@b.c/Group/file". Don't worry about Access file; that's already done.
