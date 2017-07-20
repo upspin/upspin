@@ -12,6 +12,7 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"math/big"
 	"net/http"
 	"net/url"
@@ -46,6 +47,7 @@ const (
 // handler implements an http.Handler that handles user creation requests
 // made by 'upspin signup' and the user themselves.
 type handler struct {
+	baseURL string
 	fact    upspin.Factotum
 	key     upspin.KeyServer
 	mail    mail.Mail
@@ -61,8 +63,9 @@ type handler struct {
 // the new user will be created. The Mail is used to send mail. The provided
 // project name is used in the subject line of signup notifications, to
 // distinguish test and production keyserver instances.
-func NewHandler(fact upspin.Factotum, key upspin.KeyServer, m mail.Mail, project string) http.Handler {
+func NewHandler(baseURL string, fact upspin.Factotum, key upspin.KeyServer, m mail.Mail, project string) http.Handler {
 	return &handler{
+		baseURL: baseURL,
 		fact:    fact,
 		key:     key,
 		mail:    m,
@@ -213,12 +216,7 @@ func (m *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		"sigS":  {sig.S.String()},
 		"now":   {fmt.Sprint(now.Unix())},
 	}
-	signupURL := (&url.URL{
-		Scheme:   "https",
-		Host:     "key.upspin.io", // TODO(adg): make configurable
-		Path:     "/signup",
-		RawQuery: vals.Encode(),
-	}).String()
+	signupURL := m.baseURL + "?" + vals.Encode()
 
 	// Send signup confirmation mail to user.
 	body := new(bytes.Buffer)
@@ -249,12 +247,11 @@ func verifySignupSignature(user, dir, store, key, sigR, sigS string) error {
 		return errors.Str("invalid signature S value")
 	}
 	sig := upspin.Signature{R: &rs, S: &ss}
-	hash, _ := signupRequestHash(upspin.UserName(user), upspin.NetAddr(dir), upspin.NetAddr(store), upspin.PublicKey(key))
+	hash, _ := RequestHash(upspin.UserName(user), upspin.NetAddr(dir), upspin.NetAddr(store), upspin.PublicKey(key))
 	return factotum.Verify(hash, sig, upspin.PublicKey(key))
 }
 
 func (m *handler) createUser(u *upspin.User) error {
-
 	key, err := m.dialForUser(u.Name)
 	if err != nil {
 		return err
@@ -352,11 +349,44 @@ func snapshotUser(u upspin.UserName) (upspin.UserName, error) {
 	return upspin.UserName(name + "+snapshot@" + domain), nil
 }
 
-// signupRequestHash generates a hash of the supplied arguments
-// that, when signed, is used to prove that a signup request originated
-// from the user that owns the supplied private key.
-// Keep it in sync with cmd/upspin/signup.go.
-func signupRequestHash(name upspin.UserName, dir, store upspin.NetAddr, key upspin.PublicKey) ([]byte, url.Values) {
+// MakeRequest sends a signup request to the given URL for the given Config.
+func MakeRequest(signupURL string, cfg upspin.Config) error {
+	query, err := makeQueryString(cfg)
+	if err != nil {
+		return err
+	}
+	r, err := http.Post(signupURL+"?"+query, "text/plain", nil)
+	if err != nil {
+		return err
+	}
+	b, err := ioutil.ReadAll(r.Body)
+	r.Body.Close()
+	if err != nil {
+		return err
+	}
+	if r.StatusCode != http.StatusOK {
+		return fmt.Errorf("key server error: %s", b)
+	}
+	return nil
+}
+
+// makeQueryString returns an encoded query string used to sign up a new user
+// with the KeyServer.
+func makeQueryString(cfg upspin.Config) (string, error) {
+	hash, vals := RequestHash(cfg.UserName(), cfg.DirEndpoint().NetAddr, cfg.StoreEndpoint().NetAddr, cfg.Factotum().PublicKey())
+	sig, err := cfg.Factotum().Sign(hash)
+	if err != nil {
+		return "", err
+	}
+	vals.Add("sigR", sig.R.String())
+	vals.Add("sigS", sig.S.String())
+	return vals.Encode(), nil
+}
+
+// RequestHash generates a hash of the supplied arguments that, when signed, is
+// used to prove that a signup request originated from the user that owns the
+// supplied private key.
+func RequestHash(name upspin.UserName, dir, store upspin.NetAddr, key upspin.PublicKey) ([]byte, url.Values) {
 	const magic = "signup-request"
 
 	u := url.Values{}
