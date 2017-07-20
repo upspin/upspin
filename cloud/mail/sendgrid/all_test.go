@@ -33,20 +33,16 @@ func TestSend(t *testing.T) {
 	apiSend = ts.URL
 
 	const (
-		domain    = "this.domain"
 		key       = "mykey"
 		to        = "somewhere@near.japan"
-		from      = "me"
+		from      = "me@this.domain"
 		subject   = "hello"
 		textBody  = "text"
 		htmlBody  = "html"
 		goldenReq = `{"Personalizations":[{"To":[{"Email":"somewhere@near.japan","Name":""}],"Subject":"hello"}],"From":{"Email":"me@this.domain","Name":""},"Content":[{"Type":"text/plain","Value":"text"},{"Type":"text/html","Value":"html"}]}`
 	)
-	sg := New(key, domain)
+	sg := New(key)
 
-	if sg.Domain() != domain {
-		t.Fatalf("sg.Domain = %q, want = %q", sg.Domain(), domain)
-	}
 	err := sg.Send(to, from, subject, textBody, htmlBody)
 	if err != nil {
 		t.Fatal(err)
@@ -65,7 +61,7 @@ func TestSendError(t *testing.T) {
 		domain = "this.domain"
 		key    = "mykey"
 	)
-	sg := New(key, domain)
+	sg := New(key)
 
 	err := sg.Send("to@you.com", "from_me", "hello", "", "")
 	expectedErr := errors.E(errors.Invalid, errors.Str("text or html body must be provided"))
