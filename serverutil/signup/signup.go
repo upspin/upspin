@@ -2,7 +2,9 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package keyserver
+// Package signup provides an http.Handler implementation that serves and
+// validates KeyServer signup requests.
+package signup
 
 import (
 	"bytes"
@@ -10,7 +12,6 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"math/big"
 	"net/http"
 	"net/url"
@@ -19,7 +20,6 @@ import (
 	"time"
 
 	"upspin.io/cloud/mail"
-	"upspin.io/cloud/mail/sendgrid"
 	"upspin.io/config"
 	"upspin.io/errors"
 	"upspin.io/factotum"
@@ -42,9 +42,9 @@ const (
 	serverName = "keyserver"
 )
 
-// signupHandler implements an http.Handler that handles user creation requests
+// handler implements an http.Handler that handles user creation requests
 // made by 'upspin signup' and the user themselves.
-type signupHandler struct {
+type handler struct {
 	fact    upspin.Factotum
 	key     upspin.KeyServer
 	mail    mail.Mail
@@ -53,26 +53,21 @@ type signupHandler struct {
 	rate serverutil.RateLimiter
 }
 
-// newSignupHandler creates a new handler that serves /signup.
-func newSignupHandler(fact upspin.Factotum, key upspin.KeyServer, mailConfig, project string) (*signupHandler, error) {
-	apiKey, _, _, err := parseMailConfig(mailConfig)
-	if err != nil {
-		return nil, err
-	}
-	m := &signupHandler{
+// NewHandler creates a new handler that serves /signup.
+func NewHandler(fact upspin.Factotum, key upspin.KeyServer, m mail.Mail, project string) http.Handler {
+	return &handler{
 		fact:    fact,
 		key:     key,
-		mail:    sendgrid.New(apiKey, "upspin.io"),
+		mail:    m,
 		project: project,
 		rate: serverutil.RateLimiter{
 			Backoff: 1 * time.Minute,
 			Max:     24 * time.Hour,
 		},
 	}
-	return m, nil
 }
 
-func (m *signupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (m *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	errorf := func(code int, format string, args ...interface{}) {
 		s := fmt.Sprintf(format, args...)
 		http.Error(w, s, code)
@@ -251,7 +246,7 @@ func verifySignupSignature(user, dir, store, key, sigR, sigS string) error {
 	return factotum.Verify(hash, sig, upspin.PublicKey(key))
 }
 
-func (m *signupHandler) createUser(u *upspin.User) error {
+func (m *handler) createUser(u *upspin.User) error {
 
 	key, err := m.dialForUser(u.Name)
 	if err != nil {
@@ -288,7 +283,7 @@ func (m *signupHandler) createUser(u *upspin.User) error {
 	})
 }
 
-func (m *signupHandler) dialForUser(name upspin.UserName) (upspin.KeyServer, error) {
+func (m *handler) dialForUser(name upspin.UserName) (upspin.KeyServer, error) {
 	// We need to dial this server locally so the new user is authenticated
 	// with it implicitly.
 	cfg := config.New()
@@ -307,7 +302,7 @@ func (m *signupHandler) dialForUser(name upspin.UserName) (upspin.KeyServer, err
 }
 
 // sign generates a signature for the given user creation request at time now.
-func (m *signupHandler) sign(u *upspin.User, now time.Time) (upspin.Signature, error) {
+func (m *handler) sign(u *upspin.User, now time.Time) (upspin.Signature, error) {
 	b, err := sigBytes(u, now)
 	if err != nil {
 		return upspin.Signature{}, err
@@ -315,7 +310,7 @@ func (m *signupHandler) sign(u *upspin.User, now time.Time) (upspin.Signature, e
 	return m.fact.Sign(b)
 }
 
-func (m *signupHandler) validateSignature(u *upspin.User, now time.Time, sig upspin.Signature) error {
+func (m *handler) validateSignature(u *upspin.User, now time.Time, sig upspin.Signature) error {
 	// Check that the signature is still valid.
 	if time.Now().After(now.Add(signupGracePeriod)) {
 		return errors.Str("request too old; please try again")
@@ -335,21 +330,6 @@ func sigBytes(u *upspin.User, now time.Time) ([]byte, error) {
 	b = strconv.AppendInt(b, now.Unix(), 10)
 	h := sha256.Sum256(b)
 	return h[:], nil
-}
-
-func parseMailConfig(name string) (apiKey, userName, password string, err error) {
-	data, err := ioutil.ReadFile(name)
-	if err != nil {
-		return "", "", "", errors.E(errors.IO, err)
-	}
-	lines := strings.Split(strings.TrimSpace(string(data)), "\n")
-	if len(lines) != 3 {
-		return "", "", "", errors.E(errors.IO, errors.Str("config file must have 3 entries: api key, user name, password"))
-	}
-	apiKey = strings.TrimSpace(lines[0])
-	userName = strings.TrimSpace(lines[1])
-	password = strings.TrimSpace(lines[2])
-	return
 }
 
 // snapshotUser returns the snapshot username for the named user.
