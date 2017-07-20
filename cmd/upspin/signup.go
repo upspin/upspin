@@ -6,14 +6,10 @@ package main
 
 import (
 	"bytes"
-	"crypto/sha256"
-	"encoding/binary"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"net"
-	"net/http"
-	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -21,10 +17,13 @@ import (
 
 	"upspin.io/config"
 	"upspin.io/flags"
+	"upspin.io/serverutil/signup"
 	"upspin.io/subcmd"
 	"upspin.io/upspin"
 	"upspin.io/user"
 )
+
+const signupURL = "https://key.upspin.io/signup"
 
 func (s *State) signup(args ...string) {
 	const help = `
@@ -185,44 +184,11 @@ func (s *State) registerUser(configFile string) {
 	if err != nil {
 		s.Exit(err)
 	}
-
-	// Make signup request.
-	signupURL, err := makeSignupURL(cfg)
-	if err != nil {
+	if err := signup.MakeRequest(signupURL, cfg); err != nil {
 		s.Exit(err)
-	}
-	r, err := http.Post(signupURL, "text/plain", nil)
-	if err != nil {
-		s.Exit(err)
-	}
-	b, err := ioutil.ReadAll(r.Body)
-	r.Body.Close()
-	if err != nil {
-		s.Exit(err)
-	}
-	if r.StatusCode != http.StatusOK {
-		s.Exitf("key server error: %s", b)
 	}
 	fmt.Fprintf(s.Stderr, "A signup email has been sent to %q,\n", cfg.UserName())
 	fmt.Fprintf(s.Stderr, "please read it for further instructions.\n")
-}
-
-// makeSignupURL returns an encoded URL used to sign up a new user with the
-// default keyserver.
-func makeSignupURL(cfg upspin.Config) (string, error) {
-	hash, vals := signupRequestHash(cfg.UserName(), cfg.DirEndpoint().NetAddr, cfg.StoreEndpoint().NetAddr, cfg.Factotum().PublicKey())
-	sig, err := cfg.Factotum().Sign(hash)
-	if err != nil {
-		return "", err
-	}
-	vals.Add("sigR", sig.R.String())
-	vals.Add("sigS", sig.S.String())
-	return (&url.URL{
-		Scheme:   "https",
-		Host:     "key.upspin.io",
-		Path:     "/signup",
-		RawQuery: vals.Encode(),
-	}).String(), nil
 }
 
 type configData struct {
@@ -268,28 +234,4 @@ func restoreEnvironment(env []string) {
 		}
 		os.Setenv(kv[0], kv[1])
 	}
-}
-
-// signupRequestHash generates a hash of the supplied arguments
-// that, when signed, is used to prove that a signup request originated
-// from the user that owns the supplied private key.
-// Keep it in sync with cmd/keyserver/signup.go.
-func signupRequestHash(name upspin.UserName, dir, store upspin.NetAddr, key upspin.PublicKey) ([]byte, url.Values) {
-	const magic = "signup-request"
-
-	u := url.Values{}
-	h := sha256.New()
-	h.Write([]byte(magic))
-	w := func(key, val string) {
-		var l [4]byte
-		binary.BigEndian.PutUint32(l[:], uint32(len(val)))
-		h.Write(l[:])
-		h.Write([]byte(val))
-		u.Add(key, val)
-	}
-	w("name", string(name))
-	w("dir", string(dir))
-	w("store", string(store))
-	w("key", string(key))
-	return h.Sum(nil), u
 }
