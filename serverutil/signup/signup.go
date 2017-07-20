@@ -37,9 +37,10 @@ const (
 	// signupNotifyAddress is the address that should receive signup notifications.
 	signupNotifyAddress = "upspin-sendgrid@google.com"
 
-	noHTML = "" // for mail.Send
+	// fromAddress is the origin address for signup messages.
+	fromAddress = "noreply@upspin.io"
 
-	serverName = "keyserver"
+	noHTML = "" // for mail.Send
 )
 
 // handler implements an http.Handler that handles user creation requests
@@ -157,7 +158,7 @@ func (m *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		// Send a note to our internal list, so we're aware of signups.
 		subject := fmt.Sprintf("New signup on %s: %s", m.project, string(u.Name))
 		body := fmt.Sprintf("%s signed up on %s on %s", u.Name, m.project, time.Now().Format(time.Stamp))
-		err = m.mail.Send(signupNotifyAddress, serverName, subject, body, noHTML)
+		err = m.mail.Send(signupNotifyAddress, fromAddress, subject, body, noHTML)
 		if err != nil {
 			log.Error.Printf("Error sending mail to %q: %v", signupNotifyAddress, err)
 			// Don't prevent signup if this fails.
@@ -226,7 +227,7 @@ func (m *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(body, "\nIf you were not expecting this message, please ignore it.")
 	// TODO(adg): implement opt out link
 	const subject = "Upspin signup confirmation"
-	err = m.mail.Send(string(u.Name), serverName, subject, body.String(), noHTML)
+	err = m.mail.Send(string(u.Name), fromAddress, subject, body.String(), noHTML)
 	if err != nil {
 		log.Error.Printf("Error sending mail to %q: %v", u.Name, err)
 		errorf(http.StatusInternalServerError, "could not send signup email")
