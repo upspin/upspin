@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d9225a96_36481267",
+        "filename": "access/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 530,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-20T03:53:31Z",
+      "side": 1,
+      "message": "AccessFile",
+      "range": {
+        "startLine": 530,
+        "startChar": 51,
+        "endLine": 530,
+        "endChar": 59
+      },
+      "revId": "7dffb83901472cbc6d1146c359992a54deed55c0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6a9d3cad_234c0f67",
+        "filename": "access/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 530,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-20T03:53:31Z",
+      "side": 1,
+      "message": "nElem-1",
+      "range": {
+        "startLine": 530,
+        "startChar": 30,
+        "endLine": 530,
+        "endChar": 46
+      },
+      "revId": "7dffb83901472cbc6d1146c359992a54deed55c0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
