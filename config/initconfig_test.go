@@ -36,15 +36,6 @@ type expectations struct {
 	cmdflags    map[string]map[string]string
 }
 
-type envs struct {
-	username    string
-	keyserver   string
-	dirserver   string
-	storeserver string
-	packing     string
-	secrets     string
-}
-
 var secretsDir string
 
 func init() {
@@ -227,57 +218,6 @@ func parseTestEndpoint(text string) (upspin.Endpoint, error) {
 	return *ep, nil
 }
 
-func TestEnv(t *testing.T) {
-	expect := expectations{
-		username:    "quux",
-		keyserver:   upspin.Endpoint{Transport: upspin.InProcess, NetAddr: ""},
-		dirserver:   upspin.Endpoint{Transport: upspin.Remote, NetAddr: "who.knows:1234"},
-		storeserver: upspin.Endpoint{Transport: upspin.Remote, NetAddr: "who.knows:1234"},
-		packing:     upspin.EEPack,
-		secrets:     secretsDir,
-	}
-
-	defer func() {
-		os.Setenv("upspinusername", "")
-		os.Setenv("upspinkeyserver", "")
-		os.Setenv("upspindirserver", "")
-		os.Setenv("upspinstoreserver", "")
-		os.Setenv("upspinpacking", "")
-	}()
-	config := makeConfig(&expect)
-	expect.username = "p@google.com"
-	os.Setenv("upspinusername", string(expect.username))
-	expect.keyserver = upspin.Endpoint{Transport: upspin.InProcess, NetAddr: ""}
-	expect.dirserver = upspin.Endpoint{Transport: upspin.Remote, NetAddr: "who.knows:1234"}
-	expect.storeserver = upspin.Endpoint{Transport: upspin.Remote, NetAddr: "who.knows:1234"}
-	os.Setenv("upspinkeyserver", expect.keyserver.String())
-	os.Setenv("upspindirserver", expect.dirserver.String())
-	os.Setenv("upspinstoreserver", expect.storeserver.String())
-	expect.packing = upspin.EEPack
-	os.Setenv("upspinpacking", pack.Lookup(expect.packing).String())
-	testConfig(t, &expect, config)
-}
-
-func TestBadEnv(t *testing.T) {
-	expect := expectations{
-		username:    "p@google.com",
-		keyserver:   upspin.Endpoint{Transport: upspin.InProcess, NetAddr: ""},
-		dirserver:   upspin.Endpoint{Transport: upspin.Remote, NetAddr: "who.knows:1234"},
-		storeserver: upspin.Endpoint{Transport: upspin.Remote, NetAddr: "who.knows:1234"},
-		packing:     upspin.EEPack,
-	}
-	config := makeConfig(&expect)
-	os.Setenv("upspinuser", string(expect.username)) // Should be upspinusername.
-	_, err := InitConfig(strings.NewReader(config))
-	os.Unsetenv("upspinuser")
-	if err == nil {
-		t.Fatalf("expected error, got none")
-	}
-	if !strings.Contains(err.Error(), "unrecognized environment variable") {
-		t.Fatalf("expected bad env var error; got %q", err)
-	}
-}
-
 func TestNoSecrets(t *testing.T) {
 	expect := expectations{
 		username: "bob@google.com",
@@ -335,38 +275,6 @@ func makeConfig(expect *expectations) string {
 	}
 
 	return buf.String()
-}
-
-func saveEnvs(e *envs) {
-	e.username = os.Getenv("upspinusername")
-	e.keyserver = os.Getenv("upspinkeyserver")
-	e.dirserver = os.Getenv("upspindirserver")
-	e.storeserver = os.Getenv("upspinstoreserver")
-	e.packing = os.Getenv("upspinpacking")
-	e.secrets = os.Getenv("upspinsecrets")
-}
-
-func restoreEnvs(e *envs) {
-	os.Setenv("upspinusername", e.username)
-	os.Setenv("upspinkeyserver", e.keyserver)
-	os.Setenv("upspindirserver", e.dirserver)
-	os.Setenv("upspinstoreserver", e.storeserver)
-	os.Setenv("upspinpacking", e.packing)
-	os.Setenv("upspinsecrets", e.secrets)
-}
-
-func resetEnvs() {
-	var emptyEnv envs
-	restoreEnvs(&emptyEnv)
-}
-
-func TestMain(m *testing.M) {
-	var e envs
-	saveEnvs(&e)
-	resetEnvs()
-	code := m.Run()
-	restoreEnvs(&e)
-	os.Exit(code)
 }
 
 func testConfig(t *testing.T, expect *expectations, configuration string) {
