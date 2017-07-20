@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "addb748b_8f5b6e96",
+        "filename": "cloud/mail/sendgrid/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-20T01:27:48Z",
+      "side": 1,
+      "message": "while here, let\u0027s move towards the example.com standard",
+      "revId": "a190de16437f81400ad8fa2e5c12906363e9c484",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e9668a4b_30b17ea1",
+        "filename": "serverutil/keyserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-20T01:27:48Z",
+      "side": 1,
+      "message": "don\u0027t you need to check you got 2 lines?",
+      "revId": "a190de16437f81400ad8fa2e5c12906363e9c484",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
