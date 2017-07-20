@@ -946,7 +946,7 @@ func makeDirectory(s *server, name upspin.PathName) (*upspin.DirEntry, error) {
 }
 
 func putAccessOrGroupFile(t testing.TB, s *server, userCtx upspin.Config, name upspin.PathName, contents string) (*upspin.DirEntry, error) {
-	if !access.IsAccessFile(name) && !access.IsGroupFile(name) {
+	if !access.IsAccessControlFile(name) {
 		t.Fatalf("%s not an access file", name)
 	}
 	packer := pack.Lookup(upspin.EEIntegrityPack)

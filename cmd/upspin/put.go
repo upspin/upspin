@@ -53,7 +53,7 @@ characters. (Leading @ signs are always expanded.)
 		s.Exit(err)
 	}
 	// If this is an Access or Group file, need to remove any stored info about it.
-	if access.IsAccessFile(name) || access.IsGroupFile(name) {
+	if access.IsAccessControlFile(name) {
 		// It's cached in the Sharer, so just wipe that.
 		s.sharer = newSharer(s)
 		// If this is a Group file, there is also information within the access package.

@@ -330,7 +330,7 @@ func (r *Runner) GotEntries(wantBlockData bool, ps ...upspin.PathName) bool {
 		if nBlocks > 0 == wantBlockData || r.Entries[i].IsLink() {
 			continue
 		}
-		if nBlocks > 0 && !wantBlockData && (access.IsAccessFile(r.Entries[i].Name) || access.IsGroupFile(r.Entries[i].Name)) {
+		if nBlocks > 0 && !wantBlockData && access.IsAccessControlFile(r.Entries[i].Name) {
 			// Access and Group file can have blocks in case the reader has any right.
 			continue
 		}
