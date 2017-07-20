@@ -49,10 +49,10 @@ func (c *Client) PutLink(oldName, linkName upspin.PathName) (*upspin.DirEntry, e
 	m, s := newMetric(op)
 	defer m.Done()
 
-	if access.IsAccessFile(oldName) || access.IsGroupFile(oldName) {
+	if access.IsAccessControlFile(oldName) {
 		return nil, errors.E(op, oldName, errors.Invalid, errors.Str("cannot link to Access or Group file"))
 	}
-	if access.IsAccessFile(linkName) || access.IsGroupFile(linkName) {
+	if access.IsAccessControlFile(linkName) {
 		return nil, errors.E(op, linkName, errors.Invalid, errors.Str("cannot create link named Access or Group"))
 	}
 
@@ -798,7 +798,7 @@ func (c *Client) dupOrRename(op string, oldName, newName upspin.PathName, rename
 	if packer == nil {
 		return nil, errors.E(op, oldName, errors.Invalid, errors.Errorf("unrecognized Packing %d", c.config.Packing()))
 	}
-	if access.IsAccessFile(newName) || access.IsGroupFile(newName) {
+	if access.IsAccessControlFile(newName) {
 		if entry.Packing != upspin.EEIntegrityPack {
 			return nil, errors.E(op, oldName, errors.Invalid, errors.Str("can only link integrity-packed files to access or group files"))
 		}

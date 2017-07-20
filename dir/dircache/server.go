@@ -124,7 +124,7 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 
 	// Since the directory server needs to read the Access/Group file
 	// we need to ensure that it is flushed from any cache before the Put.
-	if s.flushBlock != nil && (access.IsAccessFile(entry.Name) || access.IsGroupFile(entry.Name)) {
+	if s.flushBlock != nil && access.IsAccessControlFile(entry.Name) {
 		for _, b := range entry.Blocks {
 			s.flushBlock(b.Location)
 		}
