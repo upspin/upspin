@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "106f08b1_718ad0da",
+        "filename": "access/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 529,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-20T03:47:10Z",
+      "side": 1,
+      "message": "AccessFile",
+      "range": {
+        "startLine": 529,
+        "startChar": 60,
+        "endLine": 529,
+        "endChar": 68
+      },
+      "revId": "446667db13283fed53e2da077e28d65ac050acbe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d243389a_e0149bf5",
+        "filename": "access/access.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 533,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-20T03:47:10Z",
+      "side": 1,
+      "message": "It would be slightly more efficient to compute parsed.NElem once.",
+      "revId": "446667db13283fed53e2da077e28d65ac050acbe",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
