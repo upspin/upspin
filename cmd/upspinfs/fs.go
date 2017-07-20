@@ -947,6 +947,9 @@ func do(cfg upspin.Config, mountpoint string, cacheDir string) chan bool {
 		//fuse.NoAppleDouble(),
 		//fuse.NoAppleXattr(),
 	)
+	if err == fuse.ErrOSXFUSENotFound {
+		log.Fatal("FUSE for macOS is not installed. See https://osxfuse.github.io/")
+	}
 	if err != nil {
 		log.Fatalf("fuse.Mount failed: %s", err)
 	}
