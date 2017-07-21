@@ -115,10 +115,10 @@ type State struct {
 func main() {
 	state, args, ok := setup(flag.CommandLine, os.Args[1:])
 	if !ok || len(args) == 0 {
-		fmt.Fprintln(os.Stderr, intro)
+		help()
 	}
 	if args[0] == "help" {
-		state.help(args[1:]...)
+		help(args[1:]...)
 	}
 	// Shell cannot be in commands because of the initialization loop,
 	// and anyway we should avoid recursion in the interpreter.
@@ -176,7 +176,7 @@ func usageAndExit(fs *flag.FlagSet) {
 
 // help prints the help for the arguments provided, or if there is none,
 // for the command itself.
-func (s *State) help(args ...string) {
+func help(args ...string) {
 	// Find the first non-flag argument.
 	cmd := ""
 	for _, arg := range args {
