@@ -115,7 +115,10 @@ type State struct {
 func main() {
 	state, args, ok := setup(flag.CommandLine, os.Args[1:])
 	if !ok || len(args) == 0 {
-		fmt.Fprintln(os.Stderr, intro)
+		state.help()
+		if len(args) == 0 {
+			return
+		}
 	}
 	if args[0] == "help" {
 		state.help(args[1:]...)
