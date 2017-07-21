@@ -110,9 +110,6 @@ func FromFile(name string) (upspin.Config, error) {
 // The default configuration file location is $HOME/upspin/config.
 // If passed a non-nil io.Reader, that is used instead of the default file.
 //
-// Environment variables named "upspinkey", where "key" is a recognized
-// configuration key, may override configuration values in the config file.
-//
 // Any endpoints (keyserver, dirserver, storeserver) not set in the data for
 // the config will be set to the "unassigned" transport and an empty network
 // address, except keyserver which defaults to "remote,key.upspin.io:443".
