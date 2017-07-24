@@ -5,7 +5,6 @@
 package main
 
 import (
-	"crypto/x509"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -59,6 +58,8 @@ func TestCache(t *testing.T) {
 	cfg = config.SetKeyEndpoint(cfg, inprocessEndpoint)
 	bind.RegisterKeyServer(upspin.InProcess, inprocesskeyserver.New())
 
+	cfg = setCertPool(cfg)
+
 	var err error
 	cfg, err = setUpFactotum(cfg)
 	if err != nil {
@@ -80,10 +81,7 @@ func TestCache(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	cl, err := newClient(cfg, sep, cep)
-	if err != nil {
-		errorOut(err)
-	}
+	cl := newClient(cfg, sep, cep)
 
 	// Create a root directory. This will probably cause an error warning
 	// from the cacheserver's Watch since it will start watching before the
@@ -178,11 +176,7 @@ func startCombinedServer(cfg upspin.Config) (*upspin.Endpoint, error) {
 
 // startCacheServer starts a cache server and returns its endpoint.
 func startCacheServer(cfg upspin.Config) (*upspin.Endpoint, error) {
-	var err error
-	cfg, err = setUpCertPool(cfg)
-	if err != nil {
-		return nil, err
-	}
+	cfg = setCertPool(cfg)
 
 	// Find a free port.
 	port, err := testutil.PickPort()
@@ -206,30 +200,16 @@ func startCacheServer(cfg upspin.Config) (*upspin.Endpoint, error) {
 }
 
 // newClient returns a client using the given servers and cache.
-func newClient(cfg upspin.Config, server, cache *upspin.Endpoint) (upspin.Client, error) {
-	var err error
-	cfg, err = setUpCertPool(cfg)
-	if err != nil {
-		return nil, err
-	}
+func newClient(cfg upspin.Config, server, cache *upspin.Endpoint) upspin.Client {
+	cfg = setCertPool(cfg)
 	cfg = config.SetStoreEndpoint(cfg, *server)
 	cfg = config.SetDirEndpoint(cfg, *server)
 	cfg = config.SetCacheEndpoint(cfg, *cache)
-
-	return client.New(cfg), nil
+	return client.New(cfg)
 }
 
-// setUpCertPool adds trusted certs to the Config.
-func setUpCertPool(cfg upspin.Config) (upspin.Config, error) {
-	pem, err := ioutil.ReadFile(testutil.Repo("rpc", "testdata", "cert.pem"))
-	if err != nil {
-		return cfg, err
-	}
-	pool := x509.NewCertPool()
-	if ok := pool.AppendCertsFromPEM(pem); !ok {
-		err := fmt.Errorf("could not add certificates to pool")
-		return cfg, err
-	}
-	cfg = config.SetCertPool(cfg, pool)
-	return cfg, err
+// setCertPool adds trusted certs to the Config.
+func setCertPool(cfg upspin.Config) upspin.Config {
+	dir := testutil.Repo("rpc", "testdata")
+	return config.SetValue(cfg, "tlscerts", dir)
 }

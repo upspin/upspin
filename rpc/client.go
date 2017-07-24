@@ -109,7 +109,11 @@ func NewClient(cfg upspin.Config, netAddr upspin.NetAddr, security SecurityLevel
 		}
 		c.baseURL = "http://" + string(netAddr)
 	case Secure:
-		tlsConfig = &tls.Config{RootCAs: cfg.CertPool()}
+		certPool, err := certPoolFromConfig(cfg)
+		if err != nil {
+			return nil, errors.E(op, errors.Invalid, err)
+		}
+		tlsConfig = &tls.Config{RootCAs: certPool}
 		c.baseURL = "https://" + string(netAddr)
 	default:
 		return nil, errors.E(op, errors.Invalid, errors.Errorf("invalid security level to NewClient: %v", security))
