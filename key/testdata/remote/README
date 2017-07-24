@@ -1,9 +1,9 @@
 The keys in this directory should be generated from secret seeds known to the
 Upspin core team, using these commands:
 
-$ upspin keygen -where=$GOPATH/src/upspin.io/key/testdata/remote/test -secretseed <test seed>
-$ upspin keygen -where=$GOPATH/src/upspin.io/key/testdata/remote/test+snapshot -secretseed <test seed>
-$ upspin keygen -where=$GOPATH/src/upspin.io/key/testdata/remote/test-friend -secretseed <test-friend seed>
+$ upspin keygen -secretseed <test-seed> $GOPATH/src/upspin.io/key/testdata/remote/test
+$ upspin keygen -secretseed <test-seed> $GOPATH/src/upspin.io/key/testdata/remote/test+snapshot
+$ upspin keygen -secretseed <test-friend-seed> $GOPATH/src/upspin.io/key/testdata/remote/test-friend
 
 The keys are secret and must not be checked in to the repository.
 A .gitignore file in this directory guards against this mistake.

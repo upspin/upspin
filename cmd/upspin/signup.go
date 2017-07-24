@@ -12,7 +12,6 @@ import (
 	"net"
 	"os"
 	"path/filepath"
-	"strings"
 	"text/template"
 
 	"upspin.io/config"
@@ -59,16 +58,14 @@ file and keys and only send the signup request to the key server.
 	fs := flag.NewFlagSet("signup", flag.ExitOnError)
 	var (
 		force       = fs.Bool("force", false, "create a new user even if keys and config file exist")
-		where       = fs.String("where", filepath.Join(config.Home(), ".ssh"), "`directory` to store keys")
 		dirServer   = fs.String("dir", "", "Directory server `address`")
 		storeServer = fs.String("store", "", "Store server `address`")
 		bothServer  = fs.String("server", "", "Store and Directory server `address` (if combined)")
 		signupOnly  = fs.Bool("signuponly", false, "only send signup request to key server; do not generate config or keys")
+		secrets     = fs.String("secrets", "", "`directory` to store key pair")
+		curve       = fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
+		secretseed  = fs.String("secretseed", "", "the seed containing a 128 bit secret in proquint format or a file that contains it")
 	)
-	// Used only in keygen.
-	fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
-	fs.String("secretseed", "", "the seed containing a 128 bit secret in proquint format or a file that contains it")
-	fs.Bool("rotate", false, "always false during sign up")
 
 	s.ParseFlags(fs, args, help, "[-config=<file>] signup -dir=<addr> -store=<addr> [flags] <username>\n       upspin [-config=<file>] signup -server=<addr> [flags] <username>")
 
@@ -126,10 +123,7 @@ file and keys and only send the signup request to the key server.
 	}
 
 	userName := upspin.UserName(uname + "@" + domain)
-
-	env := os.Environ()
-	wipeUpspinEnvironment()
-	defer restoreEnvironment(env)
+	*secrets = subcmd.Tilde(*secrets)
 
 	// Verify if we have a config file.
 	_, err = config.FromFile(flags.Config)
@@ -143,8 +137,8 @@ file and keys and only send the signup request to the key server.
 		UserName:  userName,
 		Dir:       dirEndpoint,
 		Store:     storeEndpoint,
-		SecretDir: subcmd.Tilde(*where),
 		Packing:   "ee",
+		SecretDir: *secrets,
 	})
 	if err != nil {
 		s.Exit(err)
@@ -172,7 +166,14 @@ file and keys and only send the signup request to the key server.
 	fmt.Fprintf(s.Stderr, "\t%s\n\n", flags.Config)
 
 	// Generate a new key.
-	s.keygenCommand(fs)
+	if *secrets == "" {
+		// Use the default secrets directory if none specified.
+		*secrets, err = config.DefaultSecretsDir(userName)
+		if err != nil {
+			s.Exit(err)
+		}
+	}
+	s.keygenCommand(*secrets, *curve, *secretseed, false)
 
 	// Send the signup request to the key server.
 	s.registerUser(flags.Config)
@@ -194,16 +195,17 @@ func (s *State) registerUser(configFile string) {
 type configData struct {
 	UserName   upspin.UserName
 	Store, Dir *upspin.Endpoint
-	SecretDir  string
 	Packing    string
+	SecretDir  string
 }
 
 var configTemplate = template.Must(template.New("config").Parse(`
 username: {{.UserName}}
-secrets: {{.SecretDir}}
 storeserver: {{.Store}}
 dirserver: {{.Dir}}
 packing: {{.Packing}}
+{{with .SecretDir}}secrets: {{.}}
+{{end}}
 `))
 
 func parseAddress(a string) (*upspin.Endpoint, error) {
@@ -216,22 +218,4 @@ func parseAddress(a string) (*upspin.Endpoint, error) {
 		}
 	}
 	return upspin.ParseEndpoint(fmt.Sprintf("remote,%s:%s", host, port))
-}
-
-func wipeUpspinEnvironment() {
-	for _, env := range os.Environ() {
-		if strings.HasPrefix(env, "upspin") {
-			os.Setenv(env, "")
-		}
-	}
-}
-
-func restoreEnvironment(env []string) {
-	for _, e := range env {
-		kv := strings.Split(e, "=")
-		if len(kv) != 2 {
-			continue
-		}
-		os.Setenv(kv[0], kv[1])
-	}
 }
