@@ -224,16 +224,15 @@ Flags:
 
 Sub-command keygen
 
-Usage: upspin keygen [-curve=256] [-secretseed=seed] [-where=$HOME/.ssh]
+Usage: upspin keygen [-curve=256] [-secretseed=seed] <directory>
 
-Keygen creates a new Upspin key pair and stores the pair in local
-files secret.upspinkey and public.upspinkey in $HOME/.ssh. Existing
-key pairs are appended to $HOME/.ssh/secret2.upspinkey. Keygen does
-not update the information in the key server; use the user -put
-command for that.
+Keygen creates a new Upspin key pair and stores the pair in local files
+secret.upspinkey and public.upspinkey in the specified directory.
+Existing key pairs are appended to secret2.upspinkey.
+Keygen does not update the information in the key server;
+use the "user -put" command for that.
 
-New users should instead use the signup command to create their
-first key. Keygen can be used to create new keys.
+New users should instead use the "signup" command to create their first key.
 
 See the description for rotate for information about updating keys.
 
@@ -246,8 +245,6 @@ Flags:
     	rotate existing keys and replace them with new ones
   -secretseed string
     	the seed containing a 128 bit secret in proquint format or a file that contains it
-  -where directory
-    	directory to store keys (default "/home/user/.ssh")
 
 
 
@@ -385,9 +382,9 @@ Rotate pushes an updated key to the key server.
 
 To update an Upspin key, the sequence is:
 
-  upspin keygen -rotate    # Create new key.
-  upspin countersign       # Update file signatures to use new key.
-  upspin rotate            # Save new key to key server.
+  upspin keygen -rotate <secrets-dir>   # Create new key.
+  upspin countersign                    # Update file signatures to use new key.
+  upspin rotate                         # Save new key to key server.
   upspin share -r -fix me@example.com/  # Update keys in file metadata.
 
 Keygen creates a new key and saves the old one. Countersign walks
@@ -633,8 +630,8 @@ Flags:
     	create a new user even if keys and config file exist
   -help
     	print more information about the command
-  -rotate
-    	always false during sign up
+  -secrets directory
+    	directory to store key pair
   -secretseed string
     	the seed containing a 128 bit secret in proquint format or a file that contains it
   -server address
@@ -643,8 +640,6 @@ Flags:
     	only send signup request to key server; do not generate config or keys
   -store address
     	Store server address
-  -where directory
-    	directory to store keys (default "/home/user/.ssh")
 
 
 

@@ -448,7 +448,7 @@ var keygenTests = []cmdTest{
 		"create a temporary key",
 		ann,
 		do(
-			"keygen -secretseed deter-gonad-pivot-rotor.visit-roman-widow-woman -where " + testTempDir("key", deleteOld),
+			"keygen -secretseed deter-gonad-pivot-rotor.visit-roman-widow-woman " + testTempDir("key", deleteOld),
 		),
 		"",
 		keygenVerify(testTempDir("key", keepOld), "p256\n3078263077187835", "1623258616618034", "", keepOld),
@@ -457,7 +457,7 @@ var keygenTests = []cmdTest{
 		"keygen again will fail",
 		ann,
 		do(
-			"keygen -secretseed desex-fetid-pecan-fakir.color-civil-comet-haven -where " + testTempDir("key", keepOld),
+			"keygen -secretseed desex-fetid-pecan-fakir.color-civil-comet-haven " + testTempDir("key", keepOld),
 		),
 		"",
 		fail("prior keys exist"),
@@ -466,7 +466,7 @@ var keygenTests = []cmdTest{
 		"keygen rotate",
 		ann,
 		do(
-			"keygen -rotate -secretseed desex-fetid-pecan-fakir.color-civil-comet-haven -where " + testTempDir("key", keepOld),
+			"keygen -rotate -secretseed desex-fetid-pecan-fakir.color-civil-comet-haven " + testTempDir("key", keepOld),
 		),
 		"",
 		keygenVerify(testTempDir("key", keepOld), "p256\n1048813400173469", "7863414033373202", "1623258616618034", deleteOld),

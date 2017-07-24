@@ -295,6 +295,9 @@ func keyVerify(t *testing.T, name, prefix string) {
 		t.Errorf("cannot read key %q: %v", name, err)
 	}
 	if !strings.Contains(string(key), prefix) {
-		t.Errorf("invalid key: got %q...; expected %q...", key[:16], prefix)
+		if len(key) > 16 {
+			key = key[:16]
+		}
+		t.Errorf("invalid key: got %q...; expected %q...", key, prefix)
 	}
 }
