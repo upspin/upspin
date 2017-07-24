@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "a8e57113_974a0f49",
+        "filename": "config/initconfig.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 405,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-24T04:17:37Z",
+      "side": 1,
+      "message": "You\u0027re reviewing the wrong patch set, sorry. See patch set 3.",
+      "parentUuid": "a767f3d1_cdd93277",
+      "revId": "e2153c7bef30e9ccd52c54c8752177c9d36f0ead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "727e3efb_06158221",
         "filename": "config/initconfig.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2017-07-24T04:14:02Z",
       "side": 1,
       "message": "this looks like a nil ptr exception waiting to happen.",
+      "revId": "e2153c7bef30e9ccd52c54c8752177c9d36f0ead",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fcd4b1b3_7c0e2efa",
+        "filename": "config/initconfig.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 412,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-24T04:17:37Z",
+      "side": 1,
+      "message": "It\u0027s not. There\u0027s always a baseConfig at the bottom, and these should never be constructed with a nil embedded Config.",
+      "parentUuid": "727e3efb_06158221",
       "revId": "e2153c7bef30e9ccd52c54c8752177c9d36f0ead",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
