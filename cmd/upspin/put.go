@@ -8,6 +8,9 @@ import (
 	"flag"
 
 	"upspin.io/access"
+	"upspin.io/client"
+	"upspin.io/config"
+	"upspin.io/pack"
 	"upspin.io/path"
 	"upspin.io/subcmd"
 )
@@ -23,6 +26,7 @@ characters. (Leading @ signs are always expanded.)
 `
 	fs := flag.NewFlagSet("put", flag.ExitOnError)
 	inFile := fs.String("in", "", "input file (default standard input)")
+	packing := fs.String("packing", "", "packing to use (default from user's config)")
 	glob := globFlag(fs)
 	s.ParseFlags(fs, args, help, "put [-in=inputfile] path")
 
@@ -48,7 +52,15 @@ characters. (Leading @ signs are always expanded.)
 			name = s.GlobOneUpspinPath(parsed.String())
 		}
 	}
-	_, err = s.Client.Put(name, data)
+	cl := s.Client
+	if *packing != "" {
+		p := pack.LookupByName(*packing)
+		if p == nil {
+			s.Exitf("no such packing %q", *packing)
+		}
+		cl = client.New(config.SetPacking(s.Config, p.Packing()))
+	}
+	_, err = cl.Put(name, data)
 	if err != nil {
 		s.Exit(err)
 	}

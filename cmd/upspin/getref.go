@@ -15,29 +15,39 @@ import (
 func (s *State) getref(args ...string) {
 	const help = `
 Getref writes to standard output the contents identified by the reference from
-the user's default store server. It does not resolve redirections.
+the specified store endpoint, by default the user's default store server.
+It does not resolve redirections.
 `
 	fs := flag.NewFlagSet("getref", flag.ExitOnError)
 	outFile := fs.String("out", "", "output file (default standard output)")
-	s.ParseFlags(fs, args, help, "getref [-out=outputfile] ref")
+	store := fs.String("store", "", "store endpoint (default the user's store)")
+	s.ParseFlags(fs, args, help, "getref [-store endpoint] [-out=outputfile] ref")
 
 	if fs.NArg() != 1 {
 		usageAndExit(fs)
 	}
 	ref := fs.Arg(0)
 
-	store, err := bind.StoreServer(s.Config, s.Config.StoreEndpoint())
+	endpoint := s.Config.StoreEndpoint()
+	if *store != "" {
+		e, err := upspin.ParseEndpoint(*store)
+		if err != nil {
+			s.Exit(err)
+		}
+		endpoint = *e
+	}
+
+	storeServer, err := bind.StoreServer(s.Config, endpoint)
 	if err != nil {
 		s.Exit(err)
 	}
-	fmt.Fprintf(s.Stderr, "Using store server at %s\n", s.Config.StoreEndpoint())
 
-	data, _, locs, err := store.Get(upspin.Reference(ref))
+	data, _, locs, err := storeServer.Get(upspin.Reference(ref))
 	if err != nil {
 		s.Exit(err)
 	}
 	if len(locs) > 0 {
-		fmt.Fprintf(s.Stderr, "Redirection detected:\n")
+		fmt.Fprintln(s.Stderr, "Redirection detected:")
 		for _, loc := range locs {
 			fmt.Fprintf(s.Stderr, "%+v\n", loc)
 		}
