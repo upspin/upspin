@@ -188,16 +188,19 @@ Flags:
 
 Sub-command getref
 
-Usage: upspin getref [-out=outputfile] ref
+Usage: upspin getref [-store endpoint] [-out=outputfile] ref
 
 Getref writes to standard output the contents identified by the reference from
-the user's default store server. It does not resolve redirections.
+the specified store endpoint, by default the user's default store server.
+It does not resolve redirections.
 
 Flags:
   -help
     	print more information about the command
   -out string
     	output file (default standard output)
+  -store string
+    	store endpoint (default the user's store)
 
 
 
@@ -316,6 +319,8 @@ Flags:
     	print more information about the command
   -in string
     	input file (default standard input)
+  -packing string
+    	packing to use (default from user's config)
 
 
 

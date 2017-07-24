@@ -195,6 +195,20 @@ var basicCmdTests = []cmdTest{
 		),
 	},
 	{
+		"put of plain file",
+		ann,
+		do(
+			"put -packing plain @/justtext",
+			"info @/justtext",
+			"get @/justtext",
+		),
+		"unencrypted text",
+		expect(
+			"packing:", "plain",
+			"unencrypted text",
+		),
+	},
+	{
 		"whichaccess",
 		ann,
 		do(
