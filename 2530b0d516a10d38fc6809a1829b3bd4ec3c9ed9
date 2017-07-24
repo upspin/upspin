@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f3119847_d8485fe7",
+        "filename": "rpc/certpool.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-07-24T17:06:20Z",
+      "side": 1,
+      "message": "This can be an expensive operation.  Are we confident that it only gets called once?",
+      "revId": "2530b0d516a10d38fc6809a1829b3bd4ec3c9ed9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
