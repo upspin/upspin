@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d48bf801_fe607d25",
+        "filename": "doc/signup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-24T04:16:28Z",
+      "side": 1,
+      "message": "This initial sentence is a bit of a mouthful. Maybe instead:\n\n\"It is vital that you do not lose or share this key or its \"secret seed\" (which is equivalent to the key itself).\"",
+      "revId": "725f53afc13c91d15a6129b29db4eb4f7fe8780c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "315f1971_0d669f45",
+        "filename": "doc/signup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-24T04:16:28Z",
+      "side": 1,
+      "message": "or",
+      "range": {
+        "startLine": 80,
+        "startChar": 21,
+        "endLine": 80,
+        "endChar": 24
+      },
+      "revId": "725f53afc13c91d15a6129b29db4eb4f7fe8780c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "14920315_08738d42",
+        "filename": "doc/signup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-24T04:16:28Z",
+      "side": 1,
+      "message": "Furthermore you lose the ability to act as your chosen user when interacting with Upspin servers.",
+      "revId": "725f53afc13c91d15a6129b29db4eb4f7fe8780c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
