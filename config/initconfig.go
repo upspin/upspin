@@ -115,7 +115,7 @@ func FromFile(name string) (upspin.Config, error) {
 //
 // The default value for packing is "ee".
 //
-// The default value for secrets is "$HOME/.ssh".
+// The default value for secrets is "$HOME/.ssh/$USERNAME".
 // The special value "none" indicates there are no secrets to load;
 // in this case, the returned config will not include a Factotum
 // and the returned error is ErrNoFactotum.
@@ -177,28 +177,32 @@ func InitConfig(r io.Reader) (upspin.Config, error) {
 	cfg = SetPacking(cfg, packer.Packing())
 
 	dir := ""
+	defaultDir := false
 	if dirV, ok := other[secrets]; ok {
 		dir, ok = dirV.(string)
 		if !ok {
 			return nil, errors.E(op, errors.Errorf("invalid type for secrets: %T", dirV))
 		}
-	}
-	if dir == "" {
-		dir, err = sshdir()
+	} else {
+		dir, err = DefaultSecretsDir(username)
 		if err != nil {
-			return nil, errors.E(op, errors.Errorf("cannot find .ssh directory: %v", err))
+			return nil, errors.E(op, err)
 		}
+		defaultDir = true
 	}
 	if dir == "none" {
 		err = ErrNoFactotum
 	} else {
 		f, err := factotum.NewFromDir(dir)
 		if err != nil {
+			if defaultDir {
+				if err := oldSecretsExist(username); err != nil {
+					return nil, errors.E(op, err)
+				}
+			}
 			return nil, errors.E(op, err)
 		}
 		cfg = SetFactotum(cfg, f)
-		// This must be done before bind so that keys are ready for
-		// authenticating to servers.
 	}
 
 	cfg = SetKeyEndpoint(cfg, parseEndpoint(op, vals, keyserver, &err))
@@ -522,6 +526,16 @@ func Home() string {
 	return home
 }
 
+// DefaultSecretsDir returns the default directory in which the given user's
+// Upspin key pair should be kept ($HOME/.ssh/$USERNAME).
+func DefaultSecretsDir(u upspin.UserName) (string, error) {
+	h, err := Homedir()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(h, ".ssh", string(u)), nil
+}
+
 func sshdir() (string, error) {
 	h, err := Homedir()
 	if err != nil {
@@ -543,4 +557,38 @@ func isDir(p string) error {
 		return errors.E(errors.NotDir, errors.Str(p))
 	}
 	return nil
+}
+
+// oldSecretsExist checks whether a set of Upspin keys exist in the old default
+// key location ($HOME/.ssh) and, if so, returns an instructive error about how
+// to move those keys to their correct location. Otherwise it returns nil.
+func oldSecretsExist(u upspin.UserName) error {
+	// Check whether we can read keys in the old default location.
+	ssh, err := sshdir()
+	if err != nil {
+		return nil
+	}
+	if _, err := factotum.NewFromDir(ssh); err != nil {
+		return nil
+	}
+	// Print a message describing what to move where.
+	def, err := DefaultSecretsDir(u)
+	if err != nil {
+		return err
+	}
+	return errors.Errorf(`your secrets are in the wrong directory.
+
+*Action required*
+
+The default location for Upspin key pairs has changed.
+
+To continue to use Upspin you must move these files
+	public.upspinkey
+	secret.upspinkey
+from their deprecated default location
+	%[1]s
+to their new default location
+	%[2]s
+
+`, ssh, def)
 }

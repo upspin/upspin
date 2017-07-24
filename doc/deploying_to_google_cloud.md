@@ -100,8 +100,8 @@ Keys and config files for the server users
 were generated and placed under the directory:
   /home/you/upspin/deploy/example-project
 If you lose the keys you can re-create them by running these commands
-  $ upspin keygen -where /home/you/upspin/deploy/example.com/dirserver -secretseed dadij-lnjul-takiv-fomin.zapal-zuhiv-visop-gagil
-  $ upspin keygen -where /home/you/upspin/deploy/example.com/storeserver -secretseed zapal-zuhiv-visop-gagil.dadij-lnjul-takiv-fomin
+  $ upspin keygen -secretseed dadij-lnjul-takiv-fomin.zapal-zuhiv-visop-gagil /home/you/upspin/deploy/example.com/dirserver
+  $ upspin keygen -secretseed zapal-zuhiv-visop-gagil.dadij-lnjul-takiv-fomin /home/you/upspin/deploy/example.com/storeserver
 Write them down and store them in a secure, private place.
 Do not share your private keys or these commands with anyone.
 

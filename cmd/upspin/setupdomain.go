@@ -224,8 +224,8 @@ Keys and config files for the users
 were generated and placed under the directory:
 	{{.Dir}}
 If you lose the keys you can re-create them by running these commands
-	upspin keygen -where {{.DirServerPath}} -curve {{.DirCurve}} -secretseed {{.DirProquint}}
-	upspin keygen -where {{.StoreServerPath}} -curve {{.StoreCurve}} -secretseed {{.StoreProquint}}
+	upspin keygen -curve {{.DirCurve}} -secretseed {{.DirProquint}} {{.DirServerPath}}
+	upspin keygen -curve {{.StoreCurve}} -secretseed {{.StoreProquint}} {{.StoreServerPath}}
 Write them down and store them in a secure, private place.
 Do not share your private keys or these commands with anyone.
 
@@ -320,7 +320,7 @@ Domain configuration and keys for the user
 were generated and placed under the directory:
 	{{.Dir}}
 If you lose the keys you can re-create them by running this command
-	upspin keygen -where {{.Dir}} -curve {{.Curve}} -secretseed {{.Proquint}}
+	upspin keygen -curve {{.Curve}} -secretseed {{.Proquint}} {{.Dir}}
 Write this command down and store it in a secure, private place.
 Do not share your private key or this command with anyone.
 
