@@ -12,8 +12,7 @@ import (
 	"upspin.io/config"
 	"upspin.io/flags"
 	"upspin.io/log"
-
-	"upspin.io/upspin"
+	"upspin.io/rpc"
 )
 
 const cmdName = "cacheserver"
@@ -35,7 +34,11 @@ func main() {
 
 	// Serving address comes from config with flag overriding.
 	var addr string
-	if ce := cfg.CacheEndpoint(); ce.Transport == upspin.Remote {
+	ce, err := rpc.CacheEndpoint(cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if ce != nil {
 		addr = string(ce.NetAddr)
 	}
 	if flags.NetAddr != "" {

@@ -6,7 +6,7 @@
 package config // import "upspin.io/config"
 
 import (
-	"crypto/x509"
+	"bytes"
 	"flag"
 	"fmt"
 	"io"
@@ -22,7 +22,6 @@ import (
 	"upspin.io/factotum"
 	"upspin.io/log"
 	"upspin.io/pack"
-	"upspin.io/rpc/local"
 	"upspin.io/upspin"
 	"upspin.io/user"
 
@@ -42,9 +41,7 @@ func (base) Packing() upspin.Packing        { return defaultPacking }
 func (base) KeyEndpoint() upspin.Endpoint   { return defaultKeyEndpoint }
 func (base) DirEndpoint() upspin.Endpoint   { return upspin.Endpoint{} }
 func (base) StoreEndpoint() upspin.Endpoint { return upspin.Endpoint{} }
-func (base) CacheEndpoint() upspin.Endpoint { return upspin.Endpoint{} }
-func (base) CertPool() *x509.CertPool       { return nil }
-func (base) Flags(string) map[string]string { return nil }
+func (base) Value(string) string            { return "" }
 
 // New returns a config with all fields set as defaults.
 func New() upspin.Config {
@@ -60,16 +57,14 @@ var (
 	}
 )
 
-// Known keys. All others are treated as errors.
+// Known keys.
 const (
 	username    = "username"
 	keyserver   = "keyserver"
 	dirserver   = "dirserver"
 	storeserver = "storeserver"
-	cache       = "cache"
 	packing     = "packing"
 	secrets     = "secrets"
-	tlscerts    = "tlscerts"
 )
 
 // ErrNoFactotum indicates that the returned config contains no Factotum, and
@@ -139,11 +134,8 @@ func InitConfig(r io.Reader) (upspin.Config, error) {
 		keyserver:   defaultKeyEndpoint.String(),
 		dirserver:   "",
 		storeserver: "",
-		cache:       "no",
-		secrets:     "",
-		tlscerts:    "",
 	}
-	cmdFlagVals := make(map[string]map[string]string)
+	other := make(map[string]interface{})
 
 	// If the provided reader is nil, try $HOME/upspin/config.
 	if r == nil {
@@ -164,7 +156,7 @@ func InitConfig(r io.Reader) (upspin.Config, error) {
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
-	if err := valsFromYAML(vals, cmdFlagVals, data); err != nil {
+	if err := valsFromYAML(vals, other, data); err != nil {
 		return nil, errors.E(op, err)
 	}
 
@@ -184,19 +176,13 @@ func InitConfig(r io.Reader) (upspin.Config, error) {
 	}
 	cfg = SetPacking(cfg, packer.Packing())
 
-	if dir := vals[tlscerts]; dir != "" {
-		pool, err := certPoolFromDir(dir)
-		if err != nil {
-			return nil, errors.E(op, err)
-		}
-		if pool != nil {
-			cfg = SetCertPool(cfg, pool)
-		} else {
-			log.Info.Printf("config: no PEM certificates found in %q", dir)
+	dir := ""
+	if dirV, ok := other[secrets]; ok {
+		dir, ok = dirV.(string)
+		if !ok {
+			return nil, errors.E(op, errors.Errorf("invalid type for secrets: %T", dirV))
 		}
 	}
-
-	dir := vals[secrets]
 	if dir == "" {
 		dir, err = sshdir()
 		if err != nil {
@@ -211,58 +197,54 @@ func InitConfig(r io.Reader) (upspin.Config, error) {
 			return nil, errors.E(op, err)
 		}
 		cfg = SetFactotum(cfg, f)
-		// This must be done before bind so that keys are ready for authenticating to servers.
-	}
-
-	if len(cmdFlagVals) != 0 {
-		cfg = SetFlags(cfg, cmdFlagVals)
+		// This must be done before bind so that keys are ready for
+		// authenticating to servers.
 	}
 
 	cfg = SetKeyEndpoint(cfg, parseEndpoint(op, vals, keyserver, &err))
 	cfg = SetStoreEndpoint(cfg, parseEndpoint(op, vals, storeserver, &err))
 	cfg = SetDirEndpoint(cfg, parseEndpoint(op, vals, dirserver, &err))
 
-	// A shorthand for the default local address.
-	// TODO(p): phase out the ability to specify an address, yes or no should suffice.
-	switch vals[cache] {
-	case "y", "yes", "true":
-		vals[cache] = local.LocalName(cfg, "cacheserver")
-	case "n", "no", "false":
-		vals[cache] = ""
+	valueMap := make(map[string]string)
+	for k, v := range other {
+		key, err := asString(k)
+		if err != nil {
+			return nil, errors.E(op, errors.Invalid, err)
+		}
+		b, err := yaml.Marshal(v)
+		if err != nil {
+			return nil, errors.E(op, errors.Invalid, errors.Errorf("bad value for config key %v: %v", key, err))
+		}
+		valueMap[key] = string(bytes.TrimSpace(b))
 	}
-	cfg = SetCacheEndpoint(cfg, parseEndpoint(op, vals, cache, &err))
+	cfg = cfgValueMap{cfg, valueMap}
 
 	return cfg, err
 }
 
 // valsFromYAML parses YAML from the given map and puts the values
 // into the provided map. Unrecognized keys generate an error.
-func valsFromYAML(vals map[string]string, cmdFlagVals map[string]map[string]string, data []byte) error {
+func valsFromYAML(vals map[string]string, other map[string]interface{}, data []byte) error {
 	newVals := map[string]interface{}{}
 	if err := yaml.Unmarshal(data, newVals); err != nil {
 		return errors.E(errors.Invalid, errors.Errorf("parsing YAML file: %v", err))
 	}
 	for k, v := range newVals {
-		if k == "cmdflags" {
-			if err := asFlags(v, cmdFlagVals); err != nil {
-				return err
+		if _, ok := vals[k]; ok {
+			s, err := asString(v)
+			if err != nil {
+				return fmt.Errorf("%q: %v", k, err)
 			}
+			vals[k] = s
 			continue
 		}
-		if _, ok := vals[k]; !ok {
-			return errors.E(errors.Invalid, errors.Errorf("unrecognized key %q", k))
-		}
-		if s, err := asString(v); err != nil {
-			return fmt.Errorf("%q: %v", k, err)
-		} else {
-			vals[k] = s
-		}
+		other[k] = v
 	}
 	return nil
 }
 
-// asString tries to convert a value back into its original string. This will not
-// always be possible but should be for all our expected use cases.
+// asString tries to convert a value back into its original string. This will
+// not always be possible but should be for all our expected use cases.
 func asString(v interface{}) (string, error) {
 	switch vc := v.(type) {
 	case int, int32, int64, uint, uint32, uint64, float32, float64, bool:
@@ -271,62 +253,6 @@ func asString(v interface{}) (string, error) {
 		return vc, nil
 	}
 	return "", errors.E(errors.Invalid, errors.Errorf("unrecognized value %T", v))
-}
-
-func asFlags(v interface{}, m map[string]map[string]string) error {
-	cmds, ok := v.(map[interface{}]interface{})
-	if !ok {
-		return errors.E(errors.Invalid, errors.Errorf("unrecognized cmdflags %v", v))
-	}
-	for k, v := range cmds {
-		cmd, err := asString(k)
-		if err != nil {
-			return errors.E(errors.Invalid, errors.Errorf("bad command %q %v", v, err))
-		}
-		flags, ok := v.(map[interface{}]interface{})
-		if !ok {
-			return errors.E(errors.Invalid, errors.Errorf("cmd %q has bad value: %v", cmd, v))
-		}
-		fm := make(map[string]string)
-		for k, v := range flags {
-			flag, err := asString(k)
-			if err != nil {
-				return errors.E(errors.Invalid, errors.Errorf("cmd %q has bad flag: %s", cmd, err))
-			}
-			val, err := asString(v)
-			if err != nil {
-				return errors.E(errors.Invalid, errors.Errorf("cmd %q flag %q has bad value: %s", cmd, flag, err))
-			}
-			fm[flag] = val
-		}
-		m[cmd] = fm
-	}
-	return nil
-}
-
-// certPoolFromDir parses any PEM files in the provided directory
-// and returns the resulting pool.
-func certPoolFromDir(dir string) (*x509.CertPool, error) {
-	var pool *x509.CertPool
-	fis, err := ioutil.ReadDir(dir)
-	if err != nil {
-		return nil, errors.Errorf("reading TLS Certificates in %q: %v", dir, err)
-	}
-	for _, fi := range fis {
-		name := fi.Name()
-		if filepath.Ext(name) != ".pem" {
-			continue
-		}
-		pem, err := ioutil.ReadFile(filepath.Join(dir, name))
-		if err != nil {
-			return nil, errors.Errorf("reading TLS Certificate %q: %v", name, err)
-		}
-		if pool == nil {
-			pool = x509.NewCertPool()
-		}
-		pool.AppendCertsFromPEM(pem)
-	}
-	return pool, nil
 }
 
 func parseEndpoint(op string, vals map[string]string, key string, errorp *error) upspin.Endpoint {
@@ -487,66 +413,84 @@ func SetDirEndpoint(cfg upspin.Config, e upspin.Endpoint) upspin.Config {
 	}
 }
 
-type cfgCertPool struct {
+type cfgValue struct {
 	upspin.Config
-	pool *x509.CertPool
+	key, val string
 }
 
-func (cfg cfgCertPool) CertPool() *x509.CertPool {
-	return cfg.pool
+func (cfg cfgValue) Value(key string) string {
+	if key == cfg.key {
+		return cfg.val
+	}
+	return cfg.Config.Value(key)
 }
 
-func SetCertPool(cfg upspin.Config, pool *x509.CertPool) upspin.Config {
-	return cfgCertPool{
+// SetValue returns a config derived from the given config that contains
+// the given key/value pair.
+func SetValue(cfg upspin.Config, key, val string) upspin.Config {
+	return cfgValue{
 		Config: cfg,
-		pool:   pool,
+		key:    key,
+		val:    val,
 	}
 }
 
-type cfgFlags struct {
+type cfgValueMap struct {
 	upspin.Config
-	flags map[string]map[string]string
+	values map[string]string
 }
 
-func (cfg cfgFlags) Flags(cmd string) map[string]string {
-	return cfg.flags[cmd]
-}
-
-func SetFlags(cfg upspin.Config, flags map[string]map[string]string) upspin.Config {
-	return cfgFlags{
-		Config: cfg,
-		flags:  flags,
+func (cfg cfgValueMap) Value(key string) string {
+	v, ok := cfg.values[key]
+	if !ok {
+		return cfg.Config.Value(key)
 	}
+	return v
 }
 
-// SetFlagValues updates any flag that is still at its default value. It will
-// apply all the flags possible and return the last error seen.
+// SetFlagValues updates any flag that is still at its default value.
+// It will apply all the flags possible and return the last error seen.
 func SetFlagValues(cfg upspin.Config, cmd string) error {
 	const op = "config.SetFlagValues"
-	flags := cfg.Flags(cmd)
-	if flags == nil {
+	flagYAML := cfg.Value("cmdflags")
+	if flagYAML == "" {
 		return nil
 	}
-	var lasterr error
+	cmdflags := make(map[interface{}]interface{})
+	err := yaml.Unmarshal([]byte(flagYAML), cmdflags)
+	if err != nil {
+		return errors.E(op, errors.Invalid, errors.Errorf("bad cmdflags value: %v", err))
+	}
+	flags, ok := cmdflags[cmd].(map[interface{}]interface{})
+	if !ok {
+		return errors.E(op, errors.Invalid, errors.Errorf("bad cmdflags for %v: %T", cmd, cmdflags[cmd]))
+	}
 	for k, v := range flags {
-		f := flag.Lookup(k)
+		name, err := asString(k)
+		if err != nil {
+			return errors.E(op, errors.Invalid, errors.Errorf("bad flag name %v: %v", k, err))
+		}
+		val, err := asString(v)
+		if err != nil {
+			return errors.E(op, errors.Invalid, errors.Errorf("bad flag value for %v: %v", name, err))
+		}
+
+		f := flag.Lookup(name)
 		if f == nil {
-			lasterr = errors.E(op, errors.Invalid, errors.Errorf("unknown flag %q", k))
-			continue
+			return errors.E(op, errors.Invalid, errors.Errorf("unknown flag %q", k))
 		}
 		if f.Value.String() != f.DefValue {
 			continue
 		}
-		if err := flag.Set(k, v); err != nil {
-			lasterr = errors.E(op, err)
+		if err := flag.Set(name, val); err != nil {
 			continue
 		}
 	}
-	return lasterr
+	return nil
 }
 
-// TODO(adg): move to osutil package?
 // Homedir returns the home directory of the OS' logged-in user.
+// TODO(adg): move to osutil package?
 func Homedir() (string, error) {
 	u, err := osuser.Current()
 	// user.Current may return an error, but we should only handle it if it
