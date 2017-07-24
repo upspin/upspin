@@ -4,11 +4,7 @@
 
 package testfixtures // import "upspin.io/test/testfixtures"
 
-import (
-	"crypto/x509"
-
-	"upspin.io/upspin"
-)
+import "upspin.io/upspin"
 
 type simpleConfig struct {
 	userName upspin.UserName
@@ -70,17 +66,7 @@ func (cfg *simpleConfig) StoreEndpoint() upspin.Endpoint {
 	return ep0
 }
 
-// CacheEndpoint implements upspin.Config.
-func (cfg *simpleConfig) CacheEndpoint() upspin.Endpoint {
-	return ep0
-}
-
-// CertPool implements upspin.Config.
-func (cfg *simpleConfig) CertPool() *x509.CertPool {
-	return x509.NewCertPool()
-}
-
-// Flags implements upspin.Config.
-func (cfg *simpleConfig) Flags(string) map[string]string {
+// Value implements upspin.Config.
+func (cfg *simpleConfig) Value(string) interface{} {
 	return nil
 }
