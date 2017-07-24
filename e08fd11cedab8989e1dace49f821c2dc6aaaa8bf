@@ -16,6 +16,24 @@
       "revId": "e08fd11cedab8989e1dace49f821c2dc6aaaa8bf",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "30210ea7_b45d12bf",
+        "filename": "rpc/certpool.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-24T23:48:53Z",
+      "side": 1,
+      "message": "ignore all that unless you want to be fancier. i\u0027m overthinking.",
+      "parentUuid": "f5d2ff20_3420cf59",
+      "revId": "e08fd11cedab8989e1dace49f821c2dc6aaaa8bf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
