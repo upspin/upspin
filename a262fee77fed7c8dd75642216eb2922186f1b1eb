@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5535284b_b5e88397",
+        "filename": "doc/signup.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-24T04:45:32Z",
+      "side": 1,
+      "message": "Why is this in quotes? (copy/paste?)",
+      "revId": "a262fee77fed7c8dd75642216eb2922186f1b1eb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a40f0649_5cfeda1d",
+        "filename": "doc/signup.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-24T04:45:32Z",
+      "side": 1,
+      "message": "how about\n\n\"you will lose access to this Upspin identity, including all the data you have stored and even the ability to use your user name.\"",
+      "revId": "a262fee77fed7c8dd75642216eb2922186f1b1eb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5471e6b9_10e63d2f",
+        "filename": "doc/signup.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-24T04:45:32Z",
+      "side": 1,
+      "message": "should end in a period",
+      "revId": "a262fee77fed7c8dd75642216eb2922186f1b1eb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
