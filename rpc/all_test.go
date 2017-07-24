@@ -5,9 +5,7 @@
 package rpc
 
 import (
-	"crypto/x509"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"testing"
 	"time"
@@ -236,16 +234,7 @@ func startClient(port string, user upspin.UserName) {
 		log.Fatal(err)
 	}
 	cfg = config.SetFactotum(cfg, f)
-
-	pem, err := ioutil.ReadFile("testdata/cert.pem")
-	if err != nil {
-		log.Fatal(err)
-	}
-	pool := x509.NewCertPool()
-	if ok := pool.AppendCertsFromPEM(pem); !ok {
-		log.Fatal("could not add certificates to pool")
-	}
-	cfg = config.SetCertPool(cfg, pool)
+	cfg = config.SetValue(cfg, "tlscerts", "testdata/")
 
 	// Try a few times because the server may not be up yet.
 	var authClient Client
