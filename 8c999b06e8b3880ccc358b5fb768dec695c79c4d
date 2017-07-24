@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "12249696_ed515bb4",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-24T00:35:54Z",
+      "side": 1,
+      "message": "Since it doesn\u0027t use its receiver, I made help a function instead of a method. WDYT?",
+      "parentUuid": "f8d984c7_7f2c0f9e",
+      "revId": "8c999b06e8b3880ccc358b5fb768dec695c79c4d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "5040a77e_e17f36d3",
         "filename": "cmd/upspin/main.go",
         "patchSetId": 1
@@ -33,6 +51,24 @@
       "revId": "8c999b06e8b3880ccc358b5fb768dec695c79c4d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "79e809bb_b49f4847",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-24T00:35:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5040a77e_e17f36d3",
+      "revId": "8c999b06e8b3880ccc358b5fb768dec695c79c4d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
