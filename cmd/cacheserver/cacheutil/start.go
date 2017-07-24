@@ -17,6 +17,7 @@ import (
 	"upspin.io/bind"
 	"upspin.io/flags"
 	"upspin.io/log"
+	"upspin.io/rpc"
 	"upspin.io/upspin"
 )
 
@@ -34,8 +35,9 @@ func Start(cfg upspin.Config) {
 	if cfg == nil {
 		return
 	}
-	ce := cfg.CacheEndpoint()
-	if ce.Transport == upspin.Unassigned {
+	ce, err := rpc.CacheEndpoint(cfg)
+	if err != nil || ce == nil {
+		// TODO(adg): log error message?
 		return // not using a cache server
 	}
 
@@ -82,8 +84,8 @@ func Start(cfg upspin.Config) {
 }
 
 // ping determines if the cacheserver is functioning.
-func ping(cfg upspin.Config, ce upspin.Endpoint) error {
-	store, err := bind.StoreServer(cfg, ce)
+func ping(cfg upspin.Config, ce *upspin.Endpoint) error {
+	store, err := bind.StoreServer(cfg, *ce)
 	if err != nil {
 		return err
 	}

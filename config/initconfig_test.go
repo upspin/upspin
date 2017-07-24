@@ -15,7 +15,6 @@ import (
 	"testing"
 
 	"upspin.io/pack"
-	"upspin.io/rpc/local"
 	"upspin.io/upspin"
 
 	_ "upspin.io/pack/ee"
@@ -33,7 +32,7 @@ type expectations struct {
 	storeserver upspin.Endpoint
 	packing     upspin.Packing
 	secrets     string
-	cmdflags    map[string]map[string]string
+	cmdflags    interface{}
 }
 
 var secretsDir string
@@ -66,6 +65,12 @@ func TestDefaults(t *testing.T) {
 }
 
 func TestBadKey(t *testing.T) {
+	// TODO(adg): with the addition of Value to the upspin.Config interface
+	// it is not clear whether the "unknown" keys should trigger errors.
+	// To do this we'd need to make the config package aware of all valid
+	// config keys, which may or may not be desirable.
+	t.Skip("not sure whether this should be the expected behavior")
+
 	// "name=" should be "username=".
 	const config = `name: p@google.com
 packing: ee
@@ -99,9 +104,10 @@ secrets: ` + secretsDir + "\n"
 		keyserver:   upspin.Endpoint{Transport: upspin.Remote, NetAddr: "key.example.com:443"},
 		dirserver:   upspin.Endpoint{Transport: upspin.Remote, NetAddr: "dir.example.com:443"},
 		storeserver: upspin.Endpoint{Transport: upspin.Remote, NetAddr: "store.example.com:8080"},
-		cmdflags: map[string]map[string]string{
-			"cacheserver": map[string]string{"cachedir": "/tmp", "cachesize": "1000000000"},
-			"upspinfs":    map[string]string{"cachedir": "/tmp"},
+		cmdflags: map[interface{}]interface{}{
+
+			"cacheserver": map[interface{}]interface{}{"cachedir": "/tmp", "cachesize": 1000000000},
+			"upspinfs":    map[interface{}]interface{}{"cachedir": "/tmp"},
 		},
 	}
 	testConfig(t, &expect, config)
@@ -155,42 +161,6 @@ cmdflags:
 		t.Fatalf("SetFlagValues should have failed %v", configuration)
 	}
 
-}
-
-func TestCacheValues(t *testing.T) {
-	// Test values for cache:.
-	base := "secrets: " + secretsDir + "\n"
-	baseConfig, err := InitConfig(strings.NewReader(base))
-	if err != nil {
-		t.Fatalf("could not parse config %v: %v", base, err)
-	}
-	localAddr := local.LocalName(baseConfig, "cacheserver")
-	tests := []struct {
-		val    string
-		expect string
-	}{
-		{"y", localAddr},
-		{"yes", localAddr},
-		{"true", localAddr},
-		{"n", ""},
-		{"no", ""},
-		{"false", ""},
-		{"remote,server.example.com", "remote,server.example.com"},
-	}
-	for _, test := range tests {
-		configuration := base + "cache: " + test.val + "\n"
-		config, err := InitConfig(strings.NewReader(configuration))
-		if err != nil {
-			t.Fatalf("could not parse config %v: %v", configuration, err)
-		}
-		ep, err := parseTestEndpoint(test.expect)
-		if err != nil {
-			t.Fatalf("bad test: %v: %s", test, err)
-		}
-		if ep.String() != config.CacheEndpoint().String() {
-			t.Fatalf("expect %s got %s", ep, config.CacheEndpoint())
-		}
-	}
 }
 
 func parseTestEndpoint(text string) (upspin.Endpoint, error) {
@@ -301,10 +271,8 @@ func testConfig(t *testing.T, expect *expectations, configuration string) {
 	if config.Packing() != expect.packing {
 		t.Errorf("got %v expected %v", config.Packing(), expect.packing)
 	}
-	for cmd, eflags := range expect.cmdflags {
-		flags := config.Flags(cmd)
-		if !reflect.DeepEqual(eflags, flags) {
-			t.Errorf("cmdflags for %s got %v expected %v", cmd, flags, eflags)
-		}
+	cmdflags := config.Value("cmdflags")
+	if !reflect.DeepEqual(expect.cmdflags, cmdflags) {
+		t.Errorf("got cmdflags\n\t%#v\nexpected\n\t%#v", cmdflags, expect.cmdflags)
 	}
 }

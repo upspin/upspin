@@ -6,7 +6,6 @@ package upspin // import "upspin.io/upspin"
 
 import (
 	"crypto/elliptic"
-	"crypto/x509"
 	"errors"
 	"math/big"
 	"time"
@@ -736,16 +735,8 @@ type Config interface {
 	// StoreEndpoint is the endpoint of the StoreServer in which to place new data items.
 	StoreEndpoint() Endpoint
 
-	// CacheEndpoint is the endpoint of the store and directory cache server.
-	CacheEndpoint() Endpoint
-
-	// CertPool returns the x509 certificate pool used to validate client TLS
-	// connections. If the returned pointer is nil then the default system root
-	// certificates should be used.
-	CertPool() *x509.CertPool
-
-	// Flags returns the configured command flags for the named command.
-	Flags(cmd string) map[string]string
+	// Value returns the value for the given configuration key.
+	Value(key string) interface{}
 }
 
 // Dialer defines how to connect and authenticate to a server. Each
