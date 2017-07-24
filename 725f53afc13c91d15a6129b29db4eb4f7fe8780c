@@ -84,6 +84,30 @@
     },
     {
       "key": {
+        "uuid": "bd31b522_ae7f5278",
+        "filename": "doc/signup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-24T04:23:53Z",
+      "side": 1,
+      "message": "right, sorry",
+      "parentUuid": "83169c0f_55480798",
+      "range": {
+        "startLine": 80,
+        "startChar": 21,
+        "endLine": 80,
+        "endChar": 24
+      },
+      "revId": "725f53afc13c91d15a6129b29db4eb4f7fe8780c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "14920315_08738d42",
         "filename": "doc/signup.md",
         "patchSetId": 1
@@ -113,6 +137,24 @@
       "side": 1,
       "message": "i think that\u0027s a pretty minor and distracting point to bring up this early.",
       "parentUuid": "14920315_08738d42",
+      "revId": "725f53afc13c91d15a6129b29db4eb4f7fe8780c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "72c296a9_0ae894c7",
+        "filename": "doc/signup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-24T04:23:53Z",
+      "side": 1,
+      "message": "I suggest it, because in the past people have signed up for Upspin with their email address, played around a bit, and then deleted their stuff (including keys). They knew that they are going to lose all their data, but since it was just for fun they didn\u0027t care. Then they come back only to find that they can\u0027t sign up with their email address again; it\u0027s been taken forever. I think this bears an explicit warning.",
+      "parentUuid": "5d162e0f_40a2d511",
       "revId": "725f53afc13c91d15a6129b29db4eb4f7fe8780c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
