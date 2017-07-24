@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1ce8d6a5_60099396",
+        "filename": "cmd/upspin/allcmds_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-24T04:36:10Z",
+      "side": 1,
+      "message": "doing a get doesn\u0027t show that it\u0027s unencrypted, so the test string is maybe a bit misleading",
+      "revId": "c663c6bb50cb3de147e1e2cb141446c1fa8b16df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9d4c35d0_85f29d4c",
+        "filename": "cmd/upspin/getref.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-24T04:36:10Z",
+      "side": 1,
+      "message": "It\u0027s not clear to me why this is in this change, but you don\u0027t need to split it out if you can\u0027t be bothered.",
+      "revId": "c663c6bb50cb3de147e1e2cb141446c1fa8b16df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
