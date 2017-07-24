@@ -16,7 +16,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"upspin.io/config"
 	"upspin.io/errors"
 	"upspin.io/key/proquint"
 	"upspin.io/pack/ee"
@@ -25,53 +24,46 @@ import (
 
 func (s *State) keygen(args ...string) {
 	const help = `
-Keygen creates a new Upspin key pair and stores the pair in local
-files secret.upspinkey and public.upspinkey in $HOME/.ssh. Existing
-key pairs are appended to $HOME/.ssh/secret2.upspinkey. Keygen does
-not update the information in the key server; use the user -put
-command for that.
+Keygen creates a new Upspin key pair and stores the pair in local files
+secret.upspinkey and public.upspinkey in the specified directory.
+Existing key pairs are appended to secret2.upspinkey.
+Keygen does not update the information in the key server;
+use the "user -put" command for that.
 
-New users should instead use the signup command to create their
-first key. Keygen can be used to create new keys.
+New users should instead use the "signup" command to create their first key.
 
 See the description for rotate for information about updating keys.
 `
 	// Keep flags in sync with signup.go. New flags here should appear
 	// there as well.
 	fs := flag.NewFlagSet("keygen", flag.ExitOnError)
-	fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
-	fs.String("secretseed", "", "the seed containing a 128 bit secret in proquint format or a file that contains it")
-	fs.String("where", filepath.Join(config.Home(), ".ssh"), "`directory` to store keys")
-	// TODO: We do not what rotate to appear in the usage message.
-	fs.Bool("rotate", false, "rotate existing keys and replace them with new ones")
-	s.ParseFlags(fs, args, help, "keygen [-curve=256] [-secretseed=seed] [-where=$HOME/.ssh]")
-	if fs.NArg() != 0 {
+	var (
+		curve      = fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
+		secretseed = fs.String("secretseed", "", "the seed containing a 128 bit secret in proquint format or a file that contains it")
+		// TODO(ehg): We do not want rotate to appear in the usage message.
+		rotate = fs.Bool("rotate", false, "rotate existing keys and replace them with new ones")
+	)
+	s.ParseFlags(fs, args, help, "keygen [-curve=256] [-secretseed=seed] <directory>")
+	if fs.NArg() != 1 {
 		usageAndExit(fs)
 	}
-	s.keygenCommand(fs)
+	where := fs.Arg(0)
+	s.keygenCommand(where, *curve, *secretseed, *rotate)
 }
 
-func (s *State) keygenCommand(fs *flag.FlagSet) {
-	curve := subcmd.StringFlag(fs, "curve")
+func (s *State) keygenCommand(where, curve, secretseed string, rotate bool) {
 	switch curve {
 	case "p256", "p384", "p521":
 		// ok
 	default:
-		log.Printf("no such curve %q", curve)
-		usageAndExit(fs)
+		s.Exitf("no such curve %q", curve)
 	}
 
-	secretFlag := subcmd.StringFlag(fs, "secretseed")
-	public, private, secretStr, err := s.createKeys(curve, secretFlag)
+	public, private, secretStr, err := s.createKeys(curve, secretseed)
 	if err != nil {
 		s.Exitf("creating keys: %v", err)
 	}
 
-	where := subcmd.Tilde(subcmd.StringFlag(fs, "where"))
-	if where == "" {
-		s.Exitf("-where must not be empty")
-	}
-	rotate := subcmd.BoolFlag(fs, "rotate")
 	err = s.saveKeys(where, rotate, public, private)
 	if err != nil {
 		s.Exitf("saving previous keys failed, keys not generated: %s", err)
@@ -85,9 +77,9 @@ func (s *State) keygenCommand(fs *flag.FlagSet) {
 	fmt.Fprintf(s.Stderr, "\t%s\n", filepath.Join(where, "public.upspinkey"))
 	fmt.Fprintf(s.Stderr, "\t%s\n", filepath.Join(where, "secret.upspinkey"))
 	fmt.Fprintln(s.Stderr, "This key pair provides access to your Upspin identity and data.")
-	if secretFlag == "" {
+	if secretseed == "" {
 		fmt.Fprintln(s.Stderr, "If you lose the keys you can re-create them by running this command:")
-		fmt.Fprintf(s.Stderr, "\tupspin keygen -curve %s -secretseed %s\n", curve, secretStr)
+		fmt.Fprintf(s.Stderr, "\tupspin keygen -curve %s -secretseed %s %s\n", curve, secretseed, where)
 		fmt.Fprintln(s.Stderr, "Write this command down and store it in a secure, private place.")
 		fmt.Fprintln(s.Stderr, "Do not share your private key or this command with anyone.")
 	}
@@ -202,7 +194,7 @@ func (s *State) saveKeys(where string, rotate bool, newPublic, newPrivate string
 	if os.IsNotExist(err) {
 		// There is nothing to save. Did we expect there to be?
 		if rotate {
-			s.Exitf("no prior keys exist; cannot rotate keys")
+			s.Exitf("cannot rotate keys: no prior keys exist in %s", where)
 		}
 		return nil
 	}
@@ -210,7 +202,7 @@ func (s *State) saveKeys(where string, rotate bool, newPublic, newPrivate string
 		return err
 	}
 	if !rotate {
-		s.Exitf("prior keys exist; rerun with rotate command to update keys")
+		s.Exitf("prior keys exist in %s; rerun with rotate command to update keys", where)
 	}
 	public, err := ioutil.ReadFile(publicFile)
 	if err != nil {

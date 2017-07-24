@@ -276,7 +276,6 @@ func newState(name string) *State {
 // usually including setting up a Config.
 func (s *State) init() {
 	// signup is special since there is no user yet.
-	// keygen simply does not require a config or anything else.
 	if s.Name != "signup" && s.Name != "keygen" {
 		cfg, err := config.FromFile(flags.Config)
 		if err != nil && err != config.ErrNoFactotum {

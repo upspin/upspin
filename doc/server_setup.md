@@ -95,7 +95,7 @@ Domain configuration and keys for the user
 were generated and placed under the directory:
 	/home/you/upspin/deploy/example.com
 If you lose the keys you can re-create them by running this command
-	upspin keygen -where /home/you/upspin/deploy/example.com -secretseed zapal-zuhiv-visop-gagil.dadij-lnjul-takiv-fomin
+	upspin keygen -secretseed zapal-zuhiv-visop-gagil.dadij-lnjul-takiv-fomin /home/you/upspin/deploy/example.com
 Write this command down and store it in a secure, private place.
 Do not share your private key or this command with anyone.
 
