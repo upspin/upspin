@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "12704b37_180a3329",
+        "filename": "cmd/upspin/allcmds_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-24T04:38:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1ce8d6a5_60099396",
+      "revId": "c663c6bb50cb3de147e1e2cb141446c1fa8b16df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9d4c35d0_85f29d4c",
         "filename": "cmd/upspin/getref.go",
         "patchSetId": 2
