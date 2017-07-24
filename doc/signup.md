@@ -74,10 +74,27 @@ The public key is registered with the public key server and is available to
 everyone, while the private key is kept in secret by the user, such as on a
 local workstation or other private device.
 
+**Note: As you sign up, the system will create a secret key for you.
+"It is vital that you do not lose or share this key or its "secret seed"
+(which is equivalent to the key itself)."
+If you lose your key and its secret seed,
+you will lose access to all the data you have stored in
+Upspin as there is no way to recover it.
+The high security that Upspin offers would be compromised if
+there were an account recovery mechanism.**
+
+**Read the rest of this section carefully before proceeding.**
+
 To register your details with the key server takes two steps.
 
-First, the `upspin signup` command generates a key pair, saves it locally, and
+The first step in registration is to run an `upspin signup` command,
+which generates a key pair
+(one secret key, one public key), saves the keys locally, and
 sends the user details and the public key to the key server.
+The public key will also be published to the shared
+Upspin key server, but the secret key
+is stored only on your local computer.
+
 The locations provided as the `server`, `dir`, and `store` parameters when
 registering an identity are recorded in the key server.
 Other users can then look up your name in the key server to learn the locations
@@ -144,7 +161,16 @@ please read it for further instructions.
 
 ---
 
-The output is self-explanatory.
+**In that output when you run that command
+is a string that you can use to recreate the secret key
+should you lose the key or wish to install it on a new computer.
+This "secret seed" serves as a human-readable version of the key.
+(The computer-readable version is just a very long number.)
+Write down this secret seed (the one you receive, not the
+one in the example), keep it somewhere safe and do not lose it.
+It is literally your key to all your Upspin data.**
+
+The rest of the output is self-explanatory.
 Its key points are that it has written a config file for you, created your
 keys, and output the instructions to recover your keys if you lose them one day.
 Finally it prints the mail to send to tell the Upspin key server about you.
@@ -159,8 +185,7 @@ requests it.
 (Your public key is needed for securing and sharing Upspin files, and it's safe
 to share.)
 
-**Pay attention to the text in the output about remembering your "secret seed".
-It provides a way to regenerate your keys if you lose them.**
+**Again, make sure to write down your "secret seed" and do not lose it.**
 
 _Note: If used interactively with a shell that keeps a command history,
 using `keygen` with the `-secretseed` option may cause the secret to be saved in the history file.
