@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "b91bad90_dd5b149b",
+        "filename": "config/initconfig.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-07-24T18:42:35Z",
+      "side": 1,
+      "message": "delete comment?",
+      "revId": "2530b0d516a10d38fc6809a1829b3bd4ec3c9ed9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "59771532_f7999725",
+        "filename": "config/initconfig.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-07-24T18:42:35Z",
+      "side": 1,
+      "message": "Is this triggered if a config file is missing a secrets: line, and if so is that the error message you intend?",
+      "revId": "2530b0d516a10d38fc6809a1829b3bd4ec3c9ed9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f3119847_d8485fe7",
         "filename": "rpc/certpool.go",
         "patchSetId": 3
