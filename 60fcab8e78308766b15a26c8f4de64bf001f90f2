@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "24f4da0d_17104dc3",
+        "filename": "cmd/upspin/keygen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-25T04:45:06Z",
+      "side": 1,
+      "message": "128-bit (it\u0027s an adjective)\nalso the var should be secretSeed",
+      "revId": "60fcab8e78308766b15a26c8f4de64bf001f90f2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c4366a15_0dc8a211",
+        "filename": "cmd/upspin/keygen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-25T04:45:06Z",
+      "side": 1,
+      "message": "not sure this matters now. i think it referred to the old hack that got us here from signup",
+      "revId": "60fcab8e78308766b15a26c8f4de64bf001f90f2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c158cd56_1c93e949",
+        "filename": "cmd/upspin/keygen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-25T04:45:06Z",
+      "side": 1,
+      "message": "rotate is such a lousy term for this, even if it is the right one. maybe we can improve the usage message. (to me, rotating a key means turning it, not backing it up.)\n\n\"back up the existing keys and switch to the newly created ones\"",
+      "revId": "60fcab8e78308766b15a26c8f4de64bf001f90f2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d5cd102c_fe6a53fa",
+        "filename": "cmd/upspin/keygen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-25T04:45:06Z",
+      "side": 1,
+      "message": "no need for this variable.",
+      "revId": "60fcab8e78308766b15a26c8f4de64bf001f90f2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
