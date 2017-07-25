@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "95656e84_9f0f543e",
+        "filename": "config/initconfig.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-07-25T05:22:46Z",
+      "side": 0,
+      "message": "This is the sort of comment that I no longer need, but certainly appreciated when I was first reading the code.   I wish we had more of these rather than less.  Our code is easy to read at a local level, but the overall architectural assumptions are hard to grasp at first.\n\nBut I\u0027m ok with whatever style y\u0027all prefer.",
+      "revId": "fa5dd3098e50b192a5b26a6495f12768f38137c0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
