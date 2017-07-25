@@ -441,13 +441,12 @@ var shareTests = []cmdTest{
 	},
 }
 
-// keygenTests involves a user (keyloser@) whose only purpose is this test, because
-// when we are done we have rotated the user's keys but not updated the keyserver.
-// We can't use ann@ because we don't know her proquint so we can't restore.
+// The keygen tests update the keys for the user. Since the command test reloads the
+// environment for each cmdTest, we can also test that the new keys work.
 var keygenTests = []cmdTest{
 	{
 		"create a temporary key",
-		keyloser,
+		ann,
 		do(
 			"keygen -secretseed deter-gonad-pivot-rotor.visit-roman-widow-woman -where " + testTempDir("key", deleteOld),
 		),
@@ -456,7 +455,7 @@ var keygenTests = []cmdTest{
 	},
 	{
 		"keygen again will fail",
-		keyloser,
+		ann,
 		do(
 			"keygen -secretseed desex-fetid-pecan-fakir.color-civil-comet-haven -where " + testTempDir("key", keepOld),
 		),
@@ -465,11 +464,22 @@ var keygenTests = []cmdTest{
 	},
 	{
 		"keygen rotate",
-		keyloser,
+		ann,
 		do(
 			"keygen -rotate -secretseed desex-fetid-pecan-fakir.color-civil-comet-haven -where " + testTempDir("key", keepOld),
 		),
 		"",
 		keygenVerify(testTempDir("key", keepOld), "p256\n1048813400173469", "7863414033373202", "1623258616618034", deleteOld),
+	},
+	{
+		"use new keys",
+		ann,
+		do(
+			"mkdir @/keytest",
+			"ls @/keytest",
+			"rm @/keytest",
+		),
+		"",
+		expectNoOutput(),
 	},
 }

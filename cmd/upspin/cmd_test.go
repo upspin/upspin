@@ -46,25 +46,20 @@ func TestCommands(t *testing.T) {
 		t.Fatalf("starting schema: %v", err)
 	}
 
-	// Each user gets a runner for all its commands.
-	runners := make(map[upspin.UserName]*runner)
-	for _, user := range testUsers {
-		r := &runner{
-			fs:     flag.NewFlagSet("test", flag.PanicOnError), // panic if there's trouble.
-			schema: schema,
-		}
-		state, _, ok := setup(r.fs, []string{"-config=" + r.config(user), "test"})
-		if !ok {
-			t.Fatal("setup failed; bad arg list?")
-		}
-		r.state = state
-		runners[user] = r
-	}
-
 	// Loop over the tests in sequence, building state as we go.
 	for _, testSuite := range allCmdTests {
 		for _, test := range *testSuite {
-			r := runners[test.user]
+			// We create a runner for each cmdTest so the Config and State
+			// are constructed from the environment each time.
+			r := &runner{
+				fs:     flag.NewFlagSet(test.name, flag.PanicOnError), // panic if there's trouble.
+				schema: schema,
+			}
+			state, _, ok := setup(r.fs, []string{"-config=" + r.config(test.user), "test"})
+			if !ok {
+				t.Fatal("setup failed; bad arg list?")
+			}
+			r.state = state
 			t.Run(test.name, r.run(&test))
 		}
 	}
@@ -81,7 +76,6 @@ users:
   - name: chris@example.com
   - name: kelly@example.com
   - name: lee@example.com
-  - name: keyloser@example.com
 servers:
   - name: keyserver
   - name: storeserver
@@ -92,14 +86,13 @@ domain: example.com
 `
 
 const (
-	ann      = upspin.UserName("ann@example.com")
-	chris    = upspin.UserName("chris@example.com")
-	kelly    = upspin.UserName("kelly@example.com")
-	lee      = upspin.UserName("lee@example.com")
-	keyloser = upspin.UserName("keyloser@example.com")
+	ann   = upspin.UserName("ann@example.com")
+	chris = upspin.UserName("chris@example.com")
+	kelly = upspin.UserName("kelly@example.com")
+	lee   = upspin.UserName("lee@example.com")
 )
 
-var testUsers = []upspin.UserName{ann, chris, kelly, lee, keyloser}
+var testUsers = []upspin.UserName{ann, chris, kelly, lee}
 
 // devNull gives EOF on read and absorbs anything error-free on write, like Unix's /dev/null.
 type devNull struct{}
