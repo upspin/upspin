@@ -53,6 +53,24 @@
     },
     {
       "key": {
+        "uuid": "bfd7c800_4b4d2584",
+        "filename": "cmd/upspin/keygen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-07-25T05:10:58Z",
+      "side": 1,
+      "message": "Ok by me.   \"key rotation\" is the correct technical term in the security community, so we\u0027ll want to list it somewhere in the security doc.  But no need for it to be user visible.",
+      "parentUuid": "c158cd56_1c93e949",
+      "revId": "60fcab8e78308766b15a26c8f4de64bf001f90f2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "d5cd102c_fe6a53fa",
         "filename": "cmd/upspin/keygen.go",
         "patchSetId": 2
