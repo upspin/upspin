@@ -16,6 +16,24 @@
       "revId": "fa5dd3098e50b192a5b26a6495f12768f38137c0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ab49b490_d6997904",
+        "filename": "config/initconfig.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-25T06:13:58Z",
+      "side": 0,
+      "message": "It doesn\u0027t actually mean anything anymore. It\u0027s old and stale.\nThere\u0027s no bind happening here.",
+      "parentUuid": "95656e84_9f0f543e",
+      "revId": "fa5dd3098e50b192a5b26a6495f12768f38137c0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }

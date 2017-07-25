@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "19bc43d6_8a17b40a",
+        "filename": "cmd/upspin/keygen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-25T06:13:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "24f4da0d_17104dc3",
+      "revId": "60fcab8e78308766b15a26c8f4de64bf001f90f2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c4366a15_0dc8a211",
         "filename": "cmd/upspin/keygen.go",
         "patchSetId": 2
@@ -33,6 +51,24 @@
       "revId": "60fcab8e78308766b15a26c8f4de64bf001f90f2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "48809096_ed7d1352",
+        "filename": "cmd/upspin/keygen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-25T06:13:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c4366a15_0dc8a211",
+      "revId": "60fcab8e78308766b15a26c8f4de64bf001f90f2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -71,6 +107,24 @@
     },
     {
       "key": {
+        "uuid": "138975cd_cb2afc20",
+        "filename": "cmd/upspin/keygen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-25T06:13:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bfd7c800_4b4d2584",
+      "revId": "60fcab8e78308766b15a26c8f4de64bf001f90f2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d5cd102c_fe6a53fa",
         "filename": "cmd/upspin/keygen.go",
         "patchSetId": 2
@@ -85,6 +139,24 @@
       "revId": "60fcab8e78308766b15a26c8f4de64bf001f90f2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7f2fea7a_7dc39a05",
+        "filename": "cmd/upspin/keygen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-25T06:13:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d5cd102c_fe6a53fa",
+      "revId": "60fcab8e78308766b15a26c8f4de64bf001f90f2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
