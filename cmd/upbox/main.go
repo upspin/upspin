@@ -5,6 +5,8 @@
 /*
 Command upbox builds and runs Upspin servers as specified by a schema and
 provides an upspin shell acting as the first user specified by the schema.
+Such clusters of Upspin servers are usually ephemeral in nature, making them
+useful for testing, developing Upspin clients and servers, and experiments.
 
 For information on defining a schema, see the documentation for package
 upspin.io/exp/upbox.
