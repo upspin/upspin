@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "7966efe5_f2e7a827",
+        "filename": "doc/faq.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-26T05:55:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4eb98714_47b4f694",
+      "range": {
+        "startLine": 69,
+        "startChar": 49,
+        "endLine": 69,
+        "endChar": 55
+      },
+      "revId": "7d6a4acc4d96498243383211fbfacbe37c00c592",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a6c49cc9_00876729",
         "filename": "doc/faq.md",
         "patchSetId": 1
@@ -48,6 +72,30 @@
     },
     {
       "key": {
+        "uuid": "fa8120d7_e05dda1e",
+        "filename": "doc/faq.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-26T05:55:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a6c49cc9_00876729",
+      "range": {
+        "startLine": 73,
+        "startChar": 0,
+        "endLine": 73,
+        "endChar": 6
+      },
+      "revId": "7d6a4acc4d96498243383211fbfacbe37c00c592",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "44749f9f_9e6c9532",
         "filename": "doc/faq.md",
         "patchSetId": 1
@@ -65,6 +113,24 @@
     },
     {
       "key": {
+        "uuid": "4a726346_f04c9ac2",
+        "filename": "doc/faq.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-26T05:55:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "44749f9f_9e6c9532",
+      "revId": "7d6a4acc4d96498243383211fbfacbe37c00c592",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "22b9f281_b6b454fc",
         "filename": "doc/faq.md",
         "patchSetId": 1
@@ -76,6 +142,24 @@
       "writtenOn": "2017-07-26T05:26:13Z",
       "side": 1,
       "message": "not the security doc?\n\nalso the text inside angle brackets will be eaten by html parsers",
+      "revId": "7d6a4acc4d96498243383211fbfacbe37c00c592",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d202f853_abc41980",
+        "filename": "doc/faq.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-26T05:55:34Z",
+      "side": 1,
+      "message": "yes, i plan to write a document about keys alone, from a user\u0027s perspective rather than a security one.\nit will expand on the FAQ and give background about what goes on with things like sharing.",
+      "parentUuid": "22b9f281_b6b454fc",
       "revId": "7d6a4acc4d96498243383211fbfacbe37c00c592",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -99,6 +183,24 @@
     },
     {
       "key": {
+        "uuid": "872596ac_c17e286d",
+        "filename": "doc/faq.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-26T05:55:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e7e11184_8a9131b4",
+      "revId": "7d6a4acc4d96498243383211fbfacbe37c00c592",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d83fcbe5_d84cf7df",
         "filename": "doc/faq.md",
         "patchSetId": 1
@@ -113,6 +215,24 @@
       "revId": "7d6a4acc4d96498243383211fbfacbe37c00c592",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b86b911b_b970d979",
+        "filename": "doc/faq.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-26T05:55:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d83fcbe5_d84cf7df",
+      "revId": "7d6a4acc4d96498243383211fbfacbe37c00c592",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
