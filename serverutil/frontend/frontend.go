@@ -33,6 +33,7 @@ import (
 
 var (
 	docPath = flag.String("docpath", defaultDocPath(), "location of folder containing documentation")
+	local   = flag.Bool("local", false, "run local testing instance")
 )
 
 func Main() {
@@ -42,9 +43,20 @@ func Main() {
 		log.Fatalf("error parsing templates: %v", err)
 	}
 
-	cfg, err := config.FromFile(flags.Config)
-	if err != nil {
-		log.Fatal(err)
+	var cfg upspin.Config
+	if *local {
+		// Hack to serve locally. If the flag has not been set explicitly (its default
+		// value is ":80"), overwrite it to the local port.
+		if flags.HTTPAddr == ":80" {
+			flags.HTTPAddr = "localhost:8080"
+		}
+		flags.InsecureHTTP = true
+	} else {
+		var err error
+		cfg, err = config.FromFile(flags.Config)
+		if err != nil {
+			log.Fatal(err)
+		}
 	}
 	http.Handle("/", newServer(cfg))
 
@@ -121,6 +133,7 @@ type server struct {
 }
 
 // newServer initializes and returns a new HTTP server.
+// A nil Config prevents the server from building and serving binaries for download.
 func newServer(cfg upspin.Config) http.Handler {
 	s := &server{mux: http.NewServeMux()}
 	s.handlers = goGetHandler{gziphandler.GzipHandler(canonicalHostHandler{s.mux})}
