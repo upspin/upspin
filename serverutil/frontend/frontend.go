@@ -33,6 +33,7 @@ import (
 
 var (
 	docPath = flag.String("docpath", defaultDocPath(), "location of folder containing documentation")
+	local   = flag.Bool("local", false, "run local testing instance")
 )
 
 func Main() {
@@ -42,13 +43,23 @@ func Main() {
 		log.Fatalf("error parsing templates: %v", err)
 	}
 
-	cfg, err := config.FromFile(flags.Config)
-	if err != nil {
-		log.Fatal(err)
+	if *local {
+		// Hack to serve locally. If the flag has not been set explicitly (its default
+		// value is ":80"), overwrite it to the local port.
+		if flags.HTTPAddr == ":80" {
+			flags.HTTPAddr = "localhost:8080"
+		}
+		flags.InsecureHTTP = true
+		http.Handle("/", newServer(nil))
+	} else {
+		cfg, err := config.FromFile(flags.Config)
+		if err != nil {
+			log.Fatal(err)
+		}
+		http.Handle("/", newServer(cfg))
 	}
-	http.Handle("/", newServer(cfg))
 
-	if !flags.InsecureHTTP {
+	if !*local && !flags.InsecureHTTP {
 		go func() {
 			log.Printf("Serving HTTP->HTTPS redirect on %q", flags.HTTPAddr)
 			log.Fatal(http.ListenAndServe(flags.HTTPAddr, http.HandlerFunc(redirectHTTP)))
