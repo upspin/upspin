@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "baf72192_78d99082",
+        "filename": "serverutil/frontend/frontend.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-26T02:47:20Z",
+      "side": 1,
+      "message": "a very minor point, but this could go after the else.",
+      "revId": "8699357b3acdf7ff086e5e10ab8a089143a00079",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7bd1b2a3_97071977",
+        "filename": "serverutil/frontend/frontend.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-26T02:47:20Z",
+      "side": 1,
+      "message": "Can you please add a comment here about the implications of a nil config? Thank you.",
+      "revId": "8699357b3acdf7ff086e5e10ab8a089143a00079",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
