@@ -1,0 +1,118 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4eb98714_47b4f694",
+        "filename": "doc/faq.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-26T05:26:13Z",
+      "side": 1,
+      "message": "central?",
+      "range": {
+        "startLine": 69,
+        "startChar": 49,
+        "endLine": 69,
+        "endChar": 55
+      },
+      "revId": "7d6a4acc4d96498243383211fbfacbe37c00c592",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a6c49cc9_00876729",
+        "filename": "doc/faq.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-26T05:26:13Z",
+      "side": 1,
+      "message": "ditto",
+      "range": {
+        "startLine": 73,
+        "startChar": 0,
+        "endLine": 73,
+        "endChar": 6
+      },
+      "revId": "7d6a4acc4d96498243383211fbfacbe37c00c592",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "44749f9f_9e6c9532",
+        "filename": "doc/faq.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-26T05:26:13Z",
+      "side": 1,
+      "message": "the system could replace it? or would something else do that?\nunclear",
+      "revId": "7d6a4acc4d96498243383211fbfacbe37c00c592",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "22b9f281_b6b454fc",
+        "filename": "doc/faq.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-26T05:26:13Z",
+      "side": 1,
+      "message": "not the security doc?\n\nalso the text inside angle brackets will be eaten by html parsers",
+      "revId": "7d6a4acc4d96498243383211fbfacbe37c00c592",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e7e11184_8a9131b4",
+        "filename": "doc/faq.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 176,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-26T05:26:13Z",
+      "side": 1,
+      "message": "How about \"I lost my keys. How do I...\" ?",
+      "revId": "7d6a4acc4d96498243383211fbfacbe37c00c592",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d83fcbe5_d84cf7df",
+        "filename": "doc/faq.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-26T05:26:13Z",
+      "side": 1,
+      "message": "an underscore import?",
+      "revId": "7d6a4acc4d96498243383211fbfacbe37c00c592",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
