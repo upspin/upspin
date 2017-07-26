@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "86821a05_423e014b",
+        "filename": "serverutil/frontend/frontend.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-26T02:07:55Z",
+      "side": 1,
+      "message": "var cfg upspin.Config",
+      "revId": "e928c70defa8229e4a1f8fbf1bfa425e583fc6fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dd2d6c2f_69e44744",
+        "filename": "serverutil/frontend/frontend.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-26T02:07:55Z",
+      "side": 1,
+      "message": "delete",
+      "revId": "e928c70defa8229e4a1f8fbf1bfa425e583fc6fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a466eb03_ced29e54",
+        "filename": "serverutil/frontend/frontend.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-26T02:07:55Z",
+      "side": 1,
+      "message": "cfg, err \u003d",
+      "revId": "e928c70defa8229e4a1f8fbf1bfa425e583fc6fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "eba2857d_32d37a79",
+        "filename": "serverutil/frontend/frontend.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-26T02:07:55Z",
+      "side": 1,
+      "message": "http.Handle(\"/\", newServer(cfg)",
+      "revId": "e928c70defa8229e4a1f8fbf1bfa425e583fc6fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "65f2eb09_82b60c17",
+        "filename": "serverutil/frontend/frontend.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-07-26T02:07:55Z",
+      "side": 1,
+      "message": "why? if local is specified then InsecureHTTP is specified",
+      "revId": "e928c70defa8229e4a1f8fbf1bfa425e583fc6fb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
