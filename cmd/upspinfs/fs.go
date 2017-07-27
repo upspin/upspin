@@ -804,31 +804,12 @@ func (n *node) Removexattr(ctx gContext.Context, req *fuse.RemovexattrRequest) e
 	return nil
 }
 
-// convertRelPath converts a host relative path into an Upspin one. It assumes
-// that the only difference is the separators. This will work with
-// windows and *nix. Not sure about other systems.
-func convertRelPath(path string) string {
+// convertPath converts a host path separators into upspin ones.
+func convertPath(path string) upspin.PathName {
 	if filepath.Separator == '/' {
-		return path
+		return upspin.PathName(path)
 	}
-	return strings.Replace(path, string(filepath.Separator), "/", -1)
-}
-
-// hostPathToUpspinPath takes a hostpath and returns an Upspin path.
-func (dir *node) hostPathToUpspinPath(hostpath string) (upspin.PathName, error) {
-	mountrel := strings.TrimPrefix(hostpath, dir.f.mountpoint)
-	if hostpath != mountrel {
-		// We have a path that is relative to the mount point.
-		// Convert the separator if necessary and return it as an
-		// Upspin path.
-		return upspin.PathName(convertRelPath(mountrel)), nil
-	}
-	// Not relative to the mountpoint. If it is rooted, it is outside Upspin.
-	if filepath.IsAbs(hostpath) {
-		return upspin.PathName(hostpath), errors.Str("symlink outside of upspin")
-	}
-	// This is relative to dir. Convert the separators and append to dir.
-	return path.Join(dir.uname, convertRelPath(hostpath)), nil
+	return upspin.PathName(strings.Replace(path, string(filepath.Separator), "/", -1))
 }
 
 // Symlink implements fs.Symlink.
@@ -836,14 +817,23 @@ func (n *node) Symlink(ctx gContext.Context, req *fuse.SymlinkRequest) (fs.Node,
 	const op = "upspinfs/fs.Symlink"
 	n.Lock()
 	defer n.Unlock()
-	target, err := n.hostPathToUpspinPath(req.Target)
-	if err != nil {
-		return nil, e2e(errors.E(op, n.uname, err))
+	target := req.Target
+	if !filepath.IsAbs(target) {
+		target = filepath.Join(n.f.mountpoint, string(n.uname), target)
 	}
-	log.Debug.Printf("Symlink target %q", target)
-	nn := n.f.allocNode(n, req.NewName, os.ModeSymlink|unixPermissions, uint64(len(target)), time.Now())
-	nn.link = target
-	if err := n.f.cache.putRedirect(nn, target); err != nil {
+	target = filepath.Clean(target)
+	// Strip off mount point.
+	mountRel := strings.TrimPrefix(target, n.f.mountpoint)
+	upspinPath := convertPath(mountRel)
+	if target == mountRel {
+		// Don't let request walk above of the mount point.
+		return nil, errors.Str("symlink outside of upspin")
+
+	}
+	log.Debug.Printf("Symlink target %q", upspinPath)
+	nn := n.f.allocNode(n, req.NewName, os.ModeSymlink|unixPermissions, uint64(len(upspinPath)), time.Now())
+	nn.link = upspinPath
+	if err := n.f.cache.putRedirect(nn, upspinPath); err != nil {
 		return nil, e2e(errors.E(op, n.uname, err))
 	}
 	nn.exists()

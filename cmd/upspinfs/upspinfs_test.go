@@ -298,8 +298,17 @@ func TestSymlink(t *testing.T) {
 	testSymlink(t, path.Join(dir, "downlink"), real2, "subdir/real2", []byte(real2))
 	testSymlink(t, path.Join(subdir, "uplink"), real1, "../real1", []byte(real1))
 
+	// Test a relative path that ..'s out and back in again.
+	outIn := fmt.Sprintf("../../../../%s/testsymlinks/dir/real1", testConfig.user)
+	testSymlink(t, path.Join(subdir, "updown"), outIn, "../real1", []byte(real2))
+
+	// Test a path that leaves Upspin. It should fail.
+	if err := os.Symlink("../../../../quux", path.Join(subdir, "wontwork")); err == nil {
+		fatal(t, err)
+	}
+
 	if err := os.RemoveAll(testDir); err != nil {
-		t.Fatal(err)
+		t.Fatalf("symlink out of upspin worked but should not have")
 	}
 }
 
