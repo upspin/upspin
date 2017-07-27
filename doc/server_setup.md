@@ -202,7 +202,7 @@ VM by visiting the Compute section of the
 > If you're unfamiliar with Google Cloud's virtual machines, here are some sane
 > defaults: choose the `n1-standard-1` machine type, select the Ubuntu 16.04
 > boot disk image, check "Allow HTTPS traffic", and under "Networking" make
-> sure the the "External IP" is a reserved static address (rather than
+> sure the "External IP" is a reserved static address (rather than
 > ephemeral).
 
 Once provisioned, make a note of the server's IP address.

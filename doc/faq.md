@@ -76,7 +76,8 @@ engineering the risk can be mitigated.
 The key server is a very simple service, and it could
 easily be replaced with another implementation.
 We hope one day to replace the existing server with
-one built on a public service such as Google's Key Transparency
+one built on a public service such as Google's
+[Key Transparency](https://github.com/google/keytransparency)
 project.
 
 ## Users and keys
