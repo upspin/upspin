@@ -25,6 +25,7 @@ import (
 	"upspin.io/metric"
 	"upspin.io/subcmd"
 	"upspin.io/upspin"
+	"upspin.io/version"
 
 	// Load useful packers
 	_ "upspin.io/pack/ee"
@@ -95,7 +96,6 @@ var commands = map[string]func(*State, ...string){
 	"snapshot":      (*State).snapshot,
 	"tar":           (*State).tar,
 	"user":          (*State).user,
-	"version":       (*State).version,
 	"watch":         (*State).watch,
 	"whichaccess":   (*State).whichAccess,
 }
@@ -140,7 +140,11 @@ func setup(fs *flag.FlagSet, args []string) (*State, []string, bool) {
 	log.SetFlags(0)
 	log.SetPrefix("upspin: ")
 	fs.Usage = usage
-	flags.ParseArgsInto(fs, args, flags.Client)
+	flags.ParseArgsInto(fs, args, flags.Client, "version")
+	if flags.Version {
+		fmt.Fprint(os.Stdout, version.Version())
+		os.Exit(2)
+	}
 	if len(fs.Args()) < 1 {
 		return nil, nil, false
 	}
