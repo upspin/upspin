@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "e3e45e31_a25c1a2b",
+        "filename": "cmd/upspin/make_version.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-27T05:03:50Z",
+      "side": 1,
+      "message": "d\u0027oh",
+      "parentUuid": "8bb8c728_40c8d6e6",
+      "revId": "ee346d6bc99c6c78fb4bc3e82e778164476ecbd1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "5ab39fb7_94820471",
         "filename": "cmd/upspin/version.go",
         "patchSetId": 1
@@ -33,6 +51,24 @@
       "revId": "ee346d6bc99c6c78fb4bc3e82e778164476ecbd1",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fb20fa31_762fbf0b",
+        "filename": "cmd/upspin/version.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-27T05:03:50Z",
+      "side": 1,
+      "message": "what epoch? i tried something more direct.",
+      "parentUuid": "5ab39fb7_94820471",
+      "revId": "ee346d6bc99c6c78fb4bc3e82e778164476ecbd1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "4c67ebac_6b140d11",
+        "filename": "cmd/upspin/version.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-27T05:03:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "256190e0_1178e0a9",
+      "revId": "ee346d6bc99c6c78fb4bc3e82e778164476ecbd1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ca14a41a_4532e951",
         "filename": "cmd/upspin/version.go",
         "patchSetId": 1
@@ -67,6 +121,24 @@
       "revId": "ee346d6bc99c6c78fb4bc3e82e778164476ecbd1",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "717fd5f6_0a11cbc4",
+        "filename": "cmd/upspin/version.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-27T05:03:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ca14a41a_4532e951",
+      "revId": "ee346d6bc99c6c78fb4bc3e82e778164476ecbd1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
