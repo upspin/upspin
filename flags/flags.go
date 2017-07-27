@@ -121,6 +121,10 @@ var (
 	// certificate/key pair used for serving TLS (HTTPS).
 	TLSCertFile = ""
 	TLSKeyFile  = ""
+
+	// Version causes the program to print its release version and exit.
+	// The printed version is only meaningful in released binaries.
+	Version = false
 )
 
 // flags is a map of flag registration functions keyed by flag name,
@@ -186,6 +190,17 @@ var flags = map[string]*flagVar{
 		},
 		arg:  func() string { return strArg("tls_cert", TLSCertFile, "") },
 		arg2: func() string { return strArg("tls_key", TLSKeyFile, "") },
+	},
+	"version": &flagVar{
+		set: func(fs *flag.FlagSet) {
+			fs.BoolVar(&Version, "version", false, "print build version and exit")
+		},
+		arg: func() string {
+			if !Prudent {
+				return ""
+			}
+			return "-version"
+		},
 	},
 }
 
