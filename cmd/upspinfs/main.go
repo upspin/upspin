@@ -20,6 +20,7 @@ import (
 	"upspin.io/flags"
 	"upspin.io/log"
 	"upspin.io/rpc/local"
+	"upspin.io/version"
 
 	_ "upspin.io/pack/ee"
 	_ "upspin.io/pack/eeintegrity"
@@ -37,7 +38,14 @@ func usage() {
 
 func main() {
 	flag.Usage = usage
+	printVersion := flag.Bool("version", false, "print version and exit")
+
 	flags.Parse(flags.Server, "cachedir", "prudent")
+
+	if *printVersion {
+		fmt.Print(version.Version())
+		return
+	}
 
 	if flag.NArg() != 1 {
 		usage()
