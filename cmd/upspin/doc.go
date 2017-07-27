@@ -70,6 +70,7 @@ Upspin commands:
 	snapshot
 	tar
 	user
+	version
 	watch
 	whichaccess
 Global flags:
@@ -242,9 +243,9 @@ Flags:
   -help
     	print more information about the command
   -rotate
-    	rotate existing keys and replace them with new ones
+    	back up the existing keys and replace them with new ones
   -secretseed string
-    	the seed containing a 128 bit secret in proquint format or a file that contains it
+    	the seed containing a 128-bit secret in proquint format or a file that contains it
 
 
 
@@ -716,6 +717,18 @@ Flags:
     	input file (default standard input)
   -put
     	write new user record
+
+
+
+Sub-command version
+
+Usage: upspin version
+
+Version prints a summary of the git version used to build the command.
+
+Flags:
+  -help
+    	print more information about the command
 
 
 
