@@ -13,13 +13,19 @@ import (
 	"upspin.io/flags"
 	"upspin.io/log"
 	"upspin.io/rpc"
+	"upspin.io/version"
 )
 
 const cmdName = "cacheserver"
 
 func main() {
 	flag.Usage = usage
-	flags.Parse(flags.Server, "cachedir")
+	flags.Parse(flags.Server, "cachedir", "version")
+
+	if flags.Version {
+		fmt.Print(version.Version())
+		return
+	}
 
 	// Load configuration and keys for this server. It needn't have a real username.
 	cfg, err := config.FromFile(flags.Config)

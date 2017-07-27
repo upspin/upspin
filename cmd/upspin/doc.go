@@ -70,7 +70,6 @@ Upspin commands:
 	snapshot
 	tar
 	user
-	version
 	watch
 	whichaccess
 Global flags:
@@ -84,6 +83,8 @@ Global flags:
     	level of logging: debug, info, error, disabled (default info)
   -prudent
     	protect against malicious directory server
+  -version
+    	print build version and exit
   -writethrough
     	make storage cache writethrough
 
@@ -717,18 +718,6 @@ Flags:
     	input file (default standard input)
   -put
     	write new user record
-
-
-
-Sub-command version
-
-Usage: upspin version
-
-Version prints a summary of the git version used to build the command.
-
-Flags:
-  -help
-    	print more information about the command
 
 
 
