@@ -45,10 +45,18 @@ import (
 )
 
 var (
-	cfgPath   = flag.String("serverconfig", filepath.Join(config.Home(), "upspin", "server"), "server configuration `directory`")
+	cfgPath   = flag.String("serverconfig", defaultCfgPath(), "server configuration `directory`")
 	enableWeb = flag.Bool("web", false, "enable Upspin web interface")
 	readyCh   = make(chan struct{})
 )
+
+func defaultCfgPath() string {
+	home, err := config.Homedir()
+	if err == nil {
+		home = "/"
+	}
+	return filepath.Join(home, "upspin", "server")
+}
 
 func Main() (ready chan struct{}) {
 	flags.Parse(flags.Server)
