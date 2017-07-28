@@ -373,6 +373,10 @@ func MakeRequest(signupURL string, cfg upspin.Config) error {
 // makeQueryString returns an encoded query string used to sign up a new user
 // with the KeyServer.
 func makeQueryString(cfg upspin.Config) (string, error) {
+	f := cfg.Factotum()
+	if f == nil {
+		return "", errors.Str("cannot signup without Factotum")
+	}
 	hash, vals := RequestHash(cfg.UserName(), cfg.DirEndpoint().NetAddr, cfg.StoreEndpoint().NetAddr, cfg.Factotum().PublicKey())
 	sig, err := cfg.Factotum().Sign(hash)
 	if err != nil {
