@@ -52,7 +52,7 @@ var (
 
 func defaultCfgPath() string {
 	home, err := config.Homedir()
-	if err == nil {
+	if err != nil {
 		home = "/"
 	}
 	return filepath.Join(home, "upspin", "server")
