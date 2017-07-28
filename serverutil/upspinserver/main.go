@@ -284,6 +284,9 @@ func readServerConfig() (*subcmd.ServerConfig, error) {
 	cfgFile := filepath.Join(*cfgPath, subcmd.ServerConfigFile)
 	b, err := ioutil.ReadFile(cfgFile)
 	if err != nil {
+		// We can't return the usual errors.E because the caller wants
+		// to match on the raw error.  But give the admin a clue.
+		log.Printf("unable to read configuration: %s", err)
 		return nil, err
 	}
 	cfg := &subcmd.ServerConfig{}
