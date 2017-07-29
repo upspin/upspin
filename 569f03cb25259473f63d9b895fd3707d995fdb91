@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0e3a57ac_c7f00d28",
+        "filename": "serverutil/upspinserver/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-29T01:25:47Z",
+      "side": 1,
+      "message": "include the error in the message, always.\nand if you do so, you don\u0027t need to include the file name, because all errors from package os about files include it.",
+      "revId": "569f03cb25259473f63d9b895fd3707d995fdb91",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
