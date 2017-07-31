@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ad2aa9bf_b30bc08c",
+        "filename": "serverutil/frontend/frontend.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-31T21:00:10Z",
+      "side": 1,
+      "message": "i\u0027d just :\u003d these but this is fine.",
+      "revId": "17e3eaf3bc1cb959c2da7ebdc5acdbbf7bdb2a93",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7730a86e_49b85b30",
+        "filename": "serverutil/frontend/frontend.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 323,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-07-31T21:00:10Z",
+      "side": 1,
+      "message": "time.Since",
+      "revId": "17e3eaf3bc1cb959c2da7ebdc5acdbbf7bdb2a93",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
