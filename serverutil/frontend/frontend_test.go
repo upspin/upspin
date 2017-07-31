@@ -13,8 +13,6 @@ import (
 	"strings"
 	"sync"
 	"testing"
-
-	"upspin.io/test/testutil"
 )
 
 var (
@@ -26,17 +24,18 @@ var (
 )
 
 func startServer() {
-	if err := parseTemplates(testutil.Repo("doc/templates")); err != nil {
+	s, err := newServer(nil, testDocPath)
+	if err != nil {
 		fmt.Fprintln(os.Stderr, err)
 		os.Exit(1)
 	}
-	*docPath = testDocPath
-	s := newServer(nil).(*server)
-	s.mux.Handle("/_test", canonicalHostHandler{http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	mux := http.NewServeMux()
+	mux.Handle("/", s)
+	mux.Handle("/_test", canonicalHostHandler{http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, testResponse)
 	})})
-	s.mux.HandleFunc("/_redirect", redirectHTTP)
-	testServer := httptest.NewServer(s)
+	mux.HandleFunc("/_redirect", redirectHTTP)
+	testServer := httptest.NewServer(mux)
 	addr = testServer.Listener.Addr().String()
 }
 

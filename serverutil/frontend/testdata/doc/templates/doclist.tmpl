@@ -1,0 +1,11 @@
+<!--
+Copyright 2017 The Upspin Authors. All rights reserved.
+Use of this source code is governed by a BSD-style
+license that can be found in the LICENSE file.
+-->
+{{define "content"}}
+<h2>Documentation</h2>
+<ul>
+{{range $.Content.List}}<li><a href="/doc/{{.}}">{{index $.Content.Title .}}</a></li>{{end}}
+</ul>
+{{end}}
