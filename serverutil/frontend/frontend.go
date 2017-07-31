@@ -14,9 +14,12 @@ import (
 	"html/template"
 	"io/ioutil"
 	"net/http"
+	"os"
 	"path/filepath"
 	"sort"
 	"strings"
+	"sync"
+	"time"
 
 	"github.com/NYTimes/gziphandler"
 	"github.com/russross/blackfriday"
@@ -31,19 +34,11 @@ import (
 	_ "upspin.io/transports"
 )
 
-var (
-	docPath = flag.String("docpath", defaultDocPath(), "location of folder containing documentation")
-	local   = flag.Bool("local", false, "run local testing instance")
-)
-
 func Main() {
+	docPath := flag.String("docpath", defaultDocPath(), "location of folder containing documentation")
+	local := flag.Bool("local", false, "run local testing instance")
 	flags.Parse(flags.Server)
 
-	if err := parseTemplates(filepath.Join(*docPath, "templates")); err != nil {
-		log.Fatalf("error parsing templates: %v", err)
-	}
-
-	var cfg upspin.Config
 	if *local {
 		// Hack to serve locally. If the flag has not been set explicitly (its default
 		// value is ":80"), overwrite it to the local port.
@@ -51,14 +46,23 @@ func Main() {
 			flags.HTTPAddr = "localhost:8080"
 		}
 		flags.InsecureHTTP = true
+		http.Handle("/", &reloadHandler{
+			dir: *docPath,
+			load: func() (http.Handler, error) {
+				return newServer(nil, *docPath)
+			},
+		})
 	} else {
-		var err error
-		cfg, err = config.FromFile(flags.Config)
+		cfg, err := config.FromFile(flags.Config)
 		if err != nil {
 			log.Fatal(err)
 		}
+		s, err := newServer(cfg, *docPath)
+		if err != nil {
+			log.Fatal(err)
+		}
+		http.Handle("/", s)
 	}
-	http.Handle("/", newServer(cfg))
 
 	if !flags.InsecureHTTP {
 		go func() {
@@ -66,25 +70,6 @@ func Main() {
 			log.Fatal(http.ListenAndServe(flags.HTTPAddr, http.HandlerFunc(redirectHTTP)))
 		}()
 	}
-}
-
-var baseTmpl, docTmpl, doclistTmpl, downloadTmpl *template.Template
-
-func parseTemplates(dir string) (err error) {
-	baseTmpl, err = template.ParseFiles(filepath.Join(dir, "base.tmpl"))
-	if err != nil {
-		return err
-	}
-	docTmpl, err = template.ParseFiles(filepath.Join(dir, "base.tmpl"), filepath.Join(dir, "doc.tmpl"))
-	if err != nil {
-		return err
-	}
-	doclistTmpl, err = template.ParseFiles(filepath.Join(dir, "base.tmpl"), filepath.Join(dir, "doclist.tmpl"))
-	if err != nil {
-		return err
-	}
-	downloadTmpl, err = template.ParseFiles(filepath.Join(dir, "base.tmpl"), filepath.Join(dir, "download.tmpl"))
-	return err
 }
 
 const (
@@ -126,29 +111,38 @@ func redirectHTTP(w http.ResponseWriter, r *http.Request) {
 
 type server struct {
 	handlers http.Handler // stack of wrapped http.Handlers
-	mux      *http.ServeMux
 	docList  []string
 	docHTML  map[string][]byte
 	docTitle map[string]string
+	tmpl     struct {
+		doc, doclist, download *template.Template
+	}
 }
 
-// newServer initializes and returns a new HTTP server.
-// A nil Config prevents the server from building and serving binaries for download.
-func newServer(cfg upspin.Config) http.Handler {
-	s := &server{mux: http.NewServeMux()}
-	s.handlers = goGetHandler{gziphandler.GzipHandler(canonicalHostHandler{s.mux})}
-	s.mux.Handle("/", http.HandlerFunc(s.handleRoot))
-	s.mux.Handle("/doc/", http.HandlerFunc(s.handleDoc))
-	s.mux.Handle("/images/", http.FileServer(http.Dir(*docPath)))
-	if cfg != nil {
-		s.mux.Handle(downloadPath, newDownloadHandler(cfg))
-		s.mux.Handle("/"+releaseUser+"/", web.New(cfg, isWriter(releaseUser)))
+// newServer initializes and returns a new HTTP server serving documentation
+// from the given directory. A nil Config prevents the server from building and
+// serving binaries for download.
+func newServer(cfg upspin.Config, docs string) (http.Handler, error) {
+	s := &server{}
+
+	if err := s.parseTemplates(filepath.Join(docs, "templates")); err != nil {
+		return nil, fmt.Errorf("parsing templates: %v", err)
+	}
+	if err := s.parseDocs(docs); err != nil {
+		return nil, fmt.Errorf("parsing docs: %v", err)
 	}
 
-	if err := s.parseDocs(*docPath); err != nil {
-		log.Error.Fatalf("Could not parse docs in %s: %s", *docPath, err)
+	mux := http.NewServeMux()
+	mux.Handle("/", http.HandlerFunc(s.handleRoot))
+	mux.Handle("/doc/", http.HandlerFunc(s.handleDoc))
+	mux.Handle("/images/", http.FileServer(http.Dir(docs)))
+	if cfg != nil {
+		mux.Handle(downloadPath, newDownloadHandler(cfg, s.tmpl.download))
+		mux.Handle("/"+releaseUser+"/", web.New(cfg, isWriter(releaseUser)))
 	}
-	return s
+	s.handlers = goGetHandler{gziphandler.GzipHandler(canonicalHostHandler{mux})}
+
+	return s, nil
 }
 
 // isWriter is a serverutil/web.IsWriter implementation.
@@ -180,7 +174,7 @@ func (s *server) handleDoc(w http.ResponseWriter, r *http.Request) {
 			List  []string
 			Title map[string]string
 		}{s.docList, s.docTitle}}
-		if err := doclistTmpl.Execute(w, d); err != nil {
+		if err := s.tmpl.doclist.Execute(w, d); err != nil {
 			log.Error.Printf("Error executing root content template: %s", err)
 		}
 		return
@@ -194,7 +188,7 @@ func (s *server) renderDoc(w http.ResponseWriter, fn string) {
 		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
 		return
 	}
-	if err := docTmpl.Execute(w, pageData{
+	if err := s.tmpl.doc.Execute(w, pageData{
 		Title:   s.docTitle[fn] + " · Upspin",
 		Content: template.HTML(b),
 	}); err != nil {
@@ -211,8 +205,21 @@ func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.handlers.ServeHTTP(w, r)
 }
 
-func (s *server) parseDocs(path string) error {
-	fis, err := ioutil.ReadDir(path)
+func (s *server) parseTemplates(dir string) (err error) {
+	s.tmpl.doc, err = template.ParseFiles(filepath.Join(dir, "base.tmpl"), filepath.Join(dir, "doc.tmpl"))
+	if err != nil {
+		return err
+	}
+	s.tmpl.doclist, err = template.ParseFiles(filepath.Join(dir, "base.tmpl"), filepath.Join(dir, "doclist.tmpl"))
+	if err != nil {
+		return err
+	}
+	s.tmpl.download, err = template.ParseFiles(filepath.Join(dir, "base.tmpl"), filepath.Join(dir, "download.tmpl"))
+	return err
+}
+
+func (s *server) parseDocs(dir string) error {
+	fis, err := ioutil.ReadDir(dir)
 	if err != nil {
 		return err
 	}
@@ -226,7 +233,7 @@ func (s *server) parseDocs(path string) error {
 		if filepath.Ext(fn) != extMarkdown {
 			continue
 		}
-		b, err := ioutil.ReadFile(filepath.Join(path, fn))
+		b, err := ioutil.ReadFile(filepath.Join(dir, fn))
 		if err != nil {
 			return err
 		}
@@ -289,4 +296,53 @@ func (h canonicalHostHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	h.Handler.ServeHTTP(w, r)
+}
+
+// reloadHandler is a http.Handler wrapper that watches the contents of dir for
+// modifications and reloads the underlying http.Handler when changes are
+// made. It is intended to be used in local mode to facilitate rapid editing.
+type reloadHandler struct {
+	dir  string
+	load func() (http.Handler, error)
+
+	mu           sync.Mutex
+	handler      http.Handler
+	lastScan     time.Time
+	lastModified time.Time
+}
+
+func (h *reloadHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// scanInterval is time to wait between scanning for new changes.
+	// It should be set long enough to avoid scanning on every request,
+	// but not so long as to make editing tedious.
+	const scanInterval = 5 * time.Second
+
+	h.mu.Lock()
+	if h.handler != nil && time.Since(h.lastScan) > scanInterval {
+		err := filepath.Walk(h.dir, func(_ string, fi os.FileInfo, _ error) error {
+			if t := fi.ModTime(); t.After(h.lastModified) {
+				h.lastModified = t
+				h.handler = nil
+			}
+			return nil
+		})
+		if err != nil {
+			h.mu.Unlock()
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+	if h.handler == nil {
+		var err error
+		h.handler, err = h.load()
+		if err != nil {
+			h.mu.Unlock()
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+	handler := h.handler
+	h.mu.Unlock()
+
+	handler.ServeHTTP(w, r)
 }

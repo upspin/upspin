@@ -13,6 +13,7 @@ import (
 	"bytes"
 	"compress/gzip"
 	"fmt"
+	"html/template"
 	"net/http"
 	"regexp"
 	"sort"
@@ -66,9 +67,10 @@ const (
 var archiveRE = regexp.MustCompile(archiveExpr)
 
 // newDownloadHandler initializes and returns a new downloadHandler.
-func newDownloadHandler(cfg upspin.Config) http.Handler {
+func newDownloadHandler(cfg upspin.Config, tmpl *template.Template) http.Handler {
 	h := &downloadHandler{
 		client:  client.New(cfg),
+		tmpl:    tmpl,
 		latest:  make(map[string]time.Time),
 		archive: make(map[string]*archive),
 	}
@@ -89,6 +91,7 @@ func newDownloadHandler(cfg upspin.Config) http.Handler {
 // It keeps the latest archives bytes for each os-arch combination in memory.
 type downloadHandler struct {
 	client upspin.Client
+	tmpl   *template.Template
 
 	mu      sync.RWMutex
 	latest  map[string]time.Time // [os_arch]last-update-time
@@ -110,7 +113,7 @@ func (h *downloadHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return archives[i].osArch < archives[j].osArch
 		})
 
-		err := downloadTmpl.Execute(w, pageData{
+		err := h.tmpl.Execute(w, pageData{
 			Content: archives,
 		})
 		if err != nil {
