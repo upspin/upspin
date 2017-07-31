@@ -2,27 +2,44 @@
 
 <img src="/images/augie.jpg" width="180" height="218" alt="Home"/>
 
+When did you last...
 
-Upspin is an experimental project to build a framework for naming
-and sharing files and other data securely, uniformly, and globally:
-a global name system of sorts.
+- download a file just to upload to another device?
+- download a file from one web service just to upload to another?
+- make a file public just to share it with one person?
+- accidentally make something visible to the wrong people?
 
-It is not a file system, but a set of protocols and reference
-implementations that can be used to join things like file systems
-and other storage services to the name space.
+Upspin is an attempt to address problems like these, and many more.
 
-Performance is not a primary goal. Uniformity and security are.
+Upspin is in its early days, but the plan is for you to manage all your
+data—even data you've stored in commercial web services—in a safe, secure,
+and sharable way that makes it easy to discover what you've got and who you've
+shared it with.
 
-## Download
+If you'd like to help us make that vision a reality, we'd love to have you try
+out Upspin.
 
-- [Binary releases](/dl/) for Linux, macOS, and Windows
+Upspin is an open-source project <link> that consists of two main design
+elements:
 
+1. a set of protocols enabling secure, federated sharing using a global naming
+   system; and
+2. reference implementations of tools and services that demonstrate the
+   capabilities.
+
+Using these elements as a building block, Upspin provides a global name space
+for all your data and the power to expand that space to include services such
+as sensors, social media, and more.
+
+To get started, [**download the Upspin client**](/dl/) and let it guide you through
+the signup process. Once you've done that, you'll be able to store your data in
+Upspin, share it with other Upspin users, and bring the power of the ideas of
+Upspin to new information services you create.
 
 ## Documentation
 
 - The [Upspin Overview](/doc/overview.md) document provides a high-level
   introduction to Upspin.
-- The [FAQ](/doc/faq.md) answers common questions about Upspin.
 - The [Signing up a new user](/doc/signup.md) document describes the process for
   generating keys and registering a user with the Upspin key server.
 - The [Upspin Security](/doc/security.md) document describes Upspin's security
