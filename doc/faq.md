@@ -12,7 +12,7 @@ The examples are Unix-oriented but it should be easy to adapt them to a Windows 
 
 ## The project
 
-### What is Upspin?
+### What is Upspin? {#what}
 
 Upspin attempts to provide a secure platform for naming, storing, and sharing
 information.
@@ -22,7 +22,7 @@ It provides protocols for secure storage and sharing that can be
 used by people, programs, providers, and products to build a single coherent
 way to talk about and manage data.
 
-### What are the goals of the project?
+### What are the goals of the project? {#goals}
 
 The cloud-oriented information world brought much to celebrate,
 but it is not always a seamless environment.
@@ -37,7 +37,7 @@ to share it securely;
 to know who has access;
 and to unify the way information is accessed.
 
-### Why create something new rather than work on an existing system?
+### Why create something new rather than work on an existing system? {#why-new}
 
 There are many systems out there that can provide some of what
 Upspin offers, but there is none that addresses its goals directly.
@@ -62,7 +62,7 @@ Upspin.
 We prefer to think of Upspin as a complement to existing services
 rather than as a competitor to them.
 
-### Why use a central key server?
+### Why use a central key server? {#central-keyserver}
 
 The global name space requires that there be only one meaning
 for any user name or path name.
@@ -82,7 +82,7 @@ project.
 
 ## Users and keys
 
-### Why use email addresses to identify users?
+### Why use email addresses to identify users? {#email}
 
 Email addresses are easily verified, externally managed names for people.
 They therefore provide a simple foundation upon which Upspin can build.
@@ -106,7 +106,7 @@ It is just a name, after all.
 Upspin could replace the naming mechanism and one day may do so,
 although in practice we find email addresses work well.
 
-### How do keys work?
+### How do keys work? {#keys}
 
 Every user has two keys.
 A public one is stored in the key server at `key.upspin.io` and is visible to anyone.
@@ -126,7 +126,7 @@ in files named `public.upspinkey` and `secret.upspinkey`.
 See the document "not yet written" for a discussion of how keys provide
 security and safe sharing.
 
-### I lost my private key. How do I recover it?
+### I lost my private key. How do I recover it? {#lost-key}
 
 When you signed up, you were encouraged to write down a "secret seed",
 a string of letters that can be used to recreate your keys.
@@ -156,11 +156,11 @@ This command will show you your configuration and also compare it with
 the record stored in the public key server at `key.upspin.io`.
 If there is any discrepancy, it will let you know.
 
-### How do I recreate my keys on another machine?
+### How do I recreate my keys on another machine? {#recreate-keys}
 
 Use the `upspin` `keygen` command, as described in the previous answer.
 
-### I lost my secret seed. How do I recover it?
+### I lost my secret seed. How do I recover it? {#lost-seed}
 
 It is stored in your private key file, so if you still have that you can just
 look inside (the format is just one long line):
@@ -174,7 +174,7 @@ $
 If you have neither your secret seed nor your private key saved, you will be unable to access Upspin.
 There is no account recovery mechanism.
 
-### I lost my keys. How do I recover my account?
+### I lost my keys. How do I recover my account? {#lost-account}
 
 If you have your secret seed, see the previous sections.
 
@@ -190,7 +190,7 @@ We believe the system is more secure by not providing one.
 
 ## Programming
 
-### What does '"remote" not registered mean'?
+### What does '"remote" not registered mean'? {#remote}
 
 If you write your own Upspin program and on startup it fails with an error like,
 
