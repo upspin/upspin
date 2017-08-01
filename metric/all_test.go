@@ -101,15 +101,12 @@ type dummySaver struct {
 
 func (d *dummySaver) Register(queue chan *Metric) {
 	go func() {
-		for {
-			select {
-			case m := <-queue:
-				if m == nil {
-					d.done <- true
-					return
-				}
-				d.metricsReceived = append(d.metricsReceived, m)
+		for m := range queue {
+			if m == nil {
+				break
 			}
+			d.metricsReceived = append(d.metricsReceived, m)
 		}
+		d.done <- true
 	}()
 }

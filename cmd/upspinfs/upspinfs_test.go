@@ -128,11 +128,7 @@ func mount() error {
 
 	// Create the user root, all tests will need it.
 	testConfig.root = path.Join(testConfig.mountpoint, testConfig.user)
-	if err := os.Mkdir(testConfig.root, 0777); err != nil {
-		return err
-	}
-
-	return nil
+	return os.Mkdir(testConfig.root, 0777)
 }
 
 func cleanup() {

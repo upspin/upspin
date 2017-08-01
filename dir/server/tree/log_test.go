@@ -14,8 +14,6 @@ import (
 	"path/filepath"
 	"reflect"
 	"sort"
-	"sync"
-	"sync/atomic"
 	"testing"
 
 	"upspin.io/errors"
@@ -76,14 +74,16 @@ func TestConcurrent(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer logRW.Close()
-	var done sync.WaitGroup
-	start := make(chan struct{})
-	aborting := int32(0) // if positive, indicates a fatal and all must quit.
-	abort := func() { atomic.StoreInt32(&aborting, 1) }
-	aborted := func() bool { return atomic.LoadInt32(&aborting) == 1 }
-	write := func() {
-		defer done.Done()
-		<-start
+	abort := make(chan struct{})
+	aborted := func() bool {
+		select {
+		case <-abort:
+			return true
+		default:
+			return false
+		}
+	}
+	write := func() error {
 		for i := 0; i < numEntries; i++ {
 			e := entry
 			e.Entry.Sequence = upspin.NewSequence()
@@ -104,8 +104,7 @@ func TestConcurrent(t *testing.T) {
 				packdata := make([]byte, packSize)
 				_, err := rand.Read(packdata)
 				if err != nil {
-					abort()
-					t.Fatal(err)
+					return err
 				}
 				size := rand.Int63n(1000)
 				block := upspin.DirBlock{
@@ -117,32 +116,29 @@ func TestConcurrent(t *testing.T) {
 				e.Entry.Blocks = append(e.Entry.Blocks, block)
 			}
 			if aborted() {
-				return
+				return nil
 			}
 			err := logRW.Append(&e)
 			if err != nil {
-				abort()
-				t.Fatal(err)
+				return err
 			}
 		}
+		return nil
 	}
-	read := func() {
-		defer done.Done()
+	read := func() error {
 		logRO, err := logRW.NewReader()
 		if err != nil {
-			t.Fatal(err)
+			return err
 		}
 		defer logRO.Close()
-		<-start
 		var offset int64
 		for i := 0; i < numEntries*numWriters; i++ {
 			if aborted() {
-				return
+				return nil
 			}
 			_, next, err := logRO.ReadAt(offset)
 			if err != nil {
-				abort()
-				t.Fatal(err)
+				return err
 			}
 			if offset == next {
 				i--
@@ -150,17 +146,22 @@ func TestConcurrent(t *testing.T) {
 			}
 			offset = next
 		}
+		return nil
 	}
 
-	done.Add(numWriters + numReaders)
+	errc := make(chan error, numWriters+numReaders)
 	for i := 0; i < numWriters; i++ {
-		go write()
+		go func() { errc <- write() }()
 	}
 	for i := 0; i < numReaders; i++ {
-		go read()
+		go func() { errc <- read() }()
 	}
-	close(start)
-	done.Wait()
+	for i := 0; i < numWriters+numReaders; i++ {
+		if err := <-errc; err != nil {
+			close(abort)
+			t.Fatal(err)
+		}
+	}
 }
 
 func TestAppendRead(t *testing.T) {
@@ -490,6 +491,9 @@ func TestListUsers(t *testing.T) {
 	}
 	// Glob for .jp users only.
 	users, err = userGlob(op, "*.jp", dir)
+	if err != nil {
+		t.Fatal(err)
+	}
 	if !sameUsers(t, users, []upspin.UserName{
 		"morihei+snapshot@ueshiba.jp",
 		"kishomaru@ueshiba.jp",
@@ -500,6 +504,9 @@ func TestListUsers(t *testing.T) {
 	}
 	// Glob for users with suffix only.
 	users, err = ListUsersWithSuffix("*", dir)
+	if err != nil {
+		t.Fatal(err)
+	}
 	if !sameUsers(t, users, []upspin.UserName{
 		"morihei+snapshot@ueshiba.jp",
 		"jose+photos@ortega.com",
@@ -508,6 +515,9 @@ func TestListUsers(t *testing.T) {
 	}
 	// Get all users.
 	users, err = ListUsers(dir)
+	if err != nil {
+		t.Fatal(err)
+	}
 	if !sameUsers(t, users, []upspin.UserName{
 		"morihei@ueshiba.jp",
 		"kishomaru@ueshiba.jp",

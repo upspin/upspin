@@ -311,6 +311,9 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	}
 	// Read it back.
 	entry, err = directory.Lookup(fileName)
+	if err != nil {
+		t.Fatalf("%q: lookup: %v", fileName, err)
+	}
 	data, err := readAll(config, entry)
 	if err != nil {
 		t.Fatalf("%q: unpack file: %v", fileName, err)
@@ -328,6 +331,9 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	}
 	// Read it back.
 	entry, err = directory.Lookup(fileName)
+	if err != nil {
+		t.Fatalf("%q: lookup: %v", fileName, err)
+	}
 	data, err = readAll(config, entry)
 	if err != nil {
 		t.Fatalf("%q: second unpack file: %v", fileName, err)
@@ -767,8 +773,8 @@ func TestLinkToFile(t *testing.T) {
 	if err != upspin.ErrFollowLink {
 		t.Fatalf("err = %v; expected %v", err, upspin.ErrFollowLink)
 	}
-	if !equal(linkEntry, lookupEntry) {
-		t.Fatalf("lookup: expected %#v\ngot\n%#v", linkEntry, lookupEntry)
+	if !equal(e, linkEntry) {
+		t.Fatalf("put: expected %#v\ngot\n%#v", linkEntry, e)
 	}
 
 	// Make a link to the directory.

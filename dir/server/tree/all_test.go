@@ -115,6 +115,9 @@ func TestPutNodes(t *testing.T) {
 	}
 
 	newRoot, _, err := tree.Lookup(mkpath(t, userName+"/"))
+	if err != nil {
+		t.Fatal(err)
+	}
 	if newRoot.Time <= root.Time {
 		t.Fatalf("Time moved backwards: got %d, want > %d", newRoot.Time, root.Time)
 	}

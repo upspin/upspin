@@ -22,7 +22,6 @@ import (
 	"upspin.io/cmd/cacheserver/cacheutil"
 	"upspin.io/config"
 	"upspin.io/flags"
-	"upspin.io/metric"
 	"upspin.io/subcmd"
 	"upspin.io/upspin"
 	"upspin.io/version"
@@ -109,8 +108,7 @@ var externalCommands = []string{
 
 type State struct {
 	*subcmd.State
-	sharer       *Sharer
-	metricsSaver metric.Saver
+	sharer *Sharer
 }
 
 func main() {
@@ -292,7 +290,6 @@ func (s *State) init() {
 		s.sharer = newSharer(s)
 	}
 	s.enableMetrics()
-	return
 }
 
 func (s *State) Printf(format string, args ...interface{}) {

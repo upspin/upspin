@@ -84,5 +84,4 @@ assumed to refer to the store defined in the user's configuration.
 			}
 		}
 	}
-	return
 }

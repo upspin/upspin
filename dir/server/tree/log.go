@@ -206,12 +206,10 @@ func HasLog(user upspin.UserName, directory string) (bool, error) {
 	} {
 		_, err := os.Stat(name)
 		if err != nil {
-			if os.IsNotExist(err) {
-				continue
-			}
-			if firstErr != nil {
+			if !os.IsNotExist(err) && firstErr != nil {
 				firstErr = errors.E(op, errors.IO, err)
 			}
+			continue
 		}
 		return true, nil
 	}
