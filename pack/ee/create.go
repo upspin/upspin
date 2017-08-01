@@ -74,10 +74,7 @@ func CreateKeys(curveName string, entropy []byte) (public upspin.PublicKey, priv
 // GenEntropy fills the slice with cryptographically-secure random bytes.
 func GenEntropy(entropy []byte) error {
 	_, err := rand.Read(entropy)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // encodeKeys converts an ecsda private key into an upspin key pair. No error checking is performed.

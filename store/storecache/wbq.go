@@ -160,13 +160,6 @@ func (wbq *writebackQueue) enqueueWritebackFile(path string) bool {
 	return true
 }
 
-func (wbq *writebackQueue) close() {
-	close(wbq.die)
-	for i := 0; i < writers+1; i++ {
-		<-wbq.terminated
-	}
-}
-
 // scheduler puts requests into the ready queue for the writers to work on.
 func (wbq *writebackQueue) scheduler() {
 	const op = "store/storecache.scheduler"

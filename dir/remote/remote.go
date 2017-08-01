@@ -272,10 +272,6 @@ func (op *operation) logErr(err error) {
 	log.Error.Printf("%s: %s", op, err)
 }
 
-func (op *operation) logf(format string, args ...interface{}) {
-	log.Printf("%s: "+format, append([]interface{}{op.op}, args...)...)
-}
-
 func (op *operation) error(args ...interface{}) error {
 	if len(args) == 0 {
 		panic("error called with zero args")

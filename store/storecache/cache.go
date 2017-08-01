@@ -34,13 +34,11 @@ import (
 type cachedRef struct {
 	sync.Mutex
 	c      *storeCache
-	ref    upspin.Reference
 	size   int64
-	store  upspin.Endpoint // Store reference belongs to (not yet used).
-	busy   bool            // True if the ref is in the process of being cached.
-	hold   *sync.Cond      // Wait here if some other func is caching the ref.
-	valid  bool            // True if successfully cached.
-	remove bool            // Remove when no longer busy.
+	busy   bool       // True if the ref is in the process of being cached.
+	hold   *sync.Cond // Wait here if some other func is caching the ref.
+	valid  bool       // True if successfully cached.
+	remove bool       // Remove when no longer busy.
 }
 
 // storeCache represents a cache for references. If, upon adding to the cache,
@@ -75,12 +73,6 @@ func newCache(cfg upspin.Config, dir string, maxBytes int64, writethrough bool) 
 	}
 	c.walk(dir)
 	return c, blockFlusher, nil
-}
-
-func (c *storeCache) close() {
-	if c.wbq != nil {
-		c.wbq.close()
-	}
 }
 
 // walk does a recursive walk of the cache directories adding cached references

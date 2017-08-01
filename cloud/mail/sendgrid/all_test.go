@@ -57,11 +57,7 @@ func TestSend(t *testing.T) {
 }
 
 func TestSendError(t *testing.T) {
-	const (
-		domain = "example.com"
-		key    = "mykey"
-	)
-	sg := New(key)
+	sg := New("mykey")
 
 	err := sg.Send("to@you.com", "from_me", "hello", "", "")
 	expectedErr := errors.E(errors.Invalid, errors.Str("text or html body must be provided"))

@@ -173,11 +173,7 @@ func (s *State) writeKeys(where, publicKey, privateKey string) error {
 	if err != nil {
 		return err
 	}
-	err = s.writeKeyFile(filepath.Join(where, "public.upspinkey"), publicKey)
-	if err != nil {
-		return err
-	}
-	return nil
+	return s.writeKeyFile(filepath.Join(where, "public.upspinkey"), publicKey)
 }
 
 func (s *State) saveKeys(where string, rotate bool, newPublic, newPrivate string) error {

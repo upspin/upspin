@@ -205,17 +205,6 @@ func allocHandle(n *node) *handle {
 	return h
 }
 
-func (h *handle) free() {
-	n := h.n
-	n.Lock()
-	delete(n.handles, h)
-	if len(n.handles) == 0 {
-		n.cf.close()
-		n.cf = nil
-	}
-	n.Unlock()
-}
-
 func (h *handle) freeNoLock() {
 	n := h.n
 	delete(n.handles, h)
@@ -608,13 +597,9 @@ func (n *node) Setattr(context gContext.Context, req *fuse.SetattrRequest, resp 
 		}
 		n.attr.Size = req.Size
 	}
-	if req.Valid.Mode() {
-		// We ignore mode changes but still return success.
-	}
-	if req.Valid.Mtime() {
-		// Set the modify time.
-		// TODO(p): should we actually set the modify time?
-	}
+	// Ignore mode changes.
+	// Ignore modify time.
+	// TODO(p): Should we set the modify time if it changed?
 	return nil
 }
 

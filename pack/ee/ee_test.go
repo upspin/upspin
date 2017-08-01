@@ -338,7 +338,7 @@ func TestCountersign(t *testing.T) {
 		pathName                    = upspin.PathName(joeUserName + "/secret_for_bob")
 		text                        = "bob, here's the secret file. Sincerely, The Joe."
 	)
-	joeConfig, packer := setup(joeUserName)
+	joeConfig, _ := setup(joeUserName)
 	joePublic := joeConfig.Factotum().PublicKey()
 	bobConfig, packer := setup(bobUserName)
 	bobPublic := bobConfig.Factotum().PublicKey()

@@ -425,7 +425,7 @@ func TestIsDomainAdminPutOther(t *testing.T) {
 		return nil, errors.Str("no host found")
 	}
 	// New server for domainAdmin.
-	u, mockGCP = newKeyServerWithMocking(domainAdmin, domainAdmin, adminJSON)
+	u, _ = newKeyServerWithMocking(domainAdmin, domainAdmin, adminJSON)
 	u.lookupTXT = lookupTXT
 	// adminUser will now Put a new user record for otherDude.
 	user = &upspin.User{

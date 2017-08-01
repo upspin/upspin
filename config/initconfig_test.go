@@ -163,31 +163,6 @@ cmdflags:
 
 }
 
-func parseTestEndpoint(text string) (upspin.Endpoint, error) {
-	if text == "" {
-		return upspin.Endpoint{}, nil
-	}
-
-	ep, err := upspin.ParseEndpoint(text)
-	// If no transport is provided, assume remote transport.
-	if err != nil && !strings.Contains(text, ",") {
-		var err2 error
-		if ep, err2 = upspin.ParseEndpoint("remote," + text); err2 == nil {
-			err = nil
-		}
-	}
-	if err != nil {
-		return upspin.Endpoint{}, err
-	}
-
-	// If it's a remote and the provided address does not include a port,
-	// assume port 443.
-	if ep.Transport == upspin.Remote && !strings.Contains(string(ep.NetAddr), ":") {
-		ep.NetAddr += ":443"
-	}
-	return *ep, nil
-}
-
 func TestNoSecrets(t *testing.T) {
 	expect := expectations{
 		username: "bob@google.com",

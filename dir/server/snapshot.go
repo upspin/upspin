@@ -70,12 +70,6 @@ func (s *server) startSnapshotLoop() {
 	go s.snapshotLoop()
 }
 
-func (s *server) stopSnapshotLoop() {
-	if s.snapshotControl != nil {
-		close(s.snapshotControl)
-	}
-}
-
 // snapshotLoop runs in a goroutine and performs snapshots.
 // We call takeSnapshotFor only from here to serialize requests with
 // time-triggered snapshot.

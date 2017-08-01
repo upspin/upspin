@@ -245,6 +245,9 @@ func TestLogGlob(t *testing.T) {
 
 	// Check for individual entries.
 	nentries, err, ok := l.lookupGlob("u@foo.com/a/b/c/*")
+	if err != nil {
+		t.Fatalf("lookupGlob: %v", err)
+	}
 	if !ok {
 		t.Fatalf("lookupGlob not found")
 	}
@@ -269,6 +272,9 @@ l:
 		t.Fatal("creating test log")
 	}
 	nentries, err, ok = l.lookupGlob("u@foo.com/a/b/c/*")
+	if err != nil {
+		t.Fatalf("lookupGlob: %v", err)
+	}
 	if !ok {
 		t.Fatalf("lookupGlob not found")
 	}

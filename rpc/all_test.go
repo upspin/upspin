@@ -180,6 +180,7 @@ func (c *client) Count(t *testing.T, start, count int32) {
 	}
 	stream := make(countStream)
 	done := make(chan struct{})
+	errc := make(chan error, 1)
 	go func() {
 		defer close(done)
 		for i := int32(0); ; i++ {
@@ -188,16 +189,20 @@ func (c *client) Count(t *testing.T, start, count int32) {
 				if i == count {
 					break
 				}
-				t.Fatalf("stream closed after receiving %v items, want %v", i, count)
+				errc <- errors.Errorf("stream closed after receiving %v items, want %v", i, count)
 			}
 			log.Printf("Client: Count response: %d", resp.Number)
 			if got, want := resp.Number, start+int32(i); got != want {
-				t.Fatalf("stream message out of order, got %v want %v", got, want)
+				errc <- errors.Errorf("stream message out of order, got %v want %v", got, want)
 			}
 		}
+		errc <- nil
 	}()
 	if err := c.Invoke("Server/Count", req, nil, stream, done); err != nil {
 		t.Fatal("Count:", err)
+	}
+	if err := <-errc; err != nil {
+		t.Fatal(err)
 	}
 }
 

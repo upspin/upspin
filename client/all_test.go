@@ -445,7 +445,7 @@ func TestFileZeroFill(t *testing.T) {
 		user     = "zerofill@google.com"
 		fileName = user + "/" + "file"
 	)
-	client, f, _ := setupFileIO(user, fileName, 0, t)
+	client, _, _ := setupFileIO(user, fileName, 0, t)
 	// Create and write one byte 100 bytes out.
 	f, err := client.Create(fileName)
 	if err != nil {
@@ -805,7 +805,7 @@ func TestBrokenLink(t *testing.T) {
 		t.Fatal("empty entry from PutLink")
 	}
 	// Attempt Get through the broken link.
-	data, err := client.Get(linkName)
+	_, err = client.Get(linkName)
 	if !errors.Match(errors.E(errors.BrokenLink), err) {
 		t.Fatalf("BrokenLink error not raised for %q: %q", linkName, err)
 	}
@@ -815,7 +815,7 @@ func TestBrokenLink(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Get through the file.
-	data, err = client.Get(fileName)
+	data, err := client.Get(fileName)
 	if err != nil {
 		t.Fatal(err)
 	}

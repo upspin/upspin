@@ -92,8 +92,6 @@ const (
 	lee   = upspin.UserName("lee@example.com")
 )
 
-var testUsers = []upspin.UserName{ann, chris, kelly, lee}
-
 // devNull gives EOF on read and absorbs anything error-free on write, like Unix's /dev/null.
 type devNull struct{}
 
@@ -212,19 +210,6 @@ func fail(errStr string) func(t *testing.T, r *runner, cmd *cmdTest, stdout, std
 		}
 		if !strings.Contains(stderr, errStr) {
 			t.Fatalf("%q: unexpected error (expected %q)\n\t%q", cmd.name, errStr, stderr)
-		}
-	}
-}
-
-// dump is a post function that just prints the stdout and stderr.
-// If Continue is false, dump calls t.Fatal.
-// The function is handy when debugging cmdTest scripts.
-func dump(Continue bool) func(t *testing.T, r *runner, cmd *cmdTest, stdout, stderr string) {
-	return func(t *testing.T, r *runner, cmd *cmdTest, stdout, stderr string) {
-		t.Errorf("Stdout:\n%s\n", stdout)
-		t.Errorf("Stderr:\n%s\n", stderr)
-		if !Continue {
-			t.Fatal("dump stops test")
 		}
 	}
 }

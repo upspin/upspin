@@ -305,7 +305,6 @@ func (ee ee) Unpack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker
 	}
 
 	// Pull the decryption key out of the wrapped keys.
-	dkey := make([]byte, aesKeyLen)
 	// For quick lookup, hash my public key and locate my wrapped key in the metadata.
 	rhash := factotum.KeyHash(rawPublicKey)
 	f := cfg.Factotum()
@@ -314,7 +313,7 @@ func (ee ee) Unpack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker
 			continue
 		}
 		// Decode my wrapped key using my private key.
-		dkey, err = aesUnwrap(f, w)
+		dkey, err := aesUnwrap(f, w)
 		if err != nil {
 			return nil, errors.E(op, d.Name, me, err)
 		}
@@ -483,7 +482,6 @@ func (ee ee) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName
 		return errors.E(op, errors.Invalid, d.Name, err)
 	}
 
-	dkey := make([]byte, aesKeyLen)
 	sig, sig2, wrap, cipherSum, err := pdUnmarshal(d.Packdata)
 	if err != nil {
 		return errors.E(op, errors.Invalid, d.Name, err)
@@ -527,7 +525,7 @@ func (ee ee) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName
 
 	// Decode my wrapped key using my private key
 	f := cfg.Factotum()
-	dkey, err = aesUnwrap(f, w)
+	dkey, err := aesUnwrap(f, w)
 	if err != nil {
 		return errors.E(op, d.Name, errors.Str("unwrap failed"))
 	}
@@ -600,8 +598,7 @@ func (ee ee) Countersign(oldKey upspin.PublicKey, f upspin.Factotum, d *upspin.D
 	if !wrapFound {
 		return errors.E(op, d.Name, errNoWrappedKey)
 	}
-	dkey := make([]byte, aesKeyLen)
-	dkey, err = aesUnwrap(f, w)
+	dkey, err := aesUnwrap(f, w)
 	if err != nil {
 		return errors.E(op, d.Name, errors.Str("unwrap failed"))
 	}
@@ -633,6 +630,9 @@ func gcmWrap(pub upspin.PublicKey, R *ecdsa.PublicKey, dkey []byte) (w wrappedKe
 		return
 	}
 	v, err := ecdsa.GenerateKey(curve, rand.Reader)
+	if err != nil {
+		return
+	}
 	sx, sy := curve.ScalarMult(R.X, R.Y, v.D.Bytes())
 	S := elliptic.Marshal(curve, sx, sy)
 	w.ephemeral = ecdsa.PublicKey{Curve: curve, X: v.X, Y: v.Y}

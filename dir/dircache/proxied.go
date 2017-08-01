@@ -55,19 +55,6 @@ func newProxiedDirs(l *clog) *proxiedDirs {
 	return &proxiedDirs{m: make(map[upspin.UserName]*proxiedDir), l: l}
 }
 
-// close terminates all watchers.
-func (p *proxiedDirs) close() {
-	p.Lock()
-	defer p.Unlock()
-	if p.closing {
-		return
-	}
-	p.closing = true
-	for _, d := range p.m {
-		d.close()
-	}
-}
-
 // proxyFor saves the endpoint and makes sure it is being watched.
 func (p *proxiedDirs) proxyFor(name upspin.PathName, ep *upspin.Endpoint) {
 	p.Lock()

@@ -8,7 +8,6 @@ import (
 	"reflect"
 	"testing"
 
-	"upspin.io/config"
 	"upspin.io/upspin"
 
 	_ "upspin.io/dir/inprocess"
@@ -27,17 +26,8 @@ var (
 	}
 )
 
-func setup(t *testing.T) upspin.KeyServer {
-	c := config.New()
-	c = config.SetUserName(c, testUser.Name)
-	c = config.SetKeyEndpoint(c, inProcessEndpoint)
-	c = config.SetStoreEndpoint(c, inProcessEndpoint)
-	c = config.SetDirEndpoint(c, inProcessEndpoint)
-	return New()
-}
-
 func TestInstallAndLookup(t *testing.T) {
-	key := setup(t)
+	key := New()
 	if _, ok := key.(*server); !ok {
 		t.Fatal("Not an inprocess KeyServer")
 	}
