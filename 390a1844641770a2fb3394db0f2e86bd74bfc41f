@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "027625e7_b497324b",
+        "filename": "cmd/upspin/cmd_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-01T05:07:08Z",
+      "side": 0,
+      "message": "please leave this in. comment it out if you want, but i use this helper a lot.",
+      "revId": "390a1844641770a2fb3394db0f2e86bd74bfc41f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
