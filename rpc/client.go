@@ -185,7 +185,6 @@ func (c *httpClient) makeRequest(op, method string, req pb.Message, header http.
 	if err != nil {
 		return nil, errors.E(op, errors.IO, err)
 	}
-	c.setLastActivity()
 	return resp, nil
 }
 
@@ -396,25 +395,9 @@ func (c *httpClient) Close()     {}
 type clientAuth struct {
 	config upspin.Config
 
-	mu              sync.Mutex // protects the fields below.
-	token           string
-	lastRefresh     time.Time
-	lastNetActivity time.Time // last known time of some network activity.
-}
-
-// lastActivity reports the time of the last known network activity.
-func (ca *clientAuth) lastActivity() time.Time {
-	ca.mu.Lock()
-	defer ca.mu.Unlock()
-	return ca.lastNetActivity
-}
-
-// setLastActivity records the current time as that of the last known network activity.
-// It is used to prevent unnecessarily frequent pings.
-func (ca *clientAuth) setLastActivity() {
-	ca.mu.Lock()
-	ca.lastNetActivity = time.Now()
-	ca.mu.Unlock()
+	mu          sync.Mutex // protects the fields below.
+	token       string
+	lastRefresh time.Time
 }
 
 // invalidateSession forgets the authentication token.
@@ -475,10 +458,5 @@ func (ca *clientAuth) verifyServerUser(msg []string) error {
 	}
 
 	// Validate signature.
-	err = verifyUser(key.PublicKey, msg, serverAuthMagic, "[localproxy]", time.Now())
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return verifyUser(key.PublicKey, msg, serverAuthMagic, "[localproxy]", time.Now())
 }

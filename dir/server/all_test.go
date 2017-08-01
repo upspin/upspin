@@ -244,7 +244,7 @@ func TestLink(t *testing.T) {
 
 	// Get a server for otherUser, who has no right to see the link.
 	sOther, userCtx := newDirServerForTesting(t, otherUser)
-	de2, err = sOther.Lookup(userName + "/mylink")
+	_, err = sOther.Lookup(userName + "/mylink")
 	if !errors.Match(errPrivate, err) {
 		t.Errorf("err = %v, want = %v", err, errPrivate)
 	}
@@ -332,6 +332,9 @@ func TestHasRight(t *testing.T) {
 		t.Fatal(err)
 	}
 	p, err := path.Parse(userName + "/")
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	checkAccess := func(right access.Right, want bool) error {
 		hasAccess, _, err := s.hasRight(right, p)
@@ -491,6 +494,9 @@ func TestGlob(t *testing.T) {
 
 	// Try globbing a specific file.
 	ents, err = s.Glob(userName + "/file1.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
 	exp = []expected{
 		{userName + "/file1.txt", incomplete},
 	}
@@ -534,6 +540,9 @@ func TestGlob(t *testing.T) {
 
 	// Try globbing a specific directory not directly in the root.
 	ents, err = s.Glob(userName + "/dir/foo")
+	if err != nil {
+		t.Fatal(err)
+	}
 	exp = []expected{
 		{userName + "/dir/foo", !incomplete},
 	}
@@ -586,6 +595,9 @@ func TestGlob(t *testing.T) {
 
 	// Glob the link itself.
 	ents, err = sOwner.Glob(userName + "/dir/sublinkdir")
+	if err != upspin.ErrFollowLink {
+		t.Fatalf("Glob returned error %v, want ErrFollowLink", err)
+	}
 	exp = []expected{
 		{userName + "/dir/sublinkdir", !incomplete},
 	}

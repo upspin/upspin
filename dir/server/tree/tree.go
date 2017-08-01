@@ -451,11 +451,7 @@ func (t *Tree) loadKids(parent *node) error {
 	if err != nil {
 		return err
 	}
-	err = loadKidsFromBlock(parent, data)
-	if err != nil {
-		return err
-	}
-	return nil
+	return loadKidsFromBlock(parent, data)
 }
 
 // loadRoot loads the root into memory if it is not already loaded.

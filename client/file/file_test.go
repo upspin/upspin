@@ -61,7 +61,7 @@ func TestFileOverflow(t *testing.T) {
 	if n != int(maxInt) {
 		t.Fatalf("write file: expected %d got %d", maxInt, n)
 	}
-	n, err = f.Write(make([]byte, maxInt))
+	_, err = f.Write(make([]byte, maxInt))
 	if err == nil {
 		t.Fatal("write file: expected overflow")
 	}
@@ -83,7 +83,7 @@ func TestFileOverflow(t *testing.T) {
 	if n64 != maxInt {
 		t.Fatalf("seek file: expected %d got %d", maxInt, n64)
 	}
-	n64, err = f.Seek(maxInt+1, 0)
+	_, err = f.Seek(maxInt+1, 0)
 	if err == nil {
 		t.Fatal("seek past file: expected error")
 	}
@@ -97,7 +97,7 @@ func TestFileOverflow(t *testing.T) {
 	if n64 != maxInt {
 		t.Fatalf("seek filex: expected %d got %d", maxInt, n64)
 	}
-	n64, err = f.Seek(maxInt+1, 0)
+	_, err = f.Seek(maxInt+1, 0)
 	if err == nil {
 		t.Fatal("seek maxint+1 filex: expected error")
 	}

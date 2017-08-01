@@ -415,7 +415,6 @@ func (l *clog) readLogFile(fn string) error {
 		switch e.request {
 		case versionReq:
 			log.Info.Printf("%s: version other than first record", op)
-			break
 		case globReq:
 			// Since we first log all the contents of a directory before the glob,
 			// we need to first add all entries to a manufactured glob entry. Once
@@ -647,7 +646,7 @@ func cacheableGlob(p upspin.PathName) (upspin.PathName, bool) {
 
 	// This test also rejects globs with escaped glob characters, i.e., real glob
 	// characters in file names.
-	if strings.IndexAny(string(pp), "*?[") >= 0 {
+	if strings.ContainsAny(string(pp), "*?[") {
 		return p, false
 	}
 	return pp, true
@@ -790,7 +789,6 @@ func (l *clog) updateLRU(e *clogEntry) {
 	default:
 		log.Printf("unknown request type: %s", e)
 	}
-	return
 }
 
 // addToLRU adds an entry to the LRU.

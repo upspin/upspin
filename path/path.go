@@ -27,11 +27,7 @@ type Parsed struct {
 
 // UnmarshalJSON is needed because Parsed has unexported fields.
 func (p *Parsed) UnmarshalJSON(data []byte) error {
-	err := json.Unmarshal(data, &p.path)
-	if err != nil {
-		return err
-	}
-	return nil
+	return json.Unmarshal(data, &p.path)
 }
 
 // MarshalJSON is needed because Parsed has unexported fields.

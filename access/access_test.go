@@ -411,6 +411,9 @@ func TestHasAccessWithGroups(t *testing.T) {
 	}
 	// Sister can't read anymore and family group is needed.
 	ok, missingGroups, err := a.canNoGroupLoad("sister@me.com", Read, "me@here.com/foo/bar")
+	if err != nil {
+		t.Fatal(err)
+	}
 	if ok {
 		t.Errorf("Expected no permission")
 	}
@@ -724,6 +727,8 @@ func TestUsersNoGroupLoad(t *testing.T) {
 	}
 	groupsExpected = []string{"bob@foo.com/Group/grandparents"}
 	expectEqual(t, groupsExpected, listFromPathName(groupsNeeded))
+	expectedWriters = []string{"bob@foo.com", "sis@foo.com", "uncle@foo.com"}
+	expectEqual(t, expectedWriters, listFromUserName(writersList))
 	// Add grandparents and for good measure, add the family again.
 	err = AddGroup("bob@foo.com/Group/grandparents", []byte("grandpamoe@antifoo.com family"))
 	if err != nil {
@@ -732,6 +737,9 @@ func TestUsersNoGroupLoad(t *testing.T) {
 	writersList, groupsNeeded, err = acc.usersNoGroupLoad(Write)
 	if err != nil {
 		t.Fatal(err)
+	}
+	if groupsNeeded != nil {
+		t.Fatalf("Round 3: Expected no groups to be needed, got %v", groupsNeeded)
 	}
 	expectedWriters = []string{"bob@foo.com", "sis@foo.com", "uncle@foo.com", "grandpamoe@antifoo.com"}
 	expectEqual(t, expectedWriters, listFromUserName(writersList))

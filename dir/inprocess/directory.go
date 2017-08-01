@@ -376,7 +376,7 @@ func (s *server) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, error)
 	}
 	if errors.Match(err, notExist) {
 		// The parent must exist.
-		entry, err = s.lookup(op, parsed.Drop(1), true)
+		_, err = s.lookup(op, parsed.Drop(1), true)
 		if err != nil {
 			// Always say Private to avoid giving information away.
 			// We know it's not a link.

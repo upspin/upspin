@@ -92,8 +92,6 @@ const (
 	lee   = upspin.UserName("lee@example.com")
 )
 
-var testUsers = []upspin.UserName{ann, chris, kelly, lee}
-
 // devNull gives EOF on read and absorbs anything error-free on write, like Unix's /dev/null.
 type devNull struct{}
 

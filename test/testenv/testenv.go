@@ -301,10 +301,7 @@ func registerUserWithKeyServer(cfg upspin.Config, userName upspin.UserName) erro
 		Stores:    []upspin.Endpoint{cfg.StoreEndpoint()},
 		PublicKey: cfg.Factotum().PublicKey(),
 	}
-	if err := key.Put(user); err != nil {
-		return err
-	}
-	return nil
+	return key.Put(user)
 }
 
 func makeRootIfNotExist(cfg upspin.Config) error {
