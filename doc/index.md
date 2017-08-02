@@ -20,7 +20,7 @@ If you'd like to help us make that vision a reality, we'd love to have you try
 out Upspin.
 
 Upspin is an [open-source project](https://github.com/upspin/upspin) that
-consists of two main design elements:
+comprises two main design elements:
 
 1. a set of protocols enabling secure, federated sharing using a global naming
    system; and
@@ -36,29 +36,17 @@ To get started, [**download the Upspin client**](/dl/) and follow the the
 
 ## Documentation
 
-- The [Upspin Overview](/doc/overview.md) document provides a high-level
-  introduction to Upspin.
-- The [FAQ](/doc/faq.md) answers common questions about Upspin.
-- The [Signing up a new user](/doc/signup.md) document describes the process for
-  generating keys and registering a user with the Upspin key server.
-- The [Upspin Security](/doc/security.md) document describes Upspin's security
-  model.
-- The [Upspin Access Control](/doc/access_control.md) document describes
-  Upspin's access control mechanisms.
-- The [Upspin Configuration](/doc/config.md) document describes Upspin's
-  configuration file format and settings.
-- The [Setting up `upspinserver`](/doc/server_setup.md) document explains how
-  to set up your own Upspin installation on a Linux server.
-- The [Usage Examples](/doc/usage_examples.md) document demonstrates some
-  common usage scenarios.
-- The [Mascot](/doc/mascot.md) document introduces our mascot, Augie,
-  including downloadable images and usage information.
-- The [RPC](https://godoc.org/upspin.io/rpc) document is a semiformal
-  description of the wire protocol used to communicate between clients
-  and servers.
-
+The [Documentation](/doc/doc.md) page holds annotated links to the
+rich documentation for Upsin, which includes everything from
+user guides to details about the design and implemation.
 
 ## Community
+
+Upspin is an open source project with a growing community
+of users and contributors.
+These resources support the open source project and
+point to things such as the GitHub repository,
+mailing lists, user forums, and so on.
 
 - [The Upspin project on GitHub](https://github.com/upspin/upspin)
 - [Issue tracker](https://github.com/upspin/upspin/issues)
@@ -71,3 +59,9 @@ To get started, [**download the Upspin client**](/dl/) and follow the the
 - [Contribution guidelines](https://github.com/upspin/upspin/blob/master/CONTRIBUTING.md)
 - [Code review](https://upspin-review.googlesource.com)
 - [@UpspinProject](https://twitter.com/UpspinProject) on Twitter
+
+## Augie
+
+The Upspin mascot, Augie, watches over the project and its community.
+The [Mascot](/doc/mascot.md) document introduces
+him and includes downloadable images and usage information.
