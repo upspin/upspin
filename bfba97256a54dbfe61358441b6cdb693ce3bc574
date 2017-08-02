@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5d8fda16_c8b96c51",
+        "filename": "doc/arch.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-02T00:54:45Z",
+      "side": 1,
+      "message": "This is how the pieces fit together:",
+      "revId": "bfba97256a54dbfe61358441b6cdb693ce3bc574",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "50a047c2_3de7f072",
+        "filename": "doc/arch.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-02T00:54:45Z",
+      "side": 1,
+      "message": "s/the/which is the/",
+      "revId": "bfba97256a54dbfe61358441b6cdb693ce3bc574",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8c3d2beb_e54269b8",
+        "filename": "doc/arch.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-02T00:54:45Z",
+      "side": 1,
+      "message": "s/references/\u0026,/\ns/include/start with/ (too many includes)",
+      "revId": "bfba97256a54dbfe61358441b6cdb693ce3bc574",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
