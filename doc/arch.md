@@ -18,7 +18,7 @@ which holds the public key and directory server address for each user.
 
 <img src="/images/arch/key.png" width="527" alt="Key server didagram"/>
 
-Now we see it all put together:
+This is how the pieces fit together:
 
 <img src="/images/arch/overall.png" width="503" alt="Overall system diagram"/>
 
@@ -35,11 +35,11 @@ of requests a client exchanges with the servers to read the file
 <img src="/images/arch/readfile.png" width="629" alt="Reading a file diagram"/>
 
 1. The client asks the key server for the record describing the owner of the
-   file, the user name at the beginning of the file name (`augie@upspin.io`).
+   file, which is the user name at the beginning of the file name (`augie@upspin.io`).
    The key server's response includes the name of the directory server holding
    that user's tree (`dir.upspin.io`) and Augie's public key.
 2. The client asks the directory server for the directory entry describing the
-   file. The response includes a list of block references which include the
+   file. The response includes a list of block references, which start with the
    name of the store server (`store.upspin.io`).
 3. The client can then ask the store server for each of the blocks, pipelining
    the requests for efficiency.
