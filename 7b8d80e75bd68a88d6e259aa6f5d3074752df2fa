@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c14b5c1d_cee8e15c",
+        "filename": "doc/index.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-02T00:51:58Z",
+      "side": 1,
+      "message": "missing link - to github?",
+      "revId": "7b8d80e75bd68a88d6e259aa6f5d3074752df2fa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ad66bdef_122c340e",
+        "filename": "doc/index.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-02T00:51:58Z",
+      "side": 1,
+      "message": "s/a building block/building blocks/",
+      "revId": "7b8d80e75bd68a88d6e259aa6f5d3074752df2fa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
