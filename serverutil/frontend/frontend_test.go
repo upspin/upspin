@@ -133,10 +133,14 @@ func TestGoImport(t *testing.T) {
 	}
 }
 
-func TestDocList(t *testing.T) {
+func TestDocRoot(t *testing.T) {
 	once.Do(startServer)
 	b := get(t, "http://"+addr+"/doc/")
-	expected := `<a href="/doc/test.md">Test</a>`
+	expected := `<h1>Documentation</h1>`
+	if !strings.Contains(string(b), expected) {
+		t.Errorf("expected response body to contain %q; body: %q", expected, b)
+	}
+	expected = `<title>Documentation · Upspin</title>`
 	if !strings.Contains(string(b), expected) {
 		t.Errorf("expected response body to contain %q; body: %q", expected, b)
 	}
