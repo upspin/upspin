@@ -16,7 +16,6 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
 	"sync"
 	"time"
@@ -111,11 +110,10 @@ func redirectHTTP(w http.ResponseWriter, r *http.Request) {
 
 type server struct {
 	handlers http.Handler // stack of wrapped http.Handlers
-	docList  []string
 	docHTML  map[string][]byte
 	docTitle map[string]string
 	tmpl     struct {
-		doc, doclist, download *template.Template
+		doc, download *template.Template
 	}
 }
 
@@ -133,8 +131,7 @@ func newServer(cfg upspin.Config, docs string) (http.Handler, error) {
 	}
 
 	mux := http.NewServeMux()
-	mux.Handle("/", http.HandlerFunc(s.handleRoot))
-	mux.Handle("/doc/", http.HandlerFunc(s.handleDoc))
+	mux.Handle("/", http.HandlerFunc(s.handleDoc))
 	mux.Handle("/images/", http.FileServer(http.Dir(docs)))
 	if cfg != nil {
 		mux.Handle(downloadPath, newDownloadHandler(cfg, s.tmpl.download))
@@ -158,28 +155,30 @@ type pageData struct {
 	Content interface{}
 }
 
-func (s *server) handleRoot(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	if r.URL.Path != "/" {
-		http.Error(w, http.StatusText(http.StatusNotFound), http.StatusNotFound)
-		return
-	}
-	s.renderDoc(w, "index.md")
-}
-
 func (s *server) handleDoc(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
-	if r.URL.Path == "/doc/" {
-		d := pageData{Content: struct {
-			List  []string
-			Title map[string]string
-		}{s.docList, s.docTitle}}
-		if err := s.tmpl.doclist.Execute(w, d); err != nil {
-			log.Error.Printf("Error executing root content template: %s", err)
+	switch r.URL.Path {
+	case "/":
+		s.renderDoc(w, "index.md")
+	case "/doc/":
+		s.renderDoc(w, "doc.md")
+	case "/doc":
+		http.Redirect(w, r, "/doc/", http.StatusFound)
+	default:
+		if !strings.HasPrefix(r.URL.Path, "/doc/") {
+			http.NotFound(w, r)
+			return
 		}
-		return
+		base := filepath.Base(r.URL.Path)
+		switch base {
+		case "index.md":
+			http.Redirect(w, r, "/", http.StatusFound)
+		case "doc.md":
+			http.Redirect(w, r, "/doc/", http.StatusFound)
+		default:
+			s.renderDoc(w, base)
+		}
 	}
-	s.renderDoc(w, filepath.Base(r.URL.Path))
 }
 
 func (s *server) renderDoc(w http.ResponseWriter, fn string) {
@@ -210,10 +209,6 @@ func (s *server) parseTemplates(dir string) (err error) {
 	if err != nil {
 		return err
 	}
-	s.tmpl.doclist, err = template.ParseFiles(filepath.Join(dir, "base.tmpl"), filepath.Join(dir, "doclist.tmpl"))
-	if err != nil {
-		return err
-	}
 	s.tmpl.download, err = template.ParseFiles(filepath.Join(dir, "base.tmpl"), filepath.Join(dir, "download.tmpl"))
 	return err
 }
@@ -226,7 +221,6 @@ func (s *server) parseDocs(dir string) error {
 	var (
 		html  = map[string][]byte{}
 		title = map[string]string{}
-		list  = []string{}
 	)
 	for _, fi := range fis {
 		fn := fi.Name()
@@ -239,12 +233,9 @@ func (s *server) parseDocs(dir string) error {
 		}
 		html[fn] = blackfriday.MarkdownCommon(b)
 		title[fn] = docTitle(b)
-		list = append(list, fn)
 	}
 	s.docHTML = html
 	s.docTitle = title
-	s.docList = list
-	sort.Strings(s.docList)
 	return nil
 }
 
