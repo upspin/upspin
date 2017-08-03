@@ -1,0 +1,216 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "48d2e8f1_1285e3cd",
+        "filename": "doc/faq.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-08-03T23:05:49Z",
+      "side": 1,
+      "message": "\"app\" is kind of ambiguous. At first I thought you were talking about the macOS helper thing. I suggest rewording this to be something like\n\n# Can I use Upspin on my phone? {#mobile}",
+      "revId": "edcb207b97d7cdf5bfdb788ec8c53c9963ed062b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e6e03685_5b8f57cd",
+        "filename": "doc/faq.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-08-03T23:05:49Z",
+      "side": 1,
+      "message": "# How do Upspin servers authenticate users? {#server-auth}",
+      "revId": "edcb207b97d7cdf5bfdb788ec8c53c9963ed062b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cf326d3b_e22035f8",
+        "filename": "doc/faq.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-08-03T23:05:49Z",
+      "side": 1,
+      "message": "neither the directory server nor the store server",
+      "range": {
+        "startLine": 153,
+        "startChar": 5,
+        "endLine": 153,
+        "endChar": 43
+      },
+      "revId": "edcb207b97d7cdf5bfdb788ec8c53c9963ed062b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5339994d_1b2dede1",
+        "filename": "doc/faq.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-08-03T23:05:49Z",
+      "side": 1,
+      "message": "drop \"the\"",
+      "range": {
+        "startLine": 158,
+        "startChar": 46,
+        "endLine": 158,
+        "endChar": 49
+      },
+      "revId": "edcb207b97d7cdf5bfdb788ec8c53c9963ed062b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5b852845_9a21f694",
+        "filename": "doc/faq.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-08-03T23:05:49Z",
+      "side": 1,
+      "message": "...itself encrypted such that only the set of users with \"read\" access can decrypt it.",
+      "range": {
+        "startLine": 165,
+        "startChar": 23,
+        "endLine": 165,
+        "endChar": 32
+      },
+      "revId": "edcb207b97d7cdf5bfdb788ec8c53c9963ed062b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "54a48c84_b45df3f6",
+        "filename": "doc/faq.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-08-03T23:05:49Z",
+      "side": 1,
+      "message": "isn\u0027t it private *keys* (plural) and s/owner/readers/ ?\n\nthis paragraph doesn\u0027t sound right to me.",
+      "range": {
+        "startLine": 172,
+        "startChar": 0,
+        "endLine": 172,
+        "endChar": 36
+      },
+      "revId": "edcb207b97d7cdf5bfdb788ec8c53c9963ed062b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6d680123_8b180d81",
+        "filename": "doc/faq.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-08-03T23:05:49Z",
+      "side": 1,
+      "message": "it\u0027s not just owners that read encrypted files. It\u0027s anyone with a wrapped key (any of the set of readers).",
+      "range": {
+        "startLine": 175,
+        "startChar": 22,
+        "endLine": 175,
+        "endChar": 27
+      },
+      "revId": "edcb207b97d7cdf5bfdb788ec8c53c9963ed062b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "198ec2bc_7ef293fd",
+        "filename": "doc/faq.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-08-03T23:05:49Z",
+      "side": 1,
+      "message": "Oh, I see what you were doing above. First talking about an owner just encrypting for itself. Then talking about sharing. I think this is a bit confusing. It makes it seem like an owner wrapping the AES key for itself is different to wrapping it for any other reader, when it\u0027s really the same thing.",
+      "revId": "edcb207b97d7cdf5bfdb788ec8c53c9963ed062b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5fb1f9e5_8553eeff",
+        "filename": "doc/faq.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-08-03T23:05:49Z",
+      "side": 1,
+      "message": "it\u0027s not really a second level of protection, though, since the store itself does not do any access control on reads.",
+      "range": {
+        "startLine": 225,
+        "startChar": 25,
+        "endLine": 225,
+        "endChar": 31
+      },
+      "revId": "edcb207b97d7cdf5bfdb788ec8c53c9963ed062b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d8f84419_0eb4b354",
+        "filename": "doc/faq.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-08-03T23:05:49Z",
+      "side": 1,
+      "message": "I\u0027d prefer it if we did not do this stylistic trick.\nIf we want to improve the appearance of code-formatted text we should do it in the stylesheet, not by making our markdown awkward.",
+      "range": {
+        "startLine": 230,
+        "startChar": 45,
+        "endLine": 230,
+        "endChar": 48
+      },
+      "revId": "edcb207b97d7cdf5bfdb788ec8c53c9963ed062b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
