@@ -420,21 +420,28 @@ func testSelectedOnePacking(t *testing.T, setup testenv.Setup) {
 var integrationTestKinds = []string{"inprocess", "server", "remote"}
 
 func TestIntegration(t *testing.T) {
+	type testConfig struct {
+		packing  upspin.Packing
+		remoteOK bool
+	}
+	var testConfigs []testConfig
+	if testing.Short() {
+		t.Log("skipping network-based and non-ee-pack tests while -test.short specified")
+		testConfigs = []testConfig{
+			{upspin.EEPack, false},
+		}
+	} else {
+		testConfigs = []testConfig{
+			{upspin.PlainPack, false},
+			{upspin.EEIntegrityPack, false},
+			{upspin.EEPack, true}, // Run only this test against remote.
+		}
+	}
 	for _, kind := range integrationTestKinds {
 		t.Run(fmt.Sprintf("kind=%v", kind), func(t *testing.T) {
-			if testing.Short() && kind == "remote" {
-				t.Skip("skipping network-based tests while -test.short specified")
-			}
 			setup := setupTemplate
 			setup.Kind = kind
-			for _, p := range []struct {
-				packing  upspin.Packing
-				remoteOK bool
-			}{
-				{upspin.PlainPack, false},
-				{upspin.EEIntegrityPack, false},
-				{upspin.EEPack, true}, // Only run this test against remote.
-			} {
+			for _, p := range testConfigs {
 				setup.Packing = p.packing
 				t.Run(fmt.Sprintf("packing=%v", p.packing), func(t *testing.T) {
 					if kind == "remote" && !p.remoteOK {
