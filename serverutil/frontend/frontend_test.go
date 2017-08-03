@@ -133,21 +133,46 @@ func TestGoImport(t *testing.T) {
 	}
 }
 
+func TestIndex(t *testing.T) {
+	once.Do(startServer)
+	for _, p := range []string{
+		"/",
+		"/doc/index.md",
+	} {
+		b := get(t, "http://"+addr+p)
+		expected := `<h1>Index</h1>`
+		if !strings.Contains(string(b), expected) {
+			t.Errorf("expected response body to contain %q; body: %q", expected, b)
+		}
+		expected = `<title>Index · Upspin</title>`
+		if !strings.Contains(string(b), expected) {
+			t.Errorf("expected response body to contain %q; body: %q", expected, b)
+		}
+	}
+}
+
 func TestDocRoot(t *testing.T) {
 	once.Do(startServer)
-	b := get(t, "http://"+addr+"/doc/")
-	expected := `<h1>Documentation</h1>`
-	if !strings.Contains(string(b), expected) {
-		t.Errorf("expected response body to contain %q; body: %q", expected, b)
-	}
-	expected = `<title>Documentation · Upspin</title>`
-	if !strings.Contains(string(b), expected) {
-		t.Errorf("expected response body to contain %q; body: %q", expected, b)
+	for _, p := range []string{
+		"/doc",
+		"/doc/",
+		"/doc/doc.md",
+	} {
+		b := get(t, "http://"+addr+p)
+		expected := `<h1>Documentation</h1>`
+		if !strings.Contains(string(b), expected) {
+			t.Errorf("expected response body to contain %q; body: %q", expected, b)
+		}
+		expected = `<title>Documentation · Upspin</title>`
+		if !strings.Contains(string(b), expected) {
+			t.Errorf("expected response body to contain %q; body: %q", expected, b)
+		}
 	}
 }
 
 func TestDoc(t *testing.T) {
 	once.Do(startServer)
+
 	b := get(t, "http://"+addr+"/doc/test.md")
 	expected := `<h1>Test</h1>`
 	if !strings.Contains(string(b), expected) {
@@ -158,13 +183,9 @@ func TestDoc(t *testing.T) {
 		t.Errorf("expected response body to contain %q; body: %q", expected, b)
 	}
 
-	req, err := http.NewRequest("GET", "http://"+addr+"/doc/notfounddoc", nil)
+	resp, err := http.Get("http://" + addr + "/doc/notfounddoc")
 	if err != nil {
-		t.Fatalf("expected no error, but got %v", err)
-	}
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		t.Fatalf("expected no error, but got %v", err)
+		t.Fatal(err)
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusNotFound {
