@@ -420,25 +420,27 @@ func testSelectedOnePacking(t *testing.T, setup testenv.Setup) {
 var integrationTestKinds = []string{"inprocess", "server", "remote"}
 
 func TestIntegration(t *testing.T) {
+	type testConfig struct {
+		packing upspin.Packing
+		always  bool // Always run this, even with -short or kind=="remote".
+	}
+	testConfigs := []testConfig{
+		{upspin.PlainPack, false},
+		{upspin.EEIntegrityPack, false},
+		{upspin.EEPack, true},
+	}
 	for _, kind := range integrationTestKinds {
 		t.Run(fmt.Sprintf("kind=%v", kind), func(t *testing.T) {
-			if testing.Short() && kind == "remote" {
-				t.Skip("skipping network-based tests while -test.short specified")
-			}
 			setup := setupTemplate
 			setup.Kind = kind
-			for _, p := range []struct {
-				packing  upspin.Packing
-				remoteOK bool
-			}{
-				{upspin.PlainPack, false},
-				{upspin.EEIntegrityPack, false},
-				{upspin.EEPack, true}, // Only run this test against remote.
-			} {
-				setup.Packing = p.packing
-				t.Run(fmt.Sprintf("packing=%v", p.packing), func(t *testing.T) {
-					if kind == "remote" && !p.remoteOK {
-						t.Skip("skipping test against remote")
+			for _, config := range testConfigs {
+				setup.Packing = config.packing
+				t.Run(fmt.Sprintf("packing=%v", config.packing), func(t *testing.T) {
+					if testing.Short() && (kind == "remote" || !config.always) {
+						t.Skip("skipping remote or extra test with -test.short")
+					}
+					if kind == "remote" && !config.always {
+						t.Skip("skipping extra remote test")
 					}
 					testSelectedOnePacking(t, setup)
 				})
