@@ -56,7 +56,7 @@ is part of #336. --->
 
 - TODO: A worked example (implementer's guide).
 
-- The [RPC](https://godoc.org/upspin.io/rpc) page from [`godoc.org`](godoc.org) 
+- The [RPC](https://godoc.org/upspin.io/rpc) page from [`godoc.org`](godoc.org)
   is a programmer's reference that includes a semiformal description of the wire
   protocol used to communicate between clients and servers.<!--- --->
 
