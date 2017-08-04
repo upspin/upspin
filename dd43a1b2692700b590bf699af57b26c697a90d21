@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d4b2fda8_b7f0e707",
+        "filename": "doc/faq.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-08-04T01:34:14Z",
+      "side": 1,
+      "message": "There will be other end-to-end encryption packings.   The EE refers specifically to elliptic curve crypto from the Go library, i.e. the NIST curves.  I realize this is too much technical detail for the FAQ.   If you remove \"—EE packing in Upspin terminology—\" then it is technically correct and still understandable.  The next sentence \"EE packing...\" can stay as is.",
+      "revId": "dd43a1b2692700b590bf699af57b26c697a90d21",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a3a41e55_36d00a79",
+        "filename": "doc/faq.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-08-04T01:34:14Z",
+      "side": 1,
+      "message": "This will need to be tweaked a bit if Andrew\u0027s change goes in.   Before, what you see is what you get;  either the file is encrypted or it is plaintext.  Now it will be halfway encrypted.",
+      "revId": "dd43a1b2692700b590bf699af57b26c697a90d21",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
