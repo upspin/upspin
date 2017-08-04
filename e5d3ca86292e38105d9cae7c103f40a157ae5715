@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a312690b_4be8642c",
+        "filename": "upspin/code.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-04T21:40:01Z",
+      "side": 1,
+      "message": "This is unfortunate. It\u0027s easier to have the zeros counted for you, but it seems wrong to change the formatting call.",
+      "revId": "e5d3ca86292e38105d9cae7c103f40a157ae5715",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
