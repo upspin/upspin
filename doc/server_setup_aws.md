@@ -45,16 +45,6 @@ prudent to include your domain name in the bucket name.
 local$ upspin setupstorage-aws -domain=example.com example-com-upspin
 ```
 
-**Notes**:
-+ The role has access to all S3 buckets by default. To restrict its
-access to only one bucket, follow
-[this guide](https://aws.amazon.com/blogs/security/how-to-restrict-amazon-s3-bucket-access-to-a-specific-iam-role/).
-+ The role name is also used as the name for the
-[instance profile](http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html)
-you should use to provision the instance.
-+ Ensure that your security group allows inbound TCP traffic at
-least on port 443.
-
 It should produce output like this:
 
 ```
@@ -67,6 +57,16 @@ You can use the -clean flag to clean up any potential entities created:
 ```
 local$ upspin setupstorage-aws -clean -role_name=upspin-example-com -domain=example.com example-com-upspin
 ```
+
+**Notes**:
+
+- The role has access to all S3 buckets by default. To restrict its access to
+  only one bucket, follow [this guide](https://aws.amazon.com/blogs/security/how-to-restrict-amazon-s3-bucket-access-to-a-specific-iam-role/).
+- The role name is also used as the name for the
+  [instance profile](http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html)
+  you should use to provision the instance.
+- If you are running `upspinserver` on an EC2 instance, ensure that your
+  security group allows inbound TCP traffic at least on port 443.
 
 ## Continue
 
