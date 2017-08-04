@@ -69,6 +69,115 @@
       "revId": "dd43a1b2692700b590bf699af57b26c697a90d21",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "65a959bf_74b9069a",
+        "filename": "doc/faq.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-08-04T02:54:54Z",
+      "side": 1,
+      "message": "agl provides a great introduction here:\nhttps://www.imperialviolet.org/2010/12/04/ecc.html",
+      "range": {
+        "startLine": 171,
+        "startChar": 49,
+        "endLine": 171,
+        "endChar": 73
+      },
+      "revId": "dd43a1b2692700b590bf699af57b26c697a90d21",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3a09b8d8_c7ed8d02",
+        "filename": "doc/faq.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-08-04T02:54:54Z",
+      "side": 1,
+      "message": "space after this",
+      "range": {
+        "startLine": 199,
+        "startChar": 19,
+        "endLine": 199,
+        "endChar": 20
+      },
+      "revId": "dd43a1b2692700b590bf699af57b26c697a90d21",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "162ce96c_a24a11fb",
+        "filename": "doc/faq.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 201,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-08-04T02:54:54Z",
+      "side": 1,
+      "message": "decrypts?",
+      "range": {
+        "startLine": 201,
+        "startChar": 28,
+        "endLine": 201,
+        "endChar": 36
+      },
+      "revId": "dd43a1b2692700b590bf699af57b26c697a90d21",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5c933062_8cce42cf",
+        "filename": "doc/faq.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-08-04T02:54:54Z",
+      "side": 1,
+      "message": "why is \"friend\u0027s public\" emphasized?",
+      "revId": "dd43a1b2692700b590bf699af57b26c697a90d21",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "016b9449_75685b8d",
+        "filename": "doc/faq.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-08-04T02:54:54Z",
+      "side": 1,
+      "message": "perhaps this should be at the end of the sentence",
+      "range": {
+        "startLine": 220,
+        "startChar": 26,
+        "endLine": 220,
+        "endChar": 45
+      },
+      "revId": "dd43a1b2692700b590bf699af57b26c697a90d21",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
