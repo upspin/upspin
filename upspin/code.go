@@ -18,7 +18,7 @@ const (
 	// maxDirBlocks specifies a theoretical upper limit for the number of
 	// DirBlocks in a DirEntry. It should be high enough that the limit
 	// will never be reached in practice. 1 million seems okay.
-	maxDirBlocks = 1e6
+	maxDirBlocks = 1000000
 )
 
 // This file contains implementations of things like marshaling of the
