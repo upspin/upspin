@@ -266,7 +266,7 @@ func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
 	d.Blocks = nil
 	switch {
 	case nBlocks > maxDirBlocks:
-		return nil, fmt.Errorf("block count out of range (max %d): %d", maxDirBlocks, nBlocks)
+		return nil, fmt.Errorf("block count out of range (max %f): %d", maxDirBlocks, nBlocks)
 	case nBlocks < 0:
 		return nil, fmt.Errorf("negative block count: %d", nBlocks)
 	case nBlocks > 0:
