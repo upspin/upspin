@@ -43,8 +43,14 @@ func TestSignup(t *testing.T) {
 		t.Fatal(err)
 	}
 	cfg = config.SetFactotum(cfg, userFact)
-	cfg = config.SetDirEndpoint(cfg, upspin.Endpoint{upspin.Remote, dirServer})
-	cfg = config.SetStoreEndpoint(cfg, upspin.Endpoint{upspin.Remote, storeServer})
+	cfg = config.SetDirEndpoint(cfg, upspin.Endpoint{
+		Transport: upspin.Remote,
+		NetAddr:   dirServer,
+	})
+	cfg = config.SetStoreEndpoint(cfg, upspin.Endpoint{
+		Transport: upspin.Remote,
+		NetAddr:   storeServer,
+	})
 	if err := MakeRequest(s.URL, cfg); err != nil {
 		t.Fatal(err)
 	}
