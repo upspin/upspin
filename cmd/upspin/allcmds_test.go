@@ -98,22 +98,11 @@ var basicCmdTests = []cmdTest{
 		"@/Friends/Access",
 		"r,l: friends\n*:ann@example.com\n",
 	),
-	// Create and build a Public directory, but do it wrong first to check failure.
-	{
-		"prevent read:all after content",
-		ann,
-		do(
-			"mkdir @/BadPublic @/BadPublic/Photo",
-			"put @/BadPublic/Access",
-		),
-		"r,l: all\n*:ann@example.com\n",
-		fail("cannot add \"read:all\""),
-	},
+	// Create and build a Public directory.
 	{
 		"make public directory",
 		ann,
 		do(
-			"rm -R @/BadPublic",
 			"mkdir @/Public",
 			"put @/Public/Access",
 			"get @/Public/Access",
@@ -247,6 +236,66 @@ var basicCmdTests = []cmdTest{
 		),
 		"",
 		expect("ann+snapshot@example.com/2"), // "/2" for "/2017" - or maybe later.
+	},
+	{
+		"info on public file",
+		ann,
+		do(
+			"info @/Public/Photo/public.jpg",
+		),
+		"",
+		expect(
+			"ann@example.com/Public/Photo/public.jpg",
+			"packing:", "ee",
+			"writer:", "ann@example.com",
+			"key holders:", "all@upspin.io ann@example.com",
+			"can read:", "All ann@example.com",
+			"can write:", "ann@example.com",
+			"can list:", "All ann@example.com",
+			"can create:", "ann@example.com",
+			"can delete:", "(same)",
+		),
+	},
+	{
+		"make public directory private",
+		ann,
+		do(
+			"put @/Public/Access",
+			"share -q -fix -r @/Public",
+			"info @/Public/Photo/public.jpg",
+		),
+		"*:ann@example.com\n",
+		expect(
+			"ann@example.com/Public/Photo/public.jpg",
+			"packing:", "ee",
+			"writer:", "ann@example.com",
+			"key holders:", "ann@example.com",
+			"can read:", "(same)",
+			"can write:", "(same)",
+			"can list:", "(same)",
+			"can create:", "(same)",
+			"can delete:", "(same)",
+		),
+	},
+	{
+		"check access file still public",
+		ann,
+		do(
+			"info @/Public/Access",
+			"put @/Public/Access",
+		),
+		"r,l: all\n*:ann@example.com\n",
+		expect(
+			"ann@example.com/Public/Access",
+			"packing:", "ee",
+			"writer:", "ann@example.com",
+			"key holders:", "all@upspin.io ann@example.com",
+			"can read:", "ann@example.com",
+			"can write:", "(same)",
+			"can list:", "(same)",
+			"can create:", "(same)",
+			"can delete:", "(same)",
+		),
 	},
 }
 
