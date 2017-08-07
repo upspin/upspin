@@ -65,8 +65,16 @@ func (pd *packdata) Marshal(dst *[]byte) error {
 		n += packutil.PutBytes((*dst)[n:], w.keyHash)
 		n += packutil.PutBytes((*dst)[n:], w.dkey)
 		n += packutil.PutBytes((*dst)[n:], w.nonce)
-		n += packutil.PutBytes((*dst)[n:], w.ephemeral.X.Bytes())
-		n += packutil.PutBytes((*dst)[n:], w.ephemeral.Y.Bytes())
+		if w.ephemeral.X != nil {
+			n += packutil.PutBytes((*dst)[n:], w.ephemeral.X.Bytes())
+		} else {
+			n += packutil.PutBytes((*dst)[n:], nil)
+		}
+		if w.ephemeral.Y != nil {
+			n += packutil.PutBytes((*dst)[n:], w.ephemeral.Y.Bytes())
+		} else {
+			n += packutil.PutBytes((*dst)[n:], nil)
+		}
 	}
 
 	// blockSum
