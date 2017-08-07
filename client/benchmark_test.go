@@ -72,22 +72,21 @@ func setupBench(b *testing.B, userName upspin.UserName, packing upspin.Packing, 
 	}
 	block = block[:n]
 
-	var pub upspin.PublicKey
 	var keyDir string
+	cfg := baseCfg
 	switch curveName {
 	case "p256":
 		keyDir = "key/testdata/joe"
-		pub = joePublic
 	case "p521":
 		keyDir = "key/testdata/aly"
-		pub = alyPublic
+		cfg = baseCfg2
 	case "":
 		// Do nothing. Zero key will work for PlainPack.
 	default:
 		b.Fatalf("No such key for packing: %d", packing)
 	}
 
-	cfg := setup(baseCfg, userName, pub)
+	cfg = setup(cfg, userName)
 	if packing == upspin.EEPack {
 		cfg = config.SetPacking(cfg, packing)
 		f, err := factotum.NewFromDir(testutil.Repo(keyDir))

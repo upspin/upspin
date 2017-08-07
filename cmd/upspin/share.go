@@ -7,6 +7,7 @@ package main
 // Share has utility functions for checking and updating wrapped keys for encrypted items.
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"flag"
 	"fmt"
@@ -16,6 +17,7 @@ import (
 
 	"upspin.io/access"
 	"upspin.io/errors"
+	"upspin.io/factotum"
 	"upspin.io/log"
 	"upspin.io/pack"
 	"upspin.io/path"
@@ -178,18 +180,6 @@ func (s *State) shareCommand(fs *flag.FlagSet) {
 			fmt.Fprintf(s.Stderr, "looking up users for %q: %s", entry.Name, err)
 			continue
 		}
-		if !s.sharer.quiet && !s.sharer.fix {
-			// Check whether readers include "all", because we have encryption but
-			// no way to get all the world's keys. If -fix is set, we'll report below.
-			for _, user := range users {
-				if user == access.AllUsers {
-					fmt.Fprintf(s.Stderr, "%s:\n\tWarning: file readable by \"all\" but encrypted. Cannot add keys.", entry.Name)
-					fmt.Fprintf(s.Stderr, "\n\tTo decrypt and make readable by \"all\", run share -fix -unencryptforall %q", entry.Name)
-					s.ExitCode = 1
-					break
-				}
-			}
-		}
 		userNameList := users.String()
 		if userNameList != keyUsers || self {
 			if !s.sharer.quiet || !s.sharer.fix {
@@ -269,6 +259,10 @@ func (s *Sharer) readers(entry *upspin.DirEntry) (userList, string, bool, error)
 					ok = true
 					self = true
 				}
+			}
+			if !ok && bytes.Equal(factotum.AllUsersKeyHash, hash) {
+				ok = true
+				thisUser = access.AllUsers
 			}
 			if !ok && s.fix {
 				ok = true
@@ -450,17 +444,11 @@ func (s *Sharer) fixShare(name upspin.PathName, users userList) {
 	}
 	// Could do this more efficiently, calling Share collectively, but the Puts are sequential anyway.
 	keys := make([]upspin.PublicKey, 0, len(users))
+	all := access.IsAccessControlFile(entry.Name)
 	for _, user := range users {
-		// If user is "all", we need to decrypt the file to make progress. We know the file is encrypted.
 		if user == access.AllUsers {
-			if !s.unencryptForAll {
-				fmt.Fprintf(s.state.Stderr, "Encrypted file %q has read:all access; cannot add keys.\n", name)
-				fmt.Fprintf(s.state.Stderr, "To fix for everyone, rerun with -unencryptforall flag.\n")
-				s.state.ExitCode = 1
-				return
-			}
-			s.decrypt(entry)
-			return
+			all = true
+			continue
 		}
 		// Erroneous or wildcard users will have empty keys here, and be ignored.
 		if k := s.lookupKey(user); len(k) > 0 {
@@ -472,9 +460,11 @@ func (s *Sharer) fixShare(name upspin.PathName, users userList) {
 		s.state.ExitCode = 1
 		return
 	}
-	packdatas := []*[]byte{&entry.Packdata}
-	packer.Share(s.state.Config, keys, packdatas)
-	if packdatas[0] == nil {
+	if all {
+		keys = append(keys, upspin.AllUsersKey)
+	}
+	packer.Share(s.state.Config, keys, []*[]byte{&entry.Packdata})
+	if entry.Packdata == nil {
 		fmt.Fprintf(s.state.Stderr, "packing skipped for %q\n", entry.Name)
 		s.state.ExitCode = 1
 		return
@@ -487,28 +477,13 @@ func (s *Sharer) fixShare(name upspin.PathName, users userList) {
 	}
 }
 
-// decrypt replaces the contents of the encrypted file with cleartext in EEIntegrityPack.
-func (s *Sharer) decrypt(entry *upspin.DirEntry) {
-	data, err := s.state.Client.Get(entry.Name)
-	if err != nil {
-		s.state.Failf("reading clear text: %v", err)
-		return
-	}
-	// We have the entry, with an encryption packing, and the clear text.
-	// Fix the packing and overwrite.
-	entry.Blocks = nil // Lose the old blocks.
-	entry.Packing = upspin.EEIntegrityPack
-	_, err = s.state.Client.Put(entry.Name, data)
-	if err != nil {
-		s.state.Failf("writing back decrypted text: %v", err)
-		return
-	}
-}
-
 // lookupKey returns the public key for the user.
 // If the user does not exist, is the "all" user, or is a wildcard
 // (*@example.com), it returns the empty string.
 func (s *Sharer) lookupKey(user upspin.UserName) upspin.PublicKey {
+	if user == access.AllUsers {
+		return upspin.AllUsersKey
+	}
 	key, ok := s.userKeys[user] // We use an empty (zero-valued) key to cache failed lookups.
 	if ok {
 		return key
