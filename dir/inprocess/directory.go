@@ -183,8 +183,18 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 			// A Group file may be in a subdirectory; it's only Access files we worry about.
 			return nil, errors.E(op, entry.Name, errors.Invalid, errors.Str("cannot create a directory named Access"))
 		}
-		if entry.Packing != upspin.EEIntegrityPack && !entry.IsDir() {
-			return nil, errors.E(op, entry.Name, errors.Str("Access or Group file must use integrity packing"))
+		if !entry.IsDir() {
+			packer := pack.Lookup(entry.Packing)
+			if packer == nil {
+				return nil, errors.E(op, entry.Name, errors.Errorf("unknown packing %d", entry.Packing))
+			}
+			ok, err := packer.PermitsAllReaders(entry)
+			if err != nil {
+				return nil, errors.E(op, entry.Name, err)
+			}
+			if !ok {
+				return nil, errors.E(op, entry.Name, errors.Str("Access or Group files must be readable by access.AllUsers"))
+			}
 		}
 		if entry.IsLink() {
 			return nil, errors.E(op, entry.Name, errors.Str("cannot create a link named Access or Group"))

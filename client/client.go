@@ -21,7 +21,7 @@ import (
 	"upspin.io/path"
 	"upspin.io/upspin"
 
-	_ "upspin.io/pack/eeintegrity" // Integrity packer used for Access/Group files.
+	_ "upspin.io/pack/eeintegrity"
 	_ "upspin.io/pack/plain"
 )
 
@@ -118,34 +118,21 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 		return nil, errors.E(op, name, err)
 	}
 
-	isAccessFile := access.IsAccessFile(name)
-	isGroupFile := access.IsGroupFile(name)
-	var packer upspin.Packer
-	if isAccessFile || isGroupFile || c.isReadableByAll(readers) {
-		packer = pack.Lookup(upspin.EEIntegrityPack)
-	} else {
-		// Encrypt data according to the preferred packer
-		packer = pack.Lookup(c.config.Packing())
-		if packer == nil {
-			return nil, errors.E(op, name, errors.Errorf("unrecognized Packing %d", c.config.Packing()))
-		}
+	// Encrypt data according to the preferred packer
+	packer := pack.Lookup(c.config.Packing())
+	if packer == nil {
+		return nil, errors.E(op, name, errors.Errorf("unrecognized Packing %d", c.config.Packing()))
 	}
 
 	// Ensure Access file is valid.
-	if isAccessFile {
-		a, err := access.Parse(name, data)
+	if access.IsAccessFile(name) {
+		_, err := access.Parse(name, data)
 		if err != nil {
 			return nil, errors.E(op, name, err)
 		}
-		if a.IsReadableByAll() {
-			// Check that we're not adding read:all to encrypted files.
-			if err := c.readAllOK(parsed); err != nil {
-				return nil, errors.E(op, name, err)
-			}
-		}
 	}
 	// Ensure Group file is valid.
-	if isGroupFile {
+	if access.IsGroupFile(name) {
 		_, err := access.ParseGroup(parsed, data)
 		if err != nil {
 			return nil, errors.E(op, name, err)
@@ -241,46 +228,6 @@ func (c *Client) access(path upspin.PathName, dir upspin.DirServer) (*access.Acc
 	return access.Parse(whichAccess.Name, accessData)
 }
 
-var errReadAll = errors.Str(`cannot add "read:all" permission to existing files`)
-
-// readAllOK checks that we are not adding read:all permission to an existing
-// tree. There are two ways it is allowed:
-// 1) The directory is empty, so no files exist.
-// 2) The directory is already read:all, so no files will change status.
-// This is just a heuristic to avoid walking the tree looking for files, but it works
-// well enough. upspin share -fix can report or repair any mistakes later.
-func (c *Client) readAllOK(parsed path.Parsed) error {
-	// We have walked the path so there are no links; we can query the DirServer ourselves.
-	dir, err := c.DirServer(parsed.Path())
-	if err != nil {
-		return err
-	}
-	// If the directory is empty or the only file is an extant Access file, it's fine.
-	entries, err := dir.Glob(upspin.AllFilesGlob(parsed.Drop(1).Path()))
-	if err != nil {
-		return err
-	}
-	if len(entries) == 0 || (len(entries) == 1 && entries[0].Name == parsed.Path()) {
-		// We are guaranteed to have list permission because we are owner, so this is accurate.
-		return nil
-	}
-	// The directory has files, but it's OK if they're already read:all.
-	// We check this by seeing whether the controlling Access file,
-	// which could be in this directory or a parent, already has read:all.
-	acc, err := c.access(parsed.Path(), dir)
-	if err != nil {
-		return err
-	}
-	if acc == nil {
-		// There is no Access file so there is no read:all set already.
-		return errReadAll
-	}
-	if !acc.IsReadableByAll() {
-		return errReadAll
-	}
-	return nil
-}
-
 func (c *Client) pack(entry *upspin.DirEntry, data []byte, packer upspin.Packer, s *metric.Span) error {
 	// Start the I/O.
 	store, err := bind.StoreServer(c.config, c.config.StoreEndpoint())
@@ -374,14 +321,18 @@ func (c *Client) addReaders(op string, entry *upspin.DirEntry, packer upspin.Pac
 	name := entry.Name
 
 	// Add other readers to Packdata.
-	readersPublicKey := make([]upspin.PublicKey, len(readers)+1)
+	readersPublicKey := make([]upspin.PublicKey, 0, len(readers)+2)
 	f := c.config.Factotum()
 	if f == nil {
 		return errors.E(op, name, errors.Permission, errors.Str("no factotum available"))
 	}
-	readersPublicKey[0] = f.PublicKey()
-	n := 1
+	readersPublicKey = append(readersPublicKey, f.PublicKey())
+	all := access.IsAccessFile(entry.Name) || access.IsGroupFile(entry.Name)
 	for _, r := range readers {
+		if r == access.All {
+			all = true
+			continue
+		}
 		key, err := bind.KeyServer(c.config, c.config.KeyEndpoint())
 		if err != nil {
 			return errors.E(op, err)
@@ -393,11 +344,13 @@ func (c *Client) addReaders(op string, entry *upspin.DirEntry, packer upspin.Pac
 		}
 		if u.PublicKey != readersPublicKey[0] { // don't duplicate self
 			// TODO(ehg) maybe should check for other duplicates?
-			readersPublicKey[n] = u.PublicKey
-			n++
+			readersPublicKey = append(readersPublicKey, u.PublicKey)
 		}
 	}
-	readersPublicKey = readersPublicKey[:n]
+	if all {
+		readersPublicKey = append(readersPublicKey, upspin.AllReaders)
+	}
+
 	packdata := make([]*[]byte, 1)
 	packdata[0] = &entry.Packdata
 	packer.Share(c.config, readersPublicKey, packdata)
@@ -799,8 +752,12 @@ func (c *Client) dupOrRename(op string, oldName, newName upspin.PathName, rename
 		return nil, errors.E(op, oldName, errors.Invalid, errors.Errorf("unrecognized Packing %d", c.config.Packing()))
 	}
 	if access.IsAccessControlFile(newName) {
-		if entry.Packing != upspin.EEIntegrityPack {
-			return nil, errors.E(op, oldName, errors.Invalid, errors.Str("can only link integrity-packed files to access or group files"))
+		ok, err := packer.PermitsAllReaders(entry)
+		if err != nil {
+			return nil, errors.E(op, err)
+		}
+		if !ok {
+			return nil, errors.E(op, oldName, errors.Str("Access or Group file links must point to targets readable by access.AllUsers"))
 		}
 	}
 
