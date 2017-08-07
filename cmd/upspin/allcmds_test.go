@@ -277,6 +277,25 @@ var basicCmdTests = []cmdTest{
 			"can delete:", "(same)",
 		),
 	},
+	{
+		"check access file still public",
+		ann,
+		do(
+			"info @/Public/Access",
+		),
+		"",
+		expect(
+			"ann@example.com/Public/Access",
+			"packing:", "ee",
+			"writer:", "ann@example.com",
+			"key holders:", "all@upspin.io ann@example.com",
+			"can read:", "ann@example.com",
+			"can write:", "(same)",
+			"can list:", "(same)",
+			"can create:", "(same)",
+			"can delete:", "(same)",
+		),
+	},
 }
 
 // globTests tests glob processing, and the ability to disable it.
