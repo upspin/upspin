@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "92dc6f44_acab70e2",
+        "filename": "pack/ee/packdata.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-07T02:36:47Z",
+      "side": 1,
+      "message": "// A slice will be allocated and the pointer overwritten if *dst is too short.",
+      "revId": "6151ce992fd770e69e06be138164de11bfdac9f8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bffbcbee_a412f682",
+        "filename": "pack/ee/packdata.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-07T02:36:47Z",
+      "side": 1,
+      "message": "weird grammar. is that first comma a mistake? needs an \u0027and\u0027 somewhere.",
+      "revId": "6151ce992fd770e69e06be138164de11bfdac9f8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b1deff2c_0fc3443f",
+        "filename": "pack/ee/packdata.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-07T02:36:47Z",
+      "side": 1,
+      "message": "would be nice to explain this expression, possibly the largest in the whole tree.\nthe way to do that is a head comment for the file explaining what a packdata looks like.",
+      "revId": "6151ce992fd770e69e06be138164de11bfdac9f8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
