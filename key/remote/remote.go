@@ -26,7 +26,7 @@ type dialConfig struct {
 
 // remote implements upspin.KeyServer.
 type remote struct {
-	rpc.Client // For sessions, Ping, and Close.
+	rpc.Client // For sessions and Close.
 	cfg        dialConfig
 }
 

@@ -6,7 +6,6 @@ package bind
 
 import (
 	"math/rand"
-	"sync"
 	"testing"
 	"time"
 
@@ -70,83 +69,12 @@ func TestSwitch(t *testing.T) {
 	}
 	// But a different config forces a new dial.
 	cfg2 := testfixtures.NewSimpleConfig("bob@foo.com")
-	u3, err := KeyServer(cfg2, e) // Dials again,
+	_, err = KeyServer(cfg2, e) // Dials again,
 	if err != nil {
 		t.Fatal(err)
 	}
 	if du.dialed != 2 {
 		t.Errorf("Expected two dials. Got %d", du.dialed)
-	}
-	if u1.(*dummyKey).pingCount != 0 {
-		t.Errorf("Expected zero pings. Got %d", du.pingCount)
-	}
-
-	// Now check that Release works.
-	if len(userDialCache) != 2 {
-		t.Errorf("Expected two user services in the cache, got %d", len(userDialCache))
-	}
-
-	err = Release(u1) // u2 == u1
-	if err != nil {
-		t.Fatal(err)
-	}
-	err = Release(u3)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if len(userDialCache) != 0 {
-		t.Errorf("Expected only no user service in the cache.")
-	}
-
-	if u1.(*dummyKey).closeCalled != 1 {
-		t.Errorf("Expected close to be called once on u1")
-	}
-	if u3.(*dummyKey).closeCalled != 1 {
-		t.Errorf("Expected close to be called once on u3")
-	}
-}
-
-func TestConcurrency(t *testing.T) {
-	const nRuns = 10
-	pingFreshnessDuration = 0 // Forces ping to always be invalid
-	defer func() { pingFreshnessDuration = 15 * time.Minute }()
-
-	cfg := testfixtures.NewSimpleConfig("nobody@example.com")
-	e := upspin.Endpoint{Transport: upspin.InProcess, NetAddr: "addr17"}
-
-	var wg sync.WaitGroup
-	store := func(release bool) {
-		defer wg.Done()
-		for i := 0; i < nRuns; i++ {
-			var s upspin.Service
-			var err error
-			if i&1 == 0 { // alternate between store and keyservers
-				s, err = StoreServer(cfg, e)
-			} else {
-				s, err = KeyServer(cfg, e)
-			}
-
-			if err != nil {
-				t.Error("dialer", err)
-				return
-			}
-			time.Sleep(time.Duration(rand.Intn(20)) * time.Millisecond)
-			if release {
-				if err := Release(s); err != nil {
-					t.Error("Release:", err)
-					return
-				}
-			}
-		}
-	}
-	wg.Add(2)
-	go store(false)
-	go store(true)
-	wg.Wait()
-
-	if n := len(inflightDials); n != 0 {
-		t.Errorf("len(inflightDials) == %v, want 0", n)
 	}
 }
 
@@ -155,7 +83,6 @@ type dummyKey struct {
 	testfixtures.DummyKey
 	endpoint    upspin.Endpoint
 	dialed      int
-	pingCount   int
 	closeCalled int
 }
 type dummyStoreServer struct {
@@ -166,11 +93,6 @@ type dummyStoreServer struct {
 type dummyDirServer struct {
 	testfixtures.DummyDirServer
 	endpoint upspin.Endpoint
-}
-
-func (d *dummyKey) Ping() bool {
-	d.pingCount++
-	return true
 }
 
 func (d *dummyKey) Close() {
@@ -185,12 +107,6 @@ func (d *dummyKey) Dial(cc upspin.Config, e upspin.Endpoint) (upspin.Service, er
 
 func (d *dummyKey) Endpoint() upspin.Endpoint {
 	return d.endpoint
-}
-
-func (d *dummyStoreServer) Ping() bool {
-	// Add some random delays.
-	time.Sleep(time.Duration(rand.Int31n(100)) * time.Millisecond)
-	return true
 }
 
 func (d *dummyStoreServer) Endpoint() upspin.Endpoint {
@@ -210,8 +126,4 @@ func (d *dummyDirServer) Dial(cc upspin.Config, e upspin.Endpoint) (upspin.Servi
 }
 func (d *dummyDirServer) Endpoint() upspin.Endpoint {
 	return d.endpoint
-}
-func (d *dummyDirServer) Ping() bool {
-	// This directory is broken and never reachable.
-	return false
 }

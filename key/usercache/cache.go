@@ -132,19 +132,6 @@ func (c *userCacheServer) Endpoint() upspin.Endpoint {
 	return c.base.Endpoint()
 }
 
-// Ping implements upspin.Service.
-func (c *userCacheServer) Ping() bool {
-	// We don't want Ping to trigger a Dial.
-	// If we're not yet dialed, just return true.
-	c.dd.mu.Lock()
-	svc := c.dd.dialed
-	c.dd.mu.Unlock()
-	if svc == nil {
-		return true
-	}
-	return svc.Ping()
-}
-
 // Authenticate implements upspin.Service.
 func (c *userCacheServer) Authenticate(upspin.Config) error {
 	return errors.Str("key/usercache.Authenticate: not implemented")
