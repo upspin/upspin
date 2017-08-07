@@ -16,6 +16,23 @@
       "revId": "01d4619ecdbc0ad9f3f45b2ee715fc1371be6fc5",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ccc5df92_fe4c838a",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-08-07T22:03:49Z",
+      "side": 1,
+      "message": "I think that perhaps this should be AllUsers to mirror access.AllUsers.",
+      "revId": "01d4619ecdbc0ad9f3f45b2ee715fc1371be6fc5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
