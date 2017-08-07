@@ -48,6 +48,9 @@ func KeyHash(p upspin.PublicKey) []byte {
 	return keyHash[:]
 }
 
+// AllUsersKeyHash is the hash of upspin.AllUsersKey.
+var AllUsersKeyHash = KeyHash(upspin.AllUsersKey)
+
 // NewFromDir returns a new Factotum providing all needed private key operations,
 // loading keys from a directory containing *.upspinkey files.
 // Our desired end state is that Factotum is implemented on each platform by the
