@@ -250,6 +250,11 @@ func (p plainPack) Countersign(oldKey upspin.PublicKey, f upspin.Factotum, d *up
 	return nil
 }
 
+func (p plainPack) UnpackableByAll(d *upspin.DirEntry) (bool, error) {
+	// Content is not encrypted, so anyone can read it.
+	return true, nil
+}
+
 func (p plainPack) PackLen(cfg upspin.Config, cleartext []byte, entry *upspin.DirEntry) int {
 	if err := pack.CheckPacking(p, entry); err != nil {
 		return -1
