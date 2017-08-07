@@ -176,15 +176,16 @@ func expect(words ...string) func(t *testing.T, r *runner, cmd *cmdTest, stdout,
 			t.Fatalf("%q: unexpected error:\n\t%q", cmd.name, stderr)
 		}
 		// Stdout should contain all words, in order, non-abutting.
+		out := stdout
+		prev := "beginning"
 		for _, word := range words {
-			index := strings.Index(stdout, word)
-			prev := "beginning"
+			index := strings.Index(out, word)
 			if index < 0 {
-				t.Fatalf("%q: output did not contain %q after %q:\n\t%q", cmd.name, word, prev, stdout)
+				t.Fatalf("%q: output did not contain %q after %q. output:\n%s", cmd.name, word, prev, stdout)
 				return
 			}
 			prev = word
-			stdout = stdout[index:]
+			out = out[index:]
 		}
 	}
 }

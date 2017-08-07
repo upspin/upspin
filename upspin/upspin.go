@@ -209,6 +209,9 @@ type Packer interface {
 	// In case of error, Share skips processing for that reader or packdata.
 	// If packdata[i] is nil on return, it was skipped.
 	// Share trusts the caller to check the arguments are not malicious.
+	// To enable all Upspin users to decrypt the ciphertext, include
+	// AllReadersKey among the provided reader keys.
+	//
 	// TODO: It would be nice if DirServer provided a method to report
 	// which items need updates, so this could be automated.
 	Share(config Config, readers []PublicKey, packdata []*[]byte)
@@ -225,6 +228,11 @@ type Packer interface {
 	// that one over the second existing signature, and creates a new
 	// first signature using the key from factotum.
 	Countersign(oldKey PublicKey, f Factotum, d *DirEntry) error
+
+	// AllowsAllUsers reports whether the packed data may be unpacked by all
+	// Upspin users. Access and Group files must have this property, as
+	// should any files for which access.AllUsers have the read permission.
+	AllowsAllUsers(d *DirEntry) (bool, error)
 }
 
 const (
@@ -299,6 +307,10 @@ type KeyServer interface {
 
 // A PublicKey can be seen by anyone and is used for authenticating a user.
 type PublicKey string
+
+// AllUsersKey is a sentinel PublicKey value used to indicate that a
+// Packer.Share operation should make the data readable to anyone.
+var AllUsersKey = PublicKey("read: all")
 
 var (
 	// ErrFollowLink indicates that all or part of a path name has

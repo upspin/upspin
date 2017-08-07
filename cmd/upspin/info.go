@@ -90,8 +90,13 @@ func (d *infoDirEntry) Readers() string {
 		return err.Error()
 	}
 	var b bytes.Buffer
-	for i, user := range users {
-		if i > 0 {
+	if packer := pack.Lookup(d.Packing); packer != nil {
+		if ok, _ := packer.AllowsAllUsers(d.DirEntry); ok {
+			b.WriteString(string(access.AllUsers))
+		}
+	}
+	for _, user := range users {
+		if b.Len() > 0 {
 			b.WriteByte(' ')
 		}
 		b.WriteString(string(user))

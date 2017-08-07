@@ -18,6 +18,7 @@ import (
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/metric"
+	"upspin.io/pack"
 	"upspin.io/path"
 	"upspin.io/serverutil"
 	"upspin.io/shutdown"
@@ -335,8 +336,18 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 
 	// Special files must use integrity pack (plain text + signature).
 	isGroupFile := isGroup && !entry.IsDir()
-	if (isGroupFile || isAccess) && entry.Packing != upspin.EEIntegrityPack {
-		return nil, errors.E(op, p.Path(), errors.Invalid, errors.Str("must use integrity pack"))
+	if isGroupFile || isAccess {
+		packer := pack.Lookup(entry.Packing)
+		if packer == nil {
+			return nil, errors.E(op, errors.Errorf("unknown packing %d", entry.Packing))
+		}
+		ok, err := packer.AllowsAllUsers(entry)
+		if err != nil {
+			return nil, errors.E(op, err)
+		}
+		if !ok {
+			return nil, errors.E(op, p.Path(), errors.Str("Access or Group files must be readable by access.AllUsers"))
+		}
 	}
 
 	if isAccess {
