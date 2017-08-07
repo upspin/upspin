@@ -48,6 +48,8 @@ const (
 	gcmTagSize           = 16
 )
 
+var allReadersKeyHash = factotum.KeyHash(upspin.AllReaders)
+
 func init() {
 	pack.Register(ee{})
 }
@@ -286,25 +288,25 @@ func (ee ee) Unpack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker
 		return nil, errors.E(op, writer, err)
 	}
 
-	// Fetch my own keys, as I am the recipient of the file.
-	me := cfg.UserName()
-	rawPublicKey, err := packutil.GetPublicKey(cfg, me)
-	if err != nil {
-		return nil, errors.E(op, d.Name, err)
-	}
-
 	// Pull the decryption key out of the wrapped keys.
 	// For quick lookup, hash my public key and locate my wrapped key in the metadata.
-	rhash := factotum.KeyHash(rawPublicKey)
+	me := cfg.UserName()
 	f := cfg.Factotum()
+	rhash := factotum.KeyHash(f.PublicKey())
 	for _, w := range pd.wrap {
-		if !bytes.Equal(rhash, w.keyHash) {
+		all := bytes.Equal(allReadersKeyHash, w.keyHash)
+		if !all && !bytes.Equal(rhash, w.keyHash) {
 			continue
 		}
-		// Decode my wrapped key using my private key.
-		dkey, err := aesUnwrap(f, w)
-		if err != nil {
-			return nil, errors.E(op, d.Name, me, err)
+		var dkey []byte
+		if all {
+			dkey = w.dkey
+		} else {
+			// Decode my wrapped key using my private key.
+			dkey, err = aesUnwrap(f, w)
+			if err != nil {
+				return nil, errors.E(op, d.Name, me, err)
+			}
 		}
 		if len(dkey) != aesKeyLen {
 			return nil, errors.E(op, d.Name, errKeyLength)
@@ -390,6 +392,10 @@ func (ee ee) Share(cfg upspin.Config, readers []upspin.PublicKey, packdataSlice 
 	pubkey := make([]*ecdsa.PublicKey, len(readers))
 	hash := make([]keyHashArray, len(readers))
 	for i, pub := range readers {
+		if pub == upspin.AllReaders {
+			copy(hash[i][:], allReadersKeyHash)
+			continue
+		}
 		var err error
 		pubkey[i], err = factotum.ParsePublicKey(pub)
 		if err != nil {
@@ -416,15 +422,19 @@ func (ee ee) Share(cfg upspin.Config, readers []upspin.PublicKey, packdataSlice 
 			var h keyHashArray
 			copy(h[:], w.keyHash)
 			alreadyWrapped[h] = &pd.wrap[i]
-			_, err := cfg.Factotum().PublicKeyFromHash(w.keyHash)
-			if err != nil {
-				// to unwrap dkey, we can only use our own private keys
-				continue
-			}
-			dkey, err = aesUnwrap(cfg.Factotum(), w)
-			if err != nil {
-				log.Error.Printf("pack/ee: dkey unwrap failed: %v", err)
-				break
+			if bytes.Equal(allReadersKeyHash, w.keyHash) {
+				dkey = w.dkey
+			} else {
+				_, err := cfg.Factotum().PublicKeyFromHash(w.keyHash)
+				if err != nil {
+					// to unwrap dkey, we can only use our own private keys
+					continue
+				}
+				dkey, err = aesUnwrap(cfg.Factotum(), w)
+				if err != nil {
+					log.Error.Printf("pack/ee: dkey unwrap failed: %v", err)
+					break
+				}
 			}
 		}
 		if len(dkey) == 0 { // Failed to get a valid decryption key.
@@ -433,11 +443,18 @@ func (ee ee) Share(cfg upspin.Config, readers []upspin.PublicKey, packdataSlice 
 		}
 
 		// Create new list of wrapped keys.
-		pd.wrap = make([]wrappedKey, len(readers))
-		nwrap := 0
+		pd.wrap = make([]wrappedKey, 0, len(readers))
 		for i := range readers {
 			if pubkey[i] == nil {
-				continue
+				if bytes.Equal(allReadersKeyHash, hash[i][:]) {
+					// If readable by anyone,
+					// store the dkey unwrapped.
+					pd.wrap = append(pd.wrap, wrappedKey{
+						keyHash: allReadersKeyHash,
+						dkey:    dkey,
+					})
+					continue
+				}
 			}
 			pw, ok := alreadyWrapped[hash[i]]
 			if !ok { // then need to wrap
@@ -447,10 +464,8 @@ func (ee ee) Share(cfg upspin.Config, readers []upspin.PublicKey, packdataSlice 
 				}
 				pw = &w
 			} // else reuse the existing wrapped dkey.
-			pd.wrap[nwrap] = *pw
-			nwrap++
+			pd.wrap = append(pd.wrap, *pw)
 		}
-		pd.wrap = pd.wrap[:nwrap]
 
 		// Rebuild packdataSlice[j] from existing sig and new wrapped keys.
 		var dst []byte
@@ -607,6 +622,29 @@ func (ee ee) Countersign(oldKey upspin.PublicKey, f upspin.Factotum, d *upspin.D
 	pd.sig2 = pd.sig
 	pd.sig = sig1
 	return pd.Marshal(&d.Packdata)
+}
+
+func (ee ee) PermitsAllReaders(d *upspin.DirEntry) (bool, error) {
+	const op = "pack/ee.PermitsAllReaders"
+
+	if d.Packing != upspin.EEPack {
+		p := pack.Lookup(d.Packing)
+		if p == nil {
+			return false, errors.E(op, d.Name, errors.Errorf("entry has packing %d, need EEPack", d.Packing))
+		}
+		return false, errors.E(op, d.Name, errors.Errorf("entry has packing %s, need EEPack", p))
+	}
+
+	var pd packdata
+	if err := pd.Unmarshal(d.Packdata); err != nil {
+		return false, errors.E(op, err)
+	}
+	for _, w := range pd.wrap {
+		if bytes.Equal(allReadersKeyHash, w.keyHash) {
+			return true, nil
+		}
+	}
+	return false, nil
 }
 
 // gcmWrap implements NIST 800-56Ar2; see also RFC6637 §8.
