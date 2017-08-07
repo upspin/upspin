@@ -215,9 +215,9 @@ func TestSharing(t *testing.T) {
 	// TODO This could be cleaned up to be more like TestCountersign.
 	// joe@google.com is the owner of a file that is shared with bob@foo.com.
 	const (
-		joesUserName   upspin.UserName = "joe@google.com"
+		joesUserName   upspin.UserName = "joe@upspin.io"
 		pathName                       = upspin.PathName(joesUserName + "/secret_file_shared_with_bob")
-		bobsUserName   upspin.UserName = "bob@foo.com"
+		bobsUserName   upspin.UserName = "bob@upspin.io"
 		carlasUserName upspin.UserName = "carla@baz.edu"
 		text                           = "bob, here's the secret file. Sincerely, The Joe."
 	)
@@ -227,13 +227,6 @@ func TestSharing(t *testing.T) {
 
 	// Set up Joe as the creator/owner.
 	joecfg, packer := setup(joesUserName)
-	// Set up a mock key service that knows about Joe's public keys (for checking signature during unpack).
-	mockKey := &dummyKey{
-		userToMatch: []upspin.UserName{joesUserName},
-		keyToReturn: []upspin.PublicKey{joecfg.Factotum().PublicKey()},
-	}
-	bind.RegisterKeyServer(upspin.InProcess, mockKey)
-	joecfg = config.SetKeyEndpoint(joecfg, upspin.Endpoint{Transport: upspin.InProcess})
 
 	d := &upspin.DirEntry{
 		Name:       pathName,
@@ -266,11 +259,6 @@ func TestSharing(t *testing.T) {
 		t.Errorf("Expected %s, got %s", text, clear)
 	}
 
-	// Finally, check that unpack looked up Joe's public key, to verify the signature.
-	if mockKey.returnedKeys != 1 {
-		t.Fatal("Packer failed to request dude's public key")
-	}
-
 	// Load Carla as the current user.
 	carlacfg, packer := setup(carlasUserName)
 	carlacfg = config.SetKeyEndpoint(carlacfg, upspin.Endpoint{Transport: upspin.InProcess})
@@ -283,26 +271,12 @@ func TestSharing(t *testing.T) {
 func TestBadSharing(t *testing.T) {
 	// joe@google.com is the owner of a file that is attempting to be shared with bob@foo.com, but share wasn't called.
 	const (
-		joesUserName upspin.UserName = "joe@google.com"
+		joesUserName upspin.UserName = "joe@upspin.io"
 		pathName                     = upspin.PathName(joesUserName + "/secret_file_shared_with_bob")
-		bobsUserName upspin.UserName = "bob@foo.com"
+		bobsUserName upspin.UserName = "bob@upspin.io"
 		text                         = "bob, here's the secret file. sincerely, joe."
 	)
-	joePublic := upspin.PublicKey("p256\n104278369061367353805983276707664349405797936579880352274235000127123465616334\n26941412685198548642075210264642864401950753555952207894712845271039438170192\n")
-	bobPublic := upspin.PublicKey("p256\n22501350716439586308300487995594907386227865907589820632958610970814693581908\n104071495646780593180743128812641149143422089655848205222288250096821814372528\n")
-
 	cfg, packer := setup(joesUserName)
-	mockKey := &dummyKey{
-		userToMatch: []upspin.UserName{bobsUserName, joesUserName},
-		keyToReturn: []upspin.PublicKey{bobPublic, joePublic},
-	}
-	f, err := factotum.NewFromDir(testutil.Repo("key", "testdata", "joe"))
-	if err != nil {
-		t.Fatal(err)
-	}
-	cfg = config.SetFactotum(cfg, f)
-	bind.RegisterKeyServer(upspin.InProcess, mockKey)
-	cfg = config.SetKeyEndpoint(cfg, upspin.Endpoint{Transport: upspin.InProcess})
 
 	d := &upspin.DirEntry{
 		Name:       pathName,
@@ -315,7 +289,7 @@ func TestBadSharing(t *testing.T) {
 
 	// Now load Bob as the current user.
 	cfg = config.SetUserName(cfg, bobsUserName)
-	f, err = factotum.NewFromDir(testutil.Repo("key", "testdata", "bob"))
+	f, err := factotum.NewFromDir(testutil.Repo("key", "testdata", "bob"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -333,8 +307,8 @@ func TestBadSharing(t *testing.T) {
 
 func TestCountersign(t *testing.T) {
 	const (
-		joeUserName upspin.UserName = "joe@google.com"
-		bobUserName upspin.UserName = "bob@foo.com"
+		joeUserName upspin.UserName = "joe@upspin.io"
+		bobUserName upspin.UserName = "bob@upspin.io"
 		pathName                    = upspin.PathName(joeUserName + "/secret_for_bob")
 		text                        = "bob, here's the secret file. Sincerely, The Joe."
 	)
@@ -343,14 +317,6 @@ func TestCountersign(t *testing.T) {
 	bobConfig, packer := setup(bobUserName)
 	bobPublic := bobConfig.Factotum().PublicKey()
 	bobConfig = config.SetKeyEndpoint(bobConfig, upspin.Endpoint{Transport: upspin.InProcess})
-
-	// Set up key server. This is ineffective if earlier tests already called bind.
-	mockKeys := &dummyKey{
-		userToMatch: []upspin.UserName{joeUserName},
-		keyToReturn: []upspin.PublicKey{joePublic},
-	}
-	bind.RegisterKeyServer(upspin.InProcess, mockKeys)
-	joeConfig = config.SetKeyEndpoint(joeConfig, upspin.Endpoint{Transport: upspin.InProcess})
 
 	// Share file with Bob.
 	d := &upspin.DirEntry{
@@ -379,14 +345,13 @@ func TestCountersign(t *testing.T) {
 	}
 
 	// And yet again, after emulating Joe executing "upspin rotate".
-	mockKeys.keyToReturn[0] = joeConfig.Factotum().PublicKey()
 	clear = unpackBlob(t, bobConfig, packer, d, cipher)
 	if string(clear) != text {
 		t.Errorf("Expected %q, got %q", text, clear)
 	}
 }
 
-func setup(name upspin.UserName) (upspin.Config, upspin.Packer) {
+func cfgFor(name upspin.UserName) (upspin.Config, upspin.Packer) {
 	cfg := config.SetUserName(config.New(), name)
 	packer := pack.Lookup(packing)
 	j := strings.IndexByte(string(name), '@')
@@ -398,6 +363,26 @@ func setup(name upspin.UserName) (upspin.Config, upspin.Packer) {
 		log.Fatalf("unable to initialize factotum for %s", string(name[:j]))
 	}
 	cfg = config.SetFactotum(cfg, f)
+	cfg = config.SetKeyEndpoint(cfg, upspin.Endpoint{Transport: upspin.InProcess})
+	return cfg, packer
+}
+
+func setup(name upspin.UserName) (upspin.Config, upspin.Packer) {
+	cfg, packer := cfgFor(name)
+
+	joeCfg, _ := cfgFor("joe@upspin.io")
+	bobCfg, _ := cfgFor("bob@upspin.io")
+	mockKey := &dummyKey{
+		userToMatch: []upspin.UserName{
+			joeCfg.UserName(),
+			bobCfg.UserName(),
+		},
+		keyToReturn: []upspin.PublicKey{
+			joeCfg.Factotum().PublicKey(),
+			bobCfg.Factotum().PublicKey(),
+		},
+	}
+	bind.RegisterKeyServer(upspin.InProcess, mockKey)
 	return cfg, packer
 }
 
@@ -541,5 +526,71 @@ func TestConsistentKeyStream(t *testing.T) {
 		if !bytes.Equal(data, got) {
 			t.Errorf("cleartext for blockSize=%d does not match input", bs)
 		}
+	}
+}
+
+func TestAllReaders(t *testing.T) {
+	const (
+		userName  = upspin.UserName("joe@upspin.io")
+		otherName = upspin.UserName("aly@upspin.io")
+		pathName  = upspin.PathName(userName + "/dir/file")
+		content   = "Some text"
+	)
+
+	cfg, packer := setup(userName)
+	cfg2, _ := setup(otherName)
+
+	cfg = config.SetKeyEndpoint(cfg, upspin.Endpoint{Transport: upspin.InProcess})
+	cfg2 = config.SetKeyEndpoint(cfg2, upspin.Endpoint{Transport: upspin.InProcess})
+
+	de := &upspin.DirEntry{
+		Name:       pathName,
+		SignedName: pathName,
+		Writer:     userName,
+		Packing:    packer.Packing(),
+	}
+
+	cipher := packBlob(t, cfg, packer, de, []byte(content))
+
+	ok, err := packer.UnpackableByAll(de)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ok {
+		t.Error("PermitAllReaders returned true, want false")
+	}
+
+	if _, err := packer.Unpack(cfg2, de); err == nil {
+		t.Fatal("expected error unpacking as %s, got nil", otherName)
+	}
+
+	readers := []upspin.PublicKey{
+		cfg.Factotum().PublicKey(),
+		upspin.AllUsersKey,
+	}
+	packer.Share(cfg, readers, []*[]byte{&de.Packdata})
+
+	ok, err = packer.UnpackableByAll(de)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !ok {
+		t.Error("PermitAllReaders returned false, want true")
+	}
+
+	bp, err := packer.Unpack(cfg2, de)
+	if err != nil {
+		t.Fatalf("error unpacking as %s: %v", otherName, err)
+	}
+	if _, ok := bp.NextBlock(); !ok {
+		t.Fatalf("error unpacking as %s: %v", otherName, err)
+	}
+	clear, err := bp.Unpack(cipher)
+	if err != nil {
+		t.Fatalf("error unpacking as %s: %v", otherName, err)
+	}
+
+	if got, want := string(clear), content; got != want {
+		t.Errorf("content unpacked as %q, want %q", got, want)
 	}
 }

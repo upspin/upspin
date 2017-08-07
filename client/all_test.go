@@ -8,6 +8,7 @@ import (
 	"bytes"
 	"fmt"
 	"math/rand"
+	"strings"
 	"testing"
 
 	"upspin.io/bind"
@@ -15,6 +16,7 @@ import (
 	"upspin.io/factotum"
 	"upspin.io/flags"
 	"upspin.io/log"
+	"upspin.io/pack"
 	"upspin.io/test/testutil"
 	"upspin.io/upspin"
 
@@ -48,7 +50,7 @@ func init() {
 	baseCfg = config.SetFactotum(baseCfg, f)
 
 	// Create baseCfg2 with joe's keys.
-	f, err = factotum.NewFromDir(testutil.Repo("key", "testdata", "joe")) // Always use user1's keys.
+	f, err = factotum.NewFromDir(testutil.Repo("key", "testdata", "test")) // Always use test's keys.
 	if err != nil {
 		panic("cannot initialize factotum: " + err.Error())
 	}
@@ -74,7 +76,7 @@ func checkTransport(s upspin.Service) {
 	}
 }
 
-func setup(base upspin.Config, userName upspin.UserName, publicKey upspin.PublicKey) upspin.Config {
+func setup(base upspin.Config, userName upspin.UserName) upspin.Config {
 	cfg := config.SetUserName(base, userName)
 	key, _ := bind.KeyServer(cfg, cfg.KeyEndpoint())
 	checkTransport(key)
@@ -82,7 +84,6 @@ func setup(base upspin.Config, userName upspin.UserName, publicKey upspin.Public
 	checkTransport(dir)
 	if cfg.Factotum().PublicKey() == "" {
 		panic("empty public key")
-		// publicKey = upspin.PublicKey(fmt.Sprintf("key for %s", userName))
 	}
 	user := &upspin.User{
 		Name:      upspin.UserName(userName),
@@ -113,7 +114,7 @@ func TestPutGetTopLevelFile(t *testing.T) {
 		user = "user1@google.com"
 		root = user + "/"
 	)
-	client := New(setup(baseCfg, user, ""))
+	client := New(setup(baseCfg, user))
 	const (
 		fileName = root + "file"
 		text     = "hello sailor"
@@ -134,7 +135,7 @@ func TestPutGetTopLevelFile(t *testing.T) {
 const Max = 100 * 1000 // Must be > 100.
 
 func setupFileIO(user upspin.UserName, fileName upspin.PathName, max int, t *testing.T) (upspin.Client, upspin.File, []byte) {
-	client := New(setup(baseCfg, user, ""))
+	client := New(setup(baseCfg, user))
 	f, err := client.Create(fileName)
 	if err != nil {
 		t.Fatal("create file:", err)
@@ -519,7 +520,7 @@ func globAndCheck(t *testing.T, client upspin.Client, pattern string, expect ...
 
 func TestGlob(t *testing.T) {
 	const user = "multiuser@a.co"
-	client := New(setup(baseCfg, user, ""))
+	client := New(setup(baseCfg, user))
 	var err error
 
 	for _, fno := range []int{0, 1, 7, 17} {
@@ -548,7 +549,7 @@ func TestGlob(t *testing.T) {
 
 func TestPutDuplicateAndRename(t *testing.T) {
 	const user = "link@a.com"
-	client := New(setup(baseCfg, user, ""))
+	client := New(setup(baseCfg, user))
 	original := upspin.PathName(fmt.Sprintf("%s/original", user))
 	text := "the rain in spain"
 	if _, err := client.Put(original, []byte(text)); err != nil {
@@ -611,9 +612,9 @@ func testRenames(t *testing.T, packing upspin.Packing) {
 
 	// Use different keys for the two users.
 	cfg := config.SetPacking(baseCfg, packing)
-	ownerClient := New(setup(cfg, owner, ""))
+	ownerClient := New(setup(cfg, owner))
 	cfg = config.SetPacking(baseCfg2, packing)
-	userClient := New(setup(cfg, user, ""))
+	userClient := New(setup(cfg, user))
 
 	// Allow user to use owner's directory.
 	access := upspin.PathName(fmt.Sprintf("%s/Access", owner))
@@ -669,7 +670,7 @@ func TestSimpleLinks(t *testing.T) {
 		text     = "hello sailor"
 		linkText = "what a lovely day"
 	)
-	client := New(setup(baseCfg, user, ""))
+	client := New(setup(baseCfg, user))
 	// Install and check file.
 	_, err := client.MakeDirectory(dirName)
 	if err != nil {
@@ -744,7 +745,7 @@ func TestGlobLinks(t *testing.T) {
 		linkName = root + "/link" // Will point to dir.
 		text     = "ignored"
 	)
-	client := New(setup(baseCfg, user, ""))
+	client := New(setup(baseCfg, user))
 	_, err := client.MakeDirectory(dirName)
 	if err != nil {
 		t.Fatal(err)
@@ -790,7 +791,7 @@ func TestBrokenLink(t *testing.T) {
 		linkName = root + "/link"
 		linkText = "what a lovely day"
 	)
-	client := New(setup(baseCfg, user, ""))
+	client := New(setup(baseCfg, user))
 	// Install and check file.
 	_, err := client.MakeDirectory(dirName)
 	if err != nil {
@@ -849,7 +850,7 @@ func TestRejectBadAccessFile(t *testing.T) {
 		accessFile    = root + "/Access"
 		accessContent = "all:*"
 	)
-	client := New(setup(baseCfg, user, ""))
+	client := New(setup(baseCfg, user))
 	_, err := client.Put(accessFile, []byte(accessContent))
 	expectedErr := errors.E(upspin.PathName(accessFile), errors.Invalid)
 	if !errors.Match(expectedErr, err) {
@@ -865,7 +866,7 @@ func TestRejectBadGroupFile(t *testing.T) {
 		groupFile    = groupDir + "/mygroup"
 		groupContent = "foo@x, yo! ; whoo-hoo!"
 	)
-	client := New(setup(baseCfg, user, ""))
+	client := New(setup(baseCfg, user))
 	_, err := client.MakeDirectory(groupDir)
 	if err != nil {
 		t.Fatal(err)
@@ -874,6 +875,87 @@ func TestRejectBadGroupFile(t *testing.T) {
 	expectedErr := errors.E(upspin.PathName(groupFile), errors.Invalid)
 	if !errors.Match(expectedErr, err) {
 		t.Fatalf("error = %s, want = %s", err, expectedErr)
+	}
+}
+
+func TestAllUsers(t *testing.T) {
+	const (
+		user1      = "aly@example.com"
+		user2      = "kim@example.org"
+		accessFile = user1 + "/Access"
+		file       = user1 + "/file"
+	)
+	var (
+		cfg1    = config.SetPacking(setup(baseCfg, user1), upspin.EEPack)
+		cfg2    = setup(baseCfg2, user2)
+		client1 = New(cfg1)
+		client2 = New(cfg2)
+		packer  = pack.Lookup(cfg1.Packing())
+	)
+
+	// Allow all users to read the user's root.
+	de, err := client1.Put(accessFile, []byte("r:all\n*:"+user1))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ok, err := packer.UnpackableByAll(de); err != nil {
+		t.Fatal(err)
+	} else if !ok {
+		t.Errorf("UnpackableByAll(%q) returned false, want true", accessFile)
+	}
+
+	// Write a file and check its permissions.
+	de, err = client1.Put(file, []byte("some content"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ok, err := packer.UnpackableByAll(de); err != nil {
+		t.Fatal(err)
+	} else if !ok {
+		t.Errorf("UnpackableByAll(%q) returned false, want true", file)
+	}
+	_, err = client2.Get(file)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Remove all users from access file.
+	de, err = client1.Put(accessFile, []byte("*:"+user1))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ok, err := packer.UnpackableByAll(de); err != nil {
+		t.Fatal(err)
+	} else if !ok {
+		t.Errorf("UnpackableByAll(%q) returned false, want true", accessFile)
+	}
+
+	// Re-write the file and check permissions.
+	de, err = client1.Put(file, []byte("more content"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if ok, err := packer.UnpackableByAll(de); err != nil {
+		t.Fatal(err)
+	} else if ok {
+		t.Errorf("UnpackableByAll(%q) returned true, want false", file)
+	}
+	_, err = client2.Get(file)
+	if !errors.Match(errors.E(errors.Private), err) {
+		t.Fatalf("Get(%q) returned %v, want Private error", file, err)
+	}
+
+	// Allow all users again, and check that client2 still can't read file
+	// (it hasn't been re-wrapped yet).
+	_, err = client1.Put(accessFile, []byte("r:all\n*:"+user1))
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = client2.Get(file)
+	if want := "no wrapped key for user"; err == nil {
+		t.Fatalf("Get(%q) returned nil, want %q error", file, want)
+	} else if got := err.Error(); !strings.Contains(got, want) {
+		t.Fatalf("Get(%q) returned %v, want %q error", file, err, want)
 	}
 }
 
