@@ -340,6 +340,11 @@ func (ei ei) Countersign(oldKey upspin.PublicKey, f upspin.Factotum, d *upspin.D
 	return nil
 }
 
+func (ei ei) UnpackableByAll(d *upspin.DirEntry) (bool, error) {
+	// Content is not encrypted, so anyone can read it.
+	return true, nil
+}
+
 func pdMarshal(dst *[]byte, sig, sig2 upspin.Signature, cipherSum []byte) error {
 	// sig2 is a signature with another owner key, to enable smoother key rotation.
 	n := packdataLen()
