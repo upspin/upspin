@@ -141,11 +141,6 @@ func (s *server) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service, 
 	return s, nil
 }
 
-// Ping implements upspin.Service.
-func (s *server) Ping() bool {
-	return true
-}
-
 // Close implements upspin.Service.
 func (s *server) Close() {
 	s.mu.Lock()

@@ -56,11 +56,6 @@ func (d *dummyService) Endpoint() upspin.Endpoint {
 func (d *dummyService) Close() {
 }
 
-// Ping implements upspin.Service.
-func (d *dummyService) Ping() bool {
-	return true
-}
-
 // Lookup implements upspin.KeyServer.
 func (d *DummyKey) Lookup(userName upspin.UserName) (*upspin.User, error) {
 	return nil, nil

@@ -16,13 +16,11 @@ import (
 	"time"
 
 	pb "github.com/golang/protobuf/proto"
-	gContext "golang.org/x/net/context"
 
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/log"
 	"upspin.io/upspin"
-	"upspin.io/upspin/proto"
 	"upspin.io/valid"
 )
 
@@ -292,11 +290,6 @@ func (s *serverImpl) SessionForRequest(w http.ResponseWriter, r *http.Request) (
 	authRequest = strings.Split(authRequest[0], ",")
 
 	return s.handleSessionRequest(w, authRequest, proxyRequest, r.Host)
-}
-
-// Ping implements Pinger.
-func (s *serverImpl) Ping(gContext gContext.Context, req *proto.PingRequest) (*proto.PingResponse, error) {
-	return &proto.PingResponse{PingSequence: req.PingSequence}, nil
 }
 
 func (s *serverImpl) validateToken(authToken string) (Session, error) {

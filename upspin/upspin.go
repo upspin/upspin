@@ -755,9 +755,6 @@ type Service interface {
 	// Endpoint returns the network endpoint of the server.
 	Endpoint() Endpoint
 
-	// Ping reports whether the Service is reachable.
-	Ping() bool
-
 	// Close closes the connection to the service and releases all resources used.
 	// A Service may not be re-used after close.
 	Close()

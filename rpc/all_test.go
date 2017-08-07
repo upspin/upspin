@@ -143,7 +143,7 @@ func (s *server) Count(session Session, reqBytes []byte, done <-chan struct{}) (
 }
 
 type client struct {
-	Client   // For sessions, Ping, and Close.
+	Client   // For sessions and Close.
 	reqCount int
 }
 

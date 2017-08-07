@@ -190,7 +190,6 @@ func (s *server) Watch(name upspin.PathName, order int64, done <-chan struct{}) 
 
 func (s *server) Endpoint() upspin.Endpoint { return s.authority }
 func (s *server) Close()                    {}
-func (s *server) Ping() bool                { return true }
 
 func logf(format string, args ...interface{}) operation {
 	s := fmt.Sprintf(format, args...)

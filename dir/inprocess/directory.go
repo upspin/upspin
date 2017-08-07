@@ -862,11 +862,6 @@ func (s *server) Endpoint() upspin.Endpoint {
 	}
 }
 
-// Ping implements upspin.DirServer.Ping.
-func (s *server) Ping() bool {
-	return true
-}
-
 // Close implements upspin.server.
 func (s *server) Close() {
 	// TODO: unimplemented.

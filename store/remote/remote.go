@@ -28,7 +28,7 @@ type dialConfig struct {
 
 // remote implements upspin.StoreServer.
 type remote struct {
-	rpc.Client // For sessions, Ping, and Close.
+	rpc.Client // For sessions and Close.
 	cfg        dialConfig
 
 	// If non-empty, the base HTTP URL under which references for this

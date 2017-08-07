@@ -7,7 +7,6 @@ package bind // import "upspin.io/bind"
 
 import (
 	"sync"
-	"time"
 
 	"upspin.io/errors"
 	"upspin.io/upspin"
@@ -19,43 +18,6 @@ type dialKey struct {
 	user     upspin.UserName
 	endpoint upspin.Endpoint
 	dialer   upspin.Dialer
-}
-
-// dialedService holds a dialed service and its last ping time.
-type dialedService struct {
-	service upspin.Service
-
-	mu       sync.Mutex
-	lastPing time.Time
-	dead     bool
-}
-
-// A variable, so that it can be tweaked during tests.
-var pingFreshnessDuration = 5 * time.Minute
-
-// ping will issue a Ping through the dialed service, but only if it is not
-// dead and its last ping time is more than pingFreshnessDuration ago.
-// If the ping fails the service is marked as dead.
-func (ds *dialedService) ping() bool {
-	ds.mu.Lock()
-	defer ds.mu.Unlock()
-
-	if ds.dead {
-		return false
-	}
-	now := time.Now()
-	if ds.lastPing.Add(pingFreshnessDuration).After(now) {
-		// Last ping is fresh, don't ping again.
-		return true
-	}
-	// Must re-ping and store the new ping time.
-	if ds.service.Ping() {
-		ds.lastPing = now
-		return true
-	}
-	// Connection is dead.
-	ds.dead = true
-	return false
 }
 
 // inflightDial represents a service that is being created by the
@@ -72,7 +34,7 @@ type inflightDial struct {
 	err     error
 }
 
-type dialCache map[dialKey]*dialedService
+type dialCache map[dialKey]upspin.Service
 
 var (
 	noCache bool // For testing. When true, the caches are not used.
@@ -83,7 +45,7 @@ var (
 	directoryMap = make(map[upspin.Transport]upspin.DirServer)
 	storeMap     = make(map[upspin.Transport]upspin.StoreServer)
 
-	// These caches hold <dialKey, *dialedService> for each respective service type.
+	// These caches hold <dialKey, upspin.Service> for each respective service type.
 	userDialCache      = make(dialCache)
 	directoryDialCache = make(dialCache)
 	storeDialCache     = make(dialCache)
@@ -227,31 +189,6 @@ func DirServerFor(cc upspin.Config, userName upspin.UserName) (upspin.DirServer,
 
 }
 
-// Release closes the service and releases all resources associated with it.
-func Release(service upspin.Service) error {
-	const op = "bind.Release"
-	mu.Lock()
-	defer mu.Unlock()
-
-	key, ok := reverseLookup[service]
-	if !ok {
-		return errors.E(op, errors.NotExist, errors.Str("service not found"))
-	}
-	switch service.(type) {
-	case upspin.DirServer:
-		delete(directoryDialCache, key)
-	case upspin.StoreServer:
-		delete(storeDialCache, key)
-	case upspin.KeyServer:
-		delete(userDialCache, key)
-	default:
-		return errors.E(op, errors.Invalid, errors.Errorf("unknown service type %T", service))
-	}
-	service.Close()
-	delete(reverseLookup, service)
-	return nil
-}
-
 // reachableService finds a bound and reachable service in the cache or dials a fresh one and saves it in the cache.
 func reachableService(cc upspin.Config, op string, e upspin.Endpoint, cache dialCache, dialer upspin.Dialer) (upspin.Service, error) {
 	if noCache {
@@ -264,15 +201,15 @@ func reachableService(cc upspin.Config, op string, e upspin.Endpoint, cache dial
 	}
 
 	var (
-		ds     *dialedService
-		cached bool // Was there a service in the cache?
-		dial   *inflightDial
+		service upspin.Service
+		cached  bool // Was there a service in the cache?
+		dial    *inflightDial
 	)
 	for n := 0; ; n++ {
 		var wait bool // Are we waiting for a concurrent dial (with the same dialKey)?
 
 		mu.Lock()
-		ds, cached = cache[key]
+		service, cached = cache[key]
 		if !cached {
 			dial, wait = inflightDials[key]
 			if !wait {
@@ -290,7 +227,7 @@ func reachableService(cc upspin.Config, op string, e upspin.Endpoint, cache dial
 			if dial.err != nil {
 				return nil, errors.E(op, dial.err)
 			}
-			return dial.service, nil
+			return service, nil
 		}
 
 		if !cached {
@@ -299,25 +236,11 @@ func reachableService(cc upspin.Config, op string, e upspin.Endpoint, cache dial
 		}
 
 		// A cached service exists.
-		if ds.ping() {
-			// It's live; use it.
-			return ds.service, nil
-		}
-		// It's dead; release it and try again.
-		if err := Release(ds.service); err != nil {
-			return nil, errors.E(op, errors.IO, errors.Errorf("Releasing cached service: %v", err))
-		}
-
-		if n > 100 {
-			// This should only happen if something is very wrong.
-			panic("too many iterations looking for cached service")
-		}
+		return service, nil
 	}
 
 	var err error
-	ds = new(dialedService)
-	ds.service, err = dialer.Dial(cc, key.endpoint)
-	ds.lastPing = time.Now()
+	service, err = dialer.Dial(cc, key.endpoint)
 
 	mu.Lock()
 	defer mu.Unlock()
@@ -327,10 +250,10 @@ func reachableService(cc upspin.Config, op string, e upspin.Endpoint, cache dial
 	if err != nil {
 		dial.err = err
 	} else {
-		dial.service = ds.service
+		dial.service = service
 		// Add the live service to the cache.
-		cache[key] = ds
-		reverseLookup[ds.service] = key
+		cache[key] = service
+		reverseLookup[service] = key
 	}
 
 	dial.Done()                // Wake any concurrent callers, as
