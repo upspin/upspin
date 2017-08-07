@@ -19,10 +19,8 @@ import (
 	"crypto/elliptic"
 	"crypto/rand"
 	"crypto/sha256"
-	"encoding/binary"
 	"fmt"
 	"io"
-	"math/big"
 
 	"golang.org/x/crypto/hkdf"
 
@@ -36,14 +34,6 @@ import (
 	"upspin.io/path"
 	"upspin.io/upspin"
 )
-
-// wrappedKey encodes a key that will decrypt and verify the ciphertext.
-type wrappedKey struct {
-	keyHash   []byte // recipient's public key
-	dkey      []byte // ciphertext symmetric decryption key
-	nonce     []byte
-	ephemeral ecdsa.PublicKey
-}
 
 type keyHashArray [sha256.Size]byte // sometimes we need the array
 
@@ -201,9 +191,10 @@ func (bp *blockPacker) Close() error {
 
 	name := bp.entry.SignedName
 	cfg := bp.cfg
+	var pd packdata
 
 	// Wrap keys.
-	wrap := make([]wrappedKey, 2)
+	pd.wrap = make([]wrappedKey, 1, 2)
 
 	// First, wrap for myself.
 	rp := cfg.Factotum().PublicKey()
@@ -211,7 +202,7 @@ func (bp *blockPacker) Close() error {
 	if err != nil {
 		return errors.E(op, name, err)
 	}
-	wrap[0], err = gcmWrap(rp, p, bp.dkey)
+	pd.wrap[0], err = gcmWrap(rp, p, bp.dkey)
 	if err != nil {
 		return errors.E(op, name, err)
 	}
@@ -222,9 +213,7 @@ func (bp *blockPacker) Close() error {
 		return errors.E(op, name, err)
 	}
 	owner := parsed.User()
-	if owner == cfg.UserName() {
-		wrap = wrap[:1]
-	} else {
+	if owner != cfg.UserName() {
 		keyServer, err := bind.KeyServer(cfg, cfg.KeyEndpoint())
 		if err != nil {
 			return errors.E(op, name, err)
@@ -236,30 +225,30 @@ func (bp *blockPacker) Close() error {
 		ownerKey := u.PublicKey
 		if ownerKey == cfg.Factotum().PublicKey() {
 			log.Debug.Printf("pack/ee: %q and %q have the same keys", owner, cfg.UserName())
-			wrap = wrap[:1]
 		} else {
 			p, err = factotum.ParsePublicKey(ownerKey)
 			if err != nil {
 				return errors.E(op, name, owner, err)
 			}
-			wrap[1], err = gcmWrap(ownerKey, p, bp.dkey)
+			wrap, err := gcmWrap(ownerKey, p, bp.dkey)
 			if err != nil {
 				return errors.E(op, name, owner, err)
 			}
+			pd.wrap = append(pd.wrap, wrap)
 		}
 	}
 
 	// Compute checksum of block hashes.
-	sum := internal.BlockSum(bp.entry.Blocks)
+	pd.blockSum = internal.BlockSum(bp.entry.Blocks)
 
 	// Compute entry signature.
 	f := bp.cfg.Factotum()
 	e := bp.entry
-	sig, err := f.FileSign(f.DirEntryHash(e.SignedName, e.Link, e.Attr, e.Packing, e.Time, bp.dkey, sum))
+	pd.sig, err = f.FileSign(f.DirEntryHash(e.SignedName, e.Link, e.Attr, e.Packing, e.Time, bp.dkey, pd.blockSum))
 	if err != nil {
 		return errors.E(op, err)
 	}
-	return pdMarshal(&bp.entry.Packdata, sig, upspin.Signature{}, wrap, sum)
+	return pd.Marshal(&bp.entry.Packdata)
 }
 
 func (ee ee) Unpack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker, error) {
@@ -273,13 +262,13 @@ func (ee ee) Unpack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker
 		return nil, errors.E(op, d.Name, err)
 	}
 
-	sig, sig2, wrap, hash, err := pdUnmarshal(d.Packdata)
-	if err != nil {
+	var pd packdata
+	if err := pd.Unmarshal(d.Packdata); err != nil {
 		return nil, errors.E(op, d.Name, err)
 	}
 
 	// Check that our stored+signed block checksum matches the sum of the actual blocks.
-	if got, want := internal.BlockSum(d.Blocks), hash; !bytes.Equal(got, want) {
+	if !bytes.Equal(internal.BlockSum(d.Blocks), pd.blockSum) {
 		return nil, errors.E(op, d.Name, errors.Str("checksum mismatch"))
 	}
 
@@ -308,7 +297,7 @@ func (ee ee) Unpack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker
 	// For quick lookup, hash my public key and locate my wrapped key in the metadata.
 	rhash := factotum.KeyHash(rawPublicKey)
 	f := cfg.Factotum()
-	for _, w := range wrap {
+	for _, w := range pd.wrap {
 		if !bytes.Equal(rhash, w.keyHash) {
 			continue
 		}
@@ -321,9 +310,9 @@ func (ee ee) Unpack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker
 			return nil, errors.E(op, d.Name, errKeyLength)
 		}
 		// Verify that this was signed with the writer's old or new public key.
-		vhash := f.DirEntryHash(d.SignedName, d.Link, d.Attr, d.Packing, d.Time, dkey, hash)
-		if !ecdsa.Verify(writerPubKey, vhash, sig.R, sig.S) &&
-			!ecdsa.Verify(writerPubKey, vhash, sig2.R, sig2.S) {
+		vhash := f.DirEntryHash(d.SignedName, d.Link, d.Attr, d.Packing, d.Time, dkey, pd.blockSum)
+		if !ecdsa.Verify(writerPubKey, vhash, pd.sig.R, pd.sig.S) &&
+			!ecdsa.Verify(writerPubKey, vhash, pd.sig2.R, pd.sig2.S) {
 			// Check sig2 in case writerPubKey is rotating.
 			return nil, errors.E(op, d.Name, writer, errVerify)
 			// TODO(ehg) If reader is owner, consider trying even older factotum keys.
@@ -375,22 +364,23 @@ func (bp *blockUnpacker) Close() error {
 	return nil
 }
 
-// ReaderHashes returns SHA-256 hashes of the public keys able to decrypt the associated ciphertext.
-func (ee ee) ReaderHashes(packdata []byte) (readers [][]byte, err error) {
+// ReaderHashes returns SHA-256 hashes of the public keys able to decrypt the
+// associated ciphertext.
+func (ee ee) ReaderHashes(pd []byte) (readers [][]byte, err error) {
 	const op = "pack/ee.ReaderHashes"
-	_, _, wrap, _, err := pdUnmarshal(packdata)
-	if err != nil {
+	var d packdata
+	if err := d.Unmarshal(pd); err != nil {
 		return nil, errors.E(op, errors.Invalid, err)
 	}
-	readers = make([][]byte, len(wrap))
-	for i := 0; i < len(wrap); i++ {
-		readers[i] = wrap[i].keyHash
+	readers = make([][]byte, len(d.wrap))
+	for i := 0; i < len(d.wrap); i++ {
+		readers[i] = d.wrap[i].keyHash
 	}
 	return readers, nil
 }
 
 // Share extracts the file decryption key from the packdata, wraps it for a revised list of readers, and updates packdata.
-func (ee ee) Share(cfg upspin.Config, readers []upspin.PublicKey, packdata []*[]byte) {
+func (ee ee) Share(cfg upspin.Config, readers []upspin.PublicKey, packdataSlice []*[]byte) {
 
 	// A Packdata holds a cipherSum, a Signature, and a list of wrapped keys.
 	// Share updates the wrapped keys, leaving the other two fields unchanged.
@@ -409,23 +399,23 @@ func (ee ee) Share(cfg upspin.Config, readers []upspin.PublicKey, packdata []*[]
 	}
 
 	// For each packdata, wrap for new readers.
-	for j, d := range packdata {
+	for j, d := range packdataSlice {
 
 		// Extract dkey and existing wrapped keys from packdata.
 		var dkey []byte
 		alreadyWrapped := make(map[keyHashArray]*wrappedKey)
-		sig, sig2, wrap, cipherSum, err := pdUnmarshal(*d)
-		if err != nil {
-			log.Error.Printf("pack/ee.Share: pdUnmarshal failed: %v", err)
-			for jj := j; j < len(packdata); jj++ {
-				packdata[jj] = nil
+		var pd packdata
+		if err := pd.Unmarshal(*d); err != nil {
+			log.Error.Printf("pack/ee.Share: packdata unmarshal failed: %v", err)
+			for jj := j; j < len(packdataSlice); jj++ {
+				packdataSlice[jj] = nil
 			}
 			return
 		}
-		for i, w := range wrap {
+		for i, w := range pd.wrap {
 			var h keyHashArray
 			copy(h[:], w.keyHash)
-			alreadyWrapped[h] = &wrap[i]
+			alreadyWrapped[h] = &pd.wrap[i]
 			_, err := cfg.Factotum().PublicKeyFromHash(w.keyHash)
 			if err != nil {
 				// to unwrap dkey, we can only use our own private keys
@@ -438,12 +428,12 @@ func (ee ee) Share(cfg upspin.Config, readers []upspin.PublicKey, packdata []*[]
 			}
 		}
 		if len(dkey) == 0 { // Failed to get a valid decryption key.
-			packdata[j] = nil // Tell caller this packdata was skipped.
+			packdataSlice[j] = nil // Tell caller this packdata was skipped.
 			continue
 		}
 
 		// Create new list of wrapped keys.
-		wrap = make([]wrappedKey, len(readers))
+		pd.wrap = make([]wrappedKey, len(readers))
 		nwrap := 0
 		for i := range readers {
 			if pubkey[i] == nil {
@@ -457,17 +447,17 @@ func (ee ee) Share(cfg upspin.Config, readers []upspin.PublicKey, packdata []*[]
 				}
 				pw = &w
 			} // else reuse the existing wrapped dkey.
-			wrap[nwrap] = *pw
+			pd.wrap[nwrap] = *pw
 			nwrap++
 		}
-		wrap = wrap[:nwrap]
+		pd.wrap = pd.wrap[:nwrap]
 
-		// Rebuild packdata[j] from existing sig and new wrapped keys.
-		dst := make([]byte, packdataLen(nwrap))
-		if pdMarshal(&dst, sig, sig2, wrap, cipherSum) != nil {
-			packdata[j] = nil // Tell caller this packdata was skipped.
+		// Rebuild packdataSlice[j] from existing sig and new wrapped keys.
+		var dst []byte
+		if pd.Marshal(&dst) != nil {
+			packdataSlice[j] = nil // Tell caller this packdata was skipped.
 		} else {
-			*packdata[j] = dst
+			*packdataSlice[j] = dst
 		}
 	}
 }
@@ -482,8 +472,8 @@ func (ee ee) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName
 		return errors.E(op, errors.Invalid, d.Name, err)
 	}
 
-	sig, sig2, wrap, cipherSum, err := pdUnmarshal(d.Packdata)
-	if err != nil {
+	var pd packdata
+	if err := pd.Unmarshal(d.Packdata); err != nil {
 		return errors.E(op, errors.Invalid, d.Name, err)
 	}
 
@@ -513,7 +503,7 @@ func (ee ee) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName
 	rhash := factotum.KeyHash(rawPublicKey)
 	wrapFound := false
 	var w wrappedKey
-	for _, w = range wrap {
+	for _, w = range pd.wrap {
 		if bytes.Equal(rhash, w.keyHash) {
 			wrapFound = true
 			break
@@ -531,9 +521,9 @@ func (ee ee) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName
 	}
 
 	// Verify that this was signed with the writer's old or new public key.
-	vhash := f.DirEntryHash(d.SignedName, d.Link, d.Attr, d.Packing, d.Time, dkey, cipherSum)
-	if !ecdsa.Verify(writerPubKey, vhash, sig.R, sig.S) &&
-		!ecdsa.Verify(writerPubKey, vhash, sig2.R, sig2.S) {
+	vhash := f.DirEntryHash(d.SignedName, d.Link, d.Attr, d.Packing, d.Time, dkey, pd.blockSum)
+	if !ecdsa.Verify(writerPubKey, vhash, pd.sig.R, pd.sig.S) &&
+		!ecdsa.Verify(writerPubKey, vhash, pd.sig2.R, pd.sig2.S) {
 		// Check sig2 in case writerPubKey is rotating.
 		return errors.E(op, d.Name, errVerify)
 	}
@@ -545,20 +535,20 @@ func (ee ee) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName
 	}
 	newName = parsedNew.Path()
 	if !parsed.Drop(1).Equal(parsedNew.Drop(1)) {
-		wrap = []wrappedKey{w}
+		pd.wrap = []wrappedKey{w}
 	}
 
 	// Compute new signature, using the new name.
 	d.SignedName = newName
-	vhash = f.DirEntryHash(d.SignedName, d.Link, d.Attr, d.Packing, d.Time, dkey, cipherSum)
-	sig, err = f.FileSign(vhash)
+	vhash = f.DirEntryHash(d.SignedName, d.Link, d.Attr, d.Packing, d.Time, dkey, pd.blockSum)
+	pd.sig, err = f.FileSign(vhash)
 	if err != nil {
 		return errors.E(op, d.Name, err)
 	}
 
 	// Serialize packer metadata. We do not reallocate Packdata since the new data
 	// should be the same size or smaller.
-	if err := pdMarshal(&d.Packdata, sig, sig0, wrap, cipherSum); err != nil {
+	if err := pd.Marshal(&d.Packdata); err != nil {
 		return errors.E(op, d.Name, err)
 	}
 	d.Name = newName
@@ -580,8 +570,8 @@ func (ee ee) Countersign(oldKey upspin.PublicKey, f upspin.Factotum, d *upspin.D
 	}
 
 	// Extract existing signatures, but keep only the newest.
-	sig, _, wrap, cipherSum, err := pdUnmarshal(d.Packdata)
-	if err != nil {
+	var pd packdata
+	if err := pd.Unmarshal(d.Packdata); err != nil {
 		return errors.E(op, d.Name, errors.Invalid, err)
 	}
 
@@ -589,7 +579,7 @@ func (ee ee) Countersign(oldKey upspin.PublicKey, f upspin.Factotum, d *upspin.D
 	rhash := factotum.KeyHash(oldKey)
 	wrapFound := false
 	var w wrappedKey
-	for _, w = range wrap {
+	for _, w = range pd.wrap {
 		if bytes.Equal(rhash, w.keyHash) {
 			wrapFound = true
 			break
@@ -604,8 +594,8 @@ func (ee ee) Countersign(oldKey upspin.PublicKey, f upspin.Factotum, d *upspin.D
 	}
 
 	// Verify existing signature with oldKey.
-	vhash := f.DirEntryHash(d.SignedName, d.Link, d.Attr, d.Packing, d.Time, dkey, cipherSum)
-	if !ecdsa.Verify(oldPubKey, vhash, sig.R, sig.S) {
+	vhash := f.DirEntryHash(d.SignedName, d.Link, d.Attr, d.Packing, d.Time, dkey, pd.blockSum)
+	if !ecdsa.Verify(oldPubKey, vhash, pd.sig.R, pd.sig.S) {
 		return errors.E(op, d.Name, errVerify, "unable to verify existing signature")
 	}
 
@@ -614,8 +604,9 @@ func (ee ee) Countersign(oldKey upspin.PublicKey, f upspin.Factotum, d *upspin.D
 	if err != nil {
 		return errors.E(op, d.Name, errVerify, "unable to make new signature")
 	}
-	pdMarshal(&d.Packdata, sig1, sig, wrap, cipherSum)
-	return nil
+	pd.sig2 = pd.sig
+	pd.sig = sig1
+	return pd.Marshal(&d.Packdata)
 }
 
 // gcmWrap implements NIST 800-56Ar2; see also RFC6637 §8.
@@ -712,96 +703,6 @@ func aesUnwrap(f upspin.Factotum, w wrappedKey) (dkey []byte, err error) {
 		dkey = dkey[:0]
 	}
 	return
-}
-
-func pdMarshal(dst *[]byte, sig, sig2 upspin.Signature, wrap []wrappedKey, cipherSum []byte) error {
-	// sig2 is a signature with another owner key, to enable smoother key rotation.
-	n := packdataLen(len(wrap))
-	if len(*dst) < n {
-		*dst = make([]byte, n)
-	}
-	n = 0
-	n += packutil.PutBytes((*dst)[n:], sig.R.Bytes())
-	n += packutil.PutBytes((*dst)[n:], sig.S.Bytes())
-	if sig2.R == nil {
-		zero := big.NewInt(0)
-		sig2 = upspin.Signature{R: zero, S: zero}
-	}
-	n += packutil.PutBytes((*dst)[n:], sig2.R.Bytes())
-	n += packutil.PutBytes((*dst)[n:], sig2.S.Bytes())
-	n += binary.PutVarint((*dst)[n:], int64(len(wrap)))
-	for _, w := range wrap {
-		n += packutil.PutBytes((*dst)[n:], w.keyHash)
-		n += packutil.PutBytes((*dst)[n:], w.dkey)
-		n += packutil.PutBytes((*dst)[n:], w.nonce)
-		n += packutil.PutBytes((*dst)[n:], w.ephemeral.X.Bytes())
-		n += packutil.PutBytes((*dst)[n:], w.ephemeral.Y.Bytes())
-	}
-	n += packutil.PutBytes((*dst)[n:], cipherSum)
-	*dst = (*dst)[:n]
-	return nil
-}
-
-func pdUnmarshal(pd []byte) (sig, sig2 upspin.Signature, wrap []wrappedKey, hash []byte, err error) {
-	if len(pd) == 0 {
-		return sig0, sig0, nil, nil, errors.Str("nil packdata")
-	}
-	n := 0
-	sig.R = big.NewInt(0)
-	sig.S = big.NewInt(0)
-	sig2.R = big.NewInt(0)
-	sig2.S = big.NewInt(0)
-	buf := make([]byte, marshalBufLen)
-	n += packutil.GetBytes(&buf, pd[n:])
-	sig.R.SetBytes(buf)
-	n += packutil.GetBytes(&buf, pd[n:])
-	sig.S.SetBytes(buf)
-	n += packutil.GetBytes(&buf, pd[n:])
-	sig2.R.SetBytes(buf)
-	n += packutil.GetBytes(&buf, pd[n:])
-	sig2.S.SetBytes(buf)
-	nwrap64, vlen := binary.Varint(pd[n:])
-	n += vlen
-	nwrap := int(nwrap64)
-	if int64(nwrap) != nwrap64 {
-		return sig0, sig0, nil, nil, errors.Errorf("implausible number of wrapped keys: %d\n", nwrap64)
-	}
-	wrap = make([]wrappedKey, nwrap)
-	for i := 0; i < nwrap; i++ {
-		var w wrappedKey
-		w.keyHash = make([]byte, sha256.Size)
-		w.dkey = make([]byte, aesKeyLen+gcmTagSize)
-		w.nonce = make([]byte, gcmStandardNonceSize)
-		w.ephemeral = ecdsa.PublicKey{X: big.NewInt(0), Y: big.NewInt(0)}
-		n += packutil.GetBytes(&w.keyHash, pd[n:])
-		n += packutil.GetBytes(&w.dkey, pd[n:])
-		n += packutil.GetBytes(&w.nonce, pd[n:])
-		n += packutil.GetBytes(&buf, pd[n:])
-		w.ephemeral.X.SetBytes(buf)
-		n += packutil.GetBytes(&buf, pd[n:])
-		w.ephemeral.Y.SetBytes(buf)
-		if w.ephemeral.Y.BitLen() > 393 {
-			w.ephemeral.Curve = elliptic.P521()
-		} else if w.ephemeral.Y.BitLen() > 265 {
-			w.ephemeral.Curve = elliptic.P384()
-		} else {
-			w.ephemeral.Curve = elliptic.P256()
-		}
-		wrap[i] = w
-	}
-	hash = make([]byte, sha256.Size)
-	n += packutil.GetBytes(&hash, pd[n:])
-	if hash == nil {
-		return sig0, sig0, nil, nil, errors.Errorf("pdUnmarshal: file hash is required")
-	}
-	return sig, sig2, wrap, hash, nil
-}
-
-// packdataLen returns n big enough for packing, sig.R, sig.S, nwrap, {keyHash, encrypted, nonce, X, y}
-func packdataLen(nwrap int) int {
-	return 2*marshalBufLen + (1+5*nwrap)*binary.MaxVarintLen64 +
-		nwrap*(sha256.Size+(aesKeyLen+gcmTagSize)+gcmStandardNonceSize+2*marshalBufLen) +
-		sha256.Size + 1
 }
 
 // zeroSlice replaces the contents of the given slice with zeroes.
