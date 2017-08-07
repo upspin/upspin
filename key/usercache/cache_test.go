@@ -296,9 +296,5 @@ func (s *service) Endpoint() upspin.Endpoint {
 	return s.endpoint
 }
 
-func (s *service) Ping() bool {
-	return true
-}
-
 func (s *service) Close() {
 }

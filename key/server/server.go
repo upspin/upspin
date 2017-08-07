@@ -341,11 +341,6 @@ func (s *server) Dial(cfg upspin.Config, e upspin.Endpoint) (upspin.Service, err
 	return &svc, nil
 }
 
-// Ping implements upspin.Service.
-func (s *server) Ping() bool {
-	return true
-}
-
 // Close implements upspin.Service.
 func (s *server) Close() {
 	// This instance is no longer tied to a user.

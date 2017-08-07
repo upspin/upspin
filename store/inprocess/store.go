@@ -133,11 +133,6 @@ func (s *service) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service,
 	return &thisStore, nil
 }
 
-// Ping implements upspin.Service.
-func (s *service) Ping() bool {
-	return true
-}
-
 // Close implements upspin.Service.
 func (s *service) Close() {
 	// TODO

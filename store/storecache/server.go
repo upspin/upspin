@@ -104,7 +104,6 @@ func (s *server) Delete(ref upspin.Reference) error {
 
 func (s *server) Endpoint() upspin.Endpoint { return s.authority }
 func (s *server) Close()                    {}
-func (s *server) Ping() bool                { return true }
 
 func logf(format string, args ...interface{}) operation {
 	s := fmt.Sprintf(format, args...)

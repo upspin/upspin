@@ -29,7 +29,6 @@ import (
 // Client is a partial upspin.Service that uses HTTP as a transport
 // and implements authentication using out-of-band headers.
 type Client interface {
-	Ping() bool
 	Close()
 
 	// Invoke calls the given RPC method ("Server/Method") with the
@@ -388,8 +387,7 @@ func (c *httpClient) isProxy() bool {
 }
 
 // Stubs for unused methods.
-func (c *httpClient) Ping() bool { return true }
-func (c *httpClient) Close()     {}
+func (c *httpClient) Close() {}
 
 // clientAuth tracks the auth token and its freshness.
 type clientAuth struct {

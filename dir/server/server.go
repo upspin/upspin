@@ -773,11 +773,6 @@ func (s *server) Endpoint() upspin.Endpoint {
 	return s.serverConfig.DirEndpoint()
 }
 
-// Ping implements upspin.Service.
-func (s *server) Ping() bool {
-	return true
-}
-
 // Close implements upspin.Service.
 func (s *server) Close() {
 	const op = "dir/server.Close"

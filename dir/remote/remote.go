@@ -27,7 +27,7 @@ type dialConfig struct {
 
 // remote implements upspin.DirServer.
 type remote struct {
-	rpc.Client // For sessions, Ping, and Close.
+	rpc.Client // For sessions and Close.
 	cfg        dialConfig
 }
 

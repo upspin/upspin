@@ -1,13 +1,14 @@
 The upspin.io/upspin/proto package is generated from the upspin.proto file.
 
-To generate it, you need the protoc v3 and the protoc-gen-go tools.
+To generate it, you need protoc 3.1.0 or later and the protoc-gen-go tools.
 
 Download the protoc build (version 3.x) for your platform
 and put it in your PATH.
 
 	https://github.com/google/protobuf/releases
 
-Use 'go get' to install the latest protoc-gen-go (v4 at time of writing):
+Use 'go get' to install the latest protoc-gen-go
+(git hash 6a1fa94 at time of writing, June 2017):
 
 	$ go get -u github.com/golang/protobuf/protoc-gen-go
 

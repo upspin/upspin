@@ -41,11 +41,6 @@ func (u Server) Endpoint() upspin.Endpoint {
 func (Server) Close() {
 }
 
-// Ping implements upspin.Service.
-func (Server) Ping() bool {
-	return true
-}
-
 // Dial implements upspin.Service.
 func (Server) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
 	const op = "key/Server.Dial"

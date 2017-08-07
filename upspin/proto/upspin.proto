@@ -36,14 +36,6 @@ message EndpointResponse {
     Endpoint endpoint = 1;
 }
 
-message PingRequest {
-    int32 ping_sequence = 1;
-}
-
-message PingResponse {
-    int32 ping_sequence = 1;
-}
-
 // The Store interface.
 
 message StoreGetRequest {
@@ -77,7 +69,6 @@ message StoreDeleteResponse {
 service Store {
     // Service methods:
     rpc Endpoint (EndpointRequest) returns (EndpointResponse) {}
-    rpc Ping (PingRequest) returns (PingResponse) {}
 
     rpc Get (StoreGetRequest) returns (StoreGetResponse) {}
     rpc Put (StorePutRequest) returns (StorePutResponse) {}
@@ -113,7 +104,6 @@ message KeyPutResponse {
 service Key {
     // Service methods:
     rpc Endpoint (EndpointRequest) returns (EndpointResponse) {}
-    rpc Ping (PingRequest) returns (PingResponse) {}
 
     rpc Lookup (KeyLookupRequest) returns (KeyLookupResponse) {}
     rpc Put(KeyPutRequest) returns (KeyPutResponse) {}
@@ -174,7 +164,6 @@ message Event {
 service Dir{
     // Service methods:
     rpc Endpoint (EndpointRequest) returns (EndpointResponse) {}
-    rpc Ping (PingRequest) returns (PingResponse) {}
 
     rpc Lookup (DirLookupRequest) returns (EntryError) {}
     rpc Put (DirPutRequest) returns (EntryError) {}
