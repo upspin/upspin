@@ -89,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "45ed316f_d1ecdb77",
+        "filename": "dir/server/server.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 344,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-08-07T22:53:26Z",
+      "side": 1,
+      "message": "As said in my other comment, the client doesn\u0027t need to catch it; it just does it.",
+      "parentUuid": "b23b72cf_5ebded46",
+      "revId": "aa36efb7084c9ee230a95f1a739c8a34b808f930",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "2e390e9d_2820625c",
         "filename": "pack/eeintegrity/eeintegrity.go",
         "patchSetId": 5
