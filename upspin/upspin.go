@@ -225,6 +225,11 @@ type Packer interface {
 	// that one over the second existing signature, and creates a new
 	// first signature using the key from factotum.
 	Countersign(oldKey PublicKey, f Factotum, d *DirEntry) error
+
+	// PermitsAllReaders reports whether the packed data may be unpacked by
+	// all readers. Access and Group files must have this property, as
+	// should any data shared with the "read: all" permission.
+	PermitsAllReaders(d *DirEntry) (bool, error)
 }
 
 const (
@@ -299,6 +304,10 @@ type KeyServer interface {
 
 // A PublicKey can be seen by anyone and is used for authenticating a user.
 type PublicKey string
+
+// AllReaders is a sentinel PublicKey value used to indicate that a packing
+// operation should make the data readable to anyone.
+var AllReaders = PublicKey("read: all")
 
 var (
 	// ErrFollowLink indicates that all or part of a path name has

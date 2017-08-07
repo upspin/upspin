@@ -98,22 +98,11 @@ var basicCmdTests = []cmdTest{
 		"@/Friends/Access",
 		"r,l: friends\n*:ann@example.com\n",
 	),
-	// Create and build a Public directory, but do it wrong first to check failure.
-	{
-		"prevent read:all after content",
-		ann,
-		do(
-			"mkdir @/BadPublic @/BadPublic/Photo",
-			"put @/BadPublic/Access",
-		),
-		"r,l: all\n*:ann@example.com\n",
-		fail("cannot add \"read:all\""),
-	},
+	// Create and build a Public directory.
 	{
 		"make public directory",
 		ann,
 		do(
-			"rm -R @/BadPublic",
 			"mkdir @/Public",
 			"put @/Public/Access",
 			"get @/Public/Access",
