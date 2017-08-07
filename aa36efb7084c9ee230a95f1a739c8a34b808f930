@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "d6e6df46_3c2f9bd8",
+        "filename": "client/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-07T22:48:47Z",
+      "side": 1,
+      "message": "i\u0027m not sure i see this. Access files must be readable by all because the dir server hasn\u0027t got the keys.\nmaybe i missed something in my quick scan. i\u0027ll go around again.",
+      "revId": "aa36efb7084c9ee230a95f1a739c8a34b808f930",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "da435f8b_d55ca187",
         "filename": "cmd/upspin/info.go",
         "patchSetId": 5
@@ -13,6 +30,74 @@
       "writtenOn": "2017-08-07T22:42:55Z",
       "side": 1,
       "message": "Not sure if this is correct here, either.",
+      "revId": "aa36efb7084c9ee230a95f1a739c8a34b808f930",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f49c58b1_009f36be",
+        "filename": "cmd/upspin/info.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-07T22:48:47Z",
+      "side": 1,
+      "message": "s/Permits/Allows/",
+      "revId": "aa36efb7084c9ee230a95f1a739c8a34b808f930",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2e390e9d_2820625c",
+        "filename": "pack/eeintegrity/eeintegrity.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 343,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-07T22:48:47Z",
+      "side": 1,
+      "message": "s/Permits/Allows/",
+      "revId": "aa36efb7084c9ee230a95f1a739c8a34b808f930",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "07d6c970_32496505",
+        "filename": "pack/plain/plain.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-07T22:48:47Z",
+      "side": 1,
+      "message": "s/Permits/Allows/",
+      "revId": "aa36efb7084c9ee230a95f1a739c8a34b808f930",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5b768280_aa596f42",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-07T22:48:47Z",
+      "side": 1,
+      "message": "we\u0027ve been using Allow rather than Permit as our verb, so let\u0027s be consistent.\n(we use permission, but that\u0027s a different word)",
       "revId": "aa36efb7084c9ee230a95f1a739c8a34b808f930",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
