@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "99a7022c_00c7a9a4",
+        "filename": "pack/ee/packdata.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-08-07T02:49:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "92dc6f44_acab70e2",
+      "revId": "6151ce992fd770e69e06be138164de11bfdac9f8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "bffbcbee_a412f682",
         "filename": "pack/ee/packdata.go",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "13af245c_fc3eea20",
+        "filename": "pack/ee/packdata.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-08-07T02:49:28Z",
+      "side": 1,
+      "message": "Done. I simplified it.",
+      "parentUuid": "bffbcbee_a412f682",
+      "revId": "6151ce992fd770e69e06be138164de11bfdac9f8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b1deff2c_0fc3443f",
         "filename": "pack/ee/packdata.go",
         "patchSetId": 1
@@ -47,6 +83,24 @@
       "writtenOn": "2017-08-07T02:36:47Z",
       "side": 1,
       "message": "would be nice to explain this expression, possibly the largest in the whole tree.\nthe way to do that is a head comment for the file explaining what a packdata looks like.",
+      "revId": "6151ce992fd770e69e06be138164de11bfdac9f8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "aa9395aa_aa5ce013",
+        "filename": "pack/ee/packdata.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-08-07T02:49:28Z",
+      "side": 1,
+      "message": "I can\u0027t explain it with great confidence.\nI added a TODO for Eric to do so.",
+      "parentUuid": "b1deff2c_0fc3443f",
       "revId": "6151ce992fd770e69e06be138164de11bfdac9f8",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
