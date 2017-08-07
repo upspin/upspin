@@ -38,6 +38,23 @@
     },
     {
       "key": {
+        "uuid": "0550b8a6_b72f9397",
+        "filename": "client/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 332,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-07T22:56:46Z",
+      "side": 1,
+      "message": "i don\u0027t think this is right. see the comment above access.All in access/access.go",
+      "revId": "aa36efb7084c9ee230a95f1a739c8a34b808f930",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "da435f8b_d55ca187",
         "filename": "cmd/upspin/info.go",
         "patchSetId": 5
