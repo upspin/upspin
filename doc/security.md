@@ -137,9 +137,7 @@ This discussion is about a data-encrypting method, or in Upspin terminology, a p
 that is called **ee**.
 It uses NIST elliptic curves for end-to-end encryption, and is the default.
 There are other packings available, notably **eeintegrity**
-which is useful when one is willing to store signed cleartext
-in order to make the content available to everyone, not just to an
-explicit list of readers.
+which is useful when one is willing to store signed cleartext.
 
 The directory server needs to store its hierarchy of directory entries
 somewhere.
