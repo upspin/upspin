@@ -296,9 +296,8 @@ but that has not been done.
 ## Encoding and access for Access and Group files
 
 `Group` and `Access` files are plain UTF-8-encoded text files and are always
-stored using plain packing with integrity checking (LINK).
-They cannot be stored as encrypted files as this would prevent them being
-readable by the servers that enforce the permissions they grant.
+readable by anyone with permission to access them, and by the servers that enforce the
+permissions they grant.
 
 Also, if an `Access` or `Group` file in user U's tree mentions a `Group` file
 from user V's tree, user V must explicitly grant public read access for the
