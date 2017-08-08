@@ -253,16 +253,16 @@ match the signature with which it was created.
 A packing (data storage method) called end-to-end integrity packing is
 available.
 This packing does not encrypt the data, but it still signs it,
-so even though the data can be publicly viewed, it still
+so even though the data can be stored in clear text, it still
 cannot be tampered with.
 
 ### Are world-readable ("read:all") files encrypted? {#read-all}
 
-TODO - may change.
-
-### Why can't I change files from private to world-readable? {#read-all-no-crypt}
-
-TODO - may change.
+If you use the EE Packing (the default), world-readable files (`Access` and
+`Group` files, and any file shared with the permission `read: all`) are
+encrypted in StoreServer, but the decryption key is stored in clear text in the
+directory entry on the DirServer. This means that anyone with access to read
+the DirEntry may decrypt the objects in the StoreServer.
 
 ## Keys
 

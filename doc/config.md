@@ -126,8 +126,6 @@ safest, securest packing.
 Others are `plain`, which leaves the data untouched, and `eeintegrity`, which
 like `plain` leaves the data untouched but adds an end-to-end integrity check
 that can detect tampering.
-Integrity packing is used to store things like Access files, which must be readable by outside
-agents such as directory servers but must also be secured.
 If the packing is not set in the config file, `ee` is assumed.
 
 * The **`keyserver`** setting names the key server used to discover other
