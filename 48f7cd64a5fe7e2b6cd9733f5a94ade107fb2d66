@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f4dca027_89485872",
+        "filename": "cmd/upspin/allcmds_test.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-08T01:17:27Z",
+      "side": 1,
+      "message": "put back the public state or use a different dir for this",
+      "revId": "48f7cd64a5fe7e2b6cd9733f5a94ade107fb2d66",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f6051d4e_0685c985",
+        "filename": "cmd/upspin/share.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-08T01:17:27Z",
+      "side": 1,
+      "message": "this should be exported from the factotum package.",
+      "revId": "48f7cd64a5fe7e2b6cd9733f5a94ade107fb2d66",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2753161a_9b782b61",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-08T01:17:27Z",
+      "side": 1,
+      "message": "This should be UnpackableByAll. It\u0027s not what\u0027s allowed, it\u0027s what\u0027s possible.",
+      "revId": "48f7cd64a5fe7e2b6cd9733f5a94ade107fb2d66",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dafaf9cf_0fdac4fe",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-08T01:17:27Z",
+      "side": 1,
+      "message": "it\u0027s not just sharing, it\u0027s also when it\u0027s first created.\n\n// AllUsersKey is a sentinel PublicKey value. If present in the\n// packdata for a DirEntry, it enables the data to be unpacked\n// by any reader with access to the DirEntry.",
+      "revId": "48f7cd64a5fe7e2b6cd9733f5a94ade107fb2d66",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
