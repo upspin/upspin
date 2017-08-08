@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f006e9d3_3a9e7d33",
+        "filename": "dir/server/server.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 342,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-08T02:06:51Z",
+      "side": 1,
+      "message": "%s",
+      "revId": "55cff13986ad1d383101b8ca8ff4ac98f1c99250",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "231857ba_f7d11ef8",
+        "filename": "dir/server/server.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 349,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-08T02:06:51Z",
+      "side": 1,
+      "message": "s/access.AllUsers/all/\n\nuse the user-visible form, not the API\u0027s",
+      "revId": "55cff13986ad1d383101b8ca8ff4ac98f1c99250",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e742ee21_76f5b33a",
+        "filename": "pack/ee/ee.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 631,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-08T02:06:51Z",
+      "side": 1,
+      "message": "%s would be better",
+      "revId": "55cff13986ad1d383101b8ca8ff4ac98f1c99250",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6dd317d0_46e7b87c",
+        "filename": "pack/ee/ee_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 560,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-08T02:06:51Z",
+      "side": 1,
+      "message": "UnpackableByAll",
+      "revId": "55cff13986ad1d383101b8ca8ff4ac98f1c99250",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "25efe7c2_a9dcca13",
+        "filename": "pack/ee/ee_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 578,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-08T02:06:51Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "55cff13986ad1d383101b8ca8ff4ac98f1c99250",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
