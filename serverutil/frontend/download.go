@@ -43,9 +43,8 @@ var osArchFormat = map[string]string{
 }
 
 const (
-	// updateDownloadsInterval is the interval between refreshing the list
-	// of available binary releases.
-	updateDownloadsInterval = 1 * time.Minute
+	// watchRetryInterval is the time to wait before retrying a Watch.
+	watchRetryInterval = 1 * time.Minute
 
 	// releaseUser is the tree in which the releases are kept.
 	releaseUser = "release@upspin.io"
@@ -74,15 +73,7 @@ func newDownloadHandler(cfg upspin.Config, tmpl *template.Template) http.Handler
 		latest:  make(map[string]time.Time),
 		archive: make(map[string]*archive),
 	}
-	go func() {
-		for {
-			err := h.updateArchives()
-			if err != nil {
-				log.Error.Printf("download: error updating archives: %v", err)
-			}
-			time.Sleep(updateDownloadsInterval)
-		}
-	}()
+	go h.updateLoop()
 	return h
 }
 
@@ -140,48 +131,89 @@ func (h *downloadHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Write(a.data)
 }
 
-// updateArchives refreshes the list of release binaries in releasePath
-// and updates the latest and archive maps appropriately.
-func (h *downloadHandler) updateArchives() error {
-	// Fetch the available os_arch combinations.
-	des, err := h.client.Glob(upspin.AllFilesGlob(releasePath))
+// updateLoop watches releasePath for changes and builds new release archives
+// when it sees them.
+func (h *downloadHandler) updateLoop() {
+	var (
+		done      chan struct{}
+		lastOrder int64 = upspin.WatchCurrent
+		events    <-chan upspin.Event
+	)
+	parsedReleasePath, _ := path.Parse(releasePath)
+	for {
+		if events == nil {
+			dir, err := h.client.DirServer(releasePath)
+			if err != nil {
+				log.Error.Printf("download: error locating archive DirServer: %v", err)
+				time.Sleep(watchRetryInterval)
+				continue
+			}
+			done = make(chan struct{})
+			events, err = dir.Watch(releasePath, lastOrder, done)
+			if err != nil {
+				log.Error.Printf("download: error starting Watch: %v", err)
+				time.Sleep(watchRetryInterval)
+				continue
+			}
+		}
+		event := <-events
+		if event.Error != nil {
+			log.Error.Printf("download: error event received: %v", event.Error)
+			close(done)
+			events = nil
+			continue
+		}
+		p, err := path.Parse(event.Entry.Name)
+		if err != nil {
+			log.Error.Printf("download: error parsing entry path: %v", err)
+			continue
+		}
+		if p.NElem() != parsedReleasePath.NElem()+1 {
+			// Ignore files inside the releases; just watch for the directories.
+			lastOrder = event.Order
+			continue
+		}
+		if err := h.updateArchive(p); err != nil {
+			log.Error.Printf("download: error updating archives: %v", err)
+			continue
+		}
+		lastOrder = event.Order
+	}
+}
+
+// updateArchive refreshes the release binaries in the given path and updates
+// the latest and archive maps appropriately. The path should be the directory
+// containing the binaries for a specific os/arch.
+func (h *downloadHandler) updateArchive(p path.Parsed) error {
+	osArch := p.Elem(p.NElem() - 1)
+
+	des, err := h.client.Glob(upspin.AllFilesGlob(p.Path()))
 	if err != nil {
 		return err
 	}
 
-	// For each os_arch, check for new releases and build archives.
+	h.mu.RLock()
+	latest := h.latest[osArch]
+	h.mu.RUnlock()
+
+	updated := false
 	for _, de := range des {
-		p, _ := path.Parse(de.Name)
-		osArch := p.Elem(p.NElem() - 1)
-
-		des, err := h.client.Glob(upspin.AllFilesGlob(upspin.PathName(releasePath + osArch)))
-		if err != nil {
-			return err
+		if t := de.Time.Go(); t.After(latest) {
+			latest = t
+			updated = true
 		}
-
-		h.mu.RLock()
-		latest := h.latest[osArch]
-		h.mu.RUnlock()
-
-		updated := false
-		for _, de := range des {
-			if t := de.Time.Go(); t.After(latest) {
-				latest = t
-				updated = true
-			}
-		}
-		if !updated {
-			continue
-		}
-
-		h.mu.Lock()
-		h.latest[osArch] = latest
-		h.mu.Unlock()
-
-		// Build the archive in the background.
-		log.Info.Printf("download: building archive for %v released at %v", osArch, latest)
-		go h.buildArchive(osArch, des)
 	}
+	if !updated {
+		return nil
+	}
+
+	h.mu.Lock()
+	h.latest[osArch] = latest
+	h.mu.Unlock()
+
+	// Build the archive in the background.
+	log.Info.Printf("download: building archive for %v released at %v", osArch, latest)
+	go h.buildArchive(osArch, des)
 
 	return nil
 }
