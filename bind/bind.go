@@ -13,25 +13,9 @@ import (
 	"upspin.io/user"
 )
 
-// dialKey is the key to the LRU caches that store dialed services.
 type dialKey struct {
 	user     upspin.UserName
 	endpoint upspin.Endpoint
-	dialer   upspin.Dialer
-}
-
-// inflightDial represents a service that is being created by the
-// reachableService function. Concurrent calls to reachableService
-// with the same dialKey will share a single inflightDial value.
-type inflightDial struct {
-	sync.WaitGroup
-
-	// These are the return values of a reachableService call.
-	// Concurrent calls to reachableService with the same config
-	// and endpoint should return the same values.
-	// Either service or err must be non-nil.
-	service upspin.Service
-	err     error
 }
 
 type dialCache map[dialKey]upspin.Service
@@ -45,13 +29,9 @@ var (
 	directoryMap = make(map[upspin.Transport]upspin.DirServer)
 	storeMap     = make(map[upspin.Transport]upspin.StoreServer)
 
-	// These caches hold <dialKey, upspin.Service> for each respective service type.
-	userDialCache      = make(dialCache)
+	keyDialCache       = make(dialCache)
 	directoryDialCache = make(dialCache)
 	storeDialCache     = make(dialCache)
-	reverseLookup      = make(map[upspin.Service]dialKey)
-
-	inflightDials = make(map[dialKey]*inflightDial)
 )
 
 // RegisterKeyServer registers a KeyServer interface for the transport.
@@ -105,7 +85,7 @@ func KeyServer(cc upspin.Config, e upspin.Endpoint) (upspin.KeyServer, error) {
 	if !ok {
 		return nil, errors.E(op, errors.Invalid, errors.Errorf("service with transport %q not registered", e.Transport))
 	}
-	x, err := reachableService(cc, op, e, userDialCache, u)
+	x, err := reachableService(cc, op, e, keyDialCache, u)
 	if err != nil {
 		return nil, err
 	}
@@ -189,80 +169,25 @@ func DirServerFor(cc upspin.Config, userName upspin.UserName) (upspin.DirServer,
 
 }
 
-// reachableService finds a bound and reachable service in the cache or dials a fresh one and saves it in the cache.
+// reachableService finds a bound and reachable service in the cache or dials a
+// fresh one and saves it in the cache.
 func reachableService(cc upspin.Config, op string, e upspin.Endpoint, cache dialCache, dialer upspin.Dialer) (upspin.Service, error) {
 	if noCache {
 		return dialer.Dial(cc, e)
 	}
-	key := dialKey{
-		user:     cc.UserName(),
-		endpoint: e,
-		dialer:   dialer,
-	}
-
-	var (
-		service upspin.Service
-		cached  bool // Was there a service in the cache?
-		dial    *inflightDial
-	)
-	for n := 0; ; n++ {
-		var wait bool // Are we waiting for a concurrent dial (with the same dialKey)?
-
-		mu.Lock()
-		service, cached = cache[key]
-		if !cached {
-			dial, wait = inflightDials[key]
-			if !wait {
-				dial = new(inflightDial)
-				dial.Add(1)
-				inflightDials[key] = dial
-			}
-		}
-		mu.Unlock()
-
-		if wait {
-			// This call is waiting for a concurrent dial to complete
-			// and will use its result.
-			dial.Wait()
-			if dial.err != nil {
-				return nil, errors.E(op, dial.err)
-			}
-			return service, nil
-		}
-
-		if !cached {
-			// No cached service or concurrent dial, so dial one.
-			break
-		}
-
-		// A cached service exists.
-		return service, nil
-	}
-
-	var err error
-	service, err = dialer.Dial(cc, key.endpoint)
-
+	key := dialKey{user: cc.UserName(), endpoint: e}
 	mu.Lock()
 	defer mu.Unlock()
-
-	// Set up the return values for this call,
-	// and any waiting concurrent calls.
-	if err != nil {
-		dial.err = err
-	} else {
-		dial.service = service
-		// Add the live service to the cache.
+	service, cached := cache[key]
+	if !cached {
+		var err error
+		service, err = dialer.Dial(cc, e)
+		if err != nil {
+			return nil, errors.E(op, err)
+		}
 		cache[key] = service
-		reverseLookup[service] = key
 	}
-
-	dial.Done()                // Wake any concurrent callers, as
-	delete(inflightDials, key) // the dial is no longer in flight.
-
-	if err != nil {
-		return nil, errors.E(op, dial.err)
-	}
-	return dial.service, nil
+	return service, nil
 }
 
 // NoCache supresses the caching of dial results. This was added for
