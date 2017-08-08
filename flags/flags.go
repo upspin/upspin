@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"upspin.io/config"
@@ -25,7 +26,8 @@ type flagVar struct {
 }
 
 const (
-	defaultBlockSize  = 1024 * 1024 // Keep in sync with upspin.BlockSize.]
+	defaultBlockSize  = 1024 * 1024        // Keep in sync with upspin.BlockSize.
+	maxBlockSize      = 1024 * 1024 * 1024 // Keep in sync with upspin.MaxBlockSize.
 	defaultHTTPAddr   = ":80"
 	defaultHTTPSAddr  = ":443"
 	defaultLog        = "info"
@@ -67,7 +69,7 @@ var Client = []string{
 // command-line flags.
 var (
 	// BlockSize ("blocksize") is the block size used when writing large files.
-	// The default is 1MB.
+	// The default is 1MB; it can be no larger than 1GB.
 	BlockSize = defaultBlockSize
 
 	// CacheDir ("cachedir") specifies the directory for the various file
@@ -133,7 +135,7 @@ var flags = map[string]*flagVar{
 	"addr": strVar(&NetAddr, "addr", NetAddr, "publicly accessible network address (`host:port`)"),
 	"blocksize": &flagVar{
 		set: func(fs *flag.FlagSet) {
-			fs.IntVar(&BlockSize, "blocksize", BlockSize, "`size` of blocks when writing large files")
+			fs.Var(&blockSize, "blocksize", "`size` of blocks when writing large files")
 		},
 		arg: func() string {
 			if BlockSize == defaultBlockSize {
@@ -315,6 +317,36 @@ func strArg(name, value, _default string) string {
 		return ""
 	}
 	return "-" + name + "=" + value
+}
+
+// BlockSize is twinned to this implementation of flag.Value,
+// allowing us to check the value when the flag is set.
+type blockSizeFlag int
+
+var blockSize blockSizeFlag
+
+// String implements flag.Value.
+func (f blockSizeFlag) String() string {
+	return fmt.Sprint(int64(f))
+}
+
+// Set implements flag.Value.
+func (f *blockSizeFlag) Set(size string) error {
+	v, err := strconv.ParseInt(size, 0, 64)
+	if err != nil {
+		return err
+	}
+	if v <= 0 || v > maxBlockSize {
+		return fmt.Errorf("block size %d out of range; maximum %d", v, maxBlockSize)
+	}
+	*f = blockSizeFlag(v)
+	BlockSize = int(v)
+	return nil
+}
+
+// Get implements flag.Getter.
+func (f blockSizeFlag) Get() interface{} {
+	return int(f)
 }
 
 type logFlag string
