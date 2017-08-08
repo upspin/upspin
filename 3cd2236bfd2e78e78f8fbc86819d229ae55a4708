@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a01a8594_b9ed74e9",
+        "filename": "doc/access_control.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 299,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-08T02:40:41Z",
+      "side": 1,
+      "message": "complex grammar\n\n`Group` and `Access` files are plain UTF-8-encoded text files and are always\nreadable by anyone with permission to access them, and by the servers that enforce the\npermissions they grant.",
+      "revId": "3cd2236bfd2e78e78f8fbc86819d229ae55a4708",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "340dd10f_a0af5a84",
+        "filename": "doc/faq.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-08T02:40:41Z",
+      "side": 1,
+      "message": "maybe\n\nif it is tampered with, the tampering will be caught.",
+      "revId": "3cd2236bfd2e78e78f8fbc86819d229ae55a4708",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
