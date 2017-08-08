@@ -535,6 +535,10 @@ type DirEntry struct {
 // sync manually because the flags package cannot import this package.
 const BlockSize = 1024 * 1024
 
+// MaxBlockSize is the maximum size permitted for a block. The limit
+// guarantees that 32-bit machines can process the data without problems.
+const MaxBlockSize = 1024 * 1024 * 1024
+
 // DirBlock describes a block of data representing a contiguous section of a file.
 // The block my be of any non-negative size, but in large files is usually
 // BlockSize long.
