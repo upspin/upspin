@@ -38,9 +38,9 @@ import (
 
 // The servers that "remote" tests will work against.
 const (
-	TestKeyServer   = "key.test.upspin.io:443"
-	TestStoreServer = "store.test.upspin.io:443"
-	TestDirServer   = "dir.test.upspin.io:443"
+	TestKeyServer   = "key.test2.upspin.io:443"
+	TestStoreServer = "store.test2.upspin.io:443"
+	TestDirServer   = "dir.test2.upspin.io:443"
 	TestServerName  = "dir-server@upspin.io"
 )
 
