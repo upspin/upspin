@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"sync"
 
 	"upspin.io/bind"
 	"upspin.io/errors"
@@ -31,8 +32,11 @@ type remote struct {
 	rpc.Client // For sessions and Close.
 	cfg        dialConfig
 
+	// probeOnce is used to make sure we call probeDirect just once.
+	probeOnce sync.Once
 	// If non-empty, the base HTTP URL under which references for this
-	// server may be found.
+	// server may be found. It is set while probeOnce is happening, so
+	// probeDirect must be called before using baseURL.
 	baseURL string
 }
 
@@ -42,27 +46,32 @@ var _ upspin.StoreServer = (*remote)(nil)
 func (r *remote) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Location, error) {
 	op := r.opf("Get", "%q", ref)
 
-	if r.baseURL != "" {
-		// If we can fetch this by HTTP, do so.
-		u := r.baseURL + string(ref)
-		resp, err := http.Get(u)
-		if err != nil {
-			return nil, nil, nil, op.error(err)
+	if ref != upspin.HTTPBaseMetadata {
+		if err := r.probeDirect(); err != nil {
+			op.error(err)
 		}
-		if resp.StatusCode != http.StatusOK {
-			return nil, nil, nil, op.error(errors.Errorf("fetching %s: %s", u, resp.Status))
+		if r.baseURL != "" {
+			// If we can fetch this by HTTP, do so.
+			u := r.baseURL + string(ref)
+			resp, err := http.Get(u)
+			if err != nil {
+				return nil, nil, nil, op.error(err)
+			}
+			if resp.StatusCode != http.StatusOK {
+				return nil, nil, nil, op.error(errors.Errorf("fetching %s: %s", u, resp.Status))
+			}
+			body, err := ioutil.ReadAll(resp.Body)
+			resp.Body.Close()
+			if err != nil {
+				return nil, nil, nil, op.error(err)
+			}
+			refData := &upspin.Refdata{
+				Reference: ref,
+				Volatile:  false,
+				Duration:  0,
+			}
+			return body, refData, nil, nil
 		}
-		body, err := ioutil.ReadAll(resp.Body)
-		resp.Body.Close()
-		if err != nil {
-			return nil, nil, nil, op.error(err)
-		}
-		refData := &upspin.Refdata{
-			Reference: ref,
-			Volatile:  false,
-			Duration:  0,
-		}
-		return body, refData, nil, nil
 	}
 
 	req := &proto.StoreGetRequest{
@@ -165,10 +174,6 @@ func (r *remote) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service, 
 			userName: config.UserName(),
 		},
 	}
-	if err := r2.probeDirect(); err != nil {
-		op.error(err)
-	}
-
 	return r2, nil
 }
 
@@ -179,22 +184,28 @@ func (r *remote) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service, 
 func (r *remote) probeDirect() error {
 	const op = "store/remote.probeDirect"
 
-	b, _, _, err := r.Get(upspin.HTTPBaseMetadata)
-	if errors.Match(errors.E(errors.NotExist), err) {
-		return nil
-	} else if err != nil {
-		return errors.E(op, err)
-	}
-	s := string(b)
+	var err error
+	r.probeOnce.Do(func() {
+		b, _, _, err2 := r.Get(upspin.HTTPBaseMetadata)
+		if errors.Match(errors.E(errors.NotExist), err2) {
+			return
+		}
+		if err2 != nil {
+			err = errors.E(op, err2)
+			return
+		}
+		s := string(b)
 
-	u, err := url.Parse(s)
-	if err != nil {
-		return errors.E(op, errors.Errorf("parsing %q: %v", s, err))
-	}
+		u, err2 := url.Parse(s)
+		if err2 != nil {
+			err = errors.E(op, errors.Errorf("parsing %q: %v", s, err2))
+			return
+		}
 
-	// We have a valid URL. Use it as a base.
-	r.baseURL = u.String()
-	return nil
+		// We have a valid URL. Use it as a base.
+		r.baseURL = u.String()
+	})
+	return err
 }
 
 const transport = upspin.Remote
