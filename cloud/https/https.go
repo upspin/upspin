@@ -32,7 +32,8 @@ type Options struct {
 
 	// AutocertCache provides a cache for use with Let's Encrypt.
 	// If non-nil, enables Let's Encrypt certificates for this server.
-	AutocertCache autocert.Cache
+	// See the comment on ErrAutocertCacheMiss before usin this feature.
+	AutocertCache AutocertCache
 
 	// LetsEncryptCache specifies the cache file for Let's Encrypt.
 	// If non-empty, enables Let's Encrypt certificates for this server.
@@ -52,6 +53,21 @@ type Options struct {
 	// An error occurs if this is attempted with a non-loopback address.
 	InsecureHTTP bool
 }
+
+// AutocertCache is a copy of the autocert.Cache interface, provided here so
+// that implementers need not import the autocert package directly.
+// See ErrAutocertCacheMiss for more details.
+type AutocertCache interface {
+	autocert.Cache
+}
+
+// ErrAutocertCacheMiss is a copy of the autocert.ErrCacheMiss variable that
+// must be used by any autocert.Cache implementations used in the Options
+// struct. This is because the autocert package is vendored by the upspin.io
+// repository, and so outside implementations that return their own copy of
+// autocert.Cache will actually return an error value that is not recognized by
+// the autocert package.
+var ErrAutocertCacheMiss = autocert.ErrCacheMiss
 
 var defaultOptions = &Options{
 	CertFile: filepath.Join(testKeyDir, "cert.pem"),
