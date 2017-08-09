@@ -16,6 +16,24 @@
       "revId": "63f44472696fa5c166abdd1b102fb364afe0fc87",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f83096d5_fe4c74d5",
+        "filename": "store/remote/remote.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-08-09T04:47:15Z",
+      "side": 1,
+      "message": "It should have been err2.",
+      "parentUuid": "10040db5_b94077af",
+      "revId": "63f44472696fa5c166abdd1b102fb364afe0fc87",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
