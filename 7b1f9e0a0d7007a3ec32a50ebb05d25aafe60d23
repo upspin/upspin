@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a81b775f_53d02a3e",
+        "filename": "flags/flags.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-08-09T04:51:33Z",
+      "side": 1,
+      "message": "why not just use the constants?\nthis package already transitively imports package upspin",
+      "revId": "7b1f9e0a0d7007a3ec32a50ebb05d25aafe60d23",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
