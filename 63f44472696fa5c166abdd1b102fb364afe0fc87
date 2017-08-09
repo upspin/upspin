@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "10040db5_b94077af",
+        "filename": "store/remote/remote.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-09T01:40:40Z",
+      "side": 1,
+      "message": "how can err not be nil? this function is called only once. that means err is never set, which means probeDirect always returns nil.\n\ni don\u0027t understand.\n\non a smaller point, no need for the else - the if true side ends in return.",
+      "revId": "63f44472696fa5c166abdd1b102fb364afe0fc87",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
