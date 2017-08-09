@@ -229,6 +229,11 @@ func (c *Client) access(path upspin.PathName, dir upspin.DirServer) (*access.Acc
 }
 
 func (c *Client) pack(entry *upspin.DirEntry, data []byte, packer upspin.Packer, s *metric.Span) error {
+	// Verify the blocks aren't too big. This can't happen unless someone's modified
+	// flags.BlockSize underfoot, but protect anyway.
+	if flags.BlockSize > upspin.MaxBlockSize {
+		return errors.Errorf("block size too big: %d > %d", flags.BlockSize, upspin.MaxBlockSize)
+	}
 	// Start the I/O.
 	store, err := bind.StoreServer(c.config, c.config.StoreEndpoint())
 	if err != nil {
