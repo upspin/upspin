@@ -213,3 +213,108 @@ func TestDirEntryUnmarshalCrashers(t *testing.T) {
 		de.Unmarshal([]byte(s))
 	}
 }
+
+// Tests of the buffer overflow code. These know about the structure of
+// the code, but otherwise we'd be playing with 2GB buffers.
+
+func TestMarshalBigDirBlock(t *testing.T) {
+	defer func() { maxInt32 = 1<<31 - 1 }()
+	maxInt32 = 1<<15 - 1 // Has been tested on a 64-bit machine at 1<<28-1.
+	d := DirBlock{
+		Location: Location{
+			Endpoint: Endpoint{
+				Transport: Remote,
+				NetAddr:   "upspin.io",
+			},
+			Reference: "foo",
+		},
+		Offset:   0,
+		Size:     0,
+		Packdata: []byte{},
+	}
+	// Should succeed.
+	_, err := d.MarshalAppend(nil)
+	if err != nil {
+		t.Error("Marshal failed: ", err)
+	}
+	// Big Size should fail.
+	d.Size = MaxBlockSize + 1
+	_, err = d.MarshalAppend(nil)
+	if err != ErrTooLarge {
+		t.Error("Marshal big Size should fail with ErrTooLarge; got: ", err)
+	}
+	d.Size = 0
+	// Big Packdata should fail.
+	big := make([]byte, maxInt32+1)
+	d.Packdata = big
+	_, err = d.MarshalAppend(nil)
+	if err != ErrTooLarge {
+		t.Error("Marshal big Packdata should fail with ErrTooLarge; got: ", err)
+	}
+	// Every field OK but doesn't quite fit.
+	d.Packdata = big[:len(big)-10]
+	_, err = d.MarshalAppend(nil)
+	if err != ErrTooLarge {
+		t.Error("Marshal big Packdata should fail with ErrTooLarge; got: ", err)
+	}
+	// A little smaller should be OK.
+	// Start with enough headroom to discover the boundary.
+	d.Packdata = big[:len(big)-64]
+	b, err := d.MarshalAppend(nil)
+	if err != nil {
+		t.Error("Marshal just right Packdata should not fail; got: ", err)
+	}
+	startLen := uint64(len(b) - len(d.Packdata)) // It's 20, but let's compute it.
+	// Now we can get just to the edge.
+	d.Packdata = big[:maxInt32-startLen]
+	_, err = d.MarshalAppend(nil)
+	if err != nil {
+		t.Error("Marshal just right Packdata should not fail; got: ", err)
+	}
+	// One more byte should fail.
+	d.Packdata = big[:maxInt32-startLen+1]
+	_, err = d.MarshalAppend(nil)
+	if err != ErrTooLarge {
+		t.Error("Marshal just too big Packdata should fail with ErrTooLarge; got: ", err)
+	}
+}
+
+func TestMarshalBigDirEntry(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Allocates too much for a short run.")
+	}
+	defer func() { maxInt32 = 1<<31 - 1 }()
+	maxInt32 = 1<<15 - 1 // Has been tested on a 64-bit machine at 1<<28-1.
+	de := dirEnt
+
+	// Should succeed.
+	_, err := de.MarshalAppend(nil)
+	if err != nil {
+		t.Error("Marshal failed: ", err)
+	}
+	// Too many blocks should fail.
+	manyBlocks := make([]DirBlock, maxInt32+1)
+	de.Blocks = manyBlocks
+	_, err = de.MarshalAppend(nil)
+	if err != ErrTooLarge {
+		t.Error("Marshal too many blocks should fail with ErrTooLarge; got: ", err)
+	}
+	// Too much data should fail. Approach the actual size in steps.
+	for size := 1000; ; size *= 2 {
+		de.Blocks = manyBlocks[:size] // Might as well re-use it.
+		for i := range de.Blocks {
+			de.Blocks[i] = dirBlock1
+		}
+		b, err := de.MarshalAppend(nil)
+		if err == nil {
+			if uint64(len(b)) > maxInt32 {
+				t.Fatal("should have failed at size %d", len(b))
+			}
+			continue
+		}
+		if err != ErrTooLarge {
+			t.Fatal("unexpected error", err)
+		}
+		break
+	}
+}
