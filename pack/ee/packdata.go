@@ -152,9 +152,34 @@ func (pd *packdata) Unmarshal(b []byte) error {
 
 // packdataLen returns the maximum length of a packdata slice for the given
 // number of wrapped keys.
+// ee.Marshal copies byte arrays to the destination in the order declared in
+// the packdata and wrappedKey struct definitions, prefixed with length using
+// binary.PutVarint.
 func packdataLen(nwrap int) int {
-	// TODO(grosse): explain the components of this expression.
-	return 2*marshalBufLen + (1+5*nwrap)*binary.MaxVarintLen64 +
-		nwrap*(sha256.Size+(aesKeyLen+gcmTagSize)+gcmStandardNonceSize+2*marshalBufLen) +
-		sha256.Size + 1
+	intLen := binary.MaxVarintLen64
+
+	// nWrappedKey is size of a single encoded wrappedKey
+	nWrappedKey := intLen + sha256.Size            // keyHash
+	nWrappedKey += intLen + aesKeyLen + gcmTagSize // dkey
+	nWrappedKey += intLen + gcmStandardNonceSize   // nonce
+	nWrappedKey += 2 * (intLen + marshalBufLen)    // ephemeral
+
+	n := 4 * (intLen + marshalBufLen) // (R,S) for (sig, sig2)
+	n += intLen                       // len(wrap)
+	n += nwrap * nWrappedKey
+	n += intLen + sha256.Size // blockSum
+
+	// n is commonly an overestimate since the big.Int used in p256 are
+	// about half the size of big.Int used in the assumed curve p521.
+	// At the time of writing:
+	// marshalBufLen=66    curve.Params().BitSize + 7) >> 3 for p521
+	// MaxVarintLen64=10
+	// sha256.Size=32
+	// aesKeyLen=32
+	// gcmTagSize=16
+	// gcmStandardNonceSize=12
+	// and therefore n = 356 + nwrap*274.
+	// On a 32-bit machine, this supports well over a million readers.
+	// We would redesign to use group keys long before that.
+	return n
 }
