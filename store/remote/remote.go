@@ -182,8 +182,6 @@ func (r *remote) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service, 
 // base for fetching objects directly by HTTP (from Google Cloud Storage, for
 // instance).
 func (r *remote) probeDirect() error {
-	const op = "store/remote.probeDirect"
-
 	var err error
 	r.probeOnce.Do(func() {
 		b, _, _, err2 := r.Get(upspin.HTTPBaseMetadata)
@@ -191,14 +189,14 @@ func (r *remote) probeDirect() error {
 			return
 		}
 		if err2 != nil {
-			err = errors.E(op, err2)
+			err = err2
 			return
 		}
 		s := string(b)
 
 		u, err2 := url.Parse(s)
 		if err2 != nil {
-			err = errors.E(op, errors.Errorf("parsing %q: %v", s, err2))
+			err = errors.Errorf("parsing %q: %v", s, err2)
 			return
 		}
 
