@@ -2,12 +2,15 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+// This file contains implementations of things like marshaling of the
+// basic Upspin types.
+
 package upspin // import "upspin.io/upspin"
 
 import (
 	"crypto/rand"
 	"encoding/binary"
-	"errors" // Cannot use Upspin's error package because it would introduce a dependency cycle.
+	"errors" // Cannot use Upspin's errors package because it would introduce a dependency cycle.
 	"fmt"
 	"sort"
 	"strings"
@@ -101,8 +104,84 @@ func (acc *accumulator) result() ([]byte, error) {
 	return acc.buf, nil
 }
 
-// This file contains implementations of things like marshaling of the
-// basic Upspin types.
+// consumer is a helper type for unmarshaling data.
+// It tracks the buffer and simplifies error handling.
+type consumer struct {
+	buf []byte // The marshaled data to be unpacked.
+	err error  // First error that occured.
+}
+
+func (c *consumer) byte() byte {
+	if c.err != nil {
+		return 0
+	}
+	if len(c.buf) == 0 {
+		c.err = ErrTooShort
+		return 0
+	}
+	b := c.buf[0]
+	c.buf = c.buf[1:]
+	return b
+}
+
+func (c *consumer) bytes() []byte {
+	if c.err != nil {
+		return c.buf[:0] // Not nil, so we can convert to string etc.
+	}
+	u, n := binary.Varint(c.buf)
+	// If n <= 0, Varint returned an error. Otherwise we know n <= len(b).
+	// We also test that u is good and u bytes remain in the buffer after the count.
+	if n <= 0 || u < 0 || len(c.buf[n:]) < int(u) {
+		c.err = ErrTooShort
+		return c.buf[:0]
+	}
+	if uint64(u) > maxInt32 {
+		c.err = ErrTooLarge
+		return c.buf[:0]
+	}
+	c.buf = c.buf[n:]
+	data := c.buf[:u]
+	c.buf = c.buf[u:]
+	return data
+}
+
+func (c *consumer) nBytes(n int) []byte {
+	if c.err != nil {
+		return c.buf[:0] // Not nil, so we can convert to string etc.
+	}
+	if n < 0 {
+		c.err = ErrTooShort
+		return c.buf[:0]
+	}
+	if len(c.buf) < n || maxInt32 < uint64(n) {
+		c.err = ErrTooLarge
+		return c.buf[:0]
+	}
+	data := c.buf[:n]
+	c.buf = c.buf[n:]
+	return data
+}
+
+func (c *consumer) int64() int64 {
+	if c.err != nil {
+		return 0
+	}
+	i, n := binary.Varint(c.buf)
+	switch {
+	case n == 0:
+		c.err = ErrTooShort
+		return 0
+	case n < 0:
+		c.err = errors.New("DirBlock Offset overflow")
+		return 0
+	}
+	c.buf = c.buf[n:]
+	return i
+}
+
+func (c *consumer) remainder() ([]byte, error) {
+	return c.buf, c.err
+}
 
 // Marshal packs the DirBlock into a byte slice for transport.
 func (d *DirBlock) Marshal() ([]byte, error) {
@@ -143,57 +222,31 @@ func (acc *accumulator) DirBlock(d *DirBlock) ([]byte, error) {
 
 // Unmarshal unpacks the byte slice to recover the encoded DirBlock.
 func (d *DirBlock) Unmarshal(b []byte) ([]byte, error) {
+	cons := &consumer{buf: b}
+	return cons.DirBlock(d)
+}
+
+// DirBlock unmarshals a DirBlock.
+func (cons *consumer) DirBlock(d *DirBlock) ([]byte, error) {
 	// Location:
 	// Location.Endpoint:
 	//	Transport: 1 byte.
 	//	NetAddr: count n followed by n bytes.
-	if len(b) < 1 {
-		return nil, ErrTooShort
-	}
-	d.Location.Endpoint.Transport = Transport(b[0])
-	b = b[1:]
-	var bytes []byte
-	bytes, b = getBytes(b)
-	if b == nil {
-		return nil, ErrTooShort
-	}
+	d.Location.Endpoint.Transport = Transport(cons.byte())
+	bytes := cons.bytes()
 	d.Location.Endpoint.NetAddr = NetAddr(bytes)
 
 	// d.Location.Reference
 	//	Packing: 1 byte.
 	//	Key: count h followed by h bytes.
-	bytes, b = getBytes(b)
-	if b == nil {
-		return nil, ErrTooShort
-	}
+	bytes = cons.bytes()
 	d.Location.Reference = Reference(bytes)
 
-	// Offset.
-	offset, n := binary.Varint(b)
-	switch {
-	case n == 0:
-		return nil, ErrTooShort
-	case n < 0:
-		return nil, errors.New("DirBlock Offset overflow")
-	}
-	d.Offset = offset
-	b = b[n:]
+	d.Offset = cons.int64()
+	d.Size = cons.int64()
 
-	// Size.
-	size, n := binary.Varint(b)
-	switch {
-	case n == 0:
-		return nil, ErrTooShort
-	case n < 0:
-		return nil, errors.New("DirBlock Size overflow")
-	}
-	d.Size = size
-	b = b[n:]
-
-	bytes, b = getBytes(b)
-	if b == nil {
-		return nil, ErrTooShort
-	}
+	// Packdata.
+	bytes = cons.bytes()
 	if len(bytes) > 0 {
 		// Must copy Packdata - can't return buffer's own contents.
 		// (All the other slices are turned into strings, so are intrinsically copied.)
@@ -202,7 +255,7 @@ func (d *DirBlock) Unmarshal(b []byte) ([]byte, error) {
 		d.Packdata = nil
 	}
 
-	return b, nil
+	return cons.remainder()
 }
 
 // Size returns the total length of the data underlying the DirEntry
@@ -283,37 +336,19 @@ var ErrTooLarge = errors.New("data item too large")
 // If successful, every field of d will be overwritten and the remaining
 // data will be returned.
 func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
+	cons := consumer{buf: b}
 	// SignedName: count N followed by N bytes.
-	bytes, b := getBytes(b)
-	if len(b) < 1 { // Check for packing here too.
-		return nil, ErrTooShort
-	}
+	bytes := cons.bytes()
 	d.SignedName = PathName(bytes)
 
 	// Packing: One byte.
-	d.Packing = Packing(b[0])
-	b = b[1:]
+	d.Packing = Packing(cons.byte())
 
 	// Time.
-	time, n := binary.Varint(b)
-	switch {
-	case n == 0:
-		return nil, ErrTooShort
-	case n < 0:
-		return nil, errors.New("DirEntry Time overflow")
-	}
-	d.Time = Time(time)
-	b = b[n:]
+	d.Time = Time(cons.int64())
 
 	// Blocks. First a varint count, then the blocks.
-	nBlocks, n := binary.Varint(b)
-	switch {
-	case n == 0:
-		return nil, ErrTooShort
-	case n < 0:
-		return nil, errors.New("DirEntry block count overflow")
-	}
-	b = b[n:]
+	nBlocks := cons.int64()
 	d.Blocks = nil
 	switch {
 	case nBlocks > maxDirBlocks:
@@ -323,48 +358,32 @@ func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
 	case nBlocks > 0:
 		d.Blocks = make([]DirBlock, nBlocks)
 		for i := range d.Blocks {
-			var err error
-			b, err = d.Blocks[i].Unmarshal(b)
-			if err != nil {
-				return nil, err
-			}
+			cons.DirBlock(&d.Blocks[i])
 		}
 	}
 
 	// Packdata.
-	bytes, b = getBytes(b)
-	if b == nil {
-		return nil, ErrTooShort
-	}
+	bytes = cons.bytes()
 	if len(bytes) > 0 {
-		// Must copy the data for Packdata - can't return buffer's own contents.
-		// (Most other slices are turned into strings, so are intrinsically copied.)
+		// Must copy Packdata - can't return buffer's own contents.
+		// (All the other slices are turned into strings, so are intrinsically copied.)
 		d.Packdata = append([]byte(nil), bytes...)
 	} else {
 		d.Packdata = nil
 	}
 
 	// Link: count N followed by N bytes.
-	bytes, b = getBytes(b)
-	d.Link = PathName(bytes) // Zero-length is OK here.
+	d.Link = PathName(cons.bytes())
 
 	// Writer.
-	bytes, b = getBytes(b)
-	if len(b) < 1 { // At least one byte for Name.
-		return nil, ErrTooShort
-	}
-	d.Writer = UserName(bytes)
+	d.Writer = UserName(cons.bytes())
 
-	// Name: count N followed by N bytes.
+	// Name.
 	// If N is -1 Name equals SignedName.
-	length64, n := binary.Varint(b)
-	switch {
-	case n == 0:
-		return nil, ErrTooShort
-	case n < 0:
-		return nil, errors.New("DirEntry Name length overflow")
+	length64 := cons.int64()
+	if length64 > MaxBlockSize {
+		return nil, ErrTooLarge
 	}
-	b = b[n:]
 	length := int(length64)
 	switch {
 	case length == -1:
@@ -373,32 +392,13 @@ func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
 	case length < 0:
 		return nil, fmt.Errorf("DirEntry has bad Name length: %d", length)
 	default:
-		bytes, b = getNBytes(b, length)
-		if bytes == nil {
-			return nil, ErrTooShort
-		}
-		d.Name = PathName(bytes)
+		d.Name = PathName(cons.nBytes(length))
 	}
 
-	// Attr: One byte.
-	if len(b) < 1 {
-		return nil, ErrTooShort
-	}
-	d.Attr = Attribute(b[0])
-	b = b[1:]
+	d.Attr = Attribute(cons.byte())
+	d.Sequence = cons.int64()
 
-	// Sequence.
-	seq, n := binary.Varint(b)
-	switch {
-	case n == 0:
-		return nil, ErrTooShort
-	case n < 0:
-		return nil, errors.New("DirEntry Sequence overflow")
-	}
-	d.Sequence = seq
-	b = b[n:]
-
-	return b, nil
+	return cons.remainder()
 }
 
 // getBytes unmarshals the byte slice at b (varint count followed by bytes)
@@ -426,7 +426,7 @@ func getNBytes(b []byte, n int) (data, remaining []byte) {
 
 // String returns a default string representation of the time,
 // in the format similar to RFC 3339: "2006-01-02T15:04:05 UTC"
-// The time zone always UTC.
+// The time zone is always UTC.
 func (t Time) String() string {
 	return t.Go().Format("2006-01-02T15:04:05 UTC")
 }
