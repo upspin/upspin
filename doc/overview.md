@@ -111,7 +111,7 @@ suffix).
 Primary users can therefore make changes to entries on the key server for their
 name with a suffix.
 For example, `ann@example.com` may change the keys and the store and directory
-endpoints for`ann+camera@example.com`.
+endpoints for `ann+camera@example.com`.
 The converse, however, is not allowed: `ann+camera@example.com` cannot make
 changes to `ann@example.com`.
 
