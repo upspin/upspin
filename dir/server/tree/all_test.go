@@ -1011,7 +1011,7 @@ func TestFlushNewTree(t *testing.T) {
 		t.Fatal(err)
 	}
 	err = tree.Flush()
-	expectedErr := errors.E(errors.NotExist, errors.E(upspin.UserName(userName)))
+	expectedErr := errors.E(errors.NotExist, upspin.UserName(userName))
 	if !errors.Match(expectedErr, err) {
 		t.Fatalf("err = %s, want = %s", err, expectedErr)
 	}
