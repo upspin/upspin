@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "01cdeaf2_01b12f54",
+        "filename": "pack/ee/packdata.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-08-10T23:44:48Z",
+      "side": 1,
+      "message": "It is here because the caller of Marshal doesn\u0027t care (nor does the caller of packdataLen) but the detail mostly is of interest to someone trying to understand the formula here, without having to go back and reading the code of Marshal.  It would be too obvious to bother putting in Marshal, I think.\n\nLet me know if you\u0027d rather I move it or delete it;  happy to do either one.",
+      "parentUuid": "82ec5f31_a7095df5",
+      "revId": "6e6ac46e398fb81d1d77e16dcefcb031d1ed49ef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "e7c22807_b824ddca",
         "filename": "pack/ee/packdata.go",
         "patchSetId": 2
@@ -39,6 +57,30 @@
       "revId": "6e6ac46e398fb81d1d77e16dcefcb031d1ed49ef",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "98200187_0111f100",
+        "filename": "pack/ee/packdata.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-08-10T23:44:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e7c22807_b824ddca",
+      "range": {
+        "startLine": 161,
+        "startChar": 16,
+        "endLine": 161,
+        "endChar": 18
+      },
+      "revId": "6e6ac46e398fb81d1d77e16dcefcb031d1ed49ef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
