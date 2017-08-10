@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "82ec5f31_a7095df5",
+        "filename": "pack/ee/packdata.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-08-10T23:33:33Z",
+      "side": 1,
+      "message": "I\u0027m not sure why this comment is here. Shouldn\u0027t it be a comment on Marshal itself?",
+      "revId": "6e6ac46e398fb81d1d77e16dcefcb031d1ed49ef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e7c22807_b824ddca",
+        "filename": "pack/ee/packdata.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-08-10T23:33:33Z",
+      "side": 1,
+      "message": "is the size",
+      "range": {
+        "startLine": 161,
+        "startChar": 16,
+        "endLine": 161,
+        "endChar": 18
+      },
+      "revId": "6e6ac46e398fb81d1d77e16dcefcb031d1ed49ef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
