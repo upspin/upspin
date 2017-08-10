@@ -211,7 +211,7 @@ func (s *server) lookupWithPermissions(op string, name upspin.PathName, opts ...
 		return nil, errors.E(op, name, err)
 	}
 
-	entry, err := s.lookup(op, p, entryMustBeClean, opts...)
+	entry, err := s.lookup(p, entryMustBeClean, opts...)
 
 	// Check if the user can know about the file at all. If not, to prevent
 	// leaking its existence, return Private.
@@ -221,12 +221,12 @@ func (s *server) lookupWithPermissions(op string, name upspin.PathName, opts ...
 	if err != nil {
 		if errors.Match(errNotExist, err) {
 			if canAny, _, err := s.hasRight(access.AnyRight, p, opts...); err != nil {
-				return nil, err
+				return nil, errors.E(op, err)
 			} else if !canAny {
 				return nil, errors.E(op, name, errors.Private)
 			}
 		}
-		return nil, err // s.lookup wraps err already.
+		return nil, errors.E(op, err)
 	}
 
 	// Check for Read access permission.
@@ -255,13 +255,13 @@ func (s *server) lookupWithPermissions(op string, name upspin.PathName, opts ...
 // lookup implements Lookup for a parsed path. It is used by Lookup as well as
 // by put. If entryMustBeClean is true, the returned entry is guaranteed to have
 // valid references in its DirBlocks.
-func (s *server) lookup(op string, p path.Parsed, entryMustBeClean bool, opts ...options) (*upspin.DirEntry, error) {
+func (s *server) lookup(p path.Parsed, entryMustBeClean bool, opts ...options) (*upspin.DirEntry, error) {
 	o, ss := subspan("lookup", opts)
 	defer ss.End()
 
 	tree, err := s.loadTreeFor(p.User(), o)
 	if err != nil {
-		return nil, errors.E(op, err)
+		return nil, err
 	}
 	entry, dirty, err := tree.Lookup(p)
 	if err != nil {
@@ -272,14 +272,14 @@ func (s *server) lookup(op string, p path.Parsed, entryMustBeClean bool, opts ..
 		// Flush and repeat.
 		err = tree.Flush()
 		if err != nil {
-			return nil, errors.E(op, err)
+			return nil, err
 		}
 		entry, dirty, err = tree.Lookup(p)
 		if err != nil {
-			return nil, errors.E(op, err)
+			return nil, err
 		}
 		if dirty {
-			return nil, errors.E(op, errors.Internal, errors.Str("flush didn't clean entry"))
+			return nil, errors.E(errors.Internal, errors.Str("flush didn't clean entry"))
 		}
 	}
 	if entry.IsLink() {
@@ -374,7 +374,7 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	}
 
 	// Check for links along the path.
-	existingEntry, err := s.lookup(op, p, !entryMustBeClean, o)
+	existingEntry, err := s.lookup(p, !entryMustBeClean, o)
 	if err == upspin.ErrFollowLink {
 		return s.errLink(op, existingEntry, o)
 	}
