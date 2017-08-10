@@ -47,7 +47,7 @@ func (r *remote) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Lo
 	op := r.opf("Get", "%q", ref)
 
 	if ref != upspin.HTTPBaseMetadata {
-		if err := r.probeDirect(); err != nil {
+		if err := r.probeDirect(op); err != nil {
 			op.error(err)
 		}
 		if r.baseURL != "" {
@@ -181,9 +181,7 @@ func (r *remote) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service, 
 // httpBaseRef. The server may respond with an HTTP URL that may be used as a
 // base for fetching objects directly by HTTP (from Google Cloud Storage, for
 // instance).
-func (r *remote) probeDirect() error {
-	const op = "store/remote.probeDirect"
-
+func (r *remote) probeDirect(op *operation) error {
 	var err error
 	r.probeOnce.Do(func() {
 		b, _, _, err2 := r.Get(upspin.HTTPBaseMetadata)
@@ -191,15 +189,14 @@ func (r *remote) probeDirect() error {
 			return
 		}
 		if err2 != nil {
-			err = errors.E(op, err2)
+			err = op.error(err2)
 			return
 		}
 		s := string(b)
 
 		u, err2 := url.Parse(s)
 		if err2 != nil {
-			err = errors.E(op, errors.Errorf("parsing %q: %v", s, err2))
-			return
+			err = op.error(errors.Errorf("parsing %q: %v", s, err2))
 		}
 
 		// We have a valid URL. Use it as a base.

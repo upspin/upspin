@@ -342,7 +342,7 @@ type blockUnpacker struct {
 }
 
 func (bp *blockUnpacker) Unpack(ciphertext []byte) (cleartext []byte, err error) {
-	const op = "pack/ee.blockUpacker.Unpack"
+	const op = "pack/ee.blockUnpacker.Unpack"
 	// Validate checksum.
 	b := sha256.Sum256(ciphertext)
 	sum := b[:]
