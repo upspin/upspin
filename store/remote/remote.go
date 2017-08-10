@@ -58,7 +58,11 @@ func (r *remote) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Lo
 				return nil, nil, nil, op.error(err)
 			}
 			if resp.StatusCode != http.StatusOK {
-				return nil, nil, nil, op.error(errors.Errorf("fetching %s: %s", u, resp.Status))
+				err := errors.Errorf("fetching %s: %s", u, resp.Status)
+				if resp.StatusCode == http.StatusNotFound {
+					err = errors.E(errors.NotExist, err)
+				}
+				return nil, nil, nil, op.error(err)
 			}
 			body, err := ioutil.ReadAll(resp.Body)
 			resp.Body.Close()
