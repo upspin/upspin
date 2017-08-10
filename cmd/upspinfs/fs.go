@@ -231,7 +231,7 @@ func (n *node) Access(context gContext.Context, req *fuse.AccessRequest) error {
 // Every created file is initially backed by a clear text local file which is
 // Put in an Upspin DirServer on close.  It is assumed that 'n' is a directory.
 func (n *node) Create(context gContext.Context, req *fuse.CreateRequest, resp *fuse.CreateResponse) (fs.Node, fs.Handle, error) {
-	const op = "upspinfs/fs.Create"
+	const op = "Create"
 	n.Lock()
 	defer n.Unlock()
 	f := n.f
@@ -269,7 +269,7 @@ func (n *node) Create(context gContext.Context, req *fuse.CreateRequest, resp *f
 // Mkdir implements fs.NodeMkdirer.Mkdir.
 // Creates a directory without opening it.
 func (n *node) Mkdir(context gContext.Context, req *fuse.MkdirRequest) (fs.Node, error) {
-	const op = "upspinfs/fs.Mkdir"
+	const op = "Mkdir"
 	n.Lock()
 	defer n.Unlock()
 
@@ -308,7 +308,7 @@ func (n *node) Open(context gContext.Context, req *fuse.OpenRequest, resp *fuse.
 
 // openDir opens the directory and reads its contents.
 func (n *node) openDir(context gContext.Context, req *fuse.OpenRequest, resp *fuse.OpenResponse) (fs.Handle, error) {
-	const op = "upspinfs/fs.Open"
+	const op = "Open"
 	if n.attr.Mode&os.ModeDir != os.ModeDir {
 		return nil, e2e(errors.E(op, errors.NotDir, n.uname))
 	}
@@ -345,7 +345,7 @@ func (n *node) openDir(context gContext.Context, req *fuse.OpenRequest, resp *fu
 
 // openFile opens the file and reads its contents.  If the file is not plain text, we will reuse the cached version of the file.
 func (n *node) openFile(context gContext.Context, req *fuse.OpenRequest, resp *fuse.OpenResponse) (fs.Handle, error) {
-	const op = "upspinfs/fs.Open"
+	const op = "Open"
 	n.Lock()
 	defer n.Unlock()
 	if n.attr.Mode&os.ModeDir != 0 {
@@ -414,7 +414,7 @@ func (n *node) directoryLookup(uname upspin.PathName) (upspin.DirServer, *upspin
 // Remove implements fs.NodeRemover.  'n' is the directory in which the file
 // req.Name resides.  req.Dir flags this as an rmdir.
 func (n *node) Remove(context gContext.Context, req *fuse.RemoveRequest) error {
-	const op = "upspinfs/fs.Remove"
+	const op = "Remove"
 	n.Lock()
 	defer n.Unlock()
 
@@ -470,7 +470,7 @@ func (n *node) Remove(context gContext.Context, req *fuse.RemoveRequest) error {
 // Lookup implements fs.NodeStringLookuper.Lookup. 'n' must be a directory.
 // We do not use cached knowledge of 'n's contents.
 func (n *node) Lookup(context gContext.Context, name string) (fs.Node, error) {
-	const op = "upspinfs/fs.Lookup"
+	const op = "Lookup"
 	n.Lock()
 	defer n.Unlock()
 	uname := path.Join(n.uname, name)
@@ -554,7 +554,7 @@ func (n *node) Forget() {
 //
 // Files are only truncated by Setattr calls.
 func (n *node) Setattr(context gContext.Context, req *fuse.SetattrRequest, resp *fuse.SetattrResponse) error {
-	const op = "upspinfs/fs.Setattr"
+	const op = "Setattr"
 	if req.Valid.Size() {
 		// Truncate.  Lots of cases:
 		// 1) we have it opened. Truncate the cached file and
@@ -605,7 +605,7 @@ func (n *node) Setattr(context gContext.Context, req *fuse.SetattrRequest, resp 
 
 // Flush implements fs.HandleFlusher.Flush.  Called when a file is closed or synced.
 func (h *handle) Flush(context gContext.Context, req *fuse.FlushRequest) error {
-	const op = "upspinfs/fs.Flush"
+	const op = "Flush"
 
 	// Write back to upspin.
 	h.n.Lock()
@@ -638,7 +638,7 @@ func (h *handle) ReadDirAll(context gContext.Context) ([]fuse.Dirent, error) {
 
 // Read implements fs.HandleReader.Read.
 func (h *handle) Read(context gContext.Context, req *fuse.ReadRequest, resp *fuse.ReadResponse) error {
-	const op = "upspinfs/fs.Read"
+	const op = "Read"
 	h.n.Lock()
 	defer h.n.Unlock()
 	resp.Data = make([]byte, cap(resp.Data))
@@ -658,7 +658,7 @@ func (h *handle) Read(context gContext.Context, req *fuse.ReadRequest, resp *fus
 // Write implements fs.HandleWriter.Write.  We lock the node for the extent of the write to serialize
 // changes to the node.
 func (h *handle) Write(context gContext.Context, req *fuse.WriteRequest, resp *fuse.WriteResponse) error {
-	const op = "upspinfs/fs.Write"
+	const op = "Write"
 	h.n.Lock()
 	defer h.n.Unlock()
 	n, err := h.n.cf.writeAt(req.Data, req.Offset)
@@ -678,7 +678,7 @@ func (h *handle) Write(context gContext.Context, req *fuse.WriteRequest, resp *f
 // a file is finally closed.
 // TODO(p): If we fail writing a file, should we try later asynchronously?
 func (h *handle) Release(context gContext.Context, req *fuse.ReleaseRequest) error {
-	const op = "upspinfs/fs.Release"
+	const op = "Release"
 
 	// Write back to upspin.
 	h.n.Lock()
@@ -702,7 +702,7 @@ func (n *node) Fsync(ctx gContext.Context, req *fuse.FsyncRequest) error {
 // Link implements fs.NodeLinker.Link. It creates a new node in directory n that points to the same
 // reference as old.
 func (n *node) Link(ctx gContext.Context, req *fuse.LinkRequest, old fs.Node) (fs.Node, error) {
-	const op = "upspinfs/fs.Link"
+	const op = "Link"
 	n.Lock()
 	defer n.Unlock()
 	oldPath := old.(*node).uname
@@ -722,7 +722,7 @@ func (n *node) Link(ctx gContext.Context, req *fuse.LinkRequest, old fs.Node) (f
 
 // Rename implements fs.Renamer.Rename. It renames the old node to r.NewName in directory n.
 func (n *node) Rename(ctx gContext.Context, req *fuse.RenameRequest, newDir fs.Node) error {
-	const op = "upspinfs/fs.Rename"
+	const op = "Rename"
 	n.Lock()
 	defer n.Unlock()
 	oldPath := path.Join(n.uname, req.OldName)
@@ -799,7 +799,7 @@ func convertPath(path string) upspin.PathName {
 
 // Symlink implements fs.Symlink.
 func (n *node) Symlink(ctx gContext.Context, req *fuse.SymlinkRequest) (fs.Node, error) {
-	const op = "upspinfs/fs.Symlink"
+	const op = "Symlink"
 	n.Lock()
 	defer n.Unlock()
 	target := req.Target
