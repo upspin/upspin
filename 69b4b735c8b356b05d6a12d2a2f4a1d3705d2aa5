@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cb9c88e1_25e206f4",
+        "filename": "store/remote/remote.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-08-10T04:32:22Z",
+      "side": 1,
+      "message": "don\u0027t pass op in. this just wraps it twice. just return the raw errors from this function",
+      "revId": "69b4b735c8b356b05d6a12d2a2f4a1d3705d2aa5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
