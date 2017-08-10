@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "76307db0_0dfe51b4",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-08-10T04:36:50Z",
+      "side": 1,
+      "message": "should wrap with op here",
+      "revId": "219458b9afc4ec530ff38baf2a3817fa34d0a534",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "38510fbf_edbbdb85",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-08-10T04:36:50Z",
+      "side": 1,
+      "message": "this comment is no longer true",
+      "revId": "219458b9afc4ec530ff38baf2a3817fa34d0a534",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "198df2d0_363a2b7f",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-08-10T04:36:50Z",
+      "side": 1,
+      "message": "I reckon we can delete these. They get passed onto the consumer anyway.",
+      "revId": "219458b9afc4ec530ff38baf2a3817fa34d0a534",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
