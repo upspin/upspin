@@ -7,6 +7,7 @@ package upspin
 import (
 	"fmt"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -65,6 +66,7 @@ var linkDirEnt = DirEntry{
 }
 
 var nameCombinations = []DirEntry{
+	// These are nonsense entries, with many empty fields, but it's just a test.
 	{Name: "", SignedName: ""},
 	{Name: "user@example.com/path", SignedName: ""},
 	{Name: "", SignedName: "user@example.com/path"},
@@ -178,12 +180,9 @@ func TestDirEntMarshalAppendNoMalloc(t *testing.T) {
 }
 
 func TestDirEntUnmarshalNoPanic(t *testing.T) {
-	data, err := dirEnt.Unmarshal([]byte{0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x2})
+	_, err := dirEnt.Unmarshal([]byte{0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x80, 0x2})
 	if err != ErrTooShort {
 		t.Fatal(err)
-	}
-	if data != nil {
-		t.Fatalf("Expected no data, got %d bytes", len(data))
 	}
 }
 
@@ -316,5 +315,84 @@ func TestMarshalBigDirEntry(t *testing.T) {
 			t.Fatal("unexpected error", err)
 		}
 		break
+	}
+}
+
+func TestUnmarshalBigDirBlock(t *testing.T) {
+	d := DirBlock{
+		Location: Location{
+			Endpoint: Endpoint{
+				Transport: Remote,
+				NetAddr:   "upspin.io",
+			},
+			Reference: "foo",
+		},
+		Offset:   0,
+		Size:     0,
+		Packdata: make([]byte, 1<<15), // Small enough now, not later.
+	}
+	// Should succeed.
+	data, err := d.MarshalAppend(nil)
+	if err != nil {
+		t.Error("Marshal failed: ", err)
+	}
+	var db DirBlock
+	b, err := db.Unmarshal(data)
+	if err != nil {
+		t.Error("Unmarshal failed: ", err)
+	}
+	if len(b) != 0 {
+		t.Error("leftover data after Unmarshal")
+	}
+	if !reflect.DeepEqual(db, d) {
+		t.Error("data incorrect after Unmarshal")
+		t.Errorf("input: %#v", d)
+		t.Errorf("output: %#v", db)
+	}
+	// We now know that data correctly unmarshals.
+	// Change maxInt32 and we should fail.
+	defer func() { maxInt32 = 1<<31 - 1 }()
+	maxInt32 = 1<<15 - 1
+	_, err = d.Unmarshal(data)
+	if err != ErrTooLarge {
+		t.Errorf("Unmarshal got %v; want ErrTooLarge", err)
+	}
+}
+
+func TestUnmarshalBigDirEntry(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Allocates too much for a short run.")
+	}
+	d := dirEnt
+	// We probed Packdata in TestUnmarshalBigDirBlock
+	// so we do something else here.
+	d.Link = PathName(strings.Repeat("x", 1<<15))
+
+	// Should succeed for now.
+	data, err := d.MarshalAppend(nil)
+	if err != nil {
+		t.Error("Marshal failed: ", err)
+	}
+	var de DirEntry
+	b, err := de.Unmarshal(data)
+	if err != nil {
+		t.Error("Unmarshal failed: ", err)
+	}
+	if len(b) != 0 {
+		t.Error("leftover data after Unmarshal")
+	}
+	if !reflect.DeepEqual(de, d) {
+		t.Error("data incorrect after Unmarshal")
+		t.Errorf("input: %#v", d)
+		t.Errorf("output: %#v", de)
+	}
+
+	// We now know that data correctly unmarshals.
+	// Change maxInt32 and we should fail.
+	defer func() { maxInt32 = 1<<31 - 1 }()
+	maxInt32 = 1<<15 - 1 // Has been tested on a 64-bit machine at 1<<28-1.
+	_, err = d.Unmarshal(data)
+	if err != ErrTooLarge {
+		t.Errorf("Unmarshal got %v; want ErrTooLarge", err)
 	}
 }
