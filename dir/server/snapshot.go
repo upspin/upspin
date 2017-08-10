@@ -211,7 +211,7 @@ func (s *server) takeSnapshot(dstDir path.Parsed, srcDir upspin.PathName) error 
 	if err != nil {
 		return err
 	}
-	entry, err := s.lookup("takeSnapshot", srcParsed, entryMustBeClean)
+	entry, err := s.lookup(srcParsed, entryMustBeClean)
 	if err != nil {
 		return err
 	}

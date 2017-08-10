@@ -74,8 +74,6 @@ type watcher struct {
 
 // Watch implements upspin.DirServer.Watch.
 func (t *Tree) Watch(p path.Parsed, order int64, done <-chan struct{}) (<-chan *upspin.Event, error) {
-	const op = "dir/server/tree.Watch"
-
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
@@ -90,14 +88,14 @@ func (t *Tree) Watch(p path.Parsed, order int64, done <-chan struct{}) (<-chan *
 	// Therefore, we ensure the root exists before we proceed.
 	err := t.loadRoot()
 	if err != nil {
-		return nil, errors.E(op, err)
+		return nil, err
 	}
 
 	// Clone the logs so we can keep reading it while the current tree
 	// continues to be updated (we're about to unlock this tree).
 	cLog, err := t.log.NewReader()
 	if err != nil {
-		return nil, errors.E(op, err)
+		return nil, err
 	}
 
 	// Create a watcher, but do not attach it to any node yet.
@@ -119,14 +117,14 @@ func (t *Tree) Watch(p path.Parsed, order int64, done <-chan struct{}) (<-chan *
 		// from the logs).
 		err := t.flush()
 		if err != nil {
-			return nil, errors.E(op, err)
+			return nil, err
 		}
 
 		// Make a copy of the tree so we have an immutable tree in
 		// memory, at a fixed log position.
 		cIndex, err := t.logIndex.Clone()
 		if err != nil {
-			return nil, errors.E(op, err)
+			return nil, err
 		}
 		offset := t.log.LastOffset()
 		clone := &Tree{
@@ -149,7 +147,7 @@ func (t *Tree) Watch(p path.Parsed, order int64, done <-chan struct{}) (<-chan *
 			// need to recover the tree from the logs).
 			err := t.flush()
 			if err != nil {
-				return nil, errors.E(op, err)
+				return nil, err
 			}
 
 			// Set order to the current offset
@@ -159,7 +157,7 @@ func (t *Tree) Watch(p path.Parsed, order int64, done <-chan struct{}) (<-chan *
 		// Set up the notification hook.
 		err = t.addWatcher(p, w)
 		if err != nil {
-			return nil, errors.E(op, err)
+			return nil, err
 		}
 
 		// Start the watcher.
@@ -192,13 +190,10 @@ func (t *Tree) addWatcher(p path.Parsed, w *watcher) error {
 // the watcher and the cloned tree are closed.
 // It must run in a goroutine. Errors are logged.
 func (w *watcher) sendCurrentAndWatch(clone, orig *Tree, p path.Parsed, offset int64) {
-	const op = "dir/server/tree.sendCurrentAndWatch"
-
 	defer clone.Close()
 
 	n, _, err := clone.loadPath(p)
 	if err != nil && !errors.Match(errNotExist, err) {
-		log.Error.Printf("%s: error loading path: %s", op, err)
 		w.sendError(err)
 		w.close()
 		return
@@ -219,7 +214,6 @@ func (w *watcher) sendCurrentAndWatch(clone, orig *Tree, p path.Parsed, offset i
 		}
 		err = clone.traverse(n, 0, fn)
 		if err != nil {
-			log.Error.Printf("%s: error traversing tree: %s", op, err)
 			w.sendError(err)
 			w.close()
 			return
@@ -230,7 +224,6 @@ func (w *watcher) sendCurrentAndWatch(clone, orig *Tree, p path.Parsed, offset i
 	err = orig.addWatcher(p, w)
 	orig.mu.Unlock()
 	if err != nil {
-		log.Error.Printf("%s: error adding watcher: %s", op, err)
 		w.sendError(err)
 		w.close()
 		return
@@ -297,7 +290,6 @@ func (w *watcher) sendError(err error) {
 // given offset until it reaches the end of the log. It returns the next offset
 // to read.
 func (w *watcher) sendEventFromLog(offset int64) (int64, error) {
-	const op = "dir/server/tree.sendEventFromLog"
 	curr := offset
 	for {
 		// Is the receiver still interested in reading events and the
@@ -312,7 +304,7 @@ func (w *watcher) sendEventFromLog(offset int64) (int64, error) {
 
 		logEntry, next, err := w.log.ReadAt(curr)
 		if err != nil {
-			return next, errors.E(op, errors.Invalid, errors.Errorf("cannot read log at order %d: %v", curr, err))
+			return next, errors.E(errors.Invalid, errors.Errorf("cannot read log at order %d: %v", curr, err))
 		}
 		if next == curr {
 			return curr, nil

@@ -463,7 +463,6 @@ func TestLogIndex(t *testing.T) {
 }
 
 func TestListUsers(t *testing.T) {
-	const op = "TestListUsers"
 	dir, cleanup := setup(t, "ListUsers")
 	defer cleanup()
 
@@ -490,7 +489,7 @@ func TestListUsers(t *testing.T) {
 		t.Fatal("users don't match")
 	}
 	// Glob for .jp users only.
-	users, err = userGlob(op, "*.jp", dir)
+	users, err = userGlob("*.jp", dir)
 	if err != nil {
 		t.Fatal(err)
 	}

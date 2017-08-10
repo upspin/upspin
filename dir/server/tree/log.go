@@ -109,14 +109,12 @@ const oldStyleLogFilePrefix = "tree.log."
 // Only one Writer per user can be opened in a directory or unpredictable
 // results may occur.
 func NewLogs(user upspin.UserName, directory string) (*Writer, *LogIndex, error) {
-	const op = "dir/server/tree.NewLogs"
-
 	subdir := logSubDir(user, directory) // user's sub directory.
 
 	// Make the log directory if it doesn't exist.
 	// (MkdirAll returns a nil error if the directory exists.)
 	if err := os.MkdirAll(subdir, 0700); err != nil {
-		return nil, nil, errors.E(op, errors.IO, err)
+		return nil, nil, errors.E(errors.IO, err)
 	}
 
 	off := logOffsetsFor(subdir)
@@ -129,14 +127,14 @@ func NewLogs(user upspin.UserName, directory string) (*Writer, *LogIndex, error)
 		newLogName := logFile(user, 0, directory)
 		err := linkIfNotExist(oldLogName, newLogName)
 		if err != nil {
-			return nil, nil, errors.E(op, errors.IO, err)
+			return nil, nil, errors.E(errors.IO, err)
 		}
 	}
 
 	loc := logFile(user, off[0], directory)
 	loggerFile, err := os.OpenFile(loc, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 	if err != nil {
-		return nil, nil, errors.E(op, errors.IO, err)
+		return nil, nil, errors.E(errors.IO, err)
 	}
 
 	// We now have a new log name. Ensure we create an old log name too (for
@@ -146,7 +144,7 @@ func NewLogs(user upspin.UserName, directory string) (*Writer, *LogIndex, error)
 		newLogName := logFile(user, 0, directory)
 		err := linkIfNotExist(newLogName, oldLogName)
 		if err != nil {
-			return nil, nil, errors.E(op, errors.IO, err)
+			return nil, nil, errors.E(errors.IO, err)
 		}
 	}
 
@@ -160,11 +158,11 @@ func NewLogs(user upspin.UserName, directory string) (*Writer, *LogIndex, error)
 	iloc := indexFile(user, directory)
 	rootFile, err := os.OpenFile(rloc, os.O_RDWR|os.O_CREATE, 0600)
 	if err != nil {
-		return nil, nil, errors.E(op, errors.IO, err)
+		return nil, nil, errors.E(errors.IO, err)
 	}
 	indexFile, err := os.OpenFile(iloc, os.O_RDWR|os.O_CREATE, 0600)
 	if err != nil {
-		return nil, nil, errors.E(op, errors.IO, err)
+		return nil, nil, errors.E(errors.IO, err)
 	}
 	li := &LogIndex{
 		user:      user,
@@ -198,7 +196,6 @@ func linkIfNotExist(oldname, newname string) error {
 
 // HasLog reports whether user has logs in directory.
 func HasLog(user upspin.UserName, directory string) (bool, error) {
-	const op = "dir/server/tree.HasLog"
 	var firstErr error
 	for _, name := range []string{
 		filepath.Join(directory, oldStyleLogFilePrefix+string(user)),
@@ -207,7 +204,7 @@ func HasLog(user upspin.UserName, directory string) (bool, error) {
 		_, err := os.Stat(name)
 		if err != nil {
 			if !os.IsNotExist(err) && firstErr != nil {
-				firstErr = errors.E(op, errors.IO, err)
+				firstErr = errors.E(errors.IO, err)
 			}
 			continue
 		}
@@ -219,7 +216,6 @@ func HasLog(user upspin.UserName, directory string) (bool, error) {
 // DeleteLogs deletes all data for a user in directory. Any existing logs
 // associated with user must not be used subsequently.
 func DeleteLogs(user upspin.UserName, directory string) error {
-	const op = "dir/server/tree.DeleteLogs"
 	for _, fn := range []string{
 		filepath.Join(directory, oldStyleLogFilePrefix+string(user)),
 		rootFile(user, directory),
@@ -227,25 +223,25 @@ func DeleteLogs(user upspin.UserName, directory string) error {
 	} {
 		err := os.Remove(fn)
 		if err != nil && !os.IsNotExist(err) {
-			return errors.E(op, errors.IO, err)
+			return errors.E(errors.IO, err)
 		}
 	}
 	// Remove the user's log directory, if any, with all its contents.
 	// Note: RemoveAll returns nil if the subdir does not exist.
 	err := os.RemoveAll(logSubDir(user, directory))
 	if err != nil && !os.IsNotExist(err) {
-		return errors.E(op, errors.IO, err)
+		return errors.E(errors.IO, err)
 	}
 	return nil
 }
 
 // userGlob   returns the set of users in the directory that match the pattern.
 // The pattern is as per filePath.Glob, applied to the directory.
-func userGlob(op, pattern string, directory string) ([]upspin.UserName, error) {
+func userGlob(pattern string, directory string) ([]upspin.UserName, error) {
 	prefix := rootFile("", directory)
 	matches, err := filepath.Glob(rootFile(upspin.UserName(pattern), directory))
 	if err != nil {
-		return nil, errors.E(op, errors.IO, err)
+		return nil, errors.E(errors.IO, err)
 	}
 	users := make([]upspin.UserName, len(matches))
 	for i, m := range matches {
@@ -256,16 +252,14 @@ func userGlob(op, pattern string, directory string) ([]upspin.UserName, error) {
 
 // ListUsers returns all user names found in the given log directory.
 func ListUsers(directory string) ([]upspin.UserName, error) {
-	const op = "dir/server/tree.ListUsers"
-	return userGlob(op, "*@*", directory)
+	return userGlob("*@*", directory)
 }
 
 // ListUsersWithSuffix returns a list is user names found in the given log
 // directory that contain the required suffix, without the leading "+".
 // The special suffix "*" matches all users with a non-empty suffix.
 func ListUsersWithSuffix(suffix, directory string) ([]upspin.UserName, error) {
-	const op = "dir/server/tree.ListUsers"
-	return userGlob(op, "*+"+suffix+"@*", directory)
+	return userGlob("*+"+suffix+"@*", directory)
 }
 
 func logFile(user upspin.UserName, offset int64, directory string) string {
@@ -312,7 +306,6 @@ func (w *Writer) User() upspin.UserName {
 
 // Append appends a LogEntry to the end of the log.
 func (w *Writer) Append(e *LogEntry) error {
-	const op = "dir/server/tree.Append"
 	buf, err := e.marshal()
 	if err != nil {
 		return err
@@ -329,14 +322,14 @@ func (w *Writer) Append(e *LogEntry) error {
 		// Close the current underlying log file.
 		err = w.close()
 		if err != nil {
-			return errors.E(op, errors.IO, err)
+			return errors.E(errors.IO, err)
 		}
 		// Create a new log file where the previous one left off.
 		w.fileOffset += prevOffs
 		loc := filepath.Join(dir, fmt.Sprintf("%d", w.fileOffset))
 		w.file, err = os.OpenFile(loc, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 		if err != nil {
-			return errors.E(op, errors.IO, err)
+			return errors.E(errors.IO, err)
 		}
 		prevOffs = 0
 	}
@@ -344,18 +337,18 @@ func (w *Writer) Append(e *LogEntry) error {
 	// File is append-only, so this is guaranteed to write to the tail.
 	n, err := w.file.Write(buf)
 	if err != nil {
-		return errors.E(op, errors.IO, err)
+		return errors.E(errors.IO, err)
 	}
 	err = w.file.Sync()
 	if err != nil {
-		return errors.E(op, errors.IO, err)
+		return errors.E(errors.IO, err)
 	}
 	// Sanity check: flush worked and the new offset relative to the
 	// beginning of this file is the expected one.
 	newOffs := prevOffs + int64(n)
 	if newOffs != lastOffset(w.file) {
 		// This might indicate a race somewhere, despite the locks.
-		return errors.E(op, errors.IO, errors.Errorf("file.Sync did not update offset: expected %d, got %d", newOffs, lastOffset(w.file)))
+		return errors.E(errors.IO, errors.Errorf("file.Sync did not update offset: expected %d, got %d", newOffs, lastOffset(w.file)))
 	}
 	return nil
 }
@@ -363,8 +356,6 @@ func (w *Writer) Append(e *LogEntry) error {
 // ReadAt reads an entry from the log at offset. It returns the log entry and
 // the next offset.
 func (r *Reader) ReadAt(offset int64) (le LogEntry, next int64, err error) {
-	const op = "dir/server/tree.ReadAt"
-
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -383,7 +374,7 @@ func (r *Reader) ReadAt(offset int64) (le LogEntry, next int64, err error) {
 		// Locate the file and open it.
 		err := r.openLogAtOffset(readOffset, filepath.Dir(r.file.Name()))
 		if err != nil {
-			return le, 0, errors.E(op, errors.IO, err)
+			return le, 0, errors.E(errors.IO, err)
 		}
 		// Recompute maxOff for the new file.
 		maxOff = r.fileOffset + lastOffset(r.file)
@@ -403,7 +394,7 @@ func (r *Reader) ReadAt(offset int64) (le LogEntry, next int64, err error) {
 
 	_, err = r.file.Seek(offset-r.fileOffset, io.SeekStart)
 	if err != nil {
-		return le, 0, errors.E(op, errors.IO, err)
+		return le, 0, errors.E(errors.IO, err)
 	}
 	next = offset
 	checker := newChecker(r.file)
@@ -462,7 +453,6 @@ func lastOffset(f *os.File) int64 {
 
 // Truncate truncates the log at offset.
 func (w *Writer) Truncate(offset int64) error {
-	const op = "dir/server/tree.Truncate"
 	w.mu.Lock()
 	defer w.mu.Unlock()
 
@@ -470,7 +460,7 @@ func (w *Writer) Truncate(offset int64) error {
 	if offset >= w.fileOffset {
 		err := w.file.Truncate(w.fileOffset - offset)
 		if err != nil {
-			return errors.E(op, err)
+			return err
 		}
 		return nil
 	}
@@ -482,7 +472,7 @@ func (w *Writer) Truncate(offset int64) error {
 
 	err := w.close()
 	if err != nil {
-		return errors.E(op, errors.IO, err)
+		return errors.E(errors.IO, err)
 	}
 
 	var i int
@@ -493,20 +483,18 @@ func (w *Writer) Truncate(offset int64) error {
 	loc := filepath.Join(base, fmt.Sprintf("%d", offsets[i]))
 	w.file, err = os.OpenFile(loc, os.O_APPEND|os.O_WRONLY, 0600)
 	if err != nil {
-		return errors.E(op, errors.IO, err)
+		return errors.E(errors.IO, err)
 	}
 	w.fileOffset = offsets[i]
 	err = w.file.Truncate(offset - w.fileOffset)
 	if err != nil {
-		return errors.E(op, err)
+		return err
 	}
 	return nil
 }
 
 // NewReader makes a reader of the log.
 func (w *Writer) NewReader() (*Reader, error) {
-	const op = "dir/server/tree.NewReader"
-
 	r := &Reader{}
 
 	// Order is important.
@@ -521,7 +509,7 @@ func (w *Writer) NewReader() (*Reader, error) {
 	dir := filepath.Dir(w.file.Name())
 	err := r.openLogAtOffset(w.fileOffset, dir)
 	if err != nil {
-		return nil, errors.E(op, errors.IO, err)
+		return nil, errors.E(errors.IO, err)
 	}
 	return r, nil
 }
@@ -586,66 +574,62 @@ func (li *LogIndex) User() upspin.UserName {
 
 // Root returns the user's root by retrieving it from local stable storage.
 func (li *LogIndex) Root() (*upspin.DirEntry, error) {
-	const op = "dir/server/tree.LogIndex.Root"
 	li.mu.Lock()
 	defer li.mu.Unlock()
 
 	var root upspin.DirEntry
-	buf, err := readAllFromTop(op, li.rootFile)
+	buf, err := readAllFromTop(li.rootFile)
 	if err != nil {
 		return nil, err
 	}
 	if len(buf) == 0 {
-		return nil, errors.E(op, errors.NotExist, li.user, errors.Str("no root for user"))
+		return nil, errors.E(errors.NotExist, li.user, errors.Str("no root for user"))
 	}
 	more, err := root.Unmarshal(buf)
 	if err != nil {
-		return nil, errors.E(op, err)
+		return nil, err
 	}
 	if len(more) != 0 {
-		return nil, errors.E(op, errors.IO, errors.Errorf("root has %d left over bytes", len(more)))
+		return nil, errors.E(errors.IO, errors.Errorf("root has %d left over bytes", len(more)))
 	}
 	return &root, nil
 }
 
 // SaveRoot saves the user's root entry to stable storage.
 func (li *LogIndex) SaveRoot(root *upspin.DirEntry) error {
-	const op = "dir/server/tree.LogIndex.SaveRoot"
 	buf, err := root.Marshal()
 	if err != nil {
-		return errors.E(op, err)
+		return err
 	}
 
 	li.mu.Lock()
 	defer li.mu.Unlock()
-	return overwriteAndSync(op, li.rootFile, buf)
+	return overwriteAndSync(li.rootFile, buf)
 }
 
 // DeleteRoot deletes the root.
 func (li *LogIndex) DeleteRoot() error {
-	const op = "dir/server/tree.LogIndex.DeleteRoot"
 	li.mu.Lock()
 	defer li.mu.Unlock()
 
-	return overwriteAndSync(op, li.rootFile, []byte{})
+	return overwriteAndSync(li.rootFile, []byte{})
 }
 
 // Clone makes a read-only copy of the log index.
 func (li *LogIndex) Clone() (*LogIndex, error) {
-	const op = "dir/server/tree.LogIndex.Clone"
 	li.mu.Lock()
 	defer li.mu.Unlock()
 
 	idx, err := os.Open(li.indexFile.Name())
 	if os.IsNotExist(err) {
-		return nil, errors.E(op, errors.NotExist, err)
+		return nil, errors.E(errors.NotExist, err)
 	}
 	if err != nil {
-		return nil, errors.E(op, errors.IO, err)
+		return nil, errors.E(errors.IO, err)
 	}
 	root, err := os.Open(li.rootFile.Name())
 	if err != nil {
-		return nil, errors.E(op, errors.IO, err)
+		return nil, errors.E(errors.IO, err)
 	}
 	newLog := *li
 	newLog.indexFile = idx
@@ -653,59 +637,57 @@ func (li *LogIndex) Clone() (*LogIndex, error) {
 	return &newLog, nil
 }
 
-func overwriteAndSync(op string, f *os.File, buf []byte) error {
+func overwriteAndSync(f *os.File, buf []byte) error {
 	_, err := f.Seek(0, io.SeekStart)
 	if err != nil {
-		return errors.E(op, errors.IO, err)
+		return errors.E(errors.IO, err)
 	}
 	n, err := f.Write(buf)
 	if err != nil {
-		return errors.E(op, errors.IO, err)
+		return errors.E(errors.IO, err)
 	}
 	err = f.Truncate(int64(n))
 	if err != nil {
-		return errors.E(op, errors.IO, err)
+		return errors.E(errors.IO, err)
 	}
 	return f.Sync()
 }
 
-func readAllFromTop(op string, f *os.File) ([]byte, error) {
+func readAllFromTop(f *os.File) ([]byte, error) {
 	_, err := f.Seek(0, io.SeekStart)
 	if err != nil {
-		return nil, errors.E(op, errors.IO, err)
+		return nil, errors.E(errors.IO, err)
 	}
 	buf, err := ioutil.ReadAll(f)
 	if err != nil {
-		return nil, errors.E(op, errors.IO, err)
+		return nil, errors.E(errors.IO, err)
 	}
 	return buf, nil
 }
 
 // ReadOffset reads from stable storage the offset saved by SaveOffset.
 func (li *LogIndex) ReadOffset() (int64, error) {
-	const op = "dir/server/tree.LogIndex.ReadOffset"
 	li.mu.Lock()
 	defer li.mu.Unlock()
 
-	buf, err := readAllFromTop(op, li.indexFile)
+	buf, err := readAllFromTop(li.indexFile)
 	if err != nil {
-		return 0, errors.E(op, errors.IO, err)
+		return 0, errors.E(errors.IO, err)
 	}
 	if len(buf) == 0 {
-		return 0, errors.E(op, errors.NotExist, li.user, errors.Str("no log offset for user"))
+		return 0, errors.E(errors.NotExist, li.user, errors.Str("no log offset for user"))
 	}
 	offset, n := binary.Varint(buf)
 	if n <= 0 {
-		return 0, errors.E(op, errors.IO, errors.Str("invalid offset read"))
+		return 0, errors.E(errors.IO, errors.Str("invalid offset read"))
 	}
 	return offset, nil
 }
 
 // SaveOffset saves to stable storage the offset to process next.
 func (li *LogIndex) SaveOffset(offset int64) error {
-	const op = "dir/server/tree.LogIndex.SaveOffset"
 	if offset < 0 {
-		return errors.E(op, errors.Invalid, errors.Str("negative offset"))
+		return errors.E(errors.Invalid, errors.Str("negative offset"))
 	}
 	var tmp [16]byte // For use by PutVarint.
 	n := binary.PutVarint(tmp[:], offset)
@@ -713,7 +695,7 @@ func (li *LogIndex) SaveOffset(offset int64) error {
 	li.mu.Lock()
 	defer li.mu.Unlock()
 
-	return overwriteAndSync(op, li.indexFile, tmp[:n])
+	return overwriteAndSync(li.indexFile, tmp[:n])
 }
 
 // Close closes the LogIndex.
@@ -738,7 +720,6 @@ func (li *LogIndex) Close() error {
 
 // marshal packs the LogEntry into a new byte slice for storage.
 func (le *LogEntry) marshal() ([]byte, error) {
-	const op = "dir/server/tree.LogEntry.marshal"
 	var b []byte
 	var tmp [16]byte // For use by PutVarint.
 	// This should have been b = append(b, byte(le.Op)) since Operation
@@ -749,7 +730,7 @@ func (le *LogEntry) marshal() ([]byte, error) {
 
 	entry, err := le.Entry.Marshal()
 	if err != nil {
-		return nil, errors.E(op, err)
+		return nil, err
 	}
 	b = appendBytes(b, entry)
 	chksum := checksum(b)
@@ -855,43 +836,42 @@ func (c *checker) readChecksum() ([4]byte, error) {
 // unmarshal unpacks a marshaled LogEntry from a Reader and stores it in the
 // receiver.
 func (le *LogEntry) unmarshal(r *checker) error {
-	const op = "dir/server/tree.LogEntry.unmarshal"
 	operation, err := binary.ReadVarint(r)
 	if err != nil {
-		return errors.E(op, errors.IO, errors.Errorf("reading op: %s", err))
+		return errors.E(errors.IO, errors.Errorf("reading op: %s", err))
 	}
 	le.Op = Operation(operation)
 	entrySize, err := binary.ReadVarint(r)
 	if err != nil {
-		return errors.E(op, errors.IO, errors.Errorf("reading entry size: %s", err))
+		return errors.E(errors.IO, errors.Errorf("reading entry size: %s", err))
 	}
 	// TODO: document this properly. See issue #347.
 	const reasonableEntrySize = 1 << 26 // 64MB
 	if entrySize <= 0 {
-		return errors.E(op, errors.IO, errors.Errorf("invalid entry size: %d", entrySize))
+		return errors.E(errors.IO, errors.Errorf("invalid entry size: %d", entrySize))
 	}
 	if entrySize > reasonableEntrySize {
-		return errors.E(op, errors.IO, errors.Errorf("entry size too large: %d", entrySize))
+		return errors.E(errors.IO, errors.Errorf("entry size too large: %d", entrySize))
 	}
 	// Read exactly entrySize bytes.
 	data := make([]byte, entrySize)
 	_, err = io.ReadFull(r, data)
 	if err != nil {
-		return errors.E(op, errors.IO, errors.Errorf("reading %d bytes from entry: %s", entrySize, err))
+		return errors.E(errors.IO, errors.Errorf("reading %d bytes from entry: %s", entrySize, err))
 	}
 	leftOver, err := le.Entry.Unmarshal(data)
 	if err != nil {
-		return errors.E(op, errors.IO, err)
+		return errors.E(errors.IO, err)
 	}
 	if len(leftOver) != 0 {
-		return errors.E(op, errors.IO, errors.Errorf("%d bytes left; log misaligned for entry %+v", len(leftOver), le.Entry))
+		return errors.E(errors.IO, errors.Errorf("%d bytes left; log misaligned for entry %+v", len(leftOver), le.Entry))
 	}
 	chk, err := r.readChecksum()
 	if err != nil {
-		return errors.E(op, errors.IO, errors.Errorf("reading checksum: %s", err))
+		return errors.E(errors.IO, errors.Errorf("reading checksum: %s", err))
 	}
 	if chk != r.chksum {
-		return errors.E(op, errors.IO, errors.Errorf("invalid checksum: got %x, expected %x for entry %+v", r.chksum, chk, le.Entry))
+		return errors.E(errors.IO, errors.Errorf("invalid checksum: got %x, expected %x for entry %+v", r.chksum, chk, le.Entry))
 	}
 	return nil
 }
