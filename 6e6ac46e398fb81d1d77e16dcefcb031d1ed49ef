@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "0004406e_49265723",
+        "filename": "pack/ee/packdata.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-08-10T23:59:19Z",
+      "side": 1,
+      "message": "Or maybe it is no longer obvious, now that the functions have been split into several files.  Ok, will move the comment.",
+      "parentUuid": "01cdeaf2_01b12f54",
+      "revId": "6e6ac46e398fb81d1d77e16dcefcb031d1ed49ef",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "e7c22807_b824ddca",
         "filename": "pack/ee/packdata.go",
         "patchSetId": 2
