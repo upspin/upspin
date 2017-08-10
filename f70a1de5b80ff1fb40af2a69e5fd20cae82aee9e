@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "983b809a_d9b06372",
+        "filename": "pack/ee/packdata.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-10T22:18:18Z",
+      "side": 1,
+      "message": "comment seems out of place.",
+      "revId": "f70a1de5b80ff1fb40af2a69e5fd20cae82aee9e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c72d8268_d97e9152",
+        "filename": "pack/ee/packdata.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-10T22:18:18Z",
+      "side": 1,
+      "message": "const vi \u003d binary.MaxVarintLen64\n\ni\u0027d call it intLen though.",
+      "revId": "f70a1de5b80ff1fb40af2a69e5fd20cae82aee9e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b9193acf_a4ad3999",
+        "filename": "pack/ee/packdata.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-10T22:18:18Z",
+      "side": 1,
+      "message": "move the blank line before the comment",
+      "revId": "f70a1de5b80ff1fb40af2a69e5fd20cae82aee9e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "435dca9a_4396b892",
+        "filename": "pack/ee/packdata.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-10T22:18:18Z",
+      "side": 1,
+      "message": "odd to see a comment after the return. i\u0027d move it above.",
+      "revId": "f70a1de5b80ff1fb40af2a69e5fd20cae82aee9e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "59afefa4_cfb40086",
+        "filename": "pack/ee/packdata.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-10T22:18:18Z",
+      "side": 1,
+      "message": "s/$/./",
+      "revId": "f70a1de5b80ff1fb40af2a69e5fd20cae82aee9e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0abbf193_c842a904",
+        "filename": "pack/ee/packdata.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-10T22:18:18Z",
+      "side": 1,
+      "message": "32-bit (it\u0027s an adjective)",
+      "revId": "f70a1de5b80ff1fb40af2a69e5fd20cae82aee9e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
