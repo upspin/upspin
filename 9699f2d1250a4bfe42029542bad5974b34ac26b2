@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "898d83a9_f3c7f889",
+        "filename": "upspin/code.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-11T01:26:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6a0a41fb_bb8b4382",
+      "revId": "9699f2d1250a4bfe42029542bad5974b34ac26b2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "424c2ecb_dc4430ae",
         "filename": "upspin/code.go",
         "patchSetId": 3
@@ -33,6 +51,24 @@
       "revId": "9699f2d1250a4bfe42029542bad5974b34ac26b2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a696e44d_f604da86",
+        "filename": "upspin/code.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-11T01:26:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "424c2ecb_dc4430ae",
+      "revId": "9699f2d1250a4bfe42029542bad5974b34ac26b2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "6bd0d89c_7d4bfb73",
+        "filename": "upspin/code.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-11T01:26:14Z",
+      "side": 1,
+      "message": "use but not declare",
+      "parentUuid": "c841999c_5d7b89eb",
+      "revId": "9699f2d1250a4bfe42029542bad5974b34ac26b2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "efe528c5_99425984",
         "filename": "upspin/code.go",
         "patchSetId": 3
@@ -67,6 +121,24 @@
       "revId": "9699f2d1250a4bfe42029542bad5974b34ac26b2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bb99f8dd_ade3c03d",
+        "filename": "upspin/code.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 371,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-11T01:26:14Z",
+      "side": 1,
+      "message": "use but not declare",
+      "parentUuid": "efe528c5_99425984",
+      "revId": "9699f2d1250a4bfe42029542bad5974b34ac26b2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
