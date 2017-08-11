@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6a0a41fb_bb8b4382",
+        "filename": "upspin/code.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-08-11T01:07:03Z",
+      "side": 1,
+      "message": "DirBlock offset? It could also be a size, or unrelated to dirblocks entirely",
+      "revId": "9699f2d1250a4bfe42029542bad5974b34ac26b2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "424c2ecb_dc4430ae",
+        "filename": "upspin/code.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 247,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-08-11T01:07:03Z",
+      "side": 1,
+      "message": "inline this?",
+      "revId": "9699f2d1250a4bfe42029542bad5974b34ac26b2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c841999c_5d7b89eb",
+        "filename": "upspin/code.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-08-11T01:07:03Z",
+      "side": 1,
+      "message": "declare the var in the if?",
+      "revId": "9699f2d1250a4bfe42029542bad5974b34ac26b2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "efe528c5_99425984",
+        "filename": "upspin/code.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 371,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-08-11T01:07:03Z",
+      "side": 1,
+      "message": "if b :\u003d cons.bytes(); ...",
+      "revId": "9699f2d1250a4bfe42029542bad5974b34ac26b2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
