@@ -320,9 +320,16 @@ This command will show you your configuration and also compare it with
 the record stored in the public key server at `key.upspin.io`.
 If there is any discrepancy, it will let you know.
 
-### How do I recreate my keys on another machine? {#recreate-keys}
+### How do I recreate my keys and config on another machine? {#recreate-keys}
 
-Use the `upspin` `keygen` command, as described in the previous answer.
+First generate the keys with the `upspin` `keygen` command and its
+`-secretseed` flag as described in the previous answer.
+
+Then you must recreate your config file on the new machine.
+The easiest way is just to copy the existing one using `scp` or some equivalent.
+Examine it after copying and correct any settings that should
+be different on the new machine.
+See the [Upspin configuration](/doc/config.md) document for details.
 
 ### I lost my secret seed. How do I recover it? {#lost-seed}
 
@@ -386,4 +393,53 @@ The underscore in the import declaration is necessary.
 It tells the Go compiler that the import statement is being done for
 side effects only, in this case the linking into the binary of the
 full suite of transports.
+
+
+## Server administration
+
+This section shows how to perform some common tasks around
+administrating an Upspin server installation.
+The examples assume you ahve signed up as `ann@example.com` as
+described in [Signing up a new user](/doc/signup.md) and have [set up
+`upspinserver`](/doc/server_setup.md) as a combined dirserver/storeserver for
+the domain `example.com`.
+Substitute your own user and domain names in the examples that follow.
+
+### How do I add a family member to my Upspin installation?
+
+When you followed [the server setup instructions](/doc/server_setup.md),
+`upspin setupserver` created an initial version of the access control
+files for your Upspin installation that allows access for `ann@example.com` and
+the server user `upspin@example.com`.
+The key piece is a group file, owned by the server user, called `Writers`.
+This file specifies the complete list of Upspin users that,
+once authenticated, are allowed to write blocks to the server.
+
+The easiest way to modify the `Writers` file is to use the `upspin
+setupwriters` command. The arguments list the users (or wildcards) to be
+granted access.
+The server user `upspin@example.com` is always included automatically.
+
+```
+$ upspin setupwriters -domain=example.com ann@example.com anotherone@example.com third@example.com
+# ... or with wildcards
+$ upspin setupwriters -domain=example.com ann@example.com '*@example.com'
+```
+
+Every time you call `upspin setupwriters` the `Writers` file is completely replaced;
+you must always include the full set of users to have write permission.
+
+Another way to maintain the file is to edit it locally on your machine.
+To do this, you need to run the `upspin` command using the config file
+defined for the server user:
+
+```
+$ upspin -config=$HOME/upspin/deploy/example.com/config cp upspin@example.com/Group/Writers /tmp/Writers
+```
+
+Then edit it locally and copy it back once done:
+
+```
+$ upspin -config=$HOME/upspin/deploy/example.com/config cp /tmp/Writers upspin@example.com/Group/Writers
+```
 

@@ -26,9 +26,6 @@ is part of #336. --->
 - The [Upspin Configuration](/doc/config.md) document describes Upspin's
   configuration file format and settings.
 
-- The [Usage Examples](/doc/usage_examples.md) document demonstrates some
-  common usage scenarios.
-
 - TODO: A user guide to keys.<!--- #355 --->
 
 ## Architecture
