@@ -352,8 +352,8 @@ If you have your secret seed, see the previous sections.
 Otherwise, you cannot recover your keys or your Upspin account.
 
 Without your private key or secret seed to regenerate it, there is no mechanism to restore a lost account.
-Upspin attempts to be very secure, and it is our experience that account recovery mechanisms,
-no matter how carefully designed, are easily subverted.
+Upspin attempts to be very secure, and it is our experience that account
+recovery mechanisms have historically been the weak link in account security.
 We believe the system is more secure by not providing one.
 
 **Do not lose your secret seed!**
@@ -361,8 +361,84 @@ We believe the system is more secure by not providing one.
 
 ### How do I change my key? {#rotate-keys}
 
-TODO. upspin rotate, upspin countersign; explain secret2 file.
+Most people will never need to change their key;
+Upspin's intent is that you share access to your files, not your keys.
+But sometimes a key change may be justified, so here are the details.
 
+When you change your key, you migrate from one working key to another.
+The key change process maintains your old private key
+so you can authenticate you to the servers during the transition.
+When done, all your old keys will be saved so that you can still decrypt files from backups,
+but the old keys will no longer work for authentication.
+
+Suppose you are on a client device with existing keys in the default directory
+`$HOME/.ssh/you@example.com`.
+Here are the commands to switch to using a new key.
+Eventually these steps may be combined but at the moment it must
+be done in several steps, both
+to make it easier to recover if a step fails and so we can better understand
+people's needs before designing a smoother process.
+
+```
+$ upspin keygen -rotate $HOME/.ssh/you@example.com
+$ upspin countersign
+$ upspin rotate
+$ upspin share -r -fix you@example.com/
+```
+
+As always, you must write down the secret seed
+printed by `keygen` and save it someplace safe!
+
+The `countersign` and `share` commands may run for a few minutes
+as they walk your whole Upspin file tree.
+Also, if you have written
+files to other users' directories, you must run `share` there as well.
+
+You're done! But if you want to understand what these commands mean,
+please read on.
+
+The `keygen` command creates a new key pair in the two files,
+
+```
+$HOME/.ssh/you@example.com/public.upspinkey
+$HOME/.ssh/you@example.com/secret.upspinkey
+```
+
+It also saves the old key pair in
+
+```
+$HOME/.ssh/you@example.com/secret2.upspinkey`
+```
+
+After running this one command, nothing has changed yet except the contents
+of these three files on your local system; you could revert to the old ones
+and be back where you started.
+
+The `countersign` command walks through your Upspin file tree and adds
+signatures using the new key alongside those using the old.
+Recall that each file in Upspin is signed by the writer.
+There is room in the directory entry for a second signature,
+which in principle could be written by anyone else that wants to certify the file contents,
+somewhat analogous to the physical world requirement for some bank checks to be
+signed by one person and countersigned by another.
+Here the "other person" is you with your new key identity.
+After this command, files in your tree can be read and verified by
+anyone who knows your old or your new public key.
+
+The `rotate` command pushes the new key to the public key server at `key.upspin.io`,
+making it visible to others,
+who must now use your new key when sharing files with you.
+If there is a file you wrote (and signed) in someone else's tree a long time ago and have not updated,
+readers will see an error because the signature will no longer verify;
+this can be fixed by running the `share` command.
+
+The `share` command walks the specified file trees, re-wrapping the encryption keys to use
+the new keys instead.
+It's a good idea to do this, but it's not urgent because the `secret2.upspinkey` file holds the
+information necessary for the system to decrypt files that have not been updated.
+
+However, if you are changing keys because you fear your old keys leaked, run `share` as soon as possible,
+to disassociate the files from your old key.
 
 ## Programming
 
