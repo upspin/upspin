@@ -21,7 +21,7 @@ func CacheEndpoint(cfg upspin.Config) (*upspin.Endpoint, error) {
 	// a TODO(p) in package config to phase out cacheserver endpoints.
 	switch v {
 	case "y", "yes", "true":
-		name := local.LocalName(cfg, "cacheserver")
+		name := "remote," + local.LocalName(cfg, "cacheserver") + ":80"
 		ep, err := upspin.ParseEndpoint(name)
 		if err != nil {
 			return nil, errors.E(op, errors.Internal, err)
