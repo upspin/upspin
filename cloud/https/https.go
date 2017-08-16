@@ -162,7 +162,7 @@ func ListenAndServe(ready chan<- struct{}, opt *Options) {
 			log.Fatalf("https: couldn't parse address: %v", err)
 		}
 		if host != "localhost" && host != "127.0.0.1" && host != "::1" {
-			log.Fatalf("https: cannot serve insecure HTTP on non-loopback address %q", addr)
+			log.Error.Printf("https: WARNING: serving insecure HTTP on non-loopback address %q", addr)
 		}
 	case hasLetsEncryptCache && !hasAutocertCache && !hasCert:
 		// The -letscache has a default value, so only take this path
