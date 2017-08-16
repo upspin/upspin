@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "d1c84cda_5009702a",
+        "filename": "doc/faq.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 397,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-16T04:07:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f273bd92_c527fc3a",
+      "revId": "152eab8534758c085d3424f29655709408c355a3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "40f01709_e033fe81",
         "filename": "doc/faq.md",
         "patchSetId": 1
@@ -56,6 +74,30 @@
       "revId": "152eab8534758c085d3424f29655709408c355a3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e4f5786b_a8397a34",
+        "filename": "doc/faq.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 420,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-08-16T04:07:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d5e17374_107fdd3d",
+      "range": {
+        "startLine": 420,
+        "startChar": 17,
+        "endLine": 420,
+        "endChar": 20
+      },
+      "revId": "152eab8534758c085d3424f29655709408c355a3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
