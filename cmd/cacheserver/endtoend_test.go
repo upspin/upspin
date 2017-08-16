@@ -204,7 +204,7 @@ func newClient(cfg upspin.Config, server, cache *upspin.Endpoint) upspin.Client 
 	cfg = setCertPool(cfg)
 	cfg = config.SetStoreEndpoint(cfg, *server)
 	cfg = config.SetDirEndpoint(cfg, *server)
-	cfg = config.SetCacheEndpoint(cfg, *cache)
+	cfg = config.SetValue(cfg, "cache", cache.String())
 	return client.New(cfg)
 }
 

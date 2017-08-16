@@ -5,6 +5,8 @@
 package rpc
 
 import (
+	"strings"
+
 	"upspin.io/errors"
 	"upspin.io/rpc/local"
 	"upspin.io/upspin"
@@ -14,12 +16,9 @@ func CacheEndpoint(cfg upspin.Config) (*upspin.Endpoint, error) {
 	const op = "rpc.CacheEndpoint"
 
 	v := cfg.Value("cache")
-	if v == "" {
-		return nil, nil
-	}
-	// TODO(adg): do we need to parse a potential endpoint here? There was
-	// a TODO(p) in package config to phase out cacheserver endpoints.
 	switch v {
+	case "", "n", "no", "false":
+		return nil, nil
 	case "y", "yes", "true":
 		name := "remote," + local.LocalName(cfg, "cacheserver") + ":80"
 		ep, err := upspin.ParseEndpoint(name)
@@ -28,6 +27,13 @@ func CacheEndpoint(cfg upspin.Config) (*upspin.Endpoint, error) {
 		}
 		return ep, nil
 	default:
-		return nil, nil
+		if !strings.Contains(v, ",") {
+			v = "remote," + v
+		}
+		ep, err := upspin.ParseEndpoint(v)
+		if err != nil {
+			return nil, errors.E(op, errors.Invalid, err)
+		}
+		return ep, nil
 	}
 }
