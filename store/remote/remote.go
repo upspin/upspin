@@ -124,23 +124,20 @@ func (r *remote) Endpoint() upspin.Endpoint {
 	return r.cfg.endpoint
 }
 
-func dialCache(op *operation, config upspin.Config, proxyFor upspin.Endpoint) upspin.Service {
+func dialCache(config upspin.Config, proxyFor upspin.Endpoint) (upspin.Service, error) {
 	// Are we using a cache?
 	ce, err := rpc.CacheEndpoint(config)
 	if err != nil {
-		op.error(errors.Invalid, err)
-		return nil
+		return nil, err
 	}
 	if ce == nil {
-		return nil
+		return nil, nil
 	}
 
 	// Call the cache. The cache is local so don't bother with TLS.
 	authClient, err := rpc.NewClient(config, ce.NetAddr, rpc.NoSecurity, proxyFor)
 	if err != nil {
-		// On error dial direct.
-		op.error(errors.IO, err)
-		return nil
+		return nil, err
 	}
 
 	return &remote{
@@ -149,7 +146,7 @@ func dialCache(op *operation, config upspin.Config, proxyFor upspin.Endpoint) up
 			endpoint: proxyFor,
 			userName: config.UserName(),
 		},
-	}
+	}, nil
 }
 
 // Dial implements upspin.Service.
@@ -161,7 +158,9 @@ func (r *remote) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service, 
 	}
 
 	// First try a cache
-	if svc := dialCache(op, config, e); svc != nil {
+	if svc, err := dialCache(config, e); err != nil {
+		return nil, err
+	} else if svc != nil {
 		return svc, nil
 	}
 
