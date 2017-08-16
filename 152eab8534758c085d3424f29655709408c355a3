@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f273bd92_c527fc3a",
+        "filename": "doc/faq.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 397,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-08-16T03:52:47Z",
+      "side": 1,
+      "message": "After running those commands, you\u0027re done!",
+      "revId": "152eab8534758c085d3424f29655709408c355a3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d5e17374_107fdd3d",
+        "filename": "doc/faq.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 420,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-08-16T03:52:47Z",
+      "side": 1,
+      "message": "each?",
+      "range": {
+        "startLine": 420,
+        "startChar": 17,
+        "endLine": 420,
+        "endChar": 20
+      },
+      "revId": "152eab8534758c085d3424f29655709408c355a3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
