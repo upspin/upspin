@@ -381,24 +381,6 @@ func SetStoreEndpoint(cfg upspin.Config, e upspin.Endpoint) upspin.Config {
 	}
 }
 
-type cfgCacheEndpoint struct {
-	upspin.Config
-	cacheEndpoint upspin.Endpoint
-}
-
-func (cfg cfgCacheEndpoint) CacheEndpoint() upspin.Endpoint {
-	return cfg.cacheEndpoint
-}
-
-// SetCacheEndpoint returns a config derived from the given config
-// with the given cache endpoint.
-func SetCacheEndpoint(cfg upspin.Config, e upspin.Endpoint) upspin.Config {
-	return cfgCacheEndpoint{
-		Config:        cfg,
-		cacheEndpoint: e,
-	}
-}
-
 type cfgDirEndpoint struct {
 	upspin.Config
 	dirEndpoint upspin.Endpoint

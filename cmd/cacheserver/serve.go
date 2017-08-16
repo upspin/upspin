@@ -33,7 +33,7 @@ var (
 
 func serve(cfg upspin.Config, addr string) (<-chan error, error) {
 	// Stop the cache server recursing.
-	cfg = config.SetCacheEndpoint(cfg, upspin.Endpoint{})
+	cfg = config.SetValue(cfg, "cache", "no")
 
 	// Calculate limits.
 	maxRefBytes := (9 * (*cacheSizeFlag)) / 10
