@@ -37,8 +37,8 @@ To get started, [**download the Upspin client**](/dl/) and follow the the
 ## Documentation
 
 The [Documentation](/doc/doc.md) page holds annotated links to the
-rich documentation for Upsin, which includes everything from
-user guides to details about the design and implemation.
+rich documentation for Upspin, which includes everything from
+user guides to details about the design and implementation.
 
 ## Community
 
