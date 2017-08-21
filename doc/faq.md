@@ -476,7 +476,7 @@ full suite of transports.
 
 This section shows how to perform some common tasks around
 administrating an Upspin server installation.
-The examples assume you ahve signed up as `ann@example.com` as
+The examples assume you have signed up as `ann@example.com` as
 described in [Signing up a new user](/doc/signup.md) and have [set up
 `upspinserver`](/doc/server_setup.md) as a combined dirserver/storeserver for
 the domain `example.com`.

@@ -16,7 +16,7 @@ references that point to data in the store server:
 All the users are connected through a central key server at `key.upspin.io`,
 which holds the public key and directory server address for each user.
 
-<img src="/images/arch/key.png" width="527" alt="Key server didagram"/>
+<img src="/images/arch/key.png" width="527" alt="Key server diagram"/>
 
 This is how the pieces fit together:
 
