@@ -534,11 +534,15 @@ func (c *Client) lookup(op string, entry *upspin.DirEntry, fn lookupFn, followFi
 			return resultEntry, entry, nil
 		}
 		if prevEntry != nil && errors.Match(errors.E(errors.NotExist), err) {
-			return resultEntry, nil, errors.E(errors.BrokenLink, prevEntry.Name, err)
+			return resultEntry, nil, errors.E(op, errors.BrokenLink, prevEntry.Name, err)
 		}
 		prevEntry = resultEntry
 		if err != upspin.ErrFollowLink {
 			return resultEntry, nil, errors.E(op, err)
+		}
+		// Misbehaving servers could return a nil entry. Handle that explicitly. Issue 451.
+		if resultEntry == nil {
+			return nil, nil, errors.E(op, errors.Internal, prevEntry.Name, errors.Str("server returned nil entry for link"))
 		}
 		// We have a link.
 		// First, allocate a new entry if necessary so we don't overwrite user's memory.
