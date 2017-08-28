@@ -22,6 +22,12 @@ associated with interactive shells. It is intended only for testing and is kept
 simple for reasons of comprehensibility, portability, and maintainability.
 Those who need quoting or line editing or other such features should use their
 regular shell and run upspinfs or invoke the upspin command line-by-line.
+
+The shell does have one convenience feature, though, in the handling of path
+names. A path beginning with a plain @ refers to the current user's root
+(ann@example.com), while one starting @+suffix is the same with the suffix
+included (ann+suffix@example.com). This feature works in all upspin commands
+but is particularly handy inside the shell.
 `
 	fs := flag.NewFlagSet("shell", flag.ExitOnError)
 	promptFlag := fs.String("prompt", promptPlaceholder, "interactive `prompt`")
