@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0dcb6566_0d6f6b65",
+        "filename": "cmd/upspin/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-08-28T02:08:01Z",
+      "side": 1,
+      "message": "I\u0027d use the same sentence everywhere, boring thought that may seem. The one I mean is:\n\nA path beginning with a plain @ refers to the current user\u0027s root\n(ann@example.com) while one starting @+suffix is the same with the suffix included\n(ann+suffix@example.com).\n\nThis is much clearer that the wordy explanation here.",
+      "range": {
+        "startLine": 67,
+        "startChar": 0,
+        "endLine": 70,
+        "endChar": 11
+      },
+      "revId": "4adc801274752c522c4cf9072d0dbdf992a7e1df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
