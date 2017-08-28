@@ -64,8 +64,10 @@ its -l flag and debugging enabled, run
 
 	upspin -log debug ls -l
 
-As a shorthand, a lone at sign (@) at the beginning of an Upspin path
-stands for the current user's Upspin root.
+As a shorthand, a lone at sign @ at the beginning of an Upspin
+path stands for the current user's Upspin root. Similarly, @+suffix
+is shorthand for the Upspin root for the current user name, including
+the suffix.
 
 For a list of available subcommands and global flags, run
 

@@ -36,8 +36,10 @@ its -l flag and debugging enabled, run
 
 	upspin -log debug ls -l
 
-As a shorthand, a lone at sign (@) at the beginning of an Upspin path
-stands for the current user's Upspin root.
+As a shorthand, a lone at sign @ at the beginning of an Upspin
+path stands for the current user's Upspin root. Similarly, @+suffix
+is shorthand for the Upspin root for the current user name, including
+the suffix.
 
 For a list of available subcommands and global flags, run
 
@@ -74,7 +76,7 @@ Upspin commands:
 	whichaccess
 Global flags:
   -blocksize size
-    	size of blocks when writing large files (default 1048576)
+    	size of blocks when writing large files
   -cachesize bytes
     	max disk bytes for cache (default 5000000000)
   -config file
@@ -579,6 +581,12 @@ associated with interactive shells. It is intended only for testing and is kept
 simple for reasons of comprehensibility, portability, and maintainability.
 Those who need quoting or line editing or other such features should use their
 regular shell and run upspinfs or invoke the upspin command line-by-line.
+
+The shell does have one convenience feature, though, in the handling of path
+names. A path beginning with a plain @ refers to the current user's root
+(ann@example.com) while one starting @+suffix is the same with the suffix included
+(ann+suffix@example.com). This features works in all upspin commands but is
+particularly handy inside the shell.
 
 Flags:
   -help
