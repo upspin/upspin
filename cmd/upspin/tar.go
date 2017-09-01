@@ -29,7 +29,7 @@ import (
 func (s *State) tar(args ...string) {
 	const help = `
 Tar archives an Upspin tree into a local tar file, or with the
--extract flag, unpacks a a local tar file into an Upspin tree.
+-extract flag, unpacks a local tar file into an Upspin tree.
 
 When extracting, the -match and -replace flags cause the extracted
 file to have any prefix that matches be replaced by substitute text.
