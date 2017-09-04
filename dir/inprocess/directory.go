@@ -231,8 +231,12 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	s.db.eventMgr.newEvent <- upspin.Event{
 		Entry: entry,
 	}
-	// Successful Put returns no entry.
-	return nil, nil
+	// Successful Put returns incomplete DirEntry holding only the sequence number.
+	retEntry := &upspin.DirEntry{
+		Attr:     upspin.AttrIncomplete,
+		Sequence: entry.Sequence,
+	}
+	return retEntry, nil
 }
 
 // canPut verifies that the name is permitted to be written.
