@@ -455,7 +455,16 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		}
 	}
 
-	return s.put(op, p, entry, o)
+	entry, err = s.put(op, p, entry, o)
+	if err != nil {
+		return entry, err
+	}
+	// Return Incomplete entry with Sequence number.
+	retEntry := &upspin.DirEntry{
+		Attr:     upspin.AttrIncomplete,
+		Sequence: entry.Sequence,
+	}
+	return retEntry, nil
 }
 
 // put performs Put on the user's tree.

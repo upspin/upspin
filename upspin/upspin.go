@@ -394,9 +394,12 @@ type DirServer interface {
 	// If the returned error is ErrFollowLink, the caller should
 	// retry the operation as outlined in the description for
 	// ErrFollowLink (with the added step of updating the
-	// Name field of the argument DirEntry). Otherwise, the
-	// returned DirEntry will be nil whether the operation
-	// succeeded or not.
+	// Name field of the argument DirEntry). For any other error,
+	// the return DirEntry will be nil.
+	//
+	// A successful Put returns an incomplete DirEntry (see the
+	// description of AttrIncomplete) containing nothing but the
+	// new sequence number.
 	Put(entry *DirEntry) (*DirEntry, error)
 
 	// Glob matches the pattern against the file names of the full
@@ -566,7 +569,8 @@ const (
 	// A link DirEntry holds zero DirBlocks.
 	AttrLink = Attribute(1 << 1)
 	// AttrIncomplete identifies a DirEntry whose Blocks and Packdata
-	// fields are elided for access control purposes.
+	// fields are elided for access control purposes, or the reply to
+	// a successful Put containing only the updated sequence number.
 	AttrIncomplete = Attribute(1 << 2)
 )
 

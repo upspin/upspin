@@ -160,7 +160,10 @@ func (s *server) makeRoot(parsed path.Parsed) (*upspin.DirEntry, error) {
 }
 
 // Put implements upspin.DirServer.Put.
-func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
+func (s *server) Put(argEntry *upspin.DirEntry) (*upspin.DirEntry, error) {
+	// Copy the argument because we don't want to overwrite fields such as Sequence in caller.
+	entry := new(upspin.DirEntry)
+	*entry = *argEntry
 	const op = "dir/inprocess.Put"
 	if err := valid.DirEntry(entry); err != nil {
 		return nil, errors.E(op, err)
@@ -231,8 +234,12 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	s.db.eventMgr.newEvent <- upspin.Event{
 		Entry: entry,
 	}
-	// Successful Put returns no entry.
-	return nil, nil
+	// Successful Put returns incomplete DirEntry holding only the sequence number.
+	retEntry := &upspin.DirEntry{
+		Attr:     upspin.AttrIncomplete,
+		Sequence: entry.Sequence,
+	}
+	return retEntry, nil
 }
 
 // canPut verifies that the name is permitted to be written.
@@ -774,7 +781,7 @@ Loop:
 var errSeq = errors.Str("sequence mismatch")
 
 // installEntry installs the new entry in the directory referenced by the dirEntry, appending or overwriting the
-// entry as required. It returns the entry updated directory and the blob itself.
+// entry as required. It returns the entry of the updated directory and the blob itself.
 func (s *server) installEntry(op string, dirName upspin.PathName, dirEntry *upspin.DirEntry, newEntry *upspin.DirEntry, deleting, dirOverwriteOK bool) (*upspin.DirEntry, []byte, error) {
 	dirData, err := s.readAll(dirEntry)
 	if err != nil {
@@ -816,13 +823,13 @@ func (s *server) installEntry(op string, dirName upspin.PathName, dirEntry *upsp
 		copy(dirData[start:], remaining)
 		dirData = dirData[:len(dirData)-length]
 		if !deleting {
-			// We want nextEntry's sequence (previous value+1) but everything else from newEntry.
+			// We want nextEntry's sequence but everything else from newEntry.
 			if newEntry.Sequence != upspin.SeqIgnore {
 				if newEntry.Sequence != nextEntry.Sequence {
 					return nil, nil, errors.E(op, newEntry.Name, errSeq)
 				}
 			}
-			newEntry.Sequence = upspin.SeqNext(nextEntry.Sequence)
+			newEntry.Sequence = nextEntry.Sequence
 		}
 		break
 	}
@@ -835,6 +842,8 @@ func (s *server) installEntry(op string, dirName upspin.PathName, dirEntry *upsp
 		// Add new entry to directory.
 		if newEntry.Sequence == upspin.SeqIgnore {
 			newEntry.Sequence = upspin.NewSequence()
+		} else {
+			newEntry.Sequence = upspin.SeqNext(newEntry.Sequence)
 		}
 		data, err := newEntry.Marshal()
 		if err != nil {
