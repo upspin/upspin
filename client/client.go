@@ -87,10 +87,13 @@ func (c *Client) PutLink(oldName, linkName upspin.PathName) (*upspin.DirEntry, e
 func putLookupFn(dir upspin.DirServer, entry *upspin.DirEntry, s *metric.Span) (*upspin.DirEntry, error) {
 	defer s.StartSpan("dir.Put").End()
 	e, err := dir.Put(entry)
-	// Put and friends must all return an entry. dir.Put doesn't, but we know
-	// what it was when the call to it succeeded.
+	// Put and friends must all return an entry. dir.Put only returns an incomplete one,
+	// with the updated sequence number.
 	if err != nil {
 		return e, err
+	}
+	if e != nil { // TODO: Can be nil only when talking to old servers.
+		entry.Sequence = e.Sequence
 	}
 	return entry, nil
 }
@@ -168,8 +171,13 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 	}
 
 	defer s.StartSpan("dir.Put").End()
-	if e, err := dir.Put(entry); err != nil {
+	e, err := dir.Put(entry)
+	if err != nil {
 		return e, err
+	}
+	// dir.Put returns an incomplete entry, with the updated sequence number.
+	if e != nil { // TODO: Can be nil only when talking to old servers.
+		entry.Sequence = e.Sequence
 	}
 	return entry, nil
 }

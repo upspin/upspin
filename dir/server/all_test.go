@@ -122,13 +122,22 @@ func TestPut(t *testing.T) {
 		Sequence:   upspin.SeqNotExist,
 		Packing:    upspin.PlainPack,
 	}
-	_, err := s.Put(de)
+	entry, err := s.Put(de)
 	if err != nil {
 		t.Fatal(err)
+	}
+	if entry == nil {
+		t.Fatal("nil entry")
+	}
+	if !entry.IsIncomplete() {
+		t.Fatal("non-incomplete entry")
 	}
 	de2, err := s.Lookup(de.Name)
 	if err != nil {
 		t.Fatal(err)
+	}
+	if de2.Sequence != entry.Sequence {
+		t.Errorf("Lookup returned sequence %d; expected %d", de2.Sequence, entry.Sequence)
 	}
 	deExpected := *de
 	deExpected.Sequence = upspin.SeqBase | (de.Sequence ^ upspin.SeqVersion(de.Sequence))
@@ -954,7 +963,12 @@ func makeDirectory(s *server, name upspin.PathName) (*upspin.DirEntry, error) {
 		Attr:       upspin.AttrDirectory,
 		// Mimic what the client does -- it does not include any other field.
 	}
-	return s.Put(entry)
+	e, err := s.Put(entry)
+	if err != nil {
+		return e, err
+	}
+	entry.Sequence = e.Sequence
+	return entry, nil
 }
 
 func putAccessOrGroupFile(t testing.TB, s *server, userCtx upspin.Config, name upspin.PathName, contents string) (*upspin.DirEntry, error) {
