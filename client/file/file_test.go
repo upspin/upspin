@@ -147,3 +147,6 @@ func (d *dummyClient) DirServer(name upspin.PathName) (upspin.DirServer, error) 
 func (d *dummyClient) Rename(oldName, newName upspin.PathName) error {
 	return nil
 }
+func (d *dummyClient) SetTime(name upspin.PathName, t upspin.Time) error {
+	return nil
+}
