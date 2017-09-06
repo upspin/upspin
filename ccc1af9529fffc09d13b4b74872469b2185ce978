@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "6f37cde7_4f9dcf61",
+        "filename": "dir/inprocess/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 488,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-09-06T01:20:48Z",
+      "side": 1,
+      "message": "At this point we haven\u0027t changed to the new model, where the dir server is in control of sequence numbers. This code is still in the old model, where the client says what to do and the dir server obeys.\n\nI could just delete these tests. They don\u0027t do much and they\u0027ll have to go one day anyway. Just let me know.",
+      "parentUuid": "59e33314_b11da552",
+      "range": {
+        "startLine": 488,
+        "startChar": 2,
+        "endLine": 488,
+        "endChar": 40
+      },
+      "revId": "ccc1af9529fffc09d13b4b74872469b2185ce978",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "200a5441_06beb07e",
         "filename": "dir/inprocess/all_test.go",
         "patchSetId": 1
