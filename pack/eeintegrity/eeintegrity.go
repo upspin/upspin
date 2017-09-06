@@ -242,10 +242,30 @@ func (ei ei) ReaderHashes(packdata []byte) (readers [][]byte, err error) {
 func (ei ei) Share(cfg upspin.Config, readers []upspin.PublicKey, packdata []*[]byte) {
 }
 
-// Name implements upspin.Packer.
+// Name implements upspin.Name.
 func (ei ei) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName) error {
-	const op = "pack/eeintegrity.Name"
-	if d.IsDir() {
+	const op = "pack/plain.Name"
+	return ei.updateDirEntry(op, cfg, d, newName, d.Time)
+}
+
+// SetTime implements upspin.SetTime.
+func (ei ei) SetTime(cfg upspin.Config, d *upspin.DirEntry, t upspin.Time) error {
+	const op = "pack/plain.SetTime"
+	return ei.updateDirEntry(op, cfg, d, d.Name, t)
+}
+
+func (ei ei) updateDirEntry(op string, cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName, newTime upspin.Time) error {
+	parsed, err := path.Parse(d.Name)
+	if err != nil {
+		return errors.E(op, err)
+	}
+	parsedNew, err := path.Parse(newName)
+	if err != nil {
+		return errors.E(op, err)
+	}
+	newName = parsedNew.Path()
+
+	if d.IsDir() && !parsed.Equal(parsedNew) {
 		return errors.E(op, d.Name, errors.IsDir, "cannot rename directory")
 	}
 	if err := pack.CheckPacking(ei, d); err != nil {
@@ -256,10 +276,6 @@ func (ei ei) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName
 	sig, sig2, cipherSum, err := pdUnmarshal(d.Packdata)
 	if err != nil {
 		return errors.E(op, errors.Invalid, d.Name, err)
-	}
-
-	if _, err := path.Parse(d.Name); err != nil {
-		return errors.E(op, err)
 	}
 
 	// The writer has a well-known public key.
@@ -281,14 +297,9 @@ func (ei ei) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName
 		return errors.E(op, d.Name, errVerify)
 	}
 
-	parsedNew, err := path.Parse(newName)
-	if err != nil {
-		return errors.E(op, err)
-	}
-	newName = parsedNew.Path()
-
 	// Compute new signature, using the new name.
 	d.SignedName = newName
+	d.Time = newTime
 	vhash = f.DirEntryHash(d.SignedName, d.Link, d.Attr, d.Packing, d.Time, dkey, cipherSum)
 	sig, err = f.FileSign(vhash)
 	if err != nil {

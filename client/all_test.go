@@ -660,6 +660,40 @@ func testRenames(t *testing.T, packing upspin.Packing) {
 	}
 }
 
+func TestSetTimes(t *testing.T) {
+	testSetTimes(t, upspin.PlainPack)
+	testSetTimes(t, upspin.EEPack)
+	testSetTimes(t, upspin.EEIntegrityPack)
+}
+
+func testSetTimes(t *testing.T, packing upspin.Packing) {
+	owner := upspin.UserName(fmt.Sprintf("owner@%d.testsettimes.com", packing))
+	cfg := config.SetPacking(baseCfg, packing)
+	client := New(setup(cfg, owner))
+	text := "the rain in spain"
+
+	// Create.
+	path := upspin.PathName(fmt.Sprintf("%s/file", owner))
+	oldDirEntry, err := client.Put(path, []byte(text))
+	if err != nil {
+		t.Fatal("put file:", err)
+	}
+
+	// Updates the time.
+	if err := client.SetTime(path, oldDirEntry.Time+100); err != nil {
+		t.Fatal("rename file:", err)
+	}
+
+	// Make sure it was really updated.
+	newDirEntry, err := client.Lookup(path, followFinalLink)
+	if err != nil {
+		t.Fatal("lookup file:", err)
+	}
+	if newDirEntry.Time != oldDirEntry.Time+100 {
+		t.Fatalf("time mismatch: got %d expected %d", newDirEntry.Time, oldDirEntry.Time+100)
+	}
+}
+
 func TestSimpleLinks(t *testing.T) {
 	const (
 		user     = "linker@google.com"
