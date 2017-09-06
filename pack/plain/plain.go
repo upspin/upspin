@@ -190,17 +190,34 @@ func (bp *blockUnpacker) Close() error {
 }
 
 // Name implements upspin.Name.
-func (p plainPack) Name(cfg upspin.Config, dirEntry *upspin.DirEntry, newName upspin.PathName) error {
+func (p plainPack) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName) error {
 	const op = "pack/plain.Name"
-	if dirEntry.IsDir() {
-		return errors.E(op, errors.IsDir, dirEntry.Name, "cannot rename directory")
-	}
-	parsed, err := path.Parse(newName)
+	return p.updateDirEntry(op, cfg, d, newName, d.Time)
+}
+
+// SetTime implements upspin.SetTime.
+func (p plainPack) SetTime(cfg upspin.Config, d *upspin.DirEntry, t upspin.Time) error {
+	const op = "pack/plain.SetTime"
+	return p.updateDirEntry(op, cfg, d, d.Name, t)
+}
+
+func (p plainPack) updateDirEntry(op string, cfg upspin.Config, dirEntry *upspin.DirEntry, newName upspin.PathName, newTime upspin.Time) error {
+	parsed, err := path.Parse(dirEntry.Name)
 	if err != nil {
 		return errors.E(op, err)
 	}
-	dirEntry.Name = parsed.Path()
+	parsedNew, err := path.Parse(newName)
+	if err != nil {
+		return errors.E(op, err)
+	}
+	newName = parsedNew.Path()
+
+	if dirEntry.IsDir() && !parsed.Equal(parsedNew) {
+		return errors.E(op, dirEntry.Name, errors.IsDir, "cannot rename directory")
+	}
+	dirEntry.Name = newName
 	dirEntry.SignedName = dirEntry.Name
+	dirEntry.Time = newTime
 
 	// Update entry signature.
 	f := cfg.Factotum()
