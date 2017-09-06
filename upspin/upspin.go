@@ -222,6 +222,10 @@ type Packer interface {
 	// in entry must contain a wrapped key for that user.
 	Name(config Config, entry *DirEntry, path PathName) error
 
+	// SetTime changes the Time field in a DirEntry and recomputes
+	// its signature.
+	SetTime(config Config, entry *DirEntry, time Time) error
+
 	// Countersign updates the signatures in the DirEntry when a writer
 	// is in the process of switching to a new key. It checks that
 	// the first existing signature verifies under the old key, copies
@@ -666,7 +670,9 @@ type Client interface {
 	// PutDuplicate creates a new name for the references referred to
 	// by the old name. Subsequent Puts to either name do not effect
 	// the contents referred to by the other. There must be no existing
-	// item with the new name.
+	// item with the new name. If the final element of the path name
+	// is a link, PutDuplicate will duplicate the link and not the
+	// link target.
 	PutDuplicate(oldName, newName PathName) (*DirEntry, error)
 
 	// MakeDirectory creates a directory with the given name, which
@@ -675,7 +681,14 @@ type Client interface {
 	MakeDirectory(dirName PathName) (*DirEntry, error)
 
 	// Rename renames oldName to newName. The old name is no longer valid.
+	// If the final element of the path name is a link, Rename will
+	// Rename the link itself, not the link target.
 	Rename(oldName, newName PathName) error
+
+	// SetTime sets the time in name's DirEntry. If the final element
+	// of the path name is a link, SetTime will affect the link itself,
+	// not the link target.
+	SetTime(name PathName, t Time) error
 
 	// Delete deletes the DirEntry associated with the name. The
 	// storage referenced by the DirEntry is not deleted,
