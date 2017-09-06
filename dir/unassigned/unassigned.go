@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package unassigned implements a store server that errors out all its requests.
+// Package unassigned implements a directory server that errors out all its requests.
 package unassigned // import "upspin.io/dir/unassigned"
 
 import (
