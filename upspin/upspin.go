@@ -222,6 +222,10 @@ type Packer interface {
 	// in entry must contain a wrapped key for that user.
 	Name(config Config, entry *DirEntry, path PathName) error
 
+	// SetTime changes the Time field in a DirEntry and recomputes
+	// its signature.
+	SetTime(config Config, entry *DirEntry, time Time) error
+
 	// Countersign updates the signatures in the DirEntry when a writer
 	// is in the process of switching to a new key. It checks that
 	// the first existing signature verifies under the old key, copies
@@ -672,6 +676,9 @@ type Client interface {
 
 	// Rename renames oldName to newName. The old name is no longer valid.
 	Rename(oldName, newName PathName) error
+
+	// SetTime sets the time in name's DirEntry. It does not follow links.
+	SetTime(name PathName, t Time) error
 
 	// Delete deletes the DirEntry associated with the name. The
 	// storage referenced by the DirEntry is not deleted,
