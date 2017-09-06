@@ -478,7 +478,27 @@ func (ee ee) Share(cfg upspin.Config, readers []upspin.PublicKey, packdataSlice 
 // Name implements upspin.Name.
 func (ee ee) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName) error {
 	const op = "pack/ee.Name"
-	if d.IsDir() {
+	return ee.updateDirEntry(op, cfg, d, newName, d.Time)
+}
+
+// SetTime implements upspin.SetTime.
+func (ee ee) SetTime(cfg upspin.Config, d *upspin.DirEntry, t upspin.Time) error {
+	const op = "pack/ee.SetTime"
+	return ee.updateDirEntry(op, cfg, d, d.Name, t)
+}
+
+func (ee ee) updateDirEntry(op string, cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName, newTime upspin.Time) error {
+	parsed, err := path.Parse(d.Name)
+	if err != nil {
+		return errors.E(op, err)
+	}
+	parsedNew, err := path.Parse(newName)
+	if err != nil {
+		return errors.E(op, err)
+	}
+	newName = parsedNew.Path()
+
+	if d.IsDir() && !parsed.Equal(parsedNew) {
 		return errors.E(op, d.Name, errors.IsDir, "cannot rename directory")
 	}
 	if err := pack.CheckPacking(ee, d); err != nil {
@@ -488,11 +508,6 @@ func (ee ee) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName
 	var pd packdata
 	if err := pd.Unmarshal(d.Packdata); err != nil {
 		return errors.E(op, errors.Invalid, d.Name, err)
-	}
-
-	parsed, err := path.Parse(d.Name)
-	if err != nil {
-		return errors.E(op, err)
 	}
 
 	// The writer has a well-known public key.
@@ -542,17 +557,13 @@ func (ee ee) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName
 	}
 
 	// If we are changing directories, remove all wrapped keys except my own.
-	parsedNew, err := path.Parse(newName)
-	if err != nil {
-		return errors.E(op, err)
-	}
-	newName = parsedNew.Path()
 	if !parsed.Drop(1).Equal(parsedNew.Drop(1)) {
 		pd.wrap = []wrappedKey{w}
 	}
 
-	// Compute new signature, using the new name.
+	// Compute new signature.
 	d.SignedName = newName
+	d.Time = newTime
 	vhash = f.DirEntryHash(d.SignedName, d.Link, d.Attr, d.Packing, d.Time, dkey, pd.blockSum)
 	pd.sig, err = f.FileSign(vhash)
 	if err != nil {
