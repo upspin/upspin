@@ -743,8 +743,35 @@ func (c *Client) Rename(oldName, newName upspin.PathName) error {
 	return err
 }
 
+// SetTime implements upspin.Client.
+func (c *Client) SetTime(name upspin.PathName, t upspin.Time) error {
+	const op = "client.SetTime"
+	m, s := newMetric(op)
+	defer m.Done()
+
+	entry, _, err := c.lookup(op, &upspin.DirEntry{Name: name}, lookupLookupFn, doNotFollowFinalLink, s)
+	if err != nil {
+		return errors.E(op, err)
+	}
+
+	packer := pack.Lookup(entry.Packing)
+	if packer == nil {
+		return errors.E(op, name, errors.Invalid, errors.Errorf("unrecognized Packing %d", c.config.Packing()))
+	}
+	if err := packer.SetTime(c.config, entry, t); err != nil {
+		return errors.E(op, err)
+	}
+
+	// Record directory entry.
+	_, _, err = c.lookup(op, entry, putLookupFn, doNotFollowFinalLink, s)
+	if err != nil {
+		return errors.E(op, err)
+	}
+	return nil
+}
+
 func (c *Client) dupOrRename(op string, oldName, newName upspin.PathName, rename bool, s *metric.Span) (*upspin.DirEntry, error) {
-	entry, _, err := c.lookup(op, &upspin.DirEntry{Name: oldName}, lookupLookupFn, followFinalLink, s)
+	entry, _, err := c.lookup(op, &upspin.DirEntry{Name: oldName}, lookupLookupFn, doNotFollowFinalLink, s)
 	if err != nil {
 		return nil, err
 	}
@@ -782,7 +809,7 @@ func (c *Client) dupOrRename(op string, oldName, newName upspin.PathName, rename
 		return nil, errors.E(op, err)
 	}
 	if !oldParsed.Drop(1).Equal(newParsed.Drop(1)) {
-		accessEntry, _, err := c.lookup(op, entry, whichAccessLookupFn, followFinalLink, s)
+		accessEntry, _, err := c.lookup(op, entry, whichAccessLookupFn, doNotFollowFinalLink, s)
 		if err != nil {
 			return nil, errors.E(op, trueOldName, err)
 		}
@@ -796,7 +823,7 @@ func (c *Client) dupOrRename(op string, oldName, newName upspin.PathName, rename
 	}
 
 	// Record directory entry.
-	entry, _, err = c.lookup(op, entry, putLookupFn, followFinalLink, s)
+	entry, _, err = c.lookup(op, entry, putLookupFn, doNotFollowFinalLink, s)
 	if err != nil {
 		return nil, err
 	}
