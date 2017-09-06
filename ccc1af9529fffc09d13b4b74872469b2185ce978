@@ -97,6 +97,30 @@
     },
     {
       "key": {
+        "uuid": "d691b615_c446699a",
+        "filename": "dir/inprocess/all_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 488,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-09-06T10:29:03Z",
+      "side": 1,
+      "message": "Should be good now. A couple of things were wrong in this old code.\n\n1) When putting a file for the first time, the Seq was not incremented.\n2) It\u0027s inprocess but not protecting the caller, so the incoming entry was being modified underfoot. This caused a few things to work by accident.\n\nLooks good now, and the +1s are there.",
+      "parentUuid": "c50f775b_370dccfc",
+      "range": {
+        "startLine": 488,
+        "startChar": 2,
+        "endLine": 488,
+        "endChar": 40
+      },
+      "revId": "ccc1af9529fffc09d13b4b74872469b2185ce978",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "200a5441_06beb07e",
         "filename": "dir/inprocess/all_test.go",
         "patchSetId": 1
