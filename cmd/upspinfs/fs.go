@@ -597,9 +597,15 @@ func (n *node) Setattr(context gContext.Context, req *fuse.SetattrRequest, resp 
 		}
 		n.attr.Size = req.Size
 	}
+	if req.Valid.Mtime() {
+		n.Lock()
+		defer n.Unlock()
+		if err := n.f.client.SetTime(n.uname, upspin.TimeFromGo(req.Mtime)); err != nil {
+			return e2e(errors.E(op, err))
+		}
+		n.attr.Mtime = req.Mtime
+	}
 	// Ignore mode changes.
-	// Ignore modify time.
-	// TODO(p): Should we set the modify time if it changed?
 	return nil
 }
 
