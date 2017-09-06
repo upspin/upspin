@@ -15,7 +15,6 @@ import (
 	"time"
 
 	"upspin.io/bind"
-	"upspin.io/flags"
 	"upspin.io/log"
 	"upspin.io/rpc"
 	"upspin.io/upspin"
@@ -49,14 +48,13 @@ func Start(cfg upspin.Config) {
 	// Start a cache server.
 	cacheErrorChan := make(chan bool)
 	go func() {
-		cmd := exec.Command(
-			"cacheserver",
-			"-cachedir="+flags.CacheDir,
-			"-log="+log.GetLevel(),
-			fmt.Sprintf("-writethrough=%v", *writethrough),
-			fmt.Sprintf("-cachesize=%d", *cacheSize),
-			"-config="+flags.Config,
-			"-addr="+flags.NetAddr)
+		args := []string{"-log=" + log.GetLevel()}
+		args = addFlag(args, "config")
+		args = addFlag(args, "addr")
+		args = addFlag(args, "cachedir")
+		args = addFlag(args, "cachesize")
+		args = addFlag(args, "writethrough")
+		cmd := exec.Command("cacheserver", args...)
 		detach(cmd)
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
@@ -81,6 +79,18 @@ func Start(cfg upspin.Config) {
 	}
 
 	fmt.Fprintf(os.Stderr, "Timed out waiting for cacheserver to start.\n")
+}
+
+// addFlag adds a flag to the command if it is at a non-default value.
+func addFlag(args []string, name string) []string {
+	f := flag.Lookup(name)
+	if f == nil {
+		return args
+	}
+	if f.Value.String() == f.DefValue {
+		return args
+	}
+	return append(args, fmt.Sprintf("-%s=%s", name, f.Value.String()))
 }
 
 // ping determines if the cacheserver is functioning.
