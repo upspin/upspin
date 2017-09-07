@@ -307,7 +307,7 @@ func TestMarshalBigDirEntry(t *testing.T) {
 		b, err := de.MarshalAppend(nil)
 		if err == nil {
 			if uint64(len(b)) > maxInt32 {
-				t.Fatal("should have failed at size %d", len(b))
+				t.Fatalf("should have failed at size %d", len(b))
 			}
 			continue
 		}

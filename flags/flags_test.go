@@ -27,7 +27,7 @@ func TestMaxBlockSize(t *testing.T) {
 			continue
 		}
 		if err != nil {
-			t.Errorf("expected no error for %d; got %v", err)
+			t.Errorf("expected no error for %d; got %v", size, err)
 			continue
 		}
 		if int64(BlockSize) != size {
