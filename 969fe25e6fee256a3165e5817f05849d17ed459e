@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "225a1fad_8055eda0",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-09-08T00:07:46Z",
+      "side": 1,
+      "message": "There are other fields in the DirEntry.  Perhaps UpdateDirEntry should replace Name() here instead of adding SetTime()?   Not sure.",
+      "revId": "969fe25e6fee256a3165e5817f05849d17ed459e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
