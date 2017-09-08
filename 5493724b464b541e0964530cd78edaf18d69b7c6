@@ -46,6 +46,108 @@
       "revId": "5493724b464b541e0964530cd78edaf18d69b7c6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4123323c_d6927c05",
+        "filename": "doc/faq.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-09-08T04:58:55Z",
+      "side": 1,
+      "message": "change to\n\nThe keyserver allows anonymous queries.  Otherwise, Upspin servers authenticate clients via the user\u0027s published keypair, specifically including with each RPC a signed token containing the username, servername, and time.  We may switch in a later release to OAuth.",
+      "revId": "5493724b464b541e0964530cd78edaf18d69b7c6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "aa00022a_45df5634",
+        "filename": "doc/faq.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-09-08T04:58:55Z",
+      "side": 1,
+      "message": "change  \"most important of\" to \"ultimate\" or \"strongest\"",
+      "revId": "5493724b464b541e0964530cd78edaf18d69b7c6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a39f97fd_a249a513",
+        "filename": "doc/faq.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-09-08T04:58:55Z",
+      "side": 1,
+      "message": "Yes, so someone with access only to the storage server (or discarded\ndisk drive) can not read the file content.\nThe file encryption key is copied into the directory entry, so access\nto the directory entry does suffice to decrypt the file.",
+      "revId": "5493724b464b541e0964530cd78edaf18d69b7c6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f011afd5_de539696",
+        "filename": "doc/faq.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-09-08T04:58:55Z",
+      "side": 1,
+      "message": "delete?",
+      "revId": "5493724b464b541e0964530cd78edaf18d69b7c6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "61d6ec5f_0ea962ed",
+        "filename": "doc/faq.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 265,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-09-08T04:58:55Z",
+      "side": 1,
+      "message": "Do we really have to start the \"passwords are evil\" discussion again?  :-)",
+      "revId": "5493724b464b541e0964530cd78edaf18d69b7c6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c9e0415c_a07b36a2",
+        "filename": "doc/faq.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 353,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-09-08T04:58:55Z",
+      "side": 1,
+      "message": "We covered this elsewhere recently.  And there is some additional detail in security.md.",
+      "revId": "5493724b464b541e0964530cd78edaf18d69b7c6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
