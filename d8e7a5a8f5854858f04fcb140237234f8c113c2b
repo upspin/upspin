@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "241655df_66dd78f7",
+        "filename": "store/storecache/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-09-08T20:18:09Z",
+      "side": 1,
+      "message": "Just asking to be sure I understand...\n\u0026cr.c.inUse  is the same as  \u0026c.inUse ?",
+      "revId": "d8e7a5a8f5854858f04fcb140237234f8c113c2b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
