@@ -16,6 +16,24 @@
       "revId": "d8e7a5a8f5854858f04fcb140237234f8c113c2b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f417ae8f_0fe0068b",
+        "filename": "store/storecache/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-09-08T20:29:03Z",
+      "side": 1,
+      "message": "yes. I could have said c.inUse. I\u0027ll change it under the adage \u0027why use 2 when 1 will do?\u0027",
+      "parentUuid": "241655df_66dd78f7",
+      "revId": "d8e7a5a8f5854858f04fcb140237234f8c113c2b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
