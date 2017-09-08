@@ -98,8 +98,8 @@ TODO
 When you create a file in another user's directory, the storage for that
 file is placed in your storage server, not that of the directory's owner.
 There are several reasons for this, but the most important is that it
-keeps accounting clean: you pay only for what you use; others pay
-for what they use.
+keeps accounting clean: you pay only for your storage; others pay
+for theirs.
 
 There are other valuable results of this approach.
 It allows someone to build a shared directory without bearing all the
