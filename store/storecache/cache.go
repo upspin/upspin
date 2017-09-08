@@ -114,6 +114,7 @@ func (c *storeCache) walk(dir string) error {
 		cr.size = i.Size()
 		cr.valid = true
 		cr.busy = false
+		atomic.AddInt64(&cr.c.inUse, cr.size)
 	}
 	return err
 }
