@@ -100,6 +100,24 @@
     },
     {
       "key": {
+        "uuid": "40f1f730_13779bbc",
+        "filename": "doc/faq.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-09-08T05:25:13Z",
+      "side": 1,
+      "message": "You\u0027re reading a very old file. Please check the doc at tip. This is an old CL.",
+      "parentUuid": "a39f97fd_a249a513",
+      "revId": "5493724b464b541e0964530cd78edaf18d69b7c6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f011afd5_de539696",
         "filename": "doc/faq.md",
         "patchSetId": 5
@@ -145,6 +163,24 @@
       "writtenOn": "2017-09-08T04:58:55Z",
       "side": 1,
       "message": "We covered this elsewhere recently.  And there is some additional detail in security.md.",
+      "revId": "5493724b464b541e0964530cd78edaf18d69b7c6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "37a29117_26f198bd",
+        "filename": "doc/faq.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 353,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-09-08T05:25:13Z",
+      "side": 1,
+      "message": "This is a really old CL. I\u0027m just responding to an unaddressed comment.",
+      "parentUuid": "c9e0415c_a07b36a2",
       "revId": "5493724b464b541e0964530cd78edaf18d69b7c6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
