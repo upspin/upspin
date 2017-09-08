@@ -22,6 +22,30 @@
       "revId": "5493724b464b541e0964530cd78edaf18d69b7c6",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "095f5b2c_e923b864",
+        "filename": "doc/faq.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-09-08T01:59:14Z",
+      "side": 1,
+      "message": "create is an odd word here, and it destroys the parallel structure. i\u0027ll reword.",
+      "parentUuid": "fdd1fe99_435b7c9b",
+      "range": {
+        "startLine": 101,
+        "startChar": 23,
+        "endLine": 102,
+        "endChar": 18
+      },
+      "revId": "5493724b464b541e0964530cd78edaf18d69b7c6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
