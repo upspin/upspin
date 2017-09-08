@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "93659e40_011f228b",
+        "filename": "client/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 752,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-09-08T05:18:17Z",
+      "side": 1,
+      "message": "Done.  Which raises the question, should Rename also not follow links?",
+      "parentUuid": "63646899_ff8f9eb9",
+      "revId": "969fe25e6fee256a3165e5817f05849d17ed459e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "225a1fad_8055eda0",
         "filename": "upspin/upspin.go",
         "patchSetId": 1
@@ -48,6 +66,24 @@
       "side": 1,
       "message": "It would be less API, in a wstat-like way, but the semantics of each field is different enough that you\u0027d have less API but more intricate documentation. (Which fields get set, how do you avoid changing a field, what are the details that apply, etc.) I\u0027m not sure it\u0027s a net gain. This seems better, at least until we need to do it to another field.\n\nPacker sure is unwieldy though.",
       "parentUuid": "225a1fad_8055eda0",
+      "revId": "969fe25e6fee256a3165e5817f05849d17ed459e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cf8f8ced_fcdc5e7e",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-09-08T05:18:17Z",
+      "side": 1,
+      "message": "Rob hit the nail.  I had originally done what Eric suggests passing a DirEntry* and looking for everything that might have changed. However it quickly got conceptually messy and hard to explain so I backed out to this.",
+      "parentUuid": "9fd6d3f8_349d71ed",
       "revId": "969fe25e6fee256a3165e5817f05849d17ed459e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
