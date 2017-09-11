@@ -564,6 +564,8 @@ func SortDirEntries(slice []*DirEntry, unique bool) []*DirEntry {
 //
 // The unique value is provided by a cryptographic random number generator if one is
 // available. Failing that, we use nanosecond time.
+//
+// TODO: Delete.
 func NewSequence() int64 {
 	x := make([]byte, 5)
 	_, err := rand.Read(x)

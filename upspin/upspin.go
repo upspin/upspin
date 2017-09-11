@@ -373,6 +373,7 @@ type DirServer interface {
 	// Time represents a timestamp for the item. It is advisory only
 	// but is included in the packing signature and so should usually
 	// be set to a non-zero value.
+	//
 	// Sequence represents a sequence number that is incremented
 	// after each Put. If it is neither 0 nor -1, the DirServer will
 	// reject the Put operation unless Sequence is the same as that
@@ -578,7 +579,15 @@ const (
 	AttrIncomplete = Attribute(1 << 2)
 )
 
-// Special Sequence numbers.
+// Sequence numbers.
+// Sequence numbers are controlled by the DirServer. For a given user root they
+// start at SeqBase and grow monotonically (typically but not necessarily by
+// one) with each Put or Delete operation in that user's tree. After an item is
+// Put to or Deleted from the DirServer, the Sequence of that item (or its
+// directory, for a Delete) and all of the directories on its path will be set
+// to the next Sequence number for the user tree. Thus, as a corollary, any
+// directory but in particular the user root always has the Sequence number of
+// the most recently modified item at that level or deeper in the tree.
 const (
 	SeqNotExist = -1 // Put will fail if item exists.
 	SeqIgnore   = 0  // Put will not check sequence number, but will update it.
