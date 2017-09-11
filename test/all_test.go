@@ -169,3 +169,52 @@ func testSequenceNumbers(t *testing.T, r *testenv.Runner) {
 		t.Fatal(r.Diag())
 	}
 }
+
+func testNewSequenceNumbers(t *testing.T, r *testenv.Runner) {
+	const (
+		root   = ownerName + "/"
+		base   = ownerName + "/newsequencenumbers"
+		dir    = base + "/dir"
+		subdir = dir + "/subdir"
+		file   = dir + "/file"
+	)
+	r.As(ownerName)
+	r.MakeDirectory(base)
+	r.DirLookup(base)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+	seq := r.Entry.Sequence
+	check := func(names ...upspin.PathName) {
+		t.Helper()
+		for _, name := range names {
+			r.DirLookup(name)
+			if !r.GotEntryWithSequenceVersion(name, seq) {
+				t.Fatal(r.Diag())
+			}
+		}
+	}
+
+	// All entries on path should be the same after each change.
+	check(root)
+
+	seq++
+	r.MakeDirectory(dir)
+	check(root, base, dir)
+
+	seq++
+	r.MakeDirectory(subdir)
+	check(root, base, dir, subdir)
+
+	seq++
+	r.Delete(subdir)
+	check(root, base, dir)
+
+	seq++
+	r.Put(file, "meh")
+	check(root, base, dir, file)
+
+	seq++
+	r.Put(file, "new")
+	check(root, base, dir, file)
+}
