@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8cd68e75_01afc700",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-09-12T21:44:24Z",
+      "side": 1,
+      "message": "Please break this line into more manageable pieces. Github and its tools whine if you don\u0027t. So do 24x80 adherents.",
+      "revId": "05eb8b417a89c28ce54a25785b250773a335da70",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
