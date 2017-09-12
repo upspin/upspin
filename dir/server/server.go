@@ -393,7 +393,13 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 			return nil, s.errPerm(op, p, o)
 		}
 
+		// The provided sequence number may be only SeqNotExist or SeqIgnore.
+		if entry.Sequence != upspin.SeqNotExist && entry.Sequence != upspin.SeqIgnore {
+			return nil, errors.E(op, p.Path(), errors.Invalid, errors.Str("invalid sequence number"))
+		}
+
 		// New file should have a valid sequence number, if user didn't pick one already.
+		// TODO: Why is this test still required? Will fix when Seqs are reworked.
 		if entry.Sequence == upspin.SeqNotExist || entry.Sequence == upspin.SeqIgnore && !entry.IsDir() {
 			entry.Sequence = upspin.NewSequence()
 		}
@@ -811,9 +817,7 @@ func (s *server) Close() {
 }
 
 func (s *server) closeTree(user upspin.UserName) error {
-	mu := s.userLock(s.userName)
-	mu.Lock()
-	defer mu.Unlock()
+	defer s.userLock(s.userName).Unlock()
 
 	if t, ok := s.userTrees.Remove(user).(*tree.Tree); ok {
 		// Close will flush and release all resources.
@@ -832,9 +836,7 @@ func (s *server) loadTreeFor(user upspin.UserName, opts ...options) (*tree.Tree,
 		return nil, errors.E(errors.Invalid, err)
 	}
 
-	mu := s.userLock(user)
-	mu.Lock()
-	defer mu.Unlock()
+	defer s.userLock(s.userName).Unlock()
 
 	// Do we have a cached tree for this user already?
 	if val, found := s.userTrees.Get(user); found {

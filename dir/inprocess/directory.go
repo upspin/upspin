@@ -870,6 +870,12 @@ func (s *server) installEntry(op string, dirName upspin.PathName, dirEntry *upsp
 			return nil, nil, errors.E(op, newEntry.Name, errors.NotExist)
 		}
 	} else {
+		if !found {
+			// The provided sequence number may be only SeqNotExist or SeqIgnore.
+			if newEntry.Sequence != upspin.SeqNotExist && newEntry.Sequence != upspin.SeqIgnore {
+				return nil, nil, errors.E(op, parsed.Path(), errors.Invalid, errors.Str("invalid sequence number"))
+			}
+		}
 		// Add new entry to directory.
 		newEntry.Sequence = seq
 		data, err := newEntry.Marshal()
