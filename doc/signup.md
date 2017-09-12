@@ -94,7 +94,7 @@ The first step in registration is to run an `upspin signup` command,
 which generates a key pair
 (one secret key, one public key), saves the keys locally, and
 sends the your details, including your public key to the key server.
-The public key is be published to the shared
+The public key is published to the shared
 Upspin key server, but the secret key
 is stored only on your local computer.
 
@@ -184,7 +184,8 @@ It is literally your key to Upspin.**
 The rest of the output is self-explanatory.
 Its main points are that it has written a config file for you, created your
 keys, and output the instructions to recover your keys if you lose them one day.
-Finally it prints the mail to send to tell the Upspin key server about you.
+Finally it prints a message stating what email address will be used for the 
+verification message.
 Please read it carefully.
 
 As it says, you need to wait for an email message from the key server to
