@@ -125,9 +125,6 @@ func testSequenceNumbers(t *testing.T, r *testenv.Runner) {
 	r.MakeDirectory(base)
 	r.DirLookup(base)
 	seq := int64(upspin.SeqBase)
-	if !r.GotEntryWithSequenceVersion(base, seq) {
-		t.Fatal(r.Diag())
-	}
 
 	seq++
 	r.MakeDirectory(dir)
