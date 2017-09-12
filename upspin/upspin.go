@@ -376,10 +376,10 @@ type DirServer interface {
 	//
 	// Sequence represents a sequence number that is incremented
 	// after each Put. If it is neither 0 nor -1, the DirServer will
-	// reject the Put operation unless Sequence is the same as that
-	// stored in the metadata for the existing item with the same
-	// path name. If it is -1, Put will fail if there is already an item
-	// with that name.
+	// reject the Put operation if the file does not exist or, for an
+	// existing item, if the Sequence is not the same as that
+	// stored in the metadata. If it is -1, Put will fail if there
+	// is already an item with that name.
 	//
 	// The Name field of the DirEntry identifies where in the directory
 	// tree the entry belongs. The SignedName field, which usually has the
@@ -588,6 +588,9 @@ const (
 // to the next Sequence number for the user tree. Thus, as a corollary, any
 // directory but in particular the user root always has the Sequence number of
 // the most recently modified item at that level or deeper in the tree.
+//
+// When a file or directory is being created, the sequence number in the
+// DirEntry provided to Put must be either SeqNotExist or SeqIgnore.
 const (
 	SeqNotExist = -1 // Put will fail if item exists.
 	SeqIgnore   = 0  // Put will not check sequence number, but will update it.

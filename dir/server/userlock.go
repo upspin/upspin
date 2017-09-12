@@ -12,14 +12,15 @@ import (
 
 const numUserLocks = 100
 
-// userLock returns a mutex associated with a given user.
+// userLock locks and returns the mutex associated with the user.
 func (s *server) userLock(user upspin.UserName) *sync.Mutex {
-	lockNum := hashCode(string(user))
-	return &s.userLocks[lockNum%numUserLocks]
+	mu := &s.userLocks[hashCode(string(user))%numUserLocks]
+	mu.Lock()
+	return mu
 }
 
 func hashCode(s string) uint64 {
-	h := uint64(0)
+	h := uint64(123479)
 	for _, c := range s {
 		h = 31*h + uint64(c)
 	}

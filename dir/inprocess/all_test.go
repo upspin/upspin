@@ -483,7 +483,6 @@ func TestSequencing(t *testing.T) {
 		// Create a file.
 		text := fmt.Sprintln("version", i)
 		entry := storeData(t, config, []byte(text), fileName)
-		entry.Sequence = seq
 		retEntry, err := directory.Put(entry)
 		if err != nil {
 			t.Fatalf("put file %d: %v", i, err)

@@ -166,7 +166,7 @@ func TestMakeDirectory(t *testing.T) {
 	deExpected := *de
 	deExpected.Writer = serverName
 	deExpected.Packing = upspin.EEPack
-	deExpected.Sequence = upspin.SeqBase
+	deExpected.Sequence = de2.Sequence
 	err = checkDirEntry("TestMakeDirectory", de2, &deExpected)
 	if err != nil {
 		t.Fatal(err)
