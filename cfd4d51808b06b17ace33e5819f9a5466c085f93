@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "80f53d4c_8c86d698",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-09-12T12:55:28Z",
+      "side": 1,
+      "message": "Please follow the formatting conventions and write proper English sentences.\n\ndoc: link to anchors  (whatever that means - not sure)\n\u003cblank line\u003e\n\nThis is the description.",
+      "revId": "cfd4d51808b06b17ace33e5819f9a5466c085f93",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
