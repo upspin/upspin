@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "97baff3d_858193e9",
+        "filename": "doc/signup.md",
+        "patchSetId": 4
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-09-13T05:37:24Z",
+      "side": 1,
+      "message": "trailing space",
+      "revId": "2c09dc09f4f5ae67cee0eebe9ffb324e65112a83",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
