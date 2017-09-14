@@ -20,6 +20,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"upspin.io/dir/server/serverlog"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/path"
@@ -57,7 +58,7 @@ type watcher struct {
 
 	// log is a reader instance of the Tree's log that keeps track of this
 	// watcher's progress.
-	log *Reader
+	log *serverlog.Reader
 
 	// closed indicates whether the watcher is closed (1) or open (0).
 	// It must be loaded and stored atomically.
@@ -202,8 +203,8 @@ func (w *watcher) sendCurrentAndWatch(clone, orig *Tree, p path.Parsed, offset i
 	// events channel.
 	if err == nil {
 		fn := func(n *node, level int) error {
-			logEntry := &LogEntry{
-				Op:    Put,
+			logEntry := &serverlog.Entry{
+				Op:    serverlog.Put,
 				Entry: n.entry,
 			}
 			err := w.sendEvent(logEntry, offset)
@@ -235,7 +236,7 @@ func (w *watcher) sendCurrentAndWatch(clone, orig *Tree, p path.Parsed, offset i
 // sendEvent sends a single logEntry read from the log at offset position
 // to the event channel. If the channel blocks for longer than watcherTimeout,
 // the operation fails and the watcher is invalidated (marked for deletion).
-func (w *watcher) sendEvent(logEntry *LogEntry, offset int64) error {
+func (w *watcher) sendEvent(logEntry *serverlog.Entry, offset int64) error {
 	var event *upspin.Event
 	// Strip block information for directories. We avoid an extra copy
 	// if it's not a directory.
@@ -244,13 +245,13 @@ func (w *watcher) sendEvent(logEntry *LogEntry, offset int64) error {
 		entry.MarkIncomplete()
 		event = &upspin.Event{
 			Order:  offset,
-			Delete: logEntry.Op == Delete,
+			Delete: logEntry.Op == serverlog.Delete,
 			Entry:  &entry, // already a copy.
 		}
 	} else {
 		event = &upspin.Event{
 			Order:  offset,
-			Delete: logEntry.Op == Delete,
+			Delete: logEntry.Op == serverlog.Delete,
 			Entry:  &logEntry.Entry, // already a copy.
 		}
 	}

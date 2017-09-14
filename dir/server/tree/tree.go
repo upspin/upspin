@@ -15,6 +15,7 @@ import (
 	"sync"
 
 	"upspin.io/client/clientutil"
+	"upspin.io/dir/server/serverlog"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/pack"
@@ -24,7 +25,7 @@ import (
 )
 
 // node is an internal representation of a node in the tree.
-// All node accesses must be protected the tree's mutex.
+// All node accesses must be protected by the tree's mutex.
 type node struct {
 	// entry is the DirEntry this node represents.
 	entry upspin.DirEntry
@@ -55,16 +56,16 @@ type Tree struct {
 	user     upspin.UserName
 	config   upspin.Config
 	packer   upspin.Packer
-	log      *Writer
-	logIndex *LogIndex
+	log      *serverlog.Writer
+	logIndex *serverlog.Index
 	root     *node
 	// dirtyNodes is the set of dirty nodes, grouped by path length.
 	// The index of the slice is the path length of the nodes therein.
-	// The value of the map is ignored.
-	dirtyNodes []map[*node]bool
+	// The value of the map is unused - the map is just a set.
+	dirtyNodes []map[*node]struct{}
 
 	// shutdown is closed when the tree is closed. Any goroutine that needs
-	// to exit can select on it. Specially useful for watchers.
+	// to exit can select on it. Especially useful for watchers.
 	shutdown chan struct{}
 
 	// watchers tracks the number of running watchers.
@@ -74,22 +75,22 @@ type Tree struct {
 }
 
 // String implements fmt.Stringer.
-// t.mu must be held.
+// The node's tree's mutex must be held.
 func (n *node) String() string {
 	return fmt.Sprintf("node: %q, dirty: %v, kids: %d", n.entry.Name, n.dirty, len(n.kids))
 }
 
 // New creates an empty Tree using the server's config, a Log and a
-// LogIndex for a particular user's tree. Config is used for contacting
+// log Index for a particular user's tree. Config is used for contacting
 // StoreServer, defining the default packing and setting the server name.
 // All fields of the config must be defined. Log manipulates the log on behalf
-// of the tree for a user. LogIndex is used by Tree to track the most recent
-// changes stored in the log for the user. The user name in Log and LogIndex
-// must be for the exact same user. If there are unprocessed log entries in
+// of the tree for a user. The Index is used by Tree to track the most recent
+// changes stored in the log for the user. The user name in the Log and Index
+// must be identical. If there are unprocessed log entries in
 // the Log, the Tree's state is recovered from it.
-// TODO: Maybe new is doing too much work. Figure out how to break in two without
+// TODO: Maybe New is doing too much work. Figure out how to break in two without
 // returning an inconsistent new tree if log is unprocessed.
-func New(config upspin.Config, log *Writer, logIndex *LogIndex) (*Tree, error) {
+func New(config upspin.Config, log *serverlog.Writer, logIndex *serverlog.Index) (*Tree, error) {
 	if config == nil {
 		return nil, errors.E(errors.Invalid, errors.Str("config is nil"))
 	}
@@ -118,7 +119,7 @@ func New(config upspin.Config, log *Writer, logIndex *LogIndex) (*Tree, error) {
 		return nil, errors.E(errors.Invalid, errors.Str("username in log and logIndex mismatch"))
 	}
 	if err := valid.UserName(log.User()); err != nil {
-		return nil, errors.E(errors.Invalid, err)
+		return nil, err
 	}
 	packer := pack.Lookup(config.Packing())
 	if packer == nil {
@@ -184,8 +185,8 @@ func (t *Tree) Put(p path.Parsed, de *upspin.DirEntry) (*upspin.DirEntry, error)
 		return nil, err
 	}
 	// Generate log entry.
-	logEntry := &LogEntry{
-		Op:    Put,
+	logEntry := &serverlog.Entry{
+		Op:    serverlog.Put,
 		Entry: *de,
 	}
 	err = t.log.Append(logEntry)
@@ -270,8 +271,8 @@ func (t *Tree) PutDir(dstDir path.Parsed, de *upspin.DirEntry) (*upspin.DirEntry
 	}
 	de = n.entry.Copy()
 	// Generate log entry.
-	logEntry := &LogEntry{
-		Op:    Put,
+	logEntry := &serverlog.Entry{
+		Op:    serverlog.Put,
 		Entry: *de,
 	}
 	err = t.log.Append(logEntry)
@@ -326,7 +327,7 @@ func (t *Tree) addKid(n *node, nodePath path.Parsed, parent *node, parentPath pa
 func (t *Tree) markDirty(p path.Parsed) error {
 	// Do we have room to track the max path depth in p?
 	if n := p.NElem() + 1; len(t.dirtyNodes) < n { // +1 for the root.
-		newDirtyNodes := make([]map[*node]bool, n)
+		newDirtyNodes := make([]map[*node]struct{}, n)
 		copy(newDirtyNodes, t.dirtyNodes)
 		t.dirtyNodes = newDirtyNodes
 	}
@@ -362,9 +363,9 @@ func (t *Tree) markDirty(p path.Parsed) error {
 func (t *Tree) setNodeDirtyAt(level int, n *node) {
 	n.dirty = true
 	if t.dirtyNodes[level] == nil {
-		t.dirtyNodes[level] = make(map[*node]bool)
+		t.dirtyNodes[level] = make(map[*node]struct{})
 	}
-	t.dirtyNodes[level][n] = true // repetitions don't matter.
+	t.dirtyNodes[level][n] = struct{}{} // repetitions don't matter.
 	n.entry.Sequence++
 }
 
@@ -572,8 +573,8 @@ func (t *Tree) Delete(p path.Parsed) (*upspin.DirEntry, error) {
 		return nil, err
 	}
 	// Generate log entry.
-	logEntry := &LogEntry{
-		Op:    Delete,
+	logEntry := &serverlog.Entry{
+		Op:    serverlog.Delete,
 		Entry: node.entry,
 	}
 	err = t.log.Append(logEntry)
@@ -761,7 +762,7 @@ func (t *Tree) Close() error {
 	return nil
 }
 
-// recoverFromLog inspects the LogIndex and the Log and replays the missing
+// recoverFromLog inspects the Index and the Log and replays the missing
 // operations. It can only be called from New.
 func (t *Tree) recoverFromLog() error {
 	lastOffset := t.log.LastOffset()
@@ -811,10 +812,10 @@ func (t *Tree) recoverFromLog() error {
 		}
 
 		switch logEntry.Op {
-		case Put:
+		case serverlog.Put:
 			log.Debug.Printf("recoverFromLog: Putting dirEntry: %q", de.Name)
 			_, _, err = t.put(p, &de)
-		case Delete:
+		case serverlog.Delete:
 			log.Debug.Printf("recoverFromLog: Deleting path: %q", p.Path())
 			_, _, err = t.delete(p)
 		default:

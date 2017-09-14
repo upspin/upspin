@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package tree
+package serverlog
 
 import (
 	"bufio"
@@ -22,7 +22,7 @@ import (
 
 var (
 	user  upspin.UserName = "foo@bar.com"
-	entry                 = LogEntry{
+	entry                 = Entry{
 		Op: Delete,
 		Entry: upspin.DirEntry{
 			Name:       "foo@bar.com/dir/file.txt",
@@ -42,7 +42,7 @@ func TestMarshalUnmarshal(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	var newEntry LogEntry
+	var newEntry Entry
 	r := newChecker(bufio.NewReader(bytes.NewReader(buf)))
 	err = newEntry.unmarshal(r)
 	if err != nil {
@@ -69,7 +69,7 @@ func TestConcurrent(t *testing.T) {
 	dir, cleanup := setup(t, "Concurrent")
 	defer cleanup()
 
-	logRW, _, err := NewLogs(user, dir)
+	logRW, _, err := New(user, dir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -169,7 +169,7 @@ func TestAppendRead(t *testing.T) {
 	dir, cleanup := setup(t, "AppendRead")
 	defer cleanup()
 
-	logger, _, err := NewLogs(user, dir)
+	logger, _, err := New(user, dir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -178,7 +178,7 @@ func TestAppendRead(t *testing.T) {
 	}
 
 	for i := 0; i < 10; i++ {
-		le := newLogEntry(upspin.PathName(fmt.Sprintf("foo@bar.com/hello%d", i)), i+1)
+		le := newEntry(upspin.PathName(fmt.Sprintf("foo@bar.com/hello%d", i)), i+1)
 		err := logger.Append(le)
 		if err != nil {
 			t.Fatal(err)
@@ -193,7 +193,7 @@ func TestAppendRead(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	var entries []LogEntry
+	var entries []Entry
 	offset := int64(0)
 	for i := 0; i < 11; i++ { // Tries to go past EOF.
 		entry, next, err := lrd.ReadAt(offset)
@@ -238,14 +238,14 @@ func TestOldStyleLogs(t *testing.T) {
 	f.Close()
 
 	// Makes a hard link to the existing old style.
-	l, _, err := NewLogs(user, dir)
+	l, _, err := New(user, dir)
 	if err != nil {
 		t.Fatal(err)
 	}
 	l.Close()
 
 	// Open it again. No errors.
-	l, _, err = NewLogs(user, dir)
+	l, _, err = New(user, dir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -276,7 +276,7 @@ func TestReadRotatedLog(t *testing.T) {
 	}
 
 	// Open Logs for user.
-	l, _, err := NewLogs(user, dir)
+	l, _, err := New(user, dir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -303,7 +303,7 @@ func TestReadRotatedLog(t *testing.T) {
 	f.Close()
 
 	// Open Logs again and get a reader reading from 345678.
-	l, _, err = NewLogs(user, dir)
+	l, _, err = New(user, dir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -329,18 +329,18 @@ func TestRotateLogAndTruncate(t *testing.T) {
 	}
 	defer os.RemoveAll(dir)
 
-	prevMaxLogSize := maxLogSize
-	maxLogSize = 100
+	prevMaxLogSize := MaxLogSize
+	MaxLogSize = 100
 	defer func() {
-		maxLogSize = prevMaxLogSize
+		MaxLogSize = prevMaxLogSize
 	}()
 
-	log, _, err := NewLogs(user, dir)
+	log, _, err := New(user, dir)
 	if err != nil {
 		t.Fatal(err)
 	}
 	for i := 0; i < 10; i++ {
-		entry := newLogEntry(upspin.PathName(user+"/testing-testing"), 1)
+		entry := newEntry(upspin.PathName(user+"/testing-testing"), 1)
 		err := log.Append(entry)
 		if err != nil {
 			t.Fatal(err)
@@ -384,14 +384,14 @@ func TestRotateLogAndTruncate(t *testing.T) {
 	}
 }
 
-func TestLogIndex(t *testing.T) {
+func TestIndex(t *testing.T) {
 	dir, err := ioutil.TempDir("", "TestAppendRead")
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer os.RemoveAll(dir)
 
-	_, logIndex, err := NewLogs("foo@bar.com", dir)
+	_, logIndex, err := New("foo@bar.com", dir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -475,7 +475,7 @@ func TestListUsers(t *testing.T) {
 		"jose+photos@ortega.com",
 		"morihei+snapshot@ueshiba.jp",
 	} {
-		_, _, err := NewLogs(u, dir)
+		_, _, err := New(u, dir)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -551,14 +551,14 @@ func TestChecksum(t *testing.T) {
 	}
 }
 
-func newLogEntry(path upspin.PathName, seq int) *LogEntry {
+func newEntry(path upspin.PathName, seq int) *Entry {
 	var op Operation
 	if seq%2 == 0 {
 		op = Delete
 	} else {
 		op = Put
 	}
-	return &LogEntry{
+	return &Entry{
 		Op: op,
 		Entry: upspin.DirEntry{
 			Name:       path,
