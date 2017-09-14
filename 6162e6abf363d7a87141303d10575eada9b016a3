@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1f210717_bff47474",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 583,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-09-14T22:47:09Z",
+      "side": 1,
+      "message": "why comma? Personally, I\u0027d start a new sentence.",
+      "range": {
+        "startLine": 583,
+        "startChar": 51,
+        "endLine": 583,
+        "endChar": 53
+      },
+      "revId": "6162e6abf363d7a87141303d10575eada9b016a3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
