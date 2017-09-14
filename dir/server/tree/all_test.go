@@ -13,6 +13,7 @@ import (
 
 	"upspin.io/bind"
 	"upspin.io/config"
+	"upspin.io/dir/server/serverlog"
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/path"
@@ -208,7 +209,7 @@ func TestPutNodes(t *testing.T) {
 	if got, want := entry.Entry.Name, upspin.PathName(userName+"/dir/img.jpg"); got != want {
 		t.Errorf("entries[0].Name = %s, want = %s", got, want)
 	}
-	if got, want := entry.Op, Delete; got != want {
+	if got, want := entry.Op, serverlog.Delete; got != want {
 		t.Errorf("entries[0].Op = %v, want = %v", got, want)
 	}
 }
@@ -1039,8 +1040,7 @@ func TestCorruptTreeAndRecover(t *testing.T) {
 	}
 
 	// Write some garbage to the log.
-	data := "Some garbage"
-	_, err = log.file.Write([]byte(data))
+	_, err = log.Write([]byte("Some garbage"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1111,7 +1111,7 @@ func TestMain(m *testing.M) {
 	}
 
 	// Make the logs rotate frequently.
-	maxLogSize = 100
+	serverlog.MaxLogSize = 100
 
 	code := m.Run()
 
@@ -1194,7 +1194,7 @@ func newDirEntry(name upspin.PathName, isDir bool, config upspin.Config) (path.P
 
 // newConfigForTesting creates the necessary items to instantiate a Tree for
 // testing.
-func newConfigForTesting(t *testing.T, userName upspin.UserName) (upspin.Config, *Writer, *LogIndex) {
+func newConfigForTesting(t *testing.T, userName upspin.UserName) (upspin.Config, *serverlog.Writer, *serverlog.Index) {
 	factotum, err := factotum.NewFromDir(testutil.Repo("key", "testdata", "test"))
 	if err != nil {
 		t.Fatal(err)
@@ -1242,7 +1242,7 @@ func newConfigForTesting(t *testing.T, userName upspin.UserName) (upspin.Config,
 	if err != nil {
 		t.Fatal(err)
 	}
-	log, logIndex, err := NewLogs(userName, tmpDir)
+	log, logIndex, err := serverlog.New(userName, tmpDir)
 	if err != nil {
 		t.Fatal(err)
 	}

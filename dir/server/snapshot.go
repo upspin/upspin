@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"upspin.io/dir/server/tree"
+	"upspin.io/dir/server/serverlog"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/path"
@@ -98,7 +98,7 @@ func (s *server) snapshotLoop() {
 // it's time to perform a new snapshot for them and if so snapshots them.
 func (s *server) snapshotAll() error {
 	const op = "dir/server.snapshotAll"
-	users, err := tree.ListUsersWithSuffix(snapshotSuffix, s.logDir)
+	users, err := serverlog.ListUsersWithSuffix(snapshotSuffix, s.logDir)
 	if err != nil {
 		log.Error.Printf("%s: error listing snapshot users: %s", op, err)
 		return err

@@ -2,14 +2,16 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package tree
+// Package serverlog maintains logs for directory servers, permitting
+// replay, recovering, and mirroring.
+package serverlog
 
 // This file defines and implements three components for record keeping for a
 // Tree:
 //
 // 1) Writer - writes log entries to the end of the log file.
 // 2) Reader - reads log entries from any offset of the log file.
-// 3) LogIndex - saves the most recent commit point in the log and the root.
+// 3) Index - saves the most recent commit point in the log and the root.
 //
 // The structure on disk is, relative to a log directory:
 //
@@ -49,22 +51,29 @@ const (
 	Delete
 )
 
-// Not const; changed by tests.
-var maxLogSize = int64(100 * 1024 * 1024) // 100 MB
+// MaxLogSize is the maximum size of a single log file.
+// It can be modified, such as for testing.
+var MaxLogSize int64 = 100 * 1024 * 1024 // 100 MB
 
-// LogEntry is the unit of logging.
-type LogEntry struct {
+// Entry is the unit of logging.
+type Entry struct {
 	Op    Operation
 	Entry upspin.DirEntry
 }
 
-// Writer is an append-only log of LogEntry.
+// Writer is an append-only log of Entry.
 type Writer struct {
 	user upspin.UserName // user for whom this log is intended.
 
 	mu         sync.Mutex // protects fields below.
 	file       *os.File   // file descriptor for the log.
 	fileOffset int64      // offset of the first record from the file.
+}
+
+// Write implements io.Writer for the our Writer type.
+// It is the method clients use to append data to the set of log files.
+func (w *Writer) Write(b []byte) (int, error) {
+	return w.file.Write(b)
 }
 
 // Reader reads LogEntries from the log.
@@ -88,10 +97,10 @@ type Reader struct {
 	offsets []int64
 }
 
-// LogIndex reads and writes from/to stable storage the log state information
+// Index reads and writes from/to stable storage the log state information
 // and the user's root entry. It is used by Tree to track its progress
 // processing the log and storing the root.
-type LogIndex struct {
+type Index struct {
 	user upspin.UserName // user for whom this logindex is intended.
 
 	mu        *sync.Mutex // protects the files, making reads/write atomic.
@@ -101,14 +110,14 @@ type LogIndex struct {
 
 const oldStyleLogFilePrefix = "tree.log."
 
-// NewLogs returns a new Writer log and a new LogIndex for a user, logging to
+// New returns a new Writer log and a new Index for a user, logging to
 // and from a given directory accessible to the local file system. If directory
 // already contains a log or a log index for the user they are opened and
 // returned. Otherwise they are created.
 //
 // Only one Writer per user can be opened in a directory or unpredictable
 // results may occur.
-func NewLogs(user upspin.UserName, directory string) (*Writer, *LogIndex, error) {
+func New(user upspin.UserName, directory string) (*Writer, *Index, error) {
 	subdir := logSubDir(user, directory) // user's sub directory.
 
 	// Make the log directory if it doesn't exist.
@@ -164,7 +173,7 @@ func NewLogs(user upspin.UserName, directory string) (*Writer, *LogIndex, error)
 	if err != nil {
 		return nil, nil, errors.E(errors.IO, err)
 	}
-	li := &LogIndex{
+	li := &Index{
 		user:      user,
 		mu:        &sync.Mutex{},
 		indexFile: indexFile,
@@ -304,8 +313,8 @@ func (w *Writer) User() upspin.UserName {
 	return w.user
 }
 
-// Append appends a LogEntry to the end of the log.
-func (w *Writer) Append(e *LogEntry) error {
+// Append appends a Entry to the end of the log.
+func (w *Writer) Append(e *Entry) error {
 	buf, err := e.marshal()
 	if err != nil {
 		return err
@@ -317,7 +326,7 @@ func (w *Writer) Append(e *LogEntry) error {
 	prevOffs := lastOffset(w.file)
 
 	// Is it time to move to a new log file?
-	if prevOffs >= maxLogSize {
+	if prevOffs >= MaxLogSize {
 		dir := filepath.Dir(w.file.Name())
 		// Close the current underlying log file.
 		err = w.close()
@@ -355,7 +364,7 @@ func (w *Writer) Append(e *LogEntry) error {
 
 // ReadAt reads an entry from the log at offset. It returns the log entry and
 // the next offset.
-func (r *Reader) ReadAt(offset int64) (le LogEntry, next int64, err error) {
+func (r *Reader) ReadAt(offset int64) (le Entry, next int64, err error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -568,12 +577,12 @@ func (r *Reader) Close() error {
 
 // User returns the user name who owns the root of the tree that this
 // log index represents.
-func (li *LogIndex) User() upspin.UserName {
+func (li *Index) User() upspin.UserName {
 	return li.user
 }
 
 // Root returns the user's root by retrieving it from local stable storage.
-func (li *LogIndex) Root() (*upspin.DirEntry, error) {
+func (li *Index) Root() (*upspin.DirEntry, error) {
 	li.mu.Lock()
 	defer li.mu.Unlock()
 
@@ -596,7 +605,7 @@ func (li *LogIndex) Root() (*upspin.DirEntry, error) {
 }
 
 // SaveRoot saves the user's root entry to stable storage.
-func (li *LogIndex) SaveRoot(root *upspin.DirEntry) error {
+func (li *Index) SaveRoot(root *upspin.DirEntry) error {
 	buf, err := root.Marshal()
 	if err != nil {
 		return err
@@ -608,7 +617,7 @@ func (li *LogIndex) SaveRoot(root *upspin.DirEntry) error {
 }
 
 // DeleteRoot deletes the root.
-func (li *LogIndex) DeleteRoot() error {
+func (li *Index) DeleteRoot() error {
 	li.mu.Lock()
 	defer li.mu.Unlock()
 
@@ -616,7 +625,7 @@ func (li *LogIndex) DeleteRoot() error {
 }
 
 // Clone makes a read-only copy of the log index.
-func (li *LogIndex) Clone() (*LogIndex, error) {
+func (li *Index) Clone() (*Index, error) {
 	li.mu.Lock()
 	defer li.mu.Unlock()
 
@@ -666,7 +675,7 @@ func readAllFromTop(f *os.File) ([]byte, error) {
 }
 
 // ReadOffset reads from stable storage the offset saved by SaveOffset.
-func (li *LogIndex) ReadOffset() (int64, error) {
+func (li *Index) ReadOffset() (int64, error) {
 	li.mu.Lock()
 	defer li.mu.Unlock()
 
@@ -685,7 +694,7 @@ func (li *LogIndex) ReadOffset() (int64, error) {
 }
 
 // SaveOffset saves to stable storage the offset to process next.
-func (li *LogIndex) SaveOffset(offset int64) error {
+func (li *Index) SaveOffset(offset int64) error {
 	if offset < 0 {
 		return errors.E(errors.Invalid, errors.Str("negative offset"))
 	}
@@ -698,8 +707,8 @@ func (li *LogIndex) SaveOffset(offset int64) error {
 	return overwriteAndSync(li.indexFile, tmp[:n])
 }
 
-// Close closes the LogIndex.
-func (li *LogIndex) Close() error {
+// Close closes the Index.
+func (li *Index) Close() error {
 	li.mu.Lock()
 	defer li.mu.Unlock()
 
@@ -718,8 +727,8 @@ func (li *LogIndex) Close() error {
 	return firstErr
 }
 
-// marshal packs the LogEntry into a new byte slice for storage.
-func (le *LogEntry) marshal() ([]byte, error) {
+// marshal packs the Entry into a new byte slice for storage.
+func (le *Entry) marshal() ([]byte, error) {
 	var b []byte
 	var tmp [16]byte // For use by PutVarint.
 	// This should have been b = append(b, byte(le.Op)) since Operation
@@ -833,9 +842,9 @@ func (c *checker) readChecksum() ([4]byte, error) {
 	return chk, nil
 }
 
-// unmarshal unpacks a marshaled LogEntry from a Reader and stores it in the
+// unmarshal unpacks a marshaled Entry from a Reader and stores it in the
 // receiver.
-func (le *LogEntry) unmarshal(r *checker) error {
+func (le *Entry) unmarshal(r *checker) error {
 	operation, err := binary.ReadVarint(r)
 	if err != nil {
 		return errors.E(errors.IO, errors.Errorf("reading op: %s", err))

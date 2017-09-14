@@ -17,7 +17,7 @@ import (
 	"upspin.io/access"
 	"upspin.io/bind"
 	"upspin.io/config"
-	"upspin.io/dir/server/tree"
+	"upspin.io/dir/server/serverlog"
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/pack"
@@ -86,7 +86,7 @@ func TestMakeRoot(t *testing.T) {
 	}
 
 	// Ensure log for user has been deleted.
-	hasLog, err := tree.HasLog(userName, s.logDir)
+	hasLog, err := serverlog.HasLog(userName, s.logDir)
 	if err != nil {
 		t.Fatal(err)
 	}

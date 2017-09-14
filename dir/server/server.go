@@ -14,6 +14,7 @@ import (
 
 	"upspin.io/access"
 	"upspin.io/cache"
+	"upspin.io/dir/server/serverlog"
 	"upspin.io/dir/server/tree"
 	"upspin.io/errors"
 	"upspin.io/log"
@@ -626,7 +627,7 @@ func (s *server) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
 		if err := s.closeTree(p.User()); err != nil {
 			return nil, errors.E(op, name, err)
 		}
-		if err := tree.DeleteLogs(p.User(), s.logDir); err != nil {
+		if err := serverlog.DeleteLogs(p.User(), s.logDir); err != nil {
 			return nil, errors.E(op, name, err)
 		}
 	}
@@ -845,7 +846,7 @@ func (s *server) loadTreeFor(user upspin.UserName, opts ...options) (*tree.Tree,
 			errors.Errorf("userTrees contained value of unexpected type %T", val))
 	}
 	// User is not in the cache. Load a tree from the logs, if they exist.
-	hasLog, err := tree.HasLog(user, s.logDir)
+	hasLog, err := serverlog.HasLog(user, s.logDir)
 	if err != nil {
 		return nil, err
 	}
@@ -854,7 +855,7 @@ func (s *server) loadTreeFor(user upspin.UserName, opts ...options) (*tree.Tree,
 		// allowed to create it.
 		return nil, errNotExist
 	}
-	log, logIndex, err := tree.NewLogs(user, s.logDir)
+	log, logIndex, err := serverlog.New(user, s.logDir)
 	if err != nil {
 		return nil, err
 	}
