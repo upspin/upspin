@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4ac4f805_d6009538",
+        "filename": "dir/server/userlock.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-09-14T22:54:02Z",
+      "side": 1,
+      "message": "Ha! Did this not lock in the past?",
+      "range": {
+        "startLine": 18,
+        "startChar": 4,
+        "endLine": 18,
+        "endChar": 8
+      },
+      "revId": "5b3923f55c634f443e5d886ac6c7bb61952bd939",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
