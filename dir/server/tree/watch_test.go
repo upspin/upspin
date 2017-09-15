@@ -146,7 +146,7 @@ func TestWatchFromMiddle(t *testing.T) {
 	// logOffsetsFor in ../serverlog/log.go.
 	// TODO: Kill this magic when the parameter is sequence number.
 	done := make(chan struct{})
-	ch, err := tree.Watch(mkpath(t, userName+"/orig/sub1"), 175, done)
+	ch, err := tree.Watch(mkpath(t, userName+"/orig/sub1"), 115, done)
 	if err != nil {
 		t.Fatal(err)
 	}

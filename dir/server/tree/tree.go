@@ -54,6 +54,7 @@ type Tree struct {
 	mu sync.Mutex
 
 	user     upspin.UserName
+	sequence int64 // Most recent sequence number for user.
 	config   upspin.Config
 	packer   upspin.Packer
 	log      *serverlog.Writer
@@ -177,6 +178,9 @@ func (t *Tree) Put(p path.Parsed, de *upspin.DirEntry) (*upspin.DirEntry, error)
 	if p.IsRoot() {
 		return de, t.createRoot(p, de)
 	}
+
+	t.sequence++
+	de.Sequence = t.sequence
 	node, watchers, err := t.put(p, de)
 	if err == upspin.ErrFollowLink {
 		return node.entry.Copy(), err
@@ -270,6 +274,8 @@ func (t *Tree) PutDir(dstDir path.Parsed, de *upspin.DirEntry) (*upspin.DirEntry
 		return nil, err
 	}
 	de = n.entry.Copy()
+	t.sequence++
+	de.Sequence = t.sequence
 	// Generate log entry.
 	logEntry := &serverlog.Entry{
 		Op:    serverlog.Put,
@@ -366,7 +372,7 @@ func (t *Tree) setNodeDirtyAt(level int, n *node) {
 		t.dirtyNodes[level] = make(map[*node]struct{})
 	}
 	t.dirtyNodes[level][n] = struct{}{} // repetitions don't matter.
-	n.entry.Sequence++
+	n.entry.Sequence = t.sequence
 }
 
 // loadPath ensures the tree contains all nodes up to p and returns p's node.
@@ -467,6 +473,7 @@ func (t *Tree) loadRoot() error {
 	t.root = &node{
 		entry: *rootDirEntry,
 	}
+	t.sequence = rootDirEntry.Sequence
 	return nil
 }
 
@@ -498,6 +505,8 @@ func (t *Tree) createRoot(p path.Parsed, de *upspin.DirEntry) error {
 		entry: *de,
 	}
 	t.root = node
+	t.sequence = upspin.SeqBase
+	de.Sequence = upspin.SeqBase
 	err = t.markDirty(p)
 	if err != nil {
 		return err
@@ -612,6 +621,9 @@ func (t *Tree) delete(p path.Parsed) (*node, []*watcher, error) {
 		// Node is a non-empty directory.
 		return nil, watchers, errors.E(errors.NotEmpty, p.Path())
 	}
+
+	t.sequence++ // We know it will succeed now.
+
 	// Remove this elem from the parent's kids map.
 	// No need to check if it was there -- it wouldn't have loaded if it weren't.
 	delete(parent.kids, elem)

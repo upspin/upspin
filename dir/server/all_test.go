@@ -133,6 +133,7 @@ func TestPut(t *testing.T) {
 		t.Fatal("non-incomplete entry")
 	}
 	de2, err := s.Lookup(de.Name)
+	t.Log(de.Name, de2.Sequence, entry.Sequence)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -140,7 +141,7 @@ func TestPut(t *testing.T) {
 		t.Errorf("Lookup returned sequence %d; expected %d", de2.Sequence, entry.Sequence)
 	}
 	deExpected := *de
-	deExpected.Sequence = upspin.SeqBase | (de.Sequence ^ upspin.SeqVersion(de.Sequence))
+	deExpected.Sequence = upspin.SeqBase + 1
 	err = checkDirEntry("TestPut", de2, &deExpected)
 	if err != nil {
 		t.Fatal(err)
@@ -961,6 +962,7 @@ func makeDirectory(s *server, name upspin.PathName) (*upspin.DirEntry, error) {
 		Name:       parsed.Path(),
 		SignedName: parsed.Path(),
 		Attr:       upspin.AttrDirectory,
+		Sequence:   upspin.SeqIgnore,
 		// Mimic what the client does -- it does not include any other field.
 	}
 	e, err := s.Put(entry)
