@@ -116,61 +116,8 @@ func testFileSequentialAccess(t *testing.T, env *testenv.Env) {
 
 func testSequenceNumbers(t *testing.T, r *testenv.Runner) {
 	const (
-		base   = ownerName + "/sequencenumbers"
-		dir    = base + "/dir"
-		subdir = dir + "/subdir"
-		file   = dir + "/file"
-	)
-	r.As(ownerName)
-	r.MakeDirectory(base)
-	r.DirLookup(base)
-	seq := int64(upspin.SeqBase)
-
-	seq++
-	r.MakeDirectory(dir)
-	r.DirLookup(base)
-	if !r.GotEntryWithSequenceVersion(base, seq) {
-		t.Fatal(r.Diag())
-	}
-
-	seq++
-	r.MakeDirectory(subdir)
-	r.DirLookup(base)
-	if !r.GotEntryWithSequenceVersion(base, seq) {
-		t.Fatal(r.Diag())
-	}
-
-	r.DirLookup(subdir)
-	if !r.GotEntryWithSequenceVersion(subdir, upspin.SeqBase) {
-		t.Fatal(r.Diag())
-	}
-
-	seq++
-	r.Delete(subdir)
-	r.DirLookup(base)
-	if !r.GotEntryWithSequenceVersion(base, seq) {
-		t.Fatal(r.Diag())
-	}
-
-	fileSeq := int64(upspin.SeqBase)
-	r.Put(file, "meh")
-	r.DirLookup(file)
-	if !r.GotEntryWithSequenceVersion(file, fileSeq) {
-		t.Fatal(r.Diag())
-	}
-
-	fileSeq++
-	r.Put(file, "new")
-	r.DirLookup(file)
-	if !r.GotEntryWithSequenceVersion(file, fileSeq) {
-		t.Fatal(r.Diag())
-	}
-}
-
-func testNewSequenceNumbers(t *testing.T, r *testenv.Runner) {
-	const (
 		root   = ownerName + "/"
-		base   = ownerName + "/newsequencenumbers"
+		base   = ownerName + "/sequencenumbers"
 		dir    = base + "/dir"
 		subdir = dir + "/subdir"
 		file   = dir + "/file"

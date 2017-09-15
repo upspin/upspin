@@ -393,15 +393,9 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 			return nil, s.errPerm(op, p, o)
 		}
 
-		// The provided sequence number may be only SeqNotExist or SeqIgnore.
+		// The provided sequence number for a new item may be only SeqNotExist or SeqIgnore.
 		if entry.Sequence != upspin.SeqNotExist && entry.Sequence != upspin.SeqIgnore {
 			return nil, errors.E(op, p.Path(), errors.Invalid, errors.Str("invalid sequence number"))
-		}
-
-		// New file should have a valid sequence number, if user didn't pick one already.
-		// TODO: Why is this test still required? Will fix when Seqs are reworked.
-		if entry.Sequence == upspin.SeqNotExist || entry.Sequence == upspin.SeqIgnore && !entry.IsDir() {
-			entry.Sequence = upspin.NewSequence()
 		}
 	} else if err != nil {
 		// Some unexpected error happened looking up path. Abort.
@@ -440,11 +434,6 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 				return nil, errors.E(op, entry.Name, errors.Invalid, errors.Str("sequence number"))
 			}
 		}
-		// Note: sequence number updates for directories is maintained
-		// by the Tree since directory entries are never Put by the
-		// user explicitly. Here we adjust the dir entries that the user
-		// sent us (those representing files only).
-		entry.Sequence = upspin.SeqNext(existingEntry.Sequence)
 
 		// If we're updating an Access file delete it from the cache and
 		// let it be re-loaded lazily when needed again.
