@@ -47,19 +47,34 @@ func TestPutNodes(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	seq := int64(upspin.SeqBase)
 	root, err := tree.Put(newDirEntry("/", isDir, config))
 	if err != nil {
 		t.Fatal(err)
 	}
+	seq++
 	dir2, err := tree.Put(newDirEntry("/dir", isDir, config))
 	if err != nil {
 		t.Fatal(err)
 	}
+	seq++
 	dir3, err := tree.Put(newDirEntry("/dir/doc.pdf", !isDir, config))
 	if err != nil {
 		t.Fatal(err)
 	}
 	totBytes := entrySize(t, dir2) + entrySize(t, dir3)
+	// Root Sequence should be updated.
+	p, err := path.Parse(userName + "/")
+	if err != nil {
+		t.Fatal(err)
+	}
+	de, _, err := tree.Lookup(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if de.Sequence != seq {
+		t.Fatalf("%s: got sequence %d; expected %d", p, de.Sequence, seq)
+	}
 
 	// Verify three log entries were written.
 	if got, want := log.LastOffset(), int64(totBytes); got < want {
@@ -105,8 +120,8 @@ func TestPutNodes(t *testing.T) {
 	if !dirty {
 		t.Errorf("dirty = %v, want %v", dirty, true)
 	}
-	if got, want := de.Sequence, int64(upspin.SeqBase+1); got != want {
-		t.Errorf("de.Sequence = %d, want = %d", got, want)
+	if de.Sequence != seq {
+		t.Errorf("de.Sequence = %d, want = %d", de.Sequence, seq)
 	}
 
 	// Flush to later build a new tree and verify new is equivalent to old.
@@ -122,8 +137,8 @@ func TestPutNodes(t *testing.T) {
 	if newRoot.Time <= root.Time {
 		t.Fatalf("Time moved backwards: got %d, want > %d", newRoot.Time, root.Time)
 	}
-	if got, want := newRoot.Sequence, int64(upspin.SeqBase+2); got != want {
-		t.Errorf("newRoot.Sequence = %d, want = %d", got, want)
+	if newRoot.Sequence != seq {
+		t.Errorf("newRoot.Sequence = %d, want = %d", newRoot.Sequence, seq)
 	}
 
 	// New log index shows we're now at the end of the log.
@@ -143,11 +158,11 @@ func TestPutNodes(t *testing.T) {
 	if dirty {
 		t.Errorf("dirty = %v, want %v", dirty, false)
 	}
-	if got, want := de.Name, dir3.Name; got != want {
-		t.Errorf("de.Name = %v, want %v", de.Name, want)
+	if de.Name != dir3.Name {
+		t.Errorf("de.Name = %v, want %v", de.Name, dir3.Name)
 	}
 
-	// Verify that the entry for the directory now has an incremented
+	// Verify that the entry for the directory still has the incremented
 	// sequence number.
 	de, dirty, err = tree.Lookup(mkpath(t, userName+"/dir/"))
 	if err != nil {
@@ -156,8 +171,8 @@ func TestPutNodes(t *testing.T) {
 	if dirty {
 		t.Errorf("dirty = %v, want %v", dirty, false)
 	}
-	if got, want := de.Sequence, int64(upspin.SeqBase+1); got != want {
-		t.Errorf("de.Sequence = %d, want = %d", got, want)
+	if de.Sequence != seq {
+		t.Errorf("de.Sequence = %d, want = %d", de.Sequence, seq)
 	}
 
 	// Now start a new tree from scratch and confirm it is loaded from the Store.
@@ -1183,6 +1198,7 @@ func newDirEntry(name upspin.PathName, isDir bool, config upspin.Config) (path.P
 	}
 	return p, &upspin.DirEntry{
 		Name:       p.Path(),
+		Sequence:   upspin.SeqIgnore,
 		SignedName: p.Path(),
 		Attr:       attr,
 		Packing:    config.Packing(),

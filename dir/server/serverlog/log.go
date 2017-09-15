@@ -244,7 +244,7 @@ func DeleteLogs(user upspin.UserName, directory string) error {
 	return nil
 }
 
-// userGlob   returns the set of users in the directory that match the pattern.
+// userGlob returns the set of users in the directory that match the pattern.
 // The pattern is as per filePath.Glob, applied to the directory.
 func userGlob(pattern string, directory string) ([]upspin.UserName, error) {
 	prefix := rootFile("", directory)

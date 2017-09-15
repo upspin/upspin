@@ -8,7 +8,6 @@ package test
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
 	"upspin.io/access"
@@ -338,7 +337,6 @@ var integrationTests = []struct {
 	{"GlobErrors", testGlobErrors},
 	{"GlobLinkErrors", testGlobLinkErrors},
 	{"SequenceNumbers", testSequenceNumbers},
-	{"NewSequenceNumbers", testNewSequenceNumbers},
 	{"RootDeletion", testRootDeletion},
 	{"ReadAccess", testReadAccess},
 	{"GroupAccess", testGroupAccess},
@@ -410,15 +408,6 @@ func testSelectedOnePacking(t *testing.T, setup testenv.Setup) {
 
 	// The ordering here is important as each test adds state to the tree.
 	for _, test := range integrationTests {
-		// TODO: Workaround for different behavior of sequence numbers
-		// between servers as we update the system.
-		if strings.Contains(test.name, "Sequence") {
-			// Run "New" ones only witn inprocess, non-New with others.
-			if strings.HasPrefix(test.name, "New") != (setup.Kind == "inprocess") {
-				t.Logf("Skipping test %q with transport %q", test.name, setup.Kind)
-				continue
-			}
-		}
 		t.Run(test.name, func(t *testing.T) { test.fn(t, r) })
 	}
 
