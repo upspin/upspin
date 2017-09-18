@@ -135,9 +135,9 @@ func (h *downloadHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 // when it sees them.
 func (h *downloadHandler) updateLoop() {
 	var (
-		done      chan struct{}
-		lastOrder int64 = upspin.WatchCurrent
-		events    <-chan upspin.Event
+		done         chan struct{}
+		lastSequence int64 = upspin.WatchCurrent
+		events       <-chan upspin.Event
 	)
 	parsedReleasePath, _ := path.Parse(releasePath)
 	for {
@@ -149,7 +149,7 @@ func (h *downloadHandler) updateLoop() {
 				continue
 			}
 			done = make(chan struct{})
-			events, err = dir.Watch(releasePath, lastOrder, done)
+			events, err = dir.Watch(releasePath, lastSequence, done)
 			if err != nil {
 				log.Error.Printf("download: error starting Watch: %v", err)
 				time.Sleep(watchRetryInterval)
@@ -171,14 +171,14 @@ func (h *downloadHandler) updateLoop() {
 		if event.Delete || p.NElem() != parsedReleasePath.NElem()+1 {
 			// Ignore deletes and files inside the releases;
 			// just watch for the release directories.
-			lastOrder = event.Order
+			lastSequence = event.Sequence
 			continue
 		}
 		if err := h.updateArchive(p); err != nil {
 			log.Error.Printf("download: error updating archive: %v", err)
 			continue
 		}
-		lastOrder = event.Order
+		lastSequence = event.Sequence
 	}
 }
 

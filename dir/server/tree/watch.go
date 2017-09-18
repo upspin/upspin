@@ -5,8 +5,8 @@
 package tree
 
 // TODOs:
-// - The watcher "tails" the log, starting from a given order number. It is
-//   done in a goroutine because the order can be very far from current state
+// - The watcher "tails" the log, starting from a given sequence number. It is
+//   done in a goroutine because the sequence can be very far from the current state
 //   and we don't want to block the caller until all such state is sent on the
 //   Event channel. However, once the watcher has caught up with the current
 //   state of the Tree, there's no longer a need for a goroutine or for reading
@@ -74,7 +74,7 @@ type watcher struct {
 }
 
 // Watch implements upspin.DirServer.Watch.
-func (t *Tree) Watch(p path.Parsed, order int64, done <-chan struct{}) (<-chan *upspin.Event, error) {
+func (t *Tree) Watch(p path.Parsed, sequence int64, done <-chan struct{}) (<-chan *upspin.Event, error) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
@@ -112,7 +112,7 @@ func (t *Tree) Watch(p path.Parsed, order int64, done <-chan struct{}) (<-chan *
 		doneFunc: t.watchers.Done,
 	}
 
-	if order == upspin.WatchCurrent {
+	if sequence == upspin.WatchCurrent {
 		// Send the current state first. We must flush the tree so we
 		// know our logs are current (or we need to recover the tree
 		// from the logs).
@@ -143,7 +143,7 @@ func (t *Tree) Watch(p path.Parsed, order int64, done <-chan struct{}) (<-chan *
 		t.watchers.Add(1)
 		go w.sendCurrentAndWatch(clone, t, p, offset)
 	} else {
-		if order == upspin.WatchNew {
+		if sequence == upspin.WatchNew {
 			// We must flush the tree so we know our logs are current (or we
 			// need to recover the tree from the logs).
 			err := t.flush()
@@ -151,8 +151,8 @@ func (t *Tree) Watch(p path.Parsed, order int64, done <-chan struct{}) (<-chan *
 				return nil, err
 			}
 
-			// Set order to the current offset
-			order = t.log.LastOffset()
+			// Set sequence to the current offset. TODO
+			sequence = t.log.LastOffset()
 		}
 
 		// Set up the notification hook.
@@ -163,7 +163,7 @@ func (t *Tree) Watch(p path.Parsed, order int64, done <-chan struct{}) (<-chan *
 
 		// Start the watcher.
 		t.watchers.Add(1)
-		go w.watch(order)
+		go w.watch(sequence)
 	}
 
 	return w.events, nil
@@ -236,6 +236,7 @@ func (w *watcher) sendCurrentAndWatch(clone, orig *Tree, p path.Parsed, offset i
 // sendEvent sends a single logEntry read from the log at offset position
 // to the event channel. If the channel blocks for longer than watcherTimeout,
 // the operation fails and the watcher is invalidated (marked for deletion).
+// TODO: offset should be sequence.
 func (w *watcher) sendEvent(logEntry *serverlog.Entry, offset int64) error {
 	var event *upspin.Event
 	// Strip block information for directories. We avoid an extra copy
@@ -244,15 +245,15 @@ func (w *watcher) sendEvent(logEntry *serverlog.Entry, offset int64) error {
 		entry := logEntry.Entry
 		entry.MarkIncomplete()
 		event = &upspin.Event{
-			Order:  offset,
-			Delete: logEntry.Op == serverlog.Delete,
-			Entry:  &entry, // already a copy.
+			Sequence: offset, // TODO
+			Delete:   logEntry.Op == serverlog.Delete,
+			Entry:    &entry, // already a copy.
 		}
 	} else {
 		event = &upspin.Event{
-			Order:  offset,
-			Delete: logEntry.Op == serverlog.Delete,
-			Entry:  &logEntry.Entry, // already a copy.
+			Sequence: offset, // TODO
+			Delete:   logEntry.Op == serverlog.Delete,
+			Entry:    &logEntry.Entry, // already a copy.
 		}
 	}
 	timer := time.NewTimer(watcherTimeout)
@@ -305,7 +306,7 @@ func (w *watcher) sendEventFromLog(offset int64) (int64, error) {
 
 		logEntry, next, err := w.log.ReadAt(curr)
 		if err != nil {
-			return next, errors.E(errors.Invalid, errors.Errorf("cannot read log at order %d: %v", curr, err))
+			return next, errors.E(errors.Invalid, errors.Errorf("cannot read log at sequence %d: %v", curr, err))
 		}
 		if next == curr {
 			return curr, nil

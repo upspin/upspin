@@ -335,8 +335,8 @@ var (
 // when evaluating a single path name.
 const MaxLinkHops = 20
 
-// Special order values for Watch that can be used in place of the order
-// argument in the Watch function.
+// Special Sequence values for Watch that can be used in place of the
+// Sequence argument in the Watch function.
 const (
 	// WatchStart returns all known events.
 	WatchStart = -iota
@@ -452,19 +452,18 @@ type DirServer interface {
 
 	// Watch returns a channel of Events that describe operations that
 	// affect the specified path and any of its descendants, beginning
-	// at the specified order (an opaque, monotonic value that denotes
-	// a position in the sequence of all events).
+	// at the specified sequence number for the corresponding user root.
 	//
-	// If order is 0, all events known to the DirServer are sent.
+	// If sequence is 0, all events known to the DirServer are sent.
 	//
-	// If order is WatchCurrent, the server first sends a sequence
+	// If sequence is WatchCurrent, the server first sends a sequence
 	// of events describing the entire tree rooted at name. The Events are
 	// sent in sequence such that a directory is sent before its contents.
 	// After the full tree has been sent, the operation proceeds as normal.
 	//
-	// If order is WatchNew, the server sends only new events.
+	// If sequence is WatchNew, the server sends only new events.
 	//
-	// If the order is otherwise invalid, this is reported by the
+	// If the sequence is otherwise invalid, this is reported by the
 	// server sending a single event with a non-nil Error field with
 	// Kind=errors.Invalid. The events channel is then closed.
 	//
@@ -488,7 +487,7 @@ type DirServer interface {
 	// The only errors returned by the Watch method itself are
 	// to report that the name is invalid or refers to a non-existent
 	// root, or that the operation is not supported.
-	Watch(name PathName, order int64, done <-chan struct{}) (<-chan Event, error)
+	Watch(name PathName, sequence int64, done <-chan struct{}) (<-chan Event, error)
 }
 
 // Event represents the creation, modification, or deletion of a DirEntry
@@ -497,9 +496,10 @@ type Event struct {
 	// Entry is the DirEntry to which the event pertains.
 	Entry *DirEntry
 
-	// Order is an opaque, monotonic value that denotes the position
-	// of this event in the sequence of all of events.
-	Order int64
+	// Sequence is the sequence number of the change for the user,
+	// denoting the position of this event in the sequence of all of
+	// the user's events.
+	Sequence int64
 
 	// Delete is true only if the entry is being deleted;
 	// otherwise it is being created or modified.
