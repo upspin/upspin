@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "244036d9_7d429836",
+        "filename": "dir/dircache/proxied.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-09-18T19:59:57Z",
+      "side": 1,
+      "message": "a",
+      "range": {
+        "startLine": 100,
+        "startChar": 25,
+        "endLine": 100,
+        "endChar": 27
+      },
+      "revId": "67ea16bd83291c1bf0f73f93f2c35e3cb1c060e9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
