@@ -24,7 +24,7 @@ type listener struct {
 	server   *server         // Holds the user info; needed for access control.
 	done     <-chan struct{} // From the Watch method; signals termination.
 	events   chan<- upspin.Event
-	order    int64 // The point in the event stream the listener has reached.
+	sequence int64 // The point in the event stream the listener has reached.
 }
 
 // want reports whether this listener is interested in the event, which means that the
@@ -55,7 +55,7 @@ func (l *listener) doneHandler() {
 }
 
 // sendAll sends, if possible, all the events. It returns false if it cannot
-// complete the list. l.order keeps track of our progress.
+// complete the list. l.sequence keeps track of our progress.
 func (l *listener) sendAll(events []upspin.Event) bool {
 	for _, event := range events {
 		parsed, err := path.Parse(event.Entry.Name)
@@ -68,7 +68,7 @@ func (l *listener) sendAll(events []upspin.Event) bool {
 			select {
 			case l.events <- cleanEvent:
 				// Delivered.
-				l.order++
+				l.sequence++
 			case <-time.After(watchTimeout):
 				// Failed to deliver; client is not keeping up.
 				return false
@@ -125,7 +125,7 @@ func (l *listener) sendEvent(event upspin.Event) bool {
 	select {
 	case l.events <- event:
 		// Delivered.
-		// Do not increment order: these events are not part of the standard stream.
+		// Do not increment sequence: these events are not part of the standard stream.
 		return true
 	case <-time.After(watchTimeout):
 		// Failed to deliver; client is not keeping up.
@@ -163,7 +163,7 @@ func newEventManager() *eventManager {
 // All interaction with the event manager is through the channels handled
 // in this goroutine, obviating explicit mutexes.
 func (e *eventManager) run() {
-	// Invariant: Each element of e.listeners has its order at the current point.
+	// Invariant: Each element of e.listeners has its sequence at the current point.
 	// When we receive an event, each element of that list is ready for it.
 	// We only add a new listener to the list once it has caught up to the rest.
 	for {
@@ -174,7 +174,7 @@ func (e *eventManager) run() {
 			e.delete(listener)
 		case listener := <-e.newListener:
 			// New listener has been created, but it may be behind.
-			if listener.order < int64(len(e.events)) && !listener.sendAll(e.events[listener.order:]) {
+			if listener.sequence < int64(len(e.events)) && !listener.sendAll(e.events[listener.sequence:]) {
 				// It couldn't catch up, so ignore it and don't install it.
 				close(listener.events)
 				continue
@@ -193,7 +193,7 @@ func (e *eventManager) run() {
 				if cleanEvent, ok := l.want(event, parsed); ok {
 					if l.sendEvent(cleanEvent) {
 						// Delivered.
-						l.order++
+						l.sequence++
 					} else {
 						// Failed to deliver; client is not keeping up.
 						e.deleteNth(i)
@@ -226,7 +226,7 @@ func (e *eventManager) delete(which *listener) {
 }
 
 // watch is the implementation of DirServer.Watch after basic checking is done.
-func (e *eventManager) watch(server *server, root path.Parsed, order int64, done <-chan struct{}) (<-chan upspin.Event, error) {
+func (e *eventManager) watch(server *server, root path.Parsed, sequence int64, done <-chan struct{}) (<-chan upspin.Event, error) {
 	const op = "dir/inprocess.Watch"
 	events := make(chan upspin.Event, 10)
 	l := &listener{
@@ -235,17 +235,17 @@ func (e *eventManager) watch(server *server, root path.Parsed, order int64, done
 		server:   server,
 		done:     done,
 		events:   events,
-		order:    0,
+		sequence: 0,
 	}
 	go l.doneHandler()
 
 	eventsSoFar := <-e.eventsSoFar
 
-	// An order other than the special cases 0 and 1 must exist.
-	// The special case of an invalid order is returned as an event with an "invalid" error.
-	if order != 0 && order != -1 {
-		if order < 0 || int64(len(eventsSoFar)) <= order {
-			events <- upspin.Event{Error: errors.E(op, errors.Invalid, errors.Str("bad order"))}
+	// A sequence other than the special cases 0 and -1 must exist.
+	// The special case of an invalid sequence is returned as an event with an "invalid" error.
+	if sequence != 0 && sequence != -1 {
+		if sequence < 0 || int64(len(eventsSoFar)) <= sequence {
+			events <- upspin.Event{Error: errors.E(op, errors.Invalid, errors.Str("bad sequence"))}
 			close(events)
 			return events, nil
 		}
@@ -253,7 +253,7 @@ func (e *eventManager) watch(server *server, root path.Parsed, order int64, done
 
 	// Must do this in the background and return so client can receive initialization events.
 	go func() {
-		switch order {
+		switch sequence {
 		case upspin.WatchStart:
 			// 0 is a special case in the API, but it's not a special case here.
 			fallthrough
@@ -271,7 +271,7 @@ func (e *eventManager) watch(server *server, root path.Parsed, order int64, done
 			fallthrough
 		case upspin.WatchNew:
 			// Start transmitting from where we were before sendTree.
-			l.order = int64(len(eventsSoFar))
+			l.sequence = int64(len(eventsSoFar))
 		}
 		e.newListener <- l
 	}()

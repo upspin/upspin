@@ -469,7 +469,7 @@ func (s *server) whichAccess(parsed path.Parsed) *access.Access {
 }
 
 // Watch implements upspin.DirServer.Watch.
-func (s *server) Watch(name upspin.PathName, order int64, done <-chan struct{}) (<-chan upspin.Event, error) {
+func (s *server) Watch(name upspin.PathName, seq int64, done <-chan struct{}) (<-chan upspin.Event, error) {
 	const op = "dir/inprocess.Watch"
 	parsed, err := path.Parse(name)
 	if err != nil {
@@ -481,7 +481,7 @@ func (s *server) Watch(name upspin.PathName, order int64, done <-chan struct{}) 
 	if s.db.root[parsed.User()] == nil {
 		return nil, errors.E(op, name, errors.NotExist)
 	}
-	return s.db.eventMgr.watch(s, parsed, order, done)
+	return s.db.eventMgr.watch(s, parsed, seq, done)
 }
 
 // readAll retrieves the data for the entry.

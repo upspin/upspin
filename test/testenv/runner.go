@@ -192,7 +192,7 @@ func (r *Runner) DirLookup(p upspin.PathName) {
 // DirWatch performs a Watch request to the user's underlying DirServer and
 // populates the Runner's Events channel with the DirServer's returned Event
 // channel. It returns the done channel for this watcher, if successful.
-func (r *Runner) DirWatch(p upspin.PathName, order int64) chan struct{} {
+func (r *Runner) DirWatch(p upspin.PathName, seq int64) chan struct{} {
 	if r.err != nil {
 		return nil
 	}
@@ -202,7 +202,7 @@ func (r *Runner) DirWatch(p upspin.PathName, order int64) chan struct{} {
 		return nil
 	}
 	done := make(chan struct{})
-	r.events[r.user], err = dir.Watch(p, order, done)
+	r.events[r.user], err = dir.Watch(p, seq, done)
 	r.setErr(err)
 	return done
 }

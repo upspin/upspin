@@ -657,7 +657,7 @@ func (s *server) WhichAccess(name upspin.PathName) (*upspin.DirEntry, error) {
 }
 
 // Watch implements upspin.DirServer.Watch.
-func (s *server) Watch(name upspin.PathName, order int64, done <-chan struct{}) (<-chan upspin.Event, error) {
+func (s *server) Watch(name upspin.PathName, sequence int64, done <-chan struct{}) (<-chan upspin.Event, error) {
 	const op = "dir/server.Watch"
 	o, m := newOptMetric(op)
 	defer m.Done()
@@ -674,7 +674,7 @@ func (s *server) Watch(name upspin.PathName, order int64, done <-chan struct{}) 
 
 	// Establish a channel with the tree and start a goroutine that filters
 	// out requests not visible by the caller.
-	treeEvents, err := tree.Watch(p, order, done)
+	treeEvents, err := tree.Watch(p, sequence, done)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
