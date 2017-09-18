@@ -176,7 +176,7 @@ func (s *server) WhichAccess(name upspin.PathName) (*upspin.DirEntry, error) {
 }
 
 // Watch implements upspin.DirServer.
-func (s *server) Watch(name upspin.PathName, order int64, done <-chan struct{}) (<-chan upspin.Event, error) {
+func (s *server) Watch(name upspin.PathName, sequence int64, done <-chan struct{}) (<-chan upspin.Event, error) {
 	op := logf("Watch %q", name)
 
 	name = path.Clean(name)
@@ -185,7 +185,7 @@ func (s *server) Watch(name upspin.PathName, order int64, done <-chan struct{}) 
 		op.log(err)
 		return nil, err
 	}
-	return dir.Watch(name, order, done)
+	return dir.Watch(name, sequence, done)
 }
 
 func (s *server) Endpoint() upspin.Endpoint { return s.authority }

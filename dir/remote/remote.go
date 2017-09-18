@@ -109,11 +109,11 @@ func (r *remote) invoke(op *operation, method string, req pb.Message) (*upspin.D
 }
 
 // Watch implements upspin.DirServer.
-func (r *remote) Watch(name upspin.PathName, order int64, done <-chan struct{}) (<-chan upspin.Event, error) {
-	op := r.opf("Watch", "%q order %d", name, order)
+func (r *remote) Watch(name upspin.PathName, sequence int64, done <-chan struct{}) (<-chan upspin.Event, error) {
+	op := r.opf("Watch", "%q sequence %d", name, sequence)
 	req := &proto.DirWatchRequest{
-		Name:  string(name),
-		Order: order,
+		Name:     string(name),
+		Sequence: sequence,
 	}
 
 	stream := make(eventStream)

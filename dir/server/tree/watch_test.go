@@ -139,9 +139,12 @@ func TestWatchFromMiddle(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Watch for events that happened from a specific log order and on,
+	// Watch for events that happened from a specific sequence onwards,
 	// for a subdirectory. The magic number below (175) is the log offset
 	// right after "mkdir /orig/sub2/".
+	// TODO: To compute the right magic number, print return value from
+	// logOffsetsFor in ../serverlog/log.go.
+	// TODO: Kill this magic when the parameter is sequence number.
 	done := make(chan struct{})
 	ch, err := tree.Watch(mkpath(t, userName+"/orig/sub1"), 175, done)
 	if err != nil {

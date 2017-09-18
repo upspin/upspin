@@ -134,7 +134,7 @@ func testWatchErrors(t *testing.T, r *testenv.Runner) {
 		t.Fatalf("expected Watch error for bad file name %q", badFile)
 	}
 
-	// 777 is an implausible order number, at least in this test.
+	// 777 is an implausible sequence number, at least in this test.
 	// TODO: Find a better way to test this.
 	r.DirWatch(base, 777)
 	if r.Failed() {

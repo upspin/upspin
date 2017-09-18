@@ -73,7 +73,7 @@ const (
 	// obsoleteReq marks an LRU entry as no longer necessarily
 	// matching what is in the directory server. Whenever the
 	// watcher gets an error saying that the log cannot be
-	// watched at its current order, we mark all entries obsolete.
+	// watched at its current sequence, we mark all entries obsolete.
 	//
 	// obsoleteReq entries are never written to log files.
 	obsoleteReq
@@ -110,8 +110,8 @@ type clogEntry struct {
 	// For directories, the Access file that pertains.
 	access upspin.PathName
 
-	// The watch order.
-	order int64
+	// The watch sequence number.
+	sequence int64
 }
 
 // clog represents the replayable log of DirEntry changes.
@@ -601,10 +601,10 @@ func (l *clog) whichAccess(name upspin.PathName) (*upspin.DirEntry, bool) {
 }
 
 func (l *clog) logRequest(op request, name upspin.PathName, err error, de *upspin.DirEntry) {
-	l.logRequestWithOrder(op, name, err, de, 0)
+	l.logRequestWithSequence(op, name, err, de, 0)
 }
 
-func (l *clog) logRequestWithOrder(op request, name upspin.PathName, err error, de *upspin.DirEntry, order int64) {
+func (l *clog) logRequestWithSequence(op request, name upspin.PathName, err error, de *upspin.DirEntry, sequence int64) {
 	if !cacheableError(err) {
 		return
 	}
@@ -613,11 +613,11 @@ func (l *clog) logRequestWithOrder(op request, name upspin.PathName, err error, 
 	defer l.globalLock.RUnlock()
 
 	e := &clogEntry{
-		name:    name,
-		request: op,
-		error:   err,
-		de:      de,
-		order:   order,
+		name:     name,
+		request:  op,
+		error:    err,
+		de:       de,
+		sequence: sequence,
 	}
 	l.appendToLogFile(e)
 	l.updateLRU(e)
@@ -1019,7 +1019,7 @@ var badVersion = errors.E(errors.Invalid, errors.Errorf("bad log file version"))
 
 // A marshalled entry is of the form:
 //   request-type: byte
-//   order: varint
+//   sequence: varint
 //   error: len + marshalled upspin.Error
 //   direntry: len + marshalled upspin.DirEntry
 //   if direntry == nil {
@@ -1044,9 +1044,9 @@ func (e *clogEntry) marshal() ([]byte, error) {
 	}
 	b := []byte{byte(e.request)}
 
-	// order
+	// sequence
 	var tmp [16]byte
-	n := binary.PutVarint(tmp[:], e.order)
+	n := binary.PutVarint(tmp[:], e.sequence)
 	b = append(b, tmp[:n]...)
 
 	// error
@@ -1084,9 +1084,9 @@ func (e *clogEntry) unmarshal(b []byte) (err error) {
 	}
 	b = b[1:]
 
-	// order
+	// sequence
 	var n int
-	e.order, n = binary.Varint(b)
+	e.sequence, n = binary.Varint(b)
 	if n == 0 {
 		return tooShort
 	}
@@ -1149,10 +1149,10 @@ func (e *clogEntry) read(l *clog, rd *bufio.Reader) error {
 		return err
 	}
 
-	// If order is set, update the order in the proxied directories.
-	if e.order != 0 {
-		l.proxied.setOrder(e.name, e.order)
-		e.order = 0
+	// If sequence is set, update the sequence in the proxied directories.
+	if e.sequence != 0 {
+		l.proxied.setSequence(e.name, e.sequence)
+		e.sequence = 0
 	}
 	return nil
 }
@@ -1276,11 +1276,11 @@ func (e *clogEntry) String() string {
 		rv = reqName[e.request]
 	}
 	rv += fmt.Sprintf(" %s ", e.name)
-	if e.order != 0 {
-		rv += fmt.Sprintf(" order<%d>", e.order)
+	if e.sequence != 0 {
+		rv += fmt.Sprintf(" sequence<%d>", e.sequence)
 	}
 	if e.error != nil {
-		rv += fmt.Sprintf(" error<%s>", e.error)
+		rv += fmt.Sprintf(" sequence<%s>", e.sequence)
 	}
 	if e.de != nil {
 		dtype := "file"
