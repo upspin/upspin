@@ -97,6 +97,41 @@ func (ee ee) Pack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockPacker, er
 	// TODO(adg): support append; for now assume a new file.
 	d.Blocks = nil
 
+	if d.Packdata != nil && len(d.Packdata) != 0 {
+		var pd packdata
+		if err := pd.Unmarshal(d.Packdata); err != nil {
+			return nil, errors.E(op, d.Name, err)
+		}
+		f := cfg.Factotum()
+		rhash := factotum.KeyHash(f.PublicKey())
+		var err error
+		for _, w := range pd.wrap {
+			var dkey []byte
+			all := bytes.Equal(factotum.AllUsersKeyHash, w.keyHash)
+			if !all && !bytes.Equal(rhash, w.keyHash) {
+				continue
+			}
+			if all {
+				dkey = w.dkey
+			} else {
+				// Decode my wrapped key using my private key.
+				dkey, err = aesUnwrap(f, w)
+				if err != nil {
+					return nil, errors.E(op, d.Name, cfg.UserName(), err)
+				}
+			}
+			cipherBlock, err := aes.NewCipher(dkey)
+			if err != nil {
+				return nil, errors.E(op, d.Name, err)
+			}
+			return &blockPacker{
+				cfg:    cfg,
+				entry:  d,
+				cipher: cipherBlock,
+				dkey:   dkey,
+			}, nil
+		}
+	}
 	dkey, blockCipher, err := newKeyAndCipher()
 	if err != nil {
 		return nil, errors.E(op, d.Name, err)

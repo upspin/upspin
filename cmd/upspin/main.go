@@ -96,6 +96,7 @@ var commands = map[string]func(*State, ...string){
 	"snapshot":      (*State).snapshot,
 	"tar":           (*State).tar,
 	"user":          (*State).user,
+	"validate":      (*State).validate,
 	"watch":         (*State).watch,
 	"whichaccess":   (*State).whichAccess,
 }
