@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c396d87a_0b4f3e90",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 625,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-09-19T17:19:37Z",
+      "side": 1,
+      "message": "This is the sequence number of the Delete operation. However, the logged entry does not contain it. Instead it contains the DirEntry that was deleted. Should it not contain this sequence?",
+      "range": {
+        "startLine": 625,
+        "startChar": 0,
+        "endLine": 625,
+        "endChar": 45
+      },
+      "revId": "e49d2405a4429cdad5bb65e2f7a2903d26d540a1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
