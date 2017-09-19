@@ -46,7 +46,7 @@ var _ upspin.StoreServer = (*remote)(nil)
 func (r *remote) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Location, error) {
 	op := r.opf("Get", "%q", ref)
 
-	if ref != upspin.HTTPBaseMetadata {
+	if ref != upspin.HTTPBaseMetadata && !r.HaveCache() {
 		if err := r.probeDirect(); err != nil {
 			op.error(err)
 		}
@@ -170,14 +170,14 @@ func (r *remote) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service, 
 		return nil, op.error(errors.IO, err)
 	}
 
-	r2 := &remote{
+	r = &remote{
 		Client: authClient,
 		cfg: dialConfig{
 			endpoint: e,
 			userName: config.UserName(),
 		},
 	}
-	return r2, nil
+	return r, nil
 }
 
 // probeDirect performs a Get request to the remote server for the reference

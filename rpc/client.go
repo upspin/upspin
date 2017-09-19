@@ -44,6 +44,9 @@ type Client interface {
 	// ("Server/Method") with request body req. Upon success, resp, if nil,
 	// contains the server's reply, if any.
 	InvokeUnauthenticated(method string, req, resp pb.Message) error
+
+	// HaveCache returns true if the client has a local cache.
+	HaveCache() bool
 }
 
 // ResponseChan describes a mechanism to report streamed messages to a client
@@ -457,4 +460,13 @@ func (ca *clientAuth) verifyServerUser(msg []string) error {
 
 	// Validate signature.
 	return verifyUser(key.PublicKey, msg, serverAuthMagic, "[localproxy]", time.Now())
+}
+
+// HaveCache implements Client.
+func (c *httpClient) HaveCache() bool {
+	ce, err := CacheEndpoint(c.clientAuth.config)
+	if err != nil {
+		return false
+	}
+	return ce != nil
 }
