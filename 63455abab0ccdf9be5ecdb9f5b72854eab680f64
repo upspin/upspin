@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9dd26f8b_e26d42c3",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-09-19T05:53:11Z",
+      "side": 1,
+      "message": "this is just zero, and either loadRoot or makeRoot will set it, so should it just be left uninitialized?",
+      "revId": "63455abab0ccdf9be5ecdb9f5b72854eab680f64",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a98c71d8_5f3dd58a",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 578,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-09-19T05:53:11Z",
+      "side": 1,
+      "message": "what if t.delete returns errfollowlink? in that case nothing has been mutated so the sequence should stay the same, right? (I worry that someone could call Delete through a link and artificially inflate sequence numbers)\n\nmaybe this should happen in the delete (lowercase) method, after the loadPath has succeeded.",
+      "revId": "63455abab0ccdf9be5ecdb9f5b72854eab680f64",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
