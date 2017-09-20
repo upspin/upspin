@@ -57,6 +57,12 @@ func (s *server) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Lo
 
 	op := logf("Get %q", ref)
 
+	// Do not pass on the HTTP base from the underlying storage
+	// or subsequent Gets will bypass the cache.
+	if ref == upspin.HTTPBaseMetadata {
+		return nil, nil, nil, op.error(errors.E(errors.NotExist))
+	}
+
 	data, locs, err := s.cache.get(s.cfg, ref, s.authority)
 	if err != nil {
 		return nil, nil, nil, op.error(err)
@@ -73,7 +79,6 @@ func (s *server) Put(data []byte) (*upspin.Refdata, error) {
 	if s.authority.Transport == upspin.Unassigned {
 		return nil, errNotDialed
 	}
-
 	op := logf("Put %.30x...", data)
 
 	ref, err := s.cache.put(s.cfg, data, s.authority)
