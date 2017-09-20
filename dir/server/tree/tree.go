@@ -622,7 +622,8 @@ func (t *Tree) delete(p path.Parsed) (*node, []*watcher, error) {
 		return nil, watchers, errors.E(errors.NotEmpty, p.Path())
 	}
 
-	t.sequence++ // We know it will succeed now.
+	t.sequence++                     // We know it will succeed now.
+	node.entry.Sequence = t.sequence // Updated sequence will be logged.
 
 	// Remove this elem from the parent's kids map.
 	// No need to check if it was there -- it wouldn't have loaded if it weren't.
