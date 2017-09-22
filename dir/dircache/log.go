@@ -83,7 +83,7 @@ const (
 
 	// version is the version of the formatting of the log file.
 	// It must change every time we change the log file format.
-	version = "20170118"
+	version = "20170922"
 )
 
 // noAccessFile indicates we did a WhichAccess and it returned no DirEntry.
