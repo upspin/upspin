@@ -16,6 +16,24 @@
       "revId": "0dfe1428e1aa0e57efc7eaacad31beb53e28b552",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e5e2a0da_e3b47315",
+        "filename": "dir/server/tree/watch.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-09-22T00:31:46Z",
+      "side": 1,
+      "message": "When the input to Watch is also a sequence number, this will be all be consistent again.",
+      "parentUuid": "7f13e8d2_597b1eb9",
+      "revId": "0dfe1428e1aa0e57efc7eaacad31beb53e28b552",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
