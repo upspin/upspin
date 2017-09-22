@@ -245,15 +245,15 @@ func (w *watcher) sendEvent(logEntry *serverlog.Entry, offset int64) error {
 		entry := logEntry.Entry
 		entry.MarkIncomplete()
 		event = &upspin.Event{
-			Sequence: offset, // TODO
-			Delete:   logEntry.Op == serverlog.Delete,
 			Entry:    &entry, // already a copy.
+			Delete:   logEntry.Op == serverlog.Delete,
+			Sequence: entry.Sequence, // TODO: This is a breaking change for new API.
 		}
 	} else {
 		event = &upspin.Event{
-			Sequence: offset, // TODO
-			Delete:   logEntry.Op == serverlog.Delete,
 			Entry:    &logEntry.Entry, // already a copy.
+			Delete:   logEntry.Op == serverlog.Delete,
+			Sequence: logEntry.Entry.Sequence, // TODO: This is a breaking change for new API.
 		}
 	}
 	timer := time.NewTimer(watcherTimeout)
