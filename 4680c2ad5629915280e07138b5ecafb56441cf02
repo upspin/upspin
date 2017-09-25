@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8a0731bc_96e28bd5",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1283,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-09-25T15:34:57Z",
+      "side": 1,
+      "message": "The original was a snarf that I clearly didn\u0027t finish changing or accidentally u\u0027d in sam. The correction should be:\n\nrv +\u003d fmt.Sprintf(\" error\u003c%s\u003e\", e.error)",
+      "range": {
+        "startLine": 1283,
+        "startChar": 0,
+        "endLine": 1283,
+        "endChar": 48
+      },
+      "revId": "4680c2ad5629915280e07138b5ecafb56441cf02",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
