@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "544be205_ce7ffbb9",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-09-25T22:56:15Z",
+      "side": 1,
+      "message": "this is still \"index\"",
+      "revId": "30c4d0c0a9d660f1b32a988d04dce7acc55536f6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "718a0402_11b925f2",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-09-25T22:56:15Z",
+      "side": 1,
+      "message": "user?",
+      "range": {
+        "startLine": 86,
+        "startChar": 37,
+        "endLine": 86,
+        "endChar": 43
+      },
+      "revId": "30c4d0c0a9d660f1b32a988d04dce7acc55536f6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "982974c9_89fd0a5a",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-09-25T22:56:15Z",
+      "side": 1,
+      "message": "cploc ?",
+      "range": {
+        "startLine": 186,
+        "startChar": 1,
+        "endLine": 186,
+        "endChar": 5
+      },
+      "revId": "30c4d0c0a9d660f1b32a988d04dce7acc55536f6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
