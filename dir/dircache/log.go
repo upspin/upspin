@@ -1280,7 +1280,7 @@ func (e *clogEntry) String() string {
 		rv += fmt.Sprintf(" sequence<%d>", e.sequence)
 	}
 	if e.error != nil {
-		rv += fmt.Sprintf(" sequence<%s>", e.sequence)
+		rv += fmt.Sprintf(" sequence<%d>", e.sequence)
 	}
 	if e.de != nil {
 		dtype := "file"

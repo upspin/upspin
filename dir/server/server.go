@@ -619,10 +619,11 @@ func (s *server) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
 	// If we just deleted the root, close the tree, remove it from the cache
 	// and delete all logs associated with the tree owner.
 	if p.IsRoot() {
+		user := t.User()
 		if err := s.closeTree(p.User()); err != nil {
 			return nil, errors.E(op, name, err)
 		}
-		if err := serverlog.DeleteLogs(p.User(), s.logDir); err != nil {
+		if err := user.DeleteLogs(); err != nil {
 			return nil, errors.E(op, name, err)
 		}
 	}
@@ -818,40 +819,40 @@ func (s *server) closeTree(user upspin.UserName) error {
 }
 
 // loadTreeFor loads the user's tree, if it exists.
-func (s *server) loadTreeFor(user upspin.UserName, opts ...options) (*tree.Tree, error) {
+func (s *server) loadTreeFor(userName upspin.UserName, opts ...options) (*tree.Tree, error) {
 	defer span(opts).StartSpan("loadTreeFor").End()
 
-	if err := valid.UserName(user); err != nil {
+	if err := valid.UserName(userName); err != nil {
 		return nil, errors.E(errors.Invalid, err)
 	}
 
 	defer s.userLock(s.userName).Unlock()
 
 	// Do we have a cached tree for this user already?
-	if val, found := s.userTrees.Get(user); found {
+	if val, found := s.userTrees.Get(userName); found {
 		if tree, ok := val.(*tree.Tree); ok {
 			return tree, nil
 		}
 		// This should never happen because we only store type tree.Tree in the userTree.
-		return nil, errors.E(user, errors.Internal,
+		return nil, errors.E(userName, errors.Internal,
 			errors.Errorf("userTrees contained value of unexpected type %T", val))
 	}
 	// User is not in the cache. Load a tree from the logs, if they exist.
-	hasLog, err := serverlog.HasLog(user, s.logDir)
+	hasLog, err := serverlog.HasLog(userName, s.logDir)
 	if err != nil {
 		return nil, err
 	}
-	if !hasLog && !s.canCreateRoot(user) {
+	if !hasLog && !s.canCreateRoot(userName) {
 		// Tree for user does not exist and the logged-in user is not
 		// allowed to create it.
 		return nil, errNotExist
 	}
-	log, logIndex, err := serverlog.New(user, s.logDir)
+	user, err := serverlog.Open(userName, s.logDir)
 	if err != nil {
 		return nil, err
 	}
 	// If user has root, we can load the tree from it.
-	if _, err := logIndex.Root(); err != nil {
+	if _, err := user.Root(); err != nil {
 		// Likely the user has no root yet.
 		if !errors.Match(errNotExist, err) {
 			// No it's some other error. Abort.
@@ -859,19 +860,19 @@ func (s *server) loadTreeFor(user upspin.UserName, opts ...options) (*tree.Tree,
 		}
 		// Ok, let it proceed. The  user will still need to make the
 		// root, but we allow setting up a new tree for now.
-		err = logIndex.SaveOffset(0)
+		err = user.SaveOffset(0)
 		if err != nil {
 			return nil, err
 		}
 		// Fall through and load a new tree.
 	}
 	// Create a new tree for the user.
-	tree, err := tree.New(s.serverConfig, log, logIndex)
+	tree, err := tree.New(s.serverConfig, user)
 	if err != nil {
 		return nil, err
 	}
 	// Add to the cache and return
-	s.userTrees.Add(user, tree)
+	s.userTrees.Add(userName, tree)
 	return tree, nil
 }
 
