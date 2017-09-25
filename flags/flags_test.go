@@ -17,7 +17,7 @@ func TestMaxBlockSize(t *testing.T) {
 		BlockSize = defaultBlockSize
 	}()
 	sizes := []int64{-1, 0, 1234, 1000000000, 1100000000}
-	for _, size := range sizes {
+	for i, size := range sizes {
 		shouldErr := size <= 0 || upspin.MaxBlockSize < size
 		err := blockSize.Set(fmt.Sprint(size))
 		if shouldErr {
@@ -27,7 +27,7 @@ func TestMaxBlockSize(t *testing.T) {
 			continue
 		}
 		if err != nil {
-			t.Errorf("expected no error for %d; got %v", err)
+			t.Errorf("expected no error for %d; got %v", i, err)
 			continue
 		}
 		if int64(BlockSize) != size {
