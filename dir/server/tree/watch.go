@@ -94,7 +94,7 @@ func (t *Tree) Watch(p path.Parsed, sequence int64, done <-chan struct{}) (<-cha
 
 	// Clone the logs so we can keep reading it while the current tree
 	// continues to be updated (we're about to unlock this tree).
-	cLog, err := t.log.NewReader()
+	cLog, err := t.user.NewReader()
 	if err != nil {
 		return nil, err
 	}
@@ -123,17 +123,15 @@ func (t *Tree) Watch(p path.Parsed, sequence int64, done <-chan struct{}) (<-cha
 
 		// Make a copy of the tree so we have an immutable tree in
 		// memory, at a fixed log position.
-		cIndex, err := t.logIndex.Clone()
+		offset := t.user.AppendOffset()
+		clonedUser, err := t.user.ReadOnlyClone()
 		if err != nil {
 			return nil, err
 		}
-		offset := t.log.LastOffset()
 		clone := &Tree{
-			user:     t.user,
+			user:     clonedUser,
 			config:   t.config,
 			packer:   t.packer,
-			log:      nil, // Cloned tree is read-only.
-			logIndex: cIndex,
 			shutdown: make(chan struct{}),
 			// there are no watchers on the clone.
 		}
@@ -152,7 +150,7 @@ func (t *Tree) Watch(p path.Parsed, sequence int64, done <-chan struct{}) (<-cha
 			}
 
 			// Set sequence to the current offset. TODO
-			sequence = t.log.LastOffset()
+			sequence = t.user.AppendOffset()
 		}
 
 		// Set up the notification hook.

@@ -19,8 +19,8 @@ const (
 )
 
 func TestWatchStart(t *testing.T) {
-	config, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(config, log, logIndex)
+	config, user := newConfigForTesting(t, userName)
+	tree, err := New(config, user)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -125,8 +125,8 @@ func TestWatchStart(t *testing.T) {
 }
 
 func TestWatchFromMiddle(t *testing.T) {
-	config, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(config, log, logIndex)
+	config, user := newConfigForTesting(t, userName)
+	tree, err := New(config, user)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -177,8 +177,8 @@ func TestWatchFromMiddle(t *testing.T) {
 }
 
 func TestWatchCurrent(t *testing.T) {
-	config, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(config, log, logIndex)
+	config, user := newConfigForTesting(t, userName)
+	tree, err := New(config, user)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -232,8 +232,8 @@ func TestWatchCurrent(t *testing.T) {
 }
 
 func TestWatchNew(t *testing.T) {
-	config, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(config, log, logIndex)
+	config, user := newConfigForTesting(t, userName)
+	tree, err := New(config, user)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -283,8 +283,8 @@ func TestWatchNew(t *testing.T) {
 }
 
 func TestWatchNonExistingNode(t *testing.T) {
-	config, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(config, log, logIndex)
+	config, user := newConfigForTesting(t, userName)
+	tree, err := New(config, user)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -362,8 +362,8 @@ func TestWatchNonExistingNode(t *testing.T) {
 }
 
 func TestCannotWatchNonExistentRoot(t *testing.T) {
-	config, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(config, log, logIndex)
+	config, user := newConfigForTesting(t, userName)
+	tree, err := New(config, user)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -458,8 +458,8 @@ func TestMoveDownWatchers(t *testing.T) {
 }
 
 func TestClosingTreeTerminatesWatcher(t *testing.T) {
-	config, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(config, log, logIndex)
+	config, user := newConfigForTesting(t, userName)
+	tree, err := New(config, user)
 	if err != nil {
 		t.Fatal(err)
 	}
