@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "261dcec4_85c05f68",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-09-25T04:09:55Z",
+      "side": 1,
+      "message": "Please change this line to\n\ndoc: minor corrections",
+      "revId": "2660430d92da2b516170d98fe3d340d412e6e771",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
