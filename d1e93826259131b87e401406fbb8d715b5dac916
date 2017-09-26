@@ -1,0 +1,124 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2ce53bf5_40b874ff",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-09-26T23:11:46Z",
+      "side": 1,
+      "message": "i\u0027d drop the \u0027update to\u0027",
+      "range": {
+        "startLine": 7,
+        "startChar": 22,
+        "endLine": 7,
+        "endChar": 32
+      },
+      "revId": "d1e93826259131b87e401406fbb8d715b5dac916",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1a0426c7_9971f977",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 381,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-09-26T23:11:46Z",
+      "side": 1,
+      "message": "OffsetOf?",
+      "range": {
+        "startLine": 381,
+        "startChar": 3,
+        "endLine": 381,
+        "endChar": 9
+      },
+      "revId": "d1e93826259131b87e401406fbb8d715b5dac916",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "86cf9c5f_78a93640",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 383,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-09-26T23:11:46Z",
+      "side": 1,
+      "message": "Is 0 a valid sequence number?\nIf not, shouldn\u0027t this return -1?",
+      "revId": "d1e93826259131b87e401406fbb8d715b5dac916",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "528d76d6_fe713727",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 453,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-09-26T23:11:46Z",
+      "side": 1,
+      "message": "i-- ?",
+      "range": {
+        "startLine": 453,
+        "startChar": 32,
+        "endLine": 453,
+        "endChar": 41
+      },
+      "revId": "d1e93826259131b87e401406fbb8d715b5dac916",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4ac2f33d_14dce46f",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 458,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-09-26T23:11:46Z",
+      "side": 1,
+      "message": "you can make these two lines a single append, no?",
+      "revId": "d1e93826259131b87e401406fbb8d715b5dac916",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f2440caa_0029ad1c",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 621,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-09-26T23:11:46Z",
+      "side": 1,
+      "message": "I think if you use append here to make the copy then it will add an amount of headroom that works nicely with the memory allocator",
+      "revId": "d1e93826259131b87e401406fbb8d715b5dac916",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
