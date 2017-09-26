@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "3e7b3e82_d19a80b0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-09-26T23:54:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2ce53bf5_40b874ff",
+      "range": {
+        "startLine": 7,
+        "startChar": 22,
+        "endLine": 7,
+        "endChar": 32
+      },
+      "revId": "d1e93826259131b87e401406fbb8d715b5dac916",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1a0426c7_9971f977",
         "filename": "dir/server/serverlog/log.go",
         "patchSetId": 1
@@ -36,6 +60,30 @@
       "writtenOn": "2017-09-26T23:11:46Z",
       "side": 1,
       "message": "OffsetOf?",
+      "range": {
+        "startLine": 381,
+        "startChar": 3,
+        "endLine": 381,
+        "endChar": 9
+      },
+      "revId": "d1e93826259131b87e401406fbb8d715b5dac916",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5a74131a_139701ef",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 381,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-09-26T23:54:56Z",
+      "side": 1,
+      "message": "no, ReadAt. the return value of OffsetOf will almost always be passed to ReadAt.",
+      "parentUuid": "1a0426c7_9971f977",
       "range": {
         "startLine": 381,
         "startChar": 3,
@@ -65,6 +113,24 @@
     },
     {
       "key": {
+        "uuid": "6544768e_7a86a3cb",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 383,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-09-26T23:54:56Z",
+      "side": 1,
+      "message": "you get 0 at the dawn of time because of the machinations of dir/server/tree.\ni\u0027ll make this a TODO.",
+      "parentUuid": "86cf9c5f_78a93640",
+      "revId": "d1e93826259131b87e401406fbb8d715b5dac916",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "528d76d6_fe713727",
         "filename": "dir/server/serverlog/log.go",
         "patchSetId": 1
@@ -88,6 +154,30 @@
     },
     {
       "key": {
+        "uuid": "d77fba56_62403212",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 453,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-09-26T23:54:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "528d76d6_fe713727",
+      "range": {
+        "startLine": 453,
+        "startChar": 32,
+        "endLine": 453,
+        "endChar": 41
+      },
+      "revId": "d1e93826259131b87e401406fbb8d715b5dac916",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4ac2f33d_14dce46f",
         "filename": "dir/server/serverlog/log.go",
         "patchSetId": 1
@@ -99,6 +189,24 @@
       "writtenOn": "2017-09-26T23:11:46Z",
       "side": 1,
       "message": "you can make these two lines a single append, no?",
+      "revId": "d1e93826259131b87e401406fbb8d715b5dac916",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b99ad5f4_51ec6eb4",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 458,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-09-26T23:54:56Z",
+      "side": 1,
+      "message": "how? i don\u0027t see it. i need to grow one element in the middle, but all i have at this point is u.offSeqs and i may be 0 so i can\u0027t make the rhs one element longer.\n\nshow me.\n\ni find the current code clear.",
+      "parentUuid": "4ac2f33d_14dce46f",
       "revId": "d1e93826259131b87e401406fbb8d715b5dac916",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -119,6 +227,24 @@
       "revId": "d1e93826259131b87e401406fbb8d715b5dac916",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "48a92d8b_5c453ecb",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 621,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-09-26T23:54:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f2440caa_0029ad1c",
+      "revId": "d1e93826259131b87e401406fbb8d715b5dac916",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
