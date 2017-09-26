@@ -17,6 +17,7 @@ import (
 	"testing"
 
 	"upspin.io/errors"
+	"upspin.io/log"
 	"upspin.io/upspin"
 )
 
@@ -553,6 +554,96 @@ func TestChecksum(t *testing.T) {
 		chksum := checksum(tc.buf)
 		if tc.chksum != chksum {
 			t.Errorf("%d: chksum = %x, want = %x", i, chksum, tc.chksum)
+		}
+	}
+}
+
+func TestOffsetOf(t *testing.T) {
+	const numEntries = 100
+	dir, cleanup := setup(t, "XXX")
+	defer cleanup()
+
+	user, err := Open(userName, dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer user.Close()
+
+	// Create our own definition of the mapping.
+	sequenceAtOffset := make(map[int64]int64)
+	offsetAtSequence := make(map[int64]int64)
+	seq := int64(upspin.SeqBase)
+	for i := 0; i < numEntries; i, seq = i+1, seq+1 {
+		e := entry
+		e.Entry.Sequence = seq
+		e.Entry.Time = upspin.Now()
+		if rand.Intn(10) == 0 {
+			e.Entry.SignedName = "bar@foo.com/otherfile"
+		}
+		if rand.Intn(10) == 0 {
+			e.Entry.Link = "hello@example.com/subdir/file"
+		}
+		if rand.Intn(5) == 0 {
+			e.Entry.Writer = "meh@yo.com"
+		}
+		numBlocks := rand.Intn(20)
+		var offs int64
+		for b := 0; b < numBlocks; b++ {
+			packSize := rand.Intn(3000)
+			packdata := make([]byte, packSize)
+			_, err := rand.Read(packdata)
+			if err != nil {
+				log.Fatal(err)
+			}
+			size := rand.Int63n(1000)
+			block := upspin.DirBlock{
+				Offset:   offs,
+				Size:     size,
+				Packdata: packdata,
+			}
+			offs += size
+			e.Entry.Blocks = append(e.Entry.Blocks, block)
+		}
+		offset := user.AppendOffset()
+		sequenceAtOffset[offset] = seq
+		offsetAtSequence[seq] = offset
+		err := user.Append(&e)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	// Verify our data.
+	reader, err := user.NewReader()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer reader.Close()
+	var offset int64
+	for i := 0; i < numEntries; i++ {
+		le, next, err := reader.ReadAt(offset)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if offset == next {
+			i--
+			continue
+		}
+		if seq := sequenceAtOffset[offset]; seq != le.Entry.Sequence {
+			log.Fatalf("%d: bad seq; got %d, expected %d", i, le.Entry.Sequence, seq)
+		}
+		if off := offsetAtSequence[le.Entry.Sequence]; off != offset {
+			log.Fatalf("%d: bad offset; got %d, expected %d", i, off, offset)
+		}
+		offset = next
+	}
+
+	// Now ask the system. Iterating over the map asks in random order,
+	// which is good.
+	for seq, offset := range offsetAtSequence {
+		got := user.OffsetOf(seq)
+		if got != offset {
+			t.Errorf("OffsetOf(%d) = %d; want %d", seq, got, offset)
 		}
 	}
 }

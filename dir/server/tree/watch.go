@@ -141,6 +141,7 @@ func (t *Tree) Watch(p path.Parsed, sequence int64, done <-chan struct{}) (<-cha
 		t.watchers.Add(1)
 		go w.sendCurrentAndWatch(clone, t, p, offset)
 	} else {
+		var offset int64
 		if sequence == upspin.WatchNew {
 			// We must flush the tree so we know our logs are current (or we
 			// need to recover the tree from the logs).
@@ -149,8 +150,11 @@ func (t *Tree) Watch(p path.Parsed, sequence int64, done <-chan struct{}) (<-cha
 				return nil, err
 			}
 
-			// Set sequence to the current offset. TODO
-			sequence = t.user.AppendOffset()
+			offset = t.user.AppendOffset()
+		} else {
+			// If the sequence doesn't exist, offset will be negative and
+			// the first event will be an error. This is correct behavior.
+			offset = t.user.OffsetOf(sequence)
 		}
 
 		// Set up the notification hook.
@@ -161,7 +165,7 @@ func (t *Tree) Watch(p path.Parsed, sequence int64, done <-chan struct{}) (<-cha
 
 		// Start the watcher.
 		t.watchers.Add(1)
-		go w.watch(sequence)
+		go w.watch(offset)
 	}
 
 	return w.events, nil
@@ -234,7 +238,6 @@ func (w *watcher) sendCurrentAndWatch(clone, orig *Tree, p path.Parsed, offset i
 // sendEvent sends a single logEntry read from the log at offset position
 // to the event channel. If the channel blocks for longer than watcherTimeout,
 // the operation fails and the watcher is invalidated (marked for deletion).
-// TODO: offset should be sequence.
 func (w *watcher) sendEvent(logEntry *serverlog.Entry, offset int64) error {
 	var event *upspin.Event
 	// Strip block information for directories. We avoid an extra copy
@@ -245,13 +248,13 @@ func (w *watcher) sendEvent(logEntry *serverlog.Entry, offset int64) error {
 		event = &upspin.Event{
 			Entry:    &entry, // already a copy.
 			Delete:   logEntry.Op == serverlog.Delete,
-			Sequence: entry.Sequence, // TODO: This is a breaking change for new API.
+			Sequence: entry.Sequence,
 		}
 	} else {
 		event = &upspin.Event{
 			Entry:    &logEntry.Entry, // already a copy.
 			Delete:   logEntry.Op == serverlog.Delete,
-			Sequence: logEntry.Entry.Sequence, // TODO: This is a breaking change for new API.
+			Sequence: logEntry.Entry.Sequence,
 		}
 	}
 	timer := time.NewTimer(watcherTimeout)
@@ -304,7 +307,7 @@ func (w *watcher) sendEventFromLog(offset int64) (int64, error) {
 
 		logEntry, next, err := w.log.ReadAt(curr)
 		if err != nil {
-			return next, errors.E(errors.Invalid, errors.Errorf("cannot read log at sequence %d: %v", curr, err))
+			return next, errors.E(errors.Invalid, errors.Errorf("cannot read log at offset %d: %v", curr, err))
 		}
 		if next == curr {
 			return curr, nil
@@ -326,8 +329,10 @@ func (w *watcher) sendEventFromLog(offset int64) (int64, error) {
 // offset and sends notifications on the event channel until the end of the log
 // is reached. It waits to be notified of more work or until the client's
 // done channel is closed, in which case it terminates.
+// If offset is negative, the first event will be an Invalid error.
 func (w *watcher) watch(offset int64) {
 	defer w.close()
+
 	for {
 		var err error
 		offset, err = w.sendEventFromLog(offset)

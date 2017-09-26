@@ -933,7 +933,10 @@ func (s *server) shutdown() {
 			break
 		}
 		user := k.(upspin.UserName)
-		s.closeTree(user)
+		err := s.closeTree(user)
+		if err != nil {
+			log.Printf("error closing tree for user %s: %v", user, err)
+		}
 	}
 }
 
