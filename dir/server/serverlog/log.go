@@ -110,12 +110,24 @@ type checkpoint struct {
 	rootFile       *os.File    // file descriptor for the root of the tree.
 }
 
+// offSeq remembers the correspondence between a global offset
+// for a user and the sequence number of the change at that offset.
+type offSeq struct {
+	offset   int64
+	sequence int64
+}
+
 // User holds the log state for a single user.
 type User struct {
 	name       upspin.UserName
 	directory  string
 	writer     *writer
 	checkpoint *checkpoint
+
+	// Kept in increasing sequence order, locked by u.writer.mu.
+	// TODO: Move the lock here.
+	// TODO: Make this a sparse slice and do small linear scans. Easy.
+	offSeqs []offSeq
 }
 
 const oldStyleLogFilePrefix = "tree.log."
@@ -364,6 +376,24 @@ func logOffsetsFor(directory string) []int64 {
 	return offsets
 }
 
+// OffsetOf returns the global offset in the user's logs for this sequence number.
+// It returns -1 if the sequence number does not appear in the logs.
+// ReadAt will return an error if asked to read at a negative offset.
+func (u *User) OffsetOf(seq int64) int64 {
+	if seq == 0 { // Start of file. There may be no data yet.
+		return 0
+	}
+	w := u.writer
+	w.mu.Lock()
+	defer w.mu.Unlock()
+
+	i := sort.Search(len(u.offSeqs), func(i int) bool { return u.offSeqs[i].sequence >= seq })
+	if i < len(u.offSeqs) && u.offSeqs[i].sequence == seq {
+		return u.offSeqs[i].offset
+	}
+	return -1
+}
+
 // Append appends a Entry to the end of the writer log.
 func (u *User) Append(e *Entry) error {
 	buf, err := e.marshal()
@@ -375,10 +405,11 @@ func (u *User) Append(e *Entry) error {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 
-	prevOffs := size(w.file)
+	prevSize := size(w.file)
+	offset := w.fileOffset + prevSize
 
 	// Is it time to move to a new log file?
-	if prevOffs >= MaxLogSize {
+	if prevSize >= MaxLogSize {
 		dir := filepath.Dir(w.file.Name())
 		// Close the current underlying log file.
 		err = w.lockedClose()
@@ -386,13 +417,13 @@ func (u *User) Append(e *Entry) error {
 			return errors.E(errors.IO, err)
 		}
 		// Create a new log file where the previous one left off.
-		w.fileOffset += prevOffs
+		w.fileOffset += prevSize
 		loc := filepath.Join(dir, fmt.Sprintf("%d", w.fileOffset))
 		w.file, err = os.OpenFile(loc, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 		if err != nil {
 			return errors.E(errors.IO, err)
 		}
-		prevOffs = 0
+		prevSize = 0
 	}
 
 	// File is append-only, so this is guaranteed to write to the tail.
@@ -406,16 +437,36 @@ func (u *User) Append(e *Entry) error {
 	}
 	// Sanity check: flush worked and the new offset relative to the
 	// beginning of this file is the expected one.
-	newOffs := prevOffs + int64(n)
+	newOffs := prevSize + int64(n)
 	if newOffs != size(w.file) {
 		// This might indicate a race somewhere, despite the locks.
 		return errors.E(errors.IO, errors.Errorf("file.Sync did not update offset: expected %d, got %d", newOffs, size(w.file)))
+	}
+
+	// The offSeqs slice must be kept in Sequence order, which might not be
+	// in offset order if there is concurrent access. We could sort the list but
+	// the invariant is that it's sorted when we get here, so all we need to do
+	// is insert the new record in the right place. Moreover, it will be near
+	// the end so it's fastest just to scan backwards.
+	sequence := e.Entry.Sequence
+	var i int
+	for i = len(u.offSeqs); i > 0; i = i - 1 {
+		if u.offSeqs[i-1].sequence <= sequence {
+			break
+		}
+	}
+	u.offSeqs = append(u.offSeqs, offSeq{})
+	copy(u.offSeqs[i:], u.offSeqs[i+1:])
+	u.offSeqs[i] = offSeq{
+		offset:   offset,
+		sequence: sequence,
 	}
 	return nil
 }
 
 // ReadAt reads an entry from the log at offset. It returns the log entry and
-// the next offset.
+// the next offset. If offset is negative, which may correspond to an invalid
+// sequence number processed by OffsetOf, it returns an error.
 func (r *Reader) ReadAt(offset int64) (le Entry, next int64, err error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -526,6 +577,7 @@ func (u *User) Truncate(offset int64) error {
 		if err != nil {
 			return err
 		}
+		u.truncateOffSeqs(offset)
 		return nil
 	}
 
@@ -554,7 +606,21 @@ func (u *User) Truncate(offset int64) error {
 	if err != nil {
 		return err
 	}
+	u.truncateOffSeqs(offset)
 	return nil
+}
+
+// truncateOffSeqs truncates the offSeqs list at the specified offset. u.writer.mu must be locked.
+func (u *User) truncateOffSeqs(offset int64) {
+	i := sort.Search(len(u.offSeqs), func(i int) bool { return u.offSeqs[i].offset >= offset })
+	if i >= len(u.offSeqs) {
+		/* Nothing to do */
+		return
+	}
+	// Make a copy to save what might be a lot of memory.
+	new := make([]offSeq, i, i+10) // A little headroom.
+	copy(new, u.offSeqs)
+	u.offSeqs = new
 }
 
 // NewReader makes a reader of the user's log.
@@ -744,7 +810,7 @@ func (cp *checkpoint) readOffset() (int64, error) {
 		return 0, errors.E(errors.IO, err)
 	}
 	if len(buf) == 0 {
-		return 0, errors.E(errors.NotExist, cp.user, errors.Str("no log offset for user"))
+		return 0, errors.E(errors.NotExist, cp.user.Name(), errors.Str("no log offset for user"))
 	}
 	offset, n := binary.Varint(buf)
 	if n <= 0 {

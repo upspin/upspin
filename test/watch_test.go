@@ -19,6 +19,7 @@ import (
 // there is an ErrNotSupported error, returns false. It returns true
 // if there was no error; otherwise it fatals.
 func watchSupported(t *testing.T, r *testenv.Runner) bool {
+	t.Helper()
 	supported, err := watchNotSupportedError(t, r)
 	if err != nil {
 		t.Fatal(err)
@@ -142,7 +143,7 @@ func testWatchErrors(t *testing.T, r *testenv.Runner) {
 		t.Fatal(r.Diag())
 	}
 
-	r.DirWatch(base, 777)
+	r.DirWatch(base, upspin.WatchCurrent)
 	if !watchSupported(t, r) {
 		return
 	}
@@ -153,9 +154,9 @@ func testWatchErrors(t *testing.T, r *testenv.Runner) {
 		t.Fatalf("expected Watch error for bad file name %q", badFile)
 	}
 
-	// 777 is an implausible sequence number, at least in this test.
+	// 777777 is an implausible sequence number, at least in this test.
 	// TODO: Find a better way to test this.
-	r.DirWatch(base, 777)
+	r.DirWatch(base, 777777)
 	if r.Failed() {
 		t.Fatal(r.Diag())
 	}
