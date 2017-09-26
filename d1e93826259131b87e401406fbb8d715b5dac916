@@ -213,6 +213,24 @@
     },
     {
       "key": {
+        "uuid": "099e15b6_a2afb8a9",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 458,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-09-26T23:56:44Z",
+      "side": 1,
+      "message": "I didn\u0027t think that len(offSeqs) could be 0. you\u0027re right.",
+      "parentUuid": "b99ad5f4_51ec6eb4",
+      "revId": "d1e93826259131b87e401406fbb8d715b5dac916",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f2440caa_0029ad1c",
         "filename": "dir/server/serverlog/log.go",
         "patchSetId": 1
