@@ -532,3 +532,26 @@ var keygenTests = []cmdTest{
 		expectNoOutput(),
 	},
 }
+
+// The suffixed user tests create a new suffixed user confirming that the
+// config and key files for that user are created and that the user is known
+// to the key server. They also confirm that a suffixed user can not create
+// a suffixed user.
+var suffixedUserTests = []cmdTest{
+	{
+		"create a suffixed user",
+		ann,
+		do(
+			"createsuffixeduser -secrets=" + testTempDir("key", deleteOld) + " ann+quux@example.com",
+		),
+		"",
+		suffixedUserExists("ann", "quux"),
+	},
+	{
+		"user ann+quux",
+		ann,
+		do("user ann+quux@example.com"),
+		"",
+		expect("name: ann+quux@example.com"),
+	},
+}

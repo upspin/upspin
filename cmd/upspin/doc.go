@@ -50,6 +50,7 @@ Upspin commands:
 	shell (Interactive mode)
 	countersign
 	cp
+	createsuffixeduser
 	deletestorage
 	get
 	getref
@@ -131,6 +132,38 @@ Flags:
   -help
     	print more information about the command
   -v	log each file as it is copied
+
+
+
+Sub-command createsuffixeduser
+
+Usage: upspin createsuffixeduser <suffixed-user-name>
+
+Createsuffixeduser creates a suffixed user of the current user, adding it
+to the keyserver and creating a new config file and keys. It takes one
+argument, the suffix. The config file will be in the same directory as
+the current config file and will be named config.<suffix>. Default values
+for servers and packing will be taken from the current config.
+
+Flags:
+  -curve name
+    	cryptographic curve name: p256, p384, or p521 (default "p256")
+  -dir address
+    	Directory server address (default "remote,upspin.closedmind.org:443")
+  -force
+    	if suffixed user already exists, overwrite its keys and config file
+  -help
+    	print more information about the command
+  -rotate
+    	back up the existing keys and replace them with new ones
+  -secrets directory
+    	directory to store key pair
+  -secretseed string
+    	the seed containing a 128 bit secret in proquint format or a file that contains it
+  -server address
+    	Store and Directory server address (if combined)
+  -store address
+    	Store server address (default "remote,upspin.closedmind.org:443")
 
 
 
@@ -671,7 +704,7 @@ Sub-command tar
 Usage: upspin tar [-extract [-match prefix -replace substitution] ] upspin_directory local_file
 
 Tar archives an Upspin tree into a local tar file, or with the
--extract flag, unpacks a a local tar file into an Upspin tree.
+-extract flag, unpacks a local tar file into an Upspin tree.
 
 When extracting, the -match and -replace flags cause the extracted
 file to have any prefix that matches be replaced by substitute text.
