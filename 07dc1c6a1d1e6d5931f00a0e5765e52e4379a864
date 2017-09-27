@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "94791c14_93c8bb15",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-09-27T07:16:40Z",
+      "side": 1,
+      "message": "what\u0027s the rationale for discounting the version string from the offset?\ncan\u0027t we just start at 12?",
+      "revId": "07dc1c6a1d1e6d5931f00a0e5765e52e4379a864",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ac11b649_1febc6d3",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 632,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-09-27T07:16:40Z",
+      "side": 1,
+      "message": "I wonder what this line means?",
+      "revId": "07dc1c6a1d1e6d5931f00a0e5765e52e4379a864",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
