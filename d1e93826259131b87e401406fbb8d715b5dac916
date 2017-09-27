@@ -249,6 +249,29 @@
     },
     {
       "key": {
+        "uuid": "fd15984b_e95666b0",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 459,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-09-27T17:09:20Z",
+      "side": 1,
+      "message": "I\u0027m confused. You are compressing the list by copying i+1... into i.. and then overwriting i? Shouldn\u0027t you be creating a hole and copying into the hole?",
+      "range": {
+        "startLine": 459,
+        "startChar": 1,
+        "endLine": 459,
+        "endChar": 37
+      },
+      "revId": "d1e93826259131b87e401406fbb8d715b5dac916",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f2440caa_0029ad1c",
         "filename": "dir/server/serverlog/log.go",
         "patchSetId": 1
