@@ -43,6 +43,24 @@ import (
 	"upspin.io/valid"
 )
 
+// User holds the log state for a single user.
+type User struct {
+	name      upspin.UserName
+	directory string
+
+	// mu locks all writes to the writer and checkpoint,
+	// and the offSeqs structure. Readers have their
+	// own lock.
+	mu sync.Mutex
+
+	writer     *writer
+	checkpoint *checkpoint
+
+	// Kept in increasing sequence order.
+	// TODO: Make this a sparse slice and do small linear scans.
+	offSeqs []offSeq
+}
+
 // Operation is the kind of operation performed on the DirEntry.
 type Operation int
 
@@ -66,9 +84,8 @@ type Entry struct {
 type writer struct {
 	user *User // owner of this writer.
 
-	mu         sync.Mutex // protects fields below.
-	file       *os.File   // file descriptor for the log.
-	fileOffset int64      // offset of the first record from the file.
+	file       *os.File // file descriptor for the log.
+	fileOffset int64    // offset of the first record from the file.
 }
 
 // Write implements io.Writer for the our User type.
@@ -83,7 +100,7 @@ type Reader struct {
 	// user owns the log.
 	user *User
 
-	// mu protects the fields below. If writer.mu must be held, it must be
+	// mu protects the fields below. If user.mu must be held, it must be
 	// held after mu.
 	mu sync.Mutex
 
@@ -105,9 +122,8 @@ type Reader struct {
 type checkpoint struct {
 	user *User // owner of this checkpoint.
 
-	mu             *sync.Mutex // protects the files, making reads/write atomic.
-	checkpointFile *os.File    // file descriptor for the checkpoint.
-	rootFile       *os.File    // file descriptor for the root of the tree.
+	checkpointFile *os.File // file descriptor for the checkpoint.
+	rootFile       *os.File // file descriptor for the root of the tree.
 }
 
 // offSeq remembers the correspondence between a global offset
@@ -115,19 +131,6 @@ type checkpoint struct {
 type offSeq struct {
 	offset   int64
 	sequence int64
-}
-
-// User holds the log state for a single user.
-type User struct {
-	name       upspin.UserName
-	directory  string
-	writer     *writer
-	checkpoint *checkpoint
-
-	// Kept in increasing sequence order, locked by u.writer.mu.
-	// TODO: Move the lock here.
-	// TODO: Make this a sparse slice and do small linear scans. Easy.
-	offSeqs []offSeq
 }
 
 const oldStyleLogFilePrefix = "tree.log."
@@ -206,7 +209,6 @@ func Open(userName upspin.UserName, directory string) (*User, error) {
 	}
 	cp := &checkpoint{
 		user:           u,
-		mu:             &sync.Mutex{},
 		checkpointFile: checkpointFile,
 		rootFile:       rootFile,
 	}
@@ -322,6 +324,9 @@ func ListUsersWithSuffix(suffix, directory string) ([]upspin.UserName, error) {
 }
 
 func (u *User) Close() error {
+	u.mu.Lock()
+	defer u.mu.Unlock()
+
 	err1 := u.writer.close()
 	err2 := u.checkpoint.close()
 	if err1 != nil {
@@ -385,9 +390,9 @@ func (u *User) OffsetOf(seq int64) int64 {
 		// TODO: How does this arise? (It does, but it shouldn't.)
 		return 0
 	}
-	w := u.writer
-	w.mu.Lock()
-	defer w.mu.Unlock()
+
+	u.mu.Lock()
+	defer u.mu.Unlock()
 
 	i := sort.Search(len(u.offSeqs), func(i int) bool { return u.offSeqs[i].sequence >= seq })
 	if i < len(u.offSeqs) && u.offSeqs[i].sequence == seq {
@@ -403,9 +408,10 @@ func (u *User) Append(e *Entry) error {
 		return err
 	}
 
+	u.mu.Lock()
+	defer u.mu.Unlock()
+
 	w := u.writer
-	w.mu.Lock()
-	defer w.mu.Unlock()
 
 	prevSize := size(w.file)
 	offset := w.fileOffset + prevSize
@@ -414,7 +420,7 @@ func (u *User) Append(e *Entry) error {
 	if prevSize >= MaxLogSize {
 		dir := filepath.Dir(w.file.Name())
 		// Close the current underlying log file.
-		err = w.lockedClose()
+		err = w.close()
 		if err != nil {
 			return errors.E(errors.IO, err)
 		}
@@ -495,10 +501,10 @@ func (r *Reader) ReadAt(offset int64) (le Entry, next int64, err error) {
 	}
 
 	// If we're reading from the tail file (max r.readOffsets), then we
-	// must lock writer.mu to avoid reading partially-written data.
+	// must lock r.user.mu to avoid reading partially-written data.
 	if r.offsets[0] == r.fileOffset {
-		r.user.writer.mu.Lock()
-		defer r.user.writer.mu.Unlock()
+		r.user.mu.Lock()
+		defer r.user.mu.Unlock()
 	}
 
 	// Are we past the end of the current file?
@@ -535,9 +541,9 @@ func (r *Reader) readOffset(offset int64) int64 {
 
 // AppendOffset returns the offset of the end of the written log file or -1 on error.
 func (u *User) AppendOffset() int64 {
+	u.mu.Lock()
+	defer u.mu.Unlock()
 	w := u.writer
-	w.mu.Lock()
-	defer w.mu.Unlock()
 	return w.fileOffset + size(w.file)
 }
 
@@ -550,8 +556,8 @@ func (r *Reader) EndOffset() int64 {
 	// If we're reading from the same file as the current writer, lock it.
 	// Order is important.
 	if r.fileOffset == r.offsets[0] {
-		r.user.writer.mu.Lock()
-		defer r.user.writer.mu.Unlock()
+		r.user.mu.Lock()
+		defer r.user.mu.Unlock()
 	}
 
 	return r.fileOffset + size(r.file)
@@ -569,9 +575,10 @@ func size(f *os.File) int64 {
 
 // Truncate truncates the write log at offset.
 func (u *User) Truncate(offset int64) error {
+	u.mu.Lock()
+	defer u.mu.Unlock()
+
 	w := u.writer
-	w.mu.Lock()
-	defer w.mu.Unlock()
 
 	// Are we truncating the tail file?
 	if offset >= w.fileOffset {
@@ -588,7 +595,7 @@ func (u *User) Truncate(offset int64) error {
 	base := filepath.Dir(w.file.Name())
 	offsets := logOffsetsFor(base)
 
-	err := w.lockedClose()
+	err := w.close()
 	if err != nil {
 		return errors.E(errors.IO, err)
 	}
@@ -612,7 +619,7 @@ func (u *User) Truncate(offset int64) error {
 	return nil
 }
 
-// truncateOffSeqs truncates the offSeqs list at the specified offset. u.writer.mu must be locked.
+// truncateOffSeqs truncates the offSeqs list at the specified offset. u.mu must be locked.
 func (u *User) truncateOffSeqs(offset int64) {
 	i := sort.Search(len(u.offSeqs), func(i int) bool { return u.offSeqs[i].offset >= offset })
 	if i >= len(u.offSeqs) {
@@ -630,10 +637,11 @@ func (u *User) NewReader() (*Reader, error) {
 	// Order is important.
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	w := u.writer
-	w.mu.Lock()
-	defer w.mu.Unlock()
 
+	u.mu.Lock()
+	defer u.mu.Unlock()
+
+	w := u.writer
 	r.user = u
 	r.offsets = logOffsetsFor(filepath.Dir(w.file.Name()))
 
@@ -667,24 +675,14 @@ func (r *Reader) openLogAtOffset(offset int64, directory string) error {
 	return nil
 }
 
-// close closes the writer.
+// close closes the writer. user.mu must be held.
 func (w *writer) close() error {
 	if w == nil || w.file == nil {
 		return nil
 	}
-	w.mu.Lock()
-	defer w.mu.Unlock()
-	return w.lockedClose()
-}
-
-// lockedClose closes the writer; w.mu must be held.
-func (w *writer) lockedClose() error {
-	if w.file != nil {
-		err := w.file.Close()
-		w.file = nil
-		return err
-	}
-	return nil
+	err := w.file.Close()
+	w.file = nil
+	return err
 }
 
 // Close closes the reader.
@@ -703,8 +701,8 @@ func (r *Reader) Close() error {
 // Root returns the user's root by retrieving it from local stable storage.
 func (u *User) Root() (*upspin.DirEntry, error) {
 	cp := u.checkpoint
-	cp.mu.Lock()
-	defer cp.mu.Unlock()
+	cp.user.mu.Lock()
+	defer cp.user.mu.Unlock()
 
 	var root upspin.DirEntry
 	buf, err := readAllFromTop(cp.rootFile)
@@ -731,24 +729,24 @@ func (u *User) SaveRoot(root *upspin.DirEntry) error {
 		return err
 	}
 	cp := u.checkpoint
-	cp.mu.Lock()
-	defer cp.mu.Unlock()
+	cp.user.mu.Lock()
+	defer cp.user.mu.Unlock()
 	return overwriteAndSync(cp.rootFile, buf)
 }
 
 // DeleteRoot deletes the root.
 func (u *User) DeleteRoot() error {
 	cp := u.checkpoint
-	cp.mu.Lock()
-	defer cp.mu.Unlock()
+	cp.user.mu.Lock()
+	defer cp.user.mu.Unlock()
 
 	return overwriteAndSync(cp.rootFile, []byte{})
 }
 
 // readOnlyClone makes a read-only copy of the checkpoint.
 func (cp *checkpoint) readOnlyClone() (*checkpoint, error) {
-	cp.mu.Lock()
-	defer cp.mu.Unlock()
+	cp.user.mu.Lock()
+	defer cp.user.mu.Unlock()
 
 	fd, err := os.Open(cp.checkpointFile.Name())
 	if os.IsNotExist(err) {
@@ -802,8 +800,8 @@ func (u *User) ReadOffset() (int64, error) {
 
 // readOffset reads from stable storage the offset saved by SaveOffset.
 func (cp *checkpoint) readOffset() (int64, error) {
-	cp.mu.Lock()
-	defer cp.mu.Unlock()
+	cp.user.mu.Lock()
+	defer cp.user.mu.Unlock()
 
 	buf, err := readAllFromTop(cp.checkpointFile)
 	if err != nil {
@@ -832,17 +830,14 @@ func (cp *checkpoint) saveOffset(offset int64) error {
 	var tmp [16]byte // For use by PutVarint.
 	n := binary.PutVarint(tmp[:], offset)
 
-	cp.mu.Lock()
-	defer cp.mu.Unlock()
+	cp.user.mu.Lock()
+	defer cp.user.mu.Unlock()
 
 	return overwriteAndSync(cp.checkpointFile, tmp[:n])
 }
 
-// close closes the checkpoint.
+// close closes the checkpoint. user.mu must be held
 func (cp *checkpoint) close() error {
-	cp.mu.Lock()
-	defer cp.mu.Unlock()
-
 	var firstErr error
 	if cp.checkpointFile != nil {
 		firstErr = cp.checkpointFile.Close()
