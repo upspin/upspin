@@ -94,6 +94,7 @@ var commands = map[string]func(*State, ...string){
 	"share":         (*State).share,
 	"signup":        (*State).signup,
 	"snapshot":      (*State).snapshot,
+	"suffixed":      (*State).suffixed,
 	"tar":           (*State).tar,
 	"user":          (*State).user,
 	"watch":         (*State).watch,
