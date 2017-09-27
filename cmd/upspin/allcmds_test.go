@@ -532,3 +532,23 @@ var keygenTests = []cmdTest{
 		expectNoOutput(),
 	},
 }
+
+// The suffixed user tests test if we can create one and error handling.
+var suffixedUserTests = []cmdTest{
+	{
+		"create a suffixed user",
+		ann,
+		do(
+			"createsuffixeduser -secrets=" + testTempDir("key", deleteOld) + " ann+quux@example.com",
+		),
+		"",
+		suffixedUserExists("ann", "quux"),
+	},
+	{
+		"user ann+quux",
+		ann,
+		do("user ann+quux@example.com"),
+		"",
+		expect("name: ann+quux@example.com"),
+	},
+}
