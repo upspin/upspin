@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "a7de285c_a8e57b18",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-09-27T09:39:03Z",
+      "side": 1,
+      "message": "There are several reasons. First, it\u0027s an implementation detail - why expose it outside? Second, 0 is a tricky case if you do that, meaning you\u0027d have to publish 12 to clients so they know where to start, or hack something up internally. Third, it\u0027s easy to hide. Also, it maintains external compatibility. Not sure that matters, but it\u0027s a nice property.",
+      "parentUuid": "94791c14_93c8bb15",
+      "revId": "07dc1c6a1d1e6d5931f00a0e5765e52e4379a864",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "ac11b649_1febc6d3",
         "filename": "dir/server/serverlog/log.go",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2017-09-27T07:16:40Z",
       "side": 1,
       "message": "I wonder what this line means?",
+      "revId": "07dc1c6a1d1e6d5931f00a0e5765e52e4379a864",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7b75973c_ad7367ec",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 632,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-09-27T09:39:03Z",
+      "side": 1,
+      "message": "it\u0027s an old comment. i think it means \u0027hold the lock while you do this\u0027.\ni can delete it.",
+      "parentUuid": "ac11b649_1febc6d3",
       "revId": "07dc1c6a1d1e6d5931f00a0e5765e52e4379a864",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
