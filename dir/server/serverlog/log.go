@@ -84,8 +84,12 @@ type Entry struct {
 type writer struct {
 	user *User // owner of this writer.
 
-	file       *os.File // file descriptor for the log.
-	fileOffset int64    // offset of the first record from the file.
+	file *os.File // file descriptor for the log.
+
+	// offset of the first record in the file, not counting the version string.
+	// To the client, the version string doesn't appear in the offsets; first
+	// record is at user-visisble offset 0.
+	fileOffset int64
 }
 
 // Write implements io.Writer for the our User type.
@@ -95,7 +99,9 @@ func (u *User) Write(b []byte) (int, error) {
 	return u.writer.file.Write(b)
 }
 
-// Reader reads LogEntries from the log.
+// Reader reads LogEntries from the log. The offsets seen by the client
+// exclude the version string at the beginning of the file. That is, offset
+// 0 as seen by the client is immediately after the version string.
 type Reader struct {
 	// user owns the log.
 	user *User
@@ -105,7 +111,7 @@ type Reader struct {
 	mu sync.Mutex
 
 	// fileOffset is the offset of the first record from the file we're
-	// reading now.
+	// reading now, not counting the version string.
 	fileOffset int64
 
 	// file is the file for the current log, indicated by fileOffset.
@@ -133,7 +139,16 @@ type offSeq struct {
 	sequence int64
 }
 
-const oldStyleLogFilePrefix = "tree.log."
+const (
+	// As of September, 2017, we start putting a version string
+	// at the beginning of each "write" log file created.
+	// If missing, the version is assumed to be 0.
+	version               = 1
+	versionPrefix         = "upspin."
+	versionFormat         = versionPrefix + "%.4d\n"
+	versionLength         = 12
+	oldStyleLogFilePrefix = "tree.log."
+)
 
 // Open returns a User structure holding the open
 // logs for the user in the named local file system's directory.
@@ -179,6 +194,10 @@ func Open(userName upspin.UserName, directory string) (*User, error) {
 	if err != nil {
 		return nil, errors.E(errors.IO, err)
 	}
+	err = writeVersion(loggerFile)
+	if err != nil {
+		return nil, err
+	}
 
 	// We now have a new log name. Ensure we create an old log name too (for
 	// new roots) so that we could go back to old naming style if needed.
@@ -215,6 +234,47 @@ func Open(userName upspin.UserName, directory string) (*User, error) {
 	u.writer = w
 	u.checkpoint = cp
 	return u, nil
+}
+
+// writeVersion writes a version string at the beginning of the file.
+func writeVersion(fd *os.File) error {
+	fi, err := fd.Stat()
+	if err != nil {
+		return err
+	}
+	if fi.Size() > 0 {
+		return nil
+	}
+	n, err := fmt.Fprintf(fd, versionFormat, version)
+	if err != nil {
+		return err
+	}
+	if n != versionLength {
+		return errors.E(errors.Internal, errors.Errorf("internal error: length mismatch writing version"))
+	}
+	return nil
+}
+
+// readVersion returns the version number for the file, or 0 if there is no
+// version string at the start. It assumes the file is positioned at seek offset 0.
+// Zero will be the version returned if the file is in the old format (which is also the only
+// way it can be empty).
+func readVersion(fd *os.File) int {
+	buf := make([]byte, versionLength)
+	_, err := io.ReadFull(fd, buf)
+	if err != nil {
+		return 0
+	}
+	// Convert to string and delete newline
+	str := string(buf[:len(buf)-1])
+	if !strings.HasPrefix(str, versionPrefix) {
+		return 0
+	}
+	v, err := strconv.ParseInt(str[len(versionPrefix):], 10, 32)
+	if err != nil {
+		return 0
+	}
+	return int(v)
 }
 
 // ReadOnlyClone returns a copy of the user structure with no writer,
@@ -431,6 +491,10 @@ func (u *User) Append(e *Entry) error {
 		if err != nil {
 			return errors.E(errors.IO, err)
 		}
+		err = writeVersion(w.file)
+		if err != nil {
+			return err
+		}
 		prevSize = 0
 	}
 
@@ -512,7 +576,7 @@ func (r *Reader) ReadAt(offset int64) (le Entry, next int64, err error) {
 		return le, maxOff, nil
 	}
 
-	_, err = r.file.Seek(offset-r.fileOffset, io.SeekStart)
+	_, err = r.file.Seek(versionLength+offset-r.fileOffset, io.SeekStart)
 	if err != nil {
 		return le, 0, errors.E(errors.IO, err)
 	}
@@ -563,14 +627,15 @@ func (r *Reader) EndOffset() int64 {
 	return r.fileOffset + size(r.file)
 }
 
-// size returns the offset at the end of the file or -1 on error.
+// size returns the offset at the end of the file or -1 on error,
+// excluding the version string at the beginning of the file.
 // The file must be changed simultaneously with this call.
 func size(f *os.File) int64 {
 	fi, err := f.Stat()
 	if err != nil {
 		return -1
 	}
-	return fi.Size()
+	return fi.Size() - versionLength
 }
 
 // Truncate truncates the write log at offset.
@@ -582,7 +647,7 @@ func (u *User) Truncate(offset int64) error {
 
 	// Are we truncating the tail file?
 	if offset >= w.fileOffset {
-		err := w.file.Truncate(w.fileOffset - offset)
+		err := w.file.Truncate(w.fileOffset + versionLength - offset)
 		if err != nil {
 			return err
 		}
@@ -611,7 +676,7 @@ func (u *User) Truncate(offset int64) error {
 		return errors.E(errors.IO, err)
 	}
 	w.fileOffset = offsets[i]
-	err = w.file.Truncate(offset - w.fileOffset)
+	err = w.file.Truncate(offset + versionLength - w.fileOffset)
 	if err != nil {
 		return err
 	}
@@ -666,6 +731,12 @@ func (r *Reader) openLogAtOffset(offset int64, directory string) error {
 	f, err := os.Open(fname)
 	if err != nil {
 		return err
+	}
+	// Verify that we have a version string at the beginning of the file.
+	v := readVersion(f)
+	if v != version {
+		// TODO: Handle this case for old logs
+		return errors.Errorf("unrecognized version %d", v)
 	}
 	if r.file != nil {
 		r.file.Close()
