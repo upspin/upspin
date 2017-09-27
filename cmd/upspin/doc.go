@@ -51,6 +51,7 @@ Upspin commands:
 	config
 	countersign
 	cp
+	createsuffixeduser
 	deletestorage
 	get
 	getref
@@ -96,6 +97,10 @@ Sub-command config
 Usage: upspin config [-out=outputfile]
 
 Config prints to standard output the contents of the current config file.
+
+It works by saving the file at initialization time, so if the actual
+file has changed since the command started, it will still show the
+configuration being used.
 
 Flags:
   -help
@@ -146,6 +151,42 @@ Flags:
   -help
     	print more information about the command
   -v	log each file as it is copied
+
+
+
+Sub-command createsuffixeduser
+
+Usage: upspin createsuffixeduser <suffixed-user-name>
+
+Createsuffixeduser creates a suffixed user of the current user, adding it
+to the keyserver and creating a new config file and keys. It takes one
+argument, the full name of the new user. The name of the new config file
+will be the same as the current with .<suffix> appended. Default values
+for servers and packing will be taken from the current config.
+
+To create the user with suffix +snapshot, run
+   upspin snapshot
+rather than this command.
+
+Flags:
+  -curve name
+    	cryptographic curve name: p256, p384, or p521 (default "p256")
+  -dir address
+    	Directory server address (default "remote,upspin.closedmind.org:443")
+  -force
+    	if suffixed user already exists, overwrite its keys and config file
+  -help
+    	print more information about the command
+  -rotate
+    	back up the existing keys and replace them with new ones
+  -secrets directory
+    	directory to store key pair
+  -secretseed string
+    	the seed containing a 128 bit secret in proquint format or a file that contains it
+  -server address
+    	Store and Directory server address (if combined)
+  -store address
+    	Store server address (default "remote,upspin.closedmind.org:443")
 
 
 
