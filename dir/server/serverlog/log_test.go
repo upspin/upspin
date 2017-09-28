@@ -576,6 +576,24 @@ func TestChecksum(t *testing.T) {
 	}
 }
 
+func TestAddOffSeq(t *testing.T) {
+	// Generate a random ordering and make sure it comes out sorted.
+	var u User // Zero value will do.
+	perm := rand.Perm(100)
+	for _, o := range perm {
+		o64 := int64(o)
+		u.addOffSeq(o64, o64) // offset == sequence is fine for this purpose.
+	}
+	if len(u.offSeqs) != len(perm) {
+		t.Fatalf("got %d elements, expected %d", len(u.offSeqs), len(perm))
+	}
+	for i, offseq := range u.offSeqs {
+		if offseq.offset != int64(i) {
+			t.Fatalf("%d: got %d; expected %d", i, offseq.offset, i)
+		}
+	}
+}
+
 func TestOffsetOf(t *testing.T) {
 	const numEntries = 100
 	dir, cleanup := setup(t, "XXX")

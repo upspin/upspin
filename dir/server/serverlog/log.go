@@ -446,12 +446,17 @@ func (u *User) Append(e *Entry) error {
 		return errors.E(errors.IO, errors.Errorf("file.Sync did not update offset: expected %d, got %d", newOffs, size(w.file)))
 	}
 
+	u.addOffSeq(offset, e.Entry.Sequence)
+	return nil
+}
+
+// addOffSeq remembers an offset/sequence pair.
+func (u *User) addOffSeq(offset, sequence int64) {
 	// The offSeqs slice must be kept in Sequence order, which might not be
 	// in offset order if there is concurrent access. We could sort the list but
 	// the invariant is that it's sorted when we get here, so all we need to do
 	// is insert the new record in the right place. Moreover, it will be near
 	// the end so it's fastest just to scan backwards.
-	sequence := e.Entry.Sequence
 	var i int
 	for i = len(u.offSeqs); i > 0; i-- {
 		if u.offSeqs[i-1].sequence <= sequence {
@@ -459,12 +464,11 @@ func (u *User) Append(e *Entry) error {
 		}
 	}
 	u.offSeqs = append(u.offSeqs, offSeq{})
-	copy(u.offSeqs[i:], u.offSeqs[i+1:])
+	copy(u.offSeqs[i+1:], u.offSeqs[i:])
 	u.offSeqs[i] = offSeq{
 		offset:   offset,
 		sequence: sequence,
 	}
-	return nil
 }
 
 // ReadAt reads an entry from the log at offset. It returns the log entry and
