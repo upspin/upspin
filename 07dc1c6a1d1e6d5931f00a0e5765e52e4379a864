@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "7e1c55a7_61edb7c4",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-09-28T00:06:01Z",
+      "side": 1,
+      "message": "In the new world offsets are not presented to the outside at all, are they?\nIn which case it doesn\u0027t matter if they start at 12 or 0.",
+      "parentUuid": "72447085_33974139",
+      "revId": "07dc1c6a1d1e6d5931f00a0e5765e52e4379a864",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "ac11b649_1febc6d3",
         "filename": "dir/server/serverlog/log.go",
         "patchSetId": 1
