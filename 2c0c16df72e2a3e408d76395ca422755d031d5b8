@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bb250eb7_b15c9e90",
+        "filename": "cmd/upspin/suffixed.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-09-28T01:14:57Z",
+      "side": 1,
+      "message": "I don\u0027t think it does this, nor do I think it should.",
+      "range": {
+        "startLine": 25,
+        "startChar": 54,
+        "endLine": 26,
+        "endChar": 31
+      },
+      "revId": "2c0c16df72e2a3e408d76395ca422755d031d5b8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e5a6137c_50ad4a99",
+        "filename": "cmd/upspin/suffixed.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-09-28T01:14:57Z",
+      "side": 1,
+      "message": "the directory in which to put the key pair should be\nconfig.DefaultSecretsDir(username)\n\nmaybe we can think about providing an option to override this, but that should be the default and we should not encourage people to do otherwise.",
+      "revId": "2c0c16df72e2a3e408d76395ca422755d031d5b8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d279b1ec_5add27f4",
+        "filename": "cmd/upspin/suffixed.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-09-28T01:14:57Z",
+      "side": 1,
+      "message": "I think we should write the config file out as whatever the current config is, plus the suffix \".suffix\". This is what I do in the browser when creating server users.\n\nSo if I\u0027m user@example.com with config $HOME/upspin/config creating user+server@example.com, the new config should be named $HOME/upspin/config.server",
+      "revId": "2c0c16df72e2a3e408d76395ca422755d031d5b8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
