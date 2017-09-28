@@ -9,7 +9,10 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
+
+	"upspin.io/key/keygen"
 )
 
 // Round 1.
@@ -37,13 +40,13 @@ const (
 	archive2Key = `p256
 20475414006091125411730282854763965332579614918776190347990649355528840360162
 41618798560597642013440926161855187887081385971895806061707694318148863738083
-103735382135370212717736500933863354513183407328603457343387144070761075604179
+103735382135370212717736500933863354513183407328603457343387144070761075604179 # pibud-sijat-ponam-zizaz.kudol-visin-vakok-jinok
 `
 )
 
 func TestSaveKeygen(t *testing.T) {
 	s := newState("test")
-	public, private, _, err := s.createKeys("p256", secretStr)
+	public, private, proquint, err := s.createKeys("p256", secretStr)
 	if err != nil {
 		t.Fatalf("creating keys: %v", err)
 	}
@@ -60,7 +63,7 @@ func TestSaveKeygen(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer os.RemoveAll(dir)
-	err = s.writeKeys(dir, public, private)
+	err = keygen.SaveKeys(dir, false, public, private, proquint)
 	if err != nil {
 		t.Fatalf("writing keys: %v", err)
 	}
@@ -77,12 +80,13 @@ func TestSaveKeygen(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if string(data) != private {
-		t.Fatalf("reading secret key: got %q; want %q", data, private)
+	want := strings.TrimSpace(private) + " # " + proquint + "\n"
+	if got := string(data); got != want {
+		t.Fatalf("reading secret key: got %q; want %q", got, want)
 	}
 
 	// Generate again.
-	public, private, _, err = s.createKeys("p256", secretStr2)
+	public, private, proquint, err = s.createKeys("p256", secretStr2)
 	if err != nil {
 		t.Fatalf("creating keys: %v", err)
 	}
@@ -94,13 +98,9 @@ func TestSaveKeygen(t *testing.T) {
 	}
 
 	// Update and rotate keys.
-	err = newState("test").saveKeys(dir, true, public, private)
+	err = keygen.SaveKeys(dir, true, public, private, proquint)
 	if err != nil {
 		t.Fatalf("saving keys: %v", err)
-	}
-	err = s.writeKeys(dir, public, private)
-	if err != nil {
-		t.Fatalf("writing keys: %v", err)
 	}
 
 	// Read them back.
@@ -115,8 +115,9 @@ func TestSaveKeygen(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if string(data) != private {
-		t.Fatalf("reading secret key: got %q; want %q", data, private)
+	want = strings.TrimSpace(private) + " # " + proquint + "\n"
+	if got := string(data); got != want {
+		t.Fatalf("reading secret key: got %q; want %q", got, want)
 	}
 
 	// Now check the archive.
