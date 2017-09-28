@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "a3b80947_d90a0777",
+        "filename": "cmd/upspin/suffixed.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-09-28T15:46:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bb250eb7_b15c9e90",
+      "range": {
+        "startLine": 25,
+        "startChar": 54,
+        "endLine": 26,
+        "endChar": 31
+      },
+      "revId": "2c0c16df72e2a3e408d76395ca422755d031d5b8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e5a6137c_50ad4a99",
         "filename": "cmd/upspin/suffixed.go",
         "patchSetId": 1
@@ -42,6 +66,24 @@
     },
     {
       "key": {
+        "uuid": "973b4051_c81ba1b5",
+        "filename": "cmd/upspin/suffixed.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-09-28T15:46:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e5a6137c_50ad4a99",
+      "revId": "2c0c16df72e2a3e408d76395ca422755d031d5b8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d279b1ec_5add27f4",
         "filename": "cmd/upspin/suffixed.go",
         "patchSetId": 1
@@ -56,6 +98,24 @@
       "revId": "2c0c16df72e2a3e408d76395ca422755d031d5b8",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "207c22da_2bf2ff9b",
+        "filename": "cmd/upspin/suffixed.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-09-28T15:46:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d279b1ec_5add27f4",
+      "revId": "2c0c16df72e2a3e408d76395ca422755d031d5b8",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
