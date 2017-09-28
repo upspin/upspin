@@ -161,34 +161,28 @@ func Open(userName upspin.UserName, directory string) (*User, error) {
 	}
 
 	off := logOffsetsFor(subdir)
-	if off[0] == 0 { // Possibly starting a new log.
-		// Is there an existing, old-style log file? If so, hard link it
-		// to the zero offset entry in the user's subdirectory.
-		// TODO: remove at some point. Must warn stragglers to first
-		// patch their systems with this change before we remove it.
-		oldLogName := filepath.Join(directory, oldStyleLogFilePrefix+string(userName))
-		newLogName := u.logFile(0)
-		err := linkIfNotExist(oldLogName, newLogName)
+	oldLogName := filepath.Join(directory, oldStyleLogFilePrefix+string(userName))
+	if off[0] == 0 {
+		// No logs found, or the only log found is for offset zero. Is
+		// there an existing, old-style log file, move it to be the
+		// zero offset entry in the user's log directory (subdir).
+		// TODO: Remove once all users are running the new code.
+		err := moveIfNotExist(oldLogName, u.logFile(0))
 		if err != nil {
 			return nil, errors.E(errors.IO, err)
 		}
 	}
+	// If we've reached this point then we've either moved the old log file
+	// to its new location, or it was previously hard-linked as log entry
+	// zero. In either case, just blindly try to delete the old log file.
+	// We don't need it anymore.
+	// TODO: Remove once all users are running the new code.
+	os.Remove(oldLogName)
 
 	loc := u.logFile(off[0])
 	loggerFile, err := os.OpenFile(loc, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 	if err != nil {
 		return nil, errors.E(errors.IO, err)
-	}
-
-	// We now have a new log name. Ensure we create an old log name too (for
-	// new roots) so that we could go back to old naming style if needed.
-	if off[0] == 0 {
-		oldLogName := filepath.Join(directory, oldStyleLogFilePrefix+string(userName))
-		newLogName := u.logFile(0)
-		err := linkIfNotExist(newLogName, oldLogName)
-		if err != nil {
-			return nil, errors.E(errors.IO, err)
-		}
 	}
 
 	w := &writer{
@@ -230,25 +224,26 @@ func (u *User) ReadOnlyClone() (*User, error) {
 	return &clone, nil
 }
 
-// linkIfNotExist links oldname to newname if newname does not yet exist.
-// Otherwise it does nothing. If oldname does not exist, it does nothing.
-func linkIfNotExist(oldname, newname string) error {
-	_, err := os.Stat(newname)
+// moveIfNotExist moves src to dst if dst does not yet exist.
+// Otherwise it does nothing. If src does not exist, it does nothing.
+func moveIfNotExist(src, dst string) error {
+	_, err := os.Stat(dst)
 	if err == nil {
-		// Already exist, nothing to do.
+		// Target already exists, nothing to do.
 		return nil
 	}
 	if err != nil && !os.IsNotExist(err) {
 		return err
 	}
-	_, err = os.Stat(oldname)
+	_, err = os.Stat(src)
 	if os.IsNotExist(err) {
+		// Source does not exist, nothing to do.
 		return nil
 	}
 	if err != nil {
 		return err
 	}
-	return os.Link(oldname, newname)
+	return os.Rename(src, dst)
 }
 
 // HasLog reports whether user has logs in its directory.
