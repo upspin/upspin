@@ -243,7 +243,7 @@ func TestOldStyleLogs(t *testing.T) {
 	// Check that the old log has been removed.
 	_, err = os.Stat(oldLog)
 	if !os.IsNotExist(err) {
-		t.Fatalf("expected not exist error, got %v", err)
+		t.Fatalf("expected not exist error for %q, got %v", oldLog, err)
 	}
 
 	// Open it again. Should work fine.
@@ -274,6 +274,39 @@ func TestOldStyleLogs(t *testing.T) {
 
 }
 
+func TestWhichLogFile(t *testing.T) {
+	const (
+		numLogs = 10
+		size    = 100
+	)
+
+	// Fake a list of files and offsets.
+	var user User
+
+	for i := 0; i < numLogs; i++ {
+		lf := &logFile{
+			index:   len(user.files),
+			version: version,
+			offset:  int64(i * size),
+		}
+		user.files = append(user.files, lf)
+	}
+
+	for offset := 0; offset < numLogs*size; offset++ {
+		f := user.whichLogFile(int64(offset))
+		if f.index != offset/size { // Integer division gets the boundary right.
+			t.Fatalf("got log %d; expected %d", f.index, offset/size)
+		}
+	}
+
+	// Try off the end. Shouldn't happen but get it right
+	f := user.whichLogFile(numLogs*size + 100)
+	if f.index != len(user.files)-1 {
+		t.Fatal("off end did not get last entry")
+	}
+
+}
+
 func TestReadRotatedLog(t *testing.T) {
 	dir, cleanup := setup(t, "ReadRotatedLog")
 	defer cleanup()
@@ -283,7 +316,7 @@ func TestReadRotatedLog(t *testing.T) {
 		directory: dir,
 	}
 
-	// Simulate a rotated log exists. NewLog will open the rotated one and
+	// Simulate a rotated log. NewLog will open the rotated one and
 	// read from it.
 
 	err := os.Mkdir(user.logSubDir(), 0700)
@@ -292,17 +325,17 @@ func TestReadRotatedLog(t *testing.T) {
 	}
 
 	// Create a few rotated logs.
-	f, err := os.Create(user.logFile(345678))
+	f, err := os.Create(user.logFileName(345678, version))
 	if err != nil {
 		t.Fatal(err)
 	}
 	f.Close()
-	f, err = os.Create(user.logFile(555111))
+	f, err = os.Create(user.logFileName(555111, version))
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	// Open Logs for user.
+	// Open logs for user.
 	user2, err := Open(user.name, user.directory)
 	if err != nil {
 		t.Fatal(err)
@@ -323,7 +356,7 @@ func TestReadRotatedLog(t *testing.T) {
 	f.Close()
 
 	// Create one more rotated log so we can test reading from the middle.
-	f, err = os.Create(user.logFile(777222))
+	f, err = os.Create(user.logFileName(777222, version))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -373,9 +406,16 @@ func TestRotateLogAndTruncate(t *testing.T) {
 			t.Fatal(err)
 		}
 	}
+	logOffsets := func(u *User) []int64 {
+		var offs []int64
+		for _, f := range u.files {
+			offs = append(offs, f.offset)
+		}
+		return offs
+	}
 	// Verify we have logs of roughly at the expected offsets.
-	offsets := logOffsetsFor(user.logSubDir())
-	expectedOffs := []int64{464, 348, 232, 116, 0}
+	offsets := logOffsets(user)
+	expectedOffs := []int64{0, 116, 232, 348, 464}
 	if got, want := len(offsets), len(expectedOffs); got != want {
 		t.Fatalf("Expected %d offsets, got %d", want, got)
 	}
@@ -388,8 +428,8 @@ func TestRotateLogAndTruncate(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	offsets = logOffsetsFor(user.logSubDir())
-	expectedOffs = []int64{232, 116, 0}
+	offsets = logOffsets(user)
+	expectedOffs = []int64{0, 116, 232}
 	if got, want := len(offsets), len(expectedOffs); got != want {
 		t.Fatalf("Expected %d offsets, got %d", want, got)
 	}
