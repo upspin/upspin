@@ -17,6 +17,7 @@ import (
 	yaml "gopkg.in/yaml.v2"
 
 	"upspin.io/config"
+	"upspin.io/key/keygen"
 	"upspin.io/subcmd"
 	"upspin.io/upspin"
 )
@@ -124,11 +125,11 @@ If any state exists at the given location (-where) then the command aborts.
 	if err != nil {
 		s.Exit(err)
 	}
-	err = s.writeKeys(dirServerPath, dirPublic, dirPrivate)
+	err = keygen.SaveKeys(dirServerPath, false, dirPublic, dirPrivate, dirProquint)
 	if err != nil {
 		s.Exit(err)
 	}
-	err = s.writeKeys(storeServerPath, storePublic, storePrivate)
+	err = keygen.SaveKeys(storeServerPath, false, storePublic, storePrivate, storeProquint)
 	if err != nil {
 		s.Exit(err)
 	}
@@ -281,7 +282,7 @@ func (s *State) setuphost(where, domain, curve, proquint string) {
 	if err != nil {
 		s.Exit(err)
 	}
-	err = s.writeKeys(cfgPath, pub, pri)
+	err = keygen.SaveKeys(cfgPath, false, pub, pri, proquint)
 	if err != nil {
 		s.Exit(err)
 	}
