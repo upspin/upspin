@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "72447085_33974139",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-09-28T00:04:09Z",
+      "side": 1,
+      "message": "Clients start with -1 at the beginning of time. They don\u0027t care what the first offset is.",
+      "parentUuid": "a7de285c_a8e57b18",
+      "revId": "07dc1c6a1d1e6d5931f00a0e5765e52e4379a864",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "ac11b649_1febc6d3",
         "filename": "dir/server/serverlog/log.go",
         "patchSetId": 1
