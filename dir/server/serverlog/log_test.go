@@ -224,36 +224,54 @@ func TestOldStyleLogs(t *testing.T) {
 	dir, cleanup := setup(t, "OldStyleLogs")
 	defer cleanup()
 
-	user := &User{
-		name:      "bob@example.com", // TODO THIS MAY FAIL.
-		directory: dir,
-	}
-
-	err := os.Mkdir(user.logSubDir(), 0700)
-	if err != nil {
-		t.Fatal(err)
-	}
+	const name = "bob@example.com"
 
 	// Create an existing old-style log.
-	f, err := os.Create(filepath.Join(dir, oldStyleLogFilePrefix+string(user.name)))
+	oldLog := filepath.Join(dir, oldStyleLogFilePrefix+string(name))
+	err := ioutil.WriteFile(oldLog, []byte{}, 0600)
 	if err != nil {
 		t.Fatal(err)
 	}
-	f.Close()
 
-	// Makes a hard link to the existing old style.
-	user2, err := Open(user.name, user.directory) // TODO
+	// Moves the old file to the new location.
+	u, err := Open(name, dir)
 	if err != nil {
 		t.Fatal(err)
 	}
-	user2.Close()
+	u.Close()
 
-	// Open it again. No errors.
-	user3, err := Open(user.name, user.directory) // TODO
+	// Check that the old log has been removed.
+	_, err = os.Stat(oldLog)
+	if !os.IsNotExist(err) {
+		t.Fatalf("expected not exist error, got %v", err)
+	}
+
+	// Open it again. Should work fine.
+	u, err = Open(name, dir)
 	if err != nil {
 		t.Fatal(err)
 	}
-	user3.Close()
+	u.Close()
+
+	// Re-create the old log.
+	err = ioutil.WriteFile(oldLog, []byte{}, 0600)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Open it again.
+	u, err = Open(name, dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	u.Close()
+
+	// Check that the old log was simply purged.
+	_, err = os.Stat(oldLog)
+	if !os.IsNotExist(err) {
+		t.Fatalf("expected not exist error, got %v", err)
+	}
+
 }
 
 func TestReadRotatedLog(t *testing.T) {
