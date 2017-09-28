@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "e211a76d_279dc902",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-09-28T22:15:44Z",
+      "side": 1,
+      "message": "Several things make (read-only) copies of structs. They need to share the mutex. I\u0027ll add a comment.",
+      "parentUuid": "5d6dd509_6c23c03c",
+      "range": {
+        "startLine": 163,
+        "startChar": 0,
+        "endLine": 163,
+        "endChar": 29
+      },
+      "revId": "781c73e21dace7bd2c69818a745321f5da345fe0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "7e1465b3_87538470",
         "filename": "dir/server/serverlog/log.go",
         "patchSetId": 1
@@ -36,6 +60,30 @@
       "writtenOn": "2017-09-28T22:12:51Z",
       "side": 1,
       "message": "This means no rolling back but I guess we\u0027ve already decided that?",
+      "range": {
+        "startLine": 181,
+        "startChar": 0,
+        "endLine": 185,
+        "endChar": 23
+      },
+      "revId": "781c73e21dace7bd2c69818a745321f5da345fe0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c847dc99_c02cd1ad",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-09-28T22:15:44Z",
+      "side": 1,
+      "message": "Once we integrate with the main branch, yes. But this is only about the old log files that did not live in subdirectories. It\u0027s not about the versioning change for seqs.",
+      "parentUuid": "7e1465b3_87538470",
       "range": {
         "startLine": 181,
         "startChar": 0,
