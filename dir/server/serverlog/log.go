@@ -18,10 +18,11 @@ package serverlog
 // tree.root.<username>  - root entry for username
 // tree.index.<username> - log checkpoint for username (historically named).
 // d.tree.log.<username> - subdirectory for username, containing files named:
-// <offset> - log greater than offset but less than the next offset file.
+// <offset>.<version> - log greater than offset but less than the next offset file.
+// The .version part is missing for old-format logs.
 //
-// There is also a legacy file tree.log.<username> which is hard linked to
-// offset zero in the d.tree.log.<username> directory.
+// There may also be a legacy file tree.log.<username> which will be renamed
+// (and set to offset 0) if found.
 //
 
 import (
@@ -50,11 +51,15 @@ type User struct {
 
 	// mu locks all writes to the writer and checkpoint,
 	// and the offSeqs structure. Readers have their
-	// own lock.
-	mu sync.Mutex
+	// own lock. A pointer so its clones share the lock
+	// (see ReadOnlyClone).
+	mu *sync.Mutex
 
 	writer     *writer
 	checkpoint *checkpoint
+
+	// files are sorted in increasing offset order.
+	files []*logFile
 
 	// Kept in increasing sequence order.
 	// TODO: Make this a sparse slice and do small linear scans.
@@ -84,15 +89,15 @@ type Entry struct {
 type writer struct {
 	user *User // owner of this writer.
 
-	file       *os.File // file descriptor for the log.
-	fileOffset int64    // offset of the first record from the file.
+	fd   *os.File // file descriptor for the log.
+	file *logFile // log this writer is writing to.
 }
 
 // Write implements io.Writer for the our User type.
 // It is the method clients use to append data to the set of log files.
 // TODO: Used only in a test of corrupted data in ../tree - could be deleted.
 func (u *User) Write(b []byte) (int, error) {
-	return u.writer.file.Write(b)
+	return u.writer.fd.Write(b)
 }
 
 // Reader reads LogEntries from the log.
@@ -104,16 +109,8 @@ type Reader struct {
 	// held after mu.
 	mu sync.Mutex
 
-	// fileOffset is the offset of the first record from the file we're
-	// reading now.
-	fileOffset int64
-
-	// file is the file for the current log, indicated by fileOffset.
-	file *os.File
-
-	// offsets is a descending list of the known offsets available for
-	// reading.
-	offsets []int64
+	fd   *os.File // file descriptor for the log.
+	file *logFile // log this writer is writing to.
 }
 
 // checkpoint reads and writes from/to stable storage the log state information
@@ -133,7 +130,20 @@ type offSeq struct {
 	sequence int64
 }
 
-const oldStyleLogFilePrefix = "tree.log."
+// logFile gathers the information about a log file on disk.
+type logFile struct {
+	name    string // Full path name.
+	index   int    // Position in User.files.
+	version int    // Version number of the format used.
+	offset  int64  // Offset at start of file.
+}
+
+const (
+	// Version 0 refers to the old logs that did not have a version number
+	// in their name.
+	version               = 1
+	oldStyleLogFilePrefix = "tree.log."
+)
 
 // Open returns a User structure holding the open
 // logs for the user in the named local file system's directory.
@@ -151,6 +161,7 @@ func Open(userName upspin.UserName, directory string) (*User, error) {
 	u := &User{
 		name:      userName,
 		directory: directory,
+		mu:        new(sync.Mutex),
 	}
 	subdir := u.logSubDir()
 
@@ -160,35 +171,44 @@ func Open(userName upspin.UserName, directory string) (*User, error) {
 		return nil, errors.E(errors.IO, err)
 	}
 
-	off := logOffsetsFor(subdir)
+	// If there's an old log, move it.
+	// TODO: Remove this code once all users are updated, or by June 2018.
 	oldLogName := filepath.Join(directory, oldStyleLogFilePrefix+string(userName))
-	if off[0] == 0 {
-		// No logs found, or the only log found is for offset zero. Is
-		// there an existing, old-style log file, move it to be the
-		// zero offset entry in the user's log directory (subdir).
-		// TODO: Remove once all users are running the new code.
-		err := moveIfNotExist(oldLogName, u.logFile(0))
+	if _, err := os.Stat(oldLogName); err == nil {
+		err := moveIfNotExist(oldLogName, u.logFileName(0, 0))
+		if err != nil {
+			return nil, errors.E(errors.IO, err)
+		}
+		// If we've reached this point then we've either moved the old log file
+		// to its new location, or it was previously hard-linked as log entry
+		// zero. In either case, just blindly try to delete the old log file.
+		// We don't need it anymore.
+		os.Remove(oldLogName)
+	}
+
+	u.findLogFiles(subdir)
+
+	// Create user's first log if none exists.
+	var (
+		fd  *os.File
+		err error
+	)
+	if len(u.files) == 0 {
+		_, fd, err = u.createLogFile(0)
+		if err != nil {
+			return nil, errors.E(errors.IO, err)
+		}
+	} else {
+		fd, err = os.OpenFile(u.files[len(u.files)-1].name, os.O_APPEND|os.O_WRONLY, 0600)
 		if err != nil {
 			return nil, errors.E(errors.IO, err)
 		}
 	}
-	// If we've reached this point then we've either moved the old log file
-	// to its new location, or it was previously hard-linked as log entry
-	// zero. In either case, just blindly try to delete the old log file.
-	// We don't need it anymore.
-	// TODO: Remove once all users are running the new code.
-	os.Remove(oldLogName)
-
-	loc := u.logFile(off[0])
-	loggerFile, err := os.OpenFile(loc, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
-	if err != nil {
-		return nil, errors.E(errors.IO, err)
-	}
 
 	w := &writer{
-		user:       u,
-		file:       loggerFile,
-		fileOffset: off[0],
+		user: u,
+		fd:   fd,
+		file: u.files[0],
 	}
 
 	rloc := u.rootFile()
@@ -334,8 +354,8 @@ func (u *User) Name() upspin.UserName {
 	return u.name
 }
 
-func (u *User) logFile(offset int64) string {
-	return filepath.Join(u.logSubDir(), fmt.Sprintf("%d", offset))
+func (u *User) logFileName(offset int64, version int) string {
+	return filepath.Join(u.logSubDir(), fmt.Sprintf("%d.%d", offset, version))
 }
 
 func (u *User) logSubDir() string {
@@ -355,25 +375,73 @@ func rootFileName(userName, directory string) string {
 	return filepath.Join(directory, "tree.root."+userName)
 }
 
-// logOffsetsFor returns in descending order a list of log offsets in a log
-// directory for a user.
-// If no log directory exists, the only offset returned is 0.
-func logOffsetsFor(directory string) []int64 {
-	offs, err := filepath.Glob(filepath.Join(directory, "*"))
-	if err != nil || len(offs) == 0 {
-		return []int64{0}
+// findLogFiles populates u.files with the log files available for this user.
+// They are stored in increasing offset order.
+func (u *User) findLogFiles(dir string) {
+	u.files = nil // Safety; shouldn't be necessary.
+	files, err := filepath.Glob(filepath.Join(dir, "*"))
+	if err != nil || len(files) == 0 {
+		return
 	}
-	var offsets []int64
-	for _, o := range offs {
-		off, err := strconv.ParseInt(filepath.Base(o), 10, 64)
-		if err != nil {
-			log.Error.Printf("dir/server/tree.logOffsetsFor: Can't parse log offset: %s", o)
+	for _, file := range files {
+		// Format of name is ..../*tree.log.ann@example.com/oooo.vvvv where o=offset, v=version.
+		// For old files, .vvvv will be missing, and version is 0.
+		elems := strings.Split(filepath.Base(file), ".")
+		var ints []int64
+		for _, elem := range elems {
+			x, err := strconv.ParseInt(elem, 10, 64)
+			if err != nil {
+				log.Error.Printf("serverlog.findLogFiles: can't parse %q", file)
+				continue
+			}
+			ints = append(ints, x)
+		}
+		lf := &logFile{
+			name:  file,
+			index: len(u.files),
+		}
+		switch len(ints) {
+		case 2:
+			lf.version = int(ints[1])
+			fallthrough
+		case 1:
+			lf.offset = ints[0]
+		default:
+			log.Error.Printf("serverlog.findLogFiles: can't parse %q", file)
 			continue
 		}
-		offsets = append(offsets, off)
+		u.files = append(u.files, lf)
 	}
-	sort.Slice(offsets, func(i, j int) bool { return offsets[i] > offsets[j] })
-	return offsets
+	sort.Slice(u.files, func(i, j int) bool { return u.files[i].offset < u.files[j].offset })
+
+}
+
+// createLogFile creates a file for the offset and returns the logFile and open fd.
+func (u *User) createLogFile(offset int64) (*logFile, *os.File, error) {
+	name := u.logFileName(offset, version)
+	fd, err := os.OpenFile(name, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+	if err != nil {
+		return nil, nil, err
+	}
+	lf := &logFile{
+		name:    name,
+		index:   len(u.files),
+		version: version,
+		offset:  offset,
+	}
+	u.files = append(u.files, lf)
+	return lf, fd, err
+}
+
+// whichLogFile returns the log file to use to read this offset.
+// u.mu must be held.
+func (u *User) whichLogFile(offset int64) *logFile {
+	for i := 1; i < len(u.files); i++ {
+		if u.files[i].offset > offset {
+			return u.files[i-1]
+		}
+	}
+	return u.files[len(u.files)-1]
 }
 
 // OffsetOf returns the global offset in the user's logs for this sequence number.
@@ -408,42 +476,41 @@ func (u *User) Append(e *Entry) error {
 
 	w := u.writer
 
-	prevSize := size(w.file)
-	offset := w.fileOffset + prevSize
+	prevSize := size(w.fd)
+	offset := w.file.offset + prevSize
 
 	// Is it time to move to a new log file?
 	if prevSize >= MaxLogSize {
-		dir := filepath.Dir(w.file.Name())
 		// Close the current underlying log file.
 		err = w.close()
 		if err != nil {
 			return errors.E(errors.IO, err)
 		}
 		// Create a new log file where the previous one left off.
-		w.fileOffset += prevSize
-		loc := filepath.Join(dir, fmt.Sprintf("%d", w.fileOffset))
-		w.file, err = os.OpenFile(loc, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+		file, fd, err := u.createLogFile(w.file.offset + prevSize)
 		if err != nil {
 			return errors.E(errors.IO, err)
 		}
+		w.file = file
+		w.fd = fd
 		prevSize = 0
 	}
 
 	// File is append-only, so this is guaranteed to write to the tail.
-	n, err := w.file.Write(buf)
+	n, err := w.fd.Write(buf)
 	if err != nil {
 		return errors.E(errors.IO, err)
 	}
-	err = w.file.Sync()
+	err = w.fd.Sync()
 	if err != nil {
 		return errors.E(errors.IO, err)
 	}
 	// Sanity check: flush worked and the new offset relative to the
 	// beginning of this file is the expected one.
 	newOffs := prevSize + int64(n)
-	if newOffs != size(w.file) {
+	if newOffs != size(w.fd) {
 		// This might indicate a race somewhere, despite the locks.
-		return errors.E(errors.IO, errors.Errorf("file.Sync did not update offset: expected %d, got %d", newOffs, size(w.file)))
+		return errors.E(errors.IO, errors.Errorf("file.Sync did not update offset: expected %d, got %d", newOffs, size(w.fd)))
 	}
 
 	u.addOffSeq(offset, e.Entry.Sequence)
@@ -479,29 +546,26 @@ func (r *Reader) ReadAt(offset int64) (le Entry, next int64, err error) {
 	defer r.mu.Unlock()
 
 	// The maximum offset we can satisfy with the current log file.
-	maxOff := r.fileOffset + size(r.file)
+	maxOff := r.file.offset + size(r.fd)
 
 	// Is the requested offset outside the bounds of the current log file?
-	before := offset < r.fileOffset
+	before := offset < r.file.offset
 	after := offset >= maxOff
 	if before || after {
-		if after {
-			// Load new file offsets in case there was a log rotation.
-			r.offsets = logOffsetsFor(filepath.Dir(r.file.Name()))
-		}
-		readOffset := r.readOffset(offset)
 		// Locate the file and open it.
-		err := r.openLogAtOffset(readOffset, filepath.Dir(r.file.Name()))
+		r.user.mu.Lock()
+		err := r.openLogForOffset(offset)
+		r.user.mu.Unlock()
 		if err != nil {
 			return le, 0, errors.E(errors.IO, err)
 		}
 		// Recompute maxOff for the new file.
-		maxOff = r.fileOffset + size(r.file)
+		maxOff = r.file.offset + size(r.fd)
 	}
 
 	// If we're reading from the tail file (max r.readOffsets), then we
 	// must lock r.user.mu to avoid reading partially-written data.
-	if r.offsets[0] == r.fileOffset {
+	if r.file.offset == r.user.files[len(r.user.files)-1].offset {
 		r.user.mu.Lock()
 		defer r.user.mu.Unlock()
 	}
@@ -511,12 +575,12 @@ func (r *Reader) ReadAt(offset int64) (le Entry, next int64, err error) {
 		return le, maxOff, nil
 	}
 
-	_, err = r.file.Seek(offset-r.fileOffset, io.SeekStart)
+	_, err = r.fd.Seek(offset-r.file.offset, io.SeekStart)
 	if err != nil {
 		return le, 0, errors.E(errors.IO, err)
 	}
 	next = offset
-	checker := newChecker(r.file)
+	checker := newChecker(r.fd)
 	defer checker.close()
 
 	err = le.unmarshal(checker)
@@ -527,23 +591,12 @@ func (r *Reader) ReadAt(offset int64) (le Entry, next int64, err error) {
 	return
 }
 
-// readOffset returns the log we must read from to satisfy offset. If offset
-// is not in the range of what we have stored it returns -1.
-func (r *Reader) readOffset(offset int64) int64 {
-	for _, o := range r.offsets { // r.offsets are in descending order.
-		if offset >= o {
-			return o
-		}
-	}
-	return -1
-}
-
 // AppendOffset returns the offset of the end of the written log file or -1 on error.
 func (u *User) AppendOffset() int64 {
 	u.mu.Lock()
 	defer u.mu.Unlock()
 	w := u.writer
-	return w.fileOffset + size(w.file)
+	return w.file.offset + size(w.fd)
 }
 
 // EndOffset returns the offset of the end of the current file or -1 on error.
@@ -554,12 +607,12 @@ func (r *Reader) EndOffset() int64 {
 
 	// If we're reading from the same file as the current writer, lock it.
 	// Order is important.
-	if r.fileOffset == r.offsets[0] {
+	if r.file.offset == r.user.files[len(r.user.files)-1].offset {
 		r.user.mu.Lock()
 		defer r.user.mu.Unlock()
 	}
 
-	return r.fileOffset + size(r.file)
+	return r.file.offset + size(r.fd)
 }
 
 // size returns the offset at the end of the file or -1 on error.
@@ -577,42 +630,38 @@ func (u *User) Truncate(offset int64) error {
 	u.mu.Lock()
 	defer u.mu.Unlock()
 
-	w := u.writer
-
-	// Are we truncating the tail file?
-	if offset >= w.fileOffset {
-		err := w.file.Truncate(w.fileOffset - offset)
+	// Delete any files after the one holding offset.
+	file := u.whichLogFile(offset)
+	for i := file.index + 1; i < len(u.files); i++ {
+		err := os.Remove(u.files[i].name)
 		if err != nil {
-			return err
+			return errors.E(errors.IO, err)
 		}
-		u.truncateOffSeqs(offset)
-		return nil
+	}
+	u.files = u.files[:file.index+1]
+
+	// Move the writer to that file, if not already there.
+	w := u.writer
+	if w.file != file {
+		if err := w.close(); err != nil {
+			return errors.E(errors.IO, err)
+		}
+		fd, err := os.OpenFile(file.name, os.O_APPEND|os.O_WRONLY, 0600)
+		if err != nil {
+			return errors.E(errors.IO, err)
+		}
+		w.file = file
+		w.fd = fd
 	}
 
-	// Otherwise, locate the existing offsets and delete everything from
-	// this point on.
-	base := filepath.Dir(w.file.Name())
-	offsets := logOffsetsFor(base)
-
-	err := w.close()
-	if err != nil {
-		return errors.E(errors.IO, err)
-	}
-
-	var i int
-	for i = 0; i < len(offsets) && offsets[i] >= offset; i++ {
-		os.Remove(filepath.Join(base, fmt.Sprintf("%d", offsets[i])))
-	}
-
-	loc := filepath.Join(base, fmt.Sprintf("%d", offsets[i]))
-	w.file, err = os.OpenFile(loc, os.O_APPEND|os.O_WRONLY, 0600)
-	if err != nil {
-		return errors.E(errors.IO, err)
-	}
-	w.fileOffset = offsets[i]
-	err = w.file.Truncate(offset - w.fileOffset)
-	if err != nil {
-		return err
+	// Truncate the active file.
+	pos := offset - w.file.offset
+	if pos < size(w.fd) {
+		err := w.fd.Truncate(pos)
+		if err != nil {
+			return errors.E(errors.IO, err)
+		}
+		w.fd.Seek(pos, io.SeekStart)
 	}
 	u.truncateOffSeqs(offset)
 	return nil
@@ -642,45 +691,44 @@ func (u *User) NewReader() (*Reader, error) {
 
 	w := u.writer
 	r.user = u
-	r.offsets = logOffsetsFor(filepath.Dir(w.file.Name()))
 
-	dir := filepath.Dir(w.file.Name())
-	err := r.openLogAtOffset(w.fileOffset, dir)
+	if w.fd == nil {
+		panic("nil writer")
+	}
+	err := r.openLogForOffset(w.file.offset)
 	if err != nil {
 		return nil, errors.E(errors.IO, err)
 	}
 	return r, nil
 }
 
-// openLogAtOffset opens the log file relative to a directory where the absolute
-// offset is stored and sets it as this Reader's current file.
+// openLogForOffset opens the log file that holds the offset.
 // r.mu must be held.
-func (r *Reader) openLogAtOffset(offset int64, directory string) error {
-	fname := filepath.Join(directory, fmt.Sprintf("%d", offset))
+func (r *Reader) openLogForOffset(offset int64) error {
+	logFile := r.user.whichLogFile(offset)
 	// Re-opening the same offset?
-	if r.file != nil && r.file.Name() == fname {
-		r.fileOffset = offset
+	if r.fd != nil && r.fd.Name() == logFile.name {
 		return nil
 	}
-	f, err := os.Open(fname)
+	f, err := os.Open(logFile.name)
 	if err != nil {
 		return err
 	}
-	if r.file != nil {
-		r.file.Close()
+	if r.fd != nil {
+		r.fd.Close()
 	}
-	r.file = f
-	r.fileOffset = offset
+	r.fd = f
+	r.file = logFile
 	return nil
 }
 
 // close closes the writer. user.mu must be held.
 func (w *writer) close() error {
-	if w == nil || w.file == nil {
+	if w == nil || w.fd == nil {
 		return nil
 	}
-	err := w.file.Close()
-	w.file = nil
+	err := w.fd.Close()
+	w.fd = nil
 	return err
 }
 
@@ -689,9 +737,9 @@ func (r *Reader) Close() error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	if r.file != nil {
-		err := r.file.Close()
-		r.file = nil
+	if r.fd != nil {
+		err := r.fd.Close()
+		r.fd = nil
 		return err
 	}
 	return nil
