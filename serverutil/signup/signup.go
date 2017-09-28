@@ -87,16 +87,20 @@ func (m *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	v := r.FormValue
 	name, dir, store, pkey, sigR, sigS := v("name"), v("dir"), v("store"), v("key"), v("sigR"), v("sigS")
 	u := &upspin.User{
-		Name: upspin.UserName(name),
-		Dirs: []upspin.Endpoint{{
+		Name:      upspin.UserName(name),
+		PublicKey: upspin.PublicKey(pkey),
+	}
+	if dir != "" {
+		u.Dirs = []upspin.Endpoint{{
 			Transport: upspin.Remote,
 			NetAddr:   upspin.NetAddr(dir),
-		}},
-		Stores: []upspin.Endpoint{{
+		}}
+	}
+	if store != "" {
+		u.Stores = []upspin.Endpoint{{
 			Transport: upspin.Remote,
 			NetAddr:   upspin.NetAddr(store),
-		}},
-		PublicKey: upspin.PublicKey(pkey),
+		}}
 	}
 	if err := valid.UserName(u.Name); err != nil {
 		errorf(http.StatusBadRequest, "invalid user name: %s", u.Name)
@@ -207,10 +211,17 @@ func (m *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		errorf(http.StatusInternalServerError, "could not generate signature: %v", err)
 		return
 	}
+	dir, store = "", ""
+	if len(u.Dirs) == 1 {
+		dir = string(u.Dirs[0].NetAddr)
+	}
+	if len(u.Stores) == 1 {
+		store = string(u.Stores[0].NetAddr)
+	}
 	vals := url.Values{
 		"name":  {string(u.Name)},
-		"dir":   {string(u.Dirs[0].NetAddr)},
-		"store": {string(u.Stores[0].NetAddr)},
+		"dir":   {dir},
+		"store": {store},
 		"key":   {string(u.PublicKey)},
 		"sigR":  {sig.R.String()},
 		"sigS":  {sig.S.String()},
