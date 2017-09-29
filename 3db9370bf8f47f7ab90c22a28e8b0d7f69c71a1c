@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "7e6a7b7b_2a46e75d",
+        "filename": "cmd/upspin/createsuffixeduser.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-09-29T20:37:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1308bb5b_1fa06b5f",
+      "revId": "3db9370bf8f47f7ab90c22a28e8b0d7f69c71a1c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "46c53f83_2a6b7cf9",
         "filename": "cmd/upspin/createsuffixeduser.go",
         "patchSetId": 4
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "ff3b3eff_59f7bc3f",
+        "filename": "cmd/upspin/createsuffixeduser.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-09-29T20:37:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "46c53f83_2a6b7cf9",
+      "revId": "3db9370bf8f47f7ab90c22a28e8b0d7f69c71a1c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7fe98bf1_be025659",
         "filename": "cmd/upspin/createsuffixeduser.go",
         "patchSetId": 4
@@ -47,6 +83,24 @@
       "writtenOn": "2017-09-29T01:18:27Z",
       "side": 1,
       "message": "check that the others aren\u0027t set?\nif *dirServer !\u003d \"\" || *storeServer !\u003d \"\" {\nusageAndExit(fs)\n}",
+      "revId": "3db9370bf8f47f7ab90c22a28e8b0d7f69c71a1c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bf6ad257_072bdfd5",
+        "filename": "cmd/upspin/createsuffixeduser.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-09-29T20:37:40Z",
+      "side": 1,
+      "message": "Sort of done.",
+      "parentUuid": "7fe98bf1_be025659",
       "revId": "3db9370bf8f47f7ab90c22a28e8b0d7f69c71a1c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "ec3bfa67_a590f819",
+        "filename": "cmd/upspin/createsuffixeduser.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-09-29T20:37:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "65b21151_325301c0",
+      "revId": "3db9370bf8f47f7ab90c22a28e8b0d7f69c71a1c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "33159a11_1a818531",
         "filename": "cmd/upspin/createsuffixeduser.go",
         "patchSetId": 4
@@ -81,6 +153,24 @@
       "writtenOn": "2017-09-29T01:18:27Z",
       "side": 1,
       "message": "here and below:\nerrors from functions in package os already include the file name, so don\u0027t stutter it here. that property is documented and guaranteed.",
+      "revId": "3db9370bf8f47f7ab90c22a28e8b0d7f69c71a1c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6a642d50_bf9219a0",
+        "filename": "cmd/upspin/createsuffixeduser.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-09-29T20:37:40Z",
+      "side": 1,
+      "message": "Ha! I copied those from signup.go assuming I was not understanding. I\u0027ll fix in both files.",
+      "parentUuid": "33159a11_1a818531",
       "revId": "3db9370bf8f47f7ab90c22a28e8b0d7f69c71a1c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -104,6 +194,24 @@
     },
     {
       "key": {
+        "uuid": "e2b1f012_7803aa96",
+        "filename": "cmd/upspin/createsuffixeduser.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-09-29T20:37:40Z",
+      "side": 1,
+      "message": "ditto",
+      "parentUuid": "0ea31f65_91a5dbfb",
+      "revId": "3db9370bf8f47f7ab90c22a28e8b0d7f69c71a1c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f94b6fcd_e4c5d3de",
         "filename": "cmd/upspin/createsuffixeduser.go",
         "patchSetId": 4
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "62312db6_c2685b45",
+        "filename": "cmd/upspin/createsuffixeduser.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-09-29T20:37:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f94b6fcd_e4c5d3de",
+      "revId": "3db9370bf8f47f7ab90c22a28e8b0d7f69c71a1c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "784a4923_f4fc3981",
         "filename": "cmd/upspin/createsuffixeduser.go",
         "patchSetId": 4
@@ -132,6 +258,24 @@
       "writtenOn": "2017-09-29T01:18:27Z",
       "side": 1,
       "message": "there are no calls to fmt.Printf in this package. use fmt.Fprintf(s.Stderr, ...) for diagnostics.",
+      "revId": "3db9370bf8f47f7ab90c22a28e8b0d7f69c71a1c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "be76e195_beb35aac",
+        "filename": "cmd/upspin/createsuffixeduser.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-09-29T20:37:40Z",
+      "side": 1,
+      "message": "I\u0027ll do that but it seems quite strange that we put non-diagnostic messages out on stderr.  Telling someone what the proquint is and that they need to save it is not diagnostic, it is required output.",
+      "parentUuid": "784a4923_f4fc3981",
       "revId": "3db9370bf8f47f7ab90c22a28e8b0d7f69c71a1c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
