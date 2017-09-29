@@ -279,6 +279,24 @@
       "revId": "3db9370bf8f47f7ab90c22a28e8b0d7f69c71a1c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ce38cfa3_e742d54b",
+        "filename": "cmd/upspin/createsuffixeduser.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-09-29T22:30:03Z",
+      "side": 1,
+      "message": "You could use s.Printf for stdouty things.",
+      "parentUuid": "be76e195_beb35aac",
+      "revId": "3db9370bf8f47f7ab90c22a28e8b0d7f69c71a1c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
