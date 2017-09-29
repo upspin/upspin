@@ -93,6 +93,46 @@
       "revId": "781c73e21dace7bd2c69818a745321f5da345fe0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6d7063c7_74bf8547",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 379,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-09-29T00:12:34Z",
+      "side": 1,
+      "message": "should this function set u.files to nil at the top?",
+      "revId": "781c73e21dace7bd2c69818a745321f5da345fe0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "60897227_6b34785c",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 408,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-09-29T00:12:34Z",
+      "side": 1,
+      "message": "errant dot",
+      "range": {
+        "startLine": 408,
+        "startChar": 30,
+        "endLine": 408,
+        "endChar": 32
+      },
+      "revId": "781c73e21dace7bd2c69818a745321f5da345fe0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
