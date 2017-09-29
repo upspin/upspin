@@ -104,6 +104,23 @@
     },
     {
       "key": {
+        "uuid": "f94b6fcd_e4c5d3de",
+        "filename": "cmd/upspin/createsuffixeduser.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-09-29T01:54:12Z",
+      "side": 1,
+      "message": "Now that we have a keygen package you can use it here, and then you\u0027ll be able to remove the config file if key generation fails.",
+      "revId": "3db9370bf8f47f7ab90c22a28e8b0d7f69c71a1c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "784a4923_f4fc3981",
         "filename": "cmd/upspin/createsuffixeduser.go",
         "patchSetId": 4
