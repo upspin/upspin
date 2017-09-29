@@ -106,7 +106,7 @@ func (d *infoDirEntry) Readers() string {
 }
 
 func (d *infoDirEntry) Sequence() int64 {
-	return upspin.SeqVersion(d.DirEntry.Sequence)
+	return d.DirEntry.Sequence
 }
 
 func (d *infoDirEntry) Hashes() string {
