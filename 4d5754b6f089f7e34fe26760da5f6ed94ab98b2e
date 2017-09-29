@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "49a94373_b0e3fdb7",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-09-29T07:41:45Z",
+      "side": 1,
+      "message": "nice",
+      "revId": "4d5754b6f089f7e34fe26760da5f6ed94ab98b2e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "31ee570a_398b45b2",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-09-29T07:41:45Z",
+      "side": 1,
+      "message": "Check for u.files[last].version \u003e version, as a separate (erroneous) case?",
+      "revId": "4d5754b6f089f7e34fe26760da5f6ed94ab98b2e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
