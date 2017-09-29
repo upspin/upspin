@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1308bb5b_1fa06b5f",
+        "filename": "cmd/upspin/createsuffixeduser.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-09-29T01:18:27Z",
+      "side": 1,
+      "message": "s/ adding/, adding/",
+      "revId": "3db9370bf8f47f7ab90c22a28e8b0d7f69c71a1c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "46c53f83_2a6b7cf9",
+        "filename": "cmd/upspin/createsuffixeduser.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-09-29T01:18:27Z",
+      "side": 1,
+      "message": "you\u0027re not creating if it already exists.\nmaybe\n\nif suffixed user already exists, overwrite its keys and config file",
+      "revId": "3db9370bf8f47f7ab90c22a28e8b0d7f69c71a1c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7fe98bf1_be025659",
+        "filename": "cmd/upspin/createsuffixeduser.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-09-29T01:18:27Z",
+      "side": 1,
+      "message": "check that the others aren\u0027t set?\nif *dirServer !\u003d \"\" || *storeServer !\u003d \"\" {\nusageAndExit(fs)\n}",
+      "revId": "3db9370bf8f47f7ab90c22a28e8b0d7f69c71a1c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "65b21151_325301c0",
+        "filename": "cmd/upspin/createsuffixeduser.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-09-29T01:18:27Z",
+      "side": 1,
+      "message": "maybe\n\"can\u0027t add another suffix to a user with a suffix\"",
+      "revId": "3db9370bf8f47f7ab90c22a28e8b0d7f69c71a1c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "33159a11_1a818531",
+        "filename": "cmd/upspin/createsuffixeduser.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-09-29T01:18:27Z",
+      "side": 1,
+      "message": "here and below:\nerrors from functions in package os already include the file name, so don\u0027t stutter it here. that property is documented and guaranteed.",
+      "revId": "3db9370bf8f47f7ab90c22a28e8b0d7f69c71a1c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0ea31f65_91a5dbfb",
+        "filename": "cmd/upspin/createsuffixeduser.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-09-29T01:18:27Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "3db9370bf8f47f7ab90c22a28e8b0d7f69c71a1c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "784a4923_f4fc3981",
+        "filename": "cmd/upspin/createsuffixeduser.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-09-29T01:18:27Z",
+      "side": 1,
+      "message": "there are no calls to fmt.Printf in this package. use fmt.Fprintf(s.Stderr, ...) for diagnostics.",
+      "revId": "3db9370bf8f47f7ab90c22a28e8b0d7f69c71a1c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
