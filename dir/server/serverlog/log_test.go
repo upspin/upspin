@@ -87,7 +87,7 @@ func TestConcurrent(t *testing.T) {
 	write := func() error {
 		for i := 0; i < numEntries; i++ {
 			e := entry
-			e.Entry.Sequence = upspin.NewSequence()
+			e.Entry.Sequence = rand.Int63n(100)
 			e.Entry.Time = upspin.Now()
 			if rand.Intn(10) == 0 {
 				e.Entry.SignedName = "bar@foo.com/otherfile"
@@ -721,6 +721,85 @@ func TestOffsetOf(t *testing.T) {
 		if got != offset {
 			t.Errorf("OffsetOf(%d) = %d; want %d", seq, got, offset)
 		}
+	}
+}
+
+func TestVersion0Logs(t *testing.T) {
+	// Copy logs to temporary so we don't overwrite any.
+	dir, err := ioutil.TempDir("", "TestVersion0Logs")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(dir)
+
+	err = os.MkdirAll(filepath.Join(dir, "d.tree.log.user@example.com"), 0700)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = filepath.Walk("testdata", func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() {
+			return nil
+		}
+		data, err := ioutil.ReadFile(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		tmp := filepath.Join(dir, path[len("testdata/version0/"):])
+		err = ioutil.WriteFile(tmp, data, 0600)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Now we can Open the user's logs in the temporary location.
+	user, err := Open("user@example.com", dir)
+	defer os.Remove("testdata/version0/d.tree.log.user@example.com/2738.1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	r, err := user.NewReader()
+	if err != nil {
+		t.Fatal(err)
+	}
+	// This is the series of events in testdata/version0log.
+	sequence := []int64{0, 1, 1, 1, 1, 1, 2}
+	name := []upspin.PathName{"dir", "dir/file", "file", "file", "dir/file", "dir/file", "dir/file"}
+	op := []Operation{Put, Put, Put, Delete, Delete, Put, Put}
+	offset := int64(0)
+	for i := 0; i < 100; i++ {
+		entry, next, err := r.ReadAt(offset)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if offset == next {
+			break
+		}
+		if r.file.version != 0 {
+			t.Fatalf("log is version %d; expected version 0", r.file.version)
+		}
+		if entry.Entry.Sequence != sequence[i] {
+			t.Fatalf("%d: got sequence %d; expected %d", i, entry.Entry.Sequence, sequence[i])
+		}
+		path := "user@example.com/" + name[i]
+		if entry.Entry.Name != path {
+			t.Fatalf("%d: got name %q; expected %q", i, entry.Entry.Name, path)
+		}
+		if entry.Op != op[i] {
+			t.Fatalf("%d: got op %d; expected %d", i, entry.Op, op[i])
+		}
+		t.Log(entry.Entry.Name, entry.Op)
+		offset = next
+	}
+	// We only write to files with the current version.
+	if user.writer.file.version != version {
+		t.Fatalf("writer is to file version %d; expected %d", user.writer.file.version, version)
+	}
+	if user.writer.file.offset != offset {
+		t.Fatalf("writer at offset %d; expected %d", user.writer.file.offset, offset)
 	}
 }
 
