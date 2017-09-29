@@ -288,7 +288,7 @@ func (r *Runner) GotEntryWithSequenceVersion(p upspin.PathName, seq int64) bool 
 		r.lastErr = errors.Errorf("got nil entry, want %q", p)
 	} else if r.Entry.Name != p {
 		r.lastErr = errors.Errorf("got entry %q, want %q", r.Entry.Name, p)
-	} else if upspin.SeqVersion(r.Entry.Sequence) != upspin.SeqVersion(seq) {
+	} else if r.Entry.Sequence != seq {
 		r.lastErr = errors.Errorf("got sequence %d, want %d", r.Entry.Sequence, seq)
 	} else {
 		return true

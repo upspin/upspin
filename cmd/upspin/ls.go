@@ -91,7 +91,7 @@ func (s *State) printLongDirEntries(de []*upspin.DirEntry) {
 	seqWidth := 2
 	sizeWidth := 2
 	for _, e := range de {
-		str := fmt.Sprintf("%d", upspin.SeqVersion(e.Sequence))
+		str := fmt.Sprintf("%d", e.Sequence)
 		if seqWidth < len(str) {
 			seqWidth = len(str)
 		}
@@ -134,7 +134,7 @@ func (s *State) printLongDirEntries(de []*upspin.DirEntry) {
 		s.Printf("%c %-6s %*d %*d %s [%s]\t%s%s\n",
 			attrChar,
 			packStr,
-			seqWidth, upspin.SeqVersion(e.Sequence),
+			seqWidth, e.Sequence,
 			sizeWidth, s.sizeOf(e),
 			e.Time.Go().Local().Format("Mon Jan _2 15:04:05"),
 			endpt,

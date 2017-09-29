@@ -66,7 +66,7 @@ func TestMakeRoot(t *testing.T) {
 	deExpected := *de
 	deExpected.Writer = serverName
 	deExpected.Packing = upspin.EEPack
-	deExpected.Sequence = upspin.SeqBase | (de.Sequence ^ upspin.SeqVersion(de.Sequence))
+	deExpected.Sequence = upspin.SeqBase
 	err = checkDirEntry("TestMakeRoot", deLookup, &deExpected)
 	if err != nil {
 		t.Fatal(err)

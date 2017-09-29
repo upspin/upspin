@@ -143,6 +143,10 @@ const (
 	// in their name.
 	version               = 1
 	oldStyleLogFilePrefix = "tree.log."
+	// Version 0 logs had 23 low bits of actual sequence; the upper
+	// bits were random. When we read version 0 logs, we clear
+	// the random bits.
+	version0SeqMask = 1<<23 - 1
 )
 
 // Open returns a User structure holding the open
@@ -193,22 +197,32 @@ func Open(userName upspin.UserName, directory string) (*User, error) {
 		fd  *os.File
 		err error
 	)
-	if len(u.files) == 0 {
+	switch {
+	case len(u.files) == 0:
+		// No files for this user yet.
 		_, fd, err = u.createLogFile(0)
+	case u.files[len(u.files)-1].version != version:
+		// Must create new file with current version.
+		// We can only write to files with the latest version.
+		file := u.files[len(u.files)-1]
+		size, err := sizeOfFile(file.name)
 		if err != nil {
-			return nil, errors.E(errors.IO, err)
+			break
 		}
-	} else {
+		_, fd, err = u.createLogFile(file.offset + size)
 		fd, err = os.OpenFile(u.files[len(u.files)-1].name, os.O_APPEND|os.O_WRONLY, 0600)
-		if err != nil {
-			return nil, errors.E(errors.IO, err)
-		}
+	default:
+		// Things are normal.
+		fd, err = os.OpenFile(u.files[len(u.files)-1].name, os.O_APPEND|os.O_WRONLY, 0600)
+	}
+	if err != nil {
+		return nil, errors.E(errors.IO, err)
 	}
 
 	w := &writer{
 		user: u,
 		fd:   fd,
-		file: u.files[0],
+		file: u.files[len(u.files)-1],
 	}
 
 	rloc := u.rootFile()
@@ -596,6 +610,9 @@ func (r *Reader) ReadAt(offset int64) (le Entry, next int64, err error) {
 		return le, next, err
 	}
 	next = next + int64(checker.count)
+	if r.file.version == 0 {
+		le.Entry.Sequence &= version0SeqMask
+	}
 	return
 }
 
@@ -631,6 +648,12 @@ func size(f *os.File) int64 {
 		return -1
 	}
 	return fi.Size()
+}
+
+// sizeOfFile returns the offset at the end of the named file.
+func sizeOfFile(name string) (int64, error) {
+	fi, err := os.Stat(name)
+	return fi.Size(), err
 }
 
 // Truncate truncates the write log at offset.

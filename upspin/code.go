@@ -8,7 +8,6 @@
 package upspin // import "upspin.io/upspin"
 
 import (
-	"crypto/rand"
 	"encoding/binary"
 	"errors" // Cannot use Upspin's errors package because it would introduce a dependency cycle.
 	"fmt"
@@ -552,45 +551,6 @@ func SortDirEntries(slice []*DirEntry, unique bool) []*DirEntry {
 		}
 	}
 	return result
-}
-
-// NewSequence creates a sequence for a new directory entry.
-//
-// The sequence is intended to be different for each Put of a
-// Pathname. We achieve this by
-// - incrementing the sequence on every Put of an existing DirEntry.
-// - choosing a unique value for the top 41 bits of the sequence on a
-//   Put of a new DirEntry.
-//
-// The unique value is provided by a cryptographic random number generator if one is
-// available. Failing that, we use nanosecond time.
-//
-// TODO: Delete.
-func NewSequence() int64 {
-	x := make([]byte, 5)
-	_, err := rand.Read(x)
-	var s int64
-	if err == nil {
-		s = int64(x[0])<<32 | int64(x[1])<<24 | int64(x[2])<<16 | int64(x[3])<<8 | int64(x[4])
-	} else {
-		s = (time.Now().UnixNano() & 0xffffffffff)
-	}
-	return (s << 23) | SeqBase
-}
-
-// SeqVersion returns the version part of a sequence number. It is incremented
-// on every Put of an existing DirEntry and wraps at 2^23.
-func SeqVersion(s int64) int64 {
-	return s & 0x7fffff
-}
-
-// SeqNext returns the next sequence number. It wraps to avoid values less than SeqBase.
-func SeqNext(s int64) int64 {
-	s++
-	if s < SeqBase {
-		return SeqBase
-	}
-	return s
 }
 
 func isMeta(b byte) bool {
