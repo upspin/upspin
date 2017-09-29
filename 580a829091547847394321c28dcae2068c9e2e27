@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "afaad31d_6ef886bd",
+        "filename": "key/keygen/keygen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-09-29T01:23:58Z",
+      "side": 1,
+      "message": "it doesn\u0027t matter much but there will be fewer surprises with *secret",
+      "revId": "580a829091547847394321c28dcae2068c9e2e27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f62a4d33_d5189565",
+        "filename": "key/keygen/keygen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-09-29T01:23:58Z",
+      "side": 1,
+      "message": "key pair\ns/with/on/ ? or something. it reads oddly.",
+      "revId": "580a829091547847394321c28dcae2068c9e2e27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "842f03c3_9ef66639",
+        "filename": "key/keygen/keygen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-09-29T01:23:58Z",
+      "side": 1,
+      "message": "key pair",
+      "revId": "580a829091547847394321c28dcae2068c9e2e27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7ee865b5_b59120d9",
+        "filename": "key/keygen/keygen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-09-29T01:23:58Z",
+      "side": 1,
+      "message": "might as well, it\u0027s easy. add a test. it affects how -secretseed works.\nin a followup would be fine.",
+      "revId": "580a829091547847394321c28dcae2068c9e2e27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1a262b78_fad4d1e6",
+        "filename": "key/keygen/keygen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-09-29T01:23:58Z",
+      "side": 1,
+      "message": "saves",
+      "revId": "580a829091547847394321c28dcae2068c9e2e27",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
