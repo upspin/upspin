@@ -373,6 +373,10 @@ func (u *User) Name() upspin.UserName {
 }
 
 func (u *User) logFileName(offset int64, version int) string {
+	// Version 0 logs don't have a .0 at the end.
+	if version == 0 {
+		return filepath.Join(u.logSubDir(), fmt.Sprintf("%d", offset))
+	}
 	return filepath.Join(u.logSubDir(), fmt.Sprintf("%d.%d", offset, version))
 }
 
