@@ -254,8 +254,7 @@ func (s *server) Put(argEntry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		return nil, err
 	}
 	s.db.eventMgr.newEvent <- upspin.Event{
-		Entry:    entry,
-		Sequence: entry.Sequence,
+		Entry: entry,
 	}
 	// Successful Put returns incomplete DirEntry holding only the sequence number.
 	retEntry := &upspin.DirEntry{
@@ -527,9 +526,8 @@ func (s *server) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	entry, err = s.put(op, entry, parsed, true)
 	if err != nil {
 		s.db.eventMgr.newEvent <- upspin.Event{
-			Entry:    entry,
-			Delete:   true,
-			Sequence: entry.Sequence,
+			Entry:  entry,
+			Delete: true,
 		}
 	}
 	return entry, err

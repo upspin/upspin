@@ -98,7 +98,7 @@ func (l *listener) sendTree(name upspin.PathName) bool {
 		// Ignore error. The problem (existence, permission) might resolve later.
 		return true
 	}
-	event, ok := l.want(upspin.Event{Entry: entry, Sequence: entry.Sequence}, parsed)
+	event, ok := l.want(upspin.Event{Entry: entry}, parsed)
 	if !ok {
 		return true
 	}

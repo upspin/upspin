@@ -49,9 +49,6 @@ func watchEventsSameSequence(t *testing.T, r *testenv.Runner) {
 		if entry == nil {
 			t.Fatalf("nil entry in event %d", i)
 		}
-		if event.Sequence != entry.Sequence {
-			t.Errorf("mismatched sequence at event %d: Entry %d; Event %d", i, entry.Sequence, event.Sequence)
-		}
 	}
 }
 
