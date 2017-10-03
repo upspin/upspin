@@ -246,15 +246,13 @@ func (w *watcher) sendEvent(logEntry *serverlog.Entry, offset int64) error {
 		entry := logEntry.Entry
 		entry.MarkIncomplete()
 		event = &upspin.Event{
-			Entry:    &entry, // already a copy.
-			Delete:   logEntry.Op == serverlog.Delete,
-			Sequence: entry.Sequence,
+			Entry:  &entry, // already a copy.
+			Delete: logEntry.Op == serverlog.Delete,
 		}
 	} else {
 		event = &upspin.Event{
-			Entry:    &logEntry.Entry, // already a copy.
-			Delete:   logEntry.Op == serverlog.Delete,
-			Sequence: logEntry.Entry.Sequence,
+			Entry:  &logEntry.Entry, // already a copy.
+			Delete: logEntry.Op == serverlog.Delete,
 		}
 	}
 	timer := time.NewTimer(watcherTimeout)

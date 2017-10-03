@@ -171,14 +171,14 @@ func (h *downloadHandler) updateLoop() {
 		if event.Delete || p.NElem() != parsedReleasePath.NElem()+1 {
 			// Ignore deletes and files inside the releases;
 			// just watch for the release directories.
-			lastSequence = event.Sequence
+			lastSequence = event.Entry.Sequence
 			continue
 		}
 		if err := h.updateArchive(p); err != nil {
 			log.Error.Printf("download: error updating archive: %v", err)
 			continue
 		}
-		lastSequence = event.Sequence
+		lastSequence = event.Entry.Sequence
 	}
 }
 
