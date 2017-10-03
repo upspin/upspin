@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "82f589c0_44cf8984",
+        "filename": "cmd/upspin/createsuffixeduser.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-10-03T07:48:07Z",
+      "side": 1,
+      "message": "I think \u003csuffix\u003e makes it too easy to do the wrong thing, if my config has a different user to what I expect.\n\nInstead I think this should take the full suffixed username, and balk if the user in the config is not the provided name without the suffix.",
+      "revId": "54c7c2ee2da66514d59796a900ad83ab77df58dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "525c0a6d_a085e08b",
+        "filename": "cmd/upspin/createsuffixeduser.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-10-03T07:48:07Z",
+      "side": 1,
+      "message": "is this just a copy of configTemplate?\nif so, can it be deleted?",
+      "revId": "54c7c2ee2da66514d59796a900ad83ab77df58dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bcb216bb_6a652877",
+        "filename": "doc/overview.md",
+        "patchSetId": 6
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-10-03T07:48:07Z",
+      "side": 1,
+      "message": "quux?",
+      "range": {
+        "startLine": 126,
+        "startChar": 28,
+        "endLine": 126,
+        "endChar": 32
+      },
+      "revId": "54c7c2ee2da66514d59796a900ad83ab77df58dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
