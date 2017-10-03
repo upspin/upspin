@@ -39,7 +39,7 @@ func watchNotSupportedError(t *testing.T, r *testenv.Runner) (bool, error) {
 	return true, err
 }
 
-func watchEventsSameSequence(t *testing.T, r *testenv.Runner) {
+func watchEventsValid(t *testing.T, r *testenv.Runner) {
 	t.Helper()
 	for i, event := range r.Events {
 		if event.Error != nil {
@@ -48,9 +48,6 @@ func watchEventsSameSequence(t *testing.T, r *testenv.Runner) {
 		entry := event.Entry
 		if entry == nil {
 			t.Fatalf("nil entry in event %d", i)
-		}
-		if event.Sequence != entry.Sequence {
-			t.Errorf("mismatched sequence at event %d: Entry %d; Event %d", i, entry.Sequence, event.Sequence)
 		}
 	}
 }
@@ -83,7 +80,7 @@ func testWatchCurrent(t *testing.T, r *testenv.Runner) {
 		t.Fatal(r.Diag())
 	}
 
-	watchEventsSameSequence(t, r)
+	watchEventsValid(t, r)
 
 	// Put an Access file; watch it appear on the channel.
 	r.Put(access, accessContent)
@@ -124,7 +121,7 @@ func testWatchCurrent(t *testing.T, r *testenv.Runner) {
 	if r.GetNEvents(1) {
 		t.Fatalf("Channel had more events")
 	}
-	watchEventsSameSequence(t, r)
+	watchEventsValid(t, r)
 }
 
 // Test some error conditions.
@@ -199,7 +196,7 @@ func testWatchNonExistentFile(t *testing.T, r *testenv.Runner) {
 	if !r.GotEvent(file, hasBlocks) {
 		t.Fatal(r.Diag())
 	}
-	watchEventsSameSequence(t, r)
+	watchEventsValid(t, r)
 }
 
 func testWatchNonExistentDir(t *testing.T, r *testenv.Runner) {
@@ -238,7 +235,7 @@ func testWatchNonExistentDir(t *testing.T, r *testenv.Runner) {
 	if !r.GotEvent(file, hasBlocks) {
 		t.Fatal(r.Diag())
 	}
-	watchEventsSameSequence(t, r)
+	watchEventsValid(t, r)
 }
 
 func testWatchForbiddenFile(t *testing.T, r *testenv.Runner) {
@@ -284,7 +281,7 @@ func testWatchForbiddenFile(t *testing.T, r *testenv.Runner) {
 	if !r.GotEvent(file, hasBlocks) {
 		t.Fatal(r.Diag())
 	}
-	watchEventsSameSequence(t, r)
+	watchEventsValid(t, r)
 }
 
 func testWatchSubtree(t *testing.T, r *testenv.Runner) {
@@ -321,7 +318,7 @@ func testWatchSubtree(t *testing.T, r *testenv.Runner) {
 	if !r.GotEvent(dirFile, hasBlocks) {
 		t.Fatal(r.Diag())
 	}
-	watchEventsSameSequence(t, r)
+	watchEventsValid(t, r)
 }
 
 func testWatchNonExistentRoot(t *testing.T, r *testenv.Runner) {

@@ -235,12 +235,12 @@ func (d *proxiedDir) handleEvent(e *upspin.Event) error {
 	}
 
 	// This is an event we care about.
-	d.sequence = e.Sequence
+	d.sequence = e.Entry.Sequence
 	op := lookupReq
 	if e.Delete {
 		op = deleteReq
 	}
-	d.l.logRequestWithSequence(op, e.Entry.Name, nil, e.Entry, e.Sequence)
+	d.l.logRequestWithSequence(op, e.Entry.Name, nil, e.Entry, e.Entry.Sequence)
 	d.l.flush()
 	return nil
 }

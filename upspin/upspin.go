@@ -493,13 +493,9 @@ type DirServer interface {
 // Event represents the creation, modification, or deletion of a DirEntry
 // within a DirServer.
 type Event struct {
-	// Entry is the DirEntry to which the event pertains.
+	// Entry is the DirEntry to which the event pertains. Its Sequence
+	// field captures the ordering of events for this user.
 	Entry *DirEntry
-
-	// Sequence is the sequence number of the change for the user,
-	// denoting the position of this event in the sequence of all of
-	// the user's events.
-	Sequence int64
 
 	// Delete is true only if the entry is being deleted;
 	// otherwise it is being created or modified.

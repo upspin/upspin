@@ -162,8 +162,8 @@ func (p *Perm) updateLoop(op string) {
 		// An Access file could have granted or revoked our permission
 		// to watch the Writers file. Therefore, we must start the Watch
 		// again, after the Access event.
-		if isRelevantAccess(e.Entry.Name) && e.Sequence > accessSeq {
-			accessSeq = e.Sequence
+		if isRelevantAccess(e.Entry.Name) && e.Entry.Sequence > accessSeq {
+			accessSeq = e.Entry.Sequence
 			done()
 			continue
 		}
@@ -176,7 +176,7 @@ func (p *Perm) updateLoop(op string) {
 			// We rely on the fact that the server won't send us an
 			// event for the Access file first if we do have access
 			// during the first traversal.
-			accessSeq = e.Sequence
+			accessSeq = e.Entry.Sequence
 		}
 		// Process event.
 		if e.Entry.Name != p.targetFile {
