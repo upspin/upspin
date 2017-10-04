@@ -119,6 +119,10 @@ type Reader struct {
 type checkpoint struct {
 	user *User // owner of this checkpoint.
 
+	// savedRootSeq remembers the sequence number of the
+	// last root saved to the root file.
+	savedRootSeq int64
+
 	checkpointFile *os.File // file descriptor for the checkpoint.
 	rootFile       *os.File // file descriptor for the root of the tree.
 }
@@ -326,6 +330,7 @@ func (u *User) DeleteLogs() error {
 	if err != nil && !os.IsNotExist(err) {
 		return errors.E(errors.IO, err)
 	}
+	u.checkpoint.savedRootSeq = 0
 	return nil
 }
 
@@ -796,7 +801,7 @@ func (u *User) Root() (*upspin.DirEntry, error) {
 		return nil, err
 	}
 	if len(buf) == 0 {
-		return nil, errors.E(errors.NotExist, cp.user.name, errors.Str("no root for user"))
+		return nil, errors.E(errors.NotExist, cp.user.Name(), errors.Str("no root for user"))
 	}
 	more, err := root.Unmarshal(buf)
 	if err != nil {
@@ -805,19 +810,28 @@ func (u *User) Root() (*upspin.DirEntry, error) {
 	if len(more) != 0 {
 		return nil, errors.E(errors.IO, errors.Errorf("root has %d left over bytes", len(more)))
 	}
+	cp.savedRootSeq = root.Sequence
 	return &root, nil
 }
 
 // SaveRoot saves the user's root entry to stable storage.
 func (u *User) SaveRoot(root *upspin.DirEntry) error {
+	cp := u.checkpoint
+	cp.user.mu.Lock()
+	defer cp.user.mu.Unlock()
+	if cp.savedRootSeq == root.Sequence {
+		return nil
+	}
 	buf, err := root.Marshal()
 	if err != nil {
 		return err
 	}
-	cp := u.checkpoint
-	cp.user.mu.Lock()
-	defer cp.user.mu.Unlock()
-	return overwriteAndSync(cp.rootFile, buf)
+	err = overwriteAndSync(cp.rootFile, buf)
+	if err != nil {
+		return err
+	}
+	cp.savedRootSeq = root.Sequence
+	return nil
 }
 
 // DeleteRoot deletes the root.
@@ -826,6 +840,7 @@ func (u *User) DeleteRoot() error {
 	cp.user.mu.Lock()
 	defer cp.user.mu.Unlock()
 
+	cp.savedRootSeq = 0
 	return overwriteAndSync(cp.rootFile, []byte{})
 }
 
@@ -936,6 +951,7 @@ func (cp *checkpoint) close() error {
 			firstErr = err
 		}
 	}
+	cp.savedRootSeq = 0
 	return firstErr
 }
 
