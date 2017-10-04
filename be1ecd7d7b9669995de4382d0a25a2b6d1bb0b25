@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "66c5ed94_b1cd8a54",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-10-04T05:03:00Z",
+      "side": 1,
+      "message": "Didn\u0027t you just move this to the put method?\nI think these two lines should be deleted.",
+      "revId": "be1ecd7d7b9669995de4382d0a25a2b6d1bb0b25",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
