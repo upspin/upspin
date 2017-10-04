@@ -168,8 +168,6 @@ func (t *Tree) Put(p path.Parsed, de *upspin.DirEntry) (*upspin.DirEntry, error)
 		return de, t.createRoot(p, de)
 	}
 
-	t.sequence++
-	de.Sequence = t.sequence
 	node, watchers, err := t.put(p, de)
 	if err == upspin.ErrFollowLink {
 		return node.entry.Copy(), err
@@ -194,6 +192,8 @@ func (t *Tree) Put(p path.Parsed, de *upspin.DirEntry) (*upspin.DirEntry, error)
 // can be used to recover the Tree's state from the log.
 // t.mu must be held.
 func (t *Tree) put(p path.Parsed, de *upspin.DirEntry) (*node, []*watcher, error) {
+	t.sequence++
+	de.Sequence = t.sequence
 	// If putting a/b/c/d, ensure a/b/c is loaded.
 	parentPath := p.Drop(1)
 	parent, watchers, err := t.loadPath(parentPath)
@@ -263,8 +263,6 @@ func (t *Tree) PutDir(dstDir path.Parsed, de *upspin.DirEntry) (*upspin.DirEntry
 		return nil, err
 	}
 	de = n.entry.Copy()
-	t.sequence++
-	de.Sequence = t.sequence
 	// Generate log entry.
 	logEntry := &serverlog.Entry{
 		Op:    serverlog.Put,

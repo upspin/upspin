@@ -424,7 +424,7 @@ func TestRebuildFromLog(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = tree.Delete(mkpath(t, userName+"/dir0/file_in_dir.txt"))
+	deleted, err := tree.Delete(mkpath(t, userName+"/dir0/file_in_dir.txt"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -435,6 +435,13 @@ func TestRebuildFromLog(t *testing.T) {
 	tree, err = New(config, user)
 	if err != nil {
 		t.Fatal(err)
+	}
+	// Verify that all the sequence numbers are set to the most recent value.
+	if seq := tree.sequence; seq != deleted.Sequence {
+		t.Fatalf("tree sequence is %d; expected %d", seq, deleted.Sequence)
+	}
+	if seq := tree.root.entry.Sequence; seq != deleted.Sequence {
+		t.Fatalf("root sequence is %d; expected %d", seq, deleted.Sequence)
 	}
 
 	// Files are never dirty (they're packed and saved by the Client),
