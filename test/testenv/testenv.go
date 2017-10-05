@@ -9,9 +9,7 @@ package testenv
 import (
 	"crypto/rand"
 	"fmt"
-	"io/ioutil"
-	"os"
-	"strings"
+	"strconv"
 
 	"upspin.io/bind"
 	"upspin.io/client"
@@ -21,14 +19,13 @@ import (
 	"upspin.io/log"
 	"upspin.io/test/servermux"
 	"upspin.io/test/testutil"
+	"upspin.io/upbox"
 	"upspin.io/upspin"
 	"upspin.io/user"
 
 	// Implementations that are instantiated explicitly by New.
-	dirserver_inprocess "upspin.io/dir/inprocess"
-	dirserver_server "upspin.io/dir/server"
+
 	keyserver "upspin.io/key/inprocess"
-	storeserver "upspin.io/store/inprocess"
 
 	// Transports that are selected implicitly by bind.
 	_ "upspin.io/dir/remote"
@@ -49,7 +46,7 @@ type Setup struct {
 	// OwnerName is the name of the directory tree owner.
 	OwnerName upspin.UserName
 
-	// Kind is what kind of servers to use, "inprocess" or "remote".
+	// Kind is what kind of servers to use, "inprocess", "server", or "remote".
 	Kind string
 
 	// Packing is the desired packing for the tree.
@@ -78,6 +75,7 @@ type Env struct {
 	StoreServer upspin.StoreServer
 	DirServer   upspin.DirServer
 
+	schema     *upbox.Schema
 	tmpDir     string
 	exitCalled bool
 }
@@ -108,6 +106,21 @@ func randomEndpoint(prefix string) upspin.Endpoint {
 	}
 }
 
+const upboxYAML = `
+users:
+- name: server
+servers:
+- name: keyserver
+  user: server
+- name: storeserver
+  user: server
+- name: dirserver
+  user: server
+  flags:
+    kind: %s
+domain: example.com
+`
+
 // New creates a new Env for testing.
 func New(setup *Setup) (*Env, error) {
 	const op = "testenv.New"
@@ -125,44 +138,24 @@ func New(setup *Setup) (*Env, error) {
 		// Test either the dir/inprocess or dir/server implementations
 		// entire in-memory and offline.
 
-		// Set endpoints.
-		storeEndpoint := randomEndpoint("store")
-		cfg = config.SetStoreEndpoint(cfg, storeEndpoint)
-		dirEndpoint := randomEndpoint("dir")
-		cfg = config.SetDirEndpoint(cfg, dirEndpoint)
-
-		// Set up a StoreServer instance. Just use the inprocess
-		// version for offline tests; the store/server implementation
-		// isn't interesting when run offline.
-		env.StoreServer = storeserver.New()
-		storeServerMux.Register(storeEndpoint, env.StoreServer)
-
-		// Set up user and factotum.
-		cfg = config.SetUserName(cfg, TestServerName)
-		f, err := factotum.NewFromDir(testutil.Repo("key", "testdata", TestServerName[:strings.Index(TestServerName, "@")]))
+		portS, err := testutil.PickPort()
 		if err != nil {
-			return nil, errors.E(op, err)
+			return nil, err
 		}
-		cfg = config.SetFactotum(cfg, f)
-
-		// Set up DirServer instance.
-		switch k {
-		case "inprocess":
-			env.DirServer = dirserver_inprocess.New(cfg)
-		case "server":
-			// Create temporary directory for DirServer storage.
-			logDir, err := ioutil.TempDir("", "testenv-dirserver")
-			if err != nil {
-				return nil, errors.E(op, err)
-			}
-			env.tmpDir = logDir
-			env.DirServer, err = dirserver_server.New(cfg, "logDir="+logDir)
-			if err != nil {
-				env.rmTmpDir()
-				return nil, errors.E(op, err)
-			}
+		port, _ := strconv.Atoi(portS)
+		schema, err := upbox.SchemaFromYAML(fmt.Sprintf(upboxYAML, k), port)
+		if err != nil {
+			return nil, err
 		}
-		dirServerMux.Register(dirEndpoint, env.DirServer)
+		env.schema = schema
+		if err := schema.Start(); err != nil {
+			return nil, err
+		}
+		cfg, err = config.FromFile(schema.Config("server@example.com"))
+		if err != nil {
+			env.cleanup()
+			return nil, err
+		}
 
 	case "remote":
 		cfg = config.SetKeyEndpoint(cfg, upspin.Endpoint{
@@ -188,13 +181,13 @@ func New(setup *Setup) (*Env, error) {
 	// Create a testuser, and set the config to the one for the user.
 	cfg, err := env.NewUser(setup.OwnerName)
 	if err != nil {
-		env.rmTmpDir()
+		env.cleanup()
 		return nil, errors.E(op, err)
 	}
 	env.Config = cfg
 
 	if err := makeRootIfNotExist(cfg); err != nil {
-		env.rmTmpDir()
+		env.cleanup()
 		return nil, errors.E(op, err)
 	}
 
@@ -236,18 +229,18 @@ func (e *Env) Exit() error {
 		e.KeyServer.Close()
 	}
 
-	check(e.rmTmpDir())
+	check(e.cleanup())
 
 	return firstErr
 }
 
-func (e *Env) rmTmpDir() error {
-	if e.tmpDir == "" {
-		return nil
+func (e *Env) cleanup() error {
+	if e.schema != nil {
+		s := e.schema
+		e.schema = nil
+		return s.Stop()
 	}
-	d := e.tmpDir
-	e.tmpDir = ""
-	return os.RemoveAll(d)
+	return nil
 }
 
 // NewUser creates a new client for a user.  The new user will not
@@ -279,7 +272,7 @@ func (e *Env) NewUser(userName upspin.UserName) (upspin.Config, error) {
 	// our test users should be already registered there.
 	if e.Setup.Kind != "remote" {
 		// Register the user with the key server.
-		err = registerUserWithKeyServer(cfg, cfg.UserName())
+		err = registerUserWithKeyServer(e.Config, cfg)
 		if err != nil {
 			return nil, errors.E(op, err)
 		}
@@ -289,19 +282,19 @@ func (e *Env) NewUser(userName upspin.UserName) (upspin.Config, error) {
 }
 
 // registerUserWithKeyServer registers userName's config with the inProcess keyServer.
-func registerUserWithKeyServer(cfg upspin.Config, userName upspin.UserName) error {
-	key, err := bind.KeyServer(cfg, cfg.KeyEndpoint())
+func registerUserWithKeyServer(server upspin.Config, user upspin.Config) error {
+	key, err := bind.KeyServer(server, server.KeyEndpoint())
 	if err != nil {
 		return err
 	}
 	// Install the registered user.
-	user := &upspin.User{
-		Name:      userName,
-		Dirs:      []upspin.Endpoint{cfg.DirEndpoint()},
-		Stores:    []upspin.Endpoint{cfg.StoreEndpoint()},
-		PublicKey: cfg.Factotum().PublicKey(),
+	u := &upspin.User{
+		Name:      user.UserName(),
+		Dirs:      []upspin.Endpoint{user.DirEndpoint()},
+		Stores:    []upspin.Endpoint{user.StoreEndpoint()},
+		PublicKey: user.Factotum().PublicKey(),
 	}
-	return key.Put(user)
+	return key.Put(u)
 }
 
 func makeRootIfNotExist(cfg upspin.Config) error {
