@@ -7,6 +7,7 @@ package perm
 import (
 	"testing"
 
+	"upspin.io/bind"
 	"upspin.io/errors"
 	"upspin.io/test/testenv"
 	"upspin.io/upspin"
@@ -37,11 +38,15 @@ func TestDirIntegration(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Dial the DirServer as writer.
-	svc, err := perm.WrapDir(env.DirServer).Dial(writerCtx, writerCtx.DirEndpoint())
+	dir, err := bind.DirServer(env.Config, env.Config.DirEndpoint())
 	if err != nil {
 		t.Fatal(err)
 	}
-	dir := svc.(upspin.DirServer)
+	svc, err := perm.WrapDir(dir).Dial(writerCtx, writerCtx.DirEndpoint())
+	if err != nil {
+		t.Fatal(err)
+	}
+	dir = svc.(upspin.DirServer)
 
 	// At first, only owner can create a root, so it fails.
 	entry := &upspin.DirEntry{
