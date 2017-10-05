@@ -41,6 +41,7 @@ var (
 
 	setupTemplate = testenv.Setup{
 		OwnerName: ownerName,
+		UpBox:     true,
 		Cleanup:   cleanup,
 	}
 	readerConfig upspin.Config
