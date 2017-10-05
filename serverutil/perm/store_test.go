@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"upspin.io/access"
+	"upspin.io/bind"
 	"upspin.io/errors"
 	"upspin.io/test/testenv"
 	"upspin.io/upspin"
@@ -15,12 +16,16 @@ import (
 
 func setupStoreEnv(t *testing.T) (store upspin.StoreServer, perm *Perm, ownerEnv *testenv.Env, wait, cleanup func()) {
 	ownerEnv = setupEnv(t)
+	store, err := bind.StoreServer(ownerEnv.Config, ownerEnv.Config.StoreEndpoint())
+	if err != nil {
+		t.Fatal(err)
+	}
 	perm, wait, done := newWithEnv(t, ownerEnv)
 	cleanup = func() {
 		ownerEnv.Exit()
 		done()
 	}
-	store = perm.WrapStore(ownerEnv.StoreServer)
+	store = perm.WrapStore(store)
 	return
 }
 
