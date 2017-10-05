@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"upspin.io/bind"
 	"upspin.io/test/testenv"
 	"upspin.io/upspin"
 )
@@ -41,7 +42,10 @@ func setupEnv(t *testing.T) *testenv.Env {
 func newWithEnv(t *testing.T, env *testenv.Env) (perm *Perm, wait, done func()) {
 	wait, onUpdate, onRetry, ready := newStubs(t)
 	cfg := env.Config
-	dir := env.DirServer
+	dir, err := bind.DirServer(cfg, cfg.DirEndpoint())
+	if err != nil {
+		t.Fatal(err)
+	}
 	doneCh := make(chan struct{})
 	done = func() { close(doneCh) }
 	perm = newPerm("newWithEnv", cfg, ready, cfg.UserName(), dir.Lookup, dir.Watch, onUpdate, onRetry, doneCh)
@@ -243,9 +247,13 @@ func TestSequentialErrorsOK(t *testing.T) {
 
 	wait, onUpdate, onRetry, ready := newStubs(t)
 	cfg := env.Config
+	dir, err := bind.DirServer(cfg, cfg.DirEndpoint())
+	if err != nil {
+		t.Fatal(err)
+	}
 	done := make(chan struct{})
 	defer close(done)
-	newPerm("TestSequentialErrorsOK", cfg, ready, owner, env.DirServer.Lookup, errorReturningWatch, onUpdate, onRetry, done)
+	newPerm("TestSequentialErrorsOK", cfg, ready, owner, dir.Lookup, errorReturningWatch, onUpdate, onRetry, done)
 	wait()
 
 	// No crash, no problem.
