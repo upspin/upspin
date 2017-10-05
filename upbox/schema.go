@@ -105,6 +105,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"upspin.io/upspin"
@@ -483,11 +484,19 @@ func (sc *Schema) Stop() error {
 	if sc.dir == "" {
 		return errors.New("cannot stop; not started")
 	}
+	// Kill running servers and Wait for them to stop.
+	var wg sync.WaitGroup
 	for _, s := range sc.Servers {
 		if s.cmd != nil && s.cmd.Process != nil {
+			wg.Add(1)
+			go func(cmd *exec.Cmd) {
+				defer wg.Done()
+				cmd.Wait()
+			}(s.cmd)
 			s.cmd.Process.Kill()
 		}
 	}
+	wg.Wait()
 	return os.RemoveAll(sc.dir)
 }
 
