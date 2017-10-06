@@ -613,15 +613,9 @@ func (s *server) listDir(dirName upspin.PathName) ([]*upspin.DirEntry, error) {
 	}
 
 	// Fetch the directory's DirEntry.
-	dir, err := s.lookup(op, parsed, true)
-	if err == upspin.ErrFollowLink {
-		return []*upspin.DirEntry{dir}, err
-	}
-	if err != nil {
-		return nil, err
-	}
-	if !dir.IsDir() {
-		return nil, errors.E(op, dir.Name, errors.NotDir)
+	dir, listErr := s.lookup(op, parsed, true)
+	if listErr == upspin.ErrFollowLink {
+		return []*upspin.DirEntry{dir}, listErr
 	}
 
 	// Check that we have list rights for the directory.
@@ -632,6 +626,12 @@ func (s *server) listDir(dirName upspin.PathName) ([]*upspin.DirEntry, error) {
 	}
 	if !canList {
 		return nil, errors.E(op, dirName, errors.Private)
+	}
+	if listErr != nil {
+		return nil, listErr
+	}
+	if !dir.IsDir() {
+		return nil, errors.E(op, dir.Name, errors.NotDir)
 	}
 
 	// Fetch the directory's contents.
