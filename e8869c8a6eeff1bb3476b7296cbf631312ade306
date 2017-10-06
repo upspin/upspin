@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "34635369_7c7e3d32",
+        "filename": "upbox/schema.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 556,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-06T02:18:07Z",
+      "side": 1,
+      "message": "i\u0027d put the boolean first so it\u0027s better tied to the variable declaration above.\n\nalso, what you need to do is check that there is a serverconfig that already has logDir.\nit\u0027s a bit messy.",
+      "revId": "e8869c8a6eeff1bb3476b7296cbf631312ade306",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
