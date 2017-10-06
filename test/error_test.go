@@ -826,6 +826,10 @@ func testGlobErrors(t *testing.T, r *testenv.Runner) {
 	if !r.Match(errPrivate) {
 		t.Fatal(r.Diag())
 	}
+	r.Glob(base + "/nonexistant/*")
+	if !r.Match(errPrivate) {
+		t.Fatal(r.Diag())
+	}
 	r.Glob(base + "/*/*")
 	if !r.Match(errPrivate) {
 		t.Fatal(r.Diag())

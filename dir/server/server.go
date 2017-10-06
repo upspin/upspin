@@ -519,17 +519,15 @@ func (s *server) listDir(op string, dirName upspin.PathName, opts ...options) ([
 		return nil, errors.E(op, err)
 	}
 
-	// Fetch the directory's contents.
-	entries, isDirty, err := tree.List(parsed)
-	if err == upspin.ErrFollowLink {
+	// Fetch the directory's contents. Don't return the error from List
+	// until we know if we have List rights.
+	entries, isDirty, listErr := tree.List(parsed)
+	if listErr == upspin.ErrFollowLink {
 		entry, err := s.errLink(op, entries[0], opts...)
 		if entry != nil {
 			return []*upspin.DirEntry{entry}, err
 		}
 		return nil, err
-	}
-	if err != nil {
-		return nil, errors.E(op, err)
 	}
 
 	canList, canRead := false, false
@@ -541,6 +539,9 @@ func (s *server) listDir(op string, dirName upspin.PathName, opts ...options) ([
 	}
 	if !canList {
 		return nil, errors.E(op, dirName, errors.Private)
+	}
+	if listErr != nil {
+		return nil, errors.E(op, listErr)
 	}
 	canRead, _, _ = s.hasRight(access.Read, parsed, opts...)
 
