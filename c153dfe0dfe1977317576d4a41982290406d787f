@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c39ad7fa_0b376d3c",
+        "filename": "upbox/schema.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-06T03:39:24Z",
+      "side": 1,
+      "message": "s/This data is/These files are/ to avoid the plural mismatch",
+      "revId": "c153dfe0dfe1977317576d4a41982290406d787f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
