@@ -550,8 +550,12 @@ func (sc *Schema) startServer(s *Server) (*exec.Cmd, error) {
 			"-test_secrets="+filepath.Join(sc.dir, s.User),
 		)
 	}
+	_, hasServerConfigFlag := s.Flags["serverconfig"]
 	for k, v := range s.Flags {
 		args = append(args, fmt.Sprintf("-%s=%v", k, v))
+		if !hasServerConfigFlag && s.Name == "dirserver" && k == "kind" && v == "server" {
+			args = append(args, "-serverconfig", "logDir="+sc.dir)
+		}
 	}
 	cmd := exec.Command(s.Name, args...)
 	cmd.Stdout = prefix(s.Name+":\t", os.Stdout)
