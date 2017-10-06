@@ -188,7 +188,7 @@ func (s *serverImpl) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 func sendResponse(w http.ResponseWriter, resp pb.Message, err error) {
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		sendError(w, err)
 		return
 	}
 	payload, err := pb.Marshal(resp)
@@ -200,11 +200,22 @@ func sendResponse(w http.ResponseWriter, resp pb.Message, err error) {
 	w.Write(payload)
 }
 
+func sendError(w http.ResponseWriter, err error) {
+	if _, ok := err.(*errors.Error); !ok {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	h := w.Header()
+	h.Set("Content-type", "application/octet-stream")
+	w.WriteHeader(http.StatusInternalServerError)
+	w.Write(errors.MarshalError(err))
+}
+
 func serveStream(s Stream, sess Session, w http.ResponseWriter, body []byte) {
 	done := make(chan struct{})
 	msgs, err := s(sess, body, done)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		sendError(w, err)
 		return
 	}
 
