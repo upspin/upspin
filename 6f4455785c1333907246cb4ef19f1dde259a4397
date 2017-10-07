@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "23c533e8_02a01833",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-07T00:34:29Z",
+      "side": 1,
+      "message": "don\u0027t",
+      "revId": "6f4455785c1333907246cb4ef19f1dde259a4397",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0b142561_cf1acb92",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-07T00:34:29Z",
+      "side": 1,
+      "message": "the",
+      "revId": "6f4455785c1333907246cb4ef19f1dde259a4397",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "520ee38d_970ff6da",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 523,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-07T00:34:29Z",
+      "side": 1,
+      "message": "now you never return the error from list. that can\u0027t be right.",
+      "revId": "6f4455785c1333907246cb4ef19f1dde259a4397",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
