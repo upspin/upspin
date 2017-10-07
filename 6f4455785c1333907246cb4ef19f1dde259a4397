@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "8416608c_cb522e06",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-10-07T02:07:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "23c533e8_02a01833",
+      "revId": "6f4455785c1333907246cb4ef19f1dde259a4397",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "0b142561_cf1acb92",
         "filename": "/COMMIT_MSG",
         "patchSetId": 1
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "7c84097f_742892d5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-10-07T02:07:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0b142561_cf1acb92",
+      "revId": "6f4455785c1333907246cb4ef19f1dde259a4397",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "520ee38d_970ff6da",
         "filename": "dir/server/server.go",
         "patchSetId": 1
@@ -50,6 +86,24 @@
       "revId": "6f4455785c1333907246cb4ef19f1dde259a4397",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9126590f_cae58d7e",
+        "filename": "dir/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 523,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-10-07T02:07:00Z",
+      "side": 1,
+      "message": "Oops,rearranged the code to avoid doing the same thing in two places and broke it. Fixed.",
+      "parentUuid": "520ee38d_970ff6da",
+      "revId": "6f4455785c1333907246cb4ef19f1dde259a4397",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
