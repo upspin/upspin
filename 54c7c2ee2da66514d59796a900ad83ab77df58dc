@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "f98bd75e_02a7b276",
+        "filename": "cmd/upspin/createsuffixeduser.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-10-07T03:54:39Z",
+      "side": 1,
+      "message": "I agree, will do.",
+      "parentUuid": "82f589c0_44cf8984",
+      "revId": "54c7c2ee2da66514d59796a900ad83ab77df58dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "525c0a6d_a085e08b",
         "filename": "cmd/upspin/createsuffixeduser.go",
         "patchSetId": 6
@@ -36,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "feca948e_754e1927",
+        "filename": "cmd/upspin/createsuffixeduser.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-10-07T03:54:39Z",
+      "side": 1,
+      "message": "Different but I can make them the same. Just had to understand the man page for template.",
+      "parentUuid": "525c0a6d_a085e08b",
+      "revId": "54c7c2ee2da66514d59796a900ad83ab77df58dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "bcb216bb_6a652877",
         "filename": "doc/overview.md",
         "patchSetId": 6
@@ -47,6 +83,30 @@
       "writtenOn": "2017-10-03T07:48:07Z",
       "side": 1,
       "message": "quux?",
+      "range": {
+        "startLine": 126,
+        "startChar": 28,
+        "endLine": 126,
+        "endChar": 32
+      },
+      "revId": "54c7c2ee2da66514d59796a900ad83ab77df58dc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a2e3eeaf_b340b64e",
+        "filename": "doc/overview.md",
+        "patchSetId": 6
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-10-07T03:54:39Z",
+      "side": 1,
+      "message": "I needed a name.  https://en.wiktionary.org/wiki/quux\n\nGuy and I went to high school together and the name is stuck in my brain soft of like foo and bar.",
+      "parentUuid": "bcb216bb_6a652877",
       "range": {
         "startLine": 126,
         "startChar": 28,
