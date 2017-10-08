@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5363de8f_eb773eb6",
+        "filename": "cmd/upspin/allcmds_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 536,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-08T23:31:28Z",
+      "side": 1,
+      "message": "s/one/one,/\nweird sentence but a comma will help",
+      "revId": "adc5480a100dc8aaaa21fd5847c56f51cc311581",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e5de932a_301e04f6",
+        "filename": "cmd/upspin/createsuffixeduser.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-08T23:31:28Z",
+      "side": 1,
+      "message": "s/in/created in/ and reflow",
+      "revId": "adc5480a100dc8aaaa21fd5847c56f51cc311581",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
