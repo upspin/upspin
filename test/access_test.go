@@ -373,6 +373,9 @@ func testWhichAccess(t *testing.T, r *testenv.Runner) {
 	if r.Failed() {
 		t.Fatal(r.Diag())
 	}
+	if r.Entry == nil {
+		t.Fatal("entry is nil")
+	}
 	if got, want := r.Entry.Name, accessFile; got != want {
 		t.Errorf("entry.Name = %q, want = %q", got, want)
 	}
