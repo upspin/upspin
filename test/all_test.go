@@ -115,13 +115,17 @@ func testFileSequentialAccess(t *testing.T, env *testenv.Env) {
 }
 
 func testSequenceNumbers(t *testing.T, r *testenv.Runner) {
+	r.As(ownerName)
+	if r.Config().Value("cache") != "" {
+		t.Skip("skipping sequence number test with cacheserver")
+	}
+
 	const (
 		base   = ownerName + "/sequencenumbers"
 		dir    = base + "/dir"
 		subdir = dir + "/subdir"
 		file   = dir + "/file"
 	)
-	r.As(ownerName)
 	r.MakeDirectory(base)
 	r.DirLookup(base)
 	seq := int64(upspin.SeqBase)
