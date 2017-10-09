@@ -343,8 +343,8 @@ func (s *serverImpl) handleSessionRequest(w http.ResponseWriter, authRequest []s
 	// set the signed host to that endpoint.
 	ep := &upspin.Endpoint{}
 	if len(proxyRequest) == 1 {
-		if user != s.config.UserName() {
-			return nil, errors.E(errors.Permission, "client and proxy user must match")
+		if pUser := s.config.UserName(); user != pUser {
+			return nil, errors.E(errors.Permission, errors.Errorf("client %q and proxy %q users mismatched", user, pUser))
 		}
 		ep, err = upspin.ParseEndpoint(proxyRequest[0])
 		if err != nil {
