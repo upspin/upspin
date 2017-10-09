@@ -809,11 +809,21 @@ func testGlobErrors(t *testing.T, r *testenv.Runner) {
 		t.Fatal(r.Diag())
 	}
 
-	// Owner should be able to glob them all.
+	// Owner should be able to glob the root.
 	r.Glob(base + "/*")
-	if !r.GotEntries(true, dir, baseFile) {
-		t.Fatal(r.Diag())
+	// Check that we got the root entries, but ignore whether there are
+	// blocks in them because there may or may not be depending on whether
+	// a cache is in use.
+	if len(r.Entries) != 2 {
+		t.Fatalf("got %d entries, want 2", len(r.Entries))
 	}
+	if got := r.Entries[0].Name; got != dir {
+		t.Fatalf("got entry %q, want %q", got, dir)
+	}
+	if got := r.Entries[1].Name; got != baseFile {
+		t.Fatalf("got entry %q, want %q", got, baseFile)
+	}
+	// Owner should be able to glob the directory.
 	r.Glob(base + "/*/*")
 	if !r.GotEntries(true, dirFile) {
 		t.Fatal(r.Diag())
