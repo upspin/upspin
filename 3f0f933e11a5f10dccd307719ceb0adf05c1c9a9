@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "45d3eb02_45afa7d8",
+        "filename": "cmd/upspinfs/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-10-09T04:14:19Z",
+      "side": 1,
+      "message": "delete",
+      "revId": "3f0f933e11a5f10dccd307719ceb0adf05c1c9a9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
