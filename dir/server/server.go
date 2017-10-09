@@ -7,7 +7,6 @@ package server
 
 import (
 	"io/ioutil"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -138,9 +137,6 @@ func New(cfg upspin.Config, options ...string) (upspin.DirServer, error) {
 		return nil, errors.E(op, errors.Invalid, errors.Str("nil factotum"))
 	}
 	// Check which options are present and pick suitable defaults.
-	userCacheSize := 1000
-	accessCacheSize := 1000
-	groupCacheSize := 100
 	logDir := ""
 	for _, opt := range options {
 		o := strings.Split(opt, "=")
@@ -149,22 +145,6 @@ func New(cfg upspin.Config, options ...string) (upspin.DirServer, error) {
 		}
 		k, v := o[0], o[1]
 		switch k {
-		case "userCacheSize", "accessCacheSize", "groupCacheSize":
-			cacheSize, err := strconv.ParseInt(v, 10, 32)
-			if err != nil {
-				return nil, errors.E(op, errors.Invalid, errors.Errorf("invalid cache size %q: %s", v, err))
-			}
-			if cacheSize < 1 {
-				return nil, errors.E(op, errors.Invalid, errors.Errorf("%s: cache size too small: %d", k, cacheSize))
-			}
-			switch opt {
-			case "userCacheSize":
-				userCacheSize = int(cacheSize)
-			case "accessCacheSize":
-				accessCacheSize = int(cacheSize)
-			case "groupCacheSize":
-				groupCacheSize = int(cacheSize)
-			}
 		case "logDir":
 			logDir = v
 		default:
@@ -180,6 +160,11 @@ func New(cfg upspin.Config, options ...string) (upspin.DirServer, error) {
 		logDir = dir
 	}
 
+	const (
+		userCacheSize   = 1000
+		accessCacheSize = 1000
+		groupCacheSize  = 100
+	)
 	s := &server{
 		serverConfig:  cfg,
 		userName:      cfg.UserName(),
