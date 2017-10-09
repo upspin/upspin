@@ -42,6 +42,7 @@ var (
 	setupTemplate = testenv.Setup{
 		OwnerName: ownerName,
 		UpBox:     true,
+		Cache:     true,
 		Cleanup:   cleanup,
 	}
 	readerConfig upspin.Config
@@ -421,34 +422,39 @@ func testSelectedOnePacking(t *testing.T, setup testenv.Setup) {
 	}
 }
 
-var integrationTestKinds = []string{"inprocess", "server", "remote"}
-
 func TestIntegration(t *testing.T) {
 	type testConfig struct {
+		kind    string // "inprocess", "server", or "remote".
 		packing upspin.Packing
-		always  bool // Always run this, even with -short or kind=="remote".
+		cache   bool // Run a cacheserver for ownerName.
+		always  bool // Always run this test, even with -test.short.
 	}
+	const noCache, cache = false, true
 	testConfigs := []testConfig{
-		{upspin.PlainPack, false},
-		{upspin.EEIntegrityPack, false},
-		{upspin.EEPack, true},
+		{"inprocess", upspin.PlainPack, noCache, false},
+		{"inprocess", upspin.EEIntegrityPack, noCache, false},
+		{"inprocess", upspin.EEPack, noCache, true},
+
+		{"server", upspin.PlainPack, noCache, false},
+		{"server", upspin.EEIntegrityPack, noCache, false},
+		{"server", upspin.EEPack, noCache, true},
+
+		{"inprocess", upspin.EEPack, cache, true},
+		{"server", upspin.EEPack, cache, true},
+
+		{"remote", upspin.EEPack, noCache, false},
 	}
-	for _, kind := range integrationTestKinds {
-		t.Run(fmt.Sprintf("kind=%v", kind), func(t *testing.T) {
-			setup := setupTemplate
-			setup.Kind = kind
-			for _, config := range testConfigs {
-				setup.Packing = config.packing
-				t.Run(fmt.Sprintf("packing=%v", config.packing), func(t *testing.T) {
-					if testing.Short() && (kind == "remote" || !config.always) {
-						t.Skip("skipping remote or extra test with -test.short")
-					}
-					if kind == "remote" && !config.always {
-						t.Skip("skipping extra remote test")
-					}
-					testSelectedOnePacking(t, setup)
-				})
+	for _, config := range testConfigs {
+		setup := setupTemplate
+		setup.Kind = config.kind
+		setup.Packing = config.packing
+		setup.Cache = config.cache
+		name := fmt.Sprintf("kind=%v/packing=%v/cache=%t", config.kind, config.packing, config.cache)
+		t.Run(name, func(t *testing.T) {
+			if testing.Short() && !config.always {
+				t.Skip("skipping because -test.short is set")
 			}
+			testSelectedOnePacking(t, setup)
 		})
 	}
 }
