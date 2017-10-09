@@ -14,6 +14,7 @@ Schema files must be in YAML format, of this general form:
 	  storeserver: store.upspin.io
 	  dirserver: dir.upspin.io
 	  packing: ee
+	  cache: true
 	servers:
 	- name: storeserver
 	- name: dirserver
@@ -43,6 +44,8 @@ server "servername" is used.
 
 Packing specifies the packing method for this user.
 If empty, it defaults to "ee".
+
+Cache is a boolean that specifies whether to start a cacheserver for this user.
 
 Servers
 
@@ -115,6 +118,8 @@ import (
 	"sync"
 	"time"
 
+	"upspin.io/config"
+	"upspin.io/rpc/local"
 	"upspin.io/upspin"
 
 	yaml "gopkg.in/yaml.v2"
@@ -158,7 +163,12 @@ type User struct {
 	// Packing specifies the packing method for this user.
 	Packing string
 
+	// Cache specifies whether to run a cacheserver for this user.
+	Cache bool
+
 	secrets string // path to user's public and private keys; set by Run
+
+	cacheserver *exec.Cmd
 }
 
 // Server defines an Upspin server to be created and used within a schema.
@@ -346,7 +356,10 @@ func setServer(sc *Schema, field *string, kind string) error {
 // Start sets up the Users and Servers specified by the Schema.
 func (sc *Schema) Start() error {
 	// Build servers and commands.
-	args := []string{"install", "upspin.io/cmd/upspin"}
+	args := []string{"install",
+		"upspin.io/cmd/upspin",
+		"upspin.io/cmd/cacheserver",
+	}
 	for _, s := range sc.Servers {
 		args = append(args, s.ImportPath)
 	}
@@ -480,6 +493,28 @@ func (sc *Schema) Start() error {
 			return err
 		}
 	}
+	// Start cacheservers.
+	for _, u := range sc.Users {
+		if !u.Cache {
+			continue
+		}
+		cmd := exec.Command("cacheserver",
+			"-config="+sc.Config(u.Name),
+			"-log="+sc.logLevel(),
+			"-cachedir="+sc.dir,
+		)
+		p := "cacheserver." + u.Name + ":\t"
+		cmd.Stdout = prefix(p, os.Stdout)
+		cmd.Stderr = prefix(p, os.Stderr)
+		if err := cmd.Start(); err != nil {
+			return fmt.Errorf("starting cacheserver for %v: %v", u.Name, err)
+		}
+		u.cacheserver = cmd
+
+		if err := waitReady(u.cacheAddr()); err != nil {
+			return err
+		}
+	}
 
 	cleanup = false // Exiting successfully, so don't clean up.
 	return nil
@@ -492,15 +527,22 @@ func (sc *Schema) Stop() error {
 		return errors.New("cannot stop; not started")
 	}
 	// Kill running servers and Wait for them to stop.
-	var wg sync.WaitGroup
+	var cmds []*exec.Cmd
 	for _, s := range sc.Servers {
-		if s.cmd != nil && s.cmd.Process != nil {
+		cmds = append(cmds, s.cmd)
+	}
+	for _, u := range sc.Users {
+		cmds = append(cmds, u.cacheserver)
+	}
+	var wg sync.WaitGroup
+	for _, cmd := range cmds {
+		if cmd != nil && cmd.Process != nil {
 			wg.Add(1)
 			go func(cmd *exec.Cmd) {
 				defer wg.Done()
 				cmd.Wait()
-			}(s.cmd)
-			s.cmd.Process.Kill()
+			}(cmd)
+			cmd.Process.Kill()
 		}
 	}
 	wg.Wait()
@@ -519,7 +561,7 @@ func (sc *Schema) writeConfig(user string) error {
 		return fmt.Errorf("unknown user %q", user)
 	}
 
-	configContent := []string{
+	cfg := []string{
 		"username: " + u.Name,
 		"secrets: " + filepath.Join(sc.dir, u.Name),
 		"tlscerts: " + sc.dir,
@@ -529,15 +571,26 @@ func (sc *Schema) writeConfig(user string) error {
 	}
 	switch user {
 	case "keyserver":
-		configContent = append(configContent,
+		cfg = append(cfg,
 			"keyserver: inprocess,",
 		)
 	default:
-		configContent = append(configContent,
+		cfg = append(cfg,
 			"keyserver: remote,"+sc.KeyServer,
 		)
 	}
-	return ioutil.WriteFile(sc.Config(u.Name), []byte(strings.Join(configContent, "\n")), 0644)
+	if u.Cache {
+		cfg = append(cfg, "cache: "+u.cacheAddr())
+	}
+	cfg = append(cfg, "") // trailing \n
+	return ioutil.WriteFile(sc.Config(u.Name), []byte(strings.Join(cfg, "\n")), 0644)
+}
+
+func (u *User) cacheAddr() string {
+	return local.LocalName(
+		config.SetUserName(config.New(), upspin.UserName(u.Name)),
+		"upbox.cacheserver",
+	) + ":80"
 }
 
 // startServer starts the given server, returning the running exec.Cmd.
@@ -592,12 +645,20 @@ func prefix(p string, out io.Writer) io.Writer {
 }
 
 func waitReady(addr string) error {
+	url := "https://" + addr
+	if local.IsLocal(addr) {
+		url = "http://" + addr
+	}
 	rt := &http.Transport{
+		DialContext: (&local.Dialer{
+			Timeout:   5 * time.Second,
+			KeepAlive: 5 * time.Second,
+		}).DialContext,
 		TLSClientConfig: &tls.Config{
 			InsecureSkipVerify: true,
 		},
 	}
-	req, _ := http.NewRequest("GET", "https://"+addr, nil)
+	req, _ := http.NewRequest("GET", url, nil)
 	for i := 0; i < 10; i++ {
 		_, err := rt.RoundTrip(req)
 		if err != nil {
