@@ -48,6 +48,7 @@ Usage of upspin:
 	upspin [globalflags] <command> [flags] <path>
 Upspin commands:
 	shell (Interactive mode)
+	config
 	countersign
 	cp
 	deletestorage
@@ -88,6 +89,20 @@ Global flags:
     	print build version and exit
   -writethrough
     	make storage cache writethrough
+
+
+Sub-command config
+
+Usage: upspin config [-out=outputfile]
+
+Config prints to standard output the contents of the current config file.
+
+Flags:
+  -help
+    	print more information about the command
+  -out string
+    	output file (default standard output)
+
 
 
 Sub-command countersign
@@ -671,7 +686,7 @@ Sub-command tar
 Usage: upspin tar [-extract [-match prefix -replace substitution] ] upspin_directory local_file
 
 Tar archives an Upspin tree into a local tar file, or with the
--extract flag, unpacks a a local tar file into an Upspin tree.
+-extract flag, unpacks a local tar file into an Upspin tree.
 
 When extracting, the -match and -replace flags cause the extracted
 file to have any prefix that matches be replaced by substitute text.

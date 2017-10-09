@@ -55,7 +55,7 @@ If the command fails, it may leave things in an incomplete state.
 You can use the -clean flag to clean up any potential entities created:
 
 ```
-local$ upspin setupstorage-aws -clean -role_name=upspin-example-com -domain=example.com example-com-upspin
+local$ upspin setupstorage-aws -clean -role_name=upspinstorage -domain=example.com example-com-upspin
 ```
 
 **Notes**:

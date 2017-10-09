@@ -7,8 +7,10 @@
 package main
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"os/exec"
 	"sort"
@@ -76,6 +78,7 @@ For a list of available subcommands and global flags, run
 var commands = map[string]func(*State, ...string){
 	"countersign":   (*State).countersign,
 	"cp":            (*State).cp,
+	"config":        (*State).config,
 	"deletestorage": (*State).deletestorage,
 	"get":           (*State).get,
 	"getref":        (*State).getref,
@@ -109,7 +112,8 @@ var externalCommands = []string{
 
 type State struct {
 	*subcmd.State
-	sharer *Sharer
+	sharer     *Sharer
+	configFile []byte // The contents of the config file we loaded.
 }
 
 func main() {
@@ -282,13 +286,18 @@ func (s *State) init() {
 	// signup is special since there is no user yet.
 	// keygen simply does not require a config or anything else.
 	if s.Name != "signup" && s.Name != "keygen" {
-		cfg, err := config.FromFile(flags.Config)
+		data, err := ioutil.ReadFile(flags.Config)
+		if err != nil {
+			s.Exit(err)
+		}
+		cfg, err := config.InitConfig(bytes.NewReader(data))
 		if err != nil && err != config.ErrNoFactotum {
 			s.Exit(err)
 		}
 		transports.Init(cfg)
 		s.State.Init(cfg)
 		s.sharer = newSharer(s)
+		s.configFile = data
 	}
 	s.enableMetrics()
 }

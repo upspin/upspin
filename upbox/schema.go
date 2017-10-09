@@ -89,6 +89,13 @@ storeserver@example.com, and dirserver@example.com, builds and runs
 the servers keyserver, storeserver, and dirserver (running as their
 respective users), and runs "upspin shell" as user@example.com.
 
+Temporary data
+
+A running Schema needs to store data on disk: config files, TLS certificates,
+and dirserver log data (if a dirserver of kind 'server' is selected).
+These files are kept in a temporary directory that is created by the Start
+method and removed by the Stop method.
+
 */
 package upbox // import "upspin.io/upbox"
 
@@ -105,6 +112,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 
 	"upspin.io/upspin"
@@ -483,11 +491,19 @@ func (sc *Schema) Stop() error {
 	if sc.dir == "" {
 		return errors.New("cannot stop; not started")
 	}
+	// Kill running servers and Wait for them to stop.
+	var wg sync.WaitGroup
 	for _, s := range sc.Servers {
 		if s.cmd != nil && s.cmd.Process != nil {
+			wg.Add(1)
+			go func(cmd *exec.Cmd) {
+				defer wg.Done()
+				cmd.Wait()
+			}(s.cmd)
 			s.cmd.Process.Kill()
 		}
 	}
+	wg.Wait()
 	return os.RemoveAll(sc.dir)
 }
 
@@ -541,8 +557,12 @@ func (sc *Schema) startServer(s *Server) (*exec.Cmd, error) {
 			"-test_secrets="+filepath.Join(sc.dir, s.User),
 		)
 	}
+	_, hasServerConfigFlag := s.Flags["serverconfig"]
 	for k, v := range s.Flags {
 		args = append(args, fmt.Sprintf("-%s=%v", k, v))
+		if !hasServerConfigFlag && s.Name == "dirserver" && k == "kind" && v == "server" {
+			args = append(args, "-serverconfig", "logDir="+sc.dir)
+		}
 	}
 	cmd := exec.Command(s.Name, args...)
 	cmd.Stdout = prefix(s.Name+":\t", os.Stdout)

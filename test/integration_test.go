@@ -41,6 +41,7 @@ var (
 
 	setupTemplate = testenv.Setup{
 		OwnerName: ownerName,
+		UpBox:     true,
 		Cleanup:   cleanup,
 	}
 	readerConfig upspin.Config
@@ -386,15 +387,18 @@ func testSelectedOnePacking(t *testing.T, setup testenv.Setup) {
 	}
 
 	if err := cleanup(env); err != nil {
+		env.Exit()
 		t.Fatal(err)
 	}
 
 	readerConfig, err = env.NewUser(readerName)
 	if err != nil {
+		env.Exit()
 		t.Fatal(err)
 	}
 	snapshotConfig, err := env.NewUser(snapshotUser)
 	if err != nil {
+		env.Exit()
 		t.Fatal(err)
 	}
 

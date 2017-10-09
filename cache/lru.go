@@ -85,7 +85,7 @@ func (c *LRU) Get(key interface{}) (value interface{}, ok bool) {
 
 // RemoveOldest removes the oldest item in the cache and returns its key and
 // value. If the cache is empty, the empty string and nil are returned. The
-// value's EvictionNotifier if not run.
+// value's EvictionNotifier is not run.
 func (c *LRU) RemoveOldest() (key, value interface{}) {
 	c.mu.Lock()
 	defer c.mu.Unlock()

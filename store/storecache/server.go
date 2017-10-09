@@ -79,7 +79,6 @@ func (s *server) Put(data []byte) (*upspin.Refdata, error) {
 	if s.authority.Transport == upspin.Unassigned {
 		return nil, errNotDialed
 	}
-
 	op := logf("Put %.30x...", data)
 
 	ref, err := s.cache.put(s.cfg, data, s.authority)

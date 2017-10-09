@@ -32,6 +32,13 @@ type cmdTest struct {
 var basicCmdTests = []cmdTest{
 	// A couple of basic checks, mostly to test the test scaffolding itself.
 	{
+		"config",
+		ann,
+		do("config"),
+		"",
+		expect("username: ann@example.com", "secrets", "packing: ee", "storeserver:", "dirserver:", "keyserver"),
+	},
+	{
 		"user ann",
 		ann,
 		do("user"),
