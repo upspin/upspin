@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c1599d51_3df11ded",
+        "filename": "doc/overview.md",
+        "patchSetId": 11
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-09T06:41:48Z",
+      "side": 1,
+      "message": "s/bu/by/",
+      "revId": "3489bf8f71321bc9ea44b0f10025fe7edb2c8ffa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
