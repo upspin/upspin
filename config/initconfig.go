@@ -449,7 +449,7 @@ func SetFlagValues(cfg upspin.Config, cmd string) error {
 	}
 	flags, ok := cmdflags[cmd].(map[interface{}]interface{})
 	if !ok {
-		return errors.E(op, errors.Invalid, errors.Errorf("bad cmdflags for %v: %T", cmd, cmdflags[cmd]))
+		return nil // Some flags present, but none for this command.
 	}
 	for k, v := range flags {
 		name, err := asString(k)
