@@ -42,6 +42,7 @@ var (
 	setupTemplate = testenv.Setup{
 		OwnerName: ownerName,
 		UpBox:     true,
+		Cache:     true,
 		Cleanup:   cleanup,
 	}
 	readerConfig upspin.Config
@@ -426,20 +427,27 @@ var integrationTestKinds = []string{"inprocess", "server", "remote"}
 func TestIntegration(t *testing.T) {
 	type testConfig struct {
 		packing upspin.Packing
+		cache   bool // Run a cacheserver for ownerName.
 		always  bool // Always run this, even with -short or kind=="remote".
 	}
 	testConfigs := []testConfig{
-		{upspin.PlainPack, false},
-		{upspin.EEIntegrityPack, false},
-		{upspin.EEPack, true},
+		{upspin.PlainPack, false, false},
+		{upspin.EEIntegrityPack, false, false},
+		{upspin.EEPack, true, true},
+		{upspin.EEPack, false, true},
 	}
 	for _, kind := range integrationTestKinds {
 		t.Run(fmt.Sprintf("kind=%v", kind), func(t *testing.T) {
 			setup := setupTemplate
 			setup.Kind = kind
 			for _, config := range testConfigs {
+				if kind == "remote" && config.cache {
+					// Cache not supported for remote.
+					continue
+				}
 				setup.Packing = config.packing
-				t.Run(fmt.Sprintf("packing=%v", config.packing), func(t *testing.T) {
+				setup.Cache = config.cache
+				t.Run(fmt.Sprintf("packing=%v/cache=%t", config.packing, config.cache), func(t *testing.T) {
 					if testing.Short() && (kind == "remote" || !config.always) {
 						t.Skip("skipping remote or extra test with -test.short")
 					}
