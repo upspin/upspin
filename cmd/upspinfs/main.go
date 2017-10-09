@@ -58,6 +58,7 @@ func main() {
 
 	// Set any flags contained in the config.
 	if err := config.SetFlagValues(cfg, cmdName); err != nil {
+		log.Printf("%T", err)
 		log.Fatalf("%s: %s", cmdName, err)
 	}
 
