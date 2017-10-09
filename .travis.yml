@@ -3,7 +3,7 @@ os:
 - osx
 language: go
 go:
-- 1.9
+- 1.9.x
 go_import_path: upspin.io
 script: go test -short -race ./...
 notifications:

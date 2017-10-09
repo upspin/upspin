@@ -271,7 +271,6 @@ func TestOldStyleLogs(t *testing.T) {
 	if !os.IsNotExist(err) {
 		t.Fatalf("expected not exist error, got %v", err)
 	}
-
 }
 
 func TestWhichLogFile(t *testing.T) {
@@ -304,7 +303,6 @@ func TestWhichLogFile(t *testing.T) {
 	if f.index != len(user.files)-1 {
 		t.Fatal("off end did not get last entry")
 	}
-
 }
 
 func TestReadRotatedLog(t *testing.T) {

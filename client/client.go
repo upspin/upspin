@@ -793,7 +793,7 @@ func (c *Client) dupOrRename(op string, oldName, newName upspin.PathName, rename
 		return nil, errors.E(op, oldName, errors.Invalid, errors.Errorf("unrecognized Packing %d", c.config.Packing()))
 	}
 	if access.IsAccessControlFile(newName) {
-		return nil, errors.E(op, newName, errors.Invalid, errors.Str("Access or Group files cannot be links"))
+		return nil, errors.E(op, newName, errors.Invalid, errors.Str("Access or Group files cannot be renamed"))
 	}
 
 	// Update the directory entry with the new name and sequence.

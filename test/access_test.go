@@ -495,14 +495,16 @@ func testGroupAccess(t *testing.T, r *testenv.Runner) {
 	// both the reader and the owner, and then use that
 	// Group in the owner's Access file.
 	const (
-		readerGroupDir  = readerName + "/Group"
-		readerGroupFile = readerGroupDir + "/team"
+		readerGroupDir        = readerName + "/Group"
+		readerGroupAccessFile = readerGroupDir + "/Access"
+		readerGroupFile       = readerGroupDir + "/team"
 	)
 
 	// Create a tree for reader.
 	r.As(readerName)
 	r.MakeDirectory(readerName + "/")
 	r.MakeDirectory(readerGroupDir)
+	r.Put(readerGroupAccessFile, "r:all\n*:"+readerName)
 	r.Put(readerGroupFile, ownerName+","+readerName)
 
 	// Use only readerGroupFile in Access file.
@@ -542,6 +544,7 @@ func testGroupAccess(t *testing.T, r *testenv.Runner) {
 	// Clean up the reader's tree, as the integration test's cleanup
 	// process doesn't know about it.
 	r.As(readerName)
+	r.Delete(readerGroupAccessFile)
 	r.Delete(readerGroupFile)
 	r.Delete(readerGroupDir)
 	r.Delete(readerName + "/")

@@ -19,7 +19,6 @@ import (
 
 	"upspin.io/bind"
 	"upspin.io/errors"
-	"upspin.io/log"
 	"upspin.io/rpc/local"
 	"upspin.io/upspin"
 
@@ -152,7 +151,6 @@ func (c *httpClient) makeAuthenticatedRequest(op, method string, req pb.Message)
 		// Otherwise prepare an auth request.
 		authMsg, err := signUser(c.config, clientAuthMagic, serverAddr(c))
 		if err != nil {
-			log.Error.Printf("%s: signUser: %s using key %s", op, err, c.config.Factotum().PublicKey())
 			return nil, false, errors.E(op, err)
 		}
 		header.Set(authRequestHeader, strings.Join(authMsg, ","))
@@ -218,6 +216,9 @@ func (c *httpClient) Invoke(method string, req, resp pb.Message, stream Response
 		if httpResp.StatusCode != http.StatusOK {
 			msg, _ := ioutil.ReadAll(httpResp.Body)
 			httpResp.Body.Close()
+			if httpResp.Header.Get("Content-type") == "application/octet-stream" {
+				return errors.E(op, errors.UnmarshalError(msg))
+			}
 			// TODO(edpin,adg): unmarshal and check as it's more robust.
 			if bytes.Contains(msg, []byte(errUnauthenticated.Error())) {
 				// If the server restarted it will have forgotten about

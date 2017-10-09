@@ -1,11 +1,26 @@
 # Setting up upspinserver
 
-## Introduction
+## Conventions
+Throughout this document, we will mark commands to be run on your
+local machine with the shell prompt `local$` and commands to be
+run on your server with `server%`.
 
-This document describes how to create an Upspin installation by deploying
+For example:
+
+```
+local$ upspin signup -server=upspin.example.com you@gmail.com
+```
+and
+```
+server% sudo systemctl stop upspinserver.service
+```
+
+## Introduction
+This document describes the process for creating an Upspin installation by deploying
 an `upspinserver`, a combined Upspin Store and Directory server, to
 a Linux-based machine.
-The installation will use the central Upspin Key server (`key.upspin.io`) for
+
+The installation will use the central Upspin key server (`key.upspin.io`) for
 authentication, which permits inter-operation with other Upspin servers.
 
 There are multiple versions of `upspinserver`, each depending on where the
@@ -19,12 +34,12 @@ for the Google Cloud Platform.
 
 The process follows these steps:
 
-- sign up for an Upspin user account, registering your public key with the
-  central server `key.upspin.io`,
-- configure a domain name and create an Upspin user for the server,
-- if necessary, set up the cloud storage service,
-- deploy the `upspinserver` to a Linux-based server,
-- configure the `upspinserver`.
+- [sign up](#sign-up-for-an-upspin-account) for an Upspin user account
+- [configure](#set-up-your-domain) a domain name and create an Upspin user for the server,
+- if necessary, [set up the cloud](#specific-instructions-for-cloud-services
+) storage service,
+- [deploy](#set-up-a-server-and-deploy-the-upspinserver-binary) the `upspinserver` to a Linux-based server,
+- [configure](#configure-upspinserver) the `upspinserver`.
 
 Each of these steps (besides deployment) has a corresponding `upspin`
 subcommand to assist you with the process.
@@ -50,19 +65,10 @@ To deploy an `upspinserver` you need to decide on values for:
 
 ## Sign up for an Upspin account
 
-Run `upspin signup`, passing your chosen host name as its `-server` argument
+To register your public key with the the central key server run `upspin signup`,
+passing your chosen host name as its `-server` argument
 and your chosen Upspin user name as its final argument.
 Then follow the onscreen instructions.
-
-Throughout this document, we will mark commands to be run on your
-local machine with the shell prompt `local$` and commands to be
-run on your server with `server%`.
-
-For example:
-
-```
-local$ upspin signup -server=upspin.example.com you@gmail.com
-```
 
 The [Signing up a new user](/doc/signup.md) document describes this process in
 detail.
