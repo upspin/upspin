@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "77298ac0_2fd49891",
+        "filename": "cmd/upspin/allcmds_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 536,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-10-09T03:20:44Z",
+      "side": 1,
+      "message": "Bad snarf and paste, fixing.",
+      "parentUuid": "5363de8f_eb773eb6",
+      "revId": "adc5480a100dc8aaaa21fd5847c56f51cc311581",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "e5de932a_301e04f6",
         "filename": "cmd/upspin/createsuffixeduser.go",
         "patchSetId": 7
@@ -33,6 +51,24 @@
       "revId": "adc5480a100dc8aaaa21fd5847c56f51cc311581",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e1c54c66_7415e0da",
+        "filename": "cmd/upspin/createsuffixeduser.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-10-09T03:20:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e5de932a_301e04f6",
+      "revId": "adc5480a100dc8aaaa21fd5847c56f51cc311581",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
