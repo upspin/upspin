@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e5c0a093_84220bfe",
+        "filename": "cmd/upspin/createsuffixeduser.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-09T04:14:01Z",
+      "side": 1,
+      "message": "\u003cblank line\u003e\nTo create the user with suffix +snapshot, run\n   upspin snapshot\nrather than this command.",
+      "revId": "600953512d5376d95113bbb6bb680a9e252992c3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
