@@ -48,7 +48,8 @@ const (
 
 // Setup is a configuration structure that contains a directory tree and other optional flags.
 type Setup struct {
-	// OwnerName is the name of the directory tree owner.
+	// OwnerName is the name of the user that runs the dirserver,
+	// storeserver, and keyserver.
 	OwnerName upspin.UserName
 
 	// Kind is what kind of servers to use, "inprocess", "server", or "remote".
@@ -119,6 +120,8 @@ func randomEndpoint(prefix string) upspin.Endpoint {
 const upboxYAML = `
 users:
 - name: %[1]q
+- name: test@upspin.io
+  cache: true
 servers:
 - name: keyserver
   user: %[1]q
@@ -311,7 +314,13 @@ func (e *Env) cleanup() error {
 // necessary.
 func (e *Env) NewUser(userName upspin.UserName) (upspin.Config, error) {
 	const op = "testenv.NewUser"
+
+	if e.schema != nil && userName == "test@upspin.io" {
+		return config.FromFile(e.schema.Config("test@upspin.io"))
+	}
+
 	cfg := config.SetUserName(e.Config, userName)
+	cfg = config.SetValue(cfg, "cache", "no")
 	cfg = config.SetPacking(cfg, e.Setup.Packing)
 
 	// Set up a factotum for the user.
