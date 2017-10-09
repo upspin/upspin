@@ -120,10 +120,10 @@ For this reason, they do not require a working email address.
 Suffixed users are created using the `upspin` command.
 
 For example, `ann@example.com` can create the user 'ann+testing@example.com`
-bu running:
+by running:
 
 ```
-$ upspin createsuffixeduser quux
+$ upspin createsuffixeduser ann+testing@example.com
 ```
 
 ## Naming
