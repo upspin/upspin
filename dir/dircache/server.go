@@ -77,6 +77,9 @@ func (s *server) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 	}
 
 	if de, err, ok := s.clog.lookup(name); ok {
+		if err == nil && de != nil && de.Attr == upspin.AttrLink {
+			err = upspin.ErrFollowLink
+		}
 		return de, err
 	}
 
