@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"upspin.io/bind"
+	"upspin.io/cloud/storage/storagetest"
 	"upspin.io/config"
 	"upspin.io/dir/server/serverlog"
 	"upspin.io/errors"
@@ -1265,7 +1266,7 @@ func newConfigForTesting(t *testing.T, userName upspin.UserName) (upspin.Config,
 	if err != nil {
 		t.Fatal(err)
 	}
-	serverlogUser, err := serverlog.Open(userName, tmpDir)
+	serverlogUser, err := serverlog.Open(userName, tmpDir, storagetest.Memory())
 	if err != nil {
 		t.Fatal(err)
 	}
