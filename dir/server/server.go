@@ -13,6 +13,7 @@ import (
 
 	"upspin.io/access"
 	"upspin.io/cache"
+	"upspin.io/cloud/storage"
 	"upspin.io/dir/server/serverlog"
 	"upspin.io/dir/server/tree"
 	"upspin.io/errors"
@@ -98,6 +99,9 @@ type server struct {
 
 	// dialed reports whether the instance was created using Dial, not New.
 	dialed bool
+
+	// TODO
+	storage storage.Storage
 }
 
 // snapshotCreate is used to create a snapshot and report its success.
@@ -137,19 +141,23 @@ func New(cfg upspin.Config, options ...string) (upspin.DirServer, error) {
 		return nil, errors.E(op, errors.Invalid, errors.Str("nil factotum"))
 	}
 	// Check which options are present and pick suitable defaults.
-	logDir := ""
+	var (
+		logDir         string
+		storageBackend string
+		storageOpts    []storage.DialOpts
+	)
 	for _, opt := range options {
-		o := strings.Split(opt, "=")
-		if len(o) != 2 {
-			return nil, errors.E(op, errors.Invalid, errors.Errorf("invalid option format: %q", opt))
+		const logDirPrefix = "logDir="
+		if strings.HasPrefix(opt, logDirPrefix) {
+			logDir = opt[len(logDirPrefix):]
+			continue
 		}
-		k, v := o[0], o[1]
-		switch k {
-		case "logDir":
-			logDir = v
-		default:
-			return nil, errors.E(op, errors.Invalid, errors.Errorf("unknown option %q", k))
+		const backendPrefix = "backend="
+		if strings.HasPrefix(opt, backendPrefix) {
+			storageBackend = opt[len(backendPrefix):]
+			continue
 		}
+		storageOpts = append(storageOpts, storage.WithOptions(opt))
 	}
 	if logDir == "" {
 		dir, err := ioutil.TempDir("", "DirServer")
@@ -158,6 +166,15 @@ func New(cfg upspin.Config, options ...string) (upspin.DirServer, error) {
 		}
 		log.Error.Printf("%s: warning: writing important logs to a temporary directory (%q). A server restart will lose data.", op, dir)
 		logDir = dir
+	}
+
+	var store storage.Storage
+	if storageBackend != "" {
+		var err error
+		store, err = storage.Dial(storageBackend, storageOpts...)
+		if err != nil {
+			return nil, errors.E(op, err)
+		}
 	}
 
 	const (
@@ -175,6 +192,7 @@ func New(cfg upspin.Config, options ...string) (upspin.DirServer, error) {
 		remoteGroups:  cache.NewLRU(groupCacheSize),
 		userLocks:     make([]sync.Mutex, numUserLocks),
 		now:           upspin.Now,
+		storage:       store,
 	}
 	shutdown.Handle(s.shutdown)
 	// Start background services.
@@ -832,7 +850,7 @@ func (s *server) loadTreeFor(userName upspin.UserName, opts ...options) (*tree.T
 		// allowed to create it.
 		return nil, errNotExist
 	}
-	user, err := serverlog.Open(userName, s.logDir)
+	user, err := serverlog.Open(userName, s.logDir, s.storage)
 	if err != nil {
 		return nil, err
 	}
