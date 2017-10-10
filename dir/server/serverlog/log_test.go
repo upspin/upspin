@@ -15,8 +15,12 @@ import (
 	"sort"
 	"testing"
 
+	"upspin.io/cloud/storage"
+	"upspin.io/cloud/storage/storagetest"
 	"upspin.io/errors"
+	"upspin.io/factotum"
 	"upspin.io/log"
+	"upspin.io/test/testutil"
 	"upspin.io/upspin"
 )
 
@@ -60,7 +64,7 @@ func BenchmarkReadAt(b *testing.B) {
 	dir, cleanup := setup(b, "BenchmarkReadAt")
 	defer cleanup()
 
-	user, err := Open(userName, dir)
+	user, err := Open(userName, dir, nil, nil)
 	if err != nil {
 		b.Fatal(err)
 	}
@@ -86,7 +90,7 @@ func TestCountReadAtMallocs(t *testing.T) {
 	dir, cleanup := setup(t, "AppendRead")
 	defer cleanup()
 
-	user, err := Open(userName, dir)
+	user, err := Open(userName, dir, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -126,7 +130,7 @@ func TestConcurrent(t *testing.T) {
 	dir, cleanup := setup(t, "Concurrent")
 	defer cleanup()
 
-	user, err := Open(userName, dir)
+	user, err := Open(userName, dir, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -226,7 +230,7 @@ func TestAppendRead(t *testing.T) {
 	dir, cleanup := setup(t, "AppendRead")
 	defer cleanup()
 
-	user, err := Open(userName, dir)
+	user, err := Open(userName, dir, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -290,7 +294,7 @@ func TestOldStyleLogs(t *testing.T) {
 	}
 
 	// Open moves the old file to its new location.
-	u, err := Open(name, dir)
+	u, err := Open(name, dir, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -303,7 +307,7 @@ func TestOldStyleLogs(t *testing.T) {
 	}
 
 	// Open it again. Should work fine.
-	u, err = Open(name, dir)
+	u, err = Open(name, dir, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -316,7 +320,7 @@ func TestOldStyleLogs(t *testing.T) {
 	}
 
 	// Open it again.
-	u, err = Open(name, dir)
+	u, err = Open(name, dir, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -390,7 +394,7 @@ func TestReadRotatedLog(t *testing.T) {
 	}
 
 	// Open logs for user.
-	user2, err := Open(user.name, user.directory)
+	user2, err := Open(user.name, user.directory, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -417,7 +421,7 @@ func TestReadRotatedLog(t *testing.T) {
 	f.Close()
 
 	// Open Logs again and get a reader reading from 345678.
-	user3, err := Open(user.name, user.directory)
+	user3, err := Open(user.name, user.directory, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -449,7 +453,7 @@ func TestRotateLogAndTruncate(t *testing.T) {
 		MaxLogSize = prevMaxLogSize
 	}()
 
-	user, err := Open("bob@example.com", dir)
+	user, err := Open("bob@example.com", dir, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -512,7 +516,15 @@ func TestIndex(t *testing.T) {
 	}
 	defer os.RemoveAll(dir)
 
-	user, err := Open("foo@bar.com", dir)
+	store := notifyingStorage{
+		storagetest.Memory(),
+		make(chan bool, 1),
+	}
+	fac, err := factotum.NewFromDir(testutil.Repo("key", "testdata", "test"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	user, err := Open("foo@bar.com", dir, fac, store)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -544,6 +556,21 @@ func TestIndex(t *testing.T) {
 	}
 	if !reflect.DeepEqual(recoveredRoot, &root) {
 		t.Errorf("recoveredRoot = %v, want = %v", recoveredRoot, root)
+	}
+
+	// Check that the root was put to the storage backend.
+	<-store.onPut
+	b, err := store.Storage.Download(user.root.ref)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var storedRoot upspin.DirEntry
+	_, err = storedRoot.Unmarshal(b)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(storedRoot, root) {
+		t.Errorf("storedRoot = %v, want = %v", storedRoot, root)
 	}
 
 	// Save and read offset
@@ -580,6 +607,17 @@ func TestIndex(t *testing.T) {
 	}
 }
 
+type notifyingStorage struct {
+	storage.Storage
+	onPut chan bool
+}
+
+func (s notifyingStorage) Put(ref string, b []byte) error {
+	err := s.Storage.Put(ref, b)
+	s.onPut <- true
+	return err
+}
+
 func TestListUsers(t *testing.T) {
 	dir, cleanup := setup(t, "ListUsers")
 	defer cleanup()
@@ -593,7 +631,7 @@ func TestListUsers(t *testing.T) {
 		"jose+photos@ortega.com",
 		"morihei+snapshot@ueshiba.jp",
 	} {
-		user, err := Open(u, dir)
+		user, err := Open(u, dir, nil, nil)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -693,7 +731,7 @@ func TestOffsetOf(t *testing.T) {
 	dir, cleanup := setup(t, "OffsetOf")
 	defer cleanup()
 
-	user, err := Open(userName, dir)
+	user, err := Open(userName, dir, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -812,7 +850,7 @@ func TestVersion0Logs(t *testing.T) {
 	}
 
 	// Now we can Open the user's logs in the temporary location.
-	user, err := Open("user@example.com", dir)
+	user, err := Open("user@example.com", dir, nil, nil)
 	defer os.Remove("testdata/version0/d.tree.log.user@example.com/2738.1")
 	if err != nil {
 		t.Fatal(err)
@@ -870,7 +908,7 @@ func TestVersion0Logs(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	user, err = Open("user@example.com", dir)
+	user, err = Open("user@example.com", dir, nil, nil)
 	got = user.V1Transition()
 	if got < startTime {
 		t.Fatalf("got transition time %s; want a time after %s", got, startTime)
@@ -897,7 +935,7 @@ func TestReOpen(t *testing.T) {
 		MaxLogSize = oldMax
 	}()
 
-	user, err := Open("user@example.com", dir)
+	user, err := Open("user@example.com", dir, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -918,7 +956,7 @@ func TestReOpen(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	user, err = Open("user@example.com", dir)
+	user, err = Open("user@example.com", dir, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
