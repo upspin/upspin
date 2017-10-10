@@ -1265,7 +1265,7 @@ func newConfigForTesting(t *testing.T, userName upspin.UserName) (upspin.Config,
 	if err != nil {
 		t.Fatal(err)
 	}
-	serverlogUser, err := serverlog.Open(userName, tmpDir)
+	serverlogUser, err := serverlog.Open(userName, tmpDir, nil, nil)
 	if err != nil {
 		t.Fatal(err)
 	}
