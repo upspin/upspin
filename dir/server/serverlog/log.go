@@ -38,6 +38,7 @@ import (
 	"strings"
 	"sync"
 
+	"upspin.io/cloud/storage"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/upspin"
@@ -48,6 +49,7 @@ import (
 type User struct {
 	name      upspin.UserName
 	directory string
+	storage   storage.Storage
 
 	// mu locks all writes to the writer and checkpoint,
 	// and the offSeqs structure. Readers have their
@@ -64,6 +66,10 @@ type User struct {
 	// Kept in increasing sequence order.
 	// TODO: Make this a sparse slice and do small linear scans.
 	offSeqs []offSeq
+
+	// savedRootSeq remembers the sequence number of the
+	// last root saved to the root file.
+	savedRootSeq int64
 
 	// v1transition records the time that the logs switched
 	// from version 0 to version 1. If there are no version 0
@@ -124,12 +130,7 @@ type Reader struct {
 type checkpoint struct {
 	user *User // owner of this checkpoint.
 
-	// savedRootSeq remembers the sequence number of the
-	// last root saved to the root file.
-	savedRootSeq int64
-
 	checkpointFile *os.File // file descriptor for the checkpoint.
-	rootFile       *os.File // file descriptor for the root of the tree.
 }
 
 // offSeq remembers the correspondence between a global offset
@@ -166,7 +167,7 @@ const (
 // Only one User can be opened for a given user in a given directory
 // or logs could be corrupted. It is the caller's responsibility to
 // provide this guarantee.
-func Open(userName upspin.UserName, directory string) (*User, error) {
+func Open(userName upspin.UserName, directory string, store storage.Storage) (*User, error) {
 	if err := valid.UserName(userName); err != nil {
 		return nil, err
 	}
@@ -174,6 +175,7 @@ func Open(userName upspin.UserName, directory string) (*User, error) {
 	u := &User{
 		name:      userName,
 		directory: directory,
+		storage:   store,
 		mu:        new(sync.Mutex),
 	}
 	subdir := u.logSubDir()
@@ -233,30 +235,30 @@ func Open(userName upspin.UserName, directory string) (*User, error) {
 		return nil, errors.E(errors.IO, err)
 	}
 
+	u.checkpoint, err = newCheckpoint(u)
+	if err != nil {
+		return nil, err
+	}
+
 	w := &writer{
 		user: u,
 		fd:   fd,
 		file: u.files[len(u.files)-1],
 	}
-
-	rloc := u.rootFile()
-	cploc := u.checkpointFile()
-	rootFile, err := os.OpenFile(rloc, os.O_RDWR|os.O_CREATE, 0600)
-	if err != nil {
-		return nil, errors.E(errors.IO, err)
-	}
-	checkpointFile, err := os.OpenFile(cploc, os.O_RDWR|os.O_CREATE, 0600)
-	if err != nil {
-		return nil, errors.E(errors.IO, err)
-	}
-	cp := &checkpoint{
-		user:           u,
-		checkpointFile: checkpointFile,
-		rootFile:       rootFile,
-	}
 	u.writer = w
-	u.checkpoint = cp
+
 	return u, nil
+}
+
+func newCheckpoint(u *User) (*checkpoint, error) {
+	f, err := os.OpenFile(u.checkpointFile(), os.O_RDWR|os.O_CREATE, 0600)
+	if err != nil {
+		return nil, errors.E(errors.IO, err)
+	}
+	return &checkpoint{
+		user:           u,
+		checkpointFile: f,
+	}, nil
 }
 
 // ReadOnlyClone returns a copy of the user structure with no writer,
@@ -336,15 +338,15 @@ func (u *User) DeleteLogs() error {
 	if err != nil && !os.IsNotExist(err) {
 		return errors.E(errors.IO, err)
 	}
-	u.checkpoint.savedRootSeq = 0
+	u.savedRootSeq = 0
 	return nil
 }
 
 // userGlob returns the set of users in the directory that match the pattern.
 // The pattern is as per filePath.Glob, applied to the directory.
 func userGlob(pattern string, directory string) ([]upspin.UserName, error) {
-	prefix := rootFileName("", directory)
-	matches, err := filepath.Glob(rootFileName(pattern, directory))
+	prefix := filepath.Join(directory, checkpointFilePrefix)
+	matches, err := filepath.Glob(prefix + pattern)
 	if err != nil {
 		return nil, errors.E(errors.IO, err)
 	}
@@ -395,17 +397,22 @@ func (u *User) logSubDir() string {
 	return filepath.Join(u.directory, "d.tree.log."+string(u.name))
 }
 
-func (u *User) checkpointFile() string {
+const (
+	rootFilePrefix = "tree.root."
 	// For historical reasons, the checkpoint file name is "index".
-	return filepath.Join(u.directory, "tree.index."+string(u.name))
+	checkpointFilePrefix = "tree.index."
+)
+
+func (u *User) checkpointFile() string {
+	return filepath.Join(u.directory, checkpointFilePrefix+string(u.name))
 }
 
 func (u *User) rootFile() string {
-	return rootFileName(string(u.name), u.directory)
+	return filepath.Join(u.directory, rootFilePrefix+string(u.name))
 }
 
-func rootFileName(userName, directory string) string {
-	return filepath.Join(directory, "tree.root."+userName)
+func (u *User) rootFileRef() string {
+	return rootFilePrefix + string(u.name)
 }
 
 // findLogFiles populates u.files with the log files available for this user.
@@ -847,18 +854,25 @@ func (r *Reader) Close() error {
 
 // Root returns the user's root by retrieving it from local stable storage.
 func (u *User) Root() (*upspin.DirEntry, error) {
-	cp := u.checkpoint
-	cp.user.mu.Lock()
-	defer cp.user.mu.Unlock()
+	u.mu.Lock()
+	defer u.mu.Unlock()
 
-	var root upspin.DirEntry
-	buf, err := readAllFromTop(cp.rootFile)
-	if err != nil {
+	buf, err := u.storage.Download(u.rootFileRef())
+	isNotExist := errors.Match(errors.E(errors.NotExist), err)
+	if err != nil && !isNotExist {
 		return nil, err
 	}
-	if len(buf) == 0 {
-		return nil, errors.E(errors.NotExist, cp.user.Name(), errors.Str("no root for user"))
+	if isNotExist {
+		// Try reading the root from its old location on local disk.
+		buf, err = ioutil.ReadFile(u.rootFile())
+		if err != nil && !os.IsNotExist(err) {
+			return nil, errors.E(errors.IO, err)
+		}
 	}
+	if len(buf) == 0 {
+		return nil, errors.E(errors.NotExist, u.Name(), errors.Str("no root for user"))
+	}
+	var root upspin.DirEntry
 	more, err := root.Unmarshal(buf)
 	if err != nil {
 		return nil, err
@@ -866,38 +880,41 @@ func (u *User) Root() (*upspin.DirEntry, error) {
 	if len(more) != 0 {
 		return nil, errors.E(errors.IO, errors.Errorf("root has %d left over bytes", len(more)))
 	}
-	cp.savedRootSeq = root.Sequence
+	u.savedRootSeq = root.Sequence
 	return &root, nil
 }
 
 // SaveRoot saves the user's root entry to stable storage.
 func (u *User) SaveRoot(root *upspin.DirEntry) error {
-	cp := u.checkpoint
-	cp.user.mu.Lock()
-	defer cp.user.mu.Unlock()
-	if cp.savedRootSeq == root.Sequence {
+	u.mu.Lock()
+	defer u.mu.Unlock()
+
+	if u.savedRootSeq == root.Sequence {
 		return nil
 	}
+
 	buf, err := root.Marshal()
 	if err != nil {
 		return err
 	}
-	err = overwriteAndSync(cp.rootFile, buf)
+	err = u.storage.Put(u.rootFileRef(), buf)
 	if err != nil {
 		return err
 	}
-	cp.savedRootSeq = root.Sequence
+	u.savedRootSeq = root.Sequence
 	return nil
 }
 
 // DeleteRoot deletes the root.
 func (u *User) DeleteRoot() error {
-	cp := u.checkpoint
-	cp.user.mu.Lock()
-	defer cp.user.mu.Unlock()
+	u.mu.Lock()
+	defer u.mu.Unlock()
 
-	cp.savedRootSeq = 0
-	return overwriteAndSync(cp.rootFile, []byte{})
+	if err := u.storage.Delete(u.rootFileRef()); err != nil {
+		return err
+	}
+	u.savedRootSeq = 0
+	return nil
 }
 
 // readOnlyClone makes a read-only copy of the checkpoint.
@@ -912,13 +929,8 @@ func (cp *checkpoint) readOnlyClone() (*checkpoint, error) {
 	if err != nil {
 		return nil, errors.E(errors.IO, err)
 	}
-	root, err := os.Open(cp.rootFile.Name())
-	if err != nil {
-		return nil, errors.E(errors.IO, err)
-	}
 	newCp := *cp
 	newCp.checkpointFile = fd
-	newCp.rootFile = root
 	return &newCp, nil
 }
 
@@ -1000,14 +1012,6 @@ func (cp *checkpoint) close() error {
 		firstErr = cp.checkpointFile.Close()
 		cp.checkpointFile = nil
 	}
-	if cp.rootFile != nil {
-		err := cp.rootFile.Close()
-		cp.rootFile = nil
-		if err != nil && firstErr == nil {
-			firstErr = err
-		}
-	}
-	cp.savedRootSeq = 0
 	return firstErr
 }
 

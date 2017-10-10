@@ -16,6 +16,7 @@ import (
 	"sort"
 	"testing"
 
+	"upspin.io/cloud/storage/storagetest"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/upspin"
@@ -70,7 +71,7 @@ func TestConcurrent(t *testing.T) {
 	dir, cleanup := setup(t, "Concurrent")
 	defer cleanup()
 
-	user, err := Open(userName, dir)
+	user, err := Open(userName, dir, storagetest.Memory())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -170,7 +171,7 @@ func TestAppendRead(t *testing.T) {
 	dir, cleanup := setup(t, "AppendRead")
 	defer cleanup()
 
-	user, err := Open(userName, dir)
+	user, err := Open(userName, dir, storagetest.Memory())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -234,7 +235,8 @@ func TestOldStyleLogs(t *testing.T) {
 	}
 
 	// Open moves the old file to its new location.
-	u, err := Open(name, dir)
+	store := storagetest.Memory()
+	u, err := Open(name, dir, store)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -247,7 +249,7 @@ func TestOldStyleLogs(t *testing.T) {
 	}
 
 	// Open it again. Should work fine.
-	u, err = Open(name, dir)
+	u, err = Open(name, dir, store)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -260,7 +262,7 @@ func TestOldStyleLogs(t *testing.T) {
 	}
 
 	// Open it again.
-	u, err = Open(name, dir)
+	u, err = Open(name, dir, store)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -334,7 +336,8 @@ func TestReadRotatedLog(t *testing.T) {
 	}
 
 	// Open logs for user.
-	user2, err := Open(user.name, user.directory)
+	store := storagetest.Memory()
+	user2, err := Open(user.name, user.directory, store)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -361,7 +364,7 @@ func TestReadRotatedLog(t *testing.T) {
 	f.Close()
 
 	// Open Logs again and get a reader reading from 345678.
-	user3, err := Open(user.name, user.directory)
+	user3, err := Open(user.name, user.directory, store)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -393,7 +396,7 @@ func TestRotateLogAndTruncate(t *testing.T) {
 		MaxLogSize = prevMaxLogSize
 	}()
 
-	user, err := Open("bob@example.com", dir)
+	user, err := Open("bob@example.com", dir, storagetest.Memory())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -456,7 +459,7 @@ func TestIndex(t *testing.T) {
 	}
 	defer os.RemoveAll(dir)
 
-	user, err := Open("foo@bar.com", dir)
+	user, err := Open("foo@bar.com", dir, storagetest.Memory())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -537,7 +540,7 @@ func TestListUsers(t *testing.T) {
 		"jose+photos@ortega.com",
 		"morihei+snapshot@ueshiba.jp",
 	} {
-		user, err := Open(u, dir)
+		user, err := Open(u, dir, storagetest.Memory())
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -637,7 +640,7 @@ func TestOffsetOf(t *testing.T) {
 	dir, cleanup := setup(t, "XXX")
 	defer cleanup()
 
-	user, err := Open(userName, dir)
+	user, err := Open(userName, dir, storagetest.Memory())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -754,7 +757,7 @@ func TestVersion0Logs(t *testing.T) {
 	}
 
 	// Now we can Open the user's logs in the temporary location.
-	user, err := Open("user@example.com", dir)
+	user, err := Open("user@example.com", dir, storagetest.Memory())
 	defer os.Remove("testdata/version0/d.tree.log.user@example.com/2738.1")
 	if err != nil {
 		t.Fatal(err)
