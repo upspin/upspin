@@ -76,6 +76,9 @@ func (s *server) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 		return nil, err
 	}
 
+	s.clog.globalLock.RLock()
+	defer s.clog.globalLock.RUnlock()
+
 	if de, err, ok := s.clog.lookup(name); ok {
 		if err == nil && de != nil && de.Attr == upspin.AttrLink {
 			err = upspin.ErrFollowLink
@@ -99,6 +102,9 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 		op.log(err)
 		return nil, err
 	}
+
+	s.clog.globalLock.RLock()
+	defer s.clog.globalLock.RUnlock()
 
 	if entries, err, ok := s.clog.lookupGlob(name); ok {
 		return entries, err
@@ -132,6 +138,10 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 			s.flushBlock(b.Location)
 		}
 	}
+
+	s.clog.globalLock.Lock()
+	defer s.clog.globalLock.Unlock()
+
 	de, err := dir.Put(entry)
 	if err == nil {
 		// If the put worked, remember it.
@@ -139,6 +149,12 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 			entry.Sequence = de.Sequence
 		}
 		s.clog.logRequest(putReq, name, err, entry)
+
+		// If this was a Put of the root, retry the watch.
+		parsed, perr := path.Parse(entry.Name)
+		if perr == nil && parsed.IsRoot() {
+			s.clog.retryWatch(parsed)
+		}
 	}
 
 	return de, err
@@ -154,6 +170,9 @@ func (s *server) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
 		op.log(err)
 		return nil, err
 	}
+
+	s.clog.globalLock.Lock()
+	defer s.clog.globalLock.Unlock()
 
 	de, err := dir.Delete(name)
 	s.clog.logRequest(deleteReq, name, err, de)
@@ -171,6 +190,9 @@ func (s *server) WhichAccess(name upspin.PathName) (*upspin.DirEntry, error) {
 		op.log(err)
 		return nil, err
 	}
+
+	s.clog.globalLock.RLock()
+	defer s.clog.globalLock.RUnlock()
 
 	if de, ok := s.clog.whichAccess(name); ok {
 		return de, nil
