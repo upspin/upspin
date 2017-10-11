@@ -39,7 +39,9 @@ type proxiedDir struct {
 	die   chan bool // channel used to tell watcher to die
 	dying chan bool // channel used to confirm watcher is dying
 
+	// For retrying a watch.
 	retryInterval time.Duration
+	wake          chan bool
 }
 
 // proxiedDirs is used to translate between a user name and the relevant cached directory.
@@ -93,8 +95,23 @@ func (p *proxiedDirs) proxyFor(name upspin.PathName, ep *upspin.Endpoint) {
 	if d.die == nil {
 		d.die = make(chan bool)
 		d.dying = make(chan bool)
+		d.wake = make(chan bool)
 		go d.watcher(*ep)
 	}
+}
+
+// retryWatch wakes up watcher (if it exists) to try the Watch again.
+func (p *proxiedDirs) retryWatch(parsed path.Parsed) {
+	p.Lock()
+	defer p.Unlock()
+	if p.closing {
+		return
+	}
+	d := p.m[parsed.User()]
+	if d == nil || d.wake == nil {
+		return
+	}
+	d.wake <- true
 }
 
 // setOrder remembers an order read from the logfile.
@@ -129,7 +146,7 @@ func (d *proxiedDir) close() {
 }
 
 const (
-	initialRetryInterval = 10 * time.Second
+	initialRetryInterval = time.Second
 	maxRetryInterval     = time.Minute
 )
 
@@ -164,10 +181,13 @@ func (d *proxiedDir) watcher(ep upspin.Endpoint) {
 		}
 		log.Info.Printf("dir/dircache.watcher: %s: %s", d.user, err)
 
-		time.Sleep(d.retryInterval)
-		d.retryInterval *= 2
-		if d.retryInterval > maxRetryInterval {
-			d.retryInterval = maxRetryInterval
+		select {
+		case <-time.After(d.retryInterval):
+			d.retryInterval *= 2
+			if d.retryInterval > maxRetryInterval {
+				d.retryInterval = maxRetryInterval
+			}
+		case <-d.wake:
 		}
 	}
 }
