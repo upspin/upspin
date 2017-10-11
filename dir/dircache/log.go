@@ -202,6 +202,10 @@ func (l *clog) proxyFor(path upspin.PathName, ep *upspin.Endpoint) {
 	l.proxied.proxyFor(path, ep)
 }
 
+func (l *clog) retryWatch(parsed path.Parsed) {
+	l.proxied.retryWatch(parsed)
+}
+
 // rotateLog creates a new log file and removes enough old ones to stay under
 // the l.maxDisk limit.
 func (l *clog) rotateLog() {
