@@ -22,12 +22,6 @@ package dircache // import "upspin.io/dir/dircache"
 // consistency. This consistency is implemented by the refresh goroutine which will
 // periodically refresh all entries. The refresh interval increases if the entry is
 // unchanged, reflecting file inertia.
-//
-// We store in individual globReq entries, the pertinent Access file, if any. This is
-// updated as we learn more about Access files through Glob, Put, Lookup, Delete or
-// WhichAccess. Since we maintain an LRU of known DirEntries rather than a tree, we
-// must run the LRU whenever an Access file is added or removed to flush any stale
-// entries.
 
 import (
 	"bufio"
@@ -86,12 +80,6 @@ const (
 	version = "20170118"
 )
 
-// noAccessFile indicates we did a WhichAccess and it returned no DirEntry.
-const noAccessFile = upspin.PathName("none")
-
-// unknownAccessFile indicates we don't know which access file pertains.
-const unknownAccessFile = upspin.PathName("")
-
 // clogEntry corresponds to a cached operation.
 type clogEntry struct {
 	request request
@@ -107,8 +95,8 @@ type clogEntry struct {
 	children map[string]bool
 	complete bool // true if the children are the complete set
 
-	// For directories, the Access file that pertains.
-	access upspin.PathName
+	// True if we know a directory has no access file.
+	noAccessFile bool
 
 	// The watch order.
 	order int64
@@ -553,51 +541,91 @@ func (l *clog) complete(e *clogEntry) bool {
 	return true
 }
 
-// whichAcess returns the applicable Access file to name if one is known.
-func (l *clog) whichAccess(name upspin.PathName) (*upspin.DirEntry, bool) {
-	l.globalLock.RLock()
-	defer l.globalLock.RUnlock()
-
-	// The name has already been parsed getting here.
-	p, _ := path.Parse(name)
-
-	// The access member is only set in glob (directory) entries. Walk the cached glob
-	// entries to the root looking for the pertinent Access file.
-	afn := noAccessFile
-	for pd := p.Drop(1); ; pd = pd.Drop(1) {
-		dirName := pd.Path()
-		glock := l.globLocks.lock(dirName)
-		e := l.getFromLRU(lruKey{name: dirName, glob: true})
-
-		// If at any point in the walk, we can't answer the
-		// question, give up.
-		if e == nil || e.error != nil || e.access == unknownAccessFile {
-			glock.Unlock()
-			return nil, false
+// globHasAccess looks to see if there is a glob for the name with
+// an Access file. it returns:
+// - the Access file's DirEntry and true if it does
+// - nil and true if the glob definitively has no Access file
+// - nil and false if it cannot be determined
+func (l *clog) globHasAccess(name upspin.PathName) (*upspin.DirEntry, bool) {
+	glock := l.globLocks.lock(name)
+	defer glock.Unlock()
+	e := l.getFromLRU(lruKey{name: name, glob: true})
+	if e == nil {
+		// No acched Glob. We don't know.
+		return nil, false
+	}
+	if _, ok := e.children[access.AccessFile]; ok {
+		// The directory has a Access file, see if we have a cached DirEntry for it.
+		afn := path.Join(name, access.AccessFile)
+		plock := l.pathLocks.lock(afn)
+		e := l.getFromLRU(lruKey{name: afn, glob: false})
+		plock.Unlock()
+		if e != nil && e.error == nil && e.de != nil {
+			// We have the entry for the access file. Return it.
+			return e.de, true
 		}
-		afn = e.access
-		glock.Unlock()
-
-		// If we've found an Access file, we're done.
-		if afn != noAccessFile {
-			break
-		}
-
-		// If we've walked to the root with no Access file, there is none.
-		if pd.IsRoot() {
-			// We walked the whole path with no access file.
+	} else {
+		// No access file, is this conplete knowledge?
+		if e.complete || e.noAccessFile {
+			// We know there is no access file.
 			return nil, true
 		}
 	}
 
-	// We have an Access file name. See if we have the Access file DirEntry.
-	plock := l.pathLocks.lock(afn)
-	defer plock.Unlock()
-	e := l.getFromLRU(lruKey{name: afn, glob: false})
-	if e == nil || e.de == nil || e.error != nil {
-		return nil, false
+	// We don't know.
+	return nil, false
+}
+
+// whichAcess returns the applicable Access file to name if one is known.
+// We search the cache by walking the path to the root looking for a glob
+// entry that contains an Access file. If at any step in the walk, we
+// don't have a definitive answer, give up and let the request go to the
+// server.
+//
+// The Access file for a directory can be in the directory itself while the Access
+// file for other files can be in its containing directory. That means we have
+// to know type of the target is to begin our search. If we can't
+// determine that, we have to assume its a directory and start the search
+// for globs of that name.
+func (l *clog) whichAccess(name upspin.PathName) (*upspin.DirEntry, bool) {
+	// The name has already been parsed getting here.
+	p, _ := path.Parse(name)
+
+	// The global lock serializes with Access file being added by fixAccess.
+	l.globalLock.RLock()
+	defer l.globalLock.RUnlock()
+
+	// Is the target in the cache?
+	e := l.getFromLRU(lruKey{name: name, glob: false})
+	if e != nil {
+		// Give up if there was a previous error.
+		if e.error != nil || e.de == nil {
+			return nil, false
+		}
+
+		// If the target is not a directory, start the search from its parent.
+		if !e.de.IsDir() {
+			p = p.Drop(1)
+		}
 	}
-	return e.de, true
+
+	// Walk the cached glob entries to the root looking for the pertinent Access file.
+	for {
+		de, ok := l.globHasAccess(p.Path())
+		if !ok {
+			// We don't know enough, ask the actual server.
+			return nil, false
+		}
+		if de != nil {
+			// We found an Access file.
+			return de, true
+		}
+		if p.IsRoot() {
+			// We walked the whole path with no access file.
+			return nil, true
+		}
+		p = p.Drop(1)
+	}
 }
 
 func (l *clog) logRequest(op request, name upspin.PathName, err error, de *upspin.DirEntry) {
@@ -724,7 +752,6 @@ func (l *clog) updateLRU(e *clogEntry) {
 		l.removeFromLRU(e, true)
 		l.removeFromLRU(e, false)
 		l.removeFromGlob(e)
-		l.removeAccess(e)
 
 		// Add back in as a non-existent file.
 		e.request = lookupReq
@@ -738,17 +765,18 @@ func (l *clog) updateLRU(e *clogEntry) {
 		l.removeFromLRU(e, true)
 		l.removeFromLRU(e, false)
 		l.removeFromGlob(e)
-		l.removeAccess(e)
 	case putReq:
 		l.addToLRU(e)
 		l.addToGlob(e)
-		l.addAccess(e)
 	case lookupReq, globReq:
 		l.addToLRU(e)
 		l.addToGlob(e)
-		l.addAccess(e)
 	case whichAccessReq:
-		// Log the access file itself as a lookup.
+		// Log the access file itself as a lookup. This adds the
+		// Access file to the glob of its parent directory and
+		// then calls fixAccess to set noAccessFile in all
+		// directories between the Access file and the file it
+		// is an Access file for.
 		if e.de != nil {
 			ae := &clogEntry{
 				request: lookupReq,
@@ -756,32 +784,9 @@ func (l *clog) updateLRU(e *clogEntry) {
 				error:   nil,
 				de:      e.de,
 			}
-			l.addAccess(ae)
-		}
-
-		// Add it to the specific parent directory's entry.
-		dirName := path.DropPath(e.name, 1)
-		glock := l.globLocks.lock(dirName)
-		defer glock.Unlock()
-		newVal := noAccessFile
-		if e.de != nil {
-			newVal = e.de.Name
-		}
-		ge := l.getFromLRU(lruKey{name: dirName, glob: true})
-		if ge == nil {
-			// No directory entry, add one.
-			ge = &clogEntry{
-				request:  globReq,
-				name:     dirName,
-				children: make(map[string]bool),
-				complete: false,
-				access:   newVal,
-			}
-			l.addToLRU(ge)
-			l.addToGlob(ge)
-		} else {
-			// Update the current entry.
-			ge.access = newVal
+			l.addToLRU(ae)
+			l.addToGlob(ae)
+			l.fixAccess(e)
 		}
 	case obsoleteReq:
 		// These never get logged. They are just markers that the file
@@ -837,6 +842,9 @@ func (l *clog) addToGlob(e *clogEntry) {
 		l.lru.Add(k, ge)
 	}
 	lelem := lastElem(e.name)
+	if lelem == access.AccessFile {
+		ge.noAccessFile = false
+	}
 	ge.children[lelem] = true
 }
 
@@ -851,114 +859,36 @@ func (l *clog) removeFromGlob(e *clogEntry) {
 	glock := l.globLocks.lock(dirName)
 	if ge := l.getFromLRU(k); ge != nil {
 		delete(ge.children, lelem)
+		if lelem == access.AccessFile {
+			ge.noAccessFile = true
+		}
 	}
 	glock.Unlock()
 }
 
-func (l *clog) addAccess(e *clogEntry) {
-	if !access.IsAccessFile(e.name) {
-		return
-	}
-	// If the Access file entry hasn't changed, don't do anything.
-	ne := l.getFromLRU(lruKey{name: e.name, glob: false})
-	if ne != nil && ne.de != nil && e.de != nil && ne.de.Sequence == e.de.Sequence && ne.de.Attr == e.de.Attr {
-		return
-	}
+// fixAccess marks all glob entries between the e.name and e.de.Name with noAccessFile = true.
+func (l *clog) fixAccess(e *clogEntry) {
+	// The name has already been parsed getting here.
+	p, _ := path.Parse(e.name)
 
-	l.changeAccess(e, true)
-}
+	// The DirEntry for the Access file.
+	accessName := e.de.Name
 
-func (l *clog) removeAccess(e *clogEntry) {
-	if !access.IsAccessFile(e.name) {
-		return
-	}
-	l.changeAccess(e, false)
-}
+	l.globalLock.RLock()
+	defer l.globalLock.RUnlock()
 
-// changeAccess is called whenever the Access file, access, changes. It
-// updates the access pointer for any file that is a descendant of
-// access's directory and which doesn't have a more specific Access file.
-//
-// Since this walks through many entries in the LRU, it grabs the
-// global write lock to keep every other thread out.
-func (l *clog) changeAccess(access *clogEntry, add bool) {
-	const op = "dircache.changeAccess"
-
-	parsedAccess, err := path.Parse(access.name)
-	if err != nil {
-		log.Debug.Printf("%s: %s", op, err)
-		return
-	}
-	parsedAccessDir := parsedAccess.Drop(1)
-
-	// notMe is true if access's directory belongs to another user.
-	notMe := l.cfg.UserName() != parsedAccess.User()
-
-	// For unreadable Access files, the DirEntry will be incomplete.
-	unreadable := !add || access.de == nil || access.de.IsIncomplete()
-
-	newval := unknownAccessFile
-	if add {
-		newval = access.name
-	}
-
-	// Lock everyone else out while we run the LRU.
-	l.globalLock.RUnlock()
-	l.globalLock.Lock()
-	defer func() {
-		l.globalLock.Unlock()
-		l.globalLock.RLock()
-	}()
-
-	iter := l.lru.NewIterator()
+	// Walk the tree marking cached Glob entries
+	// with noAccessFile = true.
 	for {
-		_, v, ok := iter.GetAndAdvance()
-		if !ok {
+		dirName := p.Path()
+		if len(dirName) < len(accessName) {
 			break
 		}
-		entry := v.(*clogEntry)
-		parsedEntry, err := path.Parse(entry.name)
-		if err != nil {
-			log.Debug.Printf("%s: %s", op, err)
-			continue
+		e := l.getFromLRU(lruKey{name: dirName, glob: true})
+		if e != nil {
+			e.noAccessFile = true
 		}
-		if !parsedEntry.HasPrefix(parsedAccessDir) {
-			continue
-		}
-		if parsedEntry.Equal(parsedAccessDir) {
-			entry.access = newval
-			// We may no longer be able to list
-			// elements of the other user's directory
-			// so mark it as incomplete.
-			if notMe {
-				entry.complete = false
-			}
-			continue
-		}
-		if parsedEntry.Drop(1).Equal(parsedAccessDir) {
-			entry.access = newval
-			// If we can't read the Access file in the
-			// other User's directory, we can't read any
-			// files in that directory.
-			if notMe && unreadable {
-				entry.invalidate()
-			}
-			continue
-		}
-		if len(entry.access) > len(access.name) {
-			// This file uses a more specific Access file.
-			// It is unaffected by the change.
-			continue
-		}
-
-		// entry is a descendent of access's directory and is not known to use
-		// a more specific Access file. Mark its Access file as unknown
-		// and, if the directory is not our own, invalidate entry since
-		// we no longer know our ability to access it.
-		entry.access = unknownAccessFile
-		if notMe {
-			entry.invalidate()
-		}
+		p = p.Drop(1)
 	}
 }
 
