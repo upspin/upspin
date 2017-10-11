@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "796c3dd3_fcc3fae0",
+        "filename": "cmd/upspin/createsuffixeduser.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-10-11T17:37:01Z",
+      "side": 1,
+      "message": "It is a bug, thank you.  However, that isn\u0027t the fix. If *secretseed \u003d\u003d \"\" that means upapin was asked to create one and that one should be printed out.  The correct fix is to printout the proquint instead of *secretkey below.\n\nWill do.",
+      "parentUuid": "5a441d86_7290029a",
+      "revId": "3489bf8f71321bc9ea44b0f10025fe7edb2c8ffa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "c1599d51_3df11ded",
         "filename": "doc/overview.md",
         "patchSetId": 11
