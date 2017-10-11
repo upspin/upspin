@@ -455,7 +455,7 @@ func (t *Tree) loadRoot() error {
 		return err
 	}
 	if rootDirEntry == nil {
-		return errors.E(errors.NotExist, t.user)
+		return errors.E(errors.NotExist, t.user.Name())
 	}
 	t.root = &node{
 		entry: *rootDirEntry,
@@ -819,7 +819,7 @@ func (t *Tree) recoverFromLog() error {
 		}
 		if err != nil {
 			// Now we're in serious trouble. We can't recover.
-			return errors.E(t.user, errors.Errorf("can't recover log: %v", err))
+			return errors.E(t.user.Name(), errors.Errorf("can't recover log: %v", err))
 		}
 		recovered++
 		curr = next
