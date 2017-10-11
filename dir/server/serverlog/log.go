@@ -64,6 +64,11 @@ type User struct {
 	// Kept in increasing sequence order.
 	// TODO: Make this a sparse slice and do small linear scans.
 	offSeqs []offSeq
+
+	// v1transition records the time that the logs switched
+	// from version 0 to version 1. If there are no version 0
+	// logs, it will be zero.
+	v1Transition upspin.Time
 }
 
 // Operation is the kind of operation performed on the DirEntry.
@@ -195,6 +200,7 @@ func Open(userName upspin.UserName, directory string) (*User, error) {
 	}
 
 	u.findLogFiles(subdir)
+	u.setV1Transition()
 
 	// Create user's first log if none exists.
 	var (
@@ -441,6 +447,56 @@ func (u *User) findLogFiles(dir string) {
 	}
 	sort.Slice(u.files, func(i, j int) bool { return u.files[i].offset < u.files[j].offset })
 
+}
+
+func (u *User) setV1Transition() {
+	if len(u.files) == 0 || u.files[0].version > 0 {
+		return // No old logs.
+	}
+	// No files have been created in this run, so if there is only one
+	// file and it is version 0, say the transition happens now.
+	if len(u.files) == 1 {
+		u.v1Transition = upspin.Now()
+		return
+	}
+	// Read the first entry past the transition, looking for the first non-zero time.
+	// It may take several files to get there.
+	for i := 1; i < len(u.files); i++ {
+		fd, err := os.Open(u.files[i].name)
+		if err != nil {
+			return
+		}
+		defer fd.Close()
+		offset := int64(0)
+		for {
+			_, err = fd.Seek(offset, io.SeekStart)
+			if err != nil {
+				return
+			}
+			checker := newChecker(fd)
+			defer checker.close()
+
+			var le Entry
+			err = le.unmarshal(checker)
+			if err != nil {
+				return
+			}
+			offset += int64(checker.count)
+			if le.Entry.Time != 0 {
+				u.v1Transition = le.Entry.Time
+				return
+			}
+		}
+	}
+	// No luck. Zero it is. TODO: Should we fail?
+}
+
+// V1Transition returns a time that marks the transition from old (version 0)
+// logs to version 1. DirEntries created before this time use the old Sequence
+// number scheme, in which the upper 23 bits are noise. These should be
+// cleared before reporting the sequence number to the client.
+func (u *User) V1Transition() upspin.Time {
+	return u.v1Transition
 }
 
 // createLogFile creates a file for the offset and returns the logFile and open fd.

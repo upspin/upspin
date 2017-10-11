@@ -799,6 +799,14 @@ func TestVersion0Logs(t *testing.T) {
 	if user.writer.file.offset != offset {
 		t.Fatalf("writer at offset %d; expected %d", user.writer.file.offset, offset)
 	}
+
+	// Verify the transition time. The files are golden so it's a fixed instant.
+	const want = "Sep 27 03:59:06 UTC 2017"
+	got := user.V1Transition().Go().Format("Jan 2 15:04:05 UTC 2006")
+	if got != want {
+		t.Fatalf("got transition time %s; want %s", got, want)
+	}
+
 }
 
 func newEntry(path upspin.PathName, seq int) *Entry {
