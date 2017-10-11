@@ -108,8 +108,10 @@ func storeBlock(store upspin.StoreServer, bp upspin.BlockPacker, data []byte) er
 	return nil
 }
 
+const version0SeqMask = 1<<23 - 1
+
 // loadKidsFromBlock unmarshals a block of packed dirEntries into a node.
-func loadKidsFromBlock(n *node, block []byte) error {
+func (t *Tree) loadKidsFromBlock(n *node, block []byte) error {
 	if n.kids == nil {
 		n.kids = make(map[string]*node)
 	}
@@ -135,6 +137,7 @@ func loadKidsFromBlock(n *node, block []byte) error {
 	}
 	// Load children for this node.
 	elemPos := nodePath.NElem()
+	v1Transition := t.user.V1Transition()
 	for len(block) > 0 {
 		var entry upspin.DirEntry
 		remaining, err := entry.Unmarshal(block)
@@ -147,6 +150,10 @@ func loadKidsFromBlock(n *node, block []byte) error {
 		p, err := path.Parse(entry.Name)
 		if err != nil {
 			return err
+		}
+		// Is this an old entry? If so, clear the high bits of the sequence number.
+		if entry.Time < v1Transition {
+			entry.Sequence &= version0SeqMask
 		}
 		// elem is the next pathwise element to load. Normally, it's the
 		// next element in entryPath. But if it's a directory that
