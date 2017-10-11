@@ -136,6 +136,12 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	if err == nil {
 		// If the put worked, remember it.
 		s.clog.logRequest(putReq, name, err, entry)
+
+		// If this was a Put of the root, retry the watch.
+		parsed, perr := path.Parse(entry.Name)
+		if perr == nil && parsed.IsRoot() {
+			s.clog.retryWatch(parsed)
+		}
 	}
 
 	return de, err
