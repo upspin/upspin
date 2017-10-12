@@ -263,7 +263,10 @@ func (d *proxiedDir) handleEvent(e *upspin.Event) error {
 	if e.Delete {
 		op = deleteReq
 	}
+	d.l.globalLock.Lock()
 	d.l.logRequestWithOrder(op, e.Entry.Name, nil, e.Entry, e.Order)
+	d.l.globalLock.Unlock()
+
 	d.l.flush()
 	return nil
 }

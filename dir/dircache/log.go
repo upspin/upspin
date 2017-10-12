@@ -115,8 +115,7 @@ type clog struct {
 	rotate        chan bool // input signals the rotater to rotate the logs
 	rotaterExited chan bool // closing confirms the rotater is exiting
 
-	// globalLock keeps everyone else out when we are traversing the whole LRU to
-	// update Access files.
+	// globalLock serializes requests.
 	globalLock sync.RWMutex
 
 	// logFileLock provides exclusive access to the log file.
@@ -164,10 +163,6 @@ func openLog(cfg upspin.Config, dir string, maxDisk int64) (*clog, error) {
 		rotaterExited: make(chan bool),
 	}
 	l.proxied = newProxiedDirs(l)
-
-	// updateLRU expects these to be held.
-	l.globalLock.RLock()
-	defer l.globalLock.RUnlock()
 
 	// Read the log files in ascending time order.
 	files, highestLogFile, err := listSorted(dir, true)
@@ -447,9 +442,6 @@ func (l *clog) lookup(name upspin.PathName) (*upspin.DirEntry, error, bool) {
 		dumpMemStats()
 	}
 
-	l.globalLock.RLock()
-	defer l.globalLock.RUnlock()
-
 	plock := l.pathLocks.lock(name)
 	e := l.getFromLRU(lruKey{name: name, glob: false})
 	if e != nil {
@@ -485,9 +477,6 @@ func (l *clog) lookupGlob(pattern upspin.PathName) ([]*upspin.DirEntry, error, b
 	if !ok {
 		return nil, nil, false
 	}
-
-	l.globalLock.RLock()
-	defer l.globalLock.RUnlock()
 
 	// Lookup the glob.
 	glock := l.globLocks.lock(dirPath)
@@ -598,10 +587,6 @@ func (l *clog) whichAccess(name upspin.PathName) (*upspin.DirEntry, bool) {
 		return nil, false
 	}
 
-	// The global lock serializes with Access file being added by fixAccess.
-	l.globalLock.RLock()
-	defer l.globalLock.RUnlock()
-
 	// Is the target in the cache?
 	e := l.getFromLRU(lruKey{name: name, glob: false})
 	if e != nil {
@@ -643,9 +628,6 @@ func (l *clog) logRequestWithOrder(op request, name upspin.PathName, err error, 
 	if !cacheableError(err) {
 		return
 	}
-
-	l.globalLock.RLock()
-	defer l.globalLock.RUnlock()
 
 	e := &clogEntry{
 		name:    name,
@@ -702,9 +684,6 @@ func (l *clog) logGlobRequest(pattern upspin.PathName, err error, entries []*ups
 		children[lastElem(de.Name)] = true
 		l.logRequest(lookupReq, de.Name, err, de)
 	}
-
-	l.globalLock.RLock()
-	defer l.globalLock.RUnlock()
 
 	// If any files have disappeared from a preexisting glob, remove them.
 	glock := l.globLocks.lock(dirName)
@@ -883,9 +862,6 @@ func (l *clog) fixAccess(e *clogEntry) {
 
 	// The DirEntry for the Access file.
 	accessName := e.de.Name
-
-	l.globalLock.RLock()
-	defer l.globalLock.RUnlock()
 
 	// Walk the tree marking cached Glob entries
 	// with noAccessFile = true.
