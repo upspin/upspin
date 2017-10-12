@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "60cb08f3_d618e200",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-12T03:48:38Z",
+      "side": 1,
+      "message": "i was never a fan of negative true variables. they can lead to clumsy expressions. can this be hasAccessFile?",
+      "revId": "94ab8cbd775e9afdb05ebcc774cce4c17d57463c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f79af387_36c0ae5b",
         "filename": "dir/dircache/log.go",
         "patchSetId": 1
@@ -19,6 +36,40 @@
         "endLine": 554,
         "endChar": 14
       },
+      "revId": "94ab8cbd775e9afdb05ebcc774cce4c17d57463c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6b7d770c_8879ca83",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 588,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-12T03:48:38Z",
+      "side": 1,
+      "message": "it\u0027s",
+      "revId": "94ab8cbd775e9afdb05ebcc774cce4c17d57463c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "668a8c9a_498ff85d",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 591,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-12T03:48:38Z",
+      "side": 1,
+      "message": "if it\u0027s already parsed, can you pass in the parsed name?",
       "revId": "94ab8cbd775e9afdb05ebcc774cce4c17d57463c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
