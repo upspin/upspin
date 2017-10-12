@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "b4f18b1a_352fba26",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-10-12T05:34:55Z",
+      "side": 1,
+      "message": "hasAccessFile is not the opposite of this boolean. The opposite is we either have an Access file or we just don\u0027t know one way or the other. If the directory listing is the result of a glob \u0027*\u0027 then we know for sure just by looking at the list of children.  However, if it is just a partial listing created because we\u0027ve seen a number of Lookups, Puts, and Deletes in the directory, Access missing from the list of children is not definitive. However, if we\u0027ve seen a Delete(Access) or Lookup(Access) with a NotExist error, we do know for sure that it doesn\u0027t exist. This boolean reflects that.\n\nI\u0027m happy to replace it with something that is positive. MightHaveAccess is a possibility. Not sure it would be better though since the check below would be:\n\nif e.complete || !e.mightHaveAccess {\n\nwhich I find the clumsier expression.",
+      "parentUuid": "60cb08f3_d618e200",
+      "revId": "94ab8cbd775e9afdb05ebcc774cce4c17d57463c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f79af387_36c0ae5b",
         "filename": "dir/dircache/log.go",
         "patchSetId": 1
@@ -30,6 +48,30 @@
       "writtenOn": "2017-10-12T03:11:48Z",
       "side": 1,
       "message": "cached",
+      "range": {
+        "startLine": 554,
+        "startChar": 8,
+        "endLine": 554,
+        "endChar": 14
+      },
+      "revId": "94ab8cbd775e9afdb05ebcc774cce4c17d57463c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ef5d4183_bf4e17e7",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 554,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-10-12T05:34:55Z",
+      "side": 1,
+      "message": "I my acching Glob.  Done.",
+      "parentUuid": "f79af387_36c0ae5b",
       "range": {
         "startLine": 554,
         "startChar": 8,
@@ -59,6 +101,24 @@
     },
     {
       "key": {
+        "uuid": "8a1d6c76_2a46271b",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 588,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-10-12T05:34:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6b7d770c_8879ca83",
+      "revId": "94ab8cbd775e9afdb05ebcc774cce4c17d57463c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "668a8c9a_498ff85d",
         "filename": "dir/dircache/log.go",
         "patchSetId": 1
@@ -70,6 +130,24 @@
       "writtenOn": "2017-10-12T03:48:38Z",
       "side": 1,
       "message": "if it\u0027s already parsed, can you pass in the parsed name?",
+      "revId": "94ab8cbd775e9afdb05ebcc774cce4c17d57463c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e290de41_7c9681bf",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 591,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-10-12T05:34:55Z",
+      "side": 1,
+      "message": "Not easily since it is in something always called before this is called. But the code may change so the safer thing is to not piddle and just check the error here.  Saves me a stupid comment.",
+      "parentUuid": "668a8c9a_498ff85d",
       "revId": "94ab8cbd775e9afdb05ebcc774cce4c17d57463c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
