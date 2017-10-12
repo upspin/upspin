@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4811bac8_df700fc4",
+        "filename": "dir/dircache/proxied.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-10-12T01:25:01Z",
+      "side": 1,
+      "message": "I think you want to give this a buffer length of 1, since if a wake is requested while a watch is being attempted, you may want to retry straight away.",
+      "revId": "df4d8b16163d6476fd84dda9140926b45b6d5825",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
