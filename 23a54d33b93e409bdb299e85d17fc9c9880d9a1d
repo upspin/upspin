@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "af55508b_f413bd8c",
+        "filename": "cloud/storage/storagetest/memory.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-12T03:45:04Z",
+      "side": 1,
+      "message": "s/an/a/",
+      "revId": "23a54d33b93e409bdb299e85d17fc9c9880d9a1d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "33db3762_2484a06f",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 900,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-12T03:45:04Z",
+      "side": 1,
+      "message": "i thought this would be a backup, not the only copy.",
+      "revId": "23a54d33b93e409bdb299e85d17fc9c9880d9a1d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
