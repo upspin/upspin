@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "656f5160_0a8ff758",
+        "filename": "dir/server/tree/blocks.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-10-12T01:29:48Z",
+      "side": 1,
+      "message": "this deserves a lengthy comment",
+      "revId": "ba62da88fd0d9587aa54de80535d159a28c2fe03",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
