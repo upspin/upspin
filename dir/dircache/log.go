@@ -115,8 +115,7 @@ type clog struct {
 	rotate        chan bool // input signals the rotater to rotate the logs
 	rotaterExited chan bool // closing confirms the rotater is exiting
 
-	// globalLock keeps everyone else out when we are traversing the whole LRU to
-	// update Access files.
+	// globalLock serializes requests.
 	globalLock sync.RWMutex
 
 	// logFileLock provides exclusive access to the log file.
