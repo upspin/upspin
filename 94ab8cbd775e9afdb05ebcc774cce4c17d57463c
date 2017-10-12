@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f79af387_36c0ae5b",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 554,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-10-12T03:11:48Z",
+      "side": 1,
+      "message": "cached",
+      "range": {
+        "startLine": 554,
+        "startChar": 8,
+        "endLine": 554,
+        "endChar": 14
+      },
+      "revId": "94ab8cbd775e9afdb05ebcc774cce4c17d57463c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
