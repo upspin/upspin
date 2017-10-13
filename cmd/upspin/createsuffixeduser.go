@@ -173,7 +173,7 @@ rather than this command.
 	fmt.Fprintln(s.Stderr, "This key pair provides access to your Upspin identity and data.")
 	if *secretseed == "" {
 		fmt.Fprintln(s.Stderr, "If you lose the keys you can re-create them by running this command:")
-		fmt.Fprintf(s.Stderr, "\tupspin keygen -curve %s -secretseed %s %s\n", *curve, *secretseed, where)
+		fmt.Fprintf(s.Stderr, "\tupspin keygen -curve %s -secretseed %s %s\n", *curve, proquint, where)
 		fmt.Fprintln(s.Stderr, "Write this command down and store it in a secure, private place.")
 		fmt.Fprintln(s.Stderr, "Do not share your private key or this command with anyone.")
 	}
