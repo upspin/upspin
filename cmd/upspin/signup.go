@@ -147,15 +147,15 @@ file and keys and only send the signup request to the key server.
 	if err != nil {
 		// Directory doesn't exist, perhaps.
 		if !os.IsNotExist(err) {
-			s.Exitf("cannot create %s: %v", flags.Config, err)
+			s.Exit(err)
 		}
 		dir := filepath.Dir(flags.Config)
 		if _, statErr := os.Stat(dir); !os.IsNotExist(statErr) {
 			// Looks like the directory exists, so stop now and report original error.
-			s.Exitf("cannot create %s: %v", flags.Config, err)
+			s.Exit(err)
 		}
 		if mkdirErr := os.Mkdir(dir, 0700); mkdirErr != nil {
-			s.Exitf("cannot make directory %s: %v", dir, mkdirErr)
+			s.Exit(err)
 		}
 		err = ioutil.WriteFile(flags.Config, configContents.Bytes(), 0640)
 		if err != nil {
@@ -193,13 +193,15 @@ func (s *State) registerUser(configFile string) {
 }
 
 type configData struct {
-	UserName   upspin.UserName
-	Store, Dir *upspin.Endpoint
-	Packing    string
-	SecretDir  string
+	UserName        upspin.UserName
+	Key, Store, Dir *upspin.Endpoint
+	Packing         string
+	SecretDir       string
 }
 
 var configTemplate = template.Must(template.New("config").Parse(`
+{{with .Key}}keyserver: {{.}}
+{{end}}
 username: {{.UserName}}
 storeserver: {{.Store}}
 dirserver: {{.Dir}}

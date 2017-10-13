@@ -27,6 +27,7 @@ var allCmdTests = []*[]cmdTest{
 	&globTests,
 	&keygenTests,
 	&shareTests,
+	&suffixedUserTests,
 }
 
 // TestCommands runs the tests defined in cmdTests as subtests.
@@ -298,5 +299,31 @@ func keyVerify(t *testing.T, name, prefix string) {
 			key = key[:16]
 		}
 		t.Errorf("invalid key: got %q...; expected %q...", key, prefix)
+	}
+}
+
+// suffixedUserExists is a post function. It returns a function that ensures that a
+// config file and key files exist for the suffixed user.
+func suffixedUserExists(user, suffix string) func(t *testing.T, r *runner, cmd *cmdTest, stdout, stderr string) {
+	return func(t *testing.T, r *runner, cmd *cmdTest, stdout, stderr string) {
+		// Both config files should exist.
+		cfgFile := r.config(upspin.UserName(user + "@example.com"))
+		if _, err := os.Stat(cfgFile); err != nil {
+			t.Fatalf("%s", err)
+		}
+		suser := fmt.Sprintf("s+%s@example.com", user, suffix)
+		scfgFile := cfgFile + "." + suffix
+		if _, err := os.Stat(scfgFile); err != nil {
+			t.Fatalf("%s: %s", err)
+		}
+
+		// Key files should exist.
+		secretsDir := testTempDir("key", keepOld)
+		if _, err := os.Stat(filepath.Join(secretsDir, "public.upspinkey")); err != nil {
+			t.Fatalf("%s: %s", suser, err)
+		}
+		if _, err := os.Stat(filepath.Join(secretsDir, "secret.upspinkey")); err != nil {
+			t.Fatalf("%s: %s", suser, err)
+		}
 	}
 }
