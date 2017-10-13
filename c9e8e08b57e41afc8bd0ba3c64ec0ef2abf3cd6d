@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d5f34e58_b16ba3d0",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-13T03:09:37Z",
+      "side": 1,
+      "message": "comments please",
+      "revId": "c9e8e08b57e41afc8bd0ba3c64ec0ef2abf3cd6d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2949c81a_a6c29ea7",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-13T03:09:37Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "c9e8e08b57e41afc8bd0ba3c64ec0ef2abf3cd6d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3f6ba643_69ba88ff",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-13T03:09:37Z",
+      "side": 1,
+      "message": "it would be good to know how often this happens. i couldn\u0027t quite figure it out when i looked at it last round. it might be very often - too often - in which case 1 might be too small.",
+      "revId": "c9e8e08b57e41afc8bd0ba3c64ec0ef2abf3cd6d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "70416da3_4de0eb66",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-13T03:09:37Z",
+      "side": 1,
+      "message": "why not close r.done, for consistency and to indicate it will never be used again",
+      "revId": "c9e8e08b57e41afc8bd0ba3c64ec0ef2abf3cd6d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
