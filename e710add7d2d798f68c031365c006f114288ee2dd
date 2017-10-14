@@ -16,6 +16,24 @@
       "revId": "e710add7d2d798f68c031365c006f114288ee2dd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "75aa13bb_74cf493d",
+        "filename": "dir/dircache/proxied.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-10-14T00:19:42Z",
+      "side": 1,
+      "message": "cool",
+      "parentUuid": "15a076e7_581f54a2",
+      "revId": "e710add7d2d798f68c031365c006f114288ee2dd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
