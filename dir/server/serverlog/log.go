@@ -2,28 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package serverlog maintains logs for directory servers, permitting
-// replay, recovering, and mirroring.
 package serverlog
-
-// This file defines and implements three components for record keeping for a
-// Tree:
-//
-// 1) writer - writes log entries to the end of the log file.
-// 2) Reader - reads log entries from any offset of the log file.
-// 3) checkpoint - saves the most recent commit point in the log and the root.
-//
-// The structure on disk is, relative to a log directory:
-//
-// tree.root.<username>  - root entry for username
-// tree.index.<username> - log checkpoint for username (historically named).
-// d.tree.log.<username> - subdirectory for username, containing files named:
-// <offset>.<version> - log greater than offset but less than the next offset file.
-// The .version part is missing for old-format logs.
-//
-// There may also be a legacy file tree.log.<username> which will be renamed
-// (and set to offset 0) if found.
-//
 
 import (
 	"bufio"
@@ -1010,12 +989,16 @@ func (cp *checkpoint) close() error {
 // marshal packs the Entry into a new byte slice for storage.
 func (le *Entry) marshal() ([]byte, error) {
 	var b []byte
-	var tmp [16]byte // For use by PutVarint.
-	// This should have been b = append(b, byte(le.Op)) since Operation
-	// is known to fit in a byte. However, we already encode it with
-	// Varint and changing it would cause backward-incompatible issues.
-	n := binary.PutVarint(tmp[:], int64(le.Op))
-	b = append(b, tmp[:n]...)
+	// For historical reasons, the entry was written with binary.PutVarint,
+	// but that adds unnecessary overhead.
+	switch le.Op {
+	case Put:
+		b = append(b, 0x00)
+	case Delete:
+		b = append(b, 0x02)
+	default:
+		panic("bad Op in marshal")
+	}
 
 	entry, err := le.Entry.Marshal()
 	if err != nil {
@@ -1127,11 +1110,18 @@ func (c *checker) readChecksum() ([4]byte, error) {
 func (le *Entry) unmarshal(fd io.Reader) (int, error) {
 	chk := newChecker(fd)
 	defer chk.close()
-	operation, err := binary.ReadVarint(chk)
+	op, err := chk.ReadByte()
 	if err != nil {
 		return 0, errors.E(errors.IO, errors.Errorf("reading op: %s", err))
 	}
-	le.Op = Operation(operation)
+	switch op {
+	case 0x00:
+		le.Op = Put
+	case 0x02:
+		le.Op = Delete
+	default:
+		return 0, errors.E(errors.Invalid, "unknown Op %d", op)
+	}
 	entrySize, err := binary.ReadVarint(chk)
 	if err != nil {
 		return 0, errors.E(errors.IO, errors.Errorf("reading entry size: %s", err))
