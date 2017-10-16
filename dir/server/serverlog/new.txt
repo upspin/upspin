@@ -1,0 +1,6 @@
+goos: darwin
+goarch: amd64
+pkg: upspin.io/dir/server/serverlog
+BenchmarkReadAt-4   	  500000	      2542 ns/op
+PASS
+ok  	upspin.io/dir/server/serverlog	1.497s
