@@ -455,13 +455,8 @@ func (u *User) setV1Transition() {
 		defer fd.Close()
 		offset := int64(0)
 		for {
-			_, err = fd.Seek(offset, io.SeekStart)
-			if err != nil {
-				return
-			}
-
 			var le Entry
-			count, err := le.unmarshal(fd, data)
+			count, err := le.unmarshal(fd, data, offset)
 			if err != nil {
 				return
 			}
@@ -650,13 +645,8 @@ func (r *Reader) ReadAt(offset int64) (le Entry, next int64, err error) {
 		return le, maxOff, nil
 	}
 
-	_, err = r.fd.Seek(offset-r.file.offset, io.SeekStart)
-	if err != nil {
-		return le, 0, errors.E(errors.IO, err)
-	}
 	next = offset
-
-	count, err := le.unmarshal(r.fd, r.data[:])
+	count, err := le.unmarshal(r.fd, r.data[:], offset-r.file.offset)
 	if err != nil {
 		return le, next, err
 	}
@@ -1040,12 +1030,14 @@ func appendBytes(b, bytes []byte) []byte {
 // receiver. The data buffer is passed in so the routine can use it to do I/O
 // and avoid allocating one itself. It must have at least 8 bytes, preferably
 // more.
-func (le *Entry) unmarshal(fd io.Reader, data []byte) (int, error) {
+func (le *Entry) unmarshal(fd io.ReaderAt, data []byte, offset int64) (int, error) {
 	// With a varint and a valid user name and so on, we will have at least 8 bytes.
 	// It's coming from a file system, so we don't need to worry about partial reads.
 	// If the incoming buffer is big enough, we'll get it all this round.
-	nRead, err := fd.Read(data)
-	if err != nil || nRead < 8 { // Sanity check.
+	// At least from the test, which uses bytes.Reader, we could get err==io.EOF
+	// but still have some data.
+	nRead, err := fd.ReadAt(data, offset)
+	if err != nil && err != io.EOF || nRead < 8 { // Sanity check.
 		return 0, errors.E(errors.IO, errors.Errorf("reading op: %s", err))
 	}
 	switch data[0] {
@@ -1081,16 +1073,18 @@ func (le *Entry) unmarshal(fd io.Reader, data []byte) (int, error) {
 	}
 	data = data[:totalSize]
 	if totalSize > nRead {
-		n, err := io.ReadFull(fd, data[nRead:])
-		if err != nil {
+		n, err := fd.ReadAt(data[nRead:], offset+int64(nRead))
+		if err != nil && err != io.EOF { // We'll check the count below.
 			return 0, errors.E(errors.IO, errors.Errorf("reading %d bytes from entry: got %d: %s", totalSize-nRead, n, err))
+		}
+		if n != totalSize-nRead {
+			return 0, errors.E(errors.IO, errors.Errorf("incomplete read getting %d bytes from entry: got %d", totalSize-nRead, n))
 		}
 	}
 
 	// Everything's loaded, so unpack it.
 	body := data[1+n : len(data)-4]
 	checksumData := data[len(data)-4:]
-	// We've already read the first 16 bytes.
 	leftOver, err := le.Entry.Unmarshal(body)
 	if err != nil {
 		return 0, errors.E(errors.IO, err)

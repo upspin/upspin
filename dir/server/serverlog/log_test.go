@@ -43,7 +43,7 @@ func TestMarshalUnmarshal(t *testing.T) {
 		t.Fatal(err)
 	}
 	var newEntry Entry
-	count, err := newEntry.unmarshal(bytes.NewReader(buf), make([]byte, 1024))
+	count, err := newEntry.unmarshal(bytes.NewReader(buf), make([]byte, 1024), 0)
 	if err != nil {
 		t.Fatal(err)
 	}
