@@ -745,6 +745,59 @@ func TestUsersNoGroupLoad(t *testing.T) {
 	expectEqual(t, expectedWriters, listFromUserName(writersList))
 }
 
+func TestUsersNoGroupLoad2(t *testing.T) {
+	// Should find two missing groups, colleagues and neighbors.   neighbors
+	// should not be lost, just because colleagues appears twice, once at root
+	// level, once at leaf level.
+	acc, err := Parse("bob@foo.com/Access",
+		[]byte("r: colleagues, acquaintances"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Add top group.
+	err = AddGroup("bob@foo.com/Group/acquaintances", []byte("colleagues, neighbors"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, groupsNeeded, err := acc.usersNoGroupLoad(Read)
+	if err != nil {
+		t.Fatalf("Expected no error, got %s", err)
+	}
+	if len(groupsNeeded) != 2 {
+		t.Errorf("Expected two groups, got %d", len(groupsNeeded))
+	}
+}
+
+func TestUsersNoGroupLoad3(t *testing.T) {
+	// Should find two reading members, bob and jan.
+	// Verify that members of a second group (jan in this case) are not lost
+	// track of just because they appear after a group that matches the top
+	// level search (groupa in this case).
+	acc, err := Parse("bob@foo.com/Access",
+		[]byte("r: groupa groupb"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Add groups.
+	err = AddGroup("bob@foo.com/Group/groupa", []byte(""))
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = AddGroup("bob@foo.com/Group/groupb", []byte("groupa, jan@foo.com"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	readersList, groupsNeeded, err := acc.usersNoGroupLoad(Read)
+	if err != nil {
+		t.Fatalf("Expected no error, got %s", err)
+	}
+	if len(groupsNeeded) != 0 {
+		t.Errorf("Expected no groups, got %d", len(groupsNeeded))
+	}
+	expectedReaders := []string{"bob@foo.com", "jan@foo.com"}
+	expectEqual(t, expectedReaders, listFromUserName(readersList))
+}
+
 func usersCheck(t *testing.T, right Right, load func(upspin.PathName) ([]byte, error), file upspin.PathName, data []byte, expected []string) {
 	acc, err := Parse(file, data)
 	if err != nil {
