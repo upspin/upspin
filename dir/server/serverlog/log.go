@@ -5,7 +5,6 @@
 package serverlog
 
 import (
-	"bufio"
 	"encoding/binary"
 	"fmt"
 	"io"
@@ -95,6 +94,11 @@ type Reader struct {
 
 	fd   *os.File // file descriptor for the log.
 	file *logFile // log this writer is writing to.
+	// A common buffer to avoid allocation. Too big and it
+	// wastes time doing I/O, too small and it misses too
+	// many opportunities. 4K seems good - DirEntries
+	// can be fairly large.
+	data [4096]byte
 }
 
 // checkpoint reads and writes from/to stable storage the log state information
@@ -440,6 +444,7 @@ func (u *User) setV1Transition() {
 	}
 	// Read the first entry past the transition, looking for the first non-zero time.
 	// It may take several files to get there.
+	data := make([]byte, 1024)
 	for i := 1; i < len(u.files); i++ {
 		fd, err := os.Open(u.files[i].name)
 		if err != nil {
@@ -454,7 +459,7 @@ func (u *User) setV1Transition() {
 			}
 
 			var le Entry
-			count, err := le.unmarshal(fd)
+			count, err := le.unmarshal(fd, data)
 			if err != nil {
 				return
 			}
@@ -649,7 +654,7 @@ func (r *Reader) ReadAt(offset int64) (le Entry, next int64, err error) {
 	}
 	next = offset
 
-	count, err := le.unmarshal(r.fd)
+	count, err := le.unmarshal(r.fd, r.data[:])
 	if err != nil {
 		return le, next, err
 	}
@@ -1010,6 +1015,8 @@ func (le *Entry) marshal() ([]byte, error) {
 	return b, nil
 }
 
+var checksumSalt = [4]byte{0xde, 0xad, 0xbe, 0xef}
+
 func checksum(buf []byte) [4]byte {
 	var c [4]byte
 	copy(c[:], checksumSalt[:])
@@ -1027,132 +1034,71 @@ func appendBytes(b, bytes []byte) []byte {
 	return b
 }
 
-var checksumSalt = [4]byte{0xde, 0xad, 0xbe, 0xef}
-
-// checker computes the checksum of a file as it reads bytes from it. It also
-// reports the number of bytes read in its count field.
-type checker struct {
-	rd     *bufio.Reader
-	count  int
-	chksum [4]byte
-}
-
-var pool sync.Pool
-
-func newChecker(r io.Reader) *checker {
-	var chk *checker
-	if c, ok := pool.Get().(*checker); c != nil && ok {
-		chk = c
-		chk.reset(r)
-	} else {
-		chk = &checker{rd: bufio.NewReader(r), chksum: checksumSalt}
-	}
-	return chk
-}
-
-// ReadByte implements io.ByteReader.
-func (c *checker) ReadByte() (byte, error) {
-	b, err := c.rd.ReadByte()
-	if err == nil {
-		c.chksum[c.count%4] = c.chksum[c.count%4] ^ b
-		c.count++
-	}
-	return b, err
-}
-
-// resetChecksum resets the checksum and the counting of bytes, without
-// affecting the reader state.
-func (c *checker) resetChecksum() {
-	c.count = 0
-	c.chksum = checksumSalt
-}
-
-// reset clears all internal state: clears count, checksum and any buffering.
-func (c *checker) reset(rd io.Reader) {
-	c.rd.Reset(rd)
-	c.resetChecksum()
-}
-
-// close closes the checker and releases internal storage. Future uses of it are
-// invalid.
-func (c *checker) close() {
-	c.rd.Reset(nil)
-	pool.Put(c)
-}
-
-// Read implements io.Reader.
-func (c *checker) Read(p []byte) (n int, err error) {
-	n, err = c.rd.Read(p)
-	if err != nil {
-		return
-	}
-	for i := 0; i < n; i++ {
-		offs := (c.count + i) % 4
-		c.chksum[offs] = c.chksum[offs] ^ p[i]
-	}
-	c.count += n
-	return
-}
-
-func (c *checker) readChecksum() ([4]byte, error) {
-	var chk [4]byte
-
-	n, err := io.ReadFull(c.rd, chk[:])
-	if err != nil {
-		return chk, err
-	}
-	c.count += n
-	return chk, nil
-}
-
 // unmarshal unpacks a marshaled Entry from a Reader and stores it in the
-// receiver.
-func (le *Entry) unmarshal(fd io.Reader) (int, error) {
-	chk := newChecker(fd)
-	defer chk.close()
-	op, err := chk.ReadByte()
-	if err != nil {
+// receiver. The data buffer must have at least 16 bytes, preferably more.
+func (le *Entry) unmarshal(fd io.Reader, data []byte) (int, error) {
+	// With a varint and a valid user name and so on, we will have at least 8 bytes.
+	// It's coming from a file system, so we don't need to worry about partial reads.
+	// If the incoming buffer is big enough, we'll get it all this round.
+	nRead, err := fd.Read(data)
+	if err != nil || nRead < 8 { // Sanity check.
 		return 0, errors.E(errors.IO, errors.Errorf("reading op: %s", err))
 	}
-	switch op {
+	switch data[0] {
 	case 0x00:
 		le.Op = Put
 	case 0x02:
 		le.Op = Delete
 	default:
-		return 0, errors.E(errors.Invalid, "unknown Op %d", op)
+		return 0, errors.E(errors.Invalid, "unknown Op %d", data[0])
 	}
-	entrySize, err := binary.ReadVarint(chk)
-	if err != nil {
-		return 0, errors.E(errors.IO, errors.Errorf("reading entry size: %s", err))
+
+	size, n := binary.Varint(data[1:])
+	if n <= 0 {
+		return 0, errors.E(errors.IO, errors.Errorf("could not read entry"))
 	}
 
 	const reasonableEntrySize = 1 << 26 // 64MB
-	if entrySize <= 0 {
-		return 0, errors.E(errors.IO, errors.Errorf("invalid entry size: %d", entrySize))
+	if size <= 0 {
+		return 0, errors.E(errors.IO, errors.Errorf("invalid entry size: %d", size))
 	}
-	if entrySize > reasonableEntrySize {
-		return 0, errors.E(errors.IO, errors.Errorf("entry size too large: %d", entrySize))
+	if size > reasonableEntrySize {
+		return 0, errors.E(errors.IO, errors.Errorf("entry size too large: %d", size))
 	}
-	// Read exactly entrySize bytes.
-	data := make([]byte, entrySize)
-	_, err = io.ReadFull(chk, data)
-	if err != nil {
-		return 0, errors.E(errors.IO, errors.Errorf("reading %d bytes from entry: %s", entrySize, err))
+	entrySize := int(size) // Will not overflow.
+	// We need a total of 1 + n + entrySize bytes, plus 4 bytes for the checksum,
+	// which will give us a header, a marshaled entry, and a checksum.
+	// Do we need to do another read?
+	totalSize := 1 + n + entrySize + 4
+	if totalSize > cap(data) {
+		nData := make([]byte, totalSize)
+		copy(nData, data)
+		data = nData
 	}
-	leftOver, err := le.Entry.Unmarshal(data)
+	data = data[:totalSize]
+	if totalSize > nRead {
+		n, err := io.ReadFull(fd, data[nRead:])
+		if err != nil {
+			return 0, errors.E(errors.IO, errors.Errorf("reading %d bytes from entry: got %d: %s", totalSize-nRead, n, err))
+		}
+	}
+
+	// Everything's loaded, so unpack it.
+	body := data[1+n : len(data)-4]
+	checksumData := data[len(data)-4:]
+	// We've already read the first 16 bytes.
+	leftOver, err := le.Entry.Unmarshal(body)
 	if err != nil {
 		return 0, errors.E(errors.IO, err)
 	}
 	if len(leftOver) != 0 {
 		return 0, errors.E(errors.IO, errors.Errorf("%d bytes left; log misaligned for entry %+v", len(leftOver), le.Entry))
 	}
-	sum, err := chk.readChecksum()
-	if err != nil {
-		return 0, errors.E(errors.IO, errors.Errorf("reading checksum: %s", err))
+	chksum := checksum(data[:len(data)-4]) // Everything but the checksum bytes.
+	for i, c := range chksum {
+		if c != checksumData[i] {
+			return 0, errors.E(errors.IO, errors.Errorf("invalid checksum: got %x, expected %x for entry %+v", chksum, checksumData, le.Entry))
+		}
 	}
-	if sum != chk.chksum {
-		return 0, errors.E(errors.IO, errors.Errorf("invalid checksum: got %x, expected %x for entry %+v", chk.chksum, sum, le.Entry))
-	}
-	return chk.count, nil
+	return len(data), nil
 }
