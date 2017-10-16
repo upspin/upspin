@@ -757,10 +757,7 @@ func (a *Access) Can(requester upspin.UserName, right Right, pathName upspin.Pat
 // needs to resolve the answer, it returns a list of the group files it needs to have read for it.
 // The caller should fetch these and report them with the AddGroup method, then retry.
 // TODO: use this in Can.
-func (a *Access) expandGroups(toExpand []upspin.PathName) ([]upspin.UserName, []upspin.PathName) {
-	var missingGroups []upspin.PathName
-	var userNames []upspin.UserName
-Outer:
+func (a *Access) expandGroups(toExpand []upspin.PathName) (userNames []upspin.UserName, missingGroups []upspin.PathName) {
 	for i := 0; i < len(toExpand); i++ { // not range since list may grow
 		group := toExpand[i]
 		mu.RLock()
@@ -769,33 +766,38 @@ Outer:
 		if found {
 			for _, p := range usersFromGroup {
 				if p.IsRoot() {
+					// Dups are okay here, unique sorting is done by caller when no more missingGroups are found.
 					userNames = append(userNames, p.User())
 				} else {
 					// This means there are nested Groups.
 					// Add it to the list to expand if not already there.
-					newGroupToExpand := p.Path()
-					for _, te := range toExpand {
-						if te == newGroupToExpand {
-							continue Outer
-						}
-					}
-					toExpand = append(toExpand, newGroupToExpand)
+					toExpand = appendUnique(toExpand, p.Path())
 				}
 			}
 		} else {
 			// Add to missingGroups if not already there.
-			for _, mg := range missingGroups {
-				if string(group) == string(mg) {
-					continue Outer
-				}
-			}
-			missingGroups = append(missingGroups, group)
+			// (This could be done via a sorted list but is not.  Expect the list to remain short.)
+			missingGroups = appendUnique(missingGroups, group)
 		}
 	}
-	if len(missingGroups) > 0 {
-		return userNames, missingGroups
+	return
+}
+
+// appendUnique returns slice, with elem appended unless elem is already a member.
+func appendUnique(slice []upspin.PathName, elem upspin.PathName) []upspin.PathName {
+	if contains(slice, elem) {
+		return slice
 	}
-	return userNames, nil
+	return append(slice, elem)
+}
+
+func contains(haystack []upspin.PathName, needle upspin.PathName) bool {
+	for _, hay := range haystack {
+		if hay == needle {
+			return true
+		}
+	}
+	return false
 }
 
 func (a *Access) getListFor(right Right) ([]path.Parsed, error) {
