@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "aac6e906_c1cd1606",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 788,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-16T04:19:41Z",
+      "side": 1,
+      "message": "this is n^2. maybe we should always append and then sort uniquely, or keep sorted and do insertion.",
+      "revId": "9d5efc3e6082a998bd3a2ab3c2c9f3752099e3a7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d1bb7e93_ba8cc048",
+        "filename": "access/access_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 749,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-16T04:19:41Z",
+      "side": 1,
+      "message": "too many spaces",
+      "revId": "9d5efc3e6082a998bd3a2ab3c2c9f3752099e3a7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
