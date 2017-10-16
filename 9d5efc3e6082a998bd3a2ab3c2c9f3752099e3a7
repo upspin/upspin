@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "4611aa24_24a751c4",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 788,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-10-16T14:11:18Z",
+      "side": 1,
+      "message": "Happy to but the first use doesn\u0027t allow reordering as it is because it is a list being iterated through at the time.  \n\nThere are three n^2 steps within access.Users(): two in expandGroups() and one at the bottom of Users() itself where duplicates are removed by sliding the tail over one at a time.  If all three are to be changed, is the possibility of changing usersNoGroupLoad() itself on the table?  The name implies it won\u0027t load groups on its own but there are no comments indicating why it should not.  My guess is the author wanted the load and AddGroup steps to be done as high in the Users() call stack as possible, for readability and perhaps flexibility to change the high level API later - or after looking through the Can() logic, perhaps the Users() logic was mirrored from Can() for a while?  But this implies many calls back into usersNoGroupLoad() is permissible, knowing that each call will rebuild the users list from scratch.  This is also an order n^2 operation in the pathological case of a group graph that goes straight down.  Can() and Users() are similar in function, but one wants to answer a question about a particular user and can afford certain load failures and returns as soon as it can find an affirmative - no list of users is created along the way, the other wants to walk the entire graph, avoiding cycles, and build up a complete list of users and any load error is enough to return.  So some significant divergence in logic could be justified.\n\ninList() has the same order n^2 logic with a TODO comment already in it.\n\nI would recommend allowing Access.usersNoGroupLoad() to be renamed and rewritten.  I\u0027m happy to take a stab at it.  But should it be part of this bug?  The bug fix isn\u0027t adding any order n^2 steps that weren\u0027t there in the first place.\n\nSeparate question: thoughts on using string maps to represent sets vs the sorted slice?  Does it come down to whether the set needs to be listed at the end, or needs to be listed in order at the end?  Do folks call inserting and testing against a map an O(1) operation?  Is the down side to maps that they have to be allocated separately, making them a bit more unwieldy in the code than slices?  The initial overhead of a map seems small to that of loading a file, even a local file.",
+      "parentUuid": "aac6e906_c1cd1606",
+      "revId": "9d5efc3e6082a998bd3a2ab3c2c9f3752099e3a7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "d1bb7e93_ba8cc048",
         "filename": "access/access_test.go",
         "patchSetId": 2
