@@ -46,6 +46,30 @@
       "revId": "113abcf7a236d8d6e3850a17fc729b7326c39209",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "abc4fd9b_de83570e",
+        "filename": "dir/server/serverlog/log_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-10-16T20:00:16Z",
+      "side": 1,
+      "message": "I insist. If you want to know if things get worse, do it in a benchmark. That\u0027s what they are for.",
+      "parentUuid": "e4db829f_fc3df2b0",
+      "range": {
+        "startLine": 108,
+        "startChar": 1,
+        "endLine": 108,
+        "endChar": 51
+      },
+      "revId": "113abcf7a236d8d6e3850a17fc729b7326c39209",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
