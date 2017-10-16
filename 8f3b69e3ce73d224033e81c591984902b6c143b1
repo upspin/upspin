@@ -22,6 +22,30 @@
       "revId": "8f3b69e3ce73d224033e81c591984902b6c143b1",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "265ef48c_e8c90b9b",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 447,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-16T19:50:00Z",
+      "side": 1,
+      "message": "I had 4K originally but it added measurably more time, but not too much, to the benchmark. That\u0027s not hugely significant. Maybe 4K is right. It\u0027s still faster than the old code at 4K.\n\nAlso, in a followup CL I plan to use fd.ReadAt and remove the Seek, which might win back the difference.",
+      "parentUuid": "a69f5e9a_16f6a18d",
+      "range": {
+        "startLine": 447,
+        "startChar": 22,
+        "endLine": 447,
+        "endChar": 26
+      },
+      "revId": "8f3b69e3ce73d224033e81c591984902b6c143b1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
