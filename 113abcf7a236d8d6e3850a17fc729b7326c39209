@@ -70,6 +70,30 @@
       "revId": "113abcf7a236d8d6e3850a17fc729b7326c39209",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8b951bdb_4080c7db",
+        "filename": "dir/server/serverlog/log_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-16T20:03:30Z",
+      "side": 1,
+      "message": "This is a benchmark, just not a Benchmark.",
+      "parentUuid": "abc4fd9b_de83570e",
+      "range": {
+        "startLine": 108,
+        "startChar": 1,
+        "endLine": 108,
+        "endChar": 51
+      },
+      "revId": "113abcf7a236d8d6e3850a17fc729b7326c39209",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
