@@ -46,6 +46,30 @@
       "revId": "8f3b69e3ce73d224033e81c591984902b6c143b1",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ee5550c0_0c3f78ff",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 447,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-10-16T19:58:38Z",
+      "side": 1,
+      "message": "I figure if you are benchmarking you should use the same size that you use in real life. Otherwise,what are you benchmarking?",
+      "parentUuid": "265ef48c_e8c90b9b",
+      "range": {
+        "startLine": 447,
+        "startChar": 22,
+        "endLine": 447,
+        "endChar": 26
+      },
+      "revId": "8f3b69e3ce73d224033e81c591984902b6c143b1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
