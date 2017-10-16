@@ -22,6 +22,30 @@
       "revId": "113abcf7a236d8d6e3850a17fc729b7326c39209",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e4db829f_fc3df2b0",
+        "filename": "dir/server/serverlog/log_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-16T19:52:15Z",
+      "side": 1,
+      "message": "It goes down to 3 in the latest CL, and that is the correct number: two strings plus a slice of blocks. So I\u0027d rather keep it a hard limit.\n\nThere are a number of tests like this lying around, in Upspin and elsewhere. They break if things get better, yes but that\u0027s information worth knowing for the cost of the breakage.\n\nI\u0027d rather leave it as is.\n\nRegardless, if you insist on changing it let\u0027s do it in the latest CL, where it\u0027s down to 3.",
+      "parentUuid": "089f764e_ab8dbf38",
+      "range": {
+        "startLine": 108,
+        "startChar": 1,
+        "endLine": 108,
+        "endChar": 51
+      },
+      "revId": "113abcf7a236d8d6e3850a17fc729b7326c39209",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
