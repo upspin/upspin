@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "089f764e_ab8dbf38",
+        "filename": "dir/server/serverlog/log_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-10-16T14:49:26Z",
+      "side": 1,
+      "message": "This is a very specific performance test. 5 is too magic a numbber. What if you make the code more efficient somehow or the runtime changes? It might become less than 5. At the very least make this got \u003e want.",
+      "range": {
+        "startLine": 108,
+        "startChar": 1,
+        "endLine": 108,
+        "endChar": 51
+      },
+      "revId": "113abcf7a236d8d6e3850a17fc729b7326c39209",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
