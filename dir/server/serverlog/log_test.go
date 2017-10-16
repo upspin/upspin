@@ -5,7 +5,6 @@
 package serverlog
 
 import (
-	"bufio"
 	"bytes"
 	"fmt"
 	"io/ioutil"
@@ -44,10 +43,13 @@ func TestMarshalUnmarshal(t *testing.T) {
 		t.Fatal(err)
 	}
 	var newEntry Entry
-	r := newChecker(bufio.NewReader(bytes.NewReader(buf)))
-	err = newEntry.unmarshal(r)
+	r := newChecker(bytes.NewReader(buf))
+	count, err := newEntry.unmarshal(r)
 	if err != nil {
 		t.Fatal(err)
+	}
+	if count != len(buf) {
+		t.Fatalf("got %d bytes; want %d", count, len(buf))
 	}
 
 	if !reflect.DeepEqual(&entry, &newEntry) {

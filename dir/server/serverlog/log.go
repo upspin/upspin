@@ -473,15 +473,13 @@ func (u *User) setV1Transition() {
 			if err != nil {
 				return
 			}
-			checker := newChecker(fd)
-			defer checker.close()
 
 			var le Entry
-			err = le.unmarshal(checker)
+			count, err := le.unmarshal(fd)
 			if err != nil {
 				return
 			}
-			offset += int64(checker.count)
+			offset += int64(count)
 			if le.Entry.Time != 0 {
 				u.v1Transition = le.Entry.Time
 				return
@@ -671,14 +669,12 @@ func (r *Reader) ReadAt(offset int64) (le Entry, next int64, err error) {
 		return le, 0, errors.E(errors.IO, err)
 	}
 	next = offset
-	checker := newChecker(r.fd)
-	defer checker.close()
 
-	err = le.unmarshal(checker)
+	count, err := le.unmarshal(r.fd)
 	if err != nil {
 		return le, next, err
 	}
-	next = next + int64(checker.count)
+	next += int64(count)
 	if r.file.version == 0 {
 		le.Entry.Sequence &= version0SeqMask
 	}
@@ -1128,43 +1124,45 @@ func (c *checker) readChecksum() ([4]byte, error) {
 
 // unmarshal unpacks a marshaled Entry from a Reader and stores it in the
 // receiver.
-func (le *Entry) unmarshal(r *checker) error {
-	operation, err := binary.ReadVarint(r)
+func (le *Entry) unmarshal(fd io.Reader) (int, error) {
+	chk := newChecker(fd)
+	defer chk.close()
+	operation, err := binary.ReadVarint(chk)
 	if err != nil {
-		return errors.E(errors.IO, errors.Errorf("reading op: %s", err))
+		return 0, errors.E(errors.IO, errors.Errorf("reading op: %s", err))
 	}
 	le.Op = Operation(operation)
-	entrySize, err := binary.ReadVarint(r)
+	entrySize, err := binary.ReadVarint(chk)
 	if err != nil {
-		return errors.E(errors.IO, errors.Errorf("reading entry size: %s", err))
+		return 0, errors.E(errors.IO, errors.Errorf("reading entry size: %s", err))
 	}
 	// TODO: document this properly. See issue #347.
 	const reasonableEntrySize = 1 << 26 // 64MB
 	if entrySize <= 0 {
-		return errors.E(errors.IO, errors.Errorf("invalid entry size: %d", entrySize))
+		return 0, errors.E(errors.IO, errors.Errorf("invalid entry size: %d", entrySize))
 	}
 	if entrySize > reasonableEntrySize {
-		return errors.E(errors.IO, errors.Errorf("entry size too large: %d", entrySize))
+		return 0, errors.E(errors.IO, errors.Errorf("entry size too large: %d", entrySize))
 	}
 	// Read exactly entrySize bytes.
 	data := make([]byte, entrySize)
-	_, err = io.ReadFull(r, data)
+	_, err = io.ReadFull(chk, data)
 	if err != nil {
-		return errors.E(errors.IO, errors.Errorf("reading %d bytes from entry: %s", entrySize, err))
+		return 0, errors.E(errors.IO, errors.Errorf("reading %d bytes from entry: %s", entrySize, err))
 	}
 	leftOver, err := le.Entry.Unmarshal(data)
 	if err != nil {
-		return errors.E(errors.IO, err)
+		return 0, errors.E(errors.IO, err)
 	}
 	if len(leftOver) != 0 {
-		return errors.E(errors.IO, errors.Errorf("%d bytes left; log misaligned for entry %+v", len(leftOver), le.Entry))
+		return 0, errors.E(errors.IO, errors.Errorf("%d bytes left; log misaligned for entry %+v", len(leftOver), le.Entry))
 	}
-	chk, err := r.readChecksum()
+	sum, err := chk.readChecksum()
 	if err != nil {
-		return errors.E(errors.IO, errors.Errorf("reading checksum: %s", err))
+		return 0, errors.E(errors.IO, errors.Errorf("reading checksum: %s", err))
 	}
-	if chk != r.chksum {
-		return errors.E(errors.IO, errors.Errorf("invalid checksum: got %x, expected %x for entry %+v", r.chksum, chk, le.Entry))
+	if sum != chk.chksum {
+		return 0, errors.E(errors.IO, errors.Errorf("invalid checksum: got %x, expected %x for entry %+v", chk.chksum, sum, le.Entry))
 	}
-	return nil
+	return chk.count, nil
 }
