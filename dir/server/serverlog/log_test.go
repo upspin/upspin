@@ -43,8 +43,7 @@ func TestMarshalUnmarshal(t *testing.T) {
 		t.Fatal(err)
 	}
 	var newEntry Entry
-	r := newChecker(bytes.NewReader(buf))
-	count, err := newEntry.unmarshal(r)
+	count, err := newEntry.unmarshal(bytes.NewReader(buf), make([]byte, 1024))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -107,7 +106,7 @@ func TestCountReadAtMallocs(t *testing.T) {
 		}
 	}
 	mallocs := testing.AllocsPerRun(100, fn)
-	if got, want := mallocs, float64(5); got != want {
+	if got, want := mallocs, 3.0; got != want {
 		t.Errorf("got %v allocs, want <=%v", got, want)
 	}
 }
