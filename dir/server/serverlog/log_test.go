@@ -55,6 +55,61 @@ func TestMarshalUnmarshal(t *testing.T) {
 	}
 }
 
+func BenchmarkReadAt(b *testing.B) {
+	dir, cleanup := setup(b, "BenchmarkReadAt")
+	defer cleanup()
+
+	user, err := Open(userName, dir)
+	if err != nil {
+		b.Fatal(err)
+	}
+	err = user.Append(newEntry(upspin.PathName("foo@bar.com/hello"), 1))
+	if err != nil {
+		b.Fatal(err)
+	}
+	lrd, err := user.NewReader()
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _, err := lrd.ReadAt(0)
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
+func TestCountReadAtMallocs(t *testing.T) {
+	dir, cleanup := setup(t, "AppendRead")
+	defer cleanup()
+
+	user, err := Open(userName, dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = user.Append(newEntry(upspin.PathName("foo@bar.com/hello"), 1))
+	if err != nil {
+		t.Fatal(err)
+	}
+	lrd, err := user.NewReader()
+	if err != nil {
+		t.Fatal(err)
+	}
+	fn := func() {
+		_, _, err := lrd.ReadAt(0)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	mallocs := testing.AllocsPerRun(100, fn)
+	if got, want := mallocs, float64(5); got != want {
+		t.Errorf("got %v allocs, want <=%v", got, want)
+	}
+}
+
 func TestConcurrent(t *testing.T) {
 	const (
 		numWriters = 3
@@ -845,7 +900,7 @@ func sameUsers(t *testing.T, got, want []upspin.UserName) bool {
 
 // setup creates a testing directory and returns its name and a cleanup
 // function.
-func setup(t *testing.T, testName string) (string, func()) {
+func setup(t testing.TB, testName string) (string, func()) {
 	dir, err := ioutil.TempDir("", testName)
 	if err != nil {
 		t.Fatal(err)
