@@ -1,0 +1,174 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9aa78aa5_e0dfe5a9",
+        "filename": "cmd/upspin/validate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-17T03:00:02Z",
+      "side": 1,
+      "message": "what local copy? what directory? where? this is not clear.\n\nValidate compares an Upspin file with a local file and reports any discrepancy, such as non-existence or different checksums.\n\ncapitalize Upspin in comments, prints and docs. delete next sentence.",
+      "revId": "b0f1ecf6089682e92dc3744ecbeac59ef8ebbd73",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a1728a90_a00cfae5",
+        "filename": "cmd/upspin/validate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-17T03:00:02Z",
+      "side": 1,
+      "message": "s/sha256 sums/checksums/",
+      "revId": "b0f1ecf6089682e92dc3744ecbeac59ef8ebbd73",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e34c279e_ca44ff0d",
+        "filename": "cmd/upspin/validate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-17T03:00:02Z",
+      "side": 1,
+      "message": "the other commands use -R for this. be consistent.",
+      "revId": "b0f1ecf6089682e92dc3744ecbeac59ef8ebbd73",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b64edc25_09d2fd21",
+        "filename": "cmd/upspin/validate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-17T03:00:02Z",
+      "side": 1,
+      "message": "it\u0027s not \"put\"",
+      "revId": "b0f1ecf6089682e92dc3744ecbeac59ef8ebbd73",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "21a3bc91_5322d98a",
+        "filename": "cmd/upspin/validate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-17T03:00:02Z",
+      "side": 1,
+      "message": "s/recursive/R/\n\nyou don\u0027t need to add the \u0027default false\u0027. the flag package takes car of that.",
+      "revId": "b0f1ecf6089682e92dc3744ecbeac59ef8ebbd73",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a25be359_fb5e7ac0",
+        "filename": "cmd/upspin/validate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-17T03:00:02Z",
+      "side": 1,
+      "message": "if recur is not set, you shouldn\u0027t allow directories at all",
+      "revId": "b0f1ecf6089682e92dc3744ecbeac59ef8ebbd73",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e4eaef99_9af8336c",
+        "filename": "cmd/upspin/validate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-17T03:00:02Z",
+      "side": 1,
+      "message": "don\u0027t use fmt.Println. look at how the other commands report using the state variable.",
+      "revId": "b0f1ecf6089682e92dc3744ecbeac59ef8ebbd73",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "da7fe11a_eb850d72",
+        "filename": "cmd/upspin/validate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-17T03:00:02Z",
+      "side": 1,
+      "message": "call this validateCommand for consistency with the others",
+      "revId": "b0f1ecf6089682e92dc3744ecbeac59ef8ebbd73",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "09db7c0b_4c0eefd0",
+        "filename": "cmd/upspin/validate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-17T03:00:02Z",
+      "side": 1,
+      "message": "don\u0027t write function like this. please follow the local code style throughout",
+      "revId": "b0f1ecf6089682e92dc3744ecbeac59ef8ebbd73",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "229d0c91_f4ed1c26",
+        "filename": "cmd/upspin/validate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-17T03:00:02Z",
+      "side": 1,
+      "message": "this isn\u0027t right. you want to check size etc. packdata is mostly irrelevant.\n\nplus blocks may differ for equal files, so this check isn\u0027t right. in fact i\u0027m not sure what is right.",
+      "revId": "b0f1ecf6089682e92dc3744ecbeac59ef8ebbd73",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
