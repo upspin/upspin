@@ -291,10 +291,10 @@ Make a directory in which to mount the Upspin name space:
 $ mkdir $HOME/up
 ```
 
-Then run the `upspinfs` command giving that directory as its sole argument:
+Then run the `upspinfs` command giving that directory with the `-mount` flag:
 
 ```
-$ upspinfs $HOME/up
+$ upspinfs -mount $HOME/up
 ```
 
 Now you have access to the full Upspin name space:

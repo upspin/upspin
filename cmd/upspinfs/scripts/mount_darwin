@@ -13,4 +13,4 @@ umount $mp 2>/dev/null
 mkdir $mp 2>/dev/null
 
 # Start the service. Use any flags passed to us.
-upspinfs $@ $mp
+upspinfs $@ -mount $mp
