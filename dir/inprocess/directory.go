@@ -492,7 +492,7 @@ func (s *server) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	}
 
 	entry, err = s.put(op, entry, parsed, true)
-	if err != nil {
+	if err == nil {
 		s.db.eventMgr.newEvent <- upspin.Event{
 			Entry:  entry,
 			Delete: true,
