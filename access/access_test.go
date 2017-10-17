@@ -224,8 +224,8 @@ func TestParseAllocs(t *testing.T) {
 		Parse(testFile, accessText)
 	})
 	t.Log("allocs:", allocs)
-	if allocs != 24 {
-		t.Fatal("expected 24 allocations, got ", allocs)
+	if allocs != 23 {
+		t.Fatal("expected 23 allocations, got ", allocs)
 	}
 }
 
@@ -258,9 +258,9 @@ func TestHasAccessNoGroups(t *testing.T) {
 	}
 
 	check := func(user upspin.UserName, right Right, file upspin.PathName, truth bool) {
-		ok, groups, err := a.canNoGroupLoad(user, right, file)
-		if groups != nil {
-			t.Fatalf("non-empty groups %q", groups)
+		ok, missing, err := canWithNoGroupsSideEffect(a, user, right, file)
+		if len(missing) > 0 {
+			t.Fatalf("expected no missing groups: %v", missing)
 		}
 		if err != nil {
 			t.Fatal(err)
@@ -347,7 +347,7 @@ func TestHasAccessNoGroups(t *testing.T) {
 // This is a simple test of basic group functioning. We still need a proper full-on test with
 // a populated tree.
 func TestHasAccessWithGroups(t *testing.T) {
-	groups = make(map[upspin.PathName][]path.Parsed) // Forget any existing groups in the cache.
+	resetGroupsCache()
 
 	const (
 		// This access file defines readers and writers but no other rights.
@@ -410,15 +410,15 @@ func TestHasAccessWithGroups(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Sister can't read anymore and family group is needed.
-	ok, missingGroups, err := a.canNoGroupLoad("sister@me.com", Read, "me@here.com/foo/bar")
+	ok, missing, err := canWithNoGroupsSideEffect(a, "sister@me.com", Read, "me@here.com/foo/bar")
 	if err != nil {
 		t.Fatal(err)
 	}
 	if ok {
 		t.Errorf("Expected no permission")
 	}
-	if len(missingGroups) != 1 {
-		t.Fatalf("Expected one missing group, got %d", len(missingGroups))
+	if len(missing) != 1 {
+		t.Fatalf("expected one missing groups: %v", missing)
 	}
 
 	// Now operate on the Access file that mentions a non-existent group.
@@ -451,9 +451,9 @@ func TestAccessAllUsers(t *testing.T) {
 	}
 
 	check := func(user upspin.UserName, right Right, file upspin.PathName, truth bool) {
-		ok, groups, err := a.canNoGroupLoad(user, right, file)
-		if groups != nil {
-			t.Fatalf("non-empty groups %q", groups)
+		ok, missing, err := canWithNoGroupsSideEffect(a, user, right, file)
+		if len(missing) > 0 {
+			t.Fatalf("expected no missing groups: %v", missing)
 		}
 		if err != nil {
 			t.Fatal(err)
@@ -692,7 +692,7 @@ func TestUsersNoGroupLoad(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	readersList, groupsNeeded, err := acc.usersNoGroupLoad(Read)
+	readersList, groupsNeeded, err := usersWithNoGroupsSideEffects(acc, Read)
 	if err != nil {
 		t.Fatalf("Expected no error, got %s", err)
 	}
@@ -701,7 +701,7 @@ func TestUsersNoGroupLoad(t *testing.T) {
 	}
 	expectedReaders := []string{"bob@foo.com", "sue@foo.com", "tommy@foo.com", "joe@foo.com"}
 	expectEqual(t, expectedReaders, listFromUserName(readersList))
-	writersList, groupsNeeded, err := acc.usersNoGroupLoad(Write)
+	writersList, groupsNeeded, err := usersWithNoGroupsSideEffects(acc, Write)
 	if err != nil {
 		t.Fatalf("Expected no error; got %s", err)
 	}
@@ -718,7 +718,7 @@ func TestUsersNoGroupLoad(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Try again.
-	writersList, groupsNeeded, err = acc.usersNoGroupLoad(Write)
+	writersList, groupsNeeded, err = usersWithNoGroupsSideEffects(acc, Write)
 	if err != nil {
 		t.Fatalf("Round 2: Expected no error %s", err)
 	}
@@ -734,7 +734,7 @@ func TestUsersNoGroupLoad(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	writersList, groupsNeeded, err = acc.usersNoGroupLoad(Write)
+	writersList, groupsNeeded, err = usersWithNoGroupsSideEffects(acc, Write)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -745,7 +745,61 @@ func TestUsersNoGroupLoad(t *testing.T) {
 	expectEqual(t, expectedWriters, listFromUserName(writersList))
 }
 
+func TestUsersNoGroupLoad2(t *testing.T) {
+	// Should find two missing groups, colleagues and neighbors. Neighbors
+	// should not be lost even though colleagues appears twice, once at root
+	// level and once at leaf level.
+	acc, err := Parse("bob@foo.com/Access",
+		[]byte("r: colleagues, acquaintances"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Add top group.
+	err = AddGroup("bob@foo.com/Group/acquaintances", []byte("colleagues, neighbors"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, groupsNeeded, err := usersWithNoGroupsSideEffects(acc, Read)
+	if err != nil {
+		t.Fatalf("Expected no error, got %s", err)
+	}
+	if len(groupsNeeded) != 2 {
+		t.Errorf("Expected two missing groups, got %d", len(groupsNeeded))
+	}
+}
+
+func TestUsersNoGroupLoad3(t *testing.T) {
+	// Should find two reading members, bob and jan.
+	// Verify that members of a second group (jan in this case) are not lost
+	// track of just because they appear after a group that matches the top
+	// level search (groupa in this case).
+	acc, err := Parse("bob@foo.com/Access",
+		[]byte("r: groupa groupb"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Add groups.
+	err = AddGroup("bob@foo.com/Group/groupa", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = AddGroup("bob@foo.com/Group/groupb", []byte("groupa, jan@foo.com"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	readersList, groupsNeeded, err := usersWithNoGroupsSideEffects(acc, Read)
+	if err != nil {
+		t.Fatalf("Expected no error, got %s", err)
+	}
+	if len(groupsNeeded) != 0 {
+		t.Errorf("Expected no missing groups, got %d", len(groupsNeeded))
+	}
+	expectedReaders := []string{"bob@foo.com", "jan@foo.com"}
+	expectEqual(t, expectedReaders, listFromUserName(readersList))
+}
+
 func usersCheck(t *testing.T, right Right, load func(upspin.PathName) ([]byte, error), file upspin.PathName, data []byte, expected []string) {
+	resetGroupsCache()
 	acc, err := Parse(file, data)
 	if err != nil {
 		t.Fatal(err)
@@ -795,6 +849,291 @@ func TestUsers(t *testing.T) {
 	usersCheck(t, AnyRight, loadTest, "bob@foo.com/Access",
 		[]byte("r: al@foo.com, sue@foo.com, bob@foo.com, tommy@foo.com bob@foo.com/Group/friends"),
 		[]string{"al@foo.com", "anna@foo.com", "bob@foo.com", "nancy@foo.com", "sue@foo.com", "tommy@foo.com"})
+
+}
+
+func TestUsersAndCan(t *testing.T) {
+	accessOwner := upspin.PathName("foo@foo.com")
+	loadFiles := make(map[string]string)
+	loadFiles["foo@foo.com/Group/foogroup"] = "b@foo.com, c@foo.com"
+	loadFiles["bar@bar.com/Group/bargroup"] = ""
+	loadFiles["bar@bar.com/Group/self"] = "bar@bar.com"
+
+	// Create three group files from different users that create a cycle
+	loadFiles["a@a.aa/Group/a2b2c"] = "b@b.bb/Group/b2c2a"
+	loadFiles["b@b.bb/Group/b2c2a"] = "c@c.cc/Group/c2a2b"
+	loadFiles["c@c.cc/Group/c2a2b"] = "a@a.aa/Group/a2b2c"
+
+	load := func(name upspin.PathName) ([]byte, error) {
+		data, found := loadFiles[string(name)]
+		if found {
+			return []byte(data), nil
+		}
+		return nil, errors.Errorf("%s not found", name)
+	}
+
+	cantload := func(name upspin.PathName) ([]byte, error) {
+		return nil, errors.Errorf("cantload should not have been called")
+	}
+
+	checkParse := func(path upspin.PathName, data []byte) *Access {
+		a, err := Parse(path, data)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return a
+	}
+
+	checkUsers := func(a *Access, right Right, expected []string) {
+
+		resetGroupsCache()
+		list, err := a.Users(right, load) // once with now
+		if err != nil {
+			t.Errorf("Expected no error, got %s", err)
+			return
+		}
+		expectEqual(t, expected, listFromUserName(list))
+
+		// nothing should be left to load, run Users again
+		list, err = a.Users(right, cantload) // now with cantload
+		if err != nil {
+			t.Errorf("Expected no error, got %s", err)
+			return
+		}
+		expectEqual(t, expected, listFromUserName(list))
+	}
+
+	checkCan := func(a *Access, user upspin.UserName, right Right, file upspin.PathName, truth bool) {
+
+		resetGroupsCache()
+		ok, err := a.Can(user, right, file, load) // once with load
+		if ok != truth {
+			if err != nil {
+				t.Error(err)
+			} else if ok {
+				t.Errorf("%s can %s %s", user, right, file)
+			} else {
+				t.Errorf("%s cannot %s %s", user, right, file)
+			}
+		}
+
+		// nothing should be left to load, run Can again
+		ok, err = a.Can(user, right, file, cantload) // now with cantload
+		if ok != truth {
+			if err != nil {
+				t.Error(err)
+			} else if ok {
+				t.Errorf("%s can %s %s", user, right, file)
+			} else {
+				t.Errorf("%s cannot %s %s", user, right, file)
+			}
+		}
+	}
+
+	list_foo := []string{"foo@foo.com"}
+
+	// Test with an empty Access file
+	a := checkParse(accessOwner, []byte(`
+			# empty Access file`))
+	checkUsers(a, Read, list_foo)
+	checkUsers(a, List, list_foo)
+	checkUsers(a, Write, nil)
+	checkUsers(a, Create, nil)
+	checkUsers(a, Delete, nil)
+	// owner can always read or list anything in their tree
+	checkCan(a, "foo@foo.com", Read, "foo@foo.com/Access", true)
+	checkCan(a, "foo@foo.com", Read, "foo@foo.com/Group", true)
+	checkCan(a, "foo@foo.com", Read, "foo@foo.com/madeup", true)
+	checkCan(a, "foo@foo.com", List, "foo@foo.com/Access", true)
+	checkCan(a, "foo@foo.com", List, "foo@foo.com/Group", true)
+	checkCan(a, "foo@foo.com", List, "foo@foo.com/madeup", true)
+	// owner can always write their own Access file
+	checkCan(a, "foo@foo.com", Write, "foo@foo.com/Access", true)
+	checkCan(a, "foo@foo.com", Write, "foo@foo.com/deeper/Access", true)
+	// owner cannot write own Group or other files without explicit Access rights granted
+	checkCan(a, "foo@foo.com", Write, "foo@foo.com/Group", false)
+	checkCan(a, "foo@foo.com", Write, "foo@foo.com/madeup", false)
+	checkCan(a, "foo@foo.com", Create, "foo@foo.com/Access", true)
+	checkCan(a, "foo@foo.com", Create, "foo@foo.com/Group", false)
+	checkCan(a, "foo@foo.com", Create, "foo@foo.com/madeup", false)
+	checkCan(a, "foo@foo.com", Delete, "foo@foo.com/Access", true)
+	checkCan(a, "foo@foo.com", Delete, "foo@foo.com/Group", false)
+	checkCan(a, "foo@foo.com", Delete, "foo@foo.com/madeup", false)
+
+	// Test with a simple Access file that has only owner listed for everything
+	a = checkParse(accessOwner, []byte(`
+			read:	foo@foo.com
+			write:	foo@foo.com
+			list:	foo@foo.com
+			create: foo@foo.com
+			delete:	foo@foo.com
+			`))
+	checkUsers(a, Read, list_foo)
+	checkUsers(a, List, list_foo)
+	checkUsers(a, Write, list_foo)
+	checkUsers(a, Create, list_foo)
+	checkUsers(a, Delete, list_foo)
+	checkCan(a, "foo@foo.com", Read, "foo@foo.com/Access", true)
+	checkCan(a, "foo@foo.com", Read, "foo@foo.com/Group", true)
+	checkCan(a, "foo@foo.com", Read, "foo@foo.com/madeup", true)
+	checkCan(a, "foo@foo.com", List, "foo@foo.com/Access", true)
+	checkCan(a, "foo@foo.com", List, "foo@foo.com/Group", true)
+	checkCan(a, "foo@foo.com", List, "foo@foo.com/madeup", true)
+	checkCan(a, "foo@foo.com", Write, "foo@foo.com/Access", true)
+	checkCan(a, "foo@foo.com", Write, "foo@foo.com/deeper/Access", true)
+	checkCan(a, "foo@foo.com", Write, "foo@foo.com/Group", true)  // now true
+	checkCan(a, "foo@foo.com", Write, "foo@foo.com/madeup", true) // now true
+	checkCan(a, "foo@foo.com", Create, "foo@foo.com/Access", true)
+	checkCan(a, "foo@foo.com", Create, "foo@foo.com/Group", true)  // now true
+	checkCan(a, "foo@foo.com", Create, "foo@foo.com/madeup", true) // now true
+	checkCan(a, "foo@foo.com", Delete, "foo@foo.com/Access", true)
+	checkCan(a, "foo@foo.com", Delete, "foo@foo.com/Group", true)  // now true
+	checkCan(a, "foo@foo.com", Delete, "foo@foo.com/madeup", true) // now true
+
+	// Test with a simple Access file that has only another listed for everything
+	a = checkParse(accessOwner, []byte(`
+			read:	bar@bar.com
+			write:	bar@bar.com
+			list:	bar@bar.com
+			create: bar@bar.com
+			delete:	bar@bar.com
+			`))
+	list_bar := []string{"bar@bar.com"}
+	list_bar_foo := []string{"bar@bar.com", "foo@foo.com"}
+	checkUsers(a, Read, list_bar_foo)
+	checkUsers(a, List, list_bar_foo)
+	checkUsers(a, Write, list_bar)
+	checkUsers(a, Create, list_bar)
+	checkUsers(a, Delete, list_bar)
+	checkCan(a, "bar@bar.com", Read, "foo@foo.com/Access", true)
+	checkCan(a, "bar@bar.com", Read, "foo@foo.com/Group", true)
+	checkCan(a, "bar@bar.com", Read, "foo@foo.com/madeup", true)
+	checkCan(a, "bar@bar.com", List, "foo@foo.com/Access", true)
+	checkCan(a, "bar@bar.com", List, "foo@foo.com/Group", true)
+	checkCan(a, "bar@bar.com", List, "foo@foo.com/madeup", true)
+	checkCan(a, "bar@bar.com", Write, "foo@foo.com/Access", false)        // only owner can write Access
+	checkCan(a, "bar@bar.com", Write, "foo@foo.com/deeper/Access", false) // only owner can write Access
+	checkCan(a, "bar@bar.com", Write, "foo@foo.com/Group", true)          // now true
+	checkCan(a, "bar@bar.com", Write, "foo@foo.com/madeup", true)         // now true
+	checkCan(a, "bar@bar.com", Create, "foo@foo.com/Access", false)       // only owner can create Access
+	checkCan(a, "bar@bar.com", Create, "foo@foo.com/Group", true)         // now true
+	checkCan(a, "bar@bar.com", Create, "foo@foo.com/madeup", true)        // now true
+	checkCan(a, "bar@bar.com", Delete, "foo@foo.com/Access", false)       // only owner can delete Access
+	checkCan(a, "bar@bar.com", Delete, "foo@foo.com/Group", true)
+	checkCan(a, "bar@bar.com", Delete, "foo@foo.com/madeup", true)
+
+	// Test with a simple Access file that has only another's non-existing group listed for everything
+	a = checkParse(accessOwner, []byte(`
+			read:	bar@bar.com/Group/madeup
+			write:	bar@bar.com/Group/madeup
+			list:	bar@bar.com/Group/madeup
+			create: bar@bar.com/Group/madeup
+			delete:	bar@bar.com/Group/madeup
+			`))
+	// checkUsers(a, Read, list_bar_foo) // These tests would fail for now with the 'not found' error.
+	// checkUsers(a, List, list_bar_foo) // Perhaps Users() should return a partial list despite network
+	// checkUsers(a, Write, list_bar)    // errors and not found errors. Can() does.
+	// checkUsers(a, Create, list_bar)
+	// checkUsers(a, Delete, list_bar)
+	checkCan(a, "bar@bar.com", Read, "foo@foo.com/Access", true)          // same as in set above
+	checkCan(a, "bar@bar.com", Read, "foo@foo.com/Group", true)           // same as in set above
+	checkCan(a, "bar@bar.com", Read, "foo@foo.com/madeup", true)          // same as in set above
+	checkCan(a, "bar@bar.com", List, "foo@foo.com/Access", true)          // same as in set above
+	checkCan(a, "bar@bar.com", List, "foo@foo.com/Group", true)           // same as in set above
+	checkCan(a, "bar@bar.com", List, "foo@foo.com/madeup", true)          // same as in set above
+	checkCan(a, "bar@bar.com", Write, "foo@foo.com/Access", false)        // same as in set above
+	checkCan(a, "bar@bar.com", Write, "foo@foo.com/deeper/Access", false) // same as in set above
+	checkCan(a, "bar@bar.com", Write, "foo@foo.com/Group", true)          // same as in set above
+	checkCan(a, "bar@bar.com", Write, "foo@foo.com/madeup", true)         // same as in set above
+	checkCan(a, "bar@bar.com", Create, "foo@foo.com/Access", false)       // same as in set above
+	checkCan(a, "bar@bar.com", Create, "foo@foo.com/Group", true)         // same as in set above
+	checkCan(a, "bar@bar.com", Create, "foo@foo.com/madeup", true)        // same as in set above
+	checkCan(a, "bar@bar.com", Delete, "foo@foo.com/Access", false)       // same as in set above
+	checkCan(a, "bar@bar.com", Delete, "foo@foo.com/Group", true)         // same as in set above
+	checkCan(a, "bar@bar.com", Delete, "foo@foo.com/madeup", true)        // same as in set above
+
+	// Test with a simple Access file that has only another's existing group listed that includes self
+	a = checkParse(accessOwner, []byte(`
+			read:	bar@bar.com/Group/self
+			write:	bar@bar.com/Group/self
+			list:	bar@bar.com/Group/self
+			create: bar@bar.com/Group/self
+			delete:	bar@bar.com/Group/self
+			`))
+	checkUsers(a, Read, list_bar_foo)
+	checkUsers(a, List, list_bar_foo)
+	checkUsers(a, Write, list_bar)
+	checkUsers(a, Create, list_bar)
+	checkUsers(a, Delete, list_bar)
+	checkCan(a, "bar@bar.com", Read, "foo@foo.com/Access", true)          // same as in set above
+	checkCan(a, "bar@bar.com", Read, "foo@foo.com/Group", true)           // same as in set above
+	checkCan(a, "bar@bar.com", Read, "foo@foo.com/madeup", true)          // same as in set above
+	checkCan(a, "bar@bar.com", List, "foo@foo.com/Access", true)          // same as in set above
+	checkCan(a, "bar@bar.com", List, "foo@foo.com/Group", true)           // same as in set above
+	checkCan(a, "bar@bar.com", List, "foo@foo.com/madeup", true)          // same as in set above
+	checkCan(a, "bar@bar.com", Write, "foo@foo.com/Access", false)        // same as in set above
+	checkCan(a, "bar@bar.com", Write, "foo@foo.com/deeper/Access", false) // same as in set above
+	checkCan(a, "bar@bar.com", Write, "foo@foo.com/Group", true)          // same as in set above
+	checkCan(a, "bar@bar.com", Write, "foo@foo.com/madeup", true)         // same as in set above
+	checkCan(a, "bar@bar.com", Create, "foo@foo.com/Access", false)       // same as in set above
+	checkCan(a, "bar@bar.com", Create, "foo@foo.com/Group", true)         // same as in set above
+	checkCan(a, "bar@bar.com", Create, "foo@foo.com/madeup", true)        // same as in set above
+	checkCan(a, "bar@bar.com", Delete, "foo@foo.com/Access", false)       // same as in set above
+	checkCan(a, "bar@bar.com", Delete, "foo@foo.com/Group", true)         // same as in set above
+	checkCan(a, "bar@bar.com", Delete, "foo@foo.com/madeup", true)        // same as in set above
+
+	// Test with a simple Access file that contains a group cycle for each right
+	// loadFiles["a@a.a/Group/a2b2c"] = "b@b.b/Group/b2c2a"
+	a = checkParse(accessOwner, []byte(`
+			read:	b@b.bb/Group/b2c2a
+			write:	b@b.bb/Group/b2c2a
+			list:	b@b.bb/Group/b2c2a
+			create: b@b.bb/Group/b2c2a
+			delete:	b@b.bb/Group/b2c2a
+			`))
+	list_abc_foo := []string{"a@a.aa", "b@b.bb", "c@c.cc", "foo@foo.com"}
+	list_abc := []string{"a@a.aa", "b@b.bb", "c@c.cc"}
+	checkUsers(a, Read, list_abc_foo)
+	checkUsers(a, List, list_abc_foo)
+	checkUsers(a, Write, list_abc)
+	checkUsers(a, Create, list_abc)
+	checkUsers(a, Delete, list_abc)
+	checkCan(a, "a@a.aa", Read, "foo@foo.com/Access", true)          // same as in set above
+	checkCan(a, "a@a.aa", Read, "foo@foo.com/Group", true)           // same as in set above
+	checkCan(a, "a@a.aa", Read, "foo@foo.com/madeup", true)          // same as in set above
+	checkCan(a, "a@a.aa", List, "foo@foo.com/Access", true)          // same as in set above
+	checkCan(a, "a@a.aa", List, "foo@foo.com/Group", true)           // same as in set above
+	checkCan(a, "a@a.aa", List, "foo@foo.com/madeup", true)          // same as in set above
+	checkCan(a, "a@a.aa", Write, "foo@foo.com/Access", false)        // same as in set above
+	checkCan(a, "a@a.aa", Write, "foo@foo.com/deeper/Access", false) // same as in set above
+	checkCan(a, "a@a.aa", Write, "foo@foo.com/Group", true)          // same as in set above
+	checkCan(a, "a@a.aa", Write, "foo@foo.com/madeup", true)         // same as in set above
+	checkCan(a, "a@a.aa", Create, "foo@foo.com/Access", false)       // same as in set above
+	checkCan(a, "a@a.aa", Create, "foo@foo.com/Group", true)         // same as in set above
+	checkCan(a, "a@a.aa", Create, "foo@foo.com/madeup", true)        // same as in set above
+	checkCan(a, "a@a.aa", Delete, "foo@foo.com/Access", false)       // same as in set above
+	checkCan(a, "a@a.aa", Delete, "foo@foo.com/Group", true)         // same as in set above
+	checkCan(a, "a@a.aa", Delete, "foo@foo.com/madeup", true)        // same as in set above
+
+	a = checkParse(accessOwner, []byte(`
+			read:	bar@bar.com/Group/bargroup
+			write:	bar@bar.com/Group/bargroup
+			# list:	
+			# create:	
+			# delete:	
+			`))
+
+	right := Read
+	checkUsers(a, right, []string{"foo@foo.com", "bar@bar.com"})  // check that group owner is given same right as the group itself
+	checkCan(a, "bar@bar.com", right, "foo@foo.com/madeup", true) // check that group owner is given same right as the group itself
+
+	right = Write
+	checkUsers(a, right, []string{"bar@bar.com"})                 // check that group owner is given same right as the group itself
+	checkCan(a, "bar@bar.com", right, "foo@foo.com/madeup", true) // check that group owner is given same right as the group itself
+
+	//
+	checkCan(a, "foo@foo.com", Read, "Access", true)
+	checkCan(a, "jan@foo.com", Read, "Access", false)
 
 }
 
@@ -916,10 +1255,14 @@ func expectEqual(t *testing.T, expected []string, gotten []string) {
 	sort.Strings(expected)
 	sort.Strings(gotten)
 	if len(expected) != len(gotten) {
-		t.Fatalf("Length mismatched, expected %d, got %d: %v vs %v", len(expected), len(gotten), expected, gotten)
+		t.Errorf("Length mismatched, expected %d, got %d: %v vs %v", len(expected), len(gotten), expected, gotten)
+		return
 	}
-	if !reflect.DeepEqual(expected, gotten) {
-		t.Fatalf("Expected %v got %v", expected, gotten)
+	if len(expected) > 0 {
+		if !reflect.DeepEqual(expected, gotten) {
+			t.Errorf("Expected %v got %v", expected, gotten)
+			return
+		}
 	}
 }
 
@@ -959,4 +1302,50 @@ func (a *Access) equal(b *Access) bool {
 		}
 	}
 	return true
+}
+
+// These two functions exist, canWithNoGroupsSideEffect and usersWithNoGroupsSideEffects because there
+// were so many test cases written when there were private functions canNoGroupLoad and usersNoGroupLoad
+// were the results, including the missing groups returned, were checked, and were there was no expectation
+// that the global groups map had changed, that it seemed expedient to recreate their non effects.
+func canWithNoGroupsSideEffect(a *Access, user upspin.UserName, right Right, file upspin.PathName) (bool, []upspin.PathName, error) {
+
+	var missing []upspin.PathName
+
+	// This load() parameter has the side effect of adding the missing pathnames to the
+	// globals. So remove them afterwards.
+	granted, err := a.Can(user, right, file, func(p upspin.PathName) ([]byte, error) {
+		missing = append(missing, p)
+		return []byte{}, nil
+	})
+
+	for _, p := range missing {
+		_ = RemoveGroup(p)
+	}
+
+	return granted, missing, err
+}
+
+func usersWithNoGroupsSideEffects(a *Access, right Right) ([]upspin.UserName, []upspin.PathName, error) {
+
+	var missing []upspin.PathName
+
+	// This load() parameter has the side effect of adding the missing pathnames to the
+	// globals. So remove them afterwards.
+	users, err := a.Users(right, func(p upspin.PathName) ([]byte, error) {
+		missing = append(missing, p)
+		return []byte{}, nil
+	})
+
+	for _, p := range missing {
+		_ = RemoveGroup(p)
+	}
+
+	return users, missing, err
+}
+
+// resetGroupsCache sets the global groups variable back to its starting point. To help separate
+// test side effects from each other.
+func resetGroupsCache() {
+	groups = make(map[upspin.PathName][]path.Parsed) // Forget any existing groups in the cache.
 }
