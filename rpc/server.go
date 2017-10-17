@@ -430,7 +430,7 @@ func signUser(cfg upspin.Config, magic, host string) ([]string, error) {
 	}
 	f := cfg.Factotum()
 	if f == nil {
-		return nil, errors.Str("no factotum available")
+		return nil, errors.E(cfg.UserName(), errors.Str("no factotum available"))
 	}
 
 	user := string(cfg.UserName())
