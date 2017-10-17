@@ -224,8 +224,8 @@ func TestParseAllocs(t *testing.T) {
 		Parse(testFile, accessText)
 	})
 	t.Log("allocs:", allocs)
-	if allocs != 24 {
-		t.Fatal("expected 24 allocations, got ", allocs)
+	if allocs != 23 {
+		t.Fatal("expected 23 allocations, got ", allocs)
 	}
 }
 
@@ -258,9 +258,9 @@ func TestHasAccessNoGroups(t *testing.T) {
 	}
 
 	check := func(user upspin.UserName, right Right, file upspin.PathName, truth bool) {
-		ok, groups, err := a.canNoGroupLoad(user, right, file)
-		if groups != nil {
-			t.Fatalf("non-empty groups %q", groups)
+		ok, missing, err := canWithNoGroupsSideEffect(a, user, right, file)
+		if len(missing) > 0 {
+			t.Fatalf("expected no missing groups: %v", missing)
 		}
 		if err != nil {
 			t.Fatal(err)
@@ -410,15 +410,15 @@ func TestHasAccessWithGroups(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Sister can't read anymore and family group is needed.
-	ok, missingGroups, err := a.canNoGroupLoad("sister@me.com", Read, "me@here.com/foo/bar")
+	ok, missing, err := canWithNoGroupsSideEffect(a, "sister@me.com", Read, "me@here.com/foo/bar")
 	if err != nil {
 		t.Fatal(err)
 	}
 	if ok {
 		t.Errorf("Expected no permission")
 	}
-	if len(missingGroups) != 1 {
-		t.Fatalf("Expected one missing group, got %d", len(missingGroups))
+	if len(missing) != 1 {
+		t.Fatalf("expected one missing groups: %v", missing)
 	}
 
 	// Now operate on the Access file that mentions a non-existent group.
@@ -451,9 +451,9 @@ func TestAccessAllUsers(t *testing.T) {
 	}
 
 	check := func(user upspin.UserName, right Right, file upspin.PathName, truth bool) {
-		ok, groups, err := a.canNoGroupLoad(user, right, file)
-		if groups != nil {
-			t.Fatalf("non-empty groups %q", groups)
+		ok, missing, err := canWithNoGroupsSideEffect(a, user, right, file)
+		if len(missing) > 0 {
+			t.Fatalf("expected no missing groups: %v", missing)
 		}
 		if err != nil {
 			t.Fatal(err)
@@ -692,7 +692,7 @@ func TestUsersNoGroupLoad(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	readersList, groupsNeeded, err := acc.usersNoGroupLoad(Read)
+	readersList, groupsNeeded, err := usersWithNoGroupsSideEffects(acc, Read)
 	if err != nil {
 		t.Fatalf("Expected no error, got %s", err)
 	}
@@ -701,7 +701,7 @@ func TestUsersNoGroupLoad(t *testing.T) {
 	}
 	expectedReaders := []string{"bob@foo.com", "sue@foo.com", "tommy@foo.com", "joe@foo.com"}
 	expectEqual(t, expectedReaders, listFromUserName(readersList))
-	writersList, groupsNeeded, err := acc.usersNoGroupLoad(Write)
+	writersList, groupsNeeded, err := usersWithNoGroupsSideEffects(acc, Write)
 	if err != nil {
 		t.Fatalf("Expected no error; got %s", err)
 	}
@@ -718,7 +718,7 @@ func TestUsersNoGroupLoad(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Try again.
-	writersList, groupsNeeded, err = acc.usersNoGroupLoad(Write)
+	writersList, groupsNeeded, err = usersWithNoGroupsSideEffects(acc, Write)
 	if err != nil {
 		t.Fatalf("Round 2: Expected no error %s", err)
 	}
@@ -734,7 +734,7 @@ func TestUsersNoGroupLoad(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	writersList, groupsNeeded, err = acc.usersNoGroupLoad(Write)
+	writersList, groupsNeeded, err = usersWithNoGroupsSideEffects(acc, Write)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -743,6 +743,59 @@ func TestUsersNoGroupLoad(t *testing.T) {
 	}
 	expectedWriters = []string{"bob@foo.com", "sis@foo.com", "uncle@foo.com", "grandpamoe@antifoo.com"}
 	expectEqual(t, expectedWriters, listFromUserName(writersList))
+}
+
+func TestUsersNoGroupLoad2(t *testing.T) {
+	// Should find two missing groups, colleagues and neighbors.   neighbors
+	// should not be lost, just because colleagues appears twice, once at root
+	// level, once at leaf level.
+	acc, err := Parse("bob@foo.com/Access",
+		[]byte("r: colleagues, acquaintances"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Add top group.
+	err = AddGroup("bob@foo.com/Group/acquaintances", []byte("colleagues, neighbors"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, groupsNeeded, err := usersWithNoGroupsSideEffects(acc, Read)
+	if err != nil {
+		t.Fatalf("Expected no error, got %s", err)
+	}
+	if len(groupsNeeded) != 2 {
+		t.Errorf("Expected two groups, got %d", len(groupsNeeded))
+	}
+}
+
+func TestUsersNoGroupLoad3(t *testing.T) {
+	// Should find two reading members, bob and jan.
+	// Verify that members of a second group (jan in this case) are not lost
+	// track of just because they appear after a group that matches the top
+	// level search (groupa in this case).
+	acc, err := Parse("bob@foo.com/Access",
+		[]byte("r: groupa groupb"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	// Add groups.
+	err = AddGroup("bob@foo.com/Group/groupa", []byte(""))
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = AddGroup("bob@foo.com/Group/groupb", []byte("groupa, jan@foo.com"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	readersList, groupsNeeded, err := usersWithNoGroupsSideEffects(acc, Read)
+	if err != nil {
+		t.Fatalf("Expected no error, got %s", err)
+	}
+	if len(groupsNeeded) != 0 {
+		t.Errorf("Expected no groups, got %d", len(groupsNeeded))
+	}
+	expectedReaders := []string{"bob@foo.com", "jan@foo.com"}
+	expectEqual(t, expectedReaders, listFromUserName(readersList))
 }
 
 func usersCheck(t *testing.T, right Right, load func(upspin.PathName) ([]byte, error), file upspin.PathName, data []byte, expected []string) {
@@ -959,4 +1012,44 @@ func (a *Access) equal(b *Access) bool {
 		}
 	}
 	return true
+}
+
+// These two functions exist, canWithNoGroupsSideEffect and usersWithNoGroupsSideEffects because there
+// were so many test cases written when there were private functions canNoGroupLoad and usersNoGroupLoad
+// were the results, including the missing groups returned, were checked, and were there was no expectation
+// that the global groups map had changed, that it seemed expedient to recreate their non effects.
+func canWithNoGroupsSideEffect(a *Access, user upspin.UserName, right Right, file upspin.PathName) (bool, []upspin.PathName, error) {
+
+	var missing []upspin.PathName
+
+	// This load() parameter has the side effect of adding the missing pathnames to the
+	// globals.  So remove them afterwards.
+	granted, err := a.Can(user, right, file, func(p upspin.PathName) ([]byte, error) {
+		missing = append(missing, p)
+		return []byte{}, nil
+	})
+
+	for _, p := range missing {
+		_ = RemoveGroup(p)
+	}
+
+	return granted, missing, err
+}
+
+func usersWithNoGroupsSideEffects(a *Access, right Right) ([]upspin.UserName, []upspin.PathName, error) {
+
+	var missing []upspin.PathName
+
+	// This load() parameter has the side effect of adding the missing pathnames to the
+	// globals.  So remove them afterwards.
+	users, err := a.Users(right, func(p upspin.PathName) ([]byte, error) {
+		missing = append(missing, p)
+		return []byte{}, nil
+	})
+
+	for _, p := range missing {
+		_ = RemoveGroup(p)
+	}
+
+	return users, missing, err
 }
