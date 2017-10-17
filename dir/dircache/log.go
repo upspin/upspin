@@ -580,11 +580,11 @@ func (l *clog) globHasAccess(name upspin.PathName) (*upspin.DirEntry, bool) {
 // to know type of the target is to begin our search. If we can't
 // determine that, we have to assume it is a directory and start the search
 // for globs of that name.
-func (l *clog) whichAccess(name upspin.PathName) (*upspin.DirEntry, bool) {
+func (l *clog) whichAccess(name upspin.PathName) (*upspin.DirEntry, error, bool) {
 	p, err := path.Parse(name)
 	if err != nil {
 		log.Debug.Printf("dir/dircache/whichAccess: %s", err)
-		return nil, false
+		return nil, nil, false
 	}
 
 	// Is the target in the cache?
@@ -592,7 +592,11 @@ func (l *clog) whichAccess(name upspin.PathName) (*upspin.DirEntry, bool) {
 	if e != nil {
 		// Give up if there was a previous error.
 		if e.error != nil || e.de == nil {
-			return nil, false
+			return nil, nil, false
+		}
+
+		if e.de.IsLink() {
+			return e.de, upspin.ErrFollowLink, true
 		}
 
 		// If the target is not a directory, start the search from its parent.
@@ -606,15 +610,15 @@ func (l *clog) whichAccess(name upspin.PathName) (*upspin.DirEntry, bool) {
 		de, ok := l.globHasAccess(p.Path())
 		if !ok {
 			// We don't know enough, ask the actual server.
-			return nil, false
+			return nil, nil, false
 		}
 		if de != nil {
 			// We found an Access file.
-			return de, true
+			return de, nil, true
 		}
 		if p.IsRoot() {
 			// We walked the whole path with no access file.
-			return nil, true
+			return nil, nil, true
 		}
 		p = p.Drop(1)
 	}
