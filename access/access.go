@@ -282,22 +282,22 @@ func New(pathName upspin.PathName) (*Access, error) {
 	return a, nil
 }
 
-func newAccess(pathName upspin.PathName) (*Access, *path.Parsed, error) {
+func newAccess(pathName upspin.PathName) (*Access, path.Parsed, error) {
 	parsed, err := path.Parse(pathName)
 	if err != nil {
-		return nil, nil, err
+		return nil, parsed, err
 	}
 	_, _, domain, err := user.Parse(parsed.User())
 	// We don't expect an error since it's been parsed, but check anyway.
 	if err != nil {
-		return nil, nil, err
+		return nil, parsed, err
 	}
 	a := &Access{
 		parsed: parsed,
 		owner:  parsed.User(),
 		domain: domain,
 	}
-	return a, &parsed, nil
+	return a, parsed, nil
 }
 
 // For sorting the lists of paths.
@@ -622,15 +622,10 @@ func preallocSize(n int) int {
 	}
 }
 
-// canNoGroupLoad reports whether the requesting user can access the file
-// using the specified right according to the rules of the Access
-// file. If it needs to read some group files before the decision can be made,
-// it returns a non-nil slice of their names.
-func (a *Access) canNoGroupLoad(requester upspin.UserName, right Right, pathName upspin.PathName) (bool, []upspin.PathName, error) {
-	parsedRequester, err := path.Parse(upspin.PathName(requester + "/"))
-	if err != nil {
-		return false, nil, err
-	}
+// rightGrantedAndAccessList returns whether the requesting user is granted the
+// right for the file in question, and if the answer isn't immediately known,
+// the access list that needs to be walked.
+func (a *Access) rightGrantedAndAccessList(requester upspin.UserName, right Right, pathName upspin.PathName) (bool, []path.Parsed, error) {
 	isOwner := requester == a.owner
 	// If user is the owner and the request is for read, list, or any access, access is granted.
 	if isOwner {
@@ -648,40 +643,8 @@ func (a *Access) canNoGroupLoad(requester upspin.UserName, right Right, pathName
 			return isOwner, nil, nil
 		}
 	}
-	list, err := a.getListFor(right)
-	if err != nil {
-		return false, nil, err
-	}
-	// First try the list of regular users we have loaded. Make a note of groups to check.
-	found, groupsToCheck := a.inList(parsedRequester, list, nil)
-	if found {
-		return true, nil, nil
-	}
-	// Now look at the groups we have to check, and build a list of
-	// groups we don't know about in case we can't answer with
-	// what we know so far.
-	var missingGroups []upspin.PathName
-	// This is not a range loop because the groups list may grow.
-	for i := 0; i < len(groupsToCheck); i++ {
-		group := groupsToCheck[i]
-		groupPath := group.Path()
-		mu.RLock()
-		known, ok := groups[groupPath]
-		mu.RUnlock()
-		if !ok {
-			missingGroups = append(missingGroups, groupPath)
-			continue
-		}
-		// The owner of a group is automatically a member of the group
-		if group.User() == requester {
-			return true, nil, nil
-		}
-		found, groupsToCheck = a.inList(parsedRequester, known, groupsToCheck)
-		if found {
-			return true, nil, nil
-		}
-	}
-	return false, missingGroups, nil
+	group, err := a.getListFor(right)
+	return false, group, err
 }
 
 // Can reports whether the requesting user can access the file
@@ -706,96 +669,131 @@ func (a *Access) canNoGroupLoad(requester upspin.UserName, right Right, pathName
 // reported only if the requester does not match any names that
 // can be found in the Access file or other Group files.
 func (a *Access) Can(requester upspin.UserName, right Right, pathName upspin.PathName, load func(upspin.PathName) ([]byte, error)) (bool, error) {
+
+	parsedRequester, err := path.Parse(upspin.PathName(requester + "/"))
+	if err != nil {
+		return false, err
+	}
+
+	requesterUserName := parsedRequester.User()
+
+	_, _, domain, err := user.Parse(requesterUserName)
+	// We don't expect an error since it's been parsed, but check anyway.
+	if err != nil {
+		return false, err
+	}
+
+	granted, group, err := a.rightGrantedAndAccessList(requester, right, pathName)
+	if granted || err != nil {
+		return granted, err
+	}
+
+	// The groups graph is traversed depth-first, always preferring to check
+	// loaded groups first.  The list of groups to check is implemented as a
+	// set (a map) to avoid duplicates.
+
+	var groupsToCheck oneTimeSet
+	var missing []path.Parsed
 	var groupErr error
-	var failedGroups []upspin.PathName
-	for {
-		granted, missing, err := a.canNoGroupLoad(requester, right, pathName)
-		if err != nil {
-			return false, err
+
+	for len(group) > 0 {
+
+		// The loop's raison d'etre - searching lists to find whether
+		// the requester is represented in the group graph.
+
+		granted = inGroup(requesterUserName, domain, group, &groupsToCheck)
+
+		if granted {
+			return true, nil
 		}
-		if missing == nil {
-			return granted, nil
+
+		// Until a non-empty group is found, iterate through groupsToCheck,
+		// checking groups already loaded and deferring the rest.
+		group = nil
+
+		for len(group) == 0 && !groupsToCheck.oneTimeEmpty() {
+			parsed := groupsToCheck.oneTimePop()
+
+			var found bool
+			mu.RLock()
+			group, found = groups[parsed.Path()]
+			mu.RUnlock()
+
+			if !found {
+				// Defer check.
+				missing = append(missing, parsed)
+			}
 		}
 
-		loaded := false
-	missingLoop:
-		for _, group := range missing {
-			// Don't load this group if it failed
-			// in a previous iteration.
-			for _, g := range failedGroups {
-				if g == group {
-					continue missingLoop
-				}
-			}
+		// If necessary and possible, load another group.
+		for len(group) == 0 && len(missing) > 0 {
+			var parsed path.Parsed
+			parsed, missing = popBack(missing)
 
-			// Load and parse the group.
-			data, err := load(group)
-			if err == nil {
-				err = AddGroup(group, data)
-				if err == nil {
-					loaded = true
-					continue
-				}
-			}
-
-			// Remember failures.
-			failedGroups = append(failedGroups, group)
-			if groupErr != nil {
+			group, err = loadAndAdd(parsed, load)
+			// TODO issue #489, change to groupErr == nil, so we actually
+			// return an error.  Leaving like this for now, to mimic the
+			// previous behavior, so the tests in ../dir/server and ../test
+			// pass.
+			if err != nil && groupErr != nil {
+				// Remember first load or parse error.
 				groupErr = err
 			}
-		}
-		// We have tried and failed to retrieve all of missing. Give up.
-		if !loaded {
-			break
 		}
 	}
 	return false, groupErr
 }
 
-// expandGroups expands a list of groups to the user names they represent.
-// If the Access file does not know the members of a group that it
-// needs to resolve the answer, it returns a list of the group files it needs to have read for it.
-// The caller should fetch these and report them with the AddGroup method, then retry.
-// TODO: use this in Can.
-func (a *Access) expandGroups(toExpand []upspin.PathName) ([]upspin.UserName, []upspin.PathName) {
-	var missingGroups []upspin.PathName
-	var userNames []upspin.UserName
-Outer:
-	for i := 0; i < len(toExpand); i++ { // not range since list may grow
-		group := toExpand[i]
-		mu.RLock()
-		usersFromGroup, found := groups[group]
-		mu.RUnlock()
-		if found {
-			for _, p := range usersFromGroup {
-				if p.IsRoot() {
-					userNames = append(userNames, p.User())
-				} else {
-					// This means there are nested Groups.
-					// Add it to the list to expand if not already there.
-					newGroupToExpand := p.Path()
-					for _, te := range toExpand {
-						if te == newGroupToExpand {
-							continue Outer
-						}
-					}
-					toExpand = append(toExpand, newGroupToExpand)
-				}
+// inGroup reports whether the requester is present in the group, either
+// directly, by wildcard, by being the owner of a nested group, or virtually by
+// finding the allUsersParsed id in the list.  Any nested groups encountered
+// before ascertaining an answer get included in the set of groupsToCheck.
+func inGroup(requesterUserName upspin.UserName, domain string, group []path.Parsed, groupsToCheck *oneTimeSet) bool {
+	for _, allowed := range group {
+		allowedUserName := allowed.User()
+		if allowed.IsRoot() {
+			// A user id
+
+			// TBD Is this test against allUsersParsed still warranted?  There is no unit test exercising it.
+			// Simple test for AllUsers, granting universal access.
+			if allowed == allUsersParsed {
+				return true
+			}
+
+			if allowedUserName == requesterUserName {
+				return true
+			}
+			// Wildcard: The path name *@domain.com matches anyone in domain.
+			if strings.HasPrefix(string(allowedUserName), "*@") && string(allowedUserName[2:]) == domain {
+				return true
 			}
 		} else {
-			// Add to missingGroups if not already there.
-			for _, mg := range missingGroups {
-				if string(group) == string(mg) {
-					continue Outer
-				}
+			// A nested group
+
+			if allowedUserName == requesterUserName {
+				// The owner of a group is automatically a member of the group.
+				// No need to see that the group can even be loaded.
+				return true
 			}
-			missingGroups = append(missingGroups, group)
+			groupsToCheck.oneTimePush(allowed)
 		}
 	}
-	if len(missingGroups) > 0 {
-		return userNames, missingGroups
+	return false
+}
+
+// loadAndAdd returns the group having loaded the file and calling AddGroup on the result.
+func loadAndAdd(parsed path.Parsed, load func(upspin.PathName) ([]byte, error)) (group []path.Parsed, err error) {
+	var data []byte
+	data, err = load(parsed.Path())
+	if err == nil {
+		err = AddGroup(parsed.Path(), data)
+		if err == nil {
+			mu.RLock()
+			group = groups[parsed.Path()]
+			mu.RUnlock()
+		}
 	}
-	return userNames, nil
+	return
 }
 
 func (a *Access) getListFor(right Right) ([]path.Parsed, error) {
@@ -807,44 +805,6 @@ func (a *Access) getListFor(right Right) ([]path.Parsed, error) {
 	default:
 		return nil, errors.Errorf("unrecognized right value %d", right)
 	}
-}
-
-// usersNoGroupLoad returns the user names granted a given right according to the rules
-// of the Access file. It also interprets the rule that the owner can always
-// Read and List. The list is unsorted and may contain duplicates.
-//
-// If the Access file does not know the members of a group that it
-// needs to resolve the answer, it returns a list of the group files it needs to
-// have read for it. The caller should fetch these and report them
-// with the AddGroup method, then retry.
-func (a *Access) usersNoGroupLoad(right Right) ([]upspin.UserName, []upspin.PathName, error) {
-	list, err := a.getListFor(right)
-	if err != nil {
-		return nil, nil, err
-	}
-	userNames := make([]upspin.UserName, 0, len(list)+1)
-	switch right {
-	case Read, List:
-		userNames = append(userNames, a.owner)
-	}
-	var groups []upspin.PathName
-	for _, user := range list {
-		if user.IsRoot() {
-			// It's a user
-			userNames = append(userNames, user.User())
-		} else {
-			// It's a group. Need to unroll groups.
-			groups = append(groups, user.Path())
-		}
-	}
-	if len(groups) > 0 {
-		users, missingGroups := a.expandGroups(groups)
-		userNames = append(userNames, users...)
-		if missingGroups != nil {
-			return userNames, missingGroups, err
-		}
-	}
-	return userNames, nil, nil
 }
 
 // For sorting the lists of UserNames.
@@ -882,40 +842,66 @@ func (a *Access) List(right Right) []path.Parsed {
 // Read and List.  Users loads group files as needed by calling the provided
 // function to read each file's contents.
 func (a *Access) Users(right Right, load func(upspin.PathName) ([]byte, error)) ([]upspin.UserName, error) {
-	var userNames []upspin.UserName
+
+	group, err := a.getListFor(right)
+	if err != nil {
+		return nil, err
+	}
+
+	userNameSet := make(map[upspin.UserName]struct{})
+	var groupSet oneTimeSet
+
+	switch right {
+	case Read, List:
+		userNameSet[a.owner] = struct{}{}
+	}
+
+	// Loop over all the group lists reachable by traversing the graph rooted with the access right given.
+	// Every group list can include parsed user ids and nested groups.
+	// User ids and groups are uniquely tracked.  The traversal is done when no more new groups are found.
 	for {
-		users, neededGroups, err := a.usersNoGroupLoad(right)
-		if err != nil {
-			return nil, err
+		for _, allowed := range group {
+			if allowed.IsRoot() {
+				// A user id
+				userNameSet[allowed.User()] = struct{}{}
+			} else {
+				// A nested group
+				groupSet.oneTimePush(allowed)
+			}
 		}
-		if neededGroups == nil {
-			userNames = users
+
+		// Done with the loop when the groupSet has been exhausted.
+		if groupSet.oneTimeEmpty() {
 			break
 		}
-		for _, group := range neededGroups {
-			groupData, err := load(group)
-			if err != nil {
-				return nil, err
-			}
-			err = AddGroup(group, groupData)
+
+		parsed := groupSet.oneTimePop()
+
+		var found bool
+		mu.RLock()
+		group, found = groups[parsed.Path()]
+		mu.RUnlock()
+
+		if !found {
+			group, err = loadAndAdd(parsed, load)
+
 			if err != nil {
 				return nil, err
 			}
 		}
 	}
 
-	if len(userNames) == 0 {
+	if len(userNameSet) == 0 {
 		return nil, nil
 	}
-	sort.Sort(sliceOfUserName(userNames))
-	// Remove duplicates.
-	for i := 0; i < len(userNames)-1; {
-		if userNames[i] == userNames[i+1] {
-			userNames = append(userNames[:i], userNames[i+1:]...)
-			continue
-		}
-		i++
+
+	// Build a slice and then sort it.
+	userNames := make([]upspin.UserName, 0, len(userNameSet))
+	for k := range userNameSet {
+		userNames = append(userNames, k)
 	}
+
+	sort.Sort(sliceOfUserName(userNames))
 
 	return userNames, nil
 }
@@ -956,44 +942,68 @@ func UnmarshalJSON(name upspin.PathName, jsonAccess []byte) (*Access, error) {
 	return access, nil
 }
 
-// inList reports whether the requester is present in the list, either directly or by wildcard.
-// If we encounter a new group in the list, we add it the list of groups to check and will
-// process it in another call from Can.
-func (a *Access) inList(requester path.Parsed, list []path.Parsed, groupsToCheck []path.Parsed) (bool, []path.Parsed) {
-	_, _, domain, err := user.Parse(requester.User())
-	// We don't expect an error since it's been parsed, but check anyway.
-	if err != nil {
-		return false, nil
-	}
-Outer:
-	for _, allowed := range list {
-		// Simple test for AllUsers, granting universal access.
-		if allowed == allUsersParsed {
-			return true, nil
-		}
-		if allowed.IsRoot() {
-			if allowed.User() == requester.User() {
-				return true, nil
-			}
-			// Wildcard: The path name *@domain.com matches anyone in domain.
-			if strings.HasPrefix(string(allowed.User()), "*@") && string(allowed.User()[2:]) == domain {
-				return true, nil
-			}
-		} else {
-			// It's a group. Make sure we don't put the same one in twice. TODO: Could be n^2.
-			for _, group := range groupsToCheck {
-				if allowed.Equal(group) {
-					// Already there, so don't add it again.
-					continue Outer
-				}
-			}
-			groupsToCheck = append(groupsToCheck, allowed)
-		}
-	}
-	return false, groupsToCheck
-}
-
 // IsReadableByAll reports whether the Access file has read:all or read:all@upspin.io
 func (a *Access) IsReadableByAll() bool {
 	return a.worldReadable
+}
+
+// oneTimeSet creates the abstraction of a set that can return each of its
+// members one time.  For simplicity of storage, the elements that are returned
+// in FILO order.  Elements are returned without being removed from the set.
+// The zero value is the legal starting point for the set.  For example,
+//
+//   var set oneTimeSet
+//   set.oneTimePush(1)
+//   set.oneTimePush(2)
+//   set.oneTimePush(1)
+//   set.oneTimePush(3)
+//   for ! set.oneTimeEmpty() {
+//     print(set.oneTimePop()) // 3 2 1
+//   }
+//   set.oneTimePush(4)
+//   set.oneTimePush(2)
+//   for ! set.oneTimeEmpty() {
+//     print(set.oneTimePop()) // 4
+//   }
+//
+// The oneTimeSet is used by the access package to track parsed group
+// identifiers that have been examined or are queued up to potentially be
+// examined later.  The group definitions can create a graph of cycles and this
+// mechanism allows the search algorithm to avoid cycling.
+type oneTimeSet struct {
+	set       map[path.Parsed]struct{}
+	additions []path.Parsed
+}
+
+// oneTimeEmpty returns true while there are no remaining additions to the set.
+func (s *oneTimeSet) oneTimeEmpty() bool {
+	return len(s.additions) == 0
+}
+
+// oneTimePush appends p to the additions FILO if not already a member of the set.
+// The map representing the set is lazily instantiated here.
+func (s *oneTimeSet) oneTimePush(p path.Parsed) {
+	if s.set == nil {
+		s.set = make(map[path.Parsed]struct{})
+	}
+	if _, found := s.set[p]; !found {
+		s.set[p] = struct{}{}
+		// no need to keep the slice sorted
+		s.additions = append(s.additions, p)
+	}
+}
+
+// oneTimePop returns an item from the tail of the remaining additions.  It
+// panics if remaining additions is empty.  The caller was responsible for
+// testing against this condition with oneTimeEmpty() first.
+func (s *oneTimeSet) oneTimePop() path.Parsed {
+	var p path.Parsed
+	p, s.additions = popBack(s.additions)
+	return p
+}
+
+// popBack returns an item from the tail of the slice, and the shortened slice.
+// It panics if the slice is empty.
+func popBack(s []path.Parsed) (path.Parsed, []path.Parsed) {
+	return s[len(s)-1], s[:len(s)-1]
 }
