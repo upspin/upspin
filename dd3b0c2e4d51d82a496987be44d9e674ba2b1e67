@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "eb95fd81_30ec192e",
+        "filename": "serverutil/perm/perm.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-17T03:05:34Z",
+      "side": 1,
+      "message": "i tend to use \u003e\u003d in cases like this because why not?",
+      "revId": "dd3b0c2e4d51d82a496987be44d9e674ba2b1e67",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
