@@ -15,7 +15,7 @@ listed below are also passed to the cacheserver should one be
 started.
 
 Usage:
-	upspinfs [flags] mountpoint
+	upspinfs [flags] -mount mountpoint
 
 	where 'mountpoint' is an existing directory upon which to mount the Upspin name space.
 
@@ -29,13 +29,15 @@ The flags are:
 		user's configuration file (default "$HOME/upspin/config")
 	-log level
 		level of logging: debug, info, error, disabled (default info)
+	-mount directory
+		directory on which to mount service; must be provided
 	-writethrough
 		make storage cache writethrough
 
 Examples:
 
 	% mkdir $HOME/ufs
-	% upspinfs $HOME/ufs &
+	% upspinfs -mount $HOME/ufs &
 	% ls -l $HOME/ufs/tester@tester.com
 	% ...
 	% killall -9 upspinfs
@@ -44,10 +46,10 @@ Examples:
 Limitations:
 
 Uspinfs tries to present a Posix file system.
-However since Upspin semantics are
-different than Posix, some things will be different:
+However since Upspin semantics
+differs from Posix, some things will be different:
 
-- Files always appear owned by the user who started upspinfs
+- Files always appear owned by the user who started upspinfs.
 
 - Permission bits are settable but are not stored in Upspin.
 After the final close of a file, when the kernel and FUSE decide to
