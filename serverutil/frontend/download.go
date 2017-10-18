@@ -128,6 +128,7 @@ func (h *downloadHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
+	w.Header().Set("Content-length", fmt.Sprint(len(a.data)))
 	w.Write(a.data)
 }
 
