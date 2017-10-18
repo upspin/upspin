@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c44c2434_0fbcf331",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-10-18T17:56:42Z",
+      "side": 1,
+      "message": "This will need an announcement because it will break everyone\u0027s scripts.",
+      "range": {
+        "startLine": 8,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 0
+      },
+      "revId": "2a96c3b0389db09a6cd87ecb229f0c0699a03055",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8ff5324b_bb1a5054",
+        "filename": "cmd/upspinfs/doc.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-10-18T17:56:42Z",
+      "side": 1,
+      "message": "I abhor required arguments being flags.",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 35
+      },
+      "revId": "2a96c3b0389db09a6cd87ecb229f0c0699a03055",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
