@@ -33,6 +33,24 @@
       "revId": "e9c9e1905b634b842ac041d8d3f4c84f3f899979",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "17b9fdc7_99f90ece",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 481,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-10-18T01:44:21Z",
+      "side": 1,
+      "message": "My initial guess is no need to encrypt.  The contents should be encrypted with the DirServer key, and that key should be necessary and sufficient to work backwards from the backup roots.\n\nAlso, filenames in GCS are somewhat visible so if the name is enough to do harm we\u0027ve already lost.\n\n(But I haven\u0027t studied all this code and may misunderstand.)",
+      "parentUuid": "e2a582c0_08ef7c7d",
+      "revId": "e9c9e1905b634b842ac041d8d3f4c84f3f899979",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
