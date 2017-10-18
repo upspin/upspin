@@ -371,6 +371,7 @@ error: cannot find keys for remote test users.
 
 These tests are designed to be run against the test.upspin.io cluster,
 which is only accessible by the Upspin core team at Google.
+See upspin.io/key/testdata/remote/README for details.
 
 Run the test suite with -short to skip these tests.
 `
