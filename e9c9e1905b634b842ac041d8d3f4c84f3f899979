@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a5f97da7_9c31c334",
+        "filename": "cloud/storage/storagetest/memory.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-18T01:36:43Z",
+      "side": 1,
+      "message": "delete should return an error if ref does not exist.",
+      "revId": "e9c9e1905b634b842ac041d8d3f4c84f3f899979",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e2a582c0_08ef7c7d",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 481,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-18T01:36:43Z",
+      "side": 1,
+      "message": "// TODO: Consider whether the reference should be encrypted.",
+      "revId": "e9c9e1905b634b842ac041d8d3f4c84f3f899979",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
