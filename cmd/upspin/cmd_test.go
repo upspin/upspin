@@ -311,10 +311,10 @@ func suffixedUserExists(user, suffix string) func(t *testing.T, r *runner, cmd *
 		if _, err := os.Stat(cfgFile); err != nil {
 			t.Fatalf("%s", err)
 		}
-		suser := fmt.Sprintf("s+%s@example.com", user, suffix)
+		suser := fmt.Sprintf("%s+%s@example.com", user, suffix)
 		scfgFile := cfgFile + "." + suffix
 		if _, err := os.Stat(scfgFile); err != nil {
-			t.Fatalf("%s: %s", err)
+			t.Fatalf("%s: %s", suser, err)
 		}
 
 		// Key files should exist.
