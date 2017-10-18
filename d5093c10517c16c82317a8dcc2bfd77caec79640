@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e8dce15c_8d277b51",
+        "filename": "cmd/upspinfs/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-10-18T00:10:59Z",
+      "side": 1,
+      "message": "the service?\nthe Upspin name space?",
+      "range": {
+        "startLine": 41,
+        "startChar": 71,
+        "endLine": 41,
+        "endChar": 78
+      },
+      "revId": "d5093c10517c16c82317a8dcc2bfd77caec79640",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
