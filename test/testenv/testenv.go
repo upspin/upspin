@@ -48,7 +48,7 @@ const (
 
 // Setup is a configuration structure that contains a directory tree and other optional flags.
 type Setup struct {
-	// OwnerName is the name of the directory tree owner.
+	// OwnerName is the name of the user that runs the tests.
 	OwnerName upspin.UserName
 
 	// Kind is what kind of servers to use, "inprocess", "server", or "remote".
@@ -58,6 +58,10 @@ type Setup struct {
 	// storeserver, and keyserver processes separate to the test process.
 	// If false, the test server instances are run inside the test process.
 	UpBox bool
+
+	// Cache specifies whether to run a cacheserver for the owner.
+	// This option applies only when UpBox is true.
+	Cache bool
 
 	// Packing is the desired packing for the tree.
 	Packing upspin.Packing
@@ -119,6 +123,8 @@ func randomEndpoint(prefix string) upspin.Endpoint {
 const upboxYAML = `
 users:
 - name: %[1]q
+- name: %[2]q
+  cache: %[3]t
 servers:
 - name: keyserver
   user: %[1]q
@@ -127,7 +133,7 @@ servers:
 - name: dirserver
   user: %[1]q
   flags:
-    kind: %[2]s
+    kind: %[4]s
 domain: example.com
 `
 
@@ -146,13 +152,18 @@ func New(setup *Setup) (*Env, error) {
 	switch setup.Kind {
 	case "inprocess", "server":
 		if setup.UpBox {
-			// Use upbox
+			// Use upbox.
 			portS, err := testutil.PickPort()
 			if err != nil {
 				return nil, err
 			}
 			port, _ := strconv.Atoi(portS)
-			yaml := fmt.Sprintf(upboxYAML, TestServerName, setup.Kind)
+			yaml := fmt.Sprintf(upboxYAML,
+				TestServerName,
+				setup.OwnerName,
+				setup.Cache,
+				setup.Kind,
+			)
 			schema, err := upbox.SchemaFromYAML(yaml, port)
 			if err != nil {
 				return nil, err
@@ -216,6 +227,10 @@ func New(setup *Setup) (*Env, error) {
 		env.Config = cfg
 
 	case "remote":
+		if setup.UpBox {
+			return nil, errors.E(op, errors.Str("UpBox set with incompatible Kind (remote)"))
+		}
+
 		cfg = config.SetKeyEndpoint(cfg, upspin.Endpoint{
 			Transport: upspin.Remote,
 			NetAddr:   TestKeyServer,
@@ -311,7 +326,16 @@ func (e *Env) cleanup() error {
 // necessary.
 func (e *Env) NewUser(userName upspin.UserName) (upspin.Config, error) {
 	const op = "testenv.NewUser"
+
+	if e.Setup.UpBox {
+		switch userName {
+		case e.Setup.OwnerName, TestServerName:
+			return config.FromFile(e.schema.Config(string(userName)))
+		}
+	}
+
 	cfg := config.SetUserName(e.Config, userName)
+	cfg = config.SetValue(cfg, "cache", "")
 	cfg = config.SetPacking(cfg, e.Setup.Packing)
 
 	// Set up a factotum for the user.

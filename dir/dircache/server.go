@@ -194,8 +194,8 @@ func (s *server) WhichAccess(name upspin.PathName) (*upspin.DirEntry, error) {
 	s.clog.globalLock.RLock()
 	defer s.clog.globalLock.RUnlock()
 
-	if de, ok := s.clog.whichAccess(name); ok {
-		return de, nil
+	if de, err, ok := s.clog.whichAccess(name); ok {
+		return de, err
 	}
 	de, err := dir.WhichAccess(name)
 	s.clog.logRequest(whichAccessReq, name, err, de)

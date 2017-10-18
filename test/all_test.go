@@ -115,6 +115,11 @@ func testFileSequentialAccess(t *testing.T, env *testenv.Env) {
 }
 
 func testSequenceNumbers(t *testing.T, r *testenv.Runner) {
+	r.As(ownerName)
+	if r.Config().Value("cache") != "" {
+		t.Skip("skipping sequence number test with cacheserver")
+	}
+
 	const (
 		root   = ownerName + "/"
 		base   = ownerName + "/sequencenumbers"
@@ -122,7 +127,6 @@ func testSequenceNumbers(t *testing.T, r *testenv.Runner) {
 		subdir = dir + "/subdir"
 		file   = dir + "/file"
 	)
-	r.As(ownerName)
 	r.MakeDirectory(base)
 	r.DirLookup(base)
 	if r.Failed() {
