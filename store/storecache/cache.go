@@ -10,6 +10,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"sort"
 	"strings"
 	"sync"
 	"sync/atomic"
@@ -71,7 +72,16 @@ func newCache(cfg upspin.Config, dir string, maxBytes int64, writethrough bool) 
 		c.wbq = newWritebackQueue(c)
 		blockFlusher = func(l upspin.Location) { c.wbq.flush(l) }
 	}
-	c.walk(dir)
+	fis, _ := c.walk(dir)
+	sort.Sort(byRecentAccess(fis))
+	for _, fi := range fis {
+		pathName := path.Join(dir, fi.Name())
+		cr := c.newCachedRef(pathName)
+		cr.size = fi.Size()
+		cr.valid = true
+		cr.busy = false
+		atomic.AddInt64(&c.inUse, cr.size)
+	}
 	return c, blockFlusher, nil
 }
 
@@ -81,27 +91,30 @@ func newCache(cfg upspin.Config, dir string, maxBytes int64, writethrough bool) 
 // TODO(p): We lose ordering doing this. When we add a log for the write
 // through cache, we will use it to restore the ordering after this
 // operation.
-func (c *storeCache) walk(dir string) error {
+func (c *storeCache) walk(dir string) ([]os.FileInfo, error) {
 	f, err := os.Open(dir)
 	if err != nil {
-		return os.RemoveAll(dir)
+		return nil, os.RemoveAll(dir)
 	}
 	info, err := f.Readdir(0)
 	f.Close()
 	if err != nil {
-		return os.RemoveAll(dir)
+		return nil, os.RemoveAll(dir)
 
 	}
 	if len(info) == 0 {
 		// Clean up empty directories.
-		return os.RemoveAll(dir)
+		return nil, os.RemoveAll(dir)
 	}
+	fis := make([]os.FileInfo, 0, len(info))
 	for _, i := range info {
 		pathName := path.Join(dir, i.Name())
 		if i.IsDir() {
-			if err := c.walk(pathName); err != nil {
-				return err
+			dfis, err := c.walk(pathName)
+			if err != nil {
+				return nil, err
 			}
+			fis = append(fis, dfis...)
 			continue
 		}
 		// If this is a writeback link, assume the write back cache
@@ -109,14 +122,10 @@ func (c *storeCache) walk(dir string) error {
 		if c.wbq.enqueueWritebackFile(pathName) {
 			continue
 		}
-		// Not a writeback link, remember it and account for its size.
-		cr := c.newCachedRef(pathName)
-		cr.size = i.Size()
-		cr.valid = true
-		cr.busy = false
-		atomic.AddInt64(&c.inUse, cr.size)
+		// Not a writeback link, remember it and account for it.
+		fis = append(fis, i)
 	}
-	return err
+	return fis, err
 }
 
 // cachePath builds a path to the local cache file.
