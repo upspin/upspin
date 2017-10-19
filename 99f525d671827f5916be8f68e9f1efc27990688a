@@ -36,6 +36,23 @@
     },
     {
       "key": {
+        "uuid": "65737855_87aedb22",
+        "filename": "store/storecache/cache.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-10-19T16:00:04Z",
+      "side": 1,
+      "message": "Perhaps it would be cheaper in space to just put the atime in the cacheref and sort them directly. The storecache process size will take a bit initial jump because of the slice of names being sorted. Even though it gets freed, it does largely increase the footprint needed for the process.  Given that I changed maxRef recently to much larger this could be painful.",
+      "revId": "99f525d671827f5916be8f68e9f1efc27990688a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "56f82f2b_82ebb42d",
         "filename": "store/storecache/cache.go",
         "patchSetId": 6
