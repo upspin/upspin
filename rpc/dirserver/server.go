@@ -77,7 +77,7 @@ func (s *server) Lookup(session rpc.Session, reqBytes []byte) (pb.Message, error
 	if err != nil {
 		return nil, err
 	}
-	op := logf("Lookup %q", req.Name)
+	op := logf(session, "Lookup %q", req.Name)
 
 	return op.entryError(dir.Lookup(upspin.PathName(req.Name)))
 }
@@ -93,7 +93,7 @@ func (s *server) Put(session rpc.Session, reqBytes []byte) (pb.Message, error) {
 	if err != nil {
 		return &proto.EntryError{Error: errors.MarshalError(err)}, nil
 	}
-	op := logf("Put %q", entry.Name)
+	op := logf(session, "Put %q", entry.Name)
 
 	return op.entryError(dir.Put(entry))
 }
@@ -105,7 +105,7 @@ func (s *server) Glob(session rpc.Session, reqBytes []byte) (pb.Message, error) 
 	if err != nil {
 		return nil, err
 	}
-	op := logf("Glob %q", req.Pattern)
+	op := logf(session, "Glob %q", req.Pattern)
 
 	entries, globErr := dir.Glob(req.Pattern)
 	if globErr != nil && globErr != upspin.ErrFollowLink {
@@ -136,7 +136,7 @@ func (s *server) Watch(session rpc.Session, reqBytes []byte, done <-chan struct{
 	if err != nil {
 		return nil, err
 	}
-	op := logf("Watch %q sequence %d", req.Name, req.Sequence)
+	op := logf(session, "Watch %q sequence %d", req.Name, req.Sequence)
 
 	events, err := dir.Watch(upspin.PathName(req.Name), req.Sequence, done)
 	if err != nil {
@@ -165,7 +165,7 @@ func (s *server) Delete(session rpc.Session, reqBytes []byte) (pb.Message, error
 	if err != nil {
 		return nil, err
 	}
-	op := logf("Delete %q", req.Name)
+	op := logf(session, "Delete %q", req.Name)
 
 	return op.entryError(dir.Delete(upspin.PathName(req.Name)))
 }
@@ -177,13 +177,13 @@ func (s *server) WhichAccess(session rpc.Session, reqBytes []byte) (pb.Message, 
 	if err != nil {
 		return nil, err
 	}
-	op := logf("WhichAccess %q", req.Name)
+	op := logf(session, "WhichAccess %q", req.Name)
 
 	return op.entryError(dir.WhichAccess(upspin.PathName(req.Name)))
 }
 
-func logf(format string, args ...interface{}) operation {
-	s := fmt.Sprintf(format, args...)
+func logf(sess rpc.Session, format string, args ...interface{}) operation {
+	s := string(sess.User()) + ": " + fmt.Sprintf(format, args...)
 	log.Debug.Print("rpc/dirserver: " + s)
 	return operation(s)
 }
@@ -191,7 +191,7 @@ func logf(format string, args ...interface{}) operation {
 type operation string
 
 func (op operation) log(err error) {
-	logf("%s failed: %s", op, err)
+	log.Debug.Printf("rpc/dirserver: %s failed: %s", op, err)
 }
 
 func (op operation) logf(format string, args ...interface{}) {
