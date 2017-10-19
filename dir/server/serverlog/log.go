@@ -465,17 +465,14 @@ func (u *User) setV1Transition() {
 	if len(u.files) == 0 || u.files[0].version > 0 {
 		return // No old logs.
 	}
-	// No files have been created in this run, so if there is only one
-	// file and it is version 0, say the transition happens now.
-	if len(u.files) == 1 {
-		u.v1Transition = upspin.Now()
-		return
-	}
 	// Read the first entry past the transition, looking for the first non-zero time.
 	// It may take several files to get there.
 	data := make([]byte, 4096)
-	for i := 1; i < len(u.files); i++ {
-		fd, err := os.Open(u.files[i].name)
+	for _, file := range u.files {
+		if file.version == 0 {
+			continue
+		}
+		fd, err := os.Open(file.name)
 		if err != nil {
 			return
 		}
@@ -493,6 +490,12 @@ func (u *User) setV1Transition() {
 				return
 			}
 		}
+	}
+	// If there were any files but we got here
+	// then the transition happens now.
+	if len(u.files) > 0 {
+		u.v1Transition = upspin.Now()
+		return
 	}
 	// No luck. Zero it is. TODO: Should we fail?
 }
