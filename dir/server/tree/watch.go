@@ -141,7 +141,10 @@ func (t *Tree) Watch(p path.Parsed, sequence int64, done <-chan struct{}) (<-cha
 		t.watchers.Add(1)
 		go w.sendCurrentAndWatch(clone, t, p, offset)
 	} else {
-		var offset int64
+		var (
+			offset    int64
+			offsetErr error // Will be delivered on the channel, not here.
+		)
 		if sequence == upspin.WatchNew {
 			// We must flush the tree so we know our logs are current (or we
 			// need to recover the tree from the logs).
@@ -154,19 +157,18 @@ func (t *Tree) Watch(p path.Parsed, sequence int64, done <-chan struct{}) (<-cha
 		} else {
 			offset = t.user.OffsetOf(sequence)
 			if offset < 0 {
-				return nil, errors.E(p.Path(), errors.Errorf("unknown sequence %d", sequence))
+				offsetErr = errors.E(errors.Invalid, p.Path(), errors.Errorf("unknown sequence %d", sequence))
 			}
 		}
 
-		// Set up the notification hook.
-		err = t.addWatcher(p, w)
-		if err != nil {
+		// Set up the notification hook. Don't overwrite any pending error.
+		if err := t.addWatcher(p, w); err != nil {
 			return nil, err
 		}
 
 		// Start the watcher.
 		t.watchers.Add(1)
-		go w.watch(offset)
+		go w.watch(offset, offsetErr)
 	}
 
 	return w.events, nil
@@ -233,7 +235,7 @@ func (w *watcher) sendCurrentAndWatch(clone, orig *Tree, p path.Parsed, offset i
 		return
 	}
 	// Start the watcher (in this goroutine -- don't start a new one here).
-	w.watch(offset)
+	w.watch(offset, nil)
 }
 
 // sendEvent sends a single logEntry read from the log at offset position
@@ -328,9 +330,17 @@ func (w *watcher) sendEventFromLog(offset int64) (int64, error) {
 // offset and sends notifications on the event channel until the end of the log
 // is reached. It waits to be notified of more work or until the client's
 // done channel is closed, in which case it terminates.
-// If offset is negative, the first event will be an Invalid error.
-func (w *watcher) watch(offset int64) {
+// The API for the DirServer.Watch requires that an invalid sequence
+// is returned on the channel, not in the call. The initialErr argument here
+// is present for that case: If non-nil, we deliver the error and stop.
+// Otherwise if offset is negative, the first event will be an Invalid error.
+func (w *watcher) watch(offset int64, initialErr error) {
 	defer w.close()
+
+	if initialErr != nil {
+		w.sendError(initialErr)
+		return
+	}
 
 	for {
 		var err error
