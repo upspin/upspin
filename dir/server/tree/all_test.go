@@ -13,6 +13,7 @@ import (
 
 	"upspin.io/bind"
 	"upspin.io/config"
+	"upspin.io/dir/server/serverlog"
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/path"
@@ -40,31 +41,46 @@ const (
 // from creating a new tree from scratch, adding new nodes, flushing it to Store then
 // adding more nodes to a new tree and having to load it from the Store.
 func TestPutNodes(t *testing.T) {
-	config, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(config, log, logIndex)
+	config, user := newConfigForTesting(t, userName)
+	tree, err := New(config, user)
 	if err != nil {
 		t.Fatal(err)
 	}
 
+	seq := int64(upspin.SeqBase)
 	root, err := tree.Put(newDirEntry("/", isDir, config))
 	if err != nil {
 		t.Fatal(err)
 	}
+	seq++
 	dir2, err := tree.Put(newDirEntry("/dir", isDir, config))
 	if err != nil {
 		t.Fatal(err)
 	}
+	seq++
 	dir3, err := tree.Put(newDirEntry("/dir/doc.pdf", !isDir, config))
 	if err != nil {
 		t.Fatal(err)
 	}
 	totBytes := entrySize(t, dir2) + entrySize(t, dir3)
+	// Root Sequence should be updated.
+	p, err := path.Parse(userName + "/")
+	if err != nil {
+		t.Fatal(err)
+	}
+	de, _, err := tree.Lookup(p)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if de.Sequence != seq {
+		t.Fatalf("%s: got sequence %d; expected %d", p, de.Sequence, seq)
+	}
 
 	// Verify three log entries were written.
-	if got, want := log.LastOffset(), int64(totBytes); got < want {
-		t.Fatalf("LastIndex = %d, want > %d", got, want)
+	if got, want := user.AppendOffset(), int64(totBytes); got < want {
+		t.Fatalf("LastOffset = %d, want > %d", got, want)
 	}
-	lrd, err := log.NewReader()
+	lrd, err := user.NewReader()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -104,8 +120,8 @@ func TestPutNodes(t *testing.T) {
 	if !dirty {
 		t.Errorf("dirty = %v, want %v", dirty, true)
 	}
-	if got, want := de.Sequence, int64(upspin.SeqBase+1); got != want {
-		t.Errorf("de.Sequence = %d, want = %d", got, want)
+	if de.Sequence != seq {
+		t.Errorf("de.Sequence = %d, want = %d", de.Sequence, seq)
 	}
 
 	// Flush to later build a new tree and verify new is equivalent to old.
@@ -121,17 +137,17 @@ func TestPutNodes(t *testing.T) {
 	if newRoot.Time <= root.Time {
 		t.Fatalf("Time moved backwards: got %d, want > %d", newRoot.Time, root.Time)
 	}
-	if got, want := newRoot.Sequence, int64(upspin.SeqBase+2); got != want {
-		t.Errorf("newRoot.Sequence = %d, want = %d", got, want)
+	if newRoot.Sequence != seq {
+		t.Errorf("newRoot.Sequence = %d, want = %d", newRoot.Sequence, seq)
 	}
 
 	// New log index shows we're now at the end of the log.
-	got, err := logIndex.ReadOffset()
+	got, err := user.ReadOffset()
 	if err != nil {
 		t.Fatal(err)
 	}
-	if want := log.LastOffset(); got != want {
-		t.Fatalf("cfg.Log.LastIndex() = %d, want %d", got, want)
+	if want := user.AppendOffset(); got != want {
+		t.Fatalf("AppendOffset() = %d, want %d", got, want)
 	}
 
 	// Lookup now returns !dirty.
@@ -142,11 +158,11 @@ func TestPutNodes(t *testing.T) {
 	if dirty {
 		t.Errorf("dirty = %v, want %v", dirty, false)
 	}
-	if got, want := de.Name, dir3.Name; got != want {
-		t.Errorf("de.Name = %v, want %v", de.Name, want)
+	if de.Name != dir3.Name {
+		t.Errorf("de.Name = %v, want %v", de.Name, dir3.Name)
 	}
 
-	// Verify that the entry for the directory now has an incremented
+	// Verify that the entry for the directory still has the incremented
 	// sequence number.
 	de, dirty, err = tree.Lookup(mkpath(t, userName+"/dir/"))
 	if err != nil {
@@ -155,12 +171,12 @@ func TestPutNodes(t *testing.T) {
 	if dirty {
 		t.Errorf("dirty = %v, want %v", dirty, false)
 	}
-	if got, want := de.Sequence, int64(upspin.SeqBase+1); got != want {
-		t.Errorf("de.Sequence = %d, want = %d", got, want)
+	if de.Sequence != seq {
+		t.Errorf("de.Sequence = %d, want = %d", de.Sequence, seq)
 	}
 
 	// Now start a new tree from scratch and confirm it is loaded from the Store.
-	tree2, err := New(config, log, logIndex)
+	tree2, err := New(config, user)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -171,8 +187,8 @@ func TestPutNodes(t *testing.T) {
 		t.Fatal(err)
 	}
 	totBytes += entrySize(t, dir4)
-	if got, want := log.LastOffset(), int64(totBytes); got < want {
-		t.Fatalf("cfg.Log.LastIndex() = %d, want > %d", log.LastOffset(), want)
+	if got, want := user.AppendOffset(), int64(totBytes); got < want {
+		t.Fatalf("AppendOffset() = %d, want > %d", got, want)
 	}
 
 	// Try to lookup a file inside a file (checks a corner case bug).
@@ -185,7 +201,7 @@ func TestPutNodes(t *testing.T) {
 	t.Logf("== Tree:\n%s", tree2.String())
 
 	// Delete dir4. Save offset before deleting.
-	last := log.LastOffset()
+	last := user.AppendOffset()
 	_, err = tree2.Delete(mkpath(t, userName+"/dir/img.jpg"))
 	if err != nil {
 		t.Fatal(err)
@@ -197,8 +213,8 @@ func TestPutNodes(t *testing.T) {
 		t.Fatalf("err = %s, want = %s", err, expectedErr)
 	}
 	// One new entry was written to the log (an updated dir2).
-	if got, want := log.LastOffset(), int64(totBytes); got < want {
-		t.Fatalf("cfg.Log.LastIndex() = %d, want %d", log.LastOffset(), want)
+	if got, want := user.AppendOffset(), int64(totBytes); got < want {
+		t.Fatalf("AppendOffset() = %d, want %d", got, want)
 	}
 	// Verify logged entry is the deletion of a file.
 	entry, _, err = lrd.ReadAt(last)
@@ -208,14 +224,14 @@ func TestPutNodes(t *testing.T) {
 	if got, want := entry.Entry.Name, upspin.PathName(userName+"/dir/img.jpg"); got != want {
 		t.Errorf("entries[0].Name = %s, want = %s", got, want)
 	}
-	if got, want := entry.Op, Delete; got != want {
+	if got, want := entry.Op, serverlog.Delete; got != want {
 		t.Errorf("entries[0].Op = %v, want = %v", got, want)
 	}
 }
 
 func TestAddKidToEmptyNonDirtyDir(t *testing.T) {
-	config, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(config, log, logIndex)
+	config, user := newConfigForTesting(t, userName)
+	tree, err := New(config, user)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -250,8 +266,8 @@ func TestAddKidToEmptyNonDirtyDir(t *testing.T) {
 // Test that an empty root can be saved and retrieved.
 // Roots are handled differently than other directory entries.
 func TestPutEmptyRoot(t *testing.T) {
-	config, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(config, log, logIndex)
+	config, user := newConfigForTesting(t, userName)
+	tree, err := New(config, user)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -268,7 +284,7 @@ func TestPutEmptyRoot(t *testing.T) {
 	}
 
 	// Now start a new tree from scratch and confirm it is loaded from the Store.
-	tree2, err := New(config, log, logIndex)
+	tree2, err := New(config, user)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -331,8 +347,8 @@ func TestPutEmptyRoot(t *testing.T) {
 // entries that were not flushed to the Store. It tests that the new tree
 // recovers from the log and is fully functional.
 func TestRebuildFromLog(t *testing.T) {
-	config, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(config, log, logIndex)
+	config, user := newConfigForTesting(t, userName)
+	tree, err := New(config, user)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -354,16 +370,16 @@ func TestRebuildFromLog(t *testing.T) {
 		}
 	}
 
-	offsetBeforeCrash, err := logIndex.ReadOffset()
+	offsetBeforeCrash, err := user.ReadOffset()
 	if err != nil {
 		t.Fatal(err)
 	}
 	// Simulate a crash and restart, without ever having flushed the tree.
-	tree, err = New(config, log, logIndex)
+	tree, err = New(config, user)
 	if err != nil {
 		t.Fatal(err)
 	}
-	offsetAfterCrash, err := logIndex.ReadOffset()
+	offsetAfterCrash, err := user.ReadOffset()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -408,7 +424,7 @@ func TestRebuildFromLog(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = tree.Delete(mkpath(t, userName+"/dir0/file_in_dir.txt"))
+	deleted, err := tree.Delete(mkpath(t, userName+"/dir0/file_in_dir.txt"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -416,9 +432,16 @@ func TestRebuildFromLog(t *testing.T) {
 	// Now we crash and restart.
 	// /file2.txt and /dir1/file_in_dir must exist after recovery and /file1
 	// must not.
-	tree, err = New(config, log, logIndex)
+	tree, err = New(config, user)
 	if err != nil {
 		t.Fatal(err)
+	}
+	// Verify that all the sequence numbers are set to the most recent value.
+	if seq := tree.sequence; seq != deleted.Sequence {
+		t.Fatalf("tree sequence is %d; expected %d", seq, deleted.Sequence)
+	}
+	if seq := tree.root.entry.Sequence; seq != deleted.Sequence {
+		t.Fatalf("root sequence is %d; expected %d", seq, deleted.Sequence)
 	}
 
 	// Files are never dirty (they're packed and saved by the Client),
@@ -457,8 +480,8 @@ func TestRebuildFromLog(t *testing.T) {
 }
 
 func TestPutLargeNode(t *testing.T) {
-	config, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(config, log, logIndex)
+	config, user := newConfigForTesting(t, userName)
+	tree, err := New(config, user)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -484,7 +507,7 @@ func TestPutLargeNode(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Reach inside, read the root entry and verify its blocks.
-	root, err := tree.logIndex.Root()
+	root, err := tree.user.Root()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -494,8 +517,8 @@ func TestPutLargeNode(t *testing.T) {
 }
 
 func TestLinks(t *testing.T) {
-	config, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(config, log, logIndex)
+	config, user := newConfigForTesting(t, userName)
+	tree, err := New(config, user)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -554,7 +577,7 @@ func TestLinks(t *testing.T) {
 		}
 
 		// Start a new tree to ensure links are recovered from the log.
-		tree, err = New(config, log, logIndex)
+		tree, err = New(config, user)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -590,8 +613,8 @@ func TestLinks(t *testing.T) {
 }
 
 func TestList(t *testing.T) {
-	config, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(config, log, logIndex)
+	config, user := newConfigForTesting(t, userName)
+	tree, err := New(config, user)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -666,8 +689,8 @@ func TestList(t *testing.T) {
 }
 
 func TestPutDirSameTreeNonRoot(t *testing.T) {
-	config, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(config, log, logIndex)
+	config, user := newConfigForTesting(t, userName)
+	tree, err := New(config, user)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -771,7 +794,7 @@ func TestPutDirSameTreeNonRoot(t *testing.T) {
 	}
 
 	// Create a new tree (simulate a crash).
-	tree, err = New(config, log, logIndex)
+	tree, err = New(config, user)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -788,8 +811,8 @@ func TestPutDirSameTreeNonRoot(t *testing.T) {
 }
 
 func TestPutDirSameTreeRoot(t *testing.T) {
-	config, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(config, log, logIndex)
+	config, user := newConfigForTesting(t, userName)
+	tree, err := New(config, user)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -827,8 +850,8 @@ func TestPutDirSameTreeRoot(t *testing.T) {
 }
 
 func TestPutDirOtherTreeRoot(t *testing.T) {
-	config, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(config, log, logIndex)
+	config, user := newConfigForTesting(t, userName)
+	tree, err := New(config, user)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -839,8 +862,8 @@ func TestPutDirOtherTreeRoot(t *testing.T) {
 
 	// Create another tree for another user.
 	const otherUser = "other@another.biz"
-	config2, log2, logIndex2 := newConfigForTesting(t, otherUser)
-	tree2, err := New(config2, log2, logIndex2)
+	config2, user2 := newConfigForTesting(t, otherUser)
+	tree2, err := New(config2, user2)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -901,7 +924,7 @@ func TestPutDirOtherTreeRoot(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Creating a new tree2 (crash and restart) yields the same thing.
-	tree3, err := New(config2, log2, logIndex2)
+	tree3, err := New(config2, user2)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -916,8 +939,8 @@ func TestPutDirOtherTreeRoot(t *testing.T) {
 }
 
 func TestPutDirLog(t *testing.T) {
-	config, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(config, log, logIndex)
+	config, user := newConfigForTesting(t, userName)
+	tree, err := New(config, user)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -937,11 +960,11 @@ func TestPutDirLog(t *testing.T) {
 	}
 
 	// Find a log entry for "/snapshot/new".
-	r, err := log.NewReader()
+	r, err := user.NewReader()
 	if err != nil {
 		t.Fatal(err)
 	}
-	var offset, last int64 = 0, r.LastOffset()
+	var offset, last int64 = 0, r.EndOffset()
 	for offset < last {
 		le, next, err := r.ReadAt(offset)
 		if err != nil {
@@ -958,8 +981,8 @@ func TestPutDirLog(t *testing.T) {
 }
 
 func TestPutDirWatch(t *testing.T) {
-	config, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(config, log, logIndex)
+	config, user := newConfigForTesting(t, userName)
+	tree, err := New(config, user)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1005,8 +1028,8 @@ func TestPutDirWatch(t *testing.T) {
 }
 
 func TestFlushNewTree(t *testing.T) {
-	config, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(config, log, logIndex)
+	config, user := newConfigForTesting(t, userName)
+	tree, err := New(config, user)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1018,8 +1041,8 @@ func TestFlushNewTree(t *testing.T) {
 }
 
 func TestCorruptTreeAndRecover(t *testing.T) {
-	config, log, logIndex := newConfigForTesting(t, userName)
-	tree, err := New(config, log, logIndex)
+	config, user := newConfigForTesting(t, userName)
+	tree, err := New(config, user)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1039,8 +1062,7 @@ func TestCorruptTreeAndRecover(t *testing.T) {
 	}
 
 	// Write some garbage to the log.
-	data := "Some garbage"
-	_, err = log.file.Write([]byte(data))
+	_, err = user.Write([]byte("Some garbage"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1052,7 +1074,7 @@ func TestCorruptTreeAndRecover(t *testing.T) {
 	}
 
 	// Crash and recover the tree.
-	tree2, err := New(config, log, logIndex)
+	tree2, err := New(config, user)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1087,7 +1109,7 @@ func TestCorruptTreeAndRecover(t *testing.T) {
 	}
 
 	// Ensure reading the log again does not cause problems.
-	tree3, err := New(config, log, logIndex)
+	tree3, err := New(config, user)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1111,7 +1133,7 @@ func TestMain(m *testing.M) {
 	}
 
 	// Make the logs rotate frequently.
-	maxLogSize = 100
+	serverlog.MaxLogSize = 100
 
 	code := m.Run()
 
@@ -1183,6 +1205,7 @@ func newDirEntry(name upspin.PathName, isDir bool, config upspin.Config) (path.P
 	}
 	return p, &upspin.DirEntry{
 		Name:       p.Path(),
+		Sequence:   upspin.SeqIgnore,
 		SignedName: p.Path(),
 		Attr:       attr,
 		Packing:    config.Packing(),
@@ -1194,7 +1217,7 @@ func newDirEntry(name upspin.PathName, isDir bool, config upspin.Config) (path.P
 
 // newConfigForTesting creates the necessary items to instantiate a Tree for
 // testing.
-func newConfigForTesting(t *testing.T, userName upspin.UserName) (upspin.Config, *Writer, *LogIndex) {
+func newConfigForTesting(t *testing.T, userName upspin.UserName) (upspin.Config, *serverlog.User) {
 	factotum, err := factotum.NewFromDir(testutil.Repo("key", "testdata", "test"))
 	if err != nil {
 		t.Fatal(err)
@@ -1242,15 +1265,15 @@ func newConfigForTesting(t *testing.T, userName upspin.UserName) (upspin.Config,
 	if err != nil {
 		t.Fatal(err)
 	}
-	log, logIndex, err := NewLogs(userName, tmpDir)
+	serverlogUser, err := serverlog.Open(userName, tmpDir)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = logIndex.SaveOffset(0)
+	err = serverlogUser.SaveOffset(0)
 	if err != nil {
 		t.Fatal(err)
 	}
-	return cfg, log, logIndex
+	return cfg, serverlogUser
 }
 
 func entrySize(t *testing.T, entry *upspin.DirEntry) int {

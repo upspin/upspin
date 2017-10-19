@@ -131,7 +131,7 @@ func initServer(mode initMode) (*subcmd.ServerConfig, upspin.Config, *perm.Perm,
 	if err := os.MkdirAll(logDir, 0700); err != nil {
 		return nil, nil, nil, err
 	}
-	dir, err := dirServer.New(dirCfg, "userCacheSize=1000", "logDir="+logDir)
+	dir, err := dirServer.New(dirCfg, "logDir="+logDir)
 	if err != nil {
 		return nil, nil, nil, err
 	}

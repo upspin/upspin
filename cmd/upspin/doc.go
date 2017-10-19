@@ -786,11 +786,12 @@ Flags:
 
 Sub-command watch
 
-Usage: upspin watch [-order=n] path
+Usage: upspin watch [-sequence=n] path
 
-Watch watches the given Upspin path beginning with the specified order and
-prints the events to standard output. An order of -1, the default, will send
-the current state of the tree rooted at the given path.
+Watch watches the given Upspin path beginning with the specified
+sequence number and prints the events to standard output. A sequence
+number of -1, the default, will send the current state of the tree
+rooted at the given path.
 
 The -glob flag can be set to false to have watch skip Glob processing,
 treating its arguments as literal text even if they contain special
@@ -801,8 +802,8 @@ Flags:
     	apply glob processing to the arguments (default true)
   -help
     	print more information about the command
-  -order int
-    	order (default -1)
+  -sequence sequence
+    	sequence number (default -1)
 
 
 

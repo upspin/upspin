@@ -44,6 +44,11 @@ func testSnapshot(t *testing.T, r *testenv.Runner) {
 	// Take the snapshot.
 	r.As(snapshotUser)
 	r.MakeDirectory(snapshotDir)
+	if err := r.Err(); err != nil && !errors.Match(errors.E(errors.Exist), err) {
+		// It's OK for the snapshot directory to exist already,
+		// as it won't be deleted after previous test runs.
+		t.Fatal(err)
+	}
 	r.Put(snapshotControlFile, "")
 	if r.Failed() {
 		t.Fatal(r.Diag())
@@ -54,12 +59,10 @@ func testSnapshot(t *testing.T, r *testenv.Runner) {
 	r.Get(snapshotControlFile)
 	if !r.Failed() {
 		if r.Data == "" {
-			t.Log("Snapshotting not supported.")
-			return
+			t.Skip("Snapshotting not supported.")
 		}
 		t.Fatalf("Non-empty snapshot control file: %q.", r.Data)
 	}
-	t.Log("Snapshot command issued")
 
 	// Verify snapshot was taken today and has the correct data in it.
 	r.As(ownerName)

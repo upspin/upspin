@@ -240,7 +240,6 @@ func UpspinEvent(event *Event) (*upspin.Event, error) {
 	}
 	return &upspin.Event{
 		Entry:  entry, // may be nil.
-		Order:  event.Order,
 		Delete: event.Delete,
 		Error:  errors.UnmarshalError(event.Error),
 	}, nil
@@ -269,7 +268,6 @@ func EventProto(event *upspin.Event) (*Event, error) {
 	}
 	return &Event{
 		Entry:  b,
-		Order:  event.Order,
 		Delete: event.Delete,
 		Error:  err,
 	}, nil

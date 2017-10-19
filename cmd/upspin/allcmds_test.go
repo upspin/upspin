@@ -65,7 +65,7 @@ var basicCmdTests = []cmdTest{
 		"this is ann@example.com/foo\n",
 		expect(
 			"this is ann@example.com/foo\n",
-			"ee", "1", "28", "remote", "\tann@example.com/foo",
+			"ee", "2", "28", "remote", "\tann@example.com/foo",
 		),
 	},
 	{

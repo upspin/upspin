@@ -136,9 +136,9 @@ func (s *server) Watch(session rpc.Session, reqBytes []byte, done <-chan struct{
 	if err != nil {
 		return nil, err
 	}
-	op := logf("Watch %q order %d", req.Name, req.Order)
+	op := logf("Watch %q sequence %d", req.Name, req.Sequence)
 
-	events, err := dir.Watch(upspin.PathName(req.Name), req.Order, done)
+	events, err := dir.Watch(upspin.PathName(req.Name), req.Sequence, done)
 	if err != nil {
 		return nil, err
 	}

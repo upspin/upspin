@@ -7,13 +7,13 @@ package server
 
 import (
 	"io/ioutil"
-	"strconv"
 	"strings"
 	"sync"
 	"time"
 
 	"upspin.io/access"
 	"upspin.io/cache"
+	"upspin.io/dir/server/serverlog"
 	"upspin.io/dir/server/tree"
 	"upspin.io/errors"
 	"upspin.io/log"
@@ -137,9 +137,6 @@ func New(cfg upspin.Config, options ...string) (upspin.DirServer, error) {
 		return nil, errors.E(op, errors.Invalid, errors.Str("nil factotum"))
 	}
 	// Check which options are present and pick suitable defaults.
-	userCacheSize := 1000
-	accessCacheSize := 1000
-	groupCacheSize := 100
 	logDir := ""
 	for _, opt := range options {
 		o := strings.Split(opt, "=")
@@ -148,22 +145,6 @@ func New(cfg upspin.Config, options ...string) (upspin.DirServer, error) {
 		}
 		k, v := o[0], o[1]
 		switch k {
-		case "userCacheSize", "accessCacheSize", "groupCacheSize":
-			cacheSize, err := strconv.ParseInt(v, 10, 32)
-			if err != nil {
-				return nil, errors.E(op, errors.Invalid, errors.Errorf("invalid cache size %q: %s", v, err))
-			}
-			if cacheSize < 1 {
-				return nil, errors.E(op, errors.Invalid, errors.Errorf("%s: cache size too small: %d", k, cacheSize))
-			}
-			switch opt {
-			case "userCacheSize":
-				userCacheSize = int(cacheSize)
-			case "accessCacheSize":
-				accessCacheSize = int(cacheSize)
-			case "groupCacheSize":
-				groupCacheSize = int(cacheSize)
-			}
 		case "logDir":
 			logDir = v
 		default:
@@ -179,6 +160,11 @@ func New(cfg upspin.Config, options ...string) (upspin.DirServer, error) {
 		logDir = dir
 	}
 
+	const (
+		userCacheSize   = 1000
+		accessCacheSize = 1000
+		groupCacheSize  = 100
+	)
 	s := &server{
 		serverConfig:  cfg,
 		userName:      cfg.UserName(),
@@ -392,9 +378,9 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 			return nil, s.errPerm(op, p, o)
 		}
 
-		// New file should have a valid sequence number, if user didn't pick one already.
-		if entry.Sequence == upspin.SeqNotExist || entry.Sequence == upspin.SeqIgnore && !entry.IsDir() {
-			entry.Sequence = upspin.NewSequence()
+		// The provided sequence number for a new item may be only SeqNotExist or SeqIgnore.
+		if entry.Sequence != upspin.SeqNotExist && entry.Sequence != upspin.SeqIgnore {
+			return nil, errors.E(op, p.Path(), errors.Invalid, errors.Str("invalid sequence number"))
 		}
 	} else if err != nil {
 		// Some unexpected error happened looking up path. Abort.
@@ -433,11 +419,6 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 				return nil, errors.E(op, entry.Name, errors.Invalid, errors.Str("sequence number"))
 			}
 		}
-		// Note: sequence number updates for directories is maintained
-		// by the Tree since directory entries are never Put by the
-		// user explicitly. Here we adjust the dir entries that the user
-		// sent us (those representing files only).
-		entry.Sequence = upspin.SeqNext(existingEntry.Sequence)
 
 		// If we're updating an Access file delete it from the cache and
 		// let it be re-loaded lazily when needed again.
@@ -455,7 +436,16 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		}
 	}
 
-	return s.put(op, p, entry, o)
+	entry, err = s.put(op, p, entry, o)
+	if err != nil {
+		return entry, err
+	}
+	// Return Incomplete entry with Sequence number.
+	retEntry := &upspin.DirEntry{
+		Attr:     upspin.AttrIncomplete,
+		Sequence: entry.Sequence,
+	}
+	return retEntry, nil
 }
 
 // put performs Put on the user's tree.
@@ -615,10 +605,11 @@ func (s *server) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
 	// If we just deleted the root, close the tree, remove it from the cache
 	// and delete all logs associated with the tree owner.
 	if p.IsRoot() {
+		user := t.User()
 		if err := s.closeTree(p.User()); err != nil {
 			return nil, errors.E(op, name, err)
 		}
-		if err := tree.DeleteLogs(p.User(), s.logDir); err != nil {
+		if err := user.DeleteLogs(); err != nil {
 			return nil, errors.E(op, name, err)
 		}
 	}
@@ -653,7 +644,7 @@ func (s *server) WhichAccess(name upspin.PathName) (*upspin.DirEntry, error) {
 }
 
 // Watch implements upspin.DirServer.Watch.
-func (s *server) Watch(name upspin.PathName, order int64, done <-chan struct{}) (<-chan upspin.Event, error) {
+func (s *server) Watch(name upspin.PathName, sequence int64, done <-chan struct{}) (<-chan upspin.Event, error) {
 	const op = "dir/server.Watch"
 	o, m := newOptMetric(op)
 	defer m.Done()
@@ -670,7 +661,7 @@ func (s *server) Watch(name upspin.PathName, order int64, done <-chan struct{}) 
 
 	// Establish a channel with the tree and start a goroutine that filters
 	// out requests not visible by the caller.
-	treeEvents, err := tree.Watch(p, order, done)
+	treeEvents, err := tree.Watch(p, sequence, done)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
@@ -802,9 +793,7 @@ func (s *server) Close() {
 }
 
 func (s *server) closeTree(user upspin.UserName) error {
-	mu := s.userLock(s.userName)
-	mu.Lock()
-	defer mu.Unlock()
+	defer s.userLock(s.userName).Unlock()
 
 	if t, ok := s.userTrees.Remove(user).(*tree.Tree); ok {
 		// Close will flush and release all resources.
@@ -816,42 +805,40 @@ func (s *server) closeTree(user upspin.UserName) error {
 }
 
 // loadTreeFor loads the user's tree, if it exists.
-func (s *server) loadTreeFor(user upspin.UserName, opts ...options) (*tree.Tree, error) {
+func (s *server) loadTreeFor(userName upspin.UserName, opts ...options) (*tree.Tree, error) {
 	defer span(opts).StartSpan("loadTreeFor").End()
 
-	if err := valid.UserName(user); err != nil {
+	if err := valid.UserName(userName); err != nil {
 		return nil, errors.E(errors.Invalid, err)
 	}
 
-	mu := s.userLock(user)
-	mu.Lock()
-	defer mu.Unlock()
+	defer s.userLock(s.userName).Unlock()
 
 	// Do we have a cached tree for this user already?
-	if val, found := s.userTrees.Get(user); found {
+	if val, found := s.userTrees.Get(userName); found {
 		if tree, ok := val.(*tree.Tree); ok {
 			return tree, nil
 		}
 		// This should never happen because we only store type tree.Tree in the userTree.
-		return nil, errors.E(user, errors.Internal,
+		return nil, errors.E(userName, errors.Internal,
 			errors.Errorf("userTrees contained value of unexpected type %T", val))
 	}
 	// User is not in the cache. Load a tree from the logs, if they exist.
-	hasLog, err := tree.HasLog(user, s.logDir)
+	hasLog, err := serverlog.HasLog(userName, s.logDir)
 	if err != nil {
 		return nil, err
 	}
-	if !hasLog && !s.canCreateRoot(user) {
+	if !hasLog && !s.canCreateRoot(userName) {
 		// Tree for user does not exist and the logged-in user is not
 		// allowed to create it.
 		return nil, errNotExist
 	}
-	log, logIndex, err := tree.NewLogs(user, s.logDir)
+	user, err := serverlog.Open(userName, s.logDir)
 	if err != nil {
 		return nil, err
 	}
 	// If user has root, we can load the tree from it.
-	if _, err := logIndex.Root(); err != nil {
+	if _, err := user.Root(); err != nil {
 		// Likely the user has no root yet.
 		if !errors.Match(errNotExist, err) {
 			// No it's some other error. Abort.
@@ -859,19 +846,19 @@ func (s *server) loadTreeFor(user upspin.UserName, opts ...options) (*tree.Tree,
 		}
 		// Ok, let it proceed. The  user will still need to make the
 		// root, but we allow setting up a new tree for now.
-		err = logIndex.SaveOffset(0)
+		err = user.SaveOffset(0)
 		if err != nil {
 			return nil, err
 		}
 		// Fall through and load a new tree.
 	}
 	// Create a new tree for the user.
-	tree, err := tree.New(s.serverConfig, log, logIndex)
+	tree, err := tree.New(s.serverConfig, user)
 	if err != nil {
 		return nil, err
 	}
 	// Add to the cache and return
-	s.userTrees.Add(user, tree)
+	s.userTrees.Add(userName, tree)
 	return tree, nil
 }
 
@@ -932,7 +919,10 @@ func (s *server) shutdown() {
 			break
 		}
 		user := k.(upspin.UserName)
-		s.closeTree(user)
+		err := s.closeTree(user)
+		if err != nil {
+			log.Printf("error closing tree for user %s: %v", user, err)
+		}
 	}
 }
 
