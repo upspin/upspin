@@ -178,8 +178,8 @@ func (d *proxiedDir) watcher(ep upspin.Endpoint) {
 			log.Debug.Printf("dir/dircache.watcher: %s: %s", d.user, err)
 			return
 		}
-		if strings.Contains(err.Error(), "cannot read log at sequence") {
-			// Reread current state.
+		if strings.Contains(err.Error(), "cannot read log at") {
+			// Hit a bad record in the log. Reread current state.
 			d.sequence = -1
 		}
 		log.Info.Printf("dir/dircache.watcher: %s: %s", d.user, err)
