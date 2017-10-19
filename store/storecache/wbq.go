@@ -128,28 +128,27 @@ func newWritebackQueue(sc *storeCache) *writebackQueue {
 
 // enqueueWritebackFile populates the writeback queue on startup.
 // It returns true if this was indeed a write back file.
-func (wbq *writebackQueue) enqueueWritebackFile(path string) bool {
+func (wbq *writebackQueue) enqueueWritebackFile(relPath string) bool {
 	const op = "store/storecache.isWritebackFile"
-	f := strings.TrimSuffix(path, writebackSuffix)
-	if f == path {
+	f := strings.TrimSuffix(relPath, writebackSuffix)
+	if f == relPath {
 		return false
 	}
 
 	// At this point we know it is a writeback link so we will
 	// take care of it.
 	if wbq == nil {
-		log.Error.Printf("%s: writeback file %s but running as writethrough", op, path)
+		log.Error.Printf("%s: writeback file %s but running as writethrough", op, relPath)
 		return true
 	}
-	f = strings.TrimPrefix(f, wbq.sc.dir+"/")
 	elems := strings.Split(f, "/")
 	if len(elems) != 3 {
-		log.Error.Printf("%s: odd writeback file %s", op, path)
+		log.Error.Printf("%s: odd writeback file %s", op, relPath)
 		return true
 	}
 	e, err := upspin.ParseEndpoint(elems[0])
 	if err != nil {
-		log.Error.Printf("%s: odd writeback file %s: %s", op, path, err)
+		log.Error.Printf("%s: odd writeback file %s: %s", op, relPath, err)
 		return true
 	}
 	wbq.request <- &request{
@@ -310,8 +309,9 @@ func (wbq *writebackQueue) writer(me int) {
 // TODO(p): still figuring out how to tell them apart.
 func (wbq *writebackQueue) writeback(r *request) error {
 	// Read it in.
-	file := wbq.sc.cachePath(r.Reference, r.Endpoint) + writebackSuffix
-	data, err := readFromCacheFile(file)
+	relPath := wbq.sc.cachePath(r.Reference, r.Endpoint) + writebackSuffix
+	absPath := wbq.sc.absCachePath(r.Reference, r.Endpoint) + writebackSuffix
+	data, err := wbq.sc.readFromCacheFile(relPath)
 	if err != nil {
 		// Nothing we can do, log it but act like we succeeded.
 		log.Error.Printf("store/storecache.writer: disappeared before writeback: %s", err)
@@ -332,7 +332,7 @@ func (wbq *writebackQueue) writeback(r *request) error {
 		err := errors.Errorf("refdata mismatch expected %q got %q", r.Reference, refdata.Reference)
 		return err
 	}
-	if err := os.Remove(file); err != nil {
+	if err := os.Remove(absPath); err != nil {
 		log.Info.Printf("store/storecache.writer: fail remove after writeback: %s", err)
 	}
 	return nil
@@ -341,7 +341,7 @@ func (wbq *writebackQueue) writeback(r *request) error {
 // requestWriteback makes a hard link to the cache file sends a request to the scheduler queue.
 func (wbq *writebackQueue) requestWriteback(ref upspin.Reference, e upspin.Endpoint) error {
 	// Make a link to the cache file.
-	cf := wbq.sc.cachePath(ref, e)
+	cf := wbq.sc.absCachePath(ref, e)
 	wbf := cf + writebackSuffix
 	if err := os.Link(cf, wbf); err != nil {
 		if strings.Contains(err.Error(), "exists") {
