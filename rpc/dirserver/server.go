@@ -140,6 +140,7 @@ func (s *server) Watch(session rpc.Session, reqBytes []byte, done <-chan struct{
 
 	events, err := dir.Watch(upspin.PathName(req.Name), req.Sequence, done)
 	if err != nil {
+		op.log(err)
 		return nil, err
 	}
 
