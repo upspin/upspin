@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ef16d27a_3cb8baef",
+        "filename": "cloud/storage/openstack/openstack.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 6229
+      },
+      "writtenOn": "2017-10-19T00:59:03Z",
+      "side": 1,
+      "message": "Though that\u0027ll work, that repo is in maintenance mode; you\u0027ll probably want to use the actively-developed github.com/gophercloud/gophercloud instead. It may be as easy as changing the import paths (i.e. s/rackspace/gophercloud/g).",
+      "revId": "421a0b34669dafc04d731159f88e70779e965310",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
