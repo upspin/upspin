@@ -786,6 +786,8 @@ func TestVersion0Logs(t *testing.T) {
 	}
 	defer os.RemoveAll(dir)
 
+	startTime := upspin.Now()
+
 	err = os.MkdirAll(filepath.Join(dir, "d.tree.log.user@example.com"), 0700)
 	if err != nil {
 		t.Fatal(err)
@@ -857,10 +859,9 @@ func TestVersion0Logs(t *testing.T) {
 	}
 
 	// Verify the transition time. The files are golden so it's a fixed instant.
-	const want = "Sep 27 03:59:06 UTC 2017"
-	got := user.V1Transition().Go().Format("Jan 2 15:04:05 UTC 2006")
-	if got != want {
-		t.Fatalf("got transition time %s; want %s", got, want)
+	got := user.V1Transition()
+	if got < startTime {
+		t.Fatalf("got transition time %s; want a time after %s", got, startTime)
 	}
 
 }
