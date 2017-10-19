@@ -152,9 +152,10 @@ func (t *Tree) Watch(p path.Parsed, sequence int64, done <-chan struct{}) (<-cha
 
 			offset = t.user.AppendOffset()
 		} else {
-			// If the sequence doesn't exist, offset will be negative and
-			// the first event will be an error. This is correct behavior.
 			offset = t.user.OffsetOf(sequence)
+			if offset < 0 {
+				return nil, errors.E(p.Path(), errors.Errorf("unknown sequence %d", sequence))
+			}
 		}
 
 		// Set up the notification hook.
