@@ -195,7 +195,7 @@ func (op operation) log(err error) {
 }
 
 func (op operation) logf(format string, args ...interface{}) {
-	log.Printf("%s: "+format, append([]interface{}{op}, args...)...)
+	log.Debug.Printf("%s: "+format, append([]interface{}{op}, args...)...)
 }
 
 // entryError performs the common operation of converting a directory entry
