@@ -119,9 +119,9 @@ func newPerm(op string, cfg upspin.Config, ready <-chan struct{}, target upspin.
 // It must be run in a goroutine.
 func (p *Perm) updateLoop(op string) {
 	var (
-		events      <-chan upspin.Event
-		accessOrder int64 = -1
-		done              = func() {}
+		events    <-chan upspin.Event
+		accessSeq int64 = -1
+		done            = func() {}
 	)
 	for {
 		select {
@@ -141,7 +141,7 @@ func (p *Perm) updateLoop(op string) {
 					doneCh = nil
 				}
 			}
-			// TODO(edpin,adg): start watching at most recently seen order.
+			// TODO(edpin,adg): start watching at most recently seen sequence number.
 			events, err = p.watch(upspin.PathName(p.targetUser)+"/", -1, doneCh)
 			if err != nil {
 				if err == upspin.ErrNotSupported {
@@ -180,13 +180,13 @@ func (p *Perm) updateLoop(op string) {
 		// An Access file could have granted or revoked our permission
 		// to watch the Writers file. Therefore, we must start the Watch
 		// again, after the Access event.
-		if isRelevantAccess(e.Entry.Name) && e.Order > accessOrder {
-			accessOrder = e.Order
+		if isRelevantAccess(e.Entry.Name) && e.Entry.Sequence > accessSeq {
+			accessSeq = e.Entry.Sequence
 			done()
 			continue
 		}
-		if accessOrder < 0 {
-			// If we haven't seen an order before then we should
+		if accessSeq < 0 {
+			// If we haven't seen a sequence number before then we should
 			// remember the first one we see, so that we don't
 			// restart watching during the initial traversal.
 			// Do this after the check above, in case the first watch
@@ -194,7 +194,7 @@ func (p *Perm) updateLoop(op string) {
 			// We rely on the fact that the server won't send us an
 			// event for the Access file first if we do have access
 			// during the first traversal.
-			accessOrder = e.Order
+			accessSeq = e.Entry.Sequence
 		}
 		// Process event.
 		if e.Entry.Name != p.targetFile {
@@ -333,9 +333,9 @@ func (p *Perm) lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 	return dir.Lookup(name)
 }
 
-func (p *Perm) watch(name upspin.PathName, order int64, done <-chan struct{}) (<-chan upspin.Event, error) {
+func (p *Perm) watch(name upspin.PathName, sequence int64, done <-chan struct{}) (<-chan upspin.Event, error) {
 	if f := p.watchFunc; f != nil {
-		return f(name, order, done)
+		return f(name, sequence, done)
 	}
 	parsed, err := path.Parse(name)
 	if err != nil {
@@ -345,5 +345,5 @@ func (p *Perm) watch(name upspin.PathName, order int64, done <-chan struct{}) (<
 	if err != nil {
 		return nil, err
 	}
-	return dir.Watch(name, order, done)
+	return dir.Watch(name, sequence, done)
 }

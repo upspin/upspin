@@ -144,6 +144,11 @@ cmdflags:
 		t.Fatalf("cachesize got %v, expected %v", *cacheSizeFlag, expectedSize)
 	}
 
+	// No flags present for upspinfs, and that's fine.
+	if err := SetFlagValues(config, "upspinfs"); err != nil {
+		t.Fatalf("SetFlagValues should not have failed for upspinfs: %v", err)
+	}
+
 	// Add an undefined flag and expect an error from the apply.
 	configuration = `
 secrets: ` + secretsDir + `
@@ -160,7 +165,6 @@ cmdflags:
 	if err := SetFlagValues(config, "cacheserver"); err == nil {
 		t.Fatalf("SetFlagValues should have failed %v", configuration)
 	}
-
 }
 
 func TestNoSecrets(t *testing.T) {

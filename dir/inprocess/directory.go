@@ -35,6 +35,7 @@ func New(config upspin.Config) upspin.DirServer {
 		db: &database{
 			dirConfig:  config,
 			root:       make(map[upspin.UserName]*upspin.DirEntry),
+			seq:        make(map[upspin.UserName]int64),
 			rootAccess: make(map[upspin.UserName]*access.Access),
 			access:     make(map[upspin.PathName]*access.Access),
 			eventMgr:   newEventManager(),
@@ -70,6 +71,9 @@ type database struct {
 	// root stores the directory entry for each user's root.
 	root map[upspin.UserName]*upspin.DirEntry
 
+	// seq stores the most recent sequence number for each user's root.
+	seq map[upspin.UserName]int64
+
 	// rootAccess stores the default Access file for each user's root.
 	// Computed lazily and only used if needed.
 	rootAccess map[upspin.UserName]*access.Access
@@ -77,6 +81,23 @@ type database struct {
 	// access stores the parsed contents of any Access file stored
 	// in this directory. Inherited rights are computed from this map.
 	access map[upspin.PathName]*access.Access
+}
+
+// startSequence starts the next sequence number for this user. db must be locked.
+func (db *database) startSequence(user upspin.UserName) {
+	db.seq[user] = upspin.SeqBase
+}
+
+// incSequence advances the next sequence number for this user. db must be locked.
+func (db *database) incSequence(user upspin.UserName) {
+	s := db.seq[user]
+	s++
+	db.seq[user] = s
+}
+
+// sequence returns the current sequence number for this user. db must be locked.
+func (db *database) sequence(user upspin.UserName) int64 {
+	return db.seq[user]
 }
 
 var _ upspin.DirServer = (*server)(nil)
@@ -151,7 +172,8 @@ func (s *server) makeRoot(parsed path.Parsed) (*upspin.DirEntry, error) {
 	}
 	// We will have a zero-sized block here, which is odd but necessary to have
 	// a place to store the directory's Reference.
-	entry, err := s.newDirEntry(upspin.PathName(parsed.User()+"/"), nil, upspin.NewSequence())
+	s.db.startSequence(parsed.User())
+	entry, err := s.newDirEntry(upspin.PathName(parsed.User()+"/"), nil, s.db.sequence(parsed.User()))
 	if err != nil {
 		return nil, err
 	}
@@ -160,7 +182,10 @@ func (s *server) makeRoot(parsed path.Parsed) (*upspin.DirEntry, error) {
 }
 
 // Put implements upspin.DirServer.Put.
-func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
+func (s *server) Put(argEntry *upspin.DirEntry) (*upspin.DirEntry, error) {
+	// Copy the argument because we don't want to overwrite fields such as Sequence in caller.
+	entry := new(upspin.DirEntry)
+	*entry = *argEntry
 	const op = "dir/inprocess.Put"
 	if err := valid.DirEntry(entry); err != nil {
 		return nil, errors.E(op, err)
@@ -231,8 +256,12 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	s.db.eventMgr.newEvent <- upspin.Event{
 		Entry: entry,
 	}
-	// Successful Put returns no entry.
-	return nil, nil
+	// Successful Put returns incomplete DirEntry holding only the sequence number.
+	retEntry := &upspin.DirEntry{
+		Attr:     upspin.AttrIncomplete,
+		Sequence: entry.Sequence,
+	}
+	return retEntry, nil
 }
 
 // canPut verifies that the name is permitted to be written.
@@ -321,6 +350,9 @@ func (s *server) put(op string, entry *upspin.DirEntry, parsed path.Parsed, dele
 		entries = append(entries, e)
 		rootEntry = e
 	}
+	// We're adding an item (probably). Advance the sequence number. If the put fails for some reason,
+	// it's OK - the sequence number will be just be larger next time.
+	s.db.incSequence(parsed.User())
 	rootEntry, dirBlob, err := s.installEntry(op, path.DropPath(pathName, 1), rootEntry, entry, deleting, false)
 	if err != nil {
 		return nil, err
@@ -437,7 +469,7 @@ func (s *server) whichAccess(parsed path.Parsed) *access.Access {
 }
 
 // Watch implements upspin.DirServer.Watch.
-func (s *server) Watch(name upspin.PathName, order int64, done <-chan struct{}) (<-chan upspin.Event, error) {
+func (s *server) Watch(name upspin.PathName, seq int64, done <-chan struct{}) (<-chan upspin.Event, error) {
 	const op = "dir/inprocess.Watch"
 	parsed, err := path.Parse(name)
 	if err != nil {
@@ -449,7 +481,7 @@ func (s *server) Watch(name upspin.PathName, order int64, done <-chan struct{}) 
 	if s.db.root[parsed.User()] == nil {
 		return nil, errors.E(op, name, errors.NotExist)
 	}
-	return s.db.eventMgr.watch(s, parsed, order, done)
+	return s.db.eventMgr.watch(s, parsed, seq, done)
 }
 
 // readAll retrieves the data for the entry.
@@ -774,7 +806,7 @@ Loop:
 var errSeq = errors.Str("sequence mismatch")
 
 // installEntry installs the new entry in the directory referenced by the dirEntry, appending or overwriting the
-// entry as required. It returns the entry updated directory and the blob itself.
+// entry as required. It returns the entry of the updated directory and the blob itself.
 func (s *server) installEntry(op string, dirName upspin.PathName, dirEntry *upspin.DirEntry, newEntry *upspin.DirEntry, deleting, dirOverwriteOK bool) (*upspin.DirEntry, []byte, error) {
 	dirData, err := s.readAll(dirEntry)
 	if err != nil {
@@ -816,33 +848,43 @@ func (s *server) installEntry(op string, dirName upspin.PathName, dirEntry *upsp
 		copy(dirData[start:], remaining)
 		dirData = dirData[:len(dirData)-length]
 		if !deleting {
-			// We want nextEntry's sequence (previous value+1) but everything else from newEntry.
+			// We want nextEntry's sequence but everything else from newEntry.
 			if newEntry.Sequence != upspin.SeqIgnore {
 				if newEntry.Sequence != nextEntry.Sequence {
 					return nil, nil, errors.E(op, newEntry.Name, errSeq)
 				}
 			}
-			newEntry.Sequence = upspin.SeqNext(nextEntry.Sequence)
+			newEntry.Sequence = nextEntry.Sequence
 		}
 		break
 	}
+	parsed, err := path.Parse(newEntry.Name)
+	if err != nil {
+		// Cannot happen but be safe.
+		return nil, nil, errors.E(op, err)
+	}
+	seq := s.db.sequence(parsed.User())
 	if deleting {
 		// Must exist.
 		if !found {
 			return nil, nil, errors.E(op, newEntry.Name, errors.NotExist)
 		}
 	} else {
-		// Add new entry to directory.
-		if newEntry.Sequence == upspin.SeqIgnore {
-			newEntry.Sequence = upspin.NewSequence()
+		if !found {
+			// The provided sequence number may be only SeqNotExist or SeqIgnore.
+			if newEntry.Sequence != upspin.SeqNotExist && newEntry.Sequence != upspin.SeqIgnore {
+				return nil, nil, errors.E(op, parsed.Path(), errors.Invalid, errors.Str("invalid sequence number"))
+			}
 		}
+		// Add new entry to directory.
+		newEntry.Sequence = seq
 		data, err := newEntry.Marshal()
 		if err != nil {
 			return nil, nil, errors.E(op, err)
 		}
 		dirData = append(dirData, data...)
 	}
-	entry, err := s.newDirEntry(dirName, dirData, upspin.SeqNext(dirEntry.Sequence))
+	entry, err := s.newDirEntry(dirName, dirData, seq)
 	if err != nil {
 		return nil, nil, errors.E(op, err)
 	}

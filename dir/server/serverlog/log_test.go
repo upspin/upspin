@@ -2,10 +2,9 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package tree
+package serverlog
 
 import (
-	"bufio"
 	"bytes"
 	"fmt"
 	"io/ioutil"
@@ -17,12 +16,13 @@ import (
 	"testing"
 
 	"upspin.io/errors"
+	"upspin.io/log"
 	"upspin.io/upspin"
 )
 
 var (
-	user  upspin.UserName = "foo@bar.com"
-	entry                 = LogEntry{
+	userName upspin.UserName = "foo@bar.com"
+	entry                    = Entry{
 		Op: Delete,
 		Entry: upspin.DirEntry{
 			Name:       "foo@bar.com/dir/file.txt",
@@ -42,15 +42,72 @@ func TestMarshalUnmarshal(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	var newEntry LogEntry
-	r := newChecker(bufio.NewReader(bytes.NewReader(buf)))
-	err = newEntry.unmarshal(r)
+	var newEntry Entry
+	count, err := newEntry.unmarshal(bytes.NewReader(buf), make([]byte, 1024), 0)
 	if err != nil {
 		t.Fatal(err)
+	}
+	if count != len(buf) {
+		t.Fatalf("got %d bytes; want %d", count, len(buf))
 	}
 
 	if !reflect.DeepEqual(&entry, &newEntry) {
 		t.Errorf("newEntry = %v, want = %v", newEntry, entry)
+	}
+}
+
+func BenchmarkReadAt(b *testing.B) {
+	dir, cleanup := setup(b, "BenchmarkReadAt")
+	defer cleanup()
+
+	user, err := Open(userName, dir)
+	if err != nil {
+		b.Fatal(err)
+	}
+	err = user.Append(newEntry(upspin.PathName("foo@bar.com/hello"), 1))
+	if err != nil {
+		b.Fatal(err)
+	}
+	lrd, err := user.NewReader()
+	if err != nil {
+		b.Fatal(err)
+	}
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_, _, err := lrd.ReadAt(0)
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+}
+
+func TestCountReadAtMallocs(t *testing.T) {
+	dir, cleanup := setup(t, "AppendRead")
+	defer cleanup()
+
+	user, err := Open(userName, dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = user.Append(newEntry(upspin.PathName("foo@bar.com/hello"), 1))
+	if err != nil {
+		t.Fatal(err)
+	}
+	lrd, err := user.NewReader()
+	if err != nil {
+		t.Fatal(err)
+	}
+	fn := func() {
+		_, _, err := lrd.ReadAt(0)
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	mallocs := testing.AllocsPerRun(100, fn)
+	if got, want := mallocs, 3.0; got != want {
+		t.Errorf("got %v allocs, want <=%v", got, want)
 	}
 }
 
@@ -69,11 +126,11 @@ func TestConcurrent(t *testing.T) {
 	dir, cleanup := setup(t, "Concurrent")
 	defer cleanup()
 
-	logRW, _, err := NewLogs(user, dir)
+	user, err := Open(userName, dir)
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer logRW.Close()
+	defer user.Close()
 	abort := make(chan struct{})
 	aborted := func() bool {
 		select {
@@ -86,7 +143,7 @@ func TestConcurrent(t *testing.T) {
 	write := func() error {
 		for i := 0; i < numEntries; i++ {
 			e := entry
-			e.Entry.Sequence = upspin.NewSequence()
+			e.Entry.Sequence = rand.Int63n(100)
 			e.Entry.Time = upspin.Now()
 			if rand.Intn(10) == 0 {
 				e.Entry.SignedName = "bar@foo.com/otherfile"
@@ -118,7 +175,7 @@ func TestConcurrent(t *testing.T) {
 			if aborted() {
 				return nil
 			}
-			err := logRW.Append(&e)
+			err := user.Append(&e)
 			if err != nil {
 				return err
 			}
@@ -126,7 +183,7 @@ func TestConcurrent(t *testing.T) {
 		return nil
 	}
 	read := func() error {
-		logRO, err := logRW.NewReader()
+		logRO, err := user.NewReader()
 		if err != nil {
 			return err
 		}
@@ -169,31 +226,28 @@ func TestAppendRead(t *testing.T) {
 	dir, cleanup := setup(t, "AppendRead")
 	defer cleanup()
 
-	logger, _, err := NewLogs(user, dir)
+	user, err := Open(userName, dir)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := logger.User(), user; got != want {
-		t.Errorf("logger.User = %q, want = %q", got, want)
-	}
 
 	for i := 0; i < 10; i++ {
-		le := newLogEntry(upspin.PathName(fmt.Sprintf("foo@bar.com/hello%d", i)), i+1)
-		err := logger.Append(le)
+		le := newEntry(upspin.PathName(fmt.Sprintf("foo@bar.com/hello%d", i)), i+1)
+		err := user.Append(le)
 		if err != nil {
 			t.Fatal(err)
 		}
 	}
 	// Offset must have moved.
-	if got, wantAtLeast := logger.LastOffset(), int64(minEntrySize*10); got < wantAtLeast {
+	if got, wantAtLeast := user.AppendOffset(), int64(minEntrySize*10); got < wantAtLeast {
 		t.Errorf("LastOffset = %d, want > %d", got, wantAtLeast)
 	}
 	// Read LogEntries back.
-	lrd, err := logger.NewReader()
+	lrd, err := user.NewReader()
 	if err != nil {
 		t.Fatal(err)
 	}
-	var entries []LogEntry
+	var entries []Entry
 	offset := int64(0)
 	for i := 0; i < 11; i++ { // Tries to go past EOF.
 		entry, next, err := lrd.ReadAt(offset)
@@ -207,7 +261,7 @@ func TestAppendRead(t *testing.T) {
 		entries = append(entries, entry)
 	}
 
-	if want := logger.LastOffset(); offset != want {
+	if want := user.AppendOffset(); offset != want {
 		t.Errorf("nextOffset = %d, want = %d", offset, want)
 	}
 	// Spot-check some entries.
@@ -236,24 +290,24 @@ func TestOldStyleLogs(t *testing.T) {
 	}
 
 	// Open moves the old file to its new location.
-	l, _, err := NewLogs(name, dir)
+	u, err := Open(name, dir)
 	if err != nil {
 		t.Fatal(err)
 	}
-	l.Close()
+	u.Close()
 
 	// Check that the old log has been removed.
 	_, err = os.Stat(oldLog)
 	if !os.IsNotExist(err) {
-		t.Fatalf("expected not exist error, got %v", err)
+		t.Fatalf("expected not exist error for %q, got %v", oldLog, err)
 	}
 
 	// Open it again. Should work fine.
-	l, _, err = NewLogs(name, dir)
+	u, err = Open(name, dir)
 	if err != nil {
 		t.Fatal(err)
 	}
-	l.Close()
+	u.Close()
 
 	// Re-create the old log.
 	err = ioutil.WriteFile(oldLog, []byte{}, 0600)
@@ -262,11 +316,11 @@ func TestOldStyleLogs(t *testing.T) {
 	}
 
 	// Open it again.
-	l, _, err = NewLogs(name, dir)
+	u, err = Open(name, dir)
 	if err != nil {
 		t.Fatal(err)
 	}
-	l.Close()
+	u.Close()
 
 	// Check that the old log was simply purged.
 	_, err = os.Stat(oldLog)
@@ -275,38 +329,76 @@ func TestOldStyleLogs(t *testing.T) {
 	}
 }
 
+func TestWhichLogFile(t *testing.T) {
+	const (
+		numLogs = 10
+		size    = 100
+	)
+
+	// Fake a list of files and offsets.
+	var user User
+
+	for i := 0; i < numLogs; i++ {
+		lf := &logFile{
+			index:   len(user.files),
+			version: version,
+			offset:  int64(i * size),
+		}
+		user.files = append(user.files, lf)
+	}
+
+	for offset := 0; offset < numLogs*size; offset++ {
+		f := user.whichLogFile(int64(offset))
+		if f.index != offset/size { // Integer division gets the boundary right.
+			t.Fatalf("got log %d; expected %d", f.index, offset/size)
+		}
+	}
+
+	// Try off the end. Shouldn't happen but get it right
+	f := user.whichLogFile(numLogs*size + 100)
+	if f.index != len(user.files)-1 {
+		t.Fatal("off end did not get last entry")
+	}
+}
+
 func TestReadRotatedLog(t *testing.T) {
 	dir, cleanup := setup(t, "ReadRotatedLog")
 	defer cleanup()
 
-	// Simulate a rotated log exists. NewLog will open the rotated one and
+	user := &User{
+		name:      "bob@example.com",
+		directory: dir,
+	}
+
+	// Simulate a rotated log. NewLog will open the rotated one and
 	// read from it.
 
-	err := os.Mkdir(logSubDir(user, dir), 0700)
+	err := os.Mkdir(user.logSubDir(), 0700)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// Create a few rotated logs.
-	f, err := os.Create(logFile(user, 345678, dir))
+	f, err := os.Create(user.logFileName(345678, version))
 	if err != nil {
 		t.Fatal(err)
 	}
 	f.Close()
-	f, err = os.Create(logFile(user, 555111, dir))
+	f, err = os.Create(user.logFileName(555111, version))
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	// Open Logs for user.
-	l, _, err := NewLogs(user, dir)
+	// Open logs for user.
+	user2, err := Open(user.name, user.directory)
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = l.Append(&entry)
+	err = user2.Append(&entry)
 	if err != nil {
 		t.Fatal(err)
 	}
+	user2.Close()
 
 	// Verify we appended some bytes to the right place. The exact size is
 	// not important, but something greater than zero.
@@ -315,22 +407,22 @@ func TestReadRotatedLog(t *testing.T) {
 	} else if err != nil {
 		t.Fatal(err)
 	}
-	l.Close()
 	f.Close()
 
 	// Create one more rotated log so we can test reading from the middle.
-	f, err = os.Create(logFile(user, 777222, dir))
+	f, err = os.Create(user.logFileName(777222, version))
 	if err != nil {
 		t.Fatal(err)
 	}
 	f.Close()
 
 	// Open Logs again and get a reader reading from 345678.
-	l, _, err = NewLogs(user, dir)
+	user3, err := Open(user.name, user.directory)
 	if err != nil {
 		t.Fatal(err)
 	}
-	rd, err := l.NewReader()
+	defer user3.Close()
+	rd, err := user3.NewReader()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -345,33 +437,39 @@ func TestReadRotatedLog(t *testing.T) {
 }
 
 func TestRotateLogAndTruncate(t *testing.T) {
-	const user = "bob@example.com"
 	dir, err := ioutil.TempDir("", "TestRotateLog")
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer os.RemoveAll(dir)
 
-	prevMaxLogSize := maxLogSize
-	maxLogSize = 100
+	prevMaxLogSize := MaxLogSize
+	MaxLogSize = 100
 	defer func() {
-		maxLogSize = prevMaxLogSize
+		MaxLogSize = prevMaxLogSize
 	}()
 
-	log, _, err := NewLogs(user, dir)
+	user, err := Open("bob@example.com", dir)
 	if err != nil {
 		t.Fatal(err)
 	}
 	for i := 0; i < 10; i++ {
-		entry := newLogEntry(upspin.PathName(user+"/testing-testing"), 1)
-		err := log.Append(entry)
+		entry := newEntry(upspin.PathName(user.name+"/testing-testing"), 1)
+		err := user.Append(entry)
 		if err != nil {
 			t.Fatal(err)
 		}
 	}
+	logOffsets := func(u *User) []int64 {
+		var offs []int64
+		for _, f := range u.files {
+			offs = append(offs, f.offset)
+		}
+		return offs
+	}
 	// Verify we have logs of roughly at the expected offsets.
-	offsets := logOffsetsFor(logSubDir(user, dir))
-	expectedOffs := []int64{464, 348, 232, 116, 0}
+	offsets := logOffsets(user)
+	expectedOffs := []int64{0, 116, 232, 348, 464}
 	if got, want := len(offsets), len(expectedOffs); got != want {
 		t.Fatalf("Expected %d offsets, got %d", want, got)
 	}
@@ -380,12 +478,12 @@ func TestRotateLogAndTruncate(t *testing.T) {
 	}
 
 	// Check that truncation works.
-	err = log.Truncate(300)
+	err = user.Truncate(300)
 	if err != nil {
 		t.Fatal(err)
 	}
-	offsets = logOffsetsFor(logSubDir(user, dir))
-	expectedOffs = []int64{232, 116, 0}
+	offsets = logOffsets(user)
+	expectedOffs = []int64{0, 116, 232}
 	if got, want := len(offsets), len(expectedOffs); got != want {
 		t.Fatalf("Expected %d offsets, got %d", want, got)
 	}
@@ -393,7 +491,7 @@ func TestRotateLogAndTruncate(t *testing.T) {
 		t.Fatalf("Expected\n%+v\nGot:\n%+v", expectedOffs, offsets)
 	}
 
-	r, err := log.NewReader()
+	r, err := user.NewReader()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -407,23 +505,20 @@ func TestRotateLogAndTruncate(t *testing.T) {
 	}
 }
 
-func TestLogIndex(t *testing.T) {
+func TestIndex(t *testing.T) {
 	dir, err := ioutil.TempDir("", "TestAppendRead")
 	if err != nil {
 		t.Fatal(err)
 	}
 	defer os.RemoveAll(dir)
 
-	_, logIndex, err := NewLogs("foo@bar.com", dir)
+	user, err := Open("foo@bar.com", dir)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if got, want := logIndex.User(), user; got != want {
-		t.Errorf("logger.User = %q, want = %q", got, want)
-	}
 
 	// Read before write.
-	_, err = logIndex.Root()
+	_, err = user.Root()
 	expectedErr := errors.E(errors.NotExist)
 	if !errors.Match(expectedErr, err) {
 		t.Errorf("err = %s, want = %s", err, expectedErr)
@@ -439,11 +534,11 @@ func TestLogIndex(t *testing.T) {
 		Sequence:   17,
 		Time:       1234567890,
 	}
-	err = logIndex.SaveRoot(&root)
+	err = user.SaveRoot(&root)
 	if err != nil {
 		t.Fatal(err)
 	}
-	recoveredRoot, err := logIndex.Root()
+	recoveredRoot, err := user.Root()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -453,11 +548,11 @@ func TestLogIndex(t *testing.T) {
 
 	// Save and read offset
 	offset := int64(123456)
-	err = logIndex.SaveOffset(offset)
+	err = user.SaveOffset(offset)
 	if err != nil {
 		t.Fatal(err)
 	}
-	recoveredOffset, err := logIndex.ReadOffset()
+	recoveredOffset, err := user.ReadOffset()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -466,11 +561,11 @@ func TestLogIndex(t *testing.T) {
 	}
 
 	// Clone the log index and ensure it's read-only.
-	clone, err := logIndex.Clone()
+	clone, err := user.checkpoint.readOnlyClone()
 	if err != nil {
 		t.Fatal(err)
 	}
-	offset, err = clone.ReadOffset()
+	offset, err = clone.readOffset()
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -478,7 +573,7 @@ func TestLogIndex(t *testing.T) {
 		t.Errorf("LastOffset = %d, want = %d", got, want)
 	}
 	// Now write something and get an error.
-	err = clone.SaveOffset(999999)
+	err = clone.saveOffset(999999)
 	expectedErr = errors.E(errors.IO)
 	if !errors.Match(expectedErr, err) {
 		t.Errorf("err = %v, want = %v", err, expectedErr)
@@ -498,10 +593,11 @@ func TestListUsers(t *testing.T) {
 		"jose+photos@ortega.com",
 		"morihei+snapshot@ueshiba.jp",
 	} {
-		_, _, err := NewLogs(u, dir)
+		user, err := Open(u, dir)
 		if err != nil {
 			t.Fatal(err)
 		}
+		user.Close()
 	}
 	// Glob for snapshot users only.
 	users, err := ListUsersWithSuffix("snapshot", dir)
@@ -574,14 +670,209 @@ func TestChecksum(t *testing.T) {
 	}
 }
 
-func newLogEntry(path upspin.PathName, seq int) *LogEntry {
+func TestAddOffSeq(t *testing.T) {
+	// Generate a random ordering and make sure it comes out sorted.
+	var u User // Zero value will do.
+	perm := rand.Perm(100)
+	for _, o := range perm {
+		o64 := int64(o)
+		u.addOffSeq(o64, o64) // offset == sequence is fine for this purpose.
+	}
+	if len(u.offSeqs) != len(perm) {
+		t.Fatalf("got %d elements, expected %d", len(u.offSeqs), len(perm))
+	}
+	for i, offseq := range u.offSeqs {
+		if offseq.offset != int64(i) {
+			t.Fatalf("%d: got %d; expected %d", i, offseq.offset, i)
+		}
+	}
+}
+
+func TestOffsetOf(t *testing.T) {
+	const numEntries = 100
+	dir, cleanup := setup(t, "XXX")
+	defer cleanup()
+
+	user, err := Open(userName, dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer user.Close()
+
+	// Create our own definition of the mapping.
+	sequenceAtOffset := make(map[int64]int64)
+	offsetAtSequence := make(map[int64]int64)
+	seq := int64(upspin.SeqBase)
+	for i := 0; i < numEntries; i, seq = i+1, seq+1 {
+		e := entry
+		e.Entry.Sequence = seq
+		e.Entry.Time = upspin.Now()
+		if rand.Intn(10) == 0 {
+			e.Entry.SignedName = "bar@foo.com/otherfile"
+		}
+		if rand.Intn(10) == 0 {
+			e.Entry.Link = "hello@example.com/subdir/file"
+		}
+		if rand.Intn(5) == 0 {
+			e.Entry.Writer = "meh@yo.com"
+		}
+		numBlocks := rand.Intn(20)
+		var offs int64
+		for b := 0; b < numBlocks; b++ {
+			packSize := rand.Intn(3000)
+			packdata := make([]byte, packSize)
+			_, err := rand.Read(packdata)
+			if err != nil {
+				log.Fatal(err)
+			}
+			size := rand.Int63n(1000)
+			block := upspin.DirBlock{
+				Offset:   offs,
+				Size:     size,
+				Packdata: packdata,
+			}
+			offs += size
+			e.Entry.Blocks = append(e.Entry.Blocks, block)
+		}
+		offset := user.AppendOffset()
+		sequenceAtOffset[offset] = seq
+		offsetAtSequence[seq] = offset
+		err := user.Append(&e)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	// Verify our data.
+	reader, err := user.NewReader()
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer reader.Close()
+	var offset int64
+	for i := 0; i < numEntries; i++ {
+		le, next, err := reader.ReadAt(offset)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if offset == next {
+			i--
+			continue
+		}
+		if seq := sequenceAtOffset[offset]; seq != le.Entry.Sequence {
+			log.Fatalf("%d: bad seq; got %d, expected %d", i, le.Entry.Sequence, seq)
+		}
+		if off := offsetAtSequence[le.Entry.Sequence]; off != offset {
+			log.Fatalf("%d: bad offset; got %d, expected %d", i, off, offset)
+		}
+		offset = next
+	}
+
+	// Now ask the system. Iterating over the map asks in random order,
+	// which is good.
+	for seq, offset := range offsetAtSequence {
+		got := user.OffsetOf(seq)
+		if got != offset {
+			t.Errorf("OffsetOf(%d) = %d; want %d", seq, got, offset)
+		}
+	}
+}
+
+func TestVersion0Logs(t *testing.T) {
+	// Copy logs to temporary so we don't overwrite any.
+	dir, err := ioutil.TempDir("", "TestVersion0Logs")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(dir)
+
+	err = os.MkdirAll(filepath.Join(dir, "d.tree.log.user@example.com"), 0700)
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = filepath.Walk("testdata", func(path string, info os.FileInfo, err error) error {
+		if info.IsDir() {
+			return nil
+		}
+		data, err := ioutil.ReadFile(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+		tmp := filepath.Join(dir, path[len("testdata/version0/"):])
+		err = ioutil.WriteFile(tmp, data, 0600)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return nil
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Now we can Open the user's logs in the temporary location.
+	user, err := Open("user@example.com", dir)
+	defer os.Remove("testdata/version0/d.tree.log.user@example.com/2738.1")
+	if err != nil {
+		t.Fatal(err)
+	}
+	r, err := user.NewReader()
+	if err != nil {
+		t.Fatal(err)
+	}
+	// This is the series of events in testdata/version0log.
+	sequence := []int64{0, 1, 1, 1, 1, 1, 2}
+	name := []upspin.PathName{"dir", "dir/file", "file", "file", "dir/file", "dir/file", "dir/file"}
+	op := []Operation{Put, Put, Put, Delete, Delete, Put, Put}
+	offset := int64(0)
+	for i := 0; i < 100; i++ {
+		entry, next, err := r.ReadAt(offset)
+		if err != nil {
+			log.Fatal(err)
+		}
+		if offset == next {
+			break
+		}
+		if r.file.version != 0 {
+			t.Fatalf("log is version %d; expected version 0", r.file.version)
+		}
+		if entry.Entry.Sequence != sequence[i] {
+			t.Fatalf("%d: got sequence %d; expected %d", i, entry.Entry.Sequence, sequence[i])
+		}
+		path := "user@example.com/" + name[i]
+		if entry.Entry.Name != path {
+			t.Fatalf("%d: got name %q; expected %q", i, entry.Entry.Name, path)
+		}
+		if entry.Op != op[i] {
+			t.Fatalf("%d: got op %d; expected %d", i, entry.Op, op[i])
+		}
+		t.Log(entry.Entry.Name, entry.Op)
+		offset = next
+	}
+	// We only write to files with the current version.
+	if user.writer.file.version != version {
+		t.Fatalf("writer is to file version %d; expected %d", user.writer.file.version, version)
+	}
+	if user.writer.file.offset != offset {
+		t.Fatalf("writer at offset %d; expected %d", user.writer.file.offset, offset)
+	}
+
+	// Verify the transition time. The files are golden so it's a fixed instant.
+	const want = "Sep 27 03:59:06 UTC 2017"
+	got := user.V1Transition().Go().Format("Jan 2 15:04:05 UTC 2006")
+	if got != want {
+		t.Fatalf("got transition time %s; want %s", got, want)
+	}
+
+}
+
+func newEntry(path upspin.PathName, seq int) *Entry {
 	var op Operation
 	if seq%2 == 0 {
 		op = Delete
 	} else {
 		op = Put
 	}
-	return &LogEntry{
+	return &Entry{
 		Op: op,
 		Entry: upspin.DirEntry{
 			Name:       path,
@@ -610,7 +901,7 @@ func sameUsers(t *testing.T, got, want []upspin.UserName) bool {
 
 // setup creates a testing directory and returns its name and a cleanup
 // function.
-func setup(t *testing.T, testName string) (string, func()) {
+func setup(t testing.TB, testName string) (string, func()) {
 	dir, err := ioutil.TempDir("", testName)
 	if err != nil {
 		t.Fatal(err)

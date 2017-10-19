@@ -147,7 +147,7 @@ message DirWhichAccessRequest {
 
 message DirWatchRequest {
     string name = 1;
-    int64 order = 2;
+    int64 sequence = 2;
 }
 
 // The first response in the stream is whether dir.Watch succeeded. If it
@@ -156,7 +156,7 @@ message DirWatchRequest {
 // channel.
 message Event {
     bytes entry = 1;
-    int64 order = 2;
+    int64 sequence = 2;
     bool delete = 3;
     bytes error = 4;
 }

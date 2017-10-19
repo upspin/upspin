@@ -5,8 +5,8 @@
 package tree
 
 // TODOs:
-// - The watcher "tails" the log, starting from a given order number. It is
-//   done in a goroutine because the order can be very far from current state
+// - The watcher "tails" the log, starting from a given sequence number. It is
+//   done in a goroutine because the sequence can be very far from the current state
 //   and we don't want to block the caller until all such state is sent on the
 //   Event channel. However, once the watcher has caught up with the current
 //   state of the Tree, there's no longer a need for a goroutine or for reading
@@ -20,6 +20,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"upspin.io/dir/server/serverlog"
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/path"
@@ -57,7 +58,7 @@ type watcher struct {
 
 	// log is a reader instance of the Tree's log that keeps track of this
 	// watcher's progress.
-	log *Reader
+	log *serverlog.Reader
 
 	// closed indicates whether the watcher is closed (1) or open (0).
 	// It must be loaded and stored atomically.
@@ -73,7 +74,7 @@ type watcher struct {
 }
 
 // Watch implements upspin.DirServer.Watch.
-func (t *Tree) Watch(p path.Parsed, order int64, done <-chan struct{}) (<-chan *upspin.Event, error) {
+func (t *Tree) Watch(p path.Parsed, sequence int64, done <-chan struct{}) (<-chan *upspin.Event, error) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
@@ -93,7 +94,7 @@ func (t *Tree) Watch(p path.Parsed, order int64, done <-chan struct{}) (<-chan *
 
 	// Clone the logs so we can keep reading it while the current tree
 	// continues to be updated (we're about to unlock this tree).
-	cLog, err := t.log.NewReader()
+	cLog, err := t.user.NewReader()
 	if err != nil {
 		return nil, err
 	}
@@ -111,7 +112,7 @@ func (t *Tree) Watch(p path.Parsed, order int64, done <-chan struct{}) (<-chan *
 		doneFunc: t.watchers.Done,
 	}
 
-	if order == upspin.WatchCurrent {
+	if sequence == upspin.WatchCurrent {
 		// Send the current state first. We must flush the tree so we
 		// know our logs are current (or we need to recover the tree
 		// from the logs).
@@ -122,17 +123,15 @@ func (t *Tree) Watch(p path.Parsed, order int64, done <-chan struct{}) (<-chan *
 
 		// Make a copy of the tree so we have an immutable tree in
 		// memory, at a fixed log position.
-		cIndex, err := t.logIndex.Clone()
+		offset := t.user.AppendOffset()
+		clonedUser, err := t.user.ReadOnlyClone()
 		if err != nil {
 			return nil, err
 		}
-		offset := t.log.LastOffset()
 		clone := &Tree{
-			user:     t.user,
+			user:     clonedUser,
 			config:   t.config,
 			packer:   t.packer,
-			log:      nil, // Cloned tree is read-only.
-			logIndex: cIndex,
 			shutdown: make(chan struct{}),
 			// there are no watchers on the clone.
 		}
@@ -142,7 +141,8 @@ func (t *Tree) Watch(p path.Parsed, order int64, done <-chan struct{}) (<-chan *
 		t.watchers.Add(1)
 		go w.sendCurrentAndWatch(clone, t, p, offset)
 	} else {
-		if order == upspin.WatchNew {
+		var offset int64
+		if sequence == upspin.WatchNew {
 			// We must flush the tree so we know our logs are current (or we
 			// need to recover the tree from the logs).
 			err := t.flush()
@@ -150,8 +150,11 @@ func (t *Tree) Watch(p path.Parsed, order int64, done <-chan struct{}) (<-chan *
 				return nil, err
 			}
 
-			// Set order to the current offset
-			order = t.log.LastOffset()
+			offset = t.user.AppendOffset()
+		} else {
+			// If the sequence doesn't exist, offset will be negative and
+			// the first event will be an error. This is correct behavior.
+			offset = t.user.OffsetOf(sequence)
 		}
 
 		// Set up the notification hook.
@@ -162,7 +165,7 @@ func (t *Tree) Watch(p path.Parsed, order int64, done <-chan struct{}) (<-chan *
 
 		// Start the watcher.
 		t.watchers.Add(1)
-		go w.watch(order)
+		go w.watch(offset)
 	}
 
 	return w.events, nil
@@ -202,8 +205,8 @@ func (w *watcher) sendCurrentAndWatch(clone, orig *Tree, p path.Parsed, offset i
 	// events channel.
 	if err == nil {
 		fn := func(n *node, level int) error {
-			logEntry := &LogEntry{
-				Op:    Put,
+			logEntry := &serverlog.Entry{
+				Op:    serverlog.Put,
 				Entry: n.entry,
 			}
 			err := w.sendEvent(logEntry, offset)
@@ -235,7 +238,7 @@ func (w *watcher) sendCurrentAndWatch(clone, orig *Tree, p path.Parsed, offset i
 // sendEvent sends a single logEntry read from the log at offset position
 // to the event channel. If the channel blocks for longer than watcherTimeout,
 // the operation fails and the watcher is invalidated (marked for deletion).
-func (w *watcher) sendEvent(logEntry *LogEntry, offset int64) error {
+func (w *watcher) sendEvent(logEntry *serverlog.Entry, offset int64) error {
 	var event *upspin.Event
 	// Strip block information for directories. We avoid an extra copy
 	// if it's not a directory.
@@ -243,15 +246,13 @@ func (w *watcher) sendEvent(logEntry *LogEntry, offset int64) error {
 		entry := logEntry.Entry
 		entry.MarkIncomplete()
 		event = &upspin.Event{
-			Order:  offset,
-			Delete: logEntry.Op == Delete,
 			Entry:  &entry, // already a copy.
+			Delete: logEntry.Op == serverlog.Delete,
 		}
 	} else {
 		event = &upspin.Event{
-			Order:  offset,
-			Delete: logEntry.Op == Delete,
 			Entry:  &logEntry.Entry, // already a copy.
+			Delete: logEntry.Op == serverlog.Delete,
 		}
 	}
 	timer := time.NewTimer(watcherTimeout)
@@ -304,7 +305,7 @@ func (w *watcher) sendEventFromLog(offset int64) (int64, error) {
 
 		logEntry, next, err := w.log.ReadAt(curr)
 		if err != nil {
-			return next, errors.E(errors.Invalid, errors.Errorf("cannot read log at order %d: %v", curr, err))
+			return next, errors.E(errors.Invalid, errors.Errorf("cannot read log at offset %d: %v", curr, err))
 		}
 		if next == curr {
 			return curr, nil
@@ -326,8 +327,10 @@ func (w *watcher) sendEventFromLog(offset int64) (int64, error) {
 // offset and sends notifications on the event channel until the end of the log
 // is reached. It waits to be notified of more work or until the client's
 // done channel is closed, in which case it terminates.
+// If offset is negative, the first event will be an Invalid error.
 func (w *watcher) watch(offset int64) {
 	defer w.close()
+
 	for {
 		var err error
 		offset, err = w.sendEventFromLog(offset)

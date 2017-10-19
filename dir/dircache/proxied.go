@@ -27,10 +27,10 @@ type proxiedDir struct {
 	atime time.Time // time of last access
 	user  upspin.UserName
 
-	// order is the last order seen in a watch. It is only
+	// sequence is the last sequence number seen in a watch. It is only
 	// set outside the watcher before any watcher starts
 	// while reading the log files.
-	order int64
+	sequence int64
 
 	// ep is only used outside the watcher and is the
 	// endpoint of the server being watched.
@@ -117,8 +117,8 @@ func (p *proxiedDirs) retryWatch(parsed path.Parsed) {
 	}
 }
 
-// setOrder remembers an order read from the logfile.
-func (p *proxiedDirs) setOrder(name upspin.PathName, order int64) {
+// setSequence remembers a sequence read from the logfile.
+func (p *proxiedDirs) setSequence(name upspin.PathName, sequence int64) {
 	p.Lock()
 	defer p.Unlock()
 	if p.closing {
@@ -136,7 +136,7 @@ func (p *proxiedDirs) setOrder(name upspin.PathName, order int64) {
 		d = &proxiedDir{l: p.l, user: u}
 		p.m[u] = d
 	}
-	d.order = order
+	d.sequence = sequence
 }
 
 // close terminates the goroutines associated with a proxied dir.
@@ -160,8 +160,8 @@ func (d *proxiedDir) watcher(ep upspin.Endpoint) {
 
 	// If we don't know better, always read in the whole state. It
 	// is shorter than the the history of all operations.
-	if d.order == 0 {
-		d.order = -1
+	if d.sequence == 0 {
+		d.sequence = -1
 	}
 
 	d.retryInterval = initialRetryInterval
@@ -178,9 +178,9 @@ func (d *proxiedDir) watcher(ep upspin.Endpoint) {
 			log.Debug.Printf("dir/dircache.watcher: %s: %s", d.user, err)
 			return
 		}
-		if strings.Contains(err.Error(), "cannot read log at order") {
+		if strings.Contains(err.Error(), "cannot read log at sequence") {
 			// Reread current state.
-			d.order = -1
+			d.sequence = -1
 		}
 		log.Info.Printf("dir/dircache.watcher: %s: %s", d.user, err)
 
@@ -204,7 +204,7 @@ func (d *proxiedDir) watch(ep upspin.Endpoint) error {
 	}
 	done := make(chan struct{})
 	defer close(done)
-	event, err := dir.Watch(upspin.PathName(string(d.user)+"/"), d.order, done)
+	event, err := dir.Watch(upspin.PathName(string(d.user)+"/"), d.sequence, done)
 	if err != nil {
 		return err
 	}
@@ -235,7 +235,7 @@ func (d *proxiedDir) handleEvent(e *upspin.Event) error {
 	}
 
 	// If we are rereading the current state, wipe what we know.
-	if d.order == -1 {
+	if d.sequence == -1 {
 		d.l.wipeLog(d.user)
 	}
 	log.Debug.Printf("watch entry %s %v", e.Entry.Name, e)
@@ -258,13 +258,13 @@ func (d *proxiedDir) handleEvent(e *upspin.Event) error {
 	}
 
 	// This is an event we care about.
-	d.order = e.Order
+	d.sequence = e.Entry.Sequence
 	op := lookupReq
 	if e.Delete {
 		op = deleteReq
 	}
 	d.l.globalLock.Lock()
-	d.l.logRequestWithOrder(op, e.Entry.Name, nil, e.Entry, e.Order)
+	d.l.logRequestWithSequence(op, e.Entry.Name, nil, e.Entry, e.Entry.Sequence)
 	d.l.globalLock.Unlock()
 
 	d.l.flush()

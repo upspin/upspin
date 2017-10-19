@@ -335,8 +335,8 @@ var (
 // when evaluating a single path name.
 const MaxLinkHops = 20
 
-// Special order values for Watch that can be used in place of the order
-// argument in the Watch function.
+// Special Sequence values for Watch that can be used in place of the
+// Sequence argument in the Watch function.
 const (
 	// WatchStart returns all known events.
 	WatchStart = -iota
@@ -373,12 +373,13 @@ type DirServer interface {
 	// Time represents a timestamp for the item. It is advisory only
 	// but is included in the packing signature and so should usually
 	// be set to a non-zero value.
+	//
 	// Sequence represents a sequence number that is incremented
 	// after each Put. If it is neither 0 nor -1, the DirServer will
-	// reject the Put operation unless Sequence is the same as that
-	// stored in the metadata for the existing item with the same
-	// path name. If it is -1, Put will fail if there is already an item
-	// with that name.
+	// reject the Put operation if the file does not exist or, for an
+	// existing item, if the Sequence is not the same as that
+	// stored in the metadata. If it is -1, Put will fail if there
+	// is already an item with that name.
 	//
 	// The Name field of the DirEntry identifies where in the directory
 	// tree the entry belongs. The SignedName field, which usually has the
@@ -398,9 +399,12 @@ type DirServer interface {
 	// If the returned error is ErrFollowLink, the caller should
 	// retry the operation as outlined in the description for
 	// ErrFollowLink (with the added step of updating the
-	// Name field of the argument DirEntry). Otherwise, the
-	// returned DirEntry will be nil whether the operation
-	// succeeded or not.
+	// Name field of the argument DirEntry). For any other error,
+	// the return DirEntry will be nil.
+	//
+	// A successful Put returns an incomplete DirEntry (see the
+	// description of AttrIncomplete) containing nothing but the
+	// new sequence number.
 	Put(entry *DirEntry) (*DirEntry, error)
 
 	// Glob matches the pattern against the file names of the full
@@ -448,19 +452,18 @@ type DirServer interface {
 
 	// Watch returns a channel of Events that describe operations that
 	// affect the specified path and any of its descendants, beginning
-	// at the specified order (an opaque, monotonic value that denotes
-	// a position in the sequence of all events).
+	// at the specified sequence number for the corresponding user root.
 	//
-	// If order is 0, all events known to the DirServer are sent.
+	// If sequence is 0, all events known to the DirServer are sent.
 	//
-	// If order is WatchCurrent, the server first sends a sequence
+	// If sequence is WatchCurrent, the server first sends a sequence
 	// of events describing the entire tree rooted at name. The Events are
 	// sent in sequence such that a directory is sent before its contents.
 	// After the full tree has been sent, the operation proceeds as normal.
 	//
-	// If order is WatchNew, the server sends only new events.
+	// If sequence is WatchNew, the server sends only new events.
 	//
-	// If the order is otherwise invalid, this is reported by the
+	// If the sequence is otherwise invalid, this is reported by the
 	// server sending a single event with a non-nil Error field with
 	// Kind=errors.Invalid. The events channel is then closed.
 	//
@@ -484,18 +487,15 @@ type DirServer interface {
 	// The only errors returned by the Watch method itself are
 	// to report that the name is invalid or refers to a non-existent
 	// root, or that the operation is not supported.
-	Watch(name PathName, order int64, done <-chan struct{}) (<-chan Event, error)
+	Watch(name PathName, sequence int64, done <-chan struct{}) (<-chan Event, error)
 }
 
 // Event represents the creation, modification, or deletion of a DirEntry
 // within a DirServer.
 type Event struct {
-	// Entry is the DirEntry to which the event pertains.
+	// Entry is the DirEntry to which the event pertains. Its Sequence
+	// field captures the ordering of events for this user.
 	Entry *DirEntry
-
-	// Order is an opaque, monotonic value that denotes the position
-	// of this event in the sequence of all of events.
-	Order int64
 
 	// Delete is true only if the entry is being deleted;
 	// otherwise it is being created or modified.
@@ -570,11 +570,23 @@ const (
 	// A link DirEntry holds zero DirBlocks.
 	AttrLink = Attribute(1 << 1)
 	// AttrIncomplete identifies a DirEntry whose Blocks and Packdata
-	// fields are elided for access control purposes.
+	// fields are elided for access control purposes, or the reply to
+	// a successful Put containing only the updated sequence number.
 	AttrIncomplete = Attribute(1 << 2)
 )
 
-// Special Sequence numbers.
+// Sequence numbers.
+// Sequence numbers are controlled by the DirServer. For a given user root they
+// start at SeqBase and grow monotonically (typically but not necessarily by
+// one) with each Put or Delete operation in that user's tree. After an item is
+// Put to or Deleted from the DirServer, the Sequence of that item (or its
+// directory, for a Delete) and all of the directories on its path will be set
+// to the next Sequence number for the user tree. Thus, as a corollary, any
+// directory but in particular the user root always has the Sequence number of
+// the most recently modified item at that level or deeper in the tree.
+//
+// When a file or directory is being created, the sequence number in the
+// DirEntry provided to Put must be either SeqNotExist or SeqIgnore.
 const (
 	SeqNotExist = -1 // Put will fail if item exists.
 	SeqIgnore   = 0  // Put will not check sequence number, but will update it.

@@ -17,7 +17,7 @@ import (
 	"upspin.io/access"
 	"upspin.io/bind"
 	"upspin.io/config"
-	"upspin.io/dir/server/tree"
+	"upspin.io/dir/server/serverlog"
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/pack"
@@ -66,7 +66,7 @@ func TestMakeRoot(t *testing.T) {
 	deExpected := *de
 	deExpected.Writer = serverName
 	deExpected.Packing = upspin.EEPack
-	deExpected.Sequence = upspin.SeqBase | (de.Sequence ^ upspin.SeqVersion(de.Sequence))
+	deExpected.Sequence = upspin.SeqBase
 	err = checkDirEntry("TestMakeRoot", deLookup, &deExpected)
 	if err != nil {
 		t.Fatal(err)
@@ -86,7 +86,7 @@ func TestMakeRoot(t *testing.T) {
 	}
 
 	// Ensure log for user has been deleted.
-	hasLog, err := tree.HasLog(userName, s.logDir)
+	hasLog, err := serverlog.HasLog(userName, s.logDir)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -122,16 +122,26 @@ func TestPut(t *testing.T) {
 		Sequence:   upspin.SeqNotExist,
 		Packing:    upspin.PlainPack,
 	}
-	_, err := s.Put(de)
+	entry, err := s.Put(de)
 	if err != nil {
 		t.Fatal(err)
+	}
+	if entry == nil {
+		t.Fatal("nil entry")
+	}
+	if !entry.IsIncomplete() {
+		t.Fatal("non-incomplete entry")
 	}
 	de2, err := s.Lookup(de.Name)
+	t.Log(de.Name, de2.Sequence, entry.Sequence)
 	if err != nil {
 		t.Fatal(err)
 	}
+	if de2.Sequence != entry.Sequence {
+		t.Errorf("Lookup returned sequence %d; expected %d", de2.Sequence, entry.Sequence)
+	}
 	deExpected := *de
-	deExpected.Sequence = upspin.SeqBase | (de.Sequence ^ upspin.SeqVersion(de.Sequence))
+	deExpected.Sequence = upspin.SeqBase + 1
 	err = checkDirEntry("TestPut", de2, &deExpected)
 	if err != nil {
 		t.Fatal(err)
@@ -157,7 +167,7 @@ func TestMakeDirectory(t *testing.T) {
 	deExpected := *de
 	deExpected.Writer = serverName
 	deExpected.Packing = upspin.EEPack
-	deExpected.Sequence = upspin.SeqBase
+	deExpected.Sequence = de2.Sequence
 	err = checkDirEntry("TestMakeDirectory", de2, &deExpected)
 	if err != nil {
 		t.Fatal(err)
@@ -952,9 +962,15 @@ func makeDirectory(s *server, name upspin.PathName) (*upspin.DirEntry, error) {
 		Name:       parsed.Path(),
 		SignedName: parsed.Path(),
 		Attr:       upspin.AttrDirectory,
+		Sequence:   upspin.SeqIgnore,
 		// Mimic what the client does -- it does not include any other field.
 	}
-	return s.Put(entry)
+	e, err := s.Put(entry)
+	if err != nil {
+		return e, err
+	}
+	entry.Sequence = e.Sequence
+	return entry, nil
 }
 
 func putAccessOrGroupFile(t testing.TB, s *server, userCtx upspin.Config, name upspin.PathName, contents string) (*upspin.DirEntry, error) {

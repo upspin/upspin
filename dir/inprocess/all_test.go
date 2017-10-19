@@ -284,8 +284,11 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if entry != nil {
-		t.Fatal("non-nil entry making directory")
+	if entry == nil {
+		t.Fatal("nil entry making directory")
+	}
+	if !entry.IsIncomplete() {
+		t.Fatal("non-incomplete entry making directory")
 	}
 	_, err = makeDirectory(directory, upspin.PathName(fmt.Sprintf("%s/foo/bar", user)))
 	if err != nil {
@@ -306,8 +309,8 @@ func TestCreateDirectoriesAndAFile(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if e != nil {
-		t.Fatal("non-nil entry from Put")
+	if e == nil {
+		t.Fatal("nil entry from Put")
 	}
 	// Read it back.
 	entry, err = directory.Lookup(fileName)
@@ -465,45 +468,54 @@ func TestGlobSyntaxError(t *testing.T) {
 func TestSequencing(t *testing.T) {
 	config, directory := setup()
 	user := config.UserName()
+	// New user root must start at SeqBase==1.
+	entry, err := directory.Lookup(upspin.PathName(user))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if entry.Sequence != upspin.SeqBase {
+		t.Errorf("%q has seq %d; expected %d", user, entry.Sequence, upspin.SeqBase)
+	}
 	fileName := upspin.PathName(user + "/file")
 	// Validate sequence increases after write.
-	seq := int64(-1)
+	seq := int64(upspin.SeqBase)
 	for i := 0; i < 10; i++ {
 		// Create a file.
 		text := fmt.Sprintln("version", i)
 		entry := storeData(t, config, []byte(text), fileName)
-		_, err := directory.Put(entry)
+		retEntry, err := directory.Put(entry)
 		if err != nil {
 			t.Fatalf("put file %d: %v", i, err)
 		}
-		entry, err = directory.Lookup(fileName)
-		if err != nil {
-			t.Fatalf("lookup file %d: %v", i, err)
+		if retEntry == nil {
+			t.Fatalf("put file %d nil entry", i)
 		}
-		if entry.Sequence <= seq {
-			t.Fatalf("sequence file %d did not increase: old seq %d; new seq %d", i, seq, entry.Sequence)
+		if !retEntry.IsIncomplete() {
+			t.Fatalf("put file %q returns not-incomplete entry", fileName)
 		}
-		seq = entry.Sequence
+		if retEntry.Sequence != seq+1 {
+			t.Fatalf("sequence file %d did not get correct sequence: got seq %d; want seq %d", i, retEntry.Sequence, seq+1)
+		}
+		seq = retEntry.Sequence // Remember most recent sequence number.
 	}
 	// Now check it updates if we set the sequence correctly.
 	// Ditto for the directory.
-	entry, err := directory.Lookup(upspin.PathName(user))
+	entry, err = directory.Lookup(upspin.PathName(user))
 	if err != nil {
 		t.Fatalf("lookup root: %v", err)
 	}
 	dirSeq := entry.Sequence
 	entry = storeData(t, config, []byte("first seq version"), fileName)
 	entry.Sequence = seq
-	_, err = directory.Put(entry)
+	retEntry, err := directory.Put(entry)
 	if err != nil {
 		t.Fatal(err)
 	}
-	entry, err = directory.Lookup(fileName)
-	if err != nil {
-		t.Fatalf("lookup file: %v", err)
+	if retEntry == nil {
+		t.Fatal("nil entry returned from Put")
 	}
-	if entry.Sequence != seq+1 {
-		t.Fatalf("wrong sequence for file: expected %d got %d", seq+1, entry.Sequence)
+	if retEntry.Sequence != entry.Sequence+1 {
+		t.Fatalf("wrong sequence for file: expected %d got %d", seq+1, retEntry.Sequence)
 	}
 	entry, err = directory.Lookup(upspin.PathName(user))
 	if err != nil {
@@ -523,6 +535,85 @@ func TestSequencing(t *testing.T) {
 	if !strings.Contains(errStr, "sequence mismatch") {
 		t.Fatalf("expected sequence error, got %v", err)
 	}
+}
+
+// Verify that the sequence number of all the elements of a path are the
+// same as the most recently modified file below.
+func TestSequenceToRoot(t *testing.T) {
+	config, dirServer := setup()
+	user := config.UserName()
+	// Make a 5-element dir plus name: user@example.com/dir0/dir1/dir2/dir3/dir4/file
+	dirName := upspin.PathName(user)
+	var seq int64
+	var dir3Name upspin.PathName // Path to .../dir3.
+	for i := 0; i < 5; i++ {
+		dirName = path.Join(dirName, fmt.Sprintf("dir%d", i))
+		_, err := makeDirectory(dirServer, dirName)
+		if err != nil {
+			t.Fatal(err)
+		}
+		newSeq := consistentSeq(t, dirServer, dirName)
+		if seq > 0 && newSeq != seq+1 {
+			t.Fatalf("makeDirectory(%q) got seq %d; expected %d", dirName, newSeq, seq)
+		}
+		newSeq = seq
+		if i == 3 {
+			dir3Name = dirName
+		}
+	}
+	fileName := path.Join(dirName, "file")
+	entry := storeData(t, config, []byte("data"), fileName)
+	_, err := dirServer.Put(entry)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fileSeq := consistentSeq(t, dirServer, fileName)
+
+	// Create intermediate file and verify state.
+	file3Name := path.Join(dir3Name, "file3")
+	entry = storeData(t, config, []byte("data"), file3Name)
+	_, err = dirServer.Put(entry)
+	if err != nil {
+		t.Fatal(err)
+	}
+	file3Seq := consistentSeq(t, dirServer, file3Name)
+	if file3Seq != fileSeq+1 {
+		t.Errorf("%q has seq %d; expected %d", file3Name, file3Seq, fileSeq+1)
+	}
+	// fileName should still have same sequence.
+	entry, err = dirServer.Lookup(fileName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if entry.Sequence != fileSeq {
+		t.Errorf("%q has seq %d; expected %d", fileName, entry.Sequence, fileSeq)
+	}
+}
+
+// consistentSeq is a test helper that verifies that all the elements of the named
+// file, including the root, have the same sequence number. It returns that
+// sequence number.
+func consistentSeq(t *testing.T, dir upspin.DirServer, name upspin.PathName) int64 {
+	t.Helper()
+	parsed, err := path.Parse(name)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var seq int64
+	// Loop goes one extra time (<=) so we visit root plus the elems.
+	for i := 0; i <= parsed.NElem(); i++ {
+		entry, err := dir.Lookup(parsed.First(i).Path())
+		if err != nil {
+			t.Fatal(err)
+		}
+		if i == 0 {
+			seq = entry.Sequence // Remember seq for root.
+		}
+		if entry.Sequence != seq {
+			t.Errorf("path %q has seq %d; should be %d", entry.Name, entry.Sequence, seq)
+		}
+	}
+	return seq
 }
 
 func TestRootDirectorySequencing(t *testing.T) {
@@ -730,16 +821,16 @@ func TestLinkToFile(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	if e != nil {
-		t.Fatal("non-nil entry from makeDirectory")
+	if e == nil {
+		t.Fatal("nil entry from makeDirectory")
 	}
 	entry := storeData(t, config, []byte("hello"), fileName)
 	e, err = dir.Put(entry)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if e != nil {
-		t.Fatal("non-nil entry from Put")
+	if e == nil {
+		t.Fatal("nil entry from Put")
 	}
 	_, err = dir.Lookup(fileName)
 	if err != nil {
@@ -750,10 +841,11 @@ func TestLinkToFile(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = dir.Put(linkEntry)
+	e, err = dir.Put(linkEntry)
 	if err != nil {
 		t.Fatal(err)
 	}
+	linkEntry.Sequence = e.Sequence // Makes the checks for equality easier below.
 
 	// Lookup the link, should get ErrFollow link with the right path.
 	lookupEntry, err := dir.Lookup(linkName)
@@ -877,10 +969,12 @@ func TestWhichAccessLink(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = dir.Put(linkEntry)
+	e, err := dir.Put(linkEntry)
 	if err != nil {
 		t.Fatal(err)
 	}
+	linkEntry.Sequence = e.Sequence // For easier equality check below.
+
 	// Lookup the link, should get ErrFollow link with the right path.
 	lookupEntry, err := dir.Lookup(publicLinkName)
 	if err != upspin.ErrFollowLink {

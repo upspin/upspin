@@ -18,7 +18,7 @@ argument and points to the first path argument.
 	var force bool
 	fs := flag.NewFlagSet("link", flag.ExitOnError)
 	fs.BoolVar(&force, "f", false, "force creation of link when original path is inaccessible")
-	// This is the same order as in the Unix ln command. It sorta feels
+	// This is the same order as in the Unix ln command. It feels sort of
 	// backwards, but it's also the same as in cp, with the new name second.
 	s.ParseFlags(fs, args, help, "link [-f] original_path link_path")
 	if fs.NArg() != 2 {
