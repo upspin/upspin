@@ -164,17 +164,25 @@ func (c *LRU) PeekNewest() (key, value interface{}) {
 }
 
 // Iterator is an iterator through the list. The iterator points to a nil
-// element at the end of the list or when the list changes.
+// element at the end of the list.
 type Iterator struct {
-	lru  *LRU
-	this *list.Element
+	lru     *LRU
+	this    *list.Element
+	forward bool
 }
 
 // NewIterator returns a new iterator for the LRU.
 func (c *LRU) NewIterator() *Iterator {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	return &Iterator{lru: c, this: c.ll.Front()}
+	return &Iterator{lru: c, this: c.ll.Front(), forward: true}
+}
+
+// NewReverseIterator returns a new reverse iterator for the LRU.
+func (c *LRU) NewReverseIterator() *Iterator {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+	return &Iterator{lru: c, this: c.ll.Back(), forward: false}
 }
 
 // GetAndAdvance returns key, value, true if the current entry is valid and advances the
@@ -186,6 +194,10 @@ func (i *Iterator) GetAndAdvance() (interface{}, interface{}, bool) {
 		return nil, nil, false
 	}
 	ent := i.this.Value.(*entry)
-	i.this = i.this.Next()
+	if i.forward {
+		i.this = i.this.Next()
+	} else {
+		i.this = i.this.Prev()
+	}
 	return ent.key, ent.value, true
 }
