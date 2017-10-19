@@ -162,6 +162,7 @@ func (h *downloadHandler) updateLoop() {
 			log.Error.Printf("download: error event received: %v", event.Error)
 			close(done)
 			events = nil
+			time.Sleep(watchRetryInterval)
 			continue
 		}
 		p, err := path.Parse(event.Entry.Name)
