@@ -16,6 +16,24 @@
       "revId": "421a0b34669dafc04d731159f88e70779e965310",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "908f902c_c12b8f75",
+        "filename": "cloud/storage/openstack/openstack.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 6196
+      },
+      "writtenOn": "2017-10-19T18:07:56Z",
+      "side": 1,
+      "message": "Did a quick try, looks like it\u0027ll take some adjustments. I\u0027ll happily do that. Thanks!",
+      "parentUuid": "ef16d27a_3cb8baef",
+      "revId": "421a0b34669dafc04d731159f88e70779e965310",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
