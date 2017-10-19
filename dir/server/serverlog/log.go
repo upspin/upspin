@@ -462,21 +462,27 @@ func (u *User) populateOffSeqs() {
 }
 
 func (u *User) setV1Transition() {
-	if len(u.files) == 0 || u.files[0].version > 0 {
-		return // No old logs.
+	logf := func(format string, args ...interface{}) {
+		if u.name != "r@google.com" {
+			//			return
+		}
+		log.Printf(format, args...)
 	}
-	// No files have been created in this run, so if there is only one
-	// file and it is version 0, say the transition happens now.
-	if len(u.files) == 1 {
-		u.v1Transition = upspin.Now()
-		return
+	if len(u.files) == 0 || u.files[0].version > 0 {
+		logf("setV1Transition: no old logs")
+		return // No old logs.
 	}
 	// Read the first entry past the transition, looking for the first non-zero time.
 	// It may take several files to get there.
 	data := make([]byte, 4096)
-	for i := 1; i < len(u.files); i++ {
-		fd, err := os.Open(u.files[i].name)
+	for _, file := range u.files {
+		if file.version == 0 {
+			logf("%v version %v", file.name, file.version)
+			continue
+		}
+		fd, err := os.Open(file.name)
 		if err != nil {
+			logf("setV1Transition: error: %v", err)
 			return
 		}
 		defer fd.Close()
@@ -485,16 +491,26 @@ func (u *User) setV1Transition() {
 			var le Entry
 			count, err := le.unmarshal(fd, data, offset)
 			if err != nil {
+				logf("setV1Transition: unmarshal error: %v", err)
 				return
 			}
 			offset += int64(count)
 			if le.Entry.Time != 0 {
 				u.v1Transition = le.Entry.Time
+				logf("setV1Transition:  %v", le.Entry.Time)
 				return
 			}
 		}
 	}
+	// If there were any files, but we got here
+	// then the transition happens now.
+	if len(u.files) > 0 {
+		u.v1Transition = upspin.Now()
+		logf("setV1Transition: now: %v", u.v1Transition)
+		return
+	}
 	// No luck. Zero it is. TODO: Should we fail?
+	logf("setV1Transition: ZERO")
 }
 
 // V1Transition returns a time that marks the transition from old (version 0)
