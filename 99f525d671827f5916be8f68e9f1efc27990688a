@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df6e5eac_f5ded1c5",
+        "filename": "store/storecache/atime_windows.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-10-19T15:44:03Z",
+      "side": 1,
+      "message": "Not sure this works with non ntfs systems but hopefully won\u0027t core dump.  Probably not a real worry.",
+      "revId": "99f525d671827f5916be8f68e9f1efc27990688a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "137156d9_0a19b645",
+        "filename": "store/storecache/cache.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-10-19T15:44:03Z",
+      "side": 1,
+      "message": "Check my current implementation. You want to merge into that. You can get rid of the log with this but you probably want to retain the fact that I just save relative path names in the map. It has a very positive effect in process size by saving a long prefix like \"/Users/presotto/upspincaches/storecache\" for every entry.",
+      "revId": "99f525d671827f5916be8f68e9f1efc27990688a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "56f82f2b_82ebb42d",
+        "filename": "store/storecache/cache.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-10-19T15:44:03Z",
+      "side": 1,
+      "message": "The cache is a multilevel directory so that the paths are:\n\nstorecache/\u003cendpoint\u003e/xx/\u003cref\u003e\n\nSince Name() is just the basename, \u003cref\u003e, you are creating a pathname that is just \n\nstorecache/\u003cref\u003e\n\nFYI, the structure is such because:\n\n\u003cendpoint\u003e - I had to separate by system because I want to be able to selectively wipe. Also we\u0027ve had some special purpose stores that didn\u0027t use sha hashes as block names resulting in collisions.\nxx - just a way to reduce directory size.  On some systems giant directories get n squared behavior.",
+      "revId": "99f525d671827f5916be8f68e9f1efc27990688a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0efe1521_074fea6f",
+        "filename": "store/storecache/cache.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-10-19T15:44:03Z",
+      "side": 1,
+      "message": "FileInfo can be large. No reason to blow up storage with it. Also, to fix the problem above you probably just want a struct with pathname and atime.",
+      "revId": "99f525d671827f5916be8f68e9f1efc27990688a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
