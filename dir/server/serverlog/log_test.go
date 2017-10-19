@@ -690,7 +690,7 @@ func TestAddOffSeq(t *testing.T) {
 
 func TestOffsetOf(t *testing.T) {
 	const numEntries = 100
-	dir, cleanup := setup(t, "XXX")
+	dir, cleanup := setup(t, "OffsetOf")
 	defer cleanup()
 
 	user, err := Open(userName, dir)
@@ -863,6 +863,65 @@ func TestVersion0Logs(t *testing.T) {
 		t.Fatalf("got transition time %s; want %s", got, want)
 	}
 
+}
+
+func TestReOpen(t *testing.T) {
+	dir, err := ioutil.TempDir("", "ReOpen")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.RemoveAll(dir)
+
+	const first, last = 42, 420
+
+	oldMax := MaxLogSize
+	MaxLogSize = 1024
+	defer func() {
+		MaxLogSize = oldMax
+	}()
+
+	user, err := Open("user@example.com", dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	for i := int64(first); i < last; i++ {
+		err = user.Append(&Entry{
+			Op: Put,
+			Entry: upspin.DirEntry{
+				Name:     "user@example.com/foo",
+				Sequence: i,
+			},
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+	err = user.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	user, err = Open("user@example.com", dir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	r, err := user.NewReader()
+	if err != nil {
+		t.Fatal(err)
+	}
+	for i := int64(first); i < last; i++ {
+		entry, _, err := r.ReadAt(user.OffsetOf(i))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if got, want := entry.Entry.Sequence, i; got != want {
+			t.Errorf("got sequence %d, want %d", got, want)
+		}
+	}
+	err = user.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 func newEntry(path upspin.PathName, seq int) *Entry {

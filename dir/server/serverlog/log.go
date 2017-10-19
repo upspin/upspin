@@ -185,6 +185,7 @@ func Open(userName upspin.UserName, directory string) (*User, error) {
 	}
 
 	u.findLogFiles(subdir)
+	u.populateOffSeqs()
 	u.setV1Transition()
 
 	// Create user's first log if none exists.
@@ -432,6 +433,32 @@ func (u *User) findLogFiles(dir string) {
 	}
 	sort.Slice(u.files, func(i, j int) bool { return u.files[i].offset < u.files[j].offset })
 
+}
+
+// populateOffSeqs reads the entries in the logs and builds User.offSeqs.
+func (u *User) populateOffSeqs() {
+	data := make([]byte, 4096)
+	for _, file := range u.files {
+		fd, err := os.Open(file.name)
+		if err != nil {
+			return
+		}
+		defer fd.Close()
+		offset := int64(0)
+		for {
+			var le Entry
+			count, err := le.unmarshal(fd, data, offset)
+			if err != nil {
+				break
+			}
+			seq := le.Entry.Sequence
+			if file.version == 0 {
+				seq &= version0SeqMask
+			}
+			u.addOffSeq(file.offset+offset, seq)
+			offset += int64(count)
+		}
+	}
 }
 
 func (u *User) setV1Transition() {
