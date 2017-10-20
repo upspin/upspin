@@ -70,7 +70,8 @@ type writebackQueue struct {
 
 	// All queued writeback requests. Also used/modified
 	// exclusively by the scheduler goroutine.
-	queued map[upspin.Location]*request
+	queued   map[upspin.Location]*request
+	enqueued int
 
 	// request carries writeback requests to the scheduler.
 	request chan *request
@@ -92,6 +93,9 @@ type writebackQueue struct {
 
 	// Writers and scheduler send to terminated on exit.
 	terminated chan bool
+
+	// Queue of clients waiting for all writebacks to be flushed.
+	flushChans []chan bool
 
 	goodput *serverutil.RateCounter
 	output  *serverutil.RateCounter
@@ -159,6 +163,8 @@ func (wbq *writebackQueue) enqueueWritebackFile(relPath string) bool {
 	return true
 }
 
+var emptyLocation upspin.Location
+
 // scheduler puts requests into the ready queue for the writers to work on.
 func (wbq *writebackQueue) scheduler() {
 	const op = "store/storecache.scheduler"
@@ -183,6 +189,7 @@ func (wbq *writebackQueue) scheduler() {
 				wbq.byEndpoint[r.Endpoint] = epq
 			}
 			epq.queue = append(epq.queue, r)
+			wbq.enqueued++
 		case r := <-wbq.done:
 			// A request has been completed.
 			epq := wbq.byEndpoint[r.Endpoint]
@@ -216,12 +223,23 @@ func (wbq *writebackQueue) scheduler() {
 			epq.state = live
 			p.success()
 
-			// Awaken everyone waiting for a flush.
+			// Awaken everyone waiting for a flush of a particular block.
 			for _, c := range r.flushChans {
-				log.Debug.Printf("flushing...")
+				log.Debug.Printf("awakening block flusher")
 				close(c)
 			}
 			delete(wbq.queued, r.Location)
+
+			// Awaken everyone waiting for a flush of all writebacks.
+			wbq.enqueued--
+			if wbq.enqueued == 0 {
+				for _, c := range wbq.flushChans {
+					log.Debug.Printf("awakening all flusher")
+					close(c)
+				}
+				wbq.flushChans = nil
+			}
+
 			log.Debug.Printf("%s: %s %s done", op, r.Reference, r.Endpoint)
 		case epq := <-wbq.retry:
 			// Set its state to unknown so we'll try a single request to feel it out.
@@ -229,14 +247,21 @@ func (wbq *writebackQueue) scheduler() {
 				epq.state = unknown
 			}
 		case fr := <-wbq.flushRequest:
-			r := wbq.queued[fr.Location]
-			if r == nil {
-				// Not in flight
-				close(fr.flushed)
-				break
+			if fr.Location == emptyLocation {
+				if wbq.enqueued == 0 {
+					close(fr.flushed)
+					break
+				}
+				wbq.flushChans = append(wbq.flushChans, fr.flushed)
+			} else {
+				r := wbq.queued[fr.Location]
+				if r == nil {
+					// Not in flight
+					close(fr.flushed)
+					break
+				}
+				r.flushChans = append(r.flushChans, fr.flushed)
 			}
-			// Could be multiple outstanding flush requests.
-			r.flushChans = append(r.flushChans, fr.flushed)
 		case <-wbq.die:
 			wbq.terminated <- true
 			return
