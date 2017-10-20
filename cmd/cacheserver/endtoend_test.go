@@ -13,6 +13,7 @@ import (
 
 	"upspin.io/bind"
 	"upspin.io/client"
+	"upspin.io/client/clientutil"
 	"upspin.io/cloud/https"
 	"upspin.io/config"
 	"upspin.io/factotum"
@@ -81,11 +82,10 @@ func TestCache(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	cfg = config.SetValue(cfg, "cache", cep.String())
 	cl := newClient(cfg, sep, cep)
 
-	// Create a root directory. This will probably cause an error warning
-	// from the cacheserver's Watch since it will start watching before the
-	// rpc completes. This is not a problem.
+	// Create a root directory.
 	root := upspin.PathName(cfg.UserName())
 	if _, err := cl.MakeDirectory(root); err != nil {
 		errorOut(err)
@@ -111,6 +111,21 @@ func TestCache(t *testing.T) {
 	}
 	if _, err := cl.Get(fn); err == nil {
 		errorOut(fmt.Errorf("file persisted beyond delete"))
+	}
+
+	// Force a cache flush and make sure we get the expected response.
+	// This doesn't check functionality of the flush.
+	loc := upspin.Location{
+		Endpoint:  *sep,
+		Reference: upspin.FlushWritebacksMetadata,
+	}
+	data, err = clientutil.ReadLocation(cfg, loc)
+	if err != nil {
+		errorOut(err)
+	}
+	flushReply := "cache flushed"
+	if string(data) != flushReply {
+		errorOut(fmt.Errorf("expected %q got %q", flushReply, string(data)))
 	}
 
 	// Remove the cache files and logs.
