@@ -559,6 +559,6 @@ var suffixedUserTests = []cmdTest{
 		ann,
 		do("user ann+quux@example.com"),
 		"",
-		expect("name: ann+quux@example.com"),
+		expect("name: ann+quux@example.com", "dirs", "- remote,localhost", "stores", "- remote,localhost", "publickey"),
 	},
 }
