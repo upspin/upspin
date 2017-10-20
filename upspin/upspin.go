@@ -84,6 +84,10 @@ var (
 	// may be requested by HTTP(S). The server may return a URL to which
 	// a reference may be appended to obtain that reference's data.
 	HTTPBaseMetadata Reference = "metadata:HTTP-Base"
+
+	// FlushWritebacksMetadata is used as a signal to flush the cache.
+	// The Get of it will return only after all writebacks have completed.
+	FlushWritebacksMetadata Reference = "metadata:FlushWritebacks"
 )
 
 // Signature is an ECDSA signature.
