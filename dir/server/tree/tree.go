@@ -501,7 +501,7 @@ func (t *Tree) createRoot(p path.Parsed, de *upspin.DirEntry) error {
 	// The root of the tree must be flushed immediately or its recovery
 	// becomes cumbersome. Nothing else exists prior to a root existing,
 	// so only the root will be flushed.
-	log.Printf("Created root: %s", p)
+	log.Debug.Printf("Created root: %s", p)
 	return t.flush()
 }
 
@@ -638,7 +638,7 @@ func (t *Tree) deleteRoot() error {
 	if t.root == nil {
 		return errors.E(errors.NotExist, errors.Str("root does not exist"))
 	}
-	log.Printf("Deleting root %q", t.root.entry.Name)
+	log.Debug.Printf("Deleting root %q", t.root.entry.Name)
 	if len(t.root.kids) > 0 {
 		// Root is not empty.
 		return errors.E(errors.NotEmpty, t.root.entry.Name)
