@@ -275,6 +275,12 @@ func (c *storeCache) get(cfg upspin.Config, ref upspin.Reference, e upspin.Endpo
 		return []byte("you never write, you never call, I could be dead for all you know"), nil, nil
 	}
 
+	if ref == upspin.FlushWritebacksMetadata {
+		// Block until all data is flushed.
+		c.wbq.flush(upspin.Location{})
+		return []byte("cache flushed"), nil, nil
+	}
+
 	file := c.cachePath(ref, e)
 
 	c.enforceByteLimitByRemovingLeastRecentlyUsedFile()
