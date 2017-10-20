@@ -8,14 +8,15 @@ package tree // import "upspin.io/dir/server/tree"
 
 import (
 	"upspin.io/bind"
+	"upspin.io/client/clientutil"
 	"upspin.io/errors"
 	"upspin.io/path"
 	"upspin.io/upspin"
 )
 
-// store stores a node to the StoreServer. It does not reset the dirty bit.
-// Children of n, if any, must not be dirty.
-func (t *Tree) store(n *node) error {
+// store marshals kids and packs them for the given DirEntry, updating its
+// Packdata and Blocks, and stores them to the StoreServer.
+func (t *Tree) store(entry *upspin.DirEntry, kids map[string]*node) error {
 	// Get our store server.
 	storeServer, err := bind.StoreServer(t.config, t.config.StoreEndpoint())
 	if err != nil {
@@ -26,27 +27,27 @@ func (t *Tree) store(n *node) error {
 	packer := t.packer
 
 	// Can't pack a non-dir entry. Something went bad if we got here.
-	if !n.entry.IsDir() {
+	if !entry.IsDir() {
 		err := errors.E(errors.Internal, errors.Str("can't pack non-dir entry"))
 		return err
 	}
 
 	// Prepare the dirEntry
-	n.entry.Blocks = nil // if any blocks existed, their references are lost as we're packing dirEntry again.
-	n.entry.Packing = t.config.Packing()
-	n.entry.Time = upspin.Now()
-	n.entry.Writer = t.config.UserName()
+	entry.Blocks = nil // if any blocks existed, their references are lost as we're packing dirEntry again.
+	entry.Packing = t.config.Packing()
+	entry.Time = upspin.Now()
+	entry.Writer = t.config.UserName()
 	// Sequence number is already up-to-date (see setNodeDirtyAt).
 
 	// Start packing.
-	bp, err := packer.Pack(t.config, &n.entry)
+	bp, err := packer.Pack(t.config, entry)
 	if err != nil {
 		return err
 	}
 
 	// Pack and store child nodes, keeping blocks at ~BlockSize.
 	var data []byte
-	for _, kid := range n.kids {
+	for _, kid := range kids {
 		if kid.dirty {
 			// We should write nodes from the bottom up, so this should never happen.
 			return errors.E(kid.entry.Name, errors.Internal, errors.Str("kid node is dirty"))
@@ -120,50 +121,37 @@ func storeBlock(store upspin.StoreServer, bp upspin.BlockPacker, data []byte) er
 // the loading of the DirEntry in loadKidsFromBlock to clear those bits.
 const version0SeqMask = 1<<23 - 1
 
-// loadKidsFromBlock unmarshals a block of packed dirEntries into a node.
-func (t *Tree) loadKidsFromBlock(n *node, block []byte) error {
-	if n.kids == nil {
-		n.kids = make(map[string]*node)
-	}
-	if n.dirty {
-		err := errors.E(errors.Internal, n.entry.Name,
-			errors.Str("trying to load a block from storage when the node is dirty"))
-		return err
-	}
-	nodePath, err := path.Parse(n.entry.Name)
+// load fetches the blocks for a DirEntry from the StoreServer and unmarshals
+// them into a map of kids.
+func (t *Tree) load(entry *upspin.DirEntry) (kids map[string]*node, err error) {
+	nodePath, err := path.Parse(entry.Name)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	if len(n.kids) > 0 {
-		// This means we're trying to load an existing DirEntry onto
-		// a directory that has content already. To allow it, we would
-		// need to check for name collisions. Disallow for now.
-		err := errors.E(errors.Invalid, nodePath.Path(), errors.Str("cannot hide existing contents of path with new block"))
-		return err
-	}
-	if n.entry.Name == "" {
-		err := errors.E(errors.Internal, errors.Str("empty entry name"))
-		return err
+	data, err := clientutil.ReadAll(t.config, entry)
+	if err != nil {
+		return nil, err
 	}
 	// Load children for this node.
+	kids = make(map[string]*node)
 	elemPos := nodePath.NElem()
 	v1Transition := t.user.V1Transition()
-	for len(block) > 0 {
-		var entry upspin.DirEntry
-		remaining, err := entry.Unmarshal(block)
+	for len(data) > 0 {
+		var kid upspin.DirEntry
+		remaining, err := kid.Unmarshal(data)
 		if err != nil {
-			return err
+			return nil, err
 		}
-		block = remaining
+		data = remaining
 
 		// Process this entry.
-		p, err := path.Parse(entry.Name)
+		p, err := path.Parse(kid.Name)
 		if err != nil {
-			return err
+			return nil, err
 		}
 		// Is this an old entry? If so, clear the high bits of the sequence number.
-		if entry.Time < v1Transition {
-			entry.Sequence &= version0SeqMask
+		if kid.Time < v1Transition {
+			kid.Sequence &= version0SeqMask
 		}
 		// elem is the next pathwise element to load. Normally, it's the
 		// next element in entryPath. But if it's a directory that
@@ -179,17 +167,14 @@ func (t *Tree) loadKidsFromBlock(n *node, block []byte) error {
 			// entry.
 			elem = p.Elem(p.NElem() - 1) // ok, never root.
 			// Patch the entry's Name, so it belongs to this tree.
-			entry.Name = path.Join(nodePath.Path(), elem)
+			kid.Name = path.Join(nodePath.Path(), elem)
 		}
-		if _, exists := n.kids[elem]; exists {
+		if _, exists := kids[elem]; exists {
 			// Trying to re-add an existing child. Something is amiss.
-			err := errors.E(errors.Internal, n.entry.Name,
+			return nil, errors.E(errors.Internal, kid.Name,
 				errors.Str("re-adding an existing element in the Tree"))
-			return err
 		}
-		n.kids[elem] = &node{
-			entry: entry,
-		}
+		kids[elem] = &node{entry: kid}
 	}
-	return nil
+	return kids, nil
 }
