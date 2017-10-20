@@ -36,8 +36,8 @@ rather than this command.
 	fs := flag.NewFlagSet("suffixed", flag.ExitOnError)
 	var (
 		force       = fs.Bool("force", false, "if suffixed user already exists, overwrite its keys and config file")
-		dirServer   = fs.String("dir", s.Config.DirEndpoint().String(), "Directory server `address`")
-		storeServer = fs.String("store", s.Config.StoreEndpoint().String(), "Store server `address`")
+		dirServer   = fs.String("dir", string(s.Config.DirEndpoint().NetAddr), "Directory server `address`")
+		storeServer = fs.String("store", string(s.Config.StoreEndpoint().NetAddr), "Store server `address`")
 		bothServer  = fs.String("server", "", "Store and Directory server `address` (if combined)")
 		curve       = fs.String("curve", "p256", "cryptographic curve `name`: p256, p384, or p521")
 		rotate      = fs.Bool("rotate", false, "back up the existing keys and replace them with new ones")
