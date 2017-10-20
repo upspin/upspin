@@ -14,7 +14,6 @@ import (
 	"sort"
 	"sync"
 
-	"upspin.io/client/clientutil"
 	"upspin.io/dir/server/serverlog"
 	"upspin.io/errors"
 	"upspin.io/log"
@@ -437,11 +436,20 @@ func (t *Tree) loadNode(parent *node, elem string) (*node, error) {
 // loadKids loads all kids of a parent node from the Store.
 // t.mu must be held.
 func (t *Tree) loadKids(parent *node) error {
-	data, err := clientutil.ReadAll(t.config, &parent.entry)
+	if parent.dirty {
+		return errors.E(errors.Internal, parent.entry.Name,
+			errors.Str("trying to load a block from storage when the node is dirty"))
+	}
+	if len(parent.kids) > 0 {
+		return errors.E(errors.Internal, parent.entry.Name,
+			errors.Str("attempt to reload kids for populated node"))
+	}
+	kids, err := t.load(&parent.entry)
 	if err != nil {
 		return err
 	}
-	return t.loadKidsFromBlock(parent, data)
+	parent.kids = kids
+	return nil
 }
 
 // loadRoot loads the root into memory if it is not already loaded.
@@ -704,7 +712,7 @@ func (t *Tree) flush() error {
 		m := t.dirtyNodes[i]
 		// For each node at level i, flush it.
 		for n := range m {
-			err := t.store(n)
+			err := t.store(&n.entry, n.kids)
 			if err != nil {
 				return err
 			}
