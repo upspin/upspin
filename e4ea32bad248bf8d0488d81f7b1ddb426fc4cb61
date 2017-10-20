@@ -1,0 +1,225 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4611c289_47366f03",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 626,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-20T02:19:57Z",
+      "side": 1,
+      "message": "s/file/path/",
+      "revId": "e4ea32bad248bf8d0488d81f7b1ddb426fc4cb61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "93c58563_0809ae83",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 701,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-20T02:19:57Z",
+      "side": 1,
+      "message": "The loop searches lists to find...\n\nno need for french",
+      "revId": "e4ea32bad248bf8d0488d81f7b1ddb426fc4cb61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "263c9e44_aa7ca438",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 950,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-20T02:19:57Z",
+      "side": 1,
+      "message": "the name is clumsy. why not call it just set?\ncertainly the methods have no need to mention the type name.",
+      "revId": "e4ea32bad248bf8d0488d81f7b1ddb426fc4cb61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2aab23dd_0188009d",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 951,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-20T02:19:57Z",
+      "side": 1,
+      "message": "s/that //\n\nalso just one space after sentence.",
+      "revId": "e4ea32bad248bf8d0488d81f7b1ddb426fc4cb61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "92750eaf_e14249c1",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 966,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-20T02:19:57Z",
+      "side": 1,
+      "message": "i don\u0027t think you need the example, you just need a better explanation. see below",
+      "revId": "e4ea32bad248bf8d0488d81f7b1ddb426fc4cb61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ae018e5b_a1014c76",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 969,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-20T02:19:57Z",
+      "side": 1,
+      "message": "no other package can see it - mentioning the package is unnecessary.\n\n\nI suggest this comment replace all of the comment with:\n\nset implements a set of pathnames used when building the list of users of\na group. A set type is needed because users and groups can appear multiple\ntimes in the transitive closure of the Access file. The elements are handled\nin FILO order.",
+      "revId": "e4ea32bad248bf8d0488d81f7b1ddb426fc4cb61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a0888206_25a2e01b",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 978,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-20T02:19:57Z",
+      "side": 1,
+      "message": "// empty reports whether the set is empty.",
+      "revId": "e4ea32bad248bf8d0488d81f7b1ddb426fc4cb61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f3c74356_e70d36ee",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 985,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-20T02:19:57Z",
+      "side": 1,
+      "message": "push adds p to the set, which is initialized if necessary.",
+      "revId": "e4ea32bad248bf8d0488d81f7b1ddb426fc4cb61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1ac1ee28_22ae433a",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 998,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-20T02:19:57Z",
+      "side": 1,
+      "message": "pop returns the most recently added item still in the set.\n\nyou don\u0027t need to talk about panic. this is internal, not part of the API",
+      "revId": "e4ea32bad248bf8d0488d81f7b1ddb426fc4cb61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5d478ca9_7dc3eaeb",
+        "filename": "access/access_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 749,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-20T02:19:57Z",
+      "side": 1,
+      "message": "just one space after a sentence please, use capitals to start a sentence.\n\nrewrite for clarity:\n\n// Should find two missing groups, colleagues and neighbors. Neighbors\n// should not be lost even though colleagues appears twice, once at root\n// level and once at leaf level.",
+      "revId": "e4ea32bad248bf8d0488d81f7b1ddb426fc4cb61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cce1a7f3_351c6faf",
+        "filename": "access/access_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 767,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-20T02:19:57Z",
+      "side": 1,
+      "message": "s/groups/missing \u0026/",
+      "revId": "e4ea32bad248bf8d0488d81f7b1ddb426fc4cb61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3ed5020c_617f962b",
+        "filename": "access/access_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 782,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-20T02:19:57Z",
+      "side": 1,
+      "message": "you could use nil instead of []byte(\"\")",
+      "revId": "e4ea32bad248bf8d0488d81f7b1ddb426fc4cb61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d3f437b7_1a751ac6",
+        "filename": "access/access_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 795,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-20T02:19:57Z",
+      "side": 1,
+      "message": "s/groups/missing \u0026/",
+      "revId": "e4ea32bad248bf8d0488d81f7b1ddb426fc4cb61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
