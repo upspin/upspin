@@ -441,6 +441,7 @@ func (u *User) populateOffSeqs() {
 	for _, file := range u.files {
 		fd, err := os.Open(file.name)
 		if err != nil {
+			log.Error.Printf("dir/server/serverlog.populateOffSeqs: user %s: %v", u.name, err)
 			return
 		}
 		defer fd.Close()
@@ -474,6 +475,7 @@ func (u *User) setV1Transition() {
 		}
 		fd, err := os.Open(file.name)
 		if err != nil {
+			log.Error.Printf("dir/server/serverlog.setV1Transition: user %s: %v", u.name, err)
 			return
 		}
 		defer fd.Close()
@@ -482,7 +484,8 @@ func (u *User) setV1Transition() {
 			var le Entry
 			count, err := le.unmarshal(fd, data, offset)
 			if err != nil {
-				return
+				// EOF or otherwise, go to next file.
+				break
 			}
 			offset += int64(count)
 			if le.Entry.Time != 0 {
