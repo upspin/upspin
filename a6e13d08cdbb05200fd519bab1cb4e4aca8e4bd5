@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6f87f818_dd941fc3",
+        "filename": "dir/server/serverlog/log_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 869,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-10-20T00:36:41Z",
+      "side": 1,
+      "message": "check the close errors",
+      "revId": "a6e13d08cdbb05200fd519bab1cb4e4aca8e4bd5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
