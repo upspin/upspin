@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "41436b69_868d3bc5",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-20T23:24:17Z",
+      "side": 1,
+      "message": "s/The Get/A StoreServer.Get/\n\ndoes it return anything? or just (nil, nil)?",
+      "revId": "2f680e6dcbe01d0b0f2de15630caab83d7d288f9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
