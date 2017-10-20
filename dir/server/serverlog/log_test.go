@@ -864,6 +864,15 @@ func TestVersion0Logs(t *testing.T) {
 		t.Fatalf("got transition time %s; want a time after %s", got, startTime)
 	}
 
+	// We now have an empty version 1 log. Close and reopen.
+	// This was a bug.
+	user.Close()
+	user, err = Open("user@example.com", dir)
+	got = user.V1Transition()
+	if got < startTime {
+		t.Fatalf("got transition time %s; want a time after %s", got, startTime)
+	}
+	user.Close()
 }
 
 func TestReOpen(t *testing.T) {
