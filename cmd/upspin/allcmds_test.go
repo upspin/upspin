@@ -81,8 +81,8 @@ var basicCmdTests = []cmdTest{
 		ann,
 		do(
 			"mkdir @/Group",
-			"mkdir @/Friends @/Friends/Photo",
-			"mkdir @/Private @/Private/Photo",
+			"mkdir -p @/Friends/Photo",
+			"mkdir -p @/Private/Photo",
 			"ls -R",
 		),
 		"",
