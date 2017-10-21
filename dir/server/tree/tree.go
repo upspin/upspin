@@ -458,17 +458,37 @@ func (t *Tree) loadRoot() error {
 	if t.root != nil {
 		return nil
 	}
-	rootDirEntry, err := t.user.Root()
+
+	// Fetch, verify, and unpack super root.
+	superRoot, err := t.user.Root()
 	if err != nil {
 		return err
 	}
-	if rootDirEntry == nil {
+	if superRoot == nil {
 		return errors.E(errors.NotExist, t.user.Name())
 	}
-	t.root = &node{
-		entry: *rootDirEntry,
+	if got, want := superRoot.Writer, t.config.UserName(); got != want {
+		return errors.E(errors.Invalid, errors.Errorf("super root written by %q, want %q", got, want))
 	}
-	t.sequence = rootDirEntry.Sequence
+	kids, err := t.load(superRoot)
+	if err != nil {
+		return err
+	}
+
+	// Set the root node from the super root's kid.
+	if rootNode, ok := kids[""]; ok {
+		t.root = rootNode
+	} else {
+		// An old-style root (not wrapped in a super root); just use it
+		// as the root. The next time this tree stores the root we will
+		// write a super root, and stop using this code path.
+		// TODO(adg): remove this code path at some point.
+		t.root = &node{
+			entry: *superRoot,
+			kids:  kids,
+		}
+	}
+	t.sequence = t.root.entry.Sequence
 	return nil
 }
 
@@ -731,8 +751,27 @@ func (t *Tree) flush() error {
 		return err
 	}
 
-	// Save new root to the log index.
-	return t.user.SaveRoot(&t.root.entry)
+	// The Sequence of the "super root" is one more than the existing super
+	// root, or 1 if there is none.
+	superRootSeq := int64(1)
+	if oldSuperRoot, err := t.user.Root(); err == nil {
+		superRootSeq = oldSuperRoot.Sequence + 1
+	} else if err != nil && !errors.Match(errors.E(errors.NotExist), err) {
+		return err
+	}
+	// Synthesize a super root and use it to pack the root entry.
+	superRoot := &upspin.DirEntry{
+		Name:       t.root.entry.Name,
+		SignedName: t.root.entry.Name,
+		Sequence:   superRootSeq,
+		Attr:       upspin.AttrDirectory,
+		Time:       upspin.Now(),
+	}
+	kids := map[string]*node{"": t.root}
+	if err := t.store(superRoot, kids); err != nil {
+		return err
+	}
+	return t.user.SaveRoot(superRoot)
 }
 
 // Close flushes all dirty blocks to Store and releases all resources
@@ -859,8 +898,10 @@ func (t *Tree) OnEviction(key interface{}) {
 func (t *Tree) String() string {
 	t.mu.Lock()
 	defer t.mu.Unlock()
+	if t.root == nil {
+		return "<nil>"
+	}
 	var buf bytes.Buffer
-	t.loadRoot()
 	fn := func(n *node, level int) error {
 		for i := 0; i < level; i++ {
 			buf.WriteString("\t")
