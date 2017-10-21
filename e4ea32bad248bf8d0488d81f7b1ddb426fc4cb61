@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "e6067d50_6de11931",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 626,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-10-21T04:04:14Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "4611c289_47366f03",
+      "revId": "e4ea32bad248bf8d0488d81f7b1ddb426fc4cb61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "93c58563_0809ae83",
         "filename": "access/access.go",
         "patchSetId": 2
@@ -33,6 +51,24 @@
       "revId": "e4ea32bad248bf8d0488d81f7b1ddb426fc4cb61",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c020166b_5292061d",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 701,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-10-21T04:04:14Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "93c58563_0809ae83",
+      "revId": "e4ea32bad248bf8d0488d81f7b1ddb426fc4cb61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "e01d8976_a89ed5b5",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 950,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-10-21T04:04:14Z",
+      "side": 1,
+      "message": "Going with groupSet this time. The reader shouldn\u0027t have to wonder whether the set is used for users as well as groups. It\u0027s just for groups (at this point). If you still want \u0027set\u0027, I\u0027ll gladly change it next go-around.",
+      "parentUuid": "263c9e44_aa7ca438",
+      "revId": "e4ea32bad248bf8d0488d81f7b1ddb426fc4cb61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "2aab23dd_0188009d",
         "filename": "access/access.go",
         "patchSetId": 2
@@ -67,6 +121,24 @@
       "revId": "e4ea32bad248bf8d0488d81f7b1ddb426fc4cb61",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a6d5192a_49999bd9",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 951,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-10-21T04:04:14Z",
+      "side": 1,
+      "message": "Ack. My vim paragraph reformatter actually adds the two spaces too. Now that I see I was taught wrong about the use of two spaces after a period, this vim tool needs to be fixed too.",
+      "parentUuid": "2aab23dd_0188009d",
+      "revId": "e4ea32bad248bf8d0488d81f7b1ddb426fc4cb61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "70968398_1e6d90dd",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 966,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-10-21T04:04:14Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "92750eaf_e14249c1",
+      "revId": "e4ea32bad248bf8d0488d81f7b1ddb426fc4cb61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ae018e5b_a1014c76",
         "filename": "access/access.go",
         "patchSetId": 2
@@ -101,6 +191,24 @@
       "revId": "e4ea32bad248bf8d0488d81f7b1ddb426fc4cb61",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4f670bed_967701ce",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 969,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-10-21T04:04:14Z",
+      "side": 1,
+      "message": "Ack, but the new comment elaborates a bit more.",
+      "parentUuid": "ae018e5b_a1014c76",
+      "revId": "e4ea32bad248bf8d0488d81f7b1ddb426fc4cb61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "5c13ceb0_f20cc07c",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 978,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-10-21T04:04:14Z",
+      "side": 1,
+      "message": "The set isn\u0027t empty. Just the additions to the set is empty. A bad named I used. Used to have related method return the opposite sense with a different name. Going to try that route again, hopefully making it more clear while still being concise.",
+      "parentUuid": "a0888206_25a2e01b",
+      "revId": "e4ea32bad248bf8d0488d81f7b1ddb426fc4cb61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f3c74356_e70d36ee",
         "filename": "access/access.go",
         "patchSetId": 2
@@ -135,6 +261,24 @@
       "revId": "e4ea32bad248bf8d0488d81f7b1ddb426fc4cb61",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9061b29e_f0ff8d9b",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 985,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-10-21T04:04:14Z",
+      "side": 1,
+      "message": "Another try.",
+      "parentUuid": "f3c74356_e70d36ee",
+      "revId": "e4ea32bad248bf8d0488d81f7b1ddb426fc4cb61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -155,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "f46494d4_019d1857",
+        "filename": "access/access.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 998,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-10-21T04:04:14Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "1ac1ee28_22ae433a",
+      "revId": "e4ea32bad248bf8d0488d81f7b1ddb426fc4cb61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5d478ca9_7dc3eaeb",
         "filename": "access/access_test.go",
         "patchSetId": 2
@@ -172,6 +334,24 @@
     },
     {
       "key": {
+        "uuid": "13434d74_9d2cdf51",
+        "filename": "access/access_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 749,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-10-21T04:04:14Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "5d478ca9_7dc3eaeb",
+      "revId": "e4ea32bad248bf8d0488d81f7b1ddb426fc4cb61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cce1a7f3_351c6faf",
         "filename": "access/access_test.go",
         "patchSetId": 2
@@ -183,6 +363,24 @@
       "writtenOn": "2017-10-20T02:19:57Z",
       "side": 1,
       "message": "s/groups/missing \u0026/",
+      "revId": "e4ea32bad248bf8d0488d81f7b1ddb426fc4cb61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6ffe45e0_817bedb1",
+        "filename": "access/access_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 767,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-10-21T04:04:14Z",
+      "side": 1,
+      "message": "Not sure what you mean.  Change all \"groups\" to \"missing\" in all the test error messages?  Change the variable names too from groupsNeeded to missing?",
+      "parentUuid": "cce1a7f3_351c6faf",
       "revId": "e4ea32bad248bf8d0488d81f7b1ddb426fc4cb61",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -206,6 +404,24 @@
     },
     {
       "key": {
+        "uuid": "a582b297_f9efd896",
+        "filename": "access/access_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 782,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-10-21T04:04:14Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "3ed5020c_617f962b",
+      "revId": "e4ea32bad248bf8d0488d81f7b1ddb426fc4cb61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d3f437b7_1a751ac6",
         "filename": "access/access_test.go",
         "patchSetId": 2
@@ -217,6 +433,24 @@
       "writtenOn": "2017-10-20T02:19:57Z",
       "side": 1,
       "message": "s/groups/missing \u0026/",
+      "revId": "e4ea32bad248bf8d0488d81f7b1ddb426fc4cb61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c30522ca_15f6e9c3",
+        "filename": "access/access_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 795,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-10-21T04:04:14Z",
+      "side": 1,
+      "message": "Same question as above.  As I think I\u0027m using variable names and messages as the test code that came before, I\u0027m not certain what to change.",
+      "parentUuid": "d3f437b7_1a751ac6",
       "revId": "e4ea32bad248bf8d0488d81f7b1ddb426fc4cb61",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
