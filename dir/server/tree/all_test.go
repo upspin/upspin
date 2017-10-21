@@ -506,13 +506,9 @@ func TestPutLargeNode(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	// Reach inside, read the root entry and verify its blocks.
-	root, err := tree.user.Root()
-	if err != nil {
-		t.Fatal(err)
-	}
-	if got, want := len(root.Blocks), 2; got != want {
-		t.Errorf("len(root.Blocks) = %d, want = %d, root=%v", got, want, root)
+	// Check that the root entry has two blocks.
+	if got, want := len(tree.root.entry.Blocks), 2; got != want {
+		t.Errorf("len(t.root.entry.Blocks) = %d, want = %d, root=%v", got, want, tree.root)
 	}
 }
 
