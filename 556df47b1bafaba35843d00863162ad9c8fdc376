@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "99748f89_6aeb06bd",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 767,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-21T03:08:02Z",
+      "side": 1,
+      "message": "should it be the root\u0027s time, if it exists, or Now always?",
+      "revId": "556df47b1bafaba35843d00863162ad9c8fdc376",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
