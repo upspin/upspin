@@ -16,12 +16,15 @@ func (s *State) mkdir(args ...string) {
 	const help = `
 Mkdir creates Upspin directories.
 
+The -p flag can be set to have mkdir create any missing parent directories of
+each argument.
+
 The -glob flag can be set to false to have mkdir skip Glob processing,
 treating its arguments as literal text even if they contain special
 characters. (Leading @ signs are always expanded.)
 `
 	fs := flag.NewFlagSet("mkdir", flag.ExitOnError)
-	parent := fs.Bool("p", false, "Make all parent directories.")
+	parent := fs.Bool("p", false, "make all parent directories")
 	glob := globFlag(fs)
 	s.ParseFlags(fs, args, help, "mkdir [-p] directory...")
 	if fs.NArg() == 0 {
