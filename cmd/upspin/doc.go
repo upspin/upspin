@@ -172,7 +172,7 @@ Flags:
   -curve name
     	cryptographic curve name: p256, p384, or p521 (default "p256")
   -dir address
-    	Directory server address (default "remote,upspin.closedmind.org:443")
+    	Directory server address (default "upspin.adg.tech:443")
   -force
     	if suffixed user already exists, overwrite its keys and config file
   -help
@@ -186,7 +186,7 @@ Flags:
   -server address
     	Store and Directory server address (if combined)
   -store address
-    	Store server address (default "remote,upspin.closedmind.org:443")
+    	Store server address (default "upspin.adg.tech:443")
 
 
 
@@ -341,9 +341,12 @@ Flags:
 
 Sub-command mkdir
 
-Usage: upspin mkdir directory...
+Usage: upspin mkdir [-p] directory...
 
 Mkdir creates Upspin directories.
+
+The -p flag can be set to have mkdir create any missing parent directories of
+each argument.
 
 The -glob flag can be set to false to have mkdir skip Glob processing,
 treating its arguments as literal text even if they contain special
@@ -354,6 +357,7 @@ Flags:
     	apply glob processing to the arguments (default true)
   -help
     	print more information about the command
+  -p	make all parent directories
 
 
 
