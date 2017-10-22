@@ -63,7 +63,7 @@ To deploy an `upspinserver` you need to decide on values for:
 - The host name of the server on which `upspinserver` will run.
   (We will use `upspin.example.com` in this document.)
 
-## Sign up for an Upspin account
+## <a name="sign-up-for-an-upspin-account"></a>Sign up for an Upspin account
 
 To register your public key with the the central key server run `upspin signup`,
 passing your chosen host name as its `-server` argument
@@ -74,7 +74,7 @@ The [Signing up a new user](/doc/signup.md) document describes this process in
 detail.
 If you change your mind about the host name, you can update with `upspin user -put`.
 
-## Set up your domain
+## <a name="set-up-your-domain"></a>Set up your domain
 
 Upspin servers also run as Upspin users, with all the rights and requirements
 that demands, and so they need usernames and key pairs registered with the
@@ -180,12 +180,12 @@ TODO upspin-setupstorage stuff
 **If you choose to store your Upspin data on the your server's local disk then
 in the event of a disk failure all your Upspin data will be lost.**
 
-### Specific instructions for cloud services
+### <a name="specific-instructions-for-cloud-services"></a>Specific instructions for cloud services
 
 + [Google Cloud Services](/doc/server_setup_gcp.md)
 + [Amazon Web Services](/doc/server_setup_aws.md)
 
-## Set up a server and deploy the `upspinserver` binary
+## <a name="set-up-a-server-and-deploy-the-upspinserver-binary"></a>Set up a server and deploy the `upspinserver` binary
 
 Now provision a server and deploy the `upspinserver` binary to it.
 
@@ -254,7 +254,7 @@ Unconfigured Upspin Server
 If the page fails to load, check the `upspinserver` logs for clues.
 
 
-## Configure `upspinserver`
+## <a name="configure-upspinserver"></a>Configure `upspinserver`
 
 On your workstation, run `upspin setupserver` to send your server keys and
 configuration to the `upspinserver` instance:
