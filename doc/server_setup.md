@@ -34,12 +34,12 @@ for the Google Cloud Platform.
 
 The process follows these steps:
 
-- [sign up](#sign-up-for-an-upspin-account) for an Upspin user account
-- [configure](#set-up-your-domain) a domain name and create an Upspin user for the server,
-- if necessary, [set up the cloud](#specific-instructions-for-cloud-services
+- [sign up](#signup) for an Upspin user account
+- [configure](#domain) a domain name and create an Upspin user for the server,
+- if necessary, [set up the cloud](#cloud
 ) storage service,
-- [deploy](#set-up-a-server-and-deploy-the-upspinserver-binary) the `upspinserver` to a Linux-based server,
-- [configure](#configure-upspinserver) the `upspinserver`.
+- [deploy](#deploy) the `upspinserver` to a Linux-based server,
+- [configure](#configure) the `upspinserver`.
 
 Each of these steps (besides deployment) has a corresponding `upspin`
 subcommand to assist you with the process.
@@ -63,7 +63,7 @@ To deploy an `upspinserver` you need to decide on values for:
 - The host name of the server on which `upspinserver` will run.
   (We will use `upspin.example.com` in this document.)
 
-## Sign up for an Upspin account
+## Sign up for an Upspin account {#signup}
 
 To register your public key with the the central key server run `upspin signup`,
 passing your chosen host name as its `-server` argument
@@ -74,7 +74,7 @@ The [Signing up a new user](/doc/signup.md) document describes this process in
 detail.
 If you change your mind about the host name, you can update with `upspin user -put`.
 
-## Set up your domain
+## Set up your domain {#domain}
 
 Upspin servers also run as Upspin users, with all the rights and requirements
 that demands, and so they need usernames and key pairs registered with the
@@ -180,12 +180,12 @@ TODO upspin-setupstorage stuff
 **If you choose to store your Upspin data on the your server's local disk then
 in the event of a disk failure all your Upspin data will be lost.**
 
-### Specific instructions for cloud services
+### Specific instructions for cloud services {#cloud}
 
 + [Google Cloud Services](/doc/server_setup_gcp.md)
 + [Amazon Web Services](/doc/server_setup_aws.md)
 
-## Set up a server and deploy the `upspinserver` binary
+## Set up a server and deploy the `upspinserver` binary {#deploy}
 
 Now provision a server and deploy the `upspinserver` binary to it.
 
@@ -254,7 +254,7 @@ Unconfigured Upspin Server
 If the page fails to load, check the `upspinserver` logs for clues.
 
 
-## Configure `upspinserver`
+## Configure `upspinserver` {#configure}
 
 On your workstation, run `upspin setupserver` to send your server keys and
 configuration to the `upspinserver` instance:
