@@ -9,7 +9,7 @@ Such clusters of Upspin servers are usually ephemeral in nature, making them
 useful for testing, developing Upspin clients and servers, and experiments.
 
 For information on defining a schema, see the documentation for package
-upspin.io/exp/upbox.
+upspin.io/upbox.
 */
 package main
 
