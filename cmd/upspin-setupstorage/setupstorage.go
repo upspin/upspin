@@ -42,12 +42,16 @@ func main() {
 		State: subcmd.NewState(name),
 	}
 
+	configFlag := flag.String("config", "", "do not set; here only for consistency with other upspin commands")
 	where := flag.String("where", filepath.Join(os.Getenv("HOME"), "upspin", "deploy"), "`directory` to store private configuration files")
 	domain := flag.String("domain", "", "domain `name` for this Upspin installation")
 	storagePath := flag.String("path", "", "`directory` on the server in which to keep Upspin storage (default is $HOME/upspin/server/storage)")
 
 	s.ParseFlags(flag.CommandLine, os.Args[1:], help,
 		"setupstorage -domain=<name> -path=<storage_dir>")
+	if *configFlag != "" {
+		s.Exitf("the -config flag must not be set")
+	}
 	if *domain == "" {
 		s.Exitf("the -domain flag must be provided")
 	}

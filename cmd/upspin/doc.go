@@ -172,7 +172,7 @@ Flags:
   -curve name
     	cryptographic curve name: p256, p384, or p521 (default "p256")
   -dir address
-    	Directory server address (default "remote,upspin.closedmind.org:443")
+    	Directory server address (default "dir.example.com:443")
   -force
     	if suffixed user already exists, overwrite its keys and config file
   -help
@@ -186,7 +186,7 @@ Flags:
   -server address
     	Store and Directory server address (if combined)
   -store address
-    	Store server address (default "remote,upspin.closedmind.org:443")
+    	Store server address (default "store.example.com:443")
 
 
 
@@ -341,7 +341,7 @@ Flags:
 
 Sub-command mkdir
 
-Usage: upspin mkdir directory...
+Usage: upspin mkdir [-p] directory...
 
 Mkdir creates Upspin directories.
 
@@ -354,6 +354,7 @@ Flags:
     	apply glob processing to the arguments (default true)
   -help
     	print more information about the command
+  -p	Make all parent directories.
 
 
 
@@ -550,6 +551,8 @@ Read the documentation at
 for information on configuring upspinserver to use cloud storage services.
 
 Flags:
+  -config string
+    	do not set; here only for consistency with other upspin commands
   -domain name
     	domain name for this Upspin installation
   -help
