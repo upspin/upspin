@@ -46,12 +46,6 @@ const (
 	// watchRetryInterval is the time to wait before retrying a Watch.
 	watchRetryInterval = 1 * time.Minute
 
-	// releaseUser is the tree in which the releases are kept.
-	releaseUser = "release@upspin.io"
-
-	// releasePath is the path to the latest releases.
-	releasePath = releaseUser + "/latest/"
-
 	// downloadPath is the HTTP base path for the download handler.
 	downloadPath = "/dl/"
 
@@ -61,7 +55,18 @@ const (
 	// archiveFormat is a format string that formats a release archives file
 	// name. Its arguments are the os_arch combination and archive format.
 	archiveFormat = "upspin.%s.%s"
+
+	// releaseUser is the tree in which the releases are kept.
+	releaseUser = "release@upspin.io"
 )
+
+// releasePaths are the paths to the latest upspin release binaries.
+// The downloadHandler watches these paths for changes, and when they do change
+// the files therein are assembled into a new release archive.
+var releasePaths = [...]upspin.PathName{
+	releaseUser + "/upspin/latest/",
+	releaseUser + "/augie/latest/",
+}
 
 var archiveRE = regexp.MustCompile(archiveExpr)
 
@@ -70,10 +75,12 @@ func newDownloadHandler(cfg upspin.Config, tmpl *template.Template) http.Handler
 	h := &downloadHandler{
 		client:  client.New(cfg),
 		tmpl:    tmpl,
-		latest:  make(map[string]time.Time),
+		latest:  make(map[upspin.PathName]*upspin.DirEntry),
 		archive: make(map[string]*archive),
 	}
-	go h.updateLoop()
+	for _, dir := range releasePaths {
+		go h.updateLoop(dir)
+	}
 	return h
 }
 
@@ -85,8 +92,8 @@ type downloadHandler struct {
 	tmpl   *template.Template
 
 	mu      sync.RWMutex
-	latest  map[string]time.Time // [os_arch]last-update-time
-	archive map[string]*archive  // [os_arch]archive
+	latest  map[upspin.PathName]*upspin.DirEntry
+	archive map[string]*archive // [os_arch]archive
 }
 
 func (h *downloadHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -132,118 +139,117 @@ func (h *downloadHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Write(a.data)
 }
 
-// updateLoop watches releasePath for changes and builds new release archives
+// updateLoop watches dir for changes and builds new release archives
 // when it sees them.
-func (h *downloadHandler) updateLoop() {
+func (h *downloadHandler) updateLoop(dir upspin.PathName) {
 	var (
 		done         chan struct{}
 		lastSequence int64 = upspin.WatchCurrent
 		events       <-chan upspin.Event
 	)
-	parsedReleasePath, _ := path.Parse(releasePath)
+	parsedDir, _ := path.Parse(dir)
 	for {
 		if events == nil {
-			dir, err := h.client.DirServer(releasePath)
+			dirServer, err := h.client.DirServer(dir)
 			if err != nil {
-				log.Error.Printf("download: error locating archive DirServer: %v", err)
+				log.Error.Printf("download: %v", err)
 				time.Sleep(watchRetryInterval)
 				continue
 			}
 			done = make(chan struct{})
-			events, err = dir.Watch(releasePath, lastSequence, done)
+			events, err = dirServer.Watch(dir, lastSequence, done)
 			if err != nil {
-				log.Error.Printf("download: error starting Watch: %v", err)
+				log.Error.Printf("download: %v", err)
 				time.Sleep(watchRetryInterval)
 				continue
 			}
 		}
 		event := <-events
 		if event.Error != nil {
-			log.Error.Printf("download: error event received: %v", event.Error)
+			log.Error.Printf("download: %v", event.Error)
 			close(done)
 			events = nil
 			time.Sleep(watchRetryInterval)
 			continue
 		}
+		lastSequence = event.Entry.Sequence
+
 		p, err := path.Parse(event.Entry.Name)
 		if err != nil {
-			log.Error.Printf("download: error parsing entry path: %v", err)
+			log.Error.Printf("download: %v", err)
 			continue
 		}
-		if event.Delete || p.NElem() != parsedReleasePath.NElem()+1 {
+		if event.Delete || p.NElem() != parsedDir.NElem()+1 {
 			// Ignore deletes and files inside the releases;
-			// just watch for the release directories.
-			lastSequence = event.Entry.Sequence
+			// just watch for the release directories/links.
 			continue
 		}
-		if err := h.updateArchive(p); err != nil {
-			log.Error.Printf("download: error updating archive: %v", err)
-			continue
-		}
-		lastSequence = event.Entry.Sequence
+		h.mu.Lock()
+		h.latest[event.Entry.Name] = event.Entry
+		h.mu.Unlock()
+
+		go h.buildArchive(p.Elem(p.NElem() - 1))
 	}
 }
 
-// updateArchive refreshes the release binaries in the given path and updates
-// the latest and archive maps appropriately. The path should be the directory
-// containing the binaries for a specific os/arch.
-func (h *downloadHandler) updateArchive(p path.Parsed) error {
-	osArch := p.Elem(p.NElem() - 1)
-
-	des, err := h.client.Glob(upspin.AllFilesGlob(p.Path()))
-	if err != nil {
-		return err
+// buildArchive assembles the archive file for the given osArch. It fetches all
+// the files in releasePaths/osArch, archives them, and updates h.archives.
+func (h *downloadHandler) buildArchive(osArch string) {
+	var des []*upspin.DirEntry
+	for _, dir := range releasePaths {
+		dir = path.Join(dir, osArch)
+		h.mu.RLock()
+		latest, ok := h.latest[dir]
+		h.mu.RUnlock()
+		if !ok {
+			// Not all files have been seen yet; wait.
+			log.Debug.Printf("download: cannot build archive for %s: missing dir: %s", osArch, dir)
+			return
+		}
+		dir = latest.Name
+		if latest.IsLink() {
+			dir = latest.Link
+		}
+		des2, err := h.client.Glob(upspin.AllFilesGlob(dir))
+		if err != nil {
+			log.Error.Printf("download: %v", err)
+			return
+		}
+		des = append(des, des2...)
 	}
 
-	h.mu.RLock()
-	latest := h.latest[osArch]
-	h.mu.RUnlock()
-
-	updated := false
+	// Check whether we have already built this version, or a newer one.
+	var seq int64
 	for _, de := range des {
-		if t := de.Time.Go(); t.After(latest) {
-			latest = t
-			updated = true
+		if de.Sequence > seq {
+			seq = de.Sequence
 		}
 	}
-	if !updated {
-		return nil
+	h.mu.RLock()
+	a, ok := h.archive[osArch]
+	h.mu.RUnlock()
+	if ok && seq <= a.seq {
+		// Current archive as new or newer than the des.
+		return
 	}
 
-	h.mu.Lock()
-	h.latest[osArch] = latest
-	h.mu.Unlock()
-
-	// Build the archive in the background.
-	log.Info.Printf("download: building archive for %v released at %v", osArch, latest)
-	go h.buildArchive(osArch, des)
-
-	return nil
-}
-
-// buildArchive builds an archive for the given osArch containing the given
-// Upspin commands. If it succeeds it adds the archive to the list of downloads.
-func (h *downloadHandler) buildArchive(osArch string, des []*upspin.DirEntry) {
-	a, err := newArchive(osArch, h.client, des)
+	log.Info.Printf("download: building archive for %v at sequence %d", osArch, seq)
+	data, err := newArchive(osArch, h.client, des)
 	if err != nil {
 		log.Error.Printf("download: error building archive for %v: %v", osArch, err)
-
-		// Rebuild on the next update.
-		h.mu.Lock()
-		h.latest[osArch] = time.Time{}
-		h.mu.Unlock()
-	} else {
-		log.Info.Printf("download: built new archive for %v", osArch)
-
-		// Add the archive to the list.
-		h.mu.Lock()
-		h.archive[osArch] = a
-		h.mu.Unlock()
+		return
 	}
+	log.Info.Printf("download: built new archive for %v", osArch)
+
+	// Add the archive to the list.
+	h.mu.Lock()
+	h.archive[osArch] = &archive{seq: seq, osArch: osArch, data: data}
+	h.mu.Unlock()
 }
 
 // archive represents a release archive and its contents.
 type archive struct {
+	seq    int64 // Highest sequence number of a file in the archive.
 	osArch string
 	data   []byte
 }
@@ -266,7 +272,7 @@ func (a *archive) Size() string {
 
 // newArchive fetches DirEntries using the given Client and assembles a gzipped
 // tar file containing those files, and returns the resulting archive.
-func newArchive(osArch string, c upspin.Client, des []*upspin.DirEntry) (*archive, error) {
+func newArchive(osArch string, c upspin.Client, des []*upspin.DirEntry) ([]byte, error) {
 	var buf bytes.Buffer
 
 	// The Write and Close methods of tar, gzip and zip should not return
@@ -309,5 +315,5 @@ func newArchive(osArch string, c upspin.Client, des []*upspin.DirEntry) (*archiv
 		return nil, fmt.Errorf("no known archive format %v", osArch)
 	}
 
-	return &archive{osArch: osArch, data: buf.Bytes()}, nil
+	return buf.Bytes(), nil
 }
