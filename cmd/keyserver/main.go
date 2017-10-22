@@ -66,8 +66,12 @@ func setupTestUser(key upspin.KeyServer) {
 	if key.Endpoint().Transport != upspin.InProcess {
 		log.Fatalf("cannot use testuser for endpoint %q", key.Endpoint())
 	}
-	if flags.InsecureHTTP && !isLocal(flags.HTTPAddr) || !isLocal(flags.HTTPSAddr) {
-		log.Fatal("cannot use -test_user flag except on localhost:port")
+	if flags.InsecureHTTP {
+		if !isLocal(flags.HTTPAddr) {
+			log.Fatal("cannot use -test_user flag on an insecure connection except on -http=localhost:port")
+		}
+	} else if !isLocal(flags.HTTPSAddr) {
+		log.Fatal("cannot use -test_user flag on a secure connection except on -https=localhost:port")
 	}
 
 	f, err := factotum.NewFromDir(*testSecrets)
