@@ -455,6 +455,9 @@ func (l *clog) lookup(name upspin.PathName) (*upspin.DirEntry, error, bool) {
 	// Look for a complete globReq. If there is one and it doesn't list
 	// this name, we can return a NotExist error.
 	dirName := path.DropPath(name, 1)
+	if dirName == name {
+		return nil, nil, false
+	}
 	glock := l.globLocks.lock(dirName)
 	defer glock.Unlock()
 	ge := l.getFromLRU(lruKey{name: dirName, glob: true})
