@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ca20fadb_9dc309f6",
+        "filename": "cmd/upspin/mkdir.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-22T05:55:26Z",
+      "side": 1,
+      "message": "s/Make/make/\ns/\\.//",
+      "revId": "0c30c83b3134f5265f6d05be6c28d1aa01f7521c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
