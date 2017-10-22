@@ -16,6 +16,8 @@ import (
 	"os/exec"
 	"sort"
 	"strings"
+
+	"upspin.io/flags"
 )
 
 func init() {
@@ -86,7 +88,7 @@ func (s *State) gendoc(args ...string) {
 }
 
 func (s *State) helpDocs(out io.Writer, command string, args ...string) {
-	cmd := exec.Command(command, args...)
+	cmd := exec.Command(command, append(flags.Args(), args...)...)
 	var b bytes.Buffer
 	cmd.Stdout = &b
 	cmd.Stderr = &b

@@ -186,7 +186,7 @@ Flags:
   -server address
     	Store and Directory server address (if combined)
   -store address
-  	Store server address (default "store.example.com:443")
+    	Store server address (default "store.example.com:443")
 
 
 
@@ -554,6 +554,8 @@ Read the documentation at
 for information on configuring upspinserver to use cloud storage services.
 
 Flags:
+  -config string
+    	do not set; here only for consistency with other upspin commands
   -domain name
     	domain name for this Upspin installation
   -help
