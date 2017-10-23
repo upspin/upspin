@@ -416,8 +416,12 @@ func verifyUser(key upspin.PublicKey, msg []string, magic, host string, now time
 	hash := hashUser(magic, msg[0], msg[1], msg[2])
 	err = factotum.Verify(hash, upspin.Signature{R: &rs, S: &ss}, key)
 	if err != nil {
-		err = errors.Errorf("signature fails to validate using the provided key: %s", err)
-		log.Debug.Printf("rpc/server: verifyUser: %s", err)
+		shortKey := string(key)
+		if len(shortKey) > 16 {
+			shortKey = shortKey[:16] + "..."
+		}
+		user := msg[0]
+		log.Debug.Printf("rpc/server: signature fails to validate using key %q for %q: %s", shortKey, user, err)
 		return err
 	}
 	return nil
