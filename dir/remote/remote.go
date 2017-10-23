@@ -15,6 +15,7 @@ import (
 	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/rpc"
+	"upspin.io/serverutil"
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
 )
@@ -215,7 +216,11 @@ func (r *remote) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service, 
 		return svc, nil
 	}
 
-	authClient, err := rpc.NewClient(config, e.NetAddr, rpc.Secure, upspin.Endpoint{})
+	lvl := rpc.Secure
+	if serverutil.IsLoopback(string(e.NetAddr)) {
+		lvl = rpc.NoSecurity
+	}
+	authClient, err := rpc.NewClient(config, e.NetAddr, lvl, upspin.Endpoint{})
 	if err != nil {
 		return nil, op.error(errors.IO, err)
 	}
