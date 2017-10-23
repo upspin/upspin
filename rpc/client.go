@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
-	"net"
 	"net/http"
 	"strings"
 	"sync"
@@ -20,6 +19,7 @@ import (
 	"upspin.io/bind"
 	"upspin.io/errors"
 	"upspin.io/rpc/local"
+	"upspin.io/serverutil"
 	"upspin.io/upspin"
 
 	pb "github.com/golang/protobuf/proto"
@@ -102,7 +102,7 @@ func NewClient(cfg upspin.Config, netAddr upspin.NetAddr, security SecurityLevel
 	switch security {
 	case NoSecurity:
 		// Only allow insecure connections to the loop back network.
-		if !isLocal(string(netAddr)) {
+		if !serverutil.IsLoopback(string(netAddr)) {
 			return nil, errors.E(op, errors.IO, errors.Errorf("insecure dial to non-loopback destination %q", netAddr))
 		}
 		c.baseURL = "http://" + string(netAddr)
@@ -358,29 +358,6 @@ func readFull(r io.Reader, b []byte, done <-chan struct{}) (int, error) {
 	case <-done:
 		return 0, io.EOF
 	}
-}
-
-func isLocal(addr string) bool {
-	// Check for local IPC.
-	if local.IsLocal(addr) {
-		return true
-	}
-
-	// Check for loopback network.
-	host, _, err := net.SplitHostPort(addr)
-	if err != nil {
-		return false
-	}
-	ips, err := net.LookupIP(host)
-	if err != nil {
-		return false
-	}
-	for _, ip := range ips {
-		if !ip.IsLoopback() {
-			return false
-		}
-	}
-	return true
 }
 
 func (c *httpClient) isProxy() bool {
