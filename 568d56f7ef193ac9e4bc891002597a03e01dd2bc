@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2f875802_81417990",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 461,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-10-23T02:25:15Z",
+      "side": 1,
+      "message": "i like it but could you add a comment like \n\n// name is the root, no glob can contain it.",
+      "range": {
+        "startLine": 458,
+        "startChar": 1,
+        "endLine": 461,
+        "endChar": 1
+      },
+      "revId": "568d56f7ef193ac9e4bc891002597a03e01dd2bc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
