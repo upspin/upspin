@@ -266,7 +266,6 @@ func (l *clog) wipeLog(user upspin.UserName) {
 			continue
 		}
 		e.request = obsoleteReq
-		l.appendToLogFile(e)
 	}
 }
 
@@ -900,6 +899,11 @@ func (e *clogEntry) invalidate() {
 
 // appendToLogFile appends to the clog file.
 func (l *clog) appendToLogFile(e *clogEntry) error {
+	if e.request == obsoleteReq {
+		log.Info.Printf("appendToLogFile: obsolete request")
+		return nil
+	}
+
 	buf, err := e.marshal()
 	if buf == nil {
 		// Either an error or nothing to marshal.
@@ -1192,6 +1196,7 @@ var reqName = map[request]string{
 	putReq:         "put",
 	whichAccessReq: "whichAccess",
 	versionReq:     "version",
+	obsoleteReq:    "obsolete",
 }
 
 func (e *clogEntry) String() string {
