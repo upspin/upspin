@@ -63,7 +63,7 @@ var Server = []string{
 // Client is the set of flags most useful in clients. It can be passed as the
 // argument to Parse to set up the package for a client.
 var Client = []string{
-	"config", "log", "blocksize", "prudent",
+	"config", "log", "blocksize", "prudent", "insecure",
 }
 
 // The Parse and Register functions bind these variables to their respective
@@ -151,7 +151,7 @@ var flags = map[string]*flagVar{
 	"https":    strVar(&HTTPSAddr, "https", HTTPSAddr, "`address` for incoming secure network connections"),
 	"insecure": &flagVar{
 		set: func(fs *flag.FlagSet) {
-			fs.BoolVar(&InsecureHTTP, "insecure", false, "whether to serve insecure HTTP instead of HTTPS")
+			fs.BoolVar(&InsecureHTTP, "insecure", false, "whether to use insecure HTTP instead of HTTPS")
 		},
 		arg: func() string {
 			if InsecureHTTP {
