@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a39b4f79_e3cee883",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 903,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-10-23T06:10:11Z",
+      "side": 1,
+      "message": "maybe add \"(should not happen)\" ?",
+      "revId": "db2a9c895850461b296e33407230af0cf98fec6c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
