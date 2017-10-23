@@ -8,6 +8,7 @@ package keyserver // import "upspin.io/serverutil/keyserver"
 
 import (
 	"flag"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -78,7 +79,7 @@ func Main(setup func(upspin.KeyServer)) {
 	}
 
 	if *mailConfigFile != "" {
-		signupURL := "https://" + flags.NetAddr + "/signup"
+		signupURL := fmt.Sprintf("https://%s/signup", flags.NetAddr)
 		f := cfg.Factotum()
 		if f == nil {
 			log.Fatal("keyserver: supplied config must include keys when -mail_config set")
