@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "d9fe1ad3_79b21a45",
+        "filename": "serverutil/addr.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 6197
+      },
+      "writtenOn": "2017-10-23T17:17:25Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "9ff2ef4d_de0a928c",
+      "range": {
+        "startLine": 10,
+        "startChar": 5,
+        "endLine": 10,
+        "endChar": 29
+      },
+      "revId": "bf463528542f60ec6b352b5f97414cdc7886e1a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "67fc9d0f_816ebdea",
         "filename": "serverutil/addr.go",
         "patchSetId": 5
@@ -36,6 +60,30 @@
       "writtenOn": "2017-10-23T16:36:08Z",
       "side": 1,
       "message": "Did you mean || ? Otherwise this is always false.\n\nAlso \"\" means pick a port but announce on all networks, not just locally.",
+      "range": {
+        "startLine": 11,
+        "startChar": 1,
+        "endLine": 13,
+        "endChar": 2
+      },
+      "revId": "bf463528542f60ec6b352b5f97414cdc7886e1a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b16db6d3_7059fa77",
+        "filename": "serverutil/addr.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 6197
+      },
+      "writtenOn": "2017-10-23T17:17:25Z",
+      "side": 1,
+      "message": "I did mean that. It was a copy/pasta accident. Will remove the \"\"",
+      "parentUuid": "67fc9d0f_816ebdea",
       "range": {
         "startLine": 11,
         "startChar": 1,
