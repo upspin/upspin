@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2be1165f_9d3691a4",
+        "filename": "doc/server_setup.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-10-23T23:44:40Z",
+      "side": 1,
+      "message": "Sorry, I should have noticed this in the previous review round, but it would be great if these ids were shorter (making the corresponding urls shorter). This could be #signup, for example. Would you care to shorten them? Thanks.",
+      "revId": "15331f7554b2c7f28078d41a424597136f564273",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
