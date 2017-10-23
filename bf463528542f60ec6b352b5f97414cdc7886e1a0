@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9ff2ef4d_de0a928c",
+        "filename": "serverutil/addr.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-10-23T16:36:08Z",
+      "side": 1,
+      "message": "In general, why not do thesplit first and then check for the easy lookups (localhost, ::1, 127.0.0.1). Then you can avoid the LookupIP and IsLoopback whenever possible.",
+      "range": {
+        "startLine": 10,
+        "startChar": 5,
+        "endLine": 10,
+        "endChar": 29
+      },
+      "revId": "bf463528542f60ec6b352b5f97414cdc7886e1a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "67fc9d0f_816ebdea",
+        "filename": "serverutil/addr.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-10-23T16:36:08Z",
+      "side": 1,
+      "message": "Did you mean || ? Otherwise this is always false.\n\nAlso \"\" means pick a port but announce on all networks, not just locally.",
+      "range": {
+        "startLine": 11,
+        "startChar": 1,
+        "endLine": 13,
+        "endChar": 2
+      },
+      "revId": "bf463528542f60ec6b352b5f97414cdc7886e1a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
