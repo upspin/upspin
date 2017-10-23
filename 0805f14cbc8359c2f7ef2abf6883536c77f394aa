@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "28078724_c6fc61c7",
+        "filename": "cmd/upspin/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 542,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-10-23T05:00:17Z",
+      "side": 1,
+      "message": "Hmm this is odd.\nI guess setupstorage needs the flag?",
+      "revId": "0805f14cbc8359c2f7ef2abf6883536c77f394aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dbeca99f_f6e62b15",
+        "filename": "cmd/upspin/mkdoc.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-10-23T05:00:17Z",
+      "side": 1,
+      "message": "is the $$ some kind of convention?",
+      "revId": "0805f14cbc8359c2f7ef2abf6883536c77f394aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c5f7a9b6_d9822eb4",
+        "filename": "cmd/upspin/mkdoc.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-10-23T05:00:17Z",
+      "side": 1,
+      "message": "errant space",
+      "range": {
+        "startLine": 10,
+        "startChar": 3,
+        "endLine": 10,
+        "endChar": 4
+      },
+      "revId": "0805f14cbc8359c2f7ef2abf6883536c77f394aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7c8f865c_e8c41d8d",
+        "filename": "cmd/upspin/mkdoc.sh",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-10-23T05:00:17Z",
+      "side": 1,
+      "message": ":443 on each of these\nthe shortcut is okay but if you\u0027re using the shortcut you can drop remote, too",
+      "revId": "0805f14cbc8359c2f7ef2abf6883536c77f394aa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
