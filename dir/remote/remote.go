@@ -13,6 +13,7 @@ import (
 
 	"upspin.io/bind"
 	"upspin.io/errors"
+	"upspin.io/flags"
 	"upspin.io/log"
 	"upspin.io/rpc"
 	"upspin.io/upspin"
@@ -215,7 +216,11 @@ func (r *remote) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service, 
 		return svc, nil
 	}
 
-	authClient, err := rpc.NewClient(config, e.NetAddr, rpc.Secure, upspin.Endpoint{})
+	lvl := rpc.Secure
+	if flags.InsecureHTTP {
+		lvl = rpc.NoSecurity
+	}
+	authClient, err := rpc.NewClient(config, e.NetAddr, lvl, upspin.Endpoint{})
 	if err != nil {
 		return nil, op.error(errors.IO, err)
 	}
