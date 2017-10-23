@@ -8,11 +8,11 @@ package main // import "upspin.io/cmd/keyserver"
 
 import (
 	"flag"
-	"net"
 
 	"upspin.io/factotum"
 	"upspin.io/flags"
 	"upspin.io/log"
+	"upspin.io/serverutil"
 	"upspin.io/serverutil/keyserver"
 	"upspin.io/upspin"
 
@@ -34,24 +34,6 @@ func main() {
 	https.ListenAndServeFromFlags(nil)
 }
 
-// isLocal returns true if the name only resolves to loopback addresses.
-func isLocal(addr string) bool {
-	host, _, err := net.SplitHostPort(addr)
-	if err != nil {
-		return false
-	}
-	ips, err := net.LookupIP(host)
-	if err != nil {
-		return false
-	}
-	for _, ip := range ips {
-		if !ip.IsLoopback() {
-			return false
-		}
-	}
-	return true
-}
-
 // setupTestUser uses the -test_user and -test_secrets flags to bootstrap the
 // inprocess key server with an initial user.
 func setupTestUser(key upspin.KeyServer) {
@@ -66,11 +48,12 @@ func setupTestUser(key upspin.KeyServer) {
 	if key.Endpoint().Transport != upspin.InProcess {
 		log.Fatalf("cannot use testuser for endpoint %q", key.Endpoint())
 	}
+	isLocal := serverutil.IsLoopback(flags.HTTPAddr)
 	if flags.InsecureHTTP {
-		if !isLocal(flags.HTTPAddr) {
+		if !isLocal {
 			log.Fatal("cannot use -test_user flag on an insecure connection except on -http=localhost:port")
 		}
-	} else if !isLocal(flags.HTTPSAddr) {
+	} else if !isLocal {
 		log.Fatal("cannot use -test_user flag on a secure connection except on -https=localhost:port")
 	}
 
