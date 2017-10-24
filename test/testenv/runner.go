@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"upspin.io/access"
+	"upspin.io/bind"
 	"upspin.io/client"
 	"upspin.io/config"
 	"upspin.io/errors"
@@ -94,6 +95,7 @@ func (r *Runner) As(u upspin.UserName) {
 		r.setErr(errors.E(errors.NotExist, u))
 		return
 	}
+	r.setErr(r.FlushCache())
 	r.user = u
 }
 
@@ -484,4 +486,19 @@ func (r *Runner) Diag() string {
 		return r.lastErr.Error()
 	}
 	return fmt.Sprintf("%s:%d: %v", filepath.Base(r.errFile), r.errLine, r.lastErr)
+}
+
+// FlushCache flushes a user's Store cache.
+func (r *Runner) FlushCache() error {
+	if r.Config().Value("cache") == "" {
+		return nil
+	}
+	store, err := bind.StoreServer(r.Config(), r.Config().StoreEndpoint())
+	if err != nil {
+		return err
+	}
+	if _, _, _, err := store.Get(upspin.FlushWritebacksMetadata); err != nil {
+		return err
+	}
+	return nil
 }
