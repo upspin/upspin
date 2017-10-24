@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "45f89b1f_5bb3d38f",
+        "filename": "access/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 951,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-24T01:59:32Z",
+      "side": 1,
+      "message": "groupSet is an improvement. \nRemember this is an internal type in a package implemented by one file. There\u0027s really no ambiguity. I think \u0027set\u0027 would be fine, but we can leave it as groupSet if you\u0027re adamant.",
+      "revId": "26d364c0a64f37838570eac590fba0232e02e0a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "12e71a73_74186bc3",
+        "filename": "access/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 952,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-24T01:59:32Z",
+      "side": 1,
+      "message": "s/one time/exactly once/",
+      "revId": "26d364c0a64f37838570eac590fba0232e02e0a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "43767796_cf1bcb47",
+        "filename": "access/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 953,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-24T01:59:32Z",
+      "side": 1,
+      "message": "don\u0027t justify the use of the type, just explain its purpose.\n\nA groupSet helps implement the transitive closure of a right\u0027s membership.",
+      "revId": "26d364c0a64f37838570eac590fba0232e02e0a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ae1e6de8_4b70662a",
+        "filename": "access/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 955,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-24T01:59:32Z",
+      "side": 1,
+      "message": "s/one time/once/",
+      "revId": "26d364c0a64f37838570eac590fba0232e02e0a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "be5146b8_9500420e",
+        "filename": "access/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 961,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-24T01:59:32Z",
+      "side": 1,
+      "message": "s/but....granted.//\n\nYou\u0027re providing too much information. The details of how it works should not require so much explanatory text, or, if things need to be explained in such detail, the interface isn\u0027t right. Moreover, you explain newMembers in great detail but say nothing about the set field.\n\nI would drop this whole paragraph and say something that looks like:\n\n   set map[path.Parsed]struct{} // The elements of the set.\n   newMembers []path.Parsed // Newly added members, retrieved in FILO order.\n\nAnd yet, with all these words about newMember, I still don\u0027t know what it is or why the caller n needs to understand it.",
+      "revId": "26d364c0a64f37838570eac590fba0232e02e0a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6acb503d_2920cbe8",
+        "filename": "access/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 969,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-24T01:59:32Z",
+      "side": 1,
+      "message": "exist isn\u0027t the right verb here.\n\nI think the problem is that you have an internal mental model of HOW this type works, but not a clear way of explaining WHAT it does. The comments should be about the WHAT, as the API caller sees, not about the internals of the data structure. You don\u0027t document a linked list by talking about pointer fiddling.",
+      "revId": "26d364c0a64f37838570eac590fba0232e02e0a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
