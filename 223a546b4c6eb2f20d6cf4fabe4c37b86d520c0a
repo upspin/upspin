@@ -118,6 +118,24 @@
       "revId": "223a546b4c6eb2f20d6cf4fabe4c37b86d520c0a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "60de1366_77b2a8aa",
+        "filename": "dir/server/serverlog/log_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 617,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-24T04:22:40Z",
+      "side": 1,
+      "message": "disregard. i thought i had deleted this comment",
+      "parentUuid": "8bdb1bd2_36b8654c",
+      "revId": "223a546b4c6eb2f20d6cf4fabe4c37b86d520c0a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
