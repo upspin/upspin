@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e13fb1aa_c2813ea3",
+        "filename": "test/testenv/runner.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 496,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-10-24T04:28:15Z",
+      "side": 1,
+      "message": "or:\n\nstore, err :\u003d bind.StoreServer(r.Config().StoreEndpoint())\n// check err\n\nstore.Get(upspin.FlushWritebacksMetadata)\n// check err\n\n?",
+      "revId": "d58d81918defde0c8cc8b1e06500c65fc3bf7f22",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
