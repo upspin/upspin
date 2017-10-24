@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "fecc0226_41cb16ee",
+        "filename": "access/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 951,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-10-24T13:34:56Z",
+      "side": 1,
+      "message": "Trying \u0027iter\u0027.  It really is an iterator.  Many of my comments called it a set with some special characteristics but the names weren\u0027t good.  Now that the type name is cleaner and much more descriptive, the three simple method names seem appropriate too: add, done and next.",
+      "parentUuid": "45f89b1f_5bb3d38f",
+      "revId": "26d364c0a64f37838570eac590fba0232e02e0a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "12e71a73_74186bc3",
         "filename": "access/access.go",
         "patchSetId": 3
@@ -33,6 +51,24 @@
       "revId": "26d364c0a64f37838570eac590fba0232e02e0a0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b1f1480d_abc62925",
+        "filename": "access/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 952,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-10-24T13:34:56Z",
+      "side": 1,
+      "message": "All comments reworked.  All exposition removed.",
+      "parentUuid": "12e71a73_74186bc3",
+      "revId": "26d364c0a64f37838570eac590fba0232e02e0a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "5c78aef8_d773d321",
+        "filename": "access/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 953,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-10-24T13:34:56Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "43767796_cf1bcb47",
+      "revId": "26d364c0a64f37838570eac590fba0232e02e0a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ae1e6de8_4b70662a",
         "filename": "access/access.go",
         "patchSetId": 3
@@ -67,6 +121,24 @@
       "revId": "26d364c0a64f37838570eac590fba0232e02e0a0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2ccaf153_594fe9ab",
+        "filename": "access/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 955,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-10-24T13:34:56Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "ae1e6de8_4b70662a",
+      "revId": "26d364c0a64f37838570eac590fba0232e02e0a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "e7eaa803_01c791af",
+        "filename": "access/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 961,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-10-24T13:34:56Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "be5146b8_9500420e",
+      "revId": "26d364c0a64f37838570eac590fba0232e02e0a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6acb503d_2920cbe8",
         "filename": "access/access.go",
         "patchSetId": 3
@@ -101,6 +191,24 @@
       "revId": "26d364c0a64f37838570eac590fba0232e02e0a0",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4faf9f8a_3299cfbc",
+        "filename": "access/access.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 969,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-10-24T13:34:56Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "6acb503d_2920cbe8",
+      "revId": "26d364c0a64f37838570eac590fba0232e02e0a0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
