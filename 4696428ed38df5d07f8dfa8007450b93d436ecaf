@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3cbbe71c_a0971593",
+        "filename": "errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 472,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-25T03:41:40Z",
+      "side": 1,
+      "message": "this allocates. instead do:\n\ne, ok :\u003d err.(*Error)\nif !ok {\n  return false\n}\nreturn e.Is(kind)",
+      "revId": "4696428ed38df5d07f8dfa8007450b93d436ecaf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4fa6f921_acb51137",
+        "filename": "errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 473,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-25T03:41:40Z",
+      "side": 1,
+      "message": "add and use this one too - often (like from path.Parse) we can guarantee we know the type.\n\n// Is reports whether the receiver is of the given Kind.\nfunc (e *Error) Is(kind Kind) bool  ...",
+      "revId": "4696428ed38df5d07f8dfa8007450b93d436ecaf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
