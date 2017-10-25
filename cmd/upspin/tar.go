@@ -224,7 +224,7 @@ func (a *archiver) unarchive(src io.ReadCloser) error {
 		switch hdr.Typeflag {
 		case tar.TypeDir:
 			_, err = a.client.MakeDirectory(name)
-			if err != nil && !errors.Match(errors.E(errors.Exist), err) {
+			if err != nil && !errors.Is(errors.Exist, err) {
 				return err
 			}
 		case tar.TypeSymlink:

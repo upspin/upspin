@@ -328,7 +328,7 @@ func testWatchNonExistentRoot(t *testing.T, r *testenv.Runner) {
 	if !supported {
 		return
 	}
-	if !errors.Match(errNotExist, err) {
+	if !errors.Is(errors.NotExist, err) {
 		t.Fatalf("Expected %v, got %v", errNotExist, err)
 	}
 }

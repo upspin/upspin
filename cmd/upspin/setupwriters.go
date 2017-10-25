@@ -62,7 +62,7 @@ the list, so the directory server can use the store for its own data storage.
 
 	var dirUser upspin.UserName
 	storeCfg, err := config.FromFile(filepath.Join(cfgDir, "config"))
-	if errors.Match(errors.E(errors.NotExist), err) {
+	if errors.Is(errors.NotExist, err) {
 		storeCfg, err = config.FromFile(filepath.Join(cfgDir, "storeserver", "config"))
 		if err != nil {
 			s.Exit(err)
@@ -86,12 +86,12 @@ the list, so the directory server can use the store for its own data storage.
 
 	// Make the store root.
 	_, err = c.MakeDirectory(upspin.PathName(storeUser) + "/")
-	if err != nil && !errors.Match(errors.E(errors.Exist), err) {
+	if err != nil && !errors.Is(errors.Exist, err) {
 		s.Exit(err)
 	}
 	// Make the Group directory.
 	_, err = c.MakeDirectory(upspin.PathName(storeUser) + "/Group")
-	if err != nil && !errors.Match(errors.E(errors.Exist), err) {
+	if err != nil && !errors.Is(errors.Exist, err) {
 		s.Exit(err)
 	}
 
