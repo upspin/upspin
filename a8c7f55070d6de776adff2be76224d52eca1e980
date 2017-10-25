@@ -1,0 +1,191 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "974d55e7_a5507c1c",
+        "filename": "access/access.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 757,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-25T03:38:10Z",
+      "side": 1,
+      "message": "yes it is warranted. we could add a local test. there are tests elsewhere that it works but it would be good to have one locally.",
+      "revId": "a8c7f55070d6de776adff2be76224d52eca1e980",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3774318b_59811614",
+        "filename": "access/access.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 953,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-25T03:38:10Z",
+      "side": 1,
+      "message": "much better!",
+      "revId": "a8c7f55070d6de776adff2be76224d52eca1e980",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4bbf9ed2_38504951",
+        "filename": "access/access.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 984,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-25T03:38:10Z",
+      "side": 1,
+      "message": "this is such an idiom and used only twice i wouldn\u0027t bother with a special function for it.",
+      "revId": "a8c7f55070d6de776adff2be76224d52eca1e980",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a66f44ae_7ef7e684",
+        "filename": "access/access_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 920,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-25T03:38:10Z",
+      "side": 1,
+      "message": "s/n/N/\ns/$/./\nthat is, write an english sentence.",
+      "revId": "a8c7f55070d6de776adff2be76224d52eca1e980",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9f4611fd_72ac592f",
+        "filename": "access/access_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 935,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-25T03:38:10Z",
+      "side": 1,
+      "message": "s/$/./",
+      "revId": "a8c7f55070d6de776adff2be76224d52eca1e980",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cdcb6c99_a2b3a0ba",
+        "filename": "access/access_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 950,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-25T03:38:10Z",
+      "side": 1,
+      "message": "caps and periods throughout",
+      "revId": "a8c7f55070d6de776adff2be76224d52eca1e980",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "af8e38d6_1879bb99",
+        "filename": "access/access_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 963,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-25T03:38:10Z",
+      "side": 1,
+      "message": "s/$/./ etc.",
+      "revId": "a8c7f55070d6de776adff2be76224d52eca1e980",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6ba6b053_9f844fdd",
+        "filename": "access/access_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 1123,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-25T03:38:10Z",
+      "side": 1,
+      "message": "trailing spaces/tabs",
+      "revId": "a8c7f55070d6de776adff2be76224d52eca1e980",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "058b6855_8a0b79d9",
+        "filename": "access/access_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 1126,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-25T03:38:10Z",
+      "side": 1,
+      "message": "not sure what this variable is contributing",
+      "revId": "a8c7f55070d6de776adff2be76224d52eca1e980",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9e1e30f1_2aff2403",
+        "filename": "access/access_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 1310,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-25T03:38:10Z",
+      "side": 1,
+      "message": "this comment is more the kind of thing that goes in a CL description. it has no place here.",
+      "revId": "a8c7f55070d6de776adff2be76224d52eca1e980",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5040a0a0_14a00ab6",
+        "filename": "access/access_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 1347,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-25T03:38:10Z",
+      "side": 1,
+      "message": "delete second sentence. no need to limit when it might be used.",
+      "revId": "a8c7f55070d6de776adff2be76224d52eca1e980",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
