@@ -233,7 +233,7 @@ func (t *Tree) PutDir(dstDir path.Parsed, de *upspin.DirEntry) (*upspin.DirEntry
 	}
 
 	// The destination must not exist nor cross a link.
-	if node, _, err := t.loadPath(dstDir); errors.Match(errors.E(errors.NotExist), err) {
+	if node, _, err := t.loadPath(dstDir); errors.Is(errors.NotExist, err) {
 		// Destination does not exist; OK.
 	} else if err == upspin.ErrFollowLink {
 		return nil, errors.E(dstDir.Path(), errors.Errorf("destination path crosses link: %s", node.entry.Name))
@@ -380,7 +380,7 @@ func (t *Tree) loadPath(p path.Parsed) (*node, []*watcher, error) {
 	watchers := append([]*watcher(nil), node.watchers...)
 	for i := 0; i < p.NElem(); i++ {
 		child, err := t.loadNode(node, p.Elem(i))
-		if errors.Match(errors.E(errors.NotExist), err) {
+		if errors.Is(errors.NotExist, err) {
 			return node, watchers, err
 		}
 		node = child
@@ -485,7 +485,7 @@ func (t *Tree) createRoot(p path.Parsed, de *upspin.DirEntry) error {
 		return errors.E(p.User(), p.Path(), errors.Invalid, errors.Str("can't create root for another user"))
 	}
 	_, err := t.user.Root()
-	if err != nil && !errors.Match(errors.E(errors.NotExist), err) {
+	if err != nil && !errors.Is(errors.NotExist, err) {
 		// Error reading the root.
 		return err
 	}

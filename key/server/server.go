@@ -110,7 +110,7 @@ func (s *server) lookup(op string, name upspin.UserName, span *metric.Span) (*us
 	sp.End()
 	if err != nil {
 		// Not found: add to negative cache.
-		if errors.Match(errors.E(errors.NotExist), err) {
+		if errors.Is(errors.NotExist, err) {
 			s.negCache.Add(name, true)
 		}
 		return nil, err
@@ -141,7 +141,7 @@ func (s *server) Put(u *upspin.User) error {
 
 	entry, err := s.lookup(op, u.Name, span)
 	switch {
-	case errors.Match(errors.E(errors.NotExist), err):
+	case errors.Is(errors.NotExist, err):
 		// OK; adding new user.
 		newUser = true
 	case err != nil:

@@ -466,3 +466,8 @@ func Match(err1, err2 error) bool {
 	}
 	return true
 }
+
+// Is reports whether err is an *Error of the given Kind.
+func Is(kind Kind, err error) bool {
+	return Match(E(kind), err)
+}

@@ -841,7 +841,7 @@ func TestBrokenLink(t *testing.T) {
 	}
 	// Attempt Get through the broken link.
 	_, err = client.Get(linkName)
-	if !errors.Match(errors.E(errors.BrokenLink), err) {
+	if !errors.Is(errors.BrokenLink, err) {
 		t.Fatalf("BrokenLink error not raised for %q: %q", linkName, err)
 	}
 	// Put through the link.
@@ -975,7 +975,7 @@ func TestAllUsers(t *testing.T) {
 		t.Errorf("UnpackableByAll(%q) returned true, want false", file)
 	}
 	_, err = client2.Get(file)
-	if !errors.Match(errors.E(errors.Private), err) {
+	if !errors.Is(errors.Private, err) {
 		t.Fatalf("Get(%q) returned %v, want Private error", file, err)
 	}
 

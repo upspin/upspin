@@ -745,7 +745,7 @@ func (n *node) Rename(ctx gContext.Context, req *fuse.RenameRequest, newDir fs.N
 	if err := n.f.client.Rename(oldPath, newPath); err != nil {
 		// FUSE semantics state that a rename should
 		// remove the target if it exists.
-		if !errors.Match(errors.E(errors.Exist), err) {
+		if !errors.Is(errors.Exist, err) {
 			return e2e(errors.E(op, oldPath, err))
 		}
 		// Remove target and try again.

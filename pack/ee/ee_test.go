@@ -300,7 +300,7 @@ func TestBadSharing(t *testing.T) {
 	if err == nil {
 		t.Fatal("Expected error, got none.")
 	}
-	if !errors.Match(errors.E(errors.CannotDecrypt), err) {
+	if !errors.Is(errors.CannotDecrypt, err) {
 		t.Fatalf("Expected CannotDecrypt error, got %s", err)
 	}
 }

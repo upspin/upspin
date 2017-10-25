@@ -381,7 +381,7 @@ func testSelectedOnePacking(t *testing.T, setup testenv.Setup) {
 	usercache.ResetGlobal()
 
 	env, err := testenv.New(&setup)
-	if errors.Match(errors.E(errors.NotExist), err) && setup.Kind == "remote" {
+	if errors.Is(errors.NotExist, err) && setup.Kind == "remote" {
 		t.Fatal(remoteTestMessage)
 	}
 	if err != nil {

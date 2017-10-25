@@ -789,7 +789,7 @@ func TestPutDirSameTreeNonRoot(t *testing.T) {
 	_, err = tree.PutDir(mkpath(t, userName+"/snapshot/new"), entry)
 	if err == nil {
 		t.Fatal("PutDir of existing target: expected error, got nil")
-	} else if !errors.Match(errors.E(errors.Exist), err) {
+	} else if !errors.Is(errors.Exist, err) {
 		t.Fatalf("PutDir of existing target: expected 'exists' error, got %v", err)
 	}
 

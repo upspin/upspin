@@ -275,7 +275,7 @@ func setupWriters(cfg upspin.Config) error {
 // existsOK returns err if it is not an errors.Exist error,
 // in which case it returns nil.
 func existsOK(_ *upspin.DirEntry, err error) error {
-	if errors.Match(errors.E(errors.Exist), err) {
+	if errors.Is(errors.Exist, err) {
 		return nil
 	}
 	return err
