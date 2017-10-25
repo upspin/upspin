@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d43cc1e3_9581b805",
+        "filename": "errors/errors.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 470,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-25T05:22:52Z",
+      "side": 1,
+      "message": "err may be nil, in which case Is returns false.",
+      "revId": "0830c3b32e7092c67ff7baa4d2dd8eecea156d01",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d5edca78_e53a907a",
+        "filename": "test/testenv/testenv.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 403,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-25T05:22:52Z",
+      "side": 1,
+      "message": "if errors.Is(errors.Exist, err) { return nil }\nreturn err",
+      "revId": "0830c3b32e7092c67ff7baa4d2dd8eecea156d01",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
