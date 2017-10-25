@@ -21,6 +21,9 @@
 #  version = "2.4.0"
 
 
+# /x/text/gen.go imports this package; we don't need it though.
+ignored = ["golang.org/x/text/collate"]
+
 [[constraint]]
   branch = "master"
   name = "bazil.org/fuse"
