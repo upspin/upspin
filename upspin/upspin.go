@@ -407,7 +407,7 @@ type DirServer interface {
 	// the return DirEntry will be nil.
 	//
 	// A successful Put returns an incomplete DirEntry (see the
-	// description of AttrIncomplete) containing nothing but the
+	// description of AttrIncomplete) containing only the
 	// new sequence number.
 	Put(entry *DirEntry) (*DirEntry, error)
 
@@ -666,6 +666,10 @@ type Client interface {
 	// name, although it may still exist in the storage server. (See
 	// the documentation for Delete.) Like Get, it is not the usual
 	// access method. The file-like API is preferred.
+	//
+	// A successful Put returns an incomplete DirEntry (see the
+	// description of AttrIncomplete) containing only the
+	// new sequence number.
 	Put(name PathName, data []byte) (*DirEntry, error)
 
 	// PutLink creates a link from the new name to the old name. The
@@ -677,6 +681,10 @@ type Client interface {
 	// argument to PutLink even if it refers to a path that itself
 	// contains links. The name is canonicalized, however (see
 	// path.Clean).
+	//
+	// A successful PutLink returns an incomplete DirEntry (see the
+	// description of AttrIncomplete) containing only the
+	// new sequence number.
 	PutLink(oldName, newName PathName) (*DirEntry, error)
 
 	// PutDuplicate creates a new name for the references referred to
@@ -685,11 +693,19 @@ type Client interface {
 	// item with the new name. If the final element of the path name
 	// is a link, PutDuplicate will duplicate the link and not the
 	// link target.
+	//
+	// A successful PutDuplicate returns an incomplete DirEntry (see the
+	// description of AttrIncomplete) containing only the
+	// new sequence number.
 	PutDuplicate(oldName, newName PathName) (*DirEntry, error)
 
 	// MakeDirectory creates a directory with the given name, which
 	// must not already exist. All but the last element of the path
 	// name must already exist and be directories.
+	//
+	// A successful MakeDirectory returns an incomplete DirEntry (see the
+	// description of AttrIncomplete) containing only the
+	// new sequence number.
 	MakeDirectory(dirName PathName) (*DirEntry, error)
 
 	// Rename renames oldName to newName. The old name is no longer valid.
