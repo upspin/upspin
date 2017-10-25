@@ -95,12 +95,6 @@ type cpFile struct {
 	isUpspin bool
 }
 
-var (
-	errExist    = errors.E(errors.Exist)
-	errNotExist = errors.E(errors.NotExist)
-	errIsDir    = errors.E(errors.IsDir)
-)
-
 func (s *State) copyCommand(cs *copyState, srcFiles []cpFile, dstFile cpFile) {
 	// TODO: Check for nugatory copies.
 	if s.isDir(dstFile) {
@@ -128,7 +122,7 @@ func (s *State) isDir(cf cpFile) bool {
 		entry, err := s.Client.Lookup(upspin.PathName(cf.path), true)
 		// Report the error here if it's anything odd, because otherwise
 		// we'll report "not a directory" misleadingly.
-		if err != nil && !errors.Match(errNotExist, err) {
+		if err != nil && !errors.Is(errors.NotExist, err) {
 			log.Printf("%q: %v", cf.path, err)
 		}
 		return err == nil && entry.IsDir()
@@ -172,7 +166,7 @@ func (s *State) copyToDir(cs *copyState, src []cpFile, dir cpFile) {
 			}
 		}
 		reader, err := s.open(from)
-		if cs.recur && errors.Match(errIsDir, err) {
+		if cs.recur && errors.Is(errors.IsDir, err) {
 			// If the problem is that from is a directory but we have -R,
 			// recur on the contents.
 			cs.logf("recursive descent into %s", from.path)
@@ -186,7 +180,7 @@ func (s *State) copyToDir(cs *copyState, src []cpFile, dir cpFile) {
 				// Rather than use the libraries and a lot of casting, it's easiest just to cat the strings here.
 				subDir.path = subDir.path + "/" + filepath.Base(from.path) // TODO: is filepath.Base OK?
 				_, err := s.Client.MakeDirectory(upspin.PathName(subDir.path))
-				if err != nil && !errors.Match(errExist, err) {
+				if err != nil && !errors.Is(errors.Exist, err) {
 					s.Fail(err)
 					continue
 				}
@@ -244,13 +238,13 @@ func (s *State) fastCopy(src, dst upspin.PathName) error {
 	if err == nil {
 		return nil
 	}
-	if errors.Match(errExist, err) {
+	if errors.Is(errors.Exist, err) {
 		// File already exists, which PutDuplicate doesn't handle.
 		// Use regular copy. We could remove it and retry
 		// but that's a little scary.
 		return err
 	}
-	if errors.Match(errIsDir, err) {
+	if errors.Is(errors.IsDir, err) {
 		// Oops, we have a directory. Retry.
 		return err
 	}

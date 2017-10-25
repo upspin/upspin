@@ -230,7 +230,7 @@ func (p *Perm) Update() error {
 	entry, err := p.lookup(p.targetFile)
 	if err != nil {
 		// If the group file does not exist, reset writers map.
-		if errors.Match(errors.E(errors.NotExist), err) {
+		if errors.Is(errors.NotExist, err) {
 			p.deleteUsers() // Calls onUpdate.
 			return nil
 		}

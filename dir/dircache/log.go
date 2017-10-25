@@ -45,9 +45,6 @@ import (
 	"upspin.io/upspin"
 )
 
-// notExist is used to match against returned errors.
-var notExist = errors.E(errors.NotExist)
-
 // request is the requested operation to be performed on the DirEntry.
 type request int
 
@@ -738,7 +735,7 @@ func (l *clog) updateLRU(e *clogEntry) {
 			l.addToGlob(e)
 			return
 		}
-		if !errors.Match(notExist, e.error) {
+		if !errors.Is(errors.NotExist, e.error) {
 			log.Debug.Printf("updateLRU %s error %s", e.name, e.error)
 			return
 		}
@@ -936,7 +933,7 @@ func cacheableError(err error) bool {
 		return true
 	}
 	if e, ok := err.(*errors.Error); ok {
-		return errors.Match(notExist, e)
+		return errors.Is(errors.NotExist, e)
 	}
 	return err == upspin.ErrFollowLink
 }

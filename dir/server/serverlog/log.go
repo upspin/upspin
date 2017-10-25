@@ -170,7 +170,7 @@ func newRoot(rootFile string, fac upspin.Factotum, s storage.Storage) (*root, er
 		// Try to access the storage backend now
 		// so a misconfiguration is caught at startup.
 		_, err = s.Download(rootRef)
-		if err != nil && !errors.Match(errors.E(errors.NotExist), err) {
+		if err != nil && !errors.Is(errors.NotExist, err) {
 			return nil, err
 		}
 

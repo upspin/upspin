@@ -152,9 +152,6 @@ const (
 	maxRetryInterval     = time.Minute
 )
 
-// invalid is used to match against returned errors.
-var invalid = errors.E(errors.Invalid)
-
 // watcher watches a directory and caches any changes to something already in the LRU.
 func (d *proxiedDir) watcher(ep upspin.Endpoint) {
 	log.Debug.Printf("dircache.Watcher %s %s", d.user, ep)
@@ -180,7 +177,7 @@ func (d *proxiedDir) watcher(ep upspin.Endpoint) {
 			log.Debug.Printf("dir/dircache.watcher: %s: %s", d.user, err)
 			return
 		}
-		if errors.Match(invalid, err) {
+		if errors.Is(errors.Invalid, err) {
 			// A bad record in the log or a bad sequence number. Reread current state.
 			log.Info.Printf("dir/dircache.watcher restarting from -1: %s: %s", d.user, err)
 			d.sequence = -1

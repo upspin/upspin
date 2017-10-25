@@ -12,7 +12,11 @@ import (
 	"upspin.io/upspin"
 )
 
-var errLink = upspin.ErrFollowLink
+var (
+	errLink       = upspin.ErrFollowLink
+	errNotExist   = errors.E(errors.NotExist)
+	errPermission = errors.E(errors.Permission)
+)
 
 func TestGlob(t *testing.T) {
 	const (

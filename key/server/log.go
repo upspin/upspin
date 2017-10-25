@@ -121,7 +121,7 @@ func (l *loggerImpl) populate() error {
 		return nil
 	}
 	data, err := l.storage.Download(logRef)
-	if errors.Match(errors.E(errors.NotExist), err) {
+	if errors.Is(errors.NotExist, err) {
 		// The log doesn't exist yet.
 		// Make l.log non-nil so that we don't keep trying.
 		l.log = []byte{}
