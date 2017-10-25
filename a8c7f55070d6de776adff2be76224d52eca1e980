@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9411e95f_fb1c555a",
+        "filename": "access/access.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 757,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-10-25T13:01:11Z",
+      "side": 1,
+      "message": "Ack.  In fact now if I test with it commented out, there is already a local test that you added on Oct 5.  So am removing my TBD comment - odd that I thought it was not being tested.",
+      "parentUuid": "974d55e7_a5507c1c",
+      "revId": "a8c7f55070d6de776adff2be76224d52eca1e980",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "3774318b_59811614",
         "filename": "access/access.go",
         "patchSetId": 4
@@ -33,6 +51,24 @@
       "revId": "a8c7f55070d6de776adff2be76224d52eca1e980",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ae232de9_a16ba9d6",
+        "filename": "access/access.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 953,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-10-25T13:01:11Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "3774318b_59811614",
+      "revId": "a8c7f55070d6de776adff2be76224d52eca1e980",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "a872a822_586a88ea",
+        "filename": "access/access.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 984,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-10-25T13:01:11Z",
+      "side": 1,
+      "message": "Okay, it\u0027s your code.  But my opinion is that even though an idiom, and a nice one, the trivial function makes the code much more understandable at not cost to runtime.  Thinking of the seconds lost to folks reading the code to understand it and to double check its correctness when they could be smiling at the use of a trivial idiomatic function that makes it obvious that the variables are used correctly makes me sad.\n\n    p, i.posted \u003d popBack(i.posted)\n    p, i.posted \u003d i.posted[len(i.posted)-1], i.posted[:len(i.posted)-1]",
+      "parentUuid": "4bbf9ed2_38504951",
+      "revId": "a8c7f55070d6de776adff2be76224d52eca1e980",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a66f44ae_7ef7e684",
         "filename": "access/access_test.go",
         "patchSetId": 4
@@ -67,6 +121,24 @@
       "revId": "a8c7f55070d6de776adff2be76224d52eca1e980",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c2386cee_e60e39b7",
+        "filename": "access/access_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 920,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-10-25T13:01:11Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "a66f44ae_7ef7e684",
+      "revId": "a8c7f55070d6de776adff2be76224d52eca1e980",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "2afe7fa3_d252b030",
+        "filename": "access/access_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 935,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-10-25T13:01:11Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "9f4611fd_72ac592f",
+      "revId": "a8c7f55070d6de776adff2be76224d52eca1e980",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "cdcb6c99_a2b3a0ba",
         "filename": "access/access_test.go",
         "patchSetId": 4
@@ -101,6 +191,24 @@
       "revId": "a8c7f55070d6de776adff2be76224d52eca1e980",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ba408e40_908c1cc2",
+        "filename": "access/access_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 950,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-10-25T13:01:11Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "cdcb6c99_a2b3a0ba",
+      "revId": "a8c7f55070d6de776adff2be76224d52eca1e980",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "e3d0a1bd_f86293af",
+        "filename": "access/access_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 963,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-10-25T13:01:11Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "af8e38d6_1879bb99",
+      "revId": "a8c7f55070d6de776adff2be76224d52eca1e980",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6ba6b053_9f844fdd",
         "filename": "access/access_test.go",
         "patchSetId": 4
@@ -135,6 +261,24 @@
       "revId": "a8c7f55070d6de776adff2be76224d52eca1e980",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c51ff7c8_ff4bf476",
+        "filename": "access/access_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 1123,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-10-25T13:01:11Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "6ba6b053_9f844fdd",
+      "revId": "a8c7f55070d6de776adff2be76224d52eca1e980",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -155,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "12156628_60cd3acd",
+        "filename": "access/access_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 1126,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-10-25T13:01:11Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "058b6855_8a0b79d9",
+      "revId": "a8c7f55070d6de776adff2be76224d52eca1e980",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9e1e30f1_2aff2403",
         "filename": "access/access_test.go",
         "patchSetId": 4
@@ -172,6 +334,24 @@
     },
     {
       "key": {
+        "uuid": "96dbfcd7_9c95bcc5",
+        "filename": "access/access_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 1310,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-10-25T13:01:11Z",
+      "side": 1,
+      "message": "Totally agree. Just wanted the reviewer to understand my thought process.  Should have put a \"to be removed\" sticker at the beginning.",
+      "parentUuid": "9e1e30f1_2aff2403",
+      "revId": "a8c7f55070d6de776adff2be76224d52eca1e980",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5040a0a0_14a00ab6",
         "filename": "access/access_test.go",
         "patchSetId": 4
@@ -186,6 +366,24 @@
       "revId": "a8c7f55070d6de776adff2be76224d52eca1e980",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a93c9bb5_78ede82f",
+        "filename": "access/access_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 1347,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-10-25T13:01:11Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "5040a0a0_14a00ab6",
+      "revId": "a8c7f55070d6de776adff2be76224d52eca1e980",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
