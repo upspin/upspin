@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "524fdefc_36c8e726",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 670,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-10-25T06:09:38Z",
+      "side": 1,
+      "message": "s/nothing but/only/ ?",
+      "range": {
+        "startLine": 670,
+        "startChar": 0,
+        "endLine": 670,
+        "endChar": 60
+      },
+      "revId": "4059d2ec3ee9e190c625f5ddd62d14b79b9dd45c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
