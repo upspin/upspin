@@ -466,3 +466,19 @@ func Match(err1, err2 error) bool {
 	}
 	return true
 }
+
+// Is reports whether err is an *Error of the given Kind.
+// If err is nil then Is returns false.
+func Is(kind Kind, err error) bool {
+	e, ok := err.(*Error)
+	if !ok {
+		return false
+	}
+	if e.Kind != Other {
+		return e.Kind == kind
+	}
+	if e.Err != nil {
+		return Is(kind, e.Err)
+	}
+	return false
+}

@@ -337,7 +337,7 @@ func TestOnlyOwnerCanLookup(t *testing.T) {
 	// no one else can.
 	s, _ = newDirServerForTesting(t, "spy@nsa.gov")
 	_, err = s.Lookup(snapshotUser + "/")
-	if !errors.Match(errPrivate, err) {
+	if !errors.Is(errors.Private, err) {
 		t.Fatalf("err = %v, want = %v", err, errPrivate)
 	}
 }

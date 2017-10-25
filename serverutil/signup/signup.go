@@ -117,7 +117,7 @@ func (m *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err == nil {
 		errorf(http.StatusBadRequest, "user already exists on key server: %s", u.Name)
 		return
-	} else if !errors.Match(errors.E(errors.NotExist), err) {
+	} else if !errors.Is(errors.NotExist, err) {
 		errorf(http.StatusInternalServerError, "error looking up user: %v", err)
 		return
 	}
@@ -279,7 +279,7 @@ func (m *handler) createUser(u *upspin.User) error {
 
 	// Lookup snapshotUser to ensure we don't overwrite an existing one.
 	_, err = key.Lookup(snapshotUser)
-	if err != nil && !errors.Match(errors.E(errors.NotExist), err) {
+	if err != nil && !errors.Is(errors.NotExist, err) {
 		return err
 	}
 	if err == nil {

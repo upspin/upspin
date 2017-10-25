@@ -416,7 +416,7 @@ func (s *server) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, error)
 	if err == upspin.ErrFollowLink {
 		return s.errLink(op, entry, err)
 	}
-	if errors.Match(err, notExist) {
+	if errors.Is(errors.NotExist, err) {
 		// The parent must exist.
 		_, err = s.lookup(op, parsed.Drop(1), true)
 		if err != nil {

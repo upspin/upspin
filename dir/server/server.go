@@ -225,7 +225,7 @@ func (s *server) lookupWithPermissions(op string, name upspin.PathName, opts ...
 		return s.errLink(op, entry, opts...)
 	}
 	if err != nil {
-		if errors.Match(errNotExist, err) {
+		if errors.Is(errors.NotExist, err) {
 			if canAny, _, err := s.hasRight(access.AnyRight, p, opts...); err != nil {
 				return nil, errors.E(op, err)
 			} else if !canAny {
@@ -385,7 +385,7 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		return s.errLink(op, existingEntry, o)
 	}
 
-	if errors.Match(errNotExist, err) {
+	if errors.Is(errors.NotExist, err) {
 		// OK; entry not found as expected. Can we create it?
 		canCreate, _, err := s.hasRight(access.Create, p, o)
 		if err == upspin.ErrFollowLink {
@@ -860,7 +860,7 @@ func (s *server) loadTreeFor(userName upspin.UserName, opts ...options) (*tree.T
 	// If user has root, we can load the tree from it.
 	if _, err := user.Root(); err != nil {
 		// Likely the user has no root yet.
-		if !errors.Match(errNotExist, err) {
+		if !errors.Is(errors.NotExist, err) {
 			// No it's some other error. Abort.
 			return nil, err
 		}

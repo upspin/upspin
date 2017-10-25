@@ -188,7 +188,7 @@ func (r *remote) probeDirect() error {
 	var err error
 	r.probeOnce.Do(func() {
 		b, _, _, err2 := r.Get(upspin.HTTPBaseMetadata)
-		if errors.Match(errors.E(errors.NotExist), err2) {
+		if errors.Is(errors.NotExist, err2) {
 			return
 		}
 		if err2 != nil {

@@ -381,7 +381,7 @@ func testSelectedOnePacking(t *testing.T, setup testenv.Setup) {
 	usercache.ResetGlobal()
 
 	env, err := testenv.New(&setup)
-	if errors.Match(errors.E(errors.NotExist), err) && setup.Kind == "remote" {
+	if errors.Is(errors.NotExist, err) && setup.Kind == "remote" {
 		t.Fatal(remoteTestMessage)
 	}
 	if err != nil {
@@ -505,7 +505,7 @@ func cleanup(env *testenv.Env) error {
 // provided DirServer, first deleting path/Access and then path/*.
 func deleteAll(dir upspin.DirServer, path upspin.PathName) error {
 	if _, err := dir.Delete(path + "/Access"); err != nil {
-		if !errors.Match(errNotExist, err) {
+		if !errors.Is(errors.NotExist, err) {
 			return err
 		}
 	}
