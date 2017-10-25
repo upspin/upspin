@@ -433,7 +433,7 @@ func TestIsDomainAdminPutOther(t *testing.T) {
 		PublicKey: upspin.PublicKey("adminUser can Put this"),
 	}
 	err = u.Put(user)
-	if !errors.Match(errors.E(errors.Permission), err) {
+	if !errors.Is(errors.Permission, err) {
 		t.Fatalf("Expected Permission Denied, got %s", err)
 	}
 }

@@ -155,6 +155,39 @@ func TestMatch(t *testing.T) {
 	}
 }
 
+type kindTest struct {
+	err  error
+	kind Kind
+	want bool
+}
+
+var kindTests = []kindTest{
+	// Non-Error errors.
+	{nil, NotExist, false},
+	{Str("not an *Error"), NotExist, false},
+
+	// Basic comparisons.
+	{E(NotExist), NotExist, true},
+	{E(Exist), NotExist, false},
+	{E("no kind"), NotExist, false},
+	{E("no kind"), Other, false},
+
+	// Nested *Error values.
+	{E("Nesting", E(NotExist)), NotExist, true},
+	{E("Nesting", E(Exist)), NotExist, false},
+	{E("Nesting", E("no kind")), NotExist, false},
+	{E("Nesting", E("no kind")), Other, false},
+}
+
+func TestKind(t *testing.T) {
+	for _, test := range kindTests {
+		got := Is(test.kind, test.err)
+		if got != test.want {
+			t.Errorf("Is(%q, %q)=%t; want %t", test.kind, test.err, got, test.want)
+		}
+	}
+}
+
 // errorAsString returns the string form of the provided error value.
 // If the given string is an *Error, the stack information is removed
 // before the value is stringified.

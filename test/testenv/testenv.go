@@ -397,8 +397,8 @@ func makeRootIfNotExist(cfg upspin.Config) error {
 		Attr:       upspin.AttrDirectory,
 	}
 	_, err = dir.Put(entry)
-	if err != nil && !errors.Match(errors.E(errors.Exist), err) {
-		return err
+	if errors.Is(errors.Exist, err) {
+		return nil
 	}
-	return nil
+	return err
 }

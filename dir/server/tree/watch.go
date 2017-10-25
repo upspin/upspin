@@ -34,9 +34,8 @@ const (
 )
 
 var (
-	errTimeout  = errors.E(errors.IO, errors.Str("channel operation timed out"))
-	errClosed   = errors.E(errors.IO, errors.Str("channel closed"))
-	errNotExist = errors.E(errors.NotExist)
+	errTimeout = errors.E(errors.IO, errors.Str("channel operation timed out"))
+	errClosed  = errors.E(errors.IO, errors.Str("channel closed"))
 )
 
 // watcher holds together the done channel and the event channel for a given
@@ -178,7 +177,7 @@ func (t *Tree) Watch(p path.Parsed, sequence int64, done <-chan struct{}) (<-cha
 // t.mu must be held.
 func (t *Tree) addWatcher(p path.Parsed, w *watcher) error {
 	n, _, err := t.loadPath(p)
-	if err != nil && !errors.Match(errNotExist, err) {
+	if err != nil && !errors.Is(errors.NotExist, err) {
 		return err
 	}
 	if err != nil && n == nil {
@@ -199,7 +198,7 @@ func (w *watcher) sendCurrentAndWatch(clone, orig *Tree, p path.Parsed, offset i
 	defer clone.Close()
 
 	n, _, err := clone.loadPath(p)
-	if err != nil && !errors.Match(errNotExist, err) {
+	if err != nil && !errors.Is(errors.NotExist, err) {
 		w.sendError(err)
 		w.close()
 		return

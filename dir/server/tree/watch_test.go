@@ -367,7 +367,7 @@ func TestCannotWatchNonExistentRoot(t *testing.T) {
 	// Get a watcher for the current subtree, rooted at orig/sub1.
 	done := make(chan struct{})
 	_, err = tree.Watch(mkpath(t, userName+"/orig/sub1"), upspin.WatchCurrent, done)
-	if !errors.Match(errNotExist, err) {
+	if !errors.Is(errors.NotExist, err) {
 		t.Fatalf("Expected NotExist, got = %v", err)
 	}
 }

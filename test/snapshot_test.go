@@ -44,7 +44,7 @@ func testSnapshot(t *testing.T, r *testenv.Runner) {
 	// Take the snapshot.
 	r.As(snapshotUser)
 	r.MakeDirectory(snapshotDir)
-	if err := r.Err(); err != nil && !errors.Match(errors.E(errors.Exist), err) {
+	if err := r.Err(); err != nil && !errors.Is(errors.Exist, err) {
 		// It's OK for the snapshot directory to exist already,
 		// as it won't be deleted after previous test runs.
 		t.Fatal(err)

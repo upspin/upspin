@@ -85,8 +85,8 @@ func (s *web) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Lookup name.
 	entry, err := s.cli.Lookup(name, true)
 	switch {
-	case errors.Match(errors.E(errors.NotExist), err),
-		errors.Match(errors.E(errors.BrokenLink), err):
+	case errors.Is(errors.NotExist, err),
+		errors.Is(errors.BrokenLink, err):
 		// Handle NotExist or BrokenLink later, as response
 		// depends on whether 'All' has 'list' right.
 	case err != nil:
@@ -197,7 +197,7 @@ func (s *web) accessAll(name upspin.PathName) (bool, bool, error) {
 // ifError checks if the error is the expected one, and if so writes back an
 // HTTP error of the corresponding code.
 func ifError(w http.ResponseWriter, got error, want errors.Kind, code int) bool {
-	if !errors.Match(errors.E(want), got) {
+	if !errors.Is(want, got) {
 		return false
 	}
 	http.Error(w, http.StatusText(code), code)

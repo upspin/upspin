@@ -380,7 +380,7 @@ func (c *Client) getReaders(op string, name upspin.PathName, accessEntry *upspin
 		return nil, nil
 	}
 	accessData, err := c.Get(accessEntry.Name)
-	if errors.Match(errors.E(errors.NotExist), err) || errors.Match(errors.E(errors.Permission), err) || errors.Match(errors.E(errors.Private), err) {
+	if errors.Is(errors.NotExist, err) || errors.Is(errors.Permission, err) || errors.Is(errors.Private, err) {
 		// If we failed to get the Access file for access-control
 		// reasons, then we must not have read access and thus
 		// cannot know the list of readers.
@@ -541,7 +541,7 @@ func (c *Client) lookup(op string, entry *upspin.DirEntry, fn lookupFn, followFi
 		if err == nil {
 			return resultEntry, entry, nil
 		}
-		if prevEntry != nil && errors.Match(errors.E(errors.NotExist), err) {
+		if prevEntry != nil && errors.Is(errors.NotExist, err) {
 			return resultEntry, nil, errors.E(op, errors.BrokenLink, prevEntry.Name, err)
 		}
 		prevEntry = resultEntry
@@ -661,9 +661,9 @@ func (c *Client) Glob(pattern string) ([]*upspin.DirEntry, error) {
 // benignGlobError reports whether the provided error can be
 // safely ignored as part of a multi-request glob operation.
 func benignGlobError(err error) bool {
-	return errors.Match(errors.E(errors.NotExist), err) ||
-		errors.Match(errors.E(errors.Permission), err) ||
-		errors.Match(errors.E(errors.Private), err)
+	return errors.Is(errors.NotExist, err) ||
+		errors.Is(errors.Permission, err) ||
+		errors.Is(errors.Private, err)
 }
 
 func (c *Client) globOnePattern(pattern string, s *metric.Span) (entries, links []*upspin.DirEntry, err error) {

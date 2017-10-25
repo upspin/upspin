@@ -164,7 +164,7 @@ func (s *server) shouldSnapshot(cfg *snapshotConfig) (bool, path.Parsed, error) 
 	if err == upspin.ErrFollowLink {
 		// We need to get the real entry and we cannot resolve links on our own.
 		return false, path.Parsed{}, errors.E(op, errors.Internal, p.Path(), errors.Str("cannot follow a link to snapshot"))
-	} else if err != nil && !errors.Match(errNotExist, err) {
+	} else if err != nil && !errors.Is(errors.NotExist, err) {
 		// Some other error. Abort.
 		return false, path.Parsed{}, errors.E(op, err)
 	}
@@ -276,7 +276,7 @@ func (s *server) mkDirIfNotExist(name path.Parsed) error {
 	if err == upspin.ErrFollowLink {
 		return errors.E(errors.Internal, errors.Str("cannot mkdir through a link"))
 	}
-	if err != nil && !errors.Match(errNotExist, err) {
+	if err != nil && !errors.Is(errors.NotExist, err) {
 		// Real error. Abort.
 		return err
 	}

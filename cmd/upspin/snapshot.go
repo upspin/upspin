@@ -44,7 +44,7 @@ the directory server for the user's root supports them.
 	switch {
 	case err == nil:
 		// Okay -- user exists.
-	case errors.Match(errors.E(errors.NotExist), err):
+	case errors.Is(errors.NotExist, err):
 		// User must be created. This should succeed because the current
 		// user is either the canonical user or the snapshot user.
 		err = keyServer.Put(&upspin.User{
@@ -62,7 +62,7 @@ the directory server for the user's root supports them.
 
 	// Is the root for the snapshot already created?
 	_, err = s.Client.Lookup(upspin.PathName(snapshotUser), false)
-	if err != nil && errors.Match(errors.E(errors.NotExist), err) {
+	if err != nil && errors.Is(errors.NotExist, err) {
 		_, err = s.Client.MakeDirectory(upspin.PathName(snapshotUser + "/"))
 		if err != nil {
 			s.Exit(err)

@@ -57,7 +57,7 @@ func (s *server) whichAccess(p path.Parsed, opts ...options) (*upspin.DirEntry, 
 			// and ErrFollowLink.
 			return entry, err
 		}
-		if errors.Match(errNotExist, err) {
+		if errors.Is(errors.NotExist, err) {
 			if p.IsRoot() {
 				// Already at the root, nothing found.
 				return nil, nil
