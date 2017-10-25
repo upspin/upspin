@@ -255,7 +255,7 @@ func TestLink(t *testing.T) {
 	// Get a server for otherUser, who has no right to see the link.
 	sOther, userCtx := newDirServerForTesting(t, otherUser)
 	_, err = sOther.Lookup(userName + "/mylink")
-	if !errors.Match(errPrivate, err) {
+	if !errors.Is(errors.Private, err) {
 		t.Errorf("err = %v, want = %v", err, errPrivate)
 	}
 
@@ -734,7 +734,7 @@ func TestForgetsRemoteGroupFiles(t *testing.T) {
 
 	sReader, _ := newDirServerForTesting(t, otherUser)
 	_, err = sReader.Lookup(accessFile)
-	if !errors.Match(errPrivate, err) {
+	if !errors.Is(errors.Private, err) {
 		t.Errorf("err = %s\nwant = %q", err, errPrivate)
 	}
 
@@ -759,7 +759,7 @@ func TestForgetsRemoteGroupFiles(t *testing.T) {
 	// Lookup now fails because the Group file granting permission is not
 	// found (no server for foo@example.com).
 	_, err = sReader.Lookup(accessFile)
-	if !errors.Match(errPrivate, err) {
+	if !errors.Is(errors.Private, err) {
 		t.Errorf("err = %s, want = %q", err, errPrivate)
 	}
 }
@@ -778,7 +778,7 @@ func TestCantProbeForExistence(t *testing.T) {
 	s, _ := newDirServerForTesting(t, userName)
 
 	_, err := s.Lookup("barney@rubble.org/")
-	if !errors.Match(errNotExist, err) {
+	if !errors.Is(errors.NotExist, err) {
 		t.Fatalf("err = %v, want = %v", err, errNotExist)
 	}
 }

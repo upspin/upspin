@@ -41,7 +41,7 @@ func (s *State) doMkdir(name upspin.PathName, parent bool) {
 		s.Exit(err)
 	}
 	_, err = s.Client.MakeDirectory(name)
-	if parent && p.NElem() > 0 && errors.Match(errors.E(errors.NotExist), err) {
+	if parent && p.NElem() > 0 && errors.Is(errors.NotExist, err) {
 		s.doMkdir(p.Drop(1).Path(), true)
 		s.doMkdir(name, false)
 		return

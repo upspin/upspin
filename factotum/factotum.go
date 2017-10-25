@@ -72,7 +72,7 @@ func NewFromDir(dir string) (upspin.Factotum, error) {
 
 	// Read older key pairs.
 	s2, err := readFile(op, dir, "secret2.upspinkey")
-	if err != nil && !errors.Match(errors.E(errors.NotExist), err) {
+	if err != nil && !errors.Is(errors.NotExist, err) {
 		return nil, err
 	}
 	s2 = stripCR(s2)

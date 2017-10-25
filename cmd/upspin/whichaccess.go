@@ -47,7 +47,7 @@ func (s *State) whichAccessFollowLinks(name upspin.PathName) (*upspin.DirEntry, 
 			name = entry.Link
 			continue
 		}
-		if prevEntry != nil && errors.Match(errors.E(errors.NotExist), err) {
+		if prevEntry != nil && errors.Is(errors.NotExist, err) {
 			return nil, errors.E(errors.BrokenLink, prevEntry.Name, err)
 		}
 		prevEntry = entry

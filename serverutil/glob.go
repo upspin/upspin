@@ -14,12 +14,6 @@ import (
 	"upspin.io/upspin"
 )
 
-var (
-	errNotExist   = errors.E(errors.NotExist)
-	errPrivate    = errors.E(errors.Private)
-	errPermission = errors.E(errors.Permission)
-)
-
 // ListFunc lists the entries in the directory specified by path.
 // It should handle access control internally, returning a Private or
 // Permission error if the caller does not have access.
@@ -114,9 +108,9 @@ func Glob(pattern string, lookup LookupFunc, ls ListFunc) ([]*upspin.DirEntry, e
 	// Perform any additional glob operations recursively.
 	for _, pattern := range toGlob {
 		entries, err := Glob(pattern, lookup, ls)
-		if errors.Match(errPrivate, err) ||
-			errors.Match(errPermission, err) ||
-			errors.Match(errNotExist, err) {
+		if errors.Is(errors.Private, err) ||
+			errors.Is(errors.Permission, err) ||
+			errors.Is(errors.NotExist, err) {
 			// Ignore paths when access is restricted.
 			continue
 		}
