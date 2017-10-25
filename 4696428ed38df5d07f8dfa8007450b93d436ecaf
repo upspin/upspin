@@ -71,6 +71,24 @@
       "revId": "4696428ed38df5d07f8dfa8007450b93d436ecaf",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2c83d5d4_fc6bcb6d",
+        "filename": "errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 473,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-25T05:22:52Z",
+      "side": 1,
+      "message": "right. too bad. it\u0027s a little clumsy but still a great improvement.",
+      "parentUuid": "bc913293_dbe1f56c",
+      "revId": "4696428ed38df5d07f8dfa8007450b93d436ecaf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
