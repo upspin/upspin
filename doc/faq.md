@@ -134,6 +134,17 @@ It is just a name, after all.
 Upspin could replace the naming mechanism and one day may do so,
 although in practice we find email addresses work well.
 
+### Are there restrictions on Upspin user names? {#email-restrictions}
+
+Any valid email address is likely fine but since it will become as a user name
+within Upspin, the system applies some constraints that could
+invalidate some (very unusual) addresses.
+Also, within Upspin user names are case-sensitive,
+although in some email services the names are case-insensitive.
+The full story is a bit technical and irrelevant for most users, but
+if you are interested please see the description
+[here](https://godoc.org/upspin.io/user#Parse).
+
 ## Security
 
 ### How do Upspin servers authenticate users? {#server-auth}
@@ -440,6 +451,18 @@ information necessary for the system to decrypt files that have not been updated
 
 However, if you are changing keys because you fear your old keys leaked, run `share` as soon as possible,
 to disassociate the files from your old key.
+
+## Users
+
+### How do I change the location of my directory and/or store servers? {#change-servers}
+
+If you change the location of your directory and store servers, you must
+update the values stored in the key server.
+One easy way to do this is to update the values in `$HOME/config` and run:
+
+```
+$ upspin user | upspin user -put
+```
 
 ## Programming
 
