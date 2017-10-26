@@ -1,0 +1,276 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7239f563_0baf69e1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-26T01:40:47Z",
+      "side": 1,
+      "message": "use of",
+      "revId": "c0c03d031532c4feba050abc9ed365eb71b54424",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5db3c2fd_5c4b5af6",
+        "filename": "doc/faq.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-26T01:40:47Z",
+      "side": 1,
+      "message": "this file should be a separate CL. the changes are unrelated.",
+      "revId": "c0c03d031532c4feba050abc9ed365eb71b54424",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b644ce48_b0daa006",
+        "filename": "doc/signup.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-26T01:40:47Z",
+      "side": 1,
+      "message": "administer",
+      "revId": "c0c03d031532c4feba050abc9ed365eb71b54424",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a0a0bbd0_94f55e5c",
+        "filename": "doc/signup.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-26T01:40:47Z",
+      "side": 1,
+      "message": "s/,/;/",
+      "revId": "c0c03d031532c4feba050abc9ed365eb71b54424",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "79b36d7c_c17b3abf",
+        "filename": "doc/signup.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-26T01:40:47Z",
+      "side": 1,
+      "message": "there are existing uses of \"username\" in this doc, but more of \"user name\". i\u0027d rather use english than german, preferring the two word form, but most of all i\u0027d prefer to be consistent. please change the existing uses to be consistent, at least in this file.",
+      "revId": "c0c03d031532c4feba050abc9ed365eb71b54424",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "324042f8_026ab99a",
+        "filename": "doc/signup.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-26T01:40:47Z",
+      "side": 1,
+      "message": "start new sentences on new lines",
+      "revId": "c0c03d031532c4feba050abc9ed365eb71b54424",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "20a3c263_63d0dc17",
+        "filename": "doc/signup.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-26T01:40:47Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "c0c03d031532c4feba050abc9ed365eb71b54424",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1e3cad39_bc301552",
+        "filename": "doc/signup.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-26T01:40:47Z",
+      "side": 1,
+      "message": "trailing space",
+      "revId": "c0c03d031532c4feba050abc9ed365eb71b54424",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4acdcb93_0300dd8d",
+        "filename": "doc/signup.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-26T01:40:47Z",
+      "side": 1,
+      "message": "s/and it will/to/\nkeep the subject of the sentence consistent",
+      "revId": "c0c03d031532c4feba050abc9ed365eb71b54424",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e38959c5_60f8db06",
+        "filename": "doc/signup.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-26T01:40:47Z",
+      "side": 1,
+      "message": "it\u0027s not strictly read-only. it\u0027s just that you don\u0027t have your own tree. this would be fine if all you wanted to do was contribute to another\u0027s tree and they granted you write access to one of their directories and a store sever. maybe we can come up with a better term.\n\nbut if we can\u0027t, this is close enough to the truth",
+      "revId": "c0c03d031532c4feba050abc9ed365eb71b54424",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3637e399_b0022f66",
+        "filename": "doc/signup.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-26T01:40:47Z",
+      "side": 1,
+      "message": "s/and //\n\nor maybe you mean s/to/do/",
+      "revId": "c0c03d031532c4feba050abc9ed365eb71b54424",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "255d8fae_1c41d536",
+        "filename": "doc/signup.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-26T01:40:47Z",
+      "side": 1,
+      "message": "s/deployed/to deploy/",
+      "revId": "c0c03d031532c4feba050abc9ed365eb71b54424",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2c404f07_a201f30a",
+        "filename": "doc/signup.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-26T01:40:47Z",
+      "side": 1,
+      "message": "user root",
+      "revId": "c0c03d031532c4feba050abc9ed365eb71b54424",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b4911b95_687c9a5d",
+        "filename": "doc/signup.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-26T01:40:47Z",
+      "side": 1,
+      "message": "trailing space",
+      "revId": "c0c03d031532c4feba050abc9ed365eb71b54424",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6b833124_60c9ab61",
+        "filename": "doc/signup.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-26T01:40:47Z",
+      "side": 1,
+      "message": "user root. be consistent.\nfor clarity, maybe Upspin user root",
+      "revId": "c0c03d031532c4feba050abc9ed365eb71b54424",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "02a4e142_31deac2b",
+        "filename": "doc/signup.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-26T01:40:47Z",
+      "side": 1,
+      "message": "what if it doesn\u0027t?\n\ns/,.*/ then you are ready to use Upspin./",
+      "revId": "c0c03d031532c4feba050abc9ed365eb71b54424",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
