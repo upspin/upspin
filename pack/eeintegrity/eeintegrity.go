@@ -298,6 +298,7 @@ func (ei ei) updateDirEntry(op string, cfg upspin.Config, d *upspin.DirEntry, ne
 	}
 
 	// Compute new signature, using the new name.
+	d.Writer = cfg.UserName()
 	d.SignedName = newName
 	d.Time = newTime
 	vhash = f.DirEntryHash(d.SignedName, d.Link, d.Attr, d.Packing, d.Time, dkey, cipherSum)
