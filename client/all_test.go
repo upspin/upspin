@@ -103,7 +103,7 @@ func setup(base upspin.Config, userName upspin.UserName) upspin.Config {
 		Writer:     userName,
 	}
 	_, err = dir.Put(entry)
-	if err != nil {
+	if err != nil && !errors.Is(errors.Exist, err) {
 		panic(err)
 	}
 	return cfg
@@ -599,24 +599,32 @@ func TestPutDuplicateAndRename(t *testing.T) {
 		t.Fatal(fmt.Sprintf("contents of %q and %q don't match", renamed, original))
 	}
 }
-
 func TestPutDuplicateDifferentUser(t *testing.T) {
+	t.Run(fmt.Sprintf("packing=ee"), func(t *testing.T) {
+		testPutDuplicateDifferentUser(t, upspin.EEPack)
+	})
+	t.Run(fmt.Sprintf("packing=eeintegrity"), func(t *testing.T) {
+		testPutDuplicateDifferentUser(t, upspin.EEIntegrityPack)
+	})
+}
+
+func testPutDuplicateDifferentUser(t *testing.T, packing upspin.Packing) {
 	const user1, user2 = "ann@example.com", "bob@example.org"
-	client1 := New(setup(baseCfg, user1))
-	client2 := New(setup(baseCfg2, user2))
+	client1 := New(setup(config.SetPacking(baseCfg, packing), user1))
+	client2 := New(setup(config.SetPacking(baseCfg2, packing), user2))
 
 	acc := "*:" + user1 + "\nread,list:" + user2
 	if _, err := client1.Put(user1+"/Access", []byte(acc)); err != nil {
 		t.Fatal(err)
 	}
 
-	oldName := upspin.PathName(user1 + "/old")
+	oldName := upspin.PathName(fmt.Sprintf("%s/%s-old", user1, packing))
 	text := "the rain in spain"
 	if _, err := client1.Put(oldName, []byte(text)); err != nil {
 		t.Fatal(err)
 	}
 
-	newName := upspin.PathName(user2 + "/new")
+	newName := upspin.PathName(fmt.Sprintf("%s/%s-new", user2, packing))
 	if _, err := client2.PutDuplicate(oldName, newName); err != nil {
 		t.Fatal(err)
 	}
