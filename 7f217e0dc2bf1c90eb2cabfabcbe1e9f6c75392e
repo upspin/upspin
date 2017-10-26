@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "9cce6028_41b717d5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-10-26T02:00:04Z",
+      "side": 1,
+      "message": "mention the addition of serverutil.IsLoopback in this CL.\nalthough it should probably be in a separate CL, though.\nmind splitting it out?",
+      "revId": "7f217e0dc2bf1c90eb2cabfabcbe1e9f6c75392e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f62430d6_13f6c8c5",
         "filename": "cmd/upspin/signup.go",
         "patchSetId": 8
