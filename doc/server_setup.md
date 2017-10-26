@@ -185,7 +185,7 @@ local$ GOOS=linux GOARCH=amd64 go build upspin.io/cmd/upspinserver
 The default is to store data in $HOME/upspin/storage.
 TODO upspin-setupstorage stuff
 
-**If you choose to store your Upspin data on the your server's local disk then
+**If you choose to store your Upspin data on your server's local disk then
 in the event of a disk failure all your Upspin data will be lost.**
 
 ### Specific instructions for cloud services {#cloud}

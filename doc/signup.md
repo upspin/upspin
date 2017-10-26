@@ -61,7 +61,7 @@ Any valid email address is almost certainly a valid Upspin user name
 **Start the `upspin-ui` program to start the signup process.**
 
 The first step asks for your user name, generates a key pair (one secret key,
-one public key), saves the keys locally, and sends the your details, including
+one public key), saves the keys locally, and sends your details, including
 your public key, to the key server.
 The public key is published to the shared Upspin key server, but the secret key
 is stored only on your local computer.
