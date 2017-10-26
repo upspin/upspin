@@ -160,7 +160,7 @@ var flags = map[string]*flagVar{
 			return ""
 		},
 	},
-	"kind":      strVar(&ServerKind, "kind", ServerKind, "server implementation `kind` (inprocess, gcp)"),
+	"kind":      strVar(&ServerKind, "kind", ServerKind, "server implementation `kind` (inprocess, server)"),
 	"letscache": strVar(&LetsEncryptCache, "letscache", defaultLetsEncryptCache, "Let's Encrypt cache `directory`"),
 	"log": &flagVar{
 		set: func(fs *flag.FlagSet) {
