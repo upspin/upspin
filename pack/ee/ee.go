@@ -527,8 +527,10 @@ func (ee ee) updateDirEntry(op string, cfg upspin.Config, d *upspin.DirEntry, ne
 		return errors.E(op, d.Name, err)
 	}
 
-	// For quick lookup, hash my public key and locate my wrapped key in the metadata.
+	// For quick lookup, hash my public key and locate my wrapped key (or
+	// the AllUsersKeyHash) in the metadata.
 	rhash := factotum.KeyHash(rawPublicKey)
+	allFound := false
 	wrapFound := false
 	var w wrappedKey
 	for _, w = range pd.wrap {
@@ -536,16 +538,25 @@ func (ee ee) updateDirEntry(op string, cfg upspin.Config, d *upspin.DirEntry, ne
 			wrapFound = true
 			break
 		}
+		if bytes.Equal(factotum.AllUsersKeyHash, w.keyHash) {
+			allFound = true
+			break
+		}
 	}
-	if !wrapFound {
+	if !wrapFound && !allFound {
 		return errors.E(op, d.Name, errNoWrappedKey)
 	}
 
-	// Decode my wrapped key using my private key
 	f := cfg.Factotum()
-	dkey, err := aesUnwrap(f, w)
-	if err != nil {
-		return errors.E(op, d.Name, errors.Str("unwrap failed"))
+	var dkey []byte
+	if allFound {
+		dkey = w.dkey
+	} else {
+		// Decode my wrapped key using my private key
+		dkey, err = aesUnwrap(f, w)
+		if err != nil {
+			return errors.E(op, d.Name, errors.Str("unwrap failed"))
+		}
 	}
 
 	// Verify that this was signed with the writer's old or new public key.
@@ -562,6 +573,7 @@ func (ee ee) updateDirEntry(op string, cfg upspin.Config, d *upspin.DirEntry, ne
 	}
 
 	// Compute new signature.
+	d.Writer = cfg.UserName()
 	d.SignedName = newName
 	d.Time = newTime
 	vhash = f.DirEntryHash(d.SignedName, d.Link, d.Attr, d.Packing, d.Time, dkey, pd.blockSum)

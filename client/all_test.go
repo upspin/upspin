@@ -43,7 +43,7 @@ func init() {
 	}
 
 	baseCfg = config.New()
-	baseCfg = config.SetPacking(baseCfg, upspin.EEIntegrityPack)
+	baseCfg = config.SetPacking(baseCfg, upspin.EEPack)
 	baseCfg = config.SetKeyEndpoint(baseCfg, inProcess)
 	baseCfg = config.SetStoreEndpoint(baseCfg, inProcess)
 	baseCfg = config.SetDirEndpoint(baseCfg, inProcess)
@@ -56,7 +56,7 @@ func init() {
 	}
 
 	baseCfg2 = config.New()
-	baseCfg2 = config.SetPacking(baseCfg, upspin.EEIntegrityPack)
+	baseCfg2 = config.SetPacking(baseCfg, upspin.EEPack)
 	baseCfg2 = config.SetKeyEndpoint(baseCfg, inProcess)
 	baseCfg2 = config.SetStoreEndpoint(baseCfg, inProcess)
 	baseCfg2 = config.SetDirEndpoint(baseCfg, inProcess)
@@ -597,6 +597,36 @@ func TestPutDuplicateAndRename(t *testing.T) {
 	}
 	if string(in) != text {
 		t.Fatal(fmt.Sprintf("contents of %q and %q don't match", renamed, original))
+	}
+}
+
+func TestPutDuplicateDifferentUser(t *testing.T) {
+	const user1, user2 = "ann@example.com", "bob@example.org"
+	client1 := New(setup(baseCfg, user1))
+	client2 := New(setup(baseCfg2, user2))
+
+	acc := "*:" + user1 + "\nread,list:" + user2
+	if _, err := client1.Put(user1+"/Access", []byte(acc)); err != nil {
+		t.Fatal(err)
+	}
+
+	oldName := upspin.PathName(user1 + "/old")
+	text := "the rain in spain"
+	if _, err := client1.Put(oldName, []byte(text)); err != nil {
+		t.Fatal(err)
+	}
+
+	newName := upspin.PathName(user2 + "/new")
+	if _, err := client2.PutDuplicate(oldName, newName); err != nil {
+		t.Fatal(err)
+	}
+
+	got, err := client2.Get(newName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if want := []byte(text); !bytes.Equal(got, want) {
+		t.Errorf("duplicate entry content is %q, want %q", got, want)
 	}
 }
 
