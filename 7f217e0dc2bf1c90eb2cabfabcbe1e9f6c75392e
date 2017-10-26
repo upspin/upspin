@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f62430d6_13f6c8c5",
+        "filename": "cmd/upspin/signup.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-10-26T01:59:32Z",
+      "side": 1,
+      "message": "I\u0027d prefer to make this the signup URL instead of the keyserver address, then we don\u0027t need the client -insecure flag (which I would prefer to avoid entirely)",
+      "revId": "7f217e0dc2bf1c90eb2cabfabcbe1e9f6c75392e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7ad22741_a836597f",
+        "filename": "dir/remote/remote.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-10-26T01:59:32Z",
+      "side": 1,
+      "message": "I definitely don\u0027t want to do this. We should always require TLS for Upspin clients.",
+      "revId": "7f217e0dc2bf1c90eb2cabfabcbe1e9f6c75392e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fb035014_194575ec",
+        "filename": "serverutil/addr.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-10-26T01:59:32Z",
+      "side": 1,
+      "message": "please add a copyright header (see the other files for an example)",
+      "revId": "7f217e0dc2bf1c90eb2cabfabcbe1e9f6c75392e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
