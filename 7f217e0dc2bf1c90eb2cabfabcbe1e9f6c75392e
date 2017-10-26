@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "22abcc64_b0348700",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 6197
+      },
+      "writtenOn": "2017-10-26T02:25:03Z",
+      "side": 1,
+      "message": "Roger, but I\u0027m gonna wait for you to answer the other comments before reconciling here.",
+      "parentUuid": "9cce6028_41b717d5",
+      "revId": "7f217e0dc2bf1c90eb2cabfabcbe1e9f6c75392e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "f62430d6_13f6c8c5",
         "filename": "cmd/upspin/signup.go",
         "patchSetId": 8
@@ -30,6 +48,24 @@
       "writtenOn": "2017-10-26T01:59:32Z",
       "side": 1,
       "message": "I\u0027d prefer to make this the signup URL instead of the keyserver address, then we don\u0027t need the client -insecure flag (which I would prefer to avoid entirely)",
+      "revId": "7f217e0dc2bf1c90eb2cabfabcbe1e9f6c75392e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "774e1beb_d731f0a8",
+        "filename": "cmd/upspin/signup.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 6197
+      },
+      "writtenOn": "2017-10-26T02:25:03Z",
+      "side": 1,
+      "message": "That\u0027s what I initially tried to do, but soon later I\u0027ve realised that this also spits out the config file, which has to contain the keyserver address. If we use the sign-up URL, we\u0027re gonna have to parse it to extract the keyserver address and make incorrect assumptions. Or am I missing something?\n\nThis address is the keyserver that upspin will use and the basis on which the signup URL is constructed.\n\nIf a user is able to run a keyserver on a separate address, he should be able to connect to it. In the same manner, if a user is able to start an insecure server, he should be able to connect to it (can only work on localhost, see other comment).",
+      "parentUuid": "f62430d6_13f6c8c5",
       "revId": "7f217e0dc2bf1c90eb2cabfabcbe1e9f6c75392e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "a8d8bf0f_3e7a7052",
+        "filename": "dir/remote/remote.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 6197
+      },
+      "writtenOn": "2017-10-26T02:25:03Z",
+      "side": 1,
+      "message": "I absolutely agree. But you do know that rpc/client.go limits using rpc.NoSecurity to local hosts only? Considering that - is it still a problem? This helped me set up a locally running instance of each server and debug more  easily.",
+      "parentUuid": "7ad22741_a836597f",
+      "revId": "7f217e0dc2bf1c90eb2cabfabcbe1e9f6c75392e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "fb035014_194575ec",
         "filename": "serverutil/addr.go",
         "patchSetId": 8
@@ -67,6 +121,24 @@
       "revId": "7f217e0dc2bf1c90eb2cabfabcbe1e9f6c75392e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3a1e349e_05c4fb12",
+        "filename": "serverutil/addr.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 6197
+      },
+      "writtenOn": "2017-10-26T02:25:03Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "fb035014_194575ec",
+      "revId": "7f217e0dc2bf1c90eb2cabfabcbe1e9f6c75392e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
