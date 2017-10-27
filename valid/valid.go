@@ -26,10 +26,10 @@ func UserName(userName upspin.UserName) error {
 		return errors.E(op, err)
 	}
 	if string(userName) != u+"@"+d {
-		return errors.E(op, errors.Invalid, userName, "not canonically formatted")
+		return errors.E(op, errors.Invalid, userName, errors.Str("not canonically formatted"))
 	}
 	if userName == access.AllUsers {
-		return errors.E(op, errors.Invalid, userName, "reserved user name")
+		return errors.E(op, errors.Invalid, userName, errors.Str("reserved user name"))
 	}
 	return nil
 }

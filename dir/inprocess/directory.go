@@ -377,13 +377,13 @@ func (s *server) put(op string, entry *upspin.DirEntry, parsed path.Parsed, dele
 	s.db.root[parsed.User()] = rootEntry
 	if access.IsGroupFile(entry.Name) {
 		if entry.IsLink() {
-			return nil, errors.E(op, errors.Internal, entry.Name, "Group file cannot be a link")
+			return nil, errors.E(op, errors.Internal, entry.Name, errors.Str("Group file cannot be a link"))
 		}
 		// Group files are loaded on demand but we must wipe the cache.
 		access.RemoveGroup(entry.Name)
 	} else if access.IsAccessFile(entry.Name) {
 		if entry.IsLink() {
-			return nil, errors.E(op, errors.Internal, entry.Name, "Access file cannot be a link")
+			return nil, errors.E(op, errors.Internal, entry.Name, errors.Str("Access file cannot be a link"))
 		}
 		var accessFile *access.Access
 		if !deleting {
@@ -784,7 +784,7 @@ func (s *server) fetchEntry(op string, entry *upspin.DirEntry, elem string) (*up
 // The boolean is true if the entry itself describes a directory.
 func (s *server) dirEntLookup(op string, pathName upspin.PathName, payload []byte, elem string) (*upspin.DirEntry, error) {
 	if len(elem) == 0 {
-		return nil, errors.E(op, pathName, errors.E("empty path name element"))
+		return nil, errors.E(op, pathName, errors.Str("empty path name element"))
 	}
 	fileName := path.Join(pathName, elem)
 	var entry upspin.DirEntry

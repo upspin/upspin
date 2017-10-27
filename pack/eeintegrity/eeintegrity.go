@@ -266,7 +266,7 @@ func (ei ei) updateDirEntry(op string, cfg upspin.Config, d *upspin.DirEntry, ne
 	newName = parsedNew.Path()
 
 	if d.IsDir() && !parsed.Equal(parsedNew) {
-		return errors.E(op, d.Name, errors.IsDir, "cannot rename directory")
+		return errors.E(op, d.Name, errors.IsDir, errors.Str("cannot rename directory"))
 	}
 	if err := pack.CheckPacking(ei, d); err != nil {
 		return errors.E(op, errors.Invalid, d.Name, err)
@@ -321,7 +321,7 @@ func (ei ei) updateDirEntry(op string, cfg upspin.Config, d *upspin.DirEntry, ne
 func (ei ei) Countersign(oldKey upspin.PublicKey, f upspin.Factotum, d *upspin.DirEntry) error {
 	const op = "pack/eeintegrity.Countersign"
 	if d.IsDir() {
-		return errors.E(op, d.Name, errors.IsDir, "cannot sign directory")
+		return errors.E(op, d.Name, errors.IsDir, errors.Str("cannot sign directory"))
 	}
 
 	// Get ECDSA form of old key.
@@ -340,13 +340,13 @@ func (ei ei) Countersign(oldKey upspin.PublicKey, f upspin.Factotum, d *upspin.D
 	dkey := make([]byte, aesKeyLen)
 	vhash := f.DirEntryHash(d.SignedName, d.Link, d.Attr, d.Packing, d.Time, dkey, cipherSum)
 	if !ecdsa.Verify(oldPubKey, vhash, sig.R, sig.S) {
-		return errors.E(op, d.Name, errVerify, "unable to verify existing signature")
+		return errors.E(op, d.Name, errVerify, errors.Str("unable to verify existing signature"))
 	}
 
 	// Sign with newKey.
 	sig1, err := f.FileSign(vhash)
 	if err != nil {
-		return errors.E(op, d.Name, errVerify, "unable to make new signature")
+		return errors.E(op, d.Name, errVerify, errors.Str("unable to make new signature"))
 	}
 	pdMarshal(&d.Packdata, sig1, sig, cipherSum)
 	return nil

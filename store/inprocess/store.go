@@ -104,7 +104,7 @@ func (s *service) Get(ref upspin.Reference) (ciphertext []byte, refdata *upspin.
 		return nil, nil, nil, errors.E(op, errors.NotExist, errors.Errorf("no such blob: %s", ref))
 	}
 	if upspin.Reference(sha256key.Of(data).String()) != ref {
-		return nil, nil, nil, errors.E(op, errors.Invalid, "internal hash mismatch in StoreServer.Get")
+		return nil, nil, nil, errors.E(op, errors.Invalid, errors.Str("internal hash mismatch in StoreServer.Get"))
 	}
 	refdata = &upspin.Refdata{
 		Reference: ref,

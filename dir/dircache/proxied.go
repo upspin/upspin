@@ -220,7 +220,7 @@ func (d *proxiedDir) watch(ep upspin.Endpoint) error {
 			return nil
 		case e, ok := <-event:
 			if !ok {
-				return errors.E("Watch event stream closed")
+				return errors.Str("Watch event stream closed")
 			}
 			if err := d.handleEvent(&e); err != nil {
 				return err
