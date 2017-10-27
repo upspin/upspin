@@ -14,16 +14,20 @@ import (
 	"compress/gzip"
 	"fmt"
 	"html/template"
+	"io/ioutil"
 	"net/http"
 	"regexp"
 	"sort"
 	"strings"
 	"sync"
+	texttemplate "text/template"
 	"time"
 
 	"upspin.io/client"
+	"upspin.io/errors"
 	"upspin.io/log"
 	"upspin.io/path"
+	"upspin.io/test/testutil"
 	"upspin.io/upspin"
 )
 
@@ -58,6 +62,9 @@ const (
 
 	// releaseUser is the tree in which the releases are kept.
 	releaseUser = "release@upspin.io"
+
+	// readmeURL is the location of the README template file.
+	readmeURL = "https://raw.githubusercontent.com/upspin/upspin/master/README.binary"
 )
 
 // repos are the repos for which binaries are built. The downloadHandler
@@ -247,9 +254,7 @@ func (h *downloadHandler) buildArchive(osArch string) {
 	}
 
 	log.Info.Printf("download: building archive for %v at sequence %d", osArch, a.seq)
-	var err error
-	a.data, err = newArchive(osArch, h.client, des)
-	if err != nil {
+	if err := a.build(h.client, des); err != nil {
 		log.Error.Printf("download: error building archive for %v: %v", osArch, err)
 		return
 	}
@@ -313,21 +318,35 @@ func (a *archive) Commits() (cs []commit) {
 	return
 }
 
-// newArchive fetches DirEntries using the given Client and assembles a gzipped
-// tar file containing those files, and returns the resulting archive.
-func newArchive(osArch string, c upspin.Client, des []*upspin.DirEntry) ([]byte, error) {
+// build fetches DirEntries using the given Client and assembles a gzipped tar
+// file containing those files, and populates archive.data with the resulting
+// archive.
+func (a *archive) build(c upspin.Client, des []*upspin.DirEntry) error {
 	var buf bytes.Buffer
+
+	readme, err := a.readme()
+	if err != nil {
+		log.Error.Printf("error creating README: %v", err)
+	}
 
 	// The Write and Close methods of tar, gzip and zip should not return
 	// errors, as they cannnot fail when writing to a bytes.Buffer.
-	switch osArchFormat[osArch] {
+	switch osArchFormat[a.osArch] {
 	case "tar.gz":
 		zw := gzip.NewWriter(&buf)
 		tw := tar.NewWriter(zw)
+		if len(readme) > 0 {
+			tw.WriteHeader(&tar.Header{
+				Name: "README",
+				Mode: 0644,
+				Size: int64(len(readme)),
+			})
+			tw.Write(readme)
+		}
 		for _, de := range des {
 			b, err := c.Get(de.Name)
 			if err != nil {
-				return nil, err
+				return err
 			}
 
 			p, _ := path.Parse(de.Name)
@@ -343,10 +362,14 @@ func newArchive(osArch string, c upspin.Client, des []*upspin.DirEntry) ([]byte,
 		zw.Close()
 	case "zip":
 		zw := zip.NewWriter(&buf)
+		if len(readme) > 0 {
+			w, _ := zw.Create("README")
+			w.Write(readme)
+		}
 		for _, de := range des {
 			b, err := c.Get(de.Name)
 			if err != nil {
-				return nil, err
+				return err
 			}
 
 			p, _ := path.Parse(de.Name)
@@ -355,8 +378,48 @@ func newArchive(osArch string, c upspin.Client, des []*upspin.DirEntry) ([]byte,
 		}
 		zw.Close()
 	default:
-		return nil, fmt.Errorf("no known archive format %v", osArch)
+		return fmt.Errorf("no known archive format %v", a.osArch)
 	}
 
-	return buf.Bytes(), nil
+	a.data = buf.Bytes()
+	return nil
+}
+
+// readme generates the contents of the README file for this archive,
+// using readmeURL as a template.
+func (a *archive) readme() ([]byte, error) {
+	const debug = false // If true, use README.binary from local upspin.io repo.
+
+	var b []byte
+	if debug {
+		var err error
+		b, err = ioutil.ReadFile(testutil.Repo("README.binary"))
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		r, err := http.Get(readmeURL)
+		if err != nil {
+			return nil, err
+		}
+		b, err = ioutil.ReadAll(r.Body)
+		r.Body.Close()
+		if err != nil {
+			return nil, err
+		}
+		if r.StatusCode != http.StatusOK {
+			return nil, errors.Errorf("fetching %s: %v", readmeURL, r.Status)
+		}
+	}
+
+	t, err := texttemplate.New("readme").Parse(string(b))
+	if err != nil {
+		return nil, err
+	}
+	var buf bytes.Buffer
+	err = t.Execute(&buf, a)
+	if debug {
+		log.Printf("README:%s\n", &buf)
+	}
+	return buf.Bytes(), err
 }
