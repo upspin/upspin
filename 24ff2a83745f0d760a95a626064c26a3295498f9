@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4fdda045_b5385c09",
+        "filename": "README.binary",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-27T04:58:38Z",
+      "side": 1,
+      "message": "trailing space",
+      "revId": "24ff2a83745f0d760a95a626064c26a3295498f9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
