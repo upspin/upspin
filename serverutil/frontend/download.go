@@ -60,12 +60,12 @@ const (
 	releaseUser = "release@upspin.io"
 )
 
-// releasePaths are the paths to the latest upspin release binaries.
-// The downloadHandler watches these paths for changes, and when they do change
-// the files therein are assembled into a new release archive.
-var releasePaths = [...]upspin.PathName{
-	releaseUser + "/upspin/latest/",
-	releaseUser + "/augie/latest/",
+// repos are the repos for which binaries are built. The downloadHandler
+// watches releaseUser/repo/latest (for each repo) for changes, and when they
+// do change the files therein are assembled into a new release archive.
+var repos = []string{
+	"upspin",
+	"augie",
 }
 
 var archiveRE = regexp.MustCompile(archiveExpr)
@@ -78,8 +78,8 @@ func newDownloadHandler(cfg upspin.Config, tmpl *template.Template) http.Handler
 		latest:  make(map[upspin.PathName]*upspin.DirEntry),
 		archive: make(map[string]*archive),
 	}
-	for _, dir := range releasePaths {
-		go h.updateLoop(dir)
+	for _, repo := range repos {
+		go h.updateLoop(path.Join(releaseUser, repo, "latest"))
 	}
 	return h
 }
@@ -193,11 +193,16 @@ func (h *downloadHandler) updateLoop(dir upspin.PathName) {
 }
 
 // buildArchive assembles the archive file for the given osArch. It fetches all
-// the files in releasePaths/osArch, archives them, and updates h.archives.
+// files in latest/osArch for each repo, archives them, and updates h.archive.
 func (h *downloadHandler) buildArchive(osArch string) {
+	a := archive{
+		osArch: osArch,
+		commit: make([]string, len(repos)),
+	}
+
 	var des []*upspin.DirEntry
-	for _, dir := range releasePaths {
-		dir = path.Join(dir, osArch)
+	for i, repo := range repos {
+		dir := path.Join(releaseUser, repo, "latest", osArch)
 		h.mu.RLock()
 		latest, ok := h.latest[dir]
 		h.mu.RUnlock()
@@ -208,9 +213,13 @@ func (h *downloadHandler) buildArchive(osArch string) {
 		}
 		dir = latest.Name
 		if latest.IsLink() {
-			// Follow links to save a round trip, and also in case
-			// the link is being replaced right now.
+			// Follow the links to save a round trip, and also in
+			// case the link is being replaced right now.
 			dir = latest.Link
+			// Scan the commit hash from the link destination.
+			if p, err := path.Parse(dir); err == nil && p.NElem() > 0 {
+				a.commit[i] = p.Elem(p.NElem() - 1)
+			}
 		}
 		des2, err := h.client.Glob(upspin.AllFilesGlob(dir))
 		if err != nil {
@@ -221,26 +230,25 @@ func (h *downloadHandler) buildArchive(osArch string) {
 	}
 
 	// Check whether we have already built this version, or a newer one.
-	var seq int64
-	var t upspin.Time
 	for _, de := range des {
-		if de.Time > t {
-			t = de.Time
+		if de.Sequence > a.seq {
+			a.seq = de.Sequence
 		}
-		if de.Sequence > seq {
-			seq = de.Sequence
+		if de.Time > a.time {
+			a.time = de.Time
 		}
 	}
 	h.mu.RLock()
-	a, ok := h.archive[osArch]
+	curr, ok := h.archive[osArch]
 	h.mu.RUnlock()
-	if ok && seq <= a.seq {
+	if ok && a.seq <= curr.seq {
 		// Current archive as new or newer than the des.
 		return
 	}
 
-	log.Info.Printf("download: building archive for %v at sequence %d", osArch, seq)
-	data, err := newArchive(osArch, h.client, des)
+	log.Info.Printf("download: building archive for %v at sequence %d", osArch, a.seq)
+	var err error
+	a.data, err = newArchive(osArch, h.client, des)
 	if err != nil {
 		log.Error.Printf("download: error building archive for %v: %v", osArch, err)
 		return
@@ -249,15 +257,16 @@ func (h *downloadHandler) buildArchive(osArch string) {
 
 	// Add the archive to the list.
 	h.mu.Lock()
-	h.archive[osArch] = &archive{seq: seq, time: t, osArch: osArch, data: data}
+	h.archive[osArch] = &a
 	h.mu.Unlock()
 }
 
 // archive represents a release archive and its contents.
 type archive struct {
+	osArch string
+	commit []string    // Commit hash for each repo in the repos global.
 	seq    int64       // Highest Sequence of a file in the archive.
 	time   upspin.Time // Latest Time of a file in the archive.
-	osArch string
 	data   []byte
 }
 
@@ -280,6 +289,28 @@ func (a *archive) Size() string {
 // Time returns the time the files in this archive were built.
 func (a *archive) Time() time.Time {
 	return a.time.Go()
+}
+
+type commit struct {
+	Repo, Hash string
+}
+
+func (c commit) ShortHash() string {
+	if len(c.Hash) > 7 {
+		return c.Hash[:7]
+	}
+	return c.Hash
+}
+
+func (a *archive) Commits() (cs []commit) {
+	for i, repo := range repos {
+		hash := a.commit[i]
+		if hash == "" {
+			continue
+		}
+		cs = append(cs, commit{repo, hash})
+	}
+	return
 }
 
 // newArchive fetches DirEntries using the given Client and assembles a gzipped
