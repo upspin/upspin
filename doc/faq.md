@@ -288,7 +288,7 @@ A public one is stored in the key server at `key.upspin.io` and is visible to an
 A secret key is coupled to the public key but is stored only on the local machine.
 It should never be shared with anyone or published.
 It should also be kept safely; if you lose it, you lose all access to Upspin, including
-the right to use your register user name with the system.
+the right to use your registered user name with the system.
 
 Locally, these keys are stored, by default, in the directory
 
@@ -419,7 +419,7 @@ $HOME/.ssh/you@example.com/secret.upspinkey
 It also saves old key pairs in
 
 ```
-$HOME/.ssh/you@example.com/secret2.upspinkey`
+$HOME/.ssh/you@example.com/secret2.upspinkey
 ```
 
 After running this one command, nothing has changed yet except the contents
