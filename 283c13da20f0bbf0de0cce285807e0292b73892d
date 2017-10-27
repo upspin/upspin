@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0710cb2a_3e19b209",
+        "filename": "doc/templates/download.tmpl",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-27T01:41:51Z",
+      "side": 1,
+      "message": "isn\u0027t .Time an upspin time? this won\u0027t work.\ni think you need .Time.Go.Format",
+      "revId": "283c13da20f0bbf0de0cce285807e0292b73892d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
