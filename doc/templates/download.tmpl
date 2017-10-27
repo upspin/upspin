@@ -4,6 +4,14 @@ Use of this source code is governed by a BSD-style
 license that can be found in the LICENSE file.
 -->
 {{define "title"}}Download Upspin{{end}}
+{{define "styles"}}
+table {
+	width: 100%;
+}
+th {
+	text-align: left;
+}
+{{end}}
 {{define "content"}}
 	<h1>Download Upspin</h1>
 	<p>
@@ -16,17 +24,21 @@ license that can be found in the LICENSE file.
 	<p>
 		Choose a build for your operating system and processor architecture:
 	</p>
-	<ul>
-	{{range .Content}}
-		<li>
-			<a href="{{.FileName}}">{{.FileName}}</a>
-			{{with .OSArch}}({{.}}){{end}}
-			{{with .Size}}({{.}}){{end}}
-		</li>
-	{{else}}
-		<li>No builds are available. Please try again later.</li>
+	{{with .Content}}
+		<table>
+			<tr><th>File name</th><th>OS/Arch</th><th>Size</th><th>Build time</th></tr>
+	{{range .}}
+			<tr>
+				<td><a href="{{.FileName}}">{{.FileName}}</a></td>
+				<td>{{.OSArch}}</td>
+				<td>{{.Size}}</td>
+				<td>{{.Time.Format "02 Jan 06 at 15:04 MST"}}</td>
+			</tr>
 	{{end}}
-	</ul>
+		</table>
+	{{else}}
+		<p>No builds are available. Please try again later.</p>
+	{{end}}
 	<p>
 		You can find the full list of past builds in the
 		<a href="/release@upspin.io">release@upspin.io</a> Upspin tree.
