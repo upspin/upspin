@@ -1,0 +1,42 @@
+{{/* This file is interpreted as a template by serverutil/frontend/download.go. */}}
+Upspin
+
+Documentation: https://upspin.io/
+
+Upspin is an experimental project to build a framework for naming
+and sharing files and other data securely, uniformly, and globally:
+a global name system of sorts.
+
+It is not a file system, but a set of protocols and reference
+implementations that can be used to join things like file systems
+and other storage services to the name space.
+
+Performance is not a primary goal. Uniformity and security are.
+
+Tools included in this archive:
+
+upspin
+	The upspin command provides utilities for creating and
+	administering Upspin files, users, and servers. 
+
+	https://godoc.org/upspin.io/cmd/upspin
+
+upspin-ui
+	The upspin-ui command presents a web interface to the Upspin name
+	space, and also provides a facility to sign up an Upspin user and
+	deploy an upspinserver to Google Cloud Platform.
+
+	https://godoc.org/augie.upspin.io/cmd/upspin-ui
+
+cacheserver
+	The cacheserver command implements a directory
+	and storage cache for Upspin.
+
+	https://godoc.org/upspin.io/cmd/cacheserver
+
+upspinfs (Linux and macOS only)
+	The upspinfs command is a FUSE interface for Upspin.
+
+	https://godoc.org/upspin.io/cmd/upspinfs
+
+These binaries were built for {{.OSArch}} at{{range .Commits}} {{.Repo}}/{{.ShortHash}}{{end}}.
