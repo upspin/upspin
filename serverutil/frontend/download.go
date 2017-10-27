@@ -222,7 +222,11 @@ func (h *downloadHandler) buildArchive(osArch string) {
 
 	// Check whether we have already built this version, or a newer one.
 	var seq int64
+	var t upspin.Time
 	for _, de := range des {
+		if de.Time > t {
+			t = de.Time
+		}
 		if de.Sequence > seq {
 			seq = de.Sequence
 		}
@@ -245,13 +249,14 @@ func (h *downloadHandler) buildArchive(osArch string) {
 
 	// Add the archive to the list.
 	h.mu.Lock()
-	h.archive[osArch] = &archive{seq: seq, osArch: osArch, data: data}
+	h.archive[osArch] = &archive{seq: seq, time: t, osArch: osArch, data: data}
 	h.mu.Unlock()
 }
 
 // archive represents a release archive and its contents.
 type archive struct {
-	seq    int64 // Highest sequence number of a file in the archive.
+	seq    int64       // Highest Sequence of a file in the archive.
+	time   upspin.Time // Latest Time of a file in the archive.
 	osArch string
 	data   []byte
 }
@@ -270,6 +275,11 @@ func (a *archive) OSArch() string {
 // SizeMB returns the size of the archive in human-readable form.
 func (a *archive) Size() string {
 	return fmt.Sprintf("%.1fMB", float64(len(a.data))/(1<<20))
+}
+
+// Time returns the time the files in this archive were built.
+func (a *archive) Time() time.Time {
+	return a.time.Go()
 }
 
 // newArchive fetches DirEntries using the given Client and assembles a gzipped
