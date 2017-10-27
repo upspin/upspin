@@ -150,7 +150,7 @@ func (le *Entry) unmarshal(fd io.ReaderAt, data []byte, offset int64) (int, erro
 	case 0x02:
 		le.Op = Delete
 	default:
-		return 0, errors.E(errors.Invalid, "unknown Op %d", data[0])
+		return 0, errors.E(errors.Invalid, errors.Errorf("unknown Op %d", data[0]))
 	}
 
 	size, n := binary.Varint(data[1:])
