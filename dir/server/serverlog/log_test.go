@@ -524,7 +524,7 @@ func TestIndex(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	user, err := Open("foo@bar.com", dir, fac, store)
+	user, err := Open("reallylongusernamefoo@bar.com", dir, fac, store)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -537,8 +537,8 @@ func TestIndex(t *testing.T) {
 	}
 
 	root := upspin.DirEntry{
-		Name:       "foo@bar.com/dir/file.txt",
-		SignedName: "foo@bar.com/dir/file.txt",
+		Name:       "reallylongusernamefoo@bar.com/dir/file.txt",
+		SignedName: "reallylongusernamefoo@bar.com/dir/file.txt",
 		Writer:     "writer@bar.com",
 		Packing:    upspin.PlainPack,
 		Packdata:   []byte("some pack data"),
