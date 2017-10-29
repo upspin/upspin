@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "24c512f1_382e7e48",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-10-29T18:47:10Z",
+      "side": 1,
+      "message": "Thanks for catching that!  Should have been Sign(hash) of course but I missed it.",
+      "parentUuid": "4a88441b_5a3e300a",
+      "revId": "3bde769a10250c4f4b8001cd784c27c70f920d69",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "37492d51_5ccbb21a",
         "filename": "dir/server/serverlog/log.go",
         "patchSetId": 6
