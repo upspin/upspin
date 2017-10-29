@@ -16,6 +16,24 @@
       "revId": "3cfaa7790049dc06dcc4780c160c6ca97c3fca61",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d5baee5f_360784dc",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-10-29T22:03:25Z",
+      "side": 1,
+      "message": "I\u0027ll leave this to Andrew to answer definitively, but I think his idea here was that someone extra cautious might copy the string to paper or a local file as a basis for backup.",
+      "parentUuid": "bee87f6d_7df9ebb1",
+      "revId": "3cfaa7790049dc06dcc4780c160c6ca97c3fca61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
