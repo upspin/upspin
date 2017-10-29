@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e3debe5b_94f6ea7f",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 5428
+      },
+      "writtenOn": "2017-10-29T17:34:50Z",
+      "side": 1,
+      "message": "fd leak",
+      "revId": "3bde769a10250c4f4b8001cd784c27c70f920d69",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4a88441b_5a3e300a",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 5428
+      },
+      "writtenOn": "2017-10-29T17:34:50Z",
+      "side": 1,
+      "message": "This errors out for users having long email addresses (see the len check in Sign), causing dirserver to enter an infinite initialization loop.",
+      "revId": "3bde769a10250c4f4b8001cd784c27c70f920d69",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "37492d51_5ccbb21a",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 5428
+      },
+      "writtenOn": "2017-10-29T17:34:50Z",
+      "side": 1,
+      "message": "fd leak",
+      "revId": "3bde769a10250c4f4b8001cd784c27c70f920d69",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "09efb730_ccac4a59",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 5428
+      },
+      "writtenOn": "2017-10-29T17:34:50Z",
+      "side": 1,
+      "message": "fd leak",
+      "revId": "3bde769a10250c4f4b8001cd784c27c70f920d69",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
