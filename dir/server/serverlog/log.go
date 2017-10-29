@@ -5,6 +5,7 @@
 package serverlog
 
 import (
+	"crypto/sha256"
 	"encoding/binary"
 	"fmt"
 	"io"
@@ -149,23 +150,18 @@ type root struct {
 // rootFile is updated. The given config is used to generate a secret reference
 // name for the backup.
 func newRoot(rootFile string, fac upspin.Factotum, s storage.Storage) (*root, error) {
-	f, err := os.OpenFile(rootFile, os.O_RDWR|os.O_CREATE, 0600)
-	if err != nil {
-		return nil, errors.E(errors.IO, err)
-	}
-	r := &root{file: f}
+	var rootRef string
 	if s != nil {
 		// Use the provided factotum to generate the secret reference.
 		if fac == nil {
 			return nil, errors.Str("cannot backup root: config has no factotum")
 		}
 		base := filepath.Base(rootFile)
-		sig, err := fac.Sign([]byte(base))
+		sig, err := fac.Sign(hashRoot(base))
 		if err != nil {
 			return nil, err
 		}
-		rootRef := fmt.Sprintf("%s.%s.%s", base, sig.R, sig.S)
-		fmt.Println(rootRef)
+		rootRef = fmt.Sprintf("%s.%s-%s", base, sig.R, sig.S)
 
 		// Try to access the storage backend now
 		// so a misconfiguration is caught at startup.
@@ -173,13 +169,26 @@ func newRoot(rootFile string, fac upspin.Factotum, s storage.Storage) (*root, er
 		if err != nil && !errors.Is(errors.NotExist, err) {
 			return nil, err
 		}
-
+	}
+	f, err := os.OpenFile(rootFile, os.O_RDWR|os.O_CREATE, 0600)
+	if err != nil {
+		return nil, errors.E(errors.IO, err)
+	}
+	r := &root{file: f}
+	if s != nil {
 		r.ref = rootRef
 		r.saveRoot = make(chan bool, 1)
 		r.saveDone = make(chan bool)
 		go r.saveLoop(s)
 	}
 	return r, nil
+}
+
+func hashRoot(base string) []byte {
+	h := sha256.New()
+	h.Write([]byte("@@hashRoot!!")) // Don't sign raw user string.
+	h.Write([]byte(base))
+	return h.Sum(nil)
 }
 
 func (r *root) saveLoop(s storage.Storage) {
