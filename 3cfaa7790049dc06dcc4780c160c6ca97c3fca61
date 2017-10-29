@@ -34,6 +34,24 @@
       "revId": "3cfaa7790049dc06dcc4780c160c6ca97c3fca61",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "aa3d6d4a_bc040d85",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-10-29T22:15:52Z",
+      "side": 1,
+      "message": "This is definitely an errant debug print. Please remove it.",
+      "parentUuid": "d5baee5f_360784dc",
+      "revId": "3cfaa7790049dc06dcc4780c160c6ca97c3fca61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
