@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bee87f6d_7df9ebb1",
+        "filename": "dir/server/serverlog/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 5428
+      },
+      "writtenOn": "2017-10-29T21:59:50Z",
+      "side": 1,
+      "message": "Delete? Looks like a dev-time print that managed to get in.",
+      "revId": "3cfaa7790049dc06dcc4780c160c6ca97c3fca61",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
