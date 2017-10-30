@@ -370,6 +370,16 @@ We believe the system is more secure by not providing one.
 **Do not lose your secret seed!**
 
 
+### How do I delete my account on the key server? {#delete-account}
+
+If you decide to stop using Upspin, there is no need to remove anything from the key server.
+
+The transaction log at https://key.upspin.io/log is cryptographically protected by a hash chain,
+so deletions are impossible anyway.
+This protects you from an adversary removing your public key and
+re-registering the account with their own key.
+
+
 ### How do I change my key? {#rotate-keys}
 
 Most people will never need to change their key;
