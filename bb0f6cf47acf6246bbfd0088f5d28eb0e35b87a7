@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "e075e171_f11246ae",
+        "filename": "cmd/upspin/tar.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-10-30T07:00:23Z",
+      "side": 1,
+      "message": "I think that this should still return on I/O errors, rather than continuing as you have it here. There\u0027s no point trying to push on if we can\u0027t write the results anywhere. (I think it\u0027s fair to assume that any tar errors are I/O errors.)",
+      "revId": "bb0f6cf47acf6246bbfd0088f5d28eb0e35b87a7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "703d2a90_fa40b3a0",
         "filename": "cmd/upspin/tar.go",
         "patchSetId": 1
