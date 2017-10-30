@@ -74,13 +74,10 @@ func (s *State) tarCommand(fs *flag.FlagSet) {
 	if fs.NArg() != 2 {
 		usageAndExit(fs)
 	}
-	a, err := s.newArchiver(subcmd.BoolFlag(fs, "v"))
-	if err != nil {
-		s.Exit(err)
-	}
+	a := s.newArchiver(subcmd.BoolFlag(fs, "v"))
 	dir := s.GlobOneUpspinPath(fs.Arg(0))
 	file := s.GlobOneLocal(fs.Arg(1))
-	err = a.archive(dir, s.CreateLocal(file))
+	err := a.archive(dir, s.CreateLocal(file))
 	if err != nil {
 		s.Exit(err)
 	}
@@ -90,23 +87,20 @@ func (s *State) untarCommand(fs *flag.FlagSet) {
 	if fs.NArg() != 1 {
 		usageAndExit(fs)
 	}
-	a, err := s.newArchiver(subcmd.BoolFlag(fs, "v"))
-	if err != nil {
-		s.Exit(err)
-	}
+	a := s.newArchiver(subcmd.BoolFlag(fs, "v"))
 	a.matchReplace(subcmd.StringFlag(fs, "match"), subcmd.StringFlag(fs, "replace"))
-	err = a.unarchive(s.OpenLocal(s.GlobOneLocal(fs.Arg(0))))
+	err := a.unarchive(s.OpenLocal(s.GlobOneLocal(fs.Arg(0))))
 	if err != nil {
 		s.Exit(err)
 	}
 }
 
-func (s *State) newArchiver(verbose bool) (*archiver, error) {
+func (s *State) newArchiver(verbose bool) *archiver {
 	return &archiver{
 		state:   s,
 		client:  s.Client,
 		verbose: verbose,
-	}, nil
+	}
 }
 
 func (a *archiver) matchReplace(match, replace string) {
@@ -133,6 +127,13 @@ func (a *archiver) doArchive(pathName upspin.PathName, tw *tar.Writer, dst io.Wr
 	if err != nil {
 		return err
 	}
+	var firstError error
+	setErr := func(e error) {
+		a.state.Fail(e)
+		if firstError != nil {
+			firstError = e
+		}
+	}
 	for _, e := range entries {
 		hdr := &tar.Header{
 			Name:    string(e.Name),
@@ -146,37 +147,44 @@ func (a *archiver) doArchive(pathName upspin.PathName, tw *tar.Writer, dst io.Wr
 		case e.IsDir():
 			hdr.Typeflag = tar.TypeDir
 			if err := tw.WriteHeader(hdr); err != nil {
-				return err
+				setErr(err)
+				continue
 			}
 			// Recurse into this subdir.
 			err = a.doArchive(e.Name, tw, dst)
 			if err != nil {
-				return err
+				setErr(err)
+				continue
 			}
 		case e.IsLink():
 			hdr.Typeflag = tar.TypeSymlink
 			hdr.Linkname = string(e.Link)
 			if err := tw.WriteHeader(hdr); err != nil {
-				return err
+				setErr(err)
+				continue
 			}
 		default:
 			size, err := e.Size()
 			if err != nil {
-				return err
+				setErr(err)
+				continue
 			}
 			hdr.Typeflag = tar.TypeReg
 			hdr.Size = size
 			if err := tw.WriteHeader(hdr); err != nil {
-				return err
+				setErr(err)
+				continue
 			}
 			if data, err := a.client.Get(e.Name); err != nil {
-				return err
+				setErr(err)
+				continue
 			} else if _, err := tw.Write(data); err != nil {
-				return err
+				setErr(err)
+				continue
 			}
 		}
 	}
-	return nil
+	return firstError
 }
 
 // unarchive reads an archive from src and restores it to its final location.
@@ -191,6 +199,13 @@ func (a *archiver) unarchive(src io.ReadCloser) error {
 		contents []byte
 	}
 
+	var firstError error
+	setErr := func(e error) {
+		a.state.Fail(e)
+		if firstError != nil {
+			firstError = e
+		}
+	}
 	var acc []accessFiles
 	for {
 		hdr, err := tr.Next()
@@ -225,17 +240,20 @@ func (a *archiver) unarchive(src io.ReadCloser) error {
 		case tar.TypeDir:
 			_, err = a.client.MakeDirectory(name)
 			if err != nil && !errors.Is(errors.Exist, err) {
-				return err
+				setErr(err)
+				continue
 			}
 		case tar.TypeSymlink:
 			_, err = a.client.PutLink(upspin.PathName(hdr.Linkname), name)
 			if err != nil {
-				return err
+				setErr(err)
+				continue
 			}
 		case tar.TypeReg:
 			buf, err := ioutil.ReadAll(tr)
 			if err != nil {
-				return err
+				setErr(err)
+				continue
 			}
 			name := upspin.PathName(name)
 			if access.IsAccessFile(name) {
@@ -249,7 +267,8 @@ func (a *archiver) unarchive(src io.ReadCloser) error {
 			}
 			_, err = a.client.Put(name, buf)
 			if err != nil {
-				return err
+				setErr(err)
+				continue
 			}
 		}
 	}
@@ -258,9 +277,10 @@ func (a *archiver) unarchive(src io.ReadCloser) error {
 	for _, af := range acc {
 		_, err := a.client.Put(af.name, af.contents)
 		if err != nil {
-			return err
+			setErr(err)
+			continue
 		}
 	}
 
-	return nil
+	return firstError
 }
