@@ -399,6 +399,37 @@ var cpTests = []cmdTest{
 	},
 }
 
+// lsTests tests the ls command, in particular its handling of links.
+// See issue 510.
+var lsTests = []cmdTest{
+	{
+		"create links",
+		ann,
+		do(
+			"mkdir @/linktest",
+			"put @/linktest/file",
+			"link @/linktest/file @/linktest/link",
+		),
+		"a linked-to-file",
+		expectNoOutput(),
+	},
+	{
+		"ls links",
+		ann,
+		do(
+			"ls @/linktest/file",
+			"ls @/linktest/link",
+			"ls -L @/linktest/link",
+		),
+		"",
+		expect(
+			"ann@example.com/linktest/file",
+			"ann@example.com/linktest/link -> ann@example.com/linktest/file",
+			"ann@example.com/linktest/file",
+		),
+	},
+}
+
 // shareTests tests share processing,.
 // TODO: Test lots more.
 var shareTests = []cmdTest{

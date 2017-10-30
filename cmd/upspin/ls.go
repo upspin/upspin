@@ -7,8 +7,11 @@ package main
 import (
 	"flag"
 	"fmt"
+	goPath "path"
 	"strings"
 
+	"upspin.io/path"
+	"upspin.io/subcmd"
 	"upspin.io/upspin"
 )
 
@@ -21,10 +24,12 @@ to learn about the targets of links.
 `
 	fs := flag.NewFlagSet("ls", flag.ExitOnError)
 	longFormat := fs.Bool("l", false, "long format")
-	followLinks := fs.Bool("L", false, "follow links")
+	followFinal := fs.Bool("L", false, "follow final link in path")
 	recur := fs.Bool("R", false, "recur into subdirectories")
 	s.ParseFlags(fs, args, help, "ls [-l] [path...]")
 
+	// The done map marks a directory we have listed, so we don't recur endlessly
+	// when given a chain of links with -L.
 	done := map[upspin.PathName]bool{}
 	if fs.NArg() == 0 {
 		userRoot := upspin.PathName(s.Config.UserName())
@@ -32,14 +37,59 @@ to learn about the targets of links.
 		if err != nil {
 			s.Exit(err)
 		}
-		s.list(rootEntry, done, *longFormat, *followLinks, *recur)
+		s.list(rootEntry, done, *longFormat, *followFinal, *recur)
 		return
 	}
-	// The done map marks a directory we have listed, so we don't recur endlessly
-	// when given a chain of links with -L.
-	for _, entry := range s.GlobAllUpspin(fs.Args()) {
-		s.list(entry, done, *longFormat, *followLinks, *recur)
+	// Glob doesn't have a way to avoid stepping through links, so be careful.
+	// TODO: See issue 510. Client.Glob should help us here.
+	if *followFinal {
+		for _, entry := range s.GlobAllUpspin(fs.Args()) {
+			s.list(entry, done, *longFormat, true, *recur)
+		}
+		return
 	}
+	// If we're not following links, we need to Glob the directory and
+	// then evaluate carefully the entries within. Do this one arg
+	// at a time.
+	for _, arg := range fs.Args() {
+		p := s.AtSign(arg)
+		parsed, err := path.Parse(p)
+		if err != nil {
+			s.Exit(err)
+		}
+		if parsed.IsRoot() || !subcmd.HasGlobChar(arg) {
+			// Easy case: just look it up.
+			entry, err := s.Client.Lookup(p, false)
+			if err != nil {
+				s.Exit(err)
+			}
+			s.list(entry, done, *longFormat, false, *recur)
+			continue
+		}
+		// Evaluate subdirectory, including links, and then step carefully.
+		dirContents, err := s.Client.Glob(upspin.AllFilesGlob(parsed.Drop(1).Path()))
+		if err != nil {
+			s.Exit(err)
+		}
+		lastElemPat := parsed.Elem(parsed.NElem() - 1)
+		// Now match by hand.
+		for _, entry := range dirContents {
+			parsed, err := path.Parse(entry.Name)
+			if err != nil {
+				s.Exit(err) // Can't happen.
+			}
+			matched, err := goPath.Match(lastElemPat, parsed.Elem(parsed.NElem()-1))
+			if err != nil {
+				// Bad pattern. Stop.
+				s.Exit(err)
+			}
+			if !matched {
+				continue
+			}
+			s.list(entry, done, *longFormat, false, *recur)
+		}
+	}
+
 }
 
 func (s *State) list(entry *upspin.DirEntry, done map[upspin.PathName]bool, longFormat, followLinks, recur bool) {
@@ -79,9 +129,12 @@ func hasFinalSlash(name upspin.PathName) bool {
 
 func (s *State) printShortDirEntries(de []*upspin.DirEntry) {
 	for _, e := range de {
-		if e.IsDir() && !hasFinalSlash(e.Name) {
+		switch {
+		case e.IsDir() && !hasFinalSlash(e.Name):
 			s.Printf("%s/\n", e.Name)
-		} else {
+		case e.IsLink():
+			s.Printf("%s -> %s\n", e.Name, e.Link)
+		default:
 			s.Printf("%s\n", e.Name)
 		}
 	}
