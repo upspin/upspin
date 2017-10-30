@@ -72,6 +72,24 @@
     },
     {
       "key": {
+        "uuid": "655cbdbd_b53c643a",
+        "filename": "cmd/upspin/signup.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-10-30T02:50:52Z",
+      "side": 1,
+      "message": "Okay, that makes sense. The flag is fine. But let\u0027s disallow non-HTTPS paths in this CL. We can think about allowing clients to make insecure loopback connections in another CL.",
+      "parentUuid": "774e1beb_d731f0a8",
+      "revId": "7f217e0dc2bf1c90eb2cabfabcbe1e9f6c75392e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "7ad22741_a836597f",
         "filename": "dir/remote/remote.go",
         "patchSetId": 8
