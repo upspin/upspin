@@ -1,0 +1,225 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d89a9358_0060a5da",
+        "filename": "access/access.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 625,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-30T02:09:58Z",
+      "side": 1,
+      "message": "drop the AndAccessList. it doesn\u0027t parse as a name, and the doc comment will cover the meaning.\nrightGranted is a fine name.",
+      "revId": "2c483b57f7b398ae5fcd8d8af3164f4c2cb2edd9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e925be90_3afc90a9",
+        "filename": "access/access.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 699,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-30T02:09:58Z",
+      "side": 1,
+      "message": "d (delete this blank line)",
+      "revId": "2c483b57f7b398ae5fcd8d8af3164f4c2cb2edd9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "95916c2d_d45d98fc",
+        "filename": "access/access.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 704,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-30T02:09:58Z",
+      "side": 1,
+      "message": "d",
+      "revId": "2c483b57f7b398ae5fcd8d8af3164f4c2cb2edd9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "05485acc_8298d70b",
+        "filename": "access/access.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 755,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-30T02:09:58Z",
+      "side": 1,
+      "message": "d",
+      "revId": "2c483b57f7b398ae5fcd8d8af3164f4c2cb2edd9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d95c14a4_35143c16",
+        "filename": "access/access.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 770,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-30T02:09:58Z",
+      "side": 1,
+      "message": "d",
+      "revId": "2c483b57f7b398ae5fcd8d8af3164f4c2cb2edd9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f8e3ebdb_5cdc0ace",
+        "filename": "access/access.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 843,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-30T02:09:58Z",
+      "side": 1,
+      "message": "d",
+      "revId": "2c483b57f7b398ae5fcd8d8af3164f4c2cb2edd9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "86f59d55_c4d3fc9d",
+        "filename": "access/access.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 873,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-30T02:09:58Z",
+      "side": 1,
+      "message": "s/is/is,/",
+      "revId": "2c483b57f7b398ae5fcd8d8af3164f4c2cb2edd9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6615cd63_7afbc534",
+        "filename": "access/access.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 887,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-30T02:09:58Z",
+      "side": 1,
+      "message": "d\n\nlook at the existing code. blank lines are fine but the local style uses far fewer of them.",
+      "revId": "2c483b57f7b398ae5fcd8d8af3164f4c2cb2edd9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6feb71c5_fcc5f0a5",
+        "filename": "access/access_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 879,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-30T02:09:58Z",
+      "side": 1,
+      "message": "use t.Helper in this function so if the Fatal happens we get the call site rather than this function as the line number",
+      "revId": "2c483b57f7b398ae5fcd8d8af3164f4c2cb2edd9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dff6badb_d735feb5",
+        "filename": "access/access_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 888,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-30T02:09:58Z",
+      "side": 1,
+      "message": "ditto.\nalso delete the blank lines at the top of these closures.",
+      "revId": "2c483b57f7b398ae5fcd8d8af3164f4c2cb2edd9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cc82a2fe_28a0b549",
+        "filename": "access/access_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 908,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-30T02:09:58Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "2c483b57f7b398ae5fcd8d8af3164f4c2cb2edd9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "93f5b61d_235d3990",
+        "filename": "access/access_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 944,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-30T02:09:58Z",
+      "side": 1,
+      "message": "you have \"foo@goo.com\" a zillion times. it\u0027s not a problem but why not\n\nconst foo \u003d \"foo@foo.com\"\nor even\nconst F \u003d \"foo@foo.com\"\n\nfor shorter lines, easier reading, and fewer strings. you could use it on the right too:\n\ncheckCan(a, F, Read, F+\"/Group\", true)",
+      "revId": "2c483b57f7b398ae5fcd8d8af3164f4c2cb2edd9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f86d0b4c_d3479531",
+        "filename": "access/access_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 1303,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-10-30T02:09:58Z",
+      "side": 1,
+      "message": "these two functions need doc comments. the names are weird and the meaning unclear.",
+      "revId": "2c483b57f7b398ae5fcd8d8af3164f4c2cb2edd9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
