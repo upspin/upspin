@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "703d2a90_fa40b3a0",
+        "filename": "cmd/upspin/tar.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 5428
+      },
+      "writtenOn": "2017-10-30T06:03:23Z",
+      "side": 1,
+      "message": "Writing the header must happen after successful data fetch.",
+      "revId": "bb0f6cf47acf6246bbfd0088f5d28eb0e35b87a7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
