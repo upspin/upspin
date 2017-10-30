@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b6082274_77e592f0",
+        "filename": "doc/faq.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-10-30T20:36:30Z",
+      "side": 1,
+      "message": "[transaction log](https://key.upspin.io/log) at",
+      "range": {
+        "startLine": 377,
+        "startChar": 4,
+        "endLine": 377,
+        "endChar": 48
+      },
+      "revId": "00c3da479b2407354d8d954ab3ba75bd718e3e94",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
