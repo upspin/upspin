@@ -26,6 +26,7 @@ var allCmdTests = []*[]cmdTest{
 	&cpTests,
 	&globTests,
 	&keygenTests,
+	&lsTests,
 	&shareTests,
 	&suffixedUserTests,
 }
