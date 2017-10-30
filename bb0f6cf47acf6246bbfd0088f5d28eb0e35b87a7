@@ -33,6 +33,23 @@
       "revId": "bb0f6cf47acf6246bbfd0088f5d28eb0e35b87a7",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "775302f8_0f239f81",
+        "filename": "cmd/upspin/tar.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-10-30T07:14:13Z",
+      "side": 1,
+      "message": "While you\u0027re here, you could make this do client.Open and then io.Copy, so that the whole file needn\u0027t be read into memory.",
+      "revId": "bb0f6cf47acf6246bbfd0088f5d28eb0e35b87a7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
