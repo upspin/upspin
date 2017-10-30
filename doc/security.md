@@ -166,7 +166,7 @@ report to us and the public if you ever find a mismatch.
 Compare the key.upspin.io/log hash you see with what your friend sees,
 and report any discrepancy.
 Watch for your own key in the log and report if there's ever a change, even
-momentary, that you did not iniitate yourself.
+momentary, that you did not initiate yourself.
 You'll be giving the rest of our users herd immunity.
 
 As far as Upspin is concerned, a user is an email address, authenticated by an
