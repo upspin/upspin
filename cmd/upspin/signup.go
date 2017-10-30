@@ -22,8 +22,6 @@ import (
 	"upspin.io/user"
 )
 
-const signupURL = "https://key.upspin.io/signup"
-
 func (s *State) signup(args ...string) {
 	const help = `
 Signup generates an Upspin configuration file and private/public key pair,
@@ -58,6 +56,7 @@ file and keys and only send the signup request to the key server.
 	fs := flag.NewFlagSet("signup", flag.ExitOnError)
 	var (
 		force       = fs.Bool("force", false, "create a new user even if keys and config file exist")
+		keyServer   = fs.String("key", "key.upspin.io", "Key server `address`")
 		dirServer   = fs.String("dir", "", "Directory server `address`")
 		storeServer = fs.String("store", "", "Store server `address`")
 		bothServer  = fs.String("server", "", "Store and Directory server `address` (if combined)")
@@ -79,9 +78,10 @@ file and keys and only send the signup request to the key server.
 		flags.Config = filepath.Join(homedir, flags.Config)
 	}
 
+	signupURL := "https://" + *keyServer + "/signup"
 	if *signupOnly {
 		// Don't generate; just send the signup request to the key server.
-		s.registerUser(flags.Config)
+		s.registerUser(signupURL)
 		return
 	}
 
@@ -103,7 +103,11 @@ file and keys and only send the signup request to the key server.
 		usageAndExit(fs)
 	}
 
-	// Parse -dir and -store flags as addresses and construct remote endpoints.
+	// Parse -key, -dir and -store flags as addresses and construct remote endpoints.
+	keyEndpoint, err := parseAddress(*keyServer)
+	if err != nil {
+		s.Exitf("error parsing -key=%q: %v", keyServer, err)
+	}
 	dirEndpoint, err := parseAddress(*dirServer)
 	if err != nil {
 		s.Exitf("error parsing -dir=%q: %v", dirServer, err)
@@ -135,6 +139,7 @@ file and keys and only send the signup request to the key server.
 	var configContents bytes.Buffer
 	err = configTemplate.Execute(&configContents, configData{
 		UserName:  userName,
+		Key:       keyEndpoint,
 		Dir:       dirEndpoint,
 		Store:     storeEndpoint,
 		Packing:   "ee",
@@ -176,12 +181,12 @@ file and keys and only send the signup request to the key server.
 	s.keygenCommand(*secrets, *curve, *secretseed, false)
 
 	// Send the signup request to the key server.
-	s.registerUser(flags.Config)
+	s.registerUser(signupURL)
 }
 
 // registerUser reads the config file and sends its information to the key server.
-func (s *State) registerUser(configFile string) {
-	cfg, err := config.FromFile(configFile)
+func (s *State) registerUser(signupURL string) {
+	cfg, err := config.FromFile(flags.Config)
 	if err != nil {
 		s.Exit(err)
 	}
