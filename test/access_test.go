@@ -644,4 +644,60 @@ func testWriteReadAllAccessFile(t *testing.T, r *testenv.Runner) {
 	}
 }
 
+// Access files can be created by the owner even if the containing
+// directory does not have Create permission. Others never can.
+func testCreateAccessFile(t *testing.T, r *testenv.Runner) {
+	const (
+		user             = readerName
+		owner            = ownerName
+		base             = ownerName + "/create-access"
+		accessFile       = base + "/Access"
+		subDir           = base + "/dir"
+		subDirAccessFile = subDir + "/Access"
+	)
+
+	const (
+		readAll = "read:all\n"
+		allAll  = "*:all\n"
+	)
+
+	// Create base and subdirectory.
+	r.As(ownerName)
+	r.MakeDirectory(base)
+	r.MakeDirectory(subDir)
+
+	// Put Access file with only read permission.
+	r.Put(accessFile, readAll)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+
+	// Cannot create Access file if not owner.
+	r.As(user)
+	r.Put(subDirAccessFile, readAll)
+	if !r.Failed() {
+		t.Fatal("expected permission error for non-owner writing Access file with only read:all permission")
+	}
+
+	// Can create Access file as owner, even without Create permission.
+	r.As(owner)
+	r.Put(subDirAccessFile, readAll)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+
+	// Delete and try again with Create permission for user. Should still fail, as
+	// non-owners cannot create Access files.
+	r.Delete(subDirAccessFile)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+	r.As(user)
+	r.Put(subDirAccessFile, readAll)
+	if !r.Failed() {
+		t.Fatal("expected permission error for non-owner writing Access file even with Create permission")
+	}
+
+}
+
 // TODO: cross DirServer support for Group files.
