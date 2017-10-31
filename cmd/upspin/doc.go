@@ -55,6 +55,7 @@ Upspin commands:
 	deletestorage
 	get
 	getref
+	glob
 	info
 	keygen
 	link
@@ -263,6 +264,19 @@ Flags:
 
 
 
+Sub-command glob
+
+Usage: upspin glob pattern...
+
+Glob prints the names of the paths that are matched by its arguments.
+It does no further interpretation of the returned path names.
+
+Flags:
+  -help
+    	print more information about the command
+
+
+
 Sub-command info
 
 Usage: upspin info path...
@@ -331,7 +345,7 @@ user's root. By default ls does not follow links; use the -L flag
 to learn about the targets of links.
 
 Flags:
-  -L	follow links
+  -L	follow final link in path
   -R	recur into subdirectories
   -help
     	print more information about the command
@@ -701,6 +715,8 @@ Flags:
     	create a new user even if keys and config file exist
   -help
     	print more information about the command
+  -key address
+    	Key server address (default "key.upspin.io")
   -secrets directory
     	directory to store key pair
   -secretseed string
