@@ -57,6 +57,7 @@ type storeCache struct {
 
 	mu    sync.Mutex
 	dir   string     // Top directory for cached references.
+	wbDir string     // Top directory for writeback links.
 	limit int64      // Soft limit of the maximum bytes to store.
 	lru   *cache.LRU // Key is relative path to the cache file. Value is &cachedRef.
 	wbq   *writebackQueue
@@ -68,9 +69,10 @@ type storeCache struct {
 	oldLogLen int64
 }
 
-// newCache returns the cache rooted at dir. It will walk the cache to put all files
-// into the LRU.
-func newCache(cfg upspin.Config, dir string, maxBytes int64, writethrough bool) (*storeCache, func(upspin.Location), error) {
+// newCache returns the cache rooted at dir. It will walk the cache
+// to put all files into the LRU and the writeback tree to continue
+// trying to write refs back.
+func newCache(cfg upspin.Config, dir, wbDir string, maxBytes int64, writethrough bool) (*storeCache, func(upspin.Location), error) {
 	if err := os.MkdirAll(dir, 0700); err != nil {
 		return nil, nil, err
 	}
@@ -78,16 +80,61 @@ func newCache(cfg upspin.Config, dir string, maxBytes int64, writethrough bool) 
 	if maxRefs > 10000000 {
 		maxRefs = 10000000
 	}
-	c := &storeCache{cfg: cfg, dir: dir, limit: maxBytes, lru: cache.NewLRU(maxRefs)}
+	c := &storeCache{cfg: cfg, dir: dir, wbDir: wbDir, limit: maxBytes, lru: cache.NewLRU(maxRefs)}
 	var blockFlusher func(upspin.Location)
 	if !writethrough {
 		c.wbq = newWritebackQueue(c)
 		blockFlusher = func(l upspin.Location) { c.wbq.flush(l) }
 	}
-	c.walk("")
+	c.walk(c.wbDir, "", walkedWriteBack)
+	c.walk(c.dir, "", walkedCachedRef)
 	c.readLog()
 	c.rewriteLog()
+	go c.logFlusher()
 	return c, blockFlusher, nil
+}
+
+func walkedCachedRef(c *storeCache, relPath string, size int64) {
+	base := path.Base(relPath)
+	if base == tmpLogName {
+		// A previous run died before finishing rewriting
+		// the log. Remove the dregs.
+		os.Remove(c.absCachePath(relPath))
+		return
+	}
+	if base == logName {
+		// Ignore any log file.
+		return
+	}
+	cr := c.newCachedRef(relPath)
+	cr.size = size
+	cr.valid = false
+	cr.busy = false
+	atomic.AddInt64(&c.inUse, size)
+}
+
+func walkedWriteBack(c *storeCache, relPath string, size int64) {
+	c.wbq.enqueueWritebackFile(relPath)
+
+	// If a matching link doesn't exist in the cache, create one.
+	cachePath := c.absCachePath(relPath)
+	_, err := os.Stat(cachePath)
+	if err == nil {
+		return
+	}
+	os.MkdirAll(filepath.Dir(cachePath), 0700)
+	wbPath := c.absWritebackPath(relPath)
+	if err := os.Link(wbPath, cachePath); err != nil {
+		log.Debug.Printf("walkedWriteBack %s: %s", relPath, err)
+	}
+}
+
+func (c *storeCache) absCachePath(relPath string) string {
+	return path.Join(c.dir, relPath)
+}
+
+func (c *storeCache) absWritebackPath(relPath string) string {
+	return path.Join(c.wbDir, relPath)
 }
 
 // walk does a recursive walk of the cache directories adding cached references
@@ -96,8 +143,8 @@ func newCache(cfg upspin.Config, dir string, maxBytes int64, writethrough bool) 
 // TODO(p): We lose ordering doing this. When we add a log for the write
 // through cache, we will use it to restore the ordering after this
 // operation.
-func (c *storeCache) walk(relDirPath string) error {
-	absDirPath := path.Join(c.dir, relDirPath)
+func (c *storeCache) walk(root, relDirPath string, action func(*storeCache, string, int64)) error {
+	absDirPath := path.Join(root, relDirPath)
 	f, err := os.Open(absDirPath)
 	if err != nil {
 		return os.RemoveAll(absDirPath)
@@ -114,38 +161,20 @@ func (c *storeCache) walk(relDirPath string) error {
 	}
 	for _, i := range info {
 		relPath := path.Join(relDirPath, i.Name())
-		absPath := path.Join(absDirPath, i.Name())
-		if i.Name() == tmpLogName {
-			os.Remove(absPath)
-			continue
-		}
-		if i.Name() == logName {
-			continue
-		}
 		if i.IsDir() {
-			if err := c.walk(relPath); err != nil {
+			if err := c.walk(root, relPath, action); err != nil {
 				return err
 			}
 			continue
 		}
-		// If this is a writeback link, assume the write back cache
-		// will assume responsibility for it.
-		if c.wbq.enqueueWritebackFile(relPath) {
-			continue
-		}
-		// Not a writeback link, remember it and account for its size.
-		cr := c.newCachedRef(relPath)
-		cr.size = i.Size()
-		cr.valid = false
-		cr.busy = false
-		atomic.AddInt64(&c.inUse, cr.size)
+		action(c, relPath, i.Size())
 	}
 	return err
 }
 
 // readLog reads the log reordering files. It then creates a shorter version of the log.
 func (c *storeCache) readLog() {
-	f, err := os.Open(path.Join(c.dir, logName))
+	f, err := os.Open(c.absCachePath(logName))
 	if err == nil {
 		// Order all entries in lru order.
 		b := bufio.NewReader(f)
@@ -191,8 +220,8 @@ func (c *storeCache) readLog() {
 // Expects to be called with logLock held.
 func (c *storeCache) rewriteLog() {
 	// Write temporary log.
-	tmpLogPath := path.Join(c.dir, tmpLogName)
-	logPath := path.Join(c.dir, logName)
+	tmpLogPath := c.absCachePath(tmpLogName)
+	logPath := c.absCachePath(logName)
 	f, err := os.Create(tmpLogPath)
 	if err != nil {
 		log.Error.Printf("creating log file: %s", err)
@@ -242,6 +271,16 @@ func (c *storeCache) logAccess(file string) {
 	c.logLock.Unlock()
 }
 
+// logFlusher is a go func that periodically flushes the log.
+func (c *storeCache) logFlusher() {
+	for {
+		time.Sleep(60 * time.Second)
+		c.logLock.Lock()
+		c.buffered.Flush()
+		c.logLock.Unlock()
+	}
+}
+
 // cachePath builds a path to the local cache file.
 //
 // The actual cache file depends on the server endpoint because we have
@@ -255,8 +294,13 @@ func (c *storeCache) cachePath(ref upspin.Reference, e upspin.Endpoint) string {
 	return path.Join(e.String(), subdir, string(ref))
 }
 
-func (c *storeCache) absCachePath(ref upspin.Reference, e upspin.Endpoint) string {
-	return path.Join(c.dir, c.cachePath(ref, e))
+// wbPath builds a path to the local writeback link.
+func (c *storeCache) wbPath(ref upspin.Reference, e upspin.Endpoint) string {
+	subdir := "zz"
+	if len(ref) > 1 {
+		subdir = string(ref[:2])
+	}
+	return path.Join(e.String(), subdir, string(ref))
 }
 
 // newCachedRef creates a new locked and busy cachedRef.
@@ -316,7 +360,7 @@ func (c *storeCache) get(cfg upspin.Config, ref upspin.Reference, e upspin.Endpo
 			cr.Unlock()
 			continue
 		}
-		data, err := c.readFromCacheFile(file)
+		data, err := c.readFromCacheFile(c.absCachePath(file))
 		if err != nil {
 			// Could not read the cached data.
 			// Invalidate the cachedRef so that it will be fetched again.
@@ -498,8 +542,8 @@ func (c *storeCache) delete(cfg upspin.Config, ref upspin.Reference, e upspin.En
 
 // readFromCachefile reads in the cache file, if it exists.
 // Called with the cachedFile locked.
-func (c *storeCache) readFromCacheFile(relPath string) ([]byte, error) {
-	f, err := os.Open(path.Join(c.dir, relPath))
+func (c *storeCache) readFromCacheFile(file string) ([]byte, error) {
+	f, err := os.Open(file)
 	if err != nil {
 		return nil, err
 	}
@@ -523,7 +567,7 @@ func (c *storeCache) readFromCacheFile(relPath string) ([]byte, error) {
 // saveToCacheFile saves a ref in the cache.
 // Called with cr locked.
 func (cr *cachedRef) saveToCacheFile(file string, data []byte) error {
-	tmpName := path.Join(cr.c.dir, file+".tmp")
+	tmpName := cr.c.absCachePath(file + ".tmp")
 	f, err := os.OpenFile(tmpName, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0700)
 	if err != nil {
 		os.MkdirAll(filepath.Dir(tmpName), 0700)
@@ -551,7 +595,7 @@ func (cr *cachedRef) saveToCacheFile(file string, data []byte) error {
 		cleanup()
 		return err
 	}
-	pathName := path.Join(cr.c.dir, file)
+	pathName := cr.c.absCachePath(file)
 	if err := os.Rename(tmpName, pathName); err != nil {
 		cleanup()
 		return err
@@ -613,7 +657,7 @@ func (cr *cachedRef) removeFile(file string) {
 	cr.valid = false
 	cr.remove = false
 	atomic.AddInt64(&cr.c.inUse, -cr.size)
-	if err := os.Remove(path.Join(cr.c.dir, file)); err != nil {
+	if err := os.Remove(cr.c.absCachePath(file)); err != nil {
 		log.Info.Printf("can't remove file on eviction: %s", err)
 	}
 }
