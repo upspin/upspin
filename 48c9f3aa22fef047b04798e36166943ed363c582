@@ -1,0 +1,118 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cba69b5c_1c519715",
+        "filename": "store/storecache/cache.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-10-31T22:20:30Z",
+      "side": 1,
+      "message": "this can be a method on storeCache and you can still pass it into walk, as c.walkedCachedRef",
+      "revId": "48c9f3aa22fef047b04798e36166943ed363c582",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "07df6590_22ac4a95",
+        "filename": "store/storecache/cache.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-10-31T22:20:30Z",
+      "side": 1,
+      "message": "filepath",
+      "revId": "48c9f3aa22fef047b04798e36166943ed363c582",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "df89e6c9_ac16e1d3",
+        "filename": "store/storecache/cache.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-10-31T22:20:30Z",
+      "side": 1,
+      "message": "check the error?",
+      "revId": "48c9f3aa22fef047b04798e36166943ed363c582",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "de83f5d1_6a7116f7",
+        "filename": "store/storecache/cache.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-10-31T22:20:30Z",
+      "side": 1,
+      "message": "top level constant?",
+      "revId": "48c9f3aa22fef047b04798e36166943ed363c582",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cc83ccd1_3567269c",
+        "filename": "store/storecache/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-10-31T22:20:30Z",
+      "side": 1,
+      "message": "filepath",
+      "range": {
+        "startLine": 35,
+        "startChar": 74,
+        "endLine": 35,
+        "endChar": 78
+      },
+      "revId": "48c9f3aa22fef047b04798e36166943ed363c582",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c663b34f_fc77ed00",
+        "filename": "store/storecache/wbq.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-10-31T22:20:30Z",
+      "side": 1,
+      "message": "I think you want filepath.SplitList here",
+      "range": {
+        "startLine": 139,
+        "startChar": 11,
+        "endLine": 139,
+        "endChar": 23
+      },
+      "revId": "48c9f3aa22fef047b04798e36166943ed363c582",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
