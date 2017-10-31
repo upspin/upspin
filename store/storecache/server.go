@@ -32,7 +32,7 @@ type server struct {
 // the client to flush out Access file blocks before writing the
 // DirEntry.
 func New(cfg upspin.Config, cacheDir string, maxBytes int64, writethrough bool) (upspin.StoreServer, func(upspin.Location), error) {
-	c, blockFlusher, err := newCache(cfg, path.Join(cacheDir, "storecache"), maxBytes, writethrough)
+	c, blockFlusher, err := newCache(cfg, path.Join(cacheDir, "storecache"), path.Join(cacheDir, "storewritebackqueue"), maxBytes, writethrough)
 	if err != nil {
 		return nil, nil, err
 	}

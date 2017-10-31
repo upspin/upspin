@@ -7,6 +7,7 @@ package storecache
 import (
 	"expvar"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -23,9 +24,6 @@ const (
 
 	// Initial maximum number of parallel writebacks.
 	initialMaxParallel = 6
-
-	// Terminating characters for writeback link names.
-	writebackSuffix = "_wbf"
 
 	// Retry interval for endpoints that we failed to Put to.
 	retryInterval = 5 * time.Minute
@@ -131,36 +129,28 @@ func newWritebackQueue(sc *storeCache) *writebackQueue {
 }
 
 // enqueueWritebackFile populates the writeback queue on startup.
-// It returns true if this was indeed a write back file.
-func (wbq *writebackQueue) enqueueWritebackFile(relPath string) bool {
+func (wbq *writebackQueue) enqueueWritebackFile(relPath string) {
 	const op = "store/storecache.isWritebackFile"
-	f := strings.TrimSuffix(relPath, writebackSuffix)
-	if f == relPath {
-		return false
-	}
 
-	// At this point we know it is a writeback link so we will
-	// take care of it.
 	if wbq == nil {
 		log.Error.Printf("%s: writeback file %s but running as writethrough", op, relPath)
-		return true
+		return
 	}
-	elems := strings.Split(f, "/")
+	elems := filepath.SplitList(relPath)
 	if len(elems) != 3 {
 		log.Error.Printf("%s: odd writeback file %s", op, relPath)
-		return true
+		return
 	}
 	e, err := upspin.ParseEndpoint(elems[0])
 	if err != nil {
 		log.Error.Printf("%s: odd writeback file %s: %s", op, relPath, err)
-		return true
+		return
 	}
 	wbq.request <- &request{
 		Location:   upspin.Location{Reference: upspin.Reference(elems[2]), Endpoint: *e},
 		err:        nil,
 		flushChans: nil,
 	}
-	return true
 }
 
 var emptyLocation upspin.Location
@@ -176,6 +166,7 @@ func (wbq *writebackQueue) scheduler() {
 			// Keep a map of requests so that we can handle flushes
 			// and avoid Duplicates.
 			if wbq.queued[r.Location] != nil {
+				log.Debug.Printf("%s: %s %s already queued", op, r.Reference, r.Endpoint)
 				// Already queued. Unusual but OK.
 				break
 			}
@@ -190,6 +181,7 @@ func (wbq *writebackQueue) scheduler() {
 			}
 			epq.queue = append(epq.queue, r)
 			wbq.enqueued++
+			log.Debug.Printf("%s: %s %s queued", op, r.Reference, r.Endpoint)
 		case r := <-wbq.done:
 			// A request has been completed.
 			epq := wbq.byEndpoint[r.Endpoint]
@@ -334,9 +326,9 @@ func (wbq *writebackQueue) writer(me int) {
 // TODO(p): still figuring out how to tell them apart.
 func (wbq *writebackQueue) writeback(r *request) error {
 	// Read it in.
-	relPath := wbq.sc.cachePath(r.Reference, r.Endpoint) + writebackSuffix
-	absPath := wbq.sc.absCachePath(r.Reference, r.Endpoint) + writebackSuffix
-	data, err := wbq.sc.readFromCacheFile(relPath)
+	relPath := wbq.sc.cachePath(r.Reference, r.Endpoint)
+	absPath := wbq.sc.absWritebackPath(relPath)
+	data, err := wbq.sc.readFromCacheFile(absPath)
 	if err != nil {
 		// Nothing we can do, log it but act like we succeeded.
 		log.Error.Printf("store/storecache.writer: disappeared before writeback: %s", err)
@@ -366,14 +358,24 @@ func (wbq *writebackQueue) writeback(r *request) error {
 // requestWriteback makes a hard link to the cache file sends a request to the scheduler queue.
 func (wbq *writebackQueue) requestWriteback(ref upspin.Reference, e upspin.Endpoint) error {
 	// Make a link to the cache file.
-	cf := wbq.sc.absCachePath(ref, e)
-	wbf := cf + writebackSuffix
+	relPath := wbq.sc.cachePath(ref, e)
+	cf := wbq.sc.absCachePath(relPath)
+	wbf := wbq.sc.absWritebackPath(relPath)
 	if err := os.Link(cf, wbf); err != nil {
 		if strings.Contains(err.Error(), "exists") {
 			// Someone else is already writing it back.
 			return nil
 		}
-		return err
+		os.MkdirAll(filepath.Dir(wbf), 0700)
+		err := os.Link(cf, wbf)
+		if err != nil {
+			if strings.Contains(err.Error(), "exists") {
+				// Someone else is already writing it back.
+				return nil
+			}
+			log.Debug.Printf("%s", err)
+			return err
+		}
 	}
 
 	// Let the scheduler know.
