@@ -19,6 +19,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"time"
 
 	"upspin.io/client"
 	"upspin.io/config"
@@ -34,6 +35,7 @@ import (
 	storeServer "upspin.io/store/server"
 	"upspin.io/subcmd"
 	"upspin.io/upspin"
+	"upspin.io/version"
 
 	// Packers.
 	_ "upspin.io/pack/ee"
@@ -61,9 +63,14 @@ func defaultCfgPath() string {
 func Main() (ready chan struct{}) {
 	flags.Parse(flags.Server)
 
+	if git := version.GitSHA; git != "" {
+		log.Info.Printf("upspinserver built on %s at commit %s",
+			version.BuildTime.In(time.UTC).Format(time.Stamp+" UTC"),
+			git)
+	}
 	_, cfg, perm, err := initServer(startup)
 	if err == noConfig {
-		log.Print("Configuration file not found. Running in setup mode.")
+		log.Info.Print("Configuration file not found. Running in setup mode.")
 		http.Handle("/", &setupHandler{})
 	} else if err != nil {
 		log.Fatal(err)
