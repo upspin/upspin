@@ -424,6 +424,12 @@ returned `DirEntry` has empty `Blocks` and `Packdata` fields.
 As always, if the name steps through a link, the caller must have some access
 rights for the link entry itself.
 
+The owner has special rights regarding items in the owner's tree:
+
+*   any file can be read
+*   any directory can be listed (its contents can be viewed)
+*   any `Access` or `Group` file can be created, read or modified
+
 For snapshots, once the snapshot tree is initialized it behaves as if the tree
 has an `Access` file with (for `ann+snapshot@example.com`):
 
