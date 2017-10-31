@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8d543175_6b2d8acd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-10-31T20:07:34Z",
+      "side": 1,
+      "message": "I don\u0027t see this as necessary if ls without -L does what is expected of it.",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 0
+      },
+      "revId": "7878a6af8bd2c1840ba172460455eba24d7a0f7d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3476dea2_3b6cbfab",
+        "filename": "cmd/upspin/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 719,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-10-31T20:07:34Z",
+      "side": 1,
+      "message": "What does this have to do with the CL?",
+      "range": {
+        "startLine": 718,
+        "startChar": 1,
+        "endLine": 719,
+        "endChar": 49
+      },
+      "revId": "7878a6af8bd2c1840ba172460455eba24d7a0f7d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
