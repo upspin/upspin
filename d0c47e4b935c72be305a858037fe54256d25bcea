@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d2e4b253_5be5b4bd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-10-31T01:55:47Z",
+      "side": 1,
+      "message": "special",
+      "range": {
+        "startLine": 7,
+        "startChar": 15,
+        "endLine": 7,
+        "endChar": 22
+      },
+      "revId": "d0c47e4b935c72be305a858037fe54256d25bcea",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e66b6fa5_90677d3b",
+        "filename": "doc/access_control.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 432,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-10-31T01:55:47Z",
+      "side": 1,
+      "message": "delete blank",
+      "revId": "d0c47e4b935c72be305a858037fe54256d25bcea",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
