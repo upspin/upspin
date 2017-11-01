@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4d07399b_8d6ca3a9",
+        "filename": "store/storecache/cache.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-01T00:16:50Z",
+      "side": 1,
+      "message": "or even 1 * time.Minute ;-)",
+      "range": {
+        "startLine": 28,
+        "startChar": 14,
+        "endLine": 28,
+        "endChar": 31
+      },
+      "revId": "1e9cb1e76e875603b161488c0b00133986ebccbc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
