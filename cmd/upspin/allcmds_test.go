@@ -366,7 +366,7 @@ var cpTests = []cmdTest{
 			"cp -R @/cp @/cp2",
 		),
 		"",
-		fail("existing directory"),
+		fail("does not exist"),
 	},
 	// Copy tree recursively four ways.
 	{
