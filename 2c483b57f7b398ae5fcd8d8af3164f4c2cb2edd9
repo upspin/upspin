@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5cae1e15_c6740004",
+        "filename": "access/access.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 625,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-11-01T01:47:39Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "d89a9358_0060a5da",
+      "revId": "2c483b57f7b398ae5fcd8d8af3164f4c2cb2edd9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e925be90_3afc90a9",
         "filename": "access/access.go",
         "patchSetId": 5
@@ -33,6 +51,24 @@
       "revId": "2c483b57f7b398ae5fcd8d8af3164f4c2cb2edd9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e509dc09_e0d8dc5c",
+        "filename": "access/access.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 699,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-11-01T01:47:39Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "e925be90_3afc90a9",
+      "revId": "2c483b57f7b398ae5fcd8d8af3164f4c2cb2edd9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "90f51362_66b1688c",
+        "filename": "access/access.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 704,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-11-01T01:47:39Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "95916c2d_d45d98fc",
+      "revId": "2c483b57f7b398ae5fcd8d8af3164f4c2cb2edd9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "05485acc_8298d70b",
         "filename": "access/access.go",
         "patchSetId": 5
@@ -67,6 +121,24 @@
       "revId": "2c483b57f7b398ae5fcd8d8af3164f4c2cb2edd9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f934d4e9_89f1b1fa",
+        "filename": "access/access.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 755,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-11-01T01:47:39Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "05485acc_8298d70b",
+      "revId": "2c483b57f7b398ae5fcd8d8af3164f4c2cb2edd9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "c6e39c52_75042689",
+        "filename": "access/access.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 770,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-11-01T01:47:39Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "d95c14a4_35143c16",
+      "revId": "2c483b57f7b398ae5fcd8d8af3164f4c2cb2edd9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f8e3ebdb_5cdc0ace",
         "filename": "access/access.go",
         "patchSetId": 5
@@ -101,6 +191,24 @@
       "revId": "2c483b57f7b398ae5fcd8d8af3164f4c2cb2edd9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4684406e_9b2423dc",
+        "filename": "access/access.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 843,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-11-01T01:47:39Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "f8e3ebdb_5cdc0ace",
+      "revId": "2c483b57f7b398ae5fcd8d8af3164f4c2cb2edd9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -121,6 +229,24 @@
     },
     {
       "key": {
+        "uuid": "87c0cd68_77a57d58",
+        "filename": "access/access.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 873,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-11-01T01:47:39Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "86f59d55_c4d3fc9d",
+      "revId": "2c483b57f7b398ae5fcd8d8af3164f4c2cb2edd9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "6615cd63_7afbc534",
         "filename": "access/access.go",
         "patchSetId": 5
@@ -135,6 +261,24 @@
       "revId": "2c483b57f7b398ae5fcd8d8af3164f4c2cb2edd9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "745e8b52_2a917860",
+        "filename": "access/access.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 887,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-11-01T01:47:39Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "6615cd63_7afbc534",
+      "revId": "2c483b57f7b398ae5fcd8d8af3164f4c2cb2edd9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -155,6 +299,24 @@
     },
     {
       "key": {
+        "uuid": "c811d5aa_a485c354",
+        "filename": "access/access_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 879,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-11-01T01:47:39Z",
+      "side": 1,
+      "message": "Great. I had used it in my own tests and found it very useful but always removed it before submission because I thought upspin was supporting building with 1.8 too. I\u0027ve added the call to all helper functions that might have called t.Error or t.Fatal.",
+      "parentUuid": "6feb71c5_fcc5f0a5",
+      "revId": "2c483b57f7b398ae5fcd8d8af3164f4c2cb2edd9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dff6badb_d735feb5",
         "filename": "access/access_test.go",
         "patchSetId": 5
@@ -169,6 +331,24 @@
       "revId": "2c483b57f7b398ae5fcd8d8af3164f4c2cb2edd9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "134d30ab_448d59be",
+        "filename": "access/access_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 888,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-11-01T01:47:39Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "dff6badb_d735feb5",
+      "revId": "2c483b57f7b398ae5fcd8d8af3164f4c2cb2edd9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -189,6 +369,24 @@
     },
     {
       "key": {
+        "uuid": "89d6d017_873cfde7",
+        "filename": "access/access_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 908,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-11-01T01:47:39Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "cc82a2fe_28a0b549",
+      "revId": "2c483b57f7b398ae5fcd8d8af3164f4c2cb2edd9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "93f5b61d_235d3990",
         "filename": "access/access_test.go",
         "patchSetId": 5
@@ -206,6 +404,24 @@
     },
     {
       "key": {
+        "uuid": "a5db3a95_726a56f3",
+        "filename": "access/access_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 944,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-11-01T01:47:39Z",
+      "side": 1,
+      "message": "Great! I would even put all these into a loop that iterates through different Access settings and a different array of expected grant values but I thought the code becomes difficult to understand and starts to look like APL.",
+      "parentUuid": "93f5b61d_235d3990",
+      "revId": "2c483b57f7b398ae5fcd8d8af3164f4c2cb2edd9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "f86d0b4c_d3479531",
         "filename": "access/access_test.go",
         "patchSetId": 5
@@ -220,6 +436,24 @@
       "revId": "2c483b57f7b398ae5fcd8d8af3164f4c2cb2edd9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7600ca7b_23333a71",
+        "filename": "access/access_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 1303,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-11-01T01:47:39Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "f86d0b4c_d3479531",
+      "revId": "2c483b57f7b398ae5fcd8d8af3164f4c2cb2edd9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
