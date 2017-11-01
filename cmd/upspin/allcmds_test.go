@@ -443,6 +443,21 @@ var lsTests = []cmdTest{
 			"ann@example.com/linktest/link -> ann@example.com/linktest/file",
 		),
 	},
+	{
+		"ls -L links with wildcards",
+		ann,
+		do(
+			"ls -L @/link?est/l?nk",
+			"ls -L @/linktest/l?nk",
+			"ls -L @/link?est/link",
+		),
+		"",
+		expect(
+			"ann@example.com/linktest/file",
+			"ann@example.com/linktest/file",
+			"ann@example.com/linktest/file",
+		),
+	},
 }
 
 // shareTests tests share processing,.

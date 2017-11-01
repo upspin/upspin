@@ -212,7 +212,7 @@ func (s *State) GlobUpspin(pattern string) []*upspin.DirEntry {
 	}
 	// If it has no metacharacters, look it up to be sure it exists.
 	if !HasGlobChar(string(pat)) {
-		entry, err := s.Client.Lookup(pat, true)
+		entry, err := s.Client.Lookup(pat, false)
 		if err != nil {
 			s.Exit(err)
 		}

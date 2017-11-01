@@ -426,6 +426,11 @@ type DirServer interface {
 	// DirEntries as outlined in the description for ErrFollowLink,
 	// updating the pattern as appropriate. Note that any returned
 	// links may only partially match the original argument pattern.
+	//
+	// If the pattern evaluates to one or more name that identifies
+	// a link, the DirEntry for the link is returned, not the target.
+	// This is analogous to passing false as the second argument
+	// to Client.Lookup.
 	Glob(pattern string) ([]*DirEntry, error)
 
 	// Delete deletes the DirEntry for a name from the directory service.

@@ -605,8 +605,8 @@ func TestGlob(t *testing.T) {
 
 	// Glob the link itself.
 	ents, err = sOwner.Glob(userName + "/dir/sublinkdir")
-	if err != upspin.ErrFollowLink {
-		t.Fatalf("Glob returned error %v, want ErrFollowLink", err)
+	if err != nil {
+		t.Fatalf("Glob returned error %v, want nil", err)
 	}
 	exp = []expected{
 		{userName + "/dir/sublinkdir", !incomplete},
