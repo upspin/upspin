@@ -55,7 +55,7 @@ func TestGlob(t *testing.T) {
 		case link:
 			de.Attr = upspin.AttrLink
 			de.Link = linkTarget
-			return de, nil
+			return de, upspin.ErrFollowLink // This is what DirServer.Lookup does with a link.
 		default:
 			if strings.HasPrefix(string(name), link+"/") {
 				return &upspin.DirEntry{
@@ -145,6 +145,7 @@ func TestGlob(t *testing.T) {
 	testGlob := func(pattern string, matchErr error, names ...upspin.PathName) {
 		t.Logf("Glob(%q)", pattern)
 		entries, err := Glob(pattern, lookup, ls)
+		t.Log(entries, err)
 		if err != matchErr && !errors.Match(matchErr, err) {
 			t.Errorf("Glob(%q): error: %v, want %v", pattern, err, matchErr)
 		}

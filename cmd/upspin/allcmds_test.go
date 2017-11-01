@@ -424,7 +424,7 @@ var lsTests = []cmdTest{
 		"",
 		expect(
 			"ann@example.com/linktest/file",
-			"ann@example.com/linktest/link -> ann@example.com/linktest/file",
+			"ann@example.com/linktest/link",
 			"ann@example.com/linktest/file",
 		),
 	},
@@ -438,9 +438,24 @@ var lsTests = []cmdTest{
 		),
 		"",
 		expect(
-			"ann@example.com/linktest/link -> ann@example.com/linktest/file",
-			"ann@example.com/linktest/link -> ann@example.com/linktest/file",
-			"ann@example.com/linktest/link -> ann@example.com/linktest/file",
+			"ann@example.com/linktest/link",
+			"ann@example.com/linktest/link",
+			"ann@example.com/linktest/link",
+		),
+	},
+	{
+		"ls -L links with wildcards",
+		ann,
+		do(
+			"ls -L @/link?est/l?nk",
+			"ls -L @/linktest/l?nk",
+			"ls -L @/link?est/link",
+		),
+		"",
+		expect(
+			"ann@example.com/linktest/file",
+			"ann@example.com/linktest/file",
+			"ann@example.com/linktest/file",
 		),
 	},
 }
