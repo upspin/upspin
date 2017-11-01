@@ -38,6 +38,12 @@ func Glob(pattern string, lookup LookupFunc, ls ListFunc) ([]*upspin.DirEntry, e
 		if de == nil {
 			return nil, err
 		}
+		// If the pattern we look up is just a plain file, and it's a link,
+		// just return it. In effect this is equivalent to passing false as the
+		// final argument to Client.Lookup.
+		if err == upspin.ErrFollowLink && de.Name == p.Path() {
+			err = nil
+		}
 		return []*upspin.DirEntry{de}, err
 	}
 
