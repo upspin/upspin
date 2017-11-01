@@ -363,6 +363,15 @@ var cpTests = []cmdTest{
 		"cannot cp to non-existent directory",
 		ann,
 		do(
+			"cp @/cp/file @/does/not/exist",
+		),
+		"",
+		fail("does not exist"),
+	},
+	{
+		"cannot recursive cp to non-existent directory",
+		ann,
+		do(
 			"cp -R @/cp @/cp2",
 		),
 		"",

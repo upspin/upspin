@@ -98,6 +98,13 @@ type cpFile struct {
 func (s *State) copyCommand(cs *copyState, srcFiles []cpFile, dstFile cpFile) {
 	// TODO: Check for nugatory copies.
 	if s.isDir(dstFile) {
+		// Checking write access to the destination before writing blocks to storage
+		if dstFile.isUpspin {
+			dstPath := s.expandUpspin([]string{dstFile.path}, true)[0]
+			if _, err := s.Client.Lookup(dstPath, false); err != nil {
+				s.Exit(err)
+			}
+		}
 		s.copyToDir(cs, srcFiles, dstFile)
 		return
 	}
