@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5a7fb70b_2bcb2d29",
+        "filename": "cmd/upspin/cp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-11-02T01:07:49Z",
+      "side": 1,
+      "message": "You can fold the call to Client.Lookup into the intializer for the if.",
+      "revId": "a76c22e7232a33835edea4bb94c25e41ede85157",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
