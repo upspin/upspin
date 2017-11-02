@@ -273,7 +273,7 @@ local$ upspin setupserver -domain=example.com -host=upspin.example.com
 
 This registers the server user with the public key server, copies the
 configuration files from your workstation to the server, restarts the server,
-makes the Upspin user root for `upspin@example.com`,
+makes the Upspin server user root for `upspin@example.com`,
 and makes the Upspin user root for `you@gmail.com`.
 
 It also creates a special `Group` file for the store server,
