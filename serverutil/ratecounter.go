@@ -64,7 +64,7 @@ func (r *RateCounter) Rate() float64 {
 
 // String implements expvar.Val
 func (r *RateCounter) String() string {
-	return fmt.Sprintf("%g ops/s", r.Rate()/float64(r.d.Seconds()))
+	return fmt.Sprintf("\"%g ops/s\"", r.Rate()/float64(r.d.Seconds()))
 }
 
 func (r *RateCounter) loop() {

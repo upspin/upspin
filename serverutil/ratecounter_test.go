@@ -43,7 +43,7 @@ func TestRateCounter(t *testing.T) {
 	}
 
 	rc.Add(12)
-	if rc.String() != "4 ops/s" {
+	if rc.String() != "\"4 ops/s\"" {
 		t.Errorf("got = %s", rc)
 	}
 }
