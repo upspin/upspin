@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7f9b6a2c_4c704bfa",
+        "filename": "bind/bind.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-11-03T23:32:18Z",
+      "side": 1,
+      "message": "please don\u0027t use latin abbreviations. we speak english.\nanyway you\u0027re using the wrong one (another reason to avoid them).\nyou meant \u0027e.g\u0027\n\nbut you need none; this is clear enough, with quotes:\n\n// \"bind.RegisterKeyServer\"",
+      "revId": "e2c5a4873de5d966b2a754560e07a99721eb9fcf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6b18e3d6_4b0cc836",
+        "filename": "bind/bind.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-11-03T23:32:18Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "e2c5a4873de5d966b2a754560e07a99721eb9fcf",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
