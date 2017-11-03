@@ -120,6 +120,7 @@ import (
 
 	"upspin.io/config"
 	"upspin.io/rpc/local"
+	"upspin.io/serverutil"
 	"upspin.io/upspin"
 
 	yaml "gopkg.in/yaml.v2"
@@ -646,7 +647,7 @@ func prefix(p string, out io.Writer) io.Writer {
 
 func waitReady(addr string) error {
 	url := "https://" + addr
-	if local.IsLocal(addr) {
+	if serverutil.IsLoopback(addr) {
 		url = "http://" + addr
 	}
 	rt := &http.Transport{

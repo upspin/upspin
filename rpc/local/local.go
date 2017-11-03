@@ -11,10 +11,9 @@ import (
 	"net"
 	"strings"
 
+	"upspin.io/serverutil"
 	"upspin.io/upspin"
 )
-
-const localSuffix = ".localhost."
 
 type Dialer net.Dialer
 
@@ -24,22 +23,10 @@ func LocalName(config upspin.Config, service string) string {
 	return strings.Replace(s, "@", ".", 1)
 }
 
-// IsLocal returns true if the address is host local.
-func IsLocal(address string) bool {
-	h, _, err := net.SplitHostPort(address)
-	if err != nil {
-		h = address
-	}
-	if !strings.HasSuffix(h, localSuffix) {
-		return false
-	}
-	return true
-}
-
 // DialContext dials a service. Use it instead of the standard net.DialContext
 // to use a local IPC for host names ending in localSuffix.
 func (d *Dialer) DialContext(ctx context.Context, network, address string) (net.Conn, error) {
-	if IsLocal(address) {
+	if serverutil.IsLoopback(address) {
 		return d.DialContextLocal(ctx, network, address)
 	}
 	nd := net.Dialer(*d)
@@ -49,7 +36,7 @@ func (d *Dialer) DialContext(ctx context.Context, network, address string) (net.
 // Listen listens for calls to a service. Use it instead of the standard net.Listen
 // to use a local IPC for host names ending in localSuffix.
 func Listen(network, address string) (net.Listener, error) {
-	if IsLocal(address) {
+	if serverutil.IsLoopback(address) {
 		return ListenLocal(address)
 	}
 	return net.Listen(network, address)
