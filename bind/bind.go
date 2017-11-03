@@ -18,74 +18,60 @@ type dialKey struct {
 	endpoint upspin.Endpoint
 }
 
-type dialCache map[dialKey]upspin.Service
+type dialers map[upspin.Transport]upspin.Dialer
+type dialed map[dialKey]upspin.Service
+
+// The servers struct tracks upspin.Dialer(s) that have been registered for
+// various transports, and upspin.Service(s) that have already been
+// successfully dialed.
+type servers struct {
+	kind    string
+	mu      sync.Mutex // Guards the variables below.
+	dialers dialers
+	dialed  dialed
+}
 
 var (
 	noCache bool // For testing. When true, the caches are not used.
 
-	mu sync.Mutex // Guards the variables below.
-
-	keyMap       = make(map[upspin.Transport]upspin.KeyServer)
-	directoryMap = make(map[upspin.Transport]upspin.DirServer)
-	storeMap     = make(map[upspin.Transport]upspin.StoreServer)
-
-	keyDialCache       = make(dialCache)
-	directoryDialCache = make(dialCache)
-	storeDialCache     = make(dialCache)
+	keyServers = servers{
+		kind:    "Key",
+		dialers: make(dialers),
+		dialed:  make(dialed),
+	}
+	dirServers = servers{
+		kind:    "Directory",
+		dialers: make(dialers),
+		dialed:  make(dialed),
+	}
+	storeServers = servers{
+		kind:    "Store",
+		dialers: make(dialers),
+		dialed:  make(dialed),
+	}
 )
 
 // RegisterKeyServer registers a KeyServer interface for the transport.
 // There must be no previous registration.
 func RegisterKeyServer(transport upspin.Transport, key upspin.KeyServer) error {
-	const op = "bind.RegisterKeyServer"
-	mu.Lock()
-	defer mu.Unlock()
-	_, ok := keyMap[transport]
-	if ok {
-		return errors.E(op, errors.Invalid, errors.Errorf("server already registered for transport %v", transport))
-	}
-	keyMap[transport] = key
-	return nil
+	return keyServers.register(transport, key)
 }
 
 // RegisterDirServer registers a DirServer interface for the transport.
 // There must be no previous registration.
 func RegisterDirServer(transport upspin.Transport, dir upspin.DirServer) error {
-	const op = "bind.RegisterDirServer"
-	mu.Lock()
-	defer mu.Unlock()
-	_, ok := directoryMap[transport]
-	if ok {
-		return errors.E(op, errors.Invalid, errors.Errorf("server already registered for transport %v", transport))
-	}
-	directoryMap[transport] = dir
-	return nil
+	return dirServers.register(transport, dir)
 }
 
 // RegisterStoreServer registers a StoreServer interface for the transport.
 // There must be no previous registration.
 func RegisterStoreServer(transport upspin.Transport, store upspin.StoreServer) error {
-	const op = "bind.RegisterStoreServer"
-	mu.Lock()
-	defer mu.Unlock()
-	_, ok := storeMap[transport]
-	if ok {
-		return errors.E(op, errors.Invalid, errors.Errorf("server already registered for transport %v", transport))
-	}
-	storeMap[transport] = store
-	return nil
+	return storeServers.register(transport, store)
 }
 
 // KeyServer returns a KeyServer interface bound to the endpoint.
 func KeyServer(cc upspin.Config, e upspin.Endpoint) (upspin.KeyServer, error) {
-	const op = "bind.KeyServer"
-	mu.Lock()
-	u, ok := keyMap[e.Transport]
-	mu.Unlock()
-	if !ok {
-		return nil, errors.E(op, errors.Invalid, errors.Errorf("service with transport %q not registered", e.Transport))
-	}
-	x, err := reachableService(cc, op, e, keyDialCache, u)
+	x, err := keyServers.reachableService(cc, e)
 	if err != nil {
 		return nil, err
 	}
@@ -94,14 +80,7 @@ func KeyServer(cc upspin.Config, e upspin.Endpoint) (upspin.KeyServer, error) {
 
 // StoreServer returns a StoreServer interface bound to the endpoint.
 func StoreServer(cc upspin.Config, e upspin.Endpoint) (upspin.StoreServer, error) {
-	const op = "bind.StoreServer"
-	mu.Lock()
-	s, ok := storeMap[e.Transport]
-	mu.Unlock()
-	if !ok {
-		return nil, errors.E(op, errors.Invalid, errors.Errorf("service with transport %q not registered", e.Transport))
-	}
-	x, err := reachableService(cc, op, e, storeDialCache, s)
+	x, err := storeServers.reachableService(cc, e)
 	if err != nil {
 		return nil, err
 	}
@@ -110,14 +89,7 @@ func StoreServer(cc upspin.Config, e upspin.Endpoint) (upspin.StoreServer, error
 
 // DirServer returns a DirServer interface bound to the endpoint.
 func DirServer(cc upspin.Config, e upspin.Endpoint) (upspin.DirServer, error) {
-	const op = "bind.DirServer"
-	mu.Lock()
-	d, ok := directoryMap[e.Transport]
-	mu.Unlock()
-	if !ok {
-		return nil, errors.E(op, errors.Invalid, errors.Errorf("service with transport %q not registered", e.Transport))
-	}
-	x, err := reachableService(cc, op, e, directoryDialCache, d)
+	x, err := dirServers.reachableService(cc, e)
 	if err != nil {
 		return nil, err
 	}
@@ -169,25 +141,47 @@ func DirServerFor(cc upspin.Config, userName upspin.UserName) (upspin.DirServer,
 
 }
 
+func (s *servers) register(transport upspin.Transport, key upspin.Dialer) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	_, ok := s.dialers[transport]
+	if ok {
+		return errors.E(s.registerOp(), errors.Invalid, errors.Errorf("server already registered for transport %v", transport))
+	}
+	s.dialers[transport] = key
+	return nil
+}
+
 // reachableService finds a bound and reachable service in the cache or dials a
 // fresh one and saves it in the cache.
-func reachableService(cc upspin.Config, op string, e upspin.Endpoint, cache dialCache, dialer upspin.Dialer) (upspin.Service, error) {
-	if noCache {
-		return dialer.Dial(cc, e)
-	}
+func (s *servers) reachableService(cc upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
 	key := dialKey{user: cc.UserName(), endpoint: e}
-	mu.Lock()
-	defer mu.Unlock()
-	service, cached := cache[key]
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	service, cached := s.dialed[key]
 	if !cached {
 		var err error
+		dialer, ok := s.dialers[e.Transport]
+		if !ok {
+			return nil, errors.E(s.serverOp(), errors.Invalid, errors.Errorf("service with transport %q not registered", e.Transport))
+		}
 		service, err = dialer.Dial(cc, e)
 		if err != nil {
-			return nil, errors.E(op, err)
+			return nil, errors.E(s.serverOp(), err)
 		}
-		cache[key] = service
+		if !noCache {
+			s.dialed[key] = service
+		}
 	}
 	return service, nil
+}
+
+func (s *servers) registerOp() string {
+	return "bind.Register" + s.kind + "Server" // i.e. bind.RegisterKeyServer
+}
+
+func (s *servers) serverOp() string {
+	return "bind." + s.kind + "Server" // i.e. bind.KeyServer
 }
 
 // NoCache supresses the caching of dial results. This was added for
