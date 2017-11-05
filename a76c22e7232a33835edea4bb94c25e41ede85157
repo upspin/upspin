@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "724ad01b_9b688e4d",
+        "filename": "cmd/upspin/cp.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-05T04:16:44Z",
+      "side": 1,
+      "message": "I\u0027m not sure this is the right check. The destination could be a file instead of a directory, right? Hmm...\n\neg: upspin cp /home/me/localname @/dir/remotename",
+      "revId": "a76c22e7232a33835edea4bb94c25e41ede85157",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "5a7fb70b_2bcb2d29",
         "filename": "cmd/upspin/cp.go",
         "patchSetId": 1
