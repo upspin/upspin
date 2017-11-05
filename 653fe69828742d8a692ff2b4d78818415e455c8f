@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5ca39cae_c18a0498",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5428
+      },
+      "writtenOn": "2017-11-05T15:03:36Z",
+      "side": 1,
+      "message": "s/Fixes/Update/\n\nI used `upspin cp` in my description of the issue for brevity reasons but I actually hit the problem when using `upspinfs`, as presumably most users would.",
+      "revId": "653fe69828742d8a692ff2b4d78818415e455c8f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
