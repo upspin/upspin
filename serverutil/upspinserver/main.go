@@ -9,7 +9,6 @@
 package upspinserver // import "upspin.io/serverutil/upspinserver"
 
 import (
-	"encoding/base64"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -302,37 +301,5 @@ func readServerConfig() (*subcmd.ServerConfig, error) {
 		return nil, err
 	}
 
-	return cfg, updateServerConfig(cfg)
-}
-
-// If Bucket is set, look for the old style serviceaccount.json file, stuff it
-// into the StoreConfig field, clear the Bucket field, and rewrite the config.
-// TODO(adg): remove this at the same time as removing the Bucket field.
-func updateServerConfig(cfg *subcmd.ServerConfig) error {
-	if cfg.Bucket != "" {
-		cfgFile := filepath.Join(*cfgPath, subcmd.ServerConfigFile)
-		serviceFile := filepath.Join(*cfgPath, "serviceaccount.json")
-		b, err := ioutil.ReadFile(serviceFile)
-		if err != nil {
-			return fmt.Errorf("Bucket set in %v, but: %v", cfgFile, err)
-		}
-		privateKeyData := base64.StdEncoding.EncodeToString(b)
-		cfg.StoreConfig = []string{
-			"backend=GCS",
-			"defaultACL=publicRead",
-			"gcpBucketName=" + cfg.Bucket,
-			"privateKeyData=" + privateKeyData,
-		}
-		cfg.Bucket = ""
-		b, err = json.Marshal(cfg)
-		if err != nil {
-			return fmt.Errorf("encoding config %v: %v", cfgFile, err)
-		}
-		err = ioutil.WriteFile(cfgFile, b, 0700)
-		if err != nil {
-			return fmt.Errorf("rewriting config: %v", err)
-		}
-		os.Remove(serviceFile)
-	}
-	return nil
+	return cfg, nil
 }
