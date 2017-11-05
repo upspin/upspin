@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cf82c7e4_4995e892",
+        "filename": "serverutil/ratecounter.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-05T03:59:01Z",
+      "side": 1,
+      "message": "you can use backquotes to make this a bit more readable: `\"%g op/s\"`\n\nand same in the test",
+      "range": {
+        "startLine": 67,
+        "startChar": 20,
+        "endLine": 67,
+        "endChar": 34
+      },
+      "revId": "d263936a5ea73f5e484915c4e38e17c45f212220",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
