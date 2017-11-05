@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a8b132f1_081e8268",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-05T04:23:24Z",
+      "side": 1,
+      "message": "In a commit like this, where you\u0027re adding new API to a package and using it elsewhere, just include the package name that implements the API. In this case, \"serverutil:\"",
+      "revId": "6627a8a6300086dad6be2ca080d67c0785b60ff0",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
