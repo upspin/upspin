@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d5be98b1_629c1503",
+        "filename": "bind/bind.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-05T03:57:20Z",
+      "side": 1,
+      "message": "I think this should be \"services\", which would parallel \"dialers\"",
+      "range": {
+        "startLine": 22,
+        "startChar": 5,
+        "endLine": 22,
+        "endChar": 11
+      },
+      "revId": "1b58e7624ffdf820ba03dce00f4d810ad8283361",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2a465c9e_7b4a5fda",
+        "filename": "bind/bind.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-05T03:57:20Z",
+      "side": 1,
+      "message": "no need to parenthesize the s; it does track Dialers plural, even if there is only one.",
+      "range": {
+        "startLine": 24,
+        "startChar": 42,
+        "endLine": 24,
+        "endChar": 45
+      },
+      "revId": "1b58e7624ffdf820ba03dce00f4d810ad8283361",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a79ae142_68050a75",
+        "filename": "bind/bind.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-05T03:57:20Z",
+      "side": 1,
+      "message": "services",
+      "range": {
+        "startLine": 31,
+        "startChar": 1,
+        "endLine": 31,
+        "endChar": 7
+      },
+      "revId": "1b58e7624ffdf820ba03dce00f4d810ad8283361",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
