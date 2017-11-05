@@ -25,14 +25,6 @@ type ServerConfig struct {
 
 	// StoreConfig specifies the configuration options for the StoreServer.
 	StoreConfig []string
-
-	// Bucket specifies the Google Cloud Storage bucket that the
-	// upspinserver should use to store data.
-	// If empty, local disk is used instead.
-	// Deprecated: StoreConfig should be used instead.
-	Bucket string
-
-	// TODO(adg): remove the Bucket field.
 }
 
 // ServerConfigFile specifies the file name of the JSON-encoded ServerConfig.
