@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "719c2dd3_4dc72088",
+        "filename": "cmd/upspin/glob.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-05T04:24:16Z",
+      "side": 1,
+      "message": "delete",
+      "revId": "1593f296cab7c057b921c0d4e4c3216cb7fd7f2d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "22f803d3_56ff9681",
+        "filename": "cmd/upspin/glob.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-05T04:24:16Z",
+      "side": 1,
+      "message": "delete",
+      "revId": "1593f296cab7c057b921c0d4e4c3216cb7fd7f2d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a5056845_030d8310",
+        "filename": "serverutil/glob_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-05T04:24:16Z",
+      "side": 1,
+      "message": "jeez whoops",
+      "revId": "1593f296cab7c057b921c0d4e4c3216cb7fd7f2d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
