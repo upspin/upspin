@@ -6,14 +6,12 @@ package main
 
 import (
 	"bytes"
-	"encoding/base64"
 	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"net"
 	"net/http"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -125,28 +123,6 @@ The calling user must be the same one that ran 'upspin setupdomain'.
 	}
 	if err := ioutil.WriteFile(configFile, configBody.Bytes(), 0644); err != nil {
 		s.Exit(err)
-	}
-
-	// If Bucket is set, look for the old style serviceaccount.json
-	// file, stuff it into the StoreConfig field, clear the
-	// Bucket field, and rewrite the config.
-	// TODO(adg): remove this at the same time as removing the Bucket field.
-	if cfg.Bucket != "" {
-		serviceFile := filepath.Join(cfgPath, "serviceaccount.json")
-		b, err := ioutil.ReadFile(serviceFile)
-		if err != nil {
-			s.Exitf("Bucket set, but: %v", err)
-		}
-		privateKeyData := base64.StdEncoding.EncodeToString(b)
-		cfg.StoreConfig = []string{
-			"backend=GCS",
-			"defaultACL=publicRead",
-			"gcpBucketName=" + cfg.Bucket,
-			"privateKeyData=" + privateKeyData,
-		}
-		cfg.Bucket = ""
-		s.WriteServerConfig(cfgPath, cfg)
-		os.Remove(serviceFile)
 	}
 
 	// Put server config to the remote upspinserver.
