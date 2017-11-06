@@ -12,6 +12,7 @@ import (
 	"net/http"
 	"strings"
 
+	"upspin.io/cloud/mail"
 	"upspin.io/cloud/mail/sendgrid"
 	"upspin.io/cloud/storage"
 	"upspin.io/config"
@@ -77,28 +78,30 @@ func Main(setup func(upspin.KeyServer)) {
 		http.Handle("/log", logHandler{logger: logger})
 	}
 
-	if *mailConfigFile != "" {
-		signupURL := "https://" + flags.NetAddr + "/signup"
-		f := cfg.Factotum()
-		if f == nil {
-			log.Fatal("keyserver: supplied config must include keys when -mail_config set")
+	signupURL := "https://" + flags.NetAddr + "/signup"
+	f := cfg.Factotum()
+	if f == nil {
+		log.Fatal("keyserver: supplied config must include keys")
+	}
+	project := ""
+	flag.Visit(func(f *flag.Flag) {
+		if f.Name != "project" {
+			return
 		}
-		project := ""
-		flag.Visit(func(f *flag.Flag) {
-			if f.Name != "project" {
-				return
-			}
-			project = f.Value.String()
-		})
+		project = f.Value.String()
+	})
+	var m mail.Mail
+	if *mailConfigFile != "" {
 		apiKey, err := parseMailConfig(*mailConfigFile)
 		if err != nil {
 			log.Fatalf("keyserver: %v", err)
 		}
-		m := sendgrid.New(apiKey)
-		http.Handle("/signup", signup.NewHandler(signupURL, f, key, m, project))
+		m = sendgrid.New(apiKey)
 	} else {
-		log.Println("keyserver: -mail_config not set, /signup deactivated")
+		log.Info.Printf("keyserver: -mail_config not supplied; logging mail messages instead")
+		m = mail.Logger(log.Info)
 	}
+	http.Handle("/signup", signup.NewHandler(signupURL, f, key, m, project))
 }
 
 func parseMailConfig(name string) (apiKey string, err error) {
