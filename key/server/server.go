@@ -29,7 +29,24 @@ const cacheSize = 10000
 
 // New initializes an instance of the KeyServer
 // that stores its data in the given Storage implementation.
-func New(s storage.Storage) upspin.KeyServer {
+func New(options ...string) (upspin.KeyServer, error) {
+	const op = "key/server.New"
+
+	var backend string
+	var dialOpts []storage.DialOpts
+	for _, option := range options {
+		const prefix = "backend="
+		if strings.HasPrefix(option, prefix) {
+			backend = option[len(prefix):]
+			continue
+		}
+		// Pass other options to the storage backend.
+		dialOpts = append(dialOpts, storage.WithOptions(option))
+	}
+	s, err := storage.Dial(backend, dialOpts...)
+	if err != nil {
+		return nil, errors.E(op, err)
+	}
 	return &server{
 		storage:   s,
 		refCount:  &refCount{count: 1},
@@ -37,7 +54,7 @@ func New(s storage.Storage) upspin.KeyServer {
 		logger:    &loggerImpl{storage: s},
 		cache:     cache.NewLRU(cacheSize),
 		negCache:  cache.NewLRU(cacheSize),
-	}
+	}, nil
 }
 
 // server is the implementation of the KeyServer Service on GCP.
