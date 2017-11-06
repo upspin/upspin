@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a2a0054c_e22bea99",
+        "filename": "key/server/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-06T21:39:50Z",
+      "side": 1,
+      "message": "check if backend is \"\" and report an error if so\nyou\u0027ll get an error from Dial anyway, but you can generate a more friendly one this way",
+      "revId": "df6b27de86347499571364e63911a465910a8eae",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
