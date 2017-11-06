@@ -16,6 +16,23 @@
       "revId": "653fe69828742d8a692ff2b4d78818415e455c8f",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "9b400916_fa9407b4",
+        "filename": "cmd/upspin/cp.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-11-06T02:19:07Z",
+      "side": 1,
+      "message": "This isn\u0027t the right place or the right solution, as it applies only when copying from a to b where b is a directory.\n\nThe right solution is to do this check at create time, and cache the state for the associated directory. It\u0027s a little tricky.\n\nAlso, this might not be the place to do it. It should be in the client, but that could be problematic because of races as access permissions change underfoot.\n\nThis needs more thought.",
+      "revId": "653fe69828742d8a692ff2b4d78818415e455c8f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
