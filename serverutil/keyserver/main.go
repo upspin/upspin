@@ -10,7 +10,6 @@ import (
 	"flag"
 	"io/ioutil"
 	"net/http"
-	"strings"
 
 	"upspin.io/cloud/mail"
 	"upspin.io/cloud/mail/sendgrid"
@@ -27,6 +26,8 @@ import (
 
 	// Load required transports
 	_ "upspin.io/key/transports"
+
+	yaml "gopkg.in/yaml.v2"
 )
 
 // mailConfig specifies a config file name for the mail service.
@@ -83,33 +84,51 @@ func Main(setup func(upspin.KeyServer)) {
 	if f == nil {
 		log.Fatal("keyserver: supplied config must include keys")
 	}
-	project := ""
-	flag.Visit(func(f *flag.Flag) {
-		if f.Name != "project" {
-			return
-		}
-		project = f.Value.String()
-	})
-	var m mail.Mail
-	if *mailConfigFile != "" {
-		apiKey, err := parseMailConfig(*mailConfigFile)
-		if err != nil {
-			log.Fatalf("keyserver: %v", err)
-		}
-		m = sendgrid.New(apiKey)
+	mc := new(signup.MailConfig)
+	if *mailConfigFile == "" {
+		log.Info.Printf("keyserver: WARNING: -mail_config not supplied; no emails will be sent, they will be logged instead")
+		mc.Mail = mail.Logger(log.Info)
 	} else {
-		log.Info.Printf("keyserver: -mail_config not supplied; logging mail messages instead")
-		m = mail.Logger(log.Info)
+		data, err := ioutil.ReadFile(*mailConfigFile)
+		if err != nil {
+			log.Fatal("keyserver: %v", err)
+		}
+		mc, err = parseMailConfig(data)
+		if err != nil {
+			log.Fatal("keyserver: %v", err)
+		}
 	}
-	http.Handle("/signup", signup.NewHandler(signupURL, f, key, m, project))
+	http.Handle("/signup", signup.NewHandler(signupURL, f, key, mc))
 }
 
-func parseMailConfig(name string) (apiKey string, err error) {
-	data, err := ioutil.ReadFile(name)
-	if err != nil {
-		return "", errors.E(errors.IO, err)
+// parseMailConfig reads YAML data and returns a signup.MailConfig
+// 	apikey: SENDGRID_API_KEY
+// 	notify: notify-signups@email.com
+// 	from: sender@email.com
+//	project: test
+func parseMailConfig(data []byte) (*signup.MailConfig, error) {
+	var c struct{ APIKey, Project, Notify, From string }
+	var m mail.Mail
+	if err := yaml.Unmarshal(data, &c); err != nil {
+		return nil, errors.E(errors.IO, err)
 	}
-	lines := strings.SplitN(strings.TrimSpace(string(data)), "\n", 2)
-	apiKey = strings.TrimSpace(lines[0])
-	return
+	if c.Project == "" {
+		log.Info.Printf("keyserver: project name not supplied in mail config")
+	}
+	if c.APIKey == "" {
+		log.Info.Printf("keyserver: WARNING: apikey is missing in config; no emails will be sent, they will be logged instead")
+		m = mail.Logger(log.Info)
+	} else {
+		if c.Notify != "" && c.From == "" {
+			log.Info.Printf("keyserver: missing from address in config, notifications will not be sent")
+			c.Notify = ""
+		}
+		m = sendgrid.New(c.APIKey)
+	}
+	return &signup.MailConfig{
+		Project: c.Project,
+		Notify:  c.Notify,
+		From:    c.From,
+		Mail:    m,
+	}, nil
 }
