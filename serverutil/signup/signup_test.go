@@ -31,6 +31,12 @@ func TestSignup(t *testing.T) {
 	defer s.Close()
 	h.(*handler).baseURL = s.URL
 
+	signupURLScheme = "http"
+	defer func() {
+		signupURLScheme = "https"
+	}()
+	keyServer := upspin.NetAddr(strings.TrimPrefix(s.URL, "http://"))
+
 	userName := upspin.UserName("bob@example.com")
 
 	// Make a signup request.
@@ -47,6 +53,10 @@ func TestSignup(t *testing.T) {
 			t.Fatal(err)
 		}
 		cfg = config.SetFactotum(cfg, userFact)
+		cfg = config.SetKeyEndpoint(cfg, upspin.Endpoint{
+			Transport: upspin.Remote,
+			NetAddr:   keyServer,
+		})
 		cfg = config.SetDirEndpoint(cfg, upspin.Endpoint{
 			Transport: upspin.Remote,
 			NetAddr:   dirServer,
@@ -55,7 +65,7 @@ func TestSignup(t *testing.T) {
 			Transport: upspin.Remote,
 			NetAddr:   storeServer,
 		})
-		if err := MakeRequest(s.URL, cfg, nil); err != nil {
+		if err := MakeRequest(cfg); err != nil {
 			t.Fatal(err)
 		}
 

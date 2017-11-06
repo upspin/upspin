@@ -54,9 +54,10 @@ The -signuponly flag tells signup to skip the generation of the configuration
 file and keys and only send the signup request to the key server.
 `
 	fs := flag.NewFlagSet("signup", flag.ExitOnError)
+	defaultKeyServer := string(config.New().KeyEndpoint().NetAddr)
 	var (
 		force       = fs.Bool("force", false, "create a new user even if keys and config file exist")
-		keyServer   = fs.String("key", "key.upspin.io", "Key server `address`")
+		keyServer   = fs.String("key", defaultKeyServer, "Key server `address`")
 		dirServer   = fs.String("dir", "", "Directory server `address`")
 		storeServer = fs.String("store", "", "Store server `address`")
 		bothServer  = fs.String("server", "", "Store and Directory server `address` (if combined)")
@@ -78,10 +79,9 @@ file and keys and only send the signup request to the key server.
 		flags.Config = filepath.Join(homedir, flags.Config)
 	}
 
-	signupURL := "https://" + *keyServer + "/signup"
 	if *signupOnly {
 		// Don't generate; just send the signup request to the key server.
-		s.registerUser(signupURL)
+		s.registerUser(*keyServer)
 		return
 	}
 
@@ -181,16 +181,20 @@ file and keys and only send the signup request to the key server.
 	s.keygenCommand(*secrets, *curve, *secretseed, false)
 
 	// Send the signup request to the key server.
-	s.registerUser(signupURL)
+	s.registerUser(*keyServer)
 }
 
 // registerUser reads the config file and sends its information to the key server.
-func (s *State) registerUser(signupURL string) {
+func (s *State) registerUser(keyServer string) {
 	cfg, err := config.FromFile(flags.Config)
 	if err != nil {
 		s.Exit(err)
 	}
-	if err := signup.MakeRequest(signupURL, cfg, nil); err != nil {
+	cfg = config.SetKeyEndpoint(cfg, upspin.Endpoint{
+		Transport: upspin.Remote,
+		NetAddr:   upspin.NetAddr(keyServer),
+	})
+	if err := signup.MakeRequest(cfg); err != nil {
 		s.Exit(err)
 	}
 	fmt.Fprintf(s.Stderr, "A signup email has been sent to %q,\n", cfg.UserName())
