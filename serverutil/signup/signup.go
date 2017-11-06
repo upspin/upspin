@@ -364,8 +364,8 @@ func snapshotUser(u upspin.UserName) (upspin.UserName, error) {
 
 var signupURLScheme = "https" // Tests may override this.
 
-// MakeRequest sends a signup request to the given URL for the given Config
-// using the provided Client or http.DefaultClient if client is nil.
+// MakeRequest sends a signup request for the given Config to the Config's
+// KeyServer Endpoint using the Config's TLS certs (if any).
 func MakeRequest(cfg upspin.Config) error {
 	query, err := makeQueryString(cfg)
 	if err != nil {
