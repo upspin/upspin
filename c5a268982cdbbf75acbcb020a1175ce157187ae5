@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b95df408_1f3566c3",
+        "filename": "serverutil/keyserver/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-06T21:44:01Z",
+      "side": 1,
+      "message": "make this dependency in a separate block to the upspin.io ones",
+      "revId": "c5a268982cdbbf75acbcb020a1175ce157187ae5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a0a20a70_d6d8c089",
+        "filename": "serverutil/keyserver/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-06T21:44:01Z",
+      "side": 1,
+      "message": "var mc signup.MailConfig",
+      "revId": "c5a268982cdbbf75acbcb020a1175ce157187ae5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7786cfea_51174301",
+        "filename": "serverutil/keyserver/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-06T21:44:01Z",
+      "side": 1,
+      "message": "this doesn\u0027t seem worth its own function",
+      "revId": "c5a268982cdbbf75acbcb020a1175ce157187ae5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6def6e09_611bb8d9",
+        "filename": "serverutil/keyserver/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-06T21:44:01Z",
+      "side": 1,
+      "message": "parseMailConfig is still a fine name",
+      "revId": "c5a268982cdbbf75acbcb020a1175ce157187ae5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ace5b4bd_4ca58652",
+        "filename": "serverutil/keyserver/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-06T21:44:01Z",
+      "side": 1,
+      "message": "maybe also validate that Project, From and Notify are provided here",
+      "revId": "c5a268982cdbbf75acbcb020a1175ce157187ae5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d604bc06_88cd9cc5",
+        "filename": "serverutil/signup/signup.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-06T21:44:01Z",
+      "side": 1,
+      "message": "It seems wrong to update the config when it\u0027s passed in by pointer.\nI\u0027d rather just force the caller to provide a from address, instead of having a default here.",
+      "revId": "c5a268982cdbbf75acbcb020a1175ce157187ae5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
