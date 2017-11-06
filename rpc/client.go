@@ -107,7 +107,7 @@ func NewClient(cfg upspin.Config, netAddr upspin.NetAddr, security SecurityLevel
 		}
 		c.baseURL = "http://" + string(netAddr)
 	case Secure:
-		certPool, err := certPoolFromConfig(cfg)
+		certPool, err := CertPoolFromConfig(cfg)
 		if err != nil {
 			return nil, errors.E(op, errors.Invalid, err)
 		}
