@@ -26,20 +26,20 @@ import (
 //
 // The rules are:
 //
-// <name> := <user name>@<domain name>
+// 	<name> := <user name>@<domain name>
 //
-// <domain name> :=
+// 	<domain name> :=
 //
-// - each . separated token < 64 characters
-// - character set for tokens [a-z0-9\-]
-// - final token at least two characters
-// - whole name < 254 characters
-// - characters are case insensitive
-// - final period is OK, but we remove it
+// 	- each . separated token < 64 characters
+// 	- character set for tokens [a-z0-9\-]
+// 	- final token at least two characters
+// 	- whole name < 254 characters
+// 	- characters are case insensitive
+// 	- final period is OK, but we remove it
 //
 // We ignore the rules of punycode, which is defined in https://tools.ietf.org/html/rfc3490 .
 //
-// <user name> :=
+// 	<user name> :=
 //
 // Names are validated and canonicalized by the UsernameCasePreserved profile
 // of the RFC 7613, "Preparation, Enforcement, and Comparison of Internationalized Strings",
