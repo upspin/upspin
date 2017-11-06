@@ -19,7 +19,8 @@ var certPoolCache struct {
 	m map[string]*x509.CertPool // [dir]pool
 }
 
-func certPoolFromConfig(cfg upspin.Config) (*x509.CertPool, error) {
+// CertPoolFromConfig returns the TLS certificate pool for this config.
+func CertPoolFromConfig(cfg upspin.Config) (*x509.CertPool, error) {
 	dir := cfg.Value("tlscerts")
 	if dir == "" {
 		return nil, nil

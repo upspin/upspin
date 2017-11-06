@@ -9,6 +9,7 @@ package signup
 import (
 	"bytes"
 	"crypto/sha256"
+	"crypto/tls"
 	"encoding/binary"
 	"encoding/json"
 	"fmt"
@@ -25,6 +26,7 @@ import (
 	"upspin.io/errors"
 	"upspin.io/factotum"
 	"upspin.io/log"
+	"upspin.io/rpc"
 	"upspin.io/serverutil"
 	"upspin.io/upspin"
 	"upspin.io/user"
@@ -360,16 +362,27 @@ func snapshotUser(u upspin.UserName) (upspin.UserName, error) {
 	return upspin.UserName(name + "+snapshot@" + domain), nil
 }
 
+var signupURLScheme = "https" // Tests may override this.
+
 // MakeRequest sends a signup request to the given URL for the given Config
 // using the provided Client or http.DefaultClient if client is nil.
-func MakeRequest(signupURL string, cfg upspin.Config, client *http.Client) error {
+func MakeRequest(cfg upspin.Config) error {
 	query, err := makeQueryString(cfg)
 	if err != nil {
 		return err
 	}
-	if client == nil {
-		client = http.DefaultClient
+	certPool, err := rpc.CertPoolFromConfig(cfg)
+	if err != nil {
+		return err
 	}
+	client := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				RootCAs: certPool,
+			},
+		},
+	}
+	signupURL := fmt.Sprintf("%s://%s/signup", signupURLScheme, cfg.KeyEndpoint().NetAddr)
 	r, err := client.Post(signupURL+"?"+query, "text/plain", nil)
 	if err != nil {
 		return err
