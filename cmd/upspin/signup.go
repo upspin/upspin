@@ -190,7 +190,7 @@ func (s *State) registerUser(signupURL string) {
 	if err != nil {
 		s.Exit(err)
 	}
-	if err := signup.MakeRequest(signupURL, cfg); err != nil {
+	if err := signup.MakeRequest(signupURL, cfg, nil); err != nil {
 		s.Exit(err)
 	}
 	fmt.Fprintf(s.Stderr, "A signup email has been sent to %q,\n", cfg.UserName())

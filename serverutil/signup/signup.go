@@ -360,13 +360,17 @@ func snapshotUser(u upspin.UserName) (upspin.UserName, error) {
 	return upspin.UserName(name + "+snapshot@" + domain), nil
 }
 
-// MakeRequest sends a signup request to the given URL for the given Config.
-func MakeRequest(signupURL string, cfg upspin.Config) error {
+// MakeRequest sends a signup request to the given URL for the given Config
+// using the provided Client or http.DefaultClient if client is nil.
+func MakeRequest(signupURL string, cfg upspin.Config, client *http.Client) error {
 	query, err := makeQueryString(cfg)
 	if err != nil {
 		return err
 	}
-	r, err := http.Post(signupURL+"?"+query, "text/plain", nil)
+	if client == nil {
+		client = http.DefaultClient
+	}
+	r, err := client.Post(signupURL+"?"+query, "text/plain", nil)
 	if err != nil {
 		return err
 	}
