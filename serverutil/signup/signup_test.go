@@ -26,7 +26,12 @@ func TestSignup(t *testing.T) {
 	}
 	key := inprocess.New()
 	mail := &mailStub{}
-	h := NewHandler("will-be-overridden", serverFact, key, mail, "test")
+	mc := MailConfig{
+		Project: "test",
+		Mail:    mail,
+		Notify:  "signup@noti.fy",
+	}
+	h := NewHandler("will-be-overridden", serverFact, key, &mc)
 	s := httptest.NewServer(h)
 	defer s.Close()
 	h.(*handler).baseURL = s.URL

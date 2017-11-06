@@ -37,12 +37,6 @@ const (
 	// signupGracePeriod is the period of validity for a signup request.
 	signupGracePeriod = 24 * time.Hour
 
-	// signupNotifyAddress is the address that should receive signup notifications.
-	signupNotifyAddress = "upspin-sendgrid@google.com"
-
-	// fromAddress is the origin address for signup messages.
-	fromAddress = "noreply@upspin.io"
-
 	noHTML = "" // for mail.Send
 )
 
@@ -52,26 +46,38 @@ type handler struct {
 	baseURL string
 	fact    upspin.Factotum
 	key     upspin.KeyServer
-	mail    mail.Mail
-	project string
+	mail    *MailConfig
 
 	rate serverutil.RateLimiter
+}
+
+// MailConfig holds the mail configuration used by the signup handler.
+type MailConfig struct {
+	// Mail holds the mailer used for sending signup emails and notifications.
+	mail.Mail
+
+	// Project is the name used in the subject line of signup notifications,
+	// to distinguish between test and production keyserver instances.
+	Project string
+
+	// Notify specifies the recipient address for signup notifications.
+	Notify string
+
+	// From specifies the address from which to send mail messages.
+	From string
 }
 
 // NewHandler creates a new handler that serves signup requests (made by
 // 'upspin signup') and verification requests (visited by clicking the link in
 // the email).
 // The Factotum is used to sign the verification URL. The KeyServer is where
-// the new user will be created. The Mail is used to send mail. The provided
-// project name is used in the subject line of signup notifications, to
-// distinguish test and production keyserver instances.
-func NewHandler(baseURL string, fact upspin.Factotum, key upspin.KeyServer, m mail.Mail, project string) http.Handler {
+// the new user will be created. The MailConfig is used to send mail.
+func NewHandler(baseURL string, fact upspin.Factotum, key upspin.KeyServer, mc *MailConfig) http.Handler {
 	return &handler{
 		baseURL: baseURL,
 		fact:    fact,
 		key:     key,
-		mail:    m,
-		project: project,
+		mail:    mc,
 		rate: serverutil.RateLimiter{
 			Backoff: 1 * time.Minute,
 			Max:     24 * time.Hour,
@@ -164,12 +170,11 @@ func (m *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Send a note to our internal list, so we're aware of signups.
-		subject := fmt.Sprintf("New signup on %s: %s", m.project, string(u.Name))
-		body := fmt.Sprintf("%s signed up on %s on %s", u.Name, m.project, time.Now().Format(time.Stamp))
-		err = m.mail.Send(signupNotifyAddress, fromAddress, subject, body, noHTML)
+		subject := fmt.Sprintf("New signup on %s: %s", m.mail.Project, string(u.Name))
+		body := fmt.Sprintf("%s signed up on %s on %s", u.Name, m.mail.Project, time.Now().Format(time.Stamp))
+		err = m.mail.Send(m.mail.Notify, m.mail.From, subject, body, noHTML)
 		if err != nil {
-			log.Error.Printf("Error sending mail to %q: %v", signupNotifyAddress, err)
+			log.Error.Printf("Error sending mail to %q: %v", m.mail.Notify, err)
 			// Don't prevent signup if this fails.
 		}
 
@@ -238,7 +243,7 @@ func (m *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintln(body, "\nIf you were not expecting this message, please ignore it.")
 	// TODO(adg): implement opt out link
 	const subject = "Upspin signup confirmation"
-	err = m.mail.Send(string(u.Name), fromAddress, subject, body.String(), noHTML)
+	err = m.mail.Send(string(u.Name), m.mail.From, subject, body.String(), noHTML)
 	if err != nil {
 		log.Error.Printf("Error sending mail to %q: %v", u.Name, err)
 		errorf(http.StatusInternalServerError, "could not send signup email")
