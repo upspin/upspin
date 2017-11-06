@@ -10,8 +10,8 @@ import (
 	"flag"
 	"io/ioutil"
 	"net/http"
-	"strings"
 
+	yaml "gopkg.in/yaml.v2"
 	"upspin.io/cloud/mail"
 	"upspin.io/cloud/mail/sendgrid"
 	"upspin.io/cloud/storage"
@@ -83,33 +83,47 @@ func Main(setup func(upspin.KeyServer)) {
 	if f == nil {
 		log.Fatal("keyserver: supplied config must include keys")
 	}
-	project := ""
-	flag.Visit(func(f *flag.Flag) {
-		if f.Name != "project" {
-			return
-		}
-		project = f.Value.String()
-	})
-	var m mail.Mail
-	if *mailConfigFile != "" {
-		apiKey, err := parseMailConfig(*mailConfigFile)
-		if err != nil {
-			log.Fatalf("keyserver: %v", err)
-		}
-		m = sendgrid.New(apiKey)
+	mc := new(signup.MailConfig)
+	if *mailConfigFile == "" {
+		logMails(mc)
 	} else {
-		log.Info.Printf("keyserver: -mail_config not supplied; logging mail messages instead")
-		m = mail.Logger(log.Info)
+		data, err := ioutil.ReadFile(*mailConfigFile)
+		if err != nil {
+			log.Fatal("keyserver: %v", err)
+		}
+		mc, err = mailConfig(data)
+		if err != nil {
+			log.Fatal("keyserver: %v", err)
+		}
 	}
-	http.Handle("/signup", signup.NewHandler(signupURL, f, key, m, project))
+	http.Handle("/signup", signup.NewHandler(signupURL, f, key, mc))
 }
 
-func parseMailConfig(name string) (apiKey string, err error) {
-	data, err := ioutil.ReadFile(name)
-	if err != nil {
-		return "", errors.E(errors.IO, err)
+// logMails sets the mailer for this configuration to the info logger.
+func logMails(mc *signup.MailConfig) {
+	log.Info.Printf("keyserver: WARNING: -mail_config not supplied; no emails will be sent, they will be logged instead")
+	mc.Mail = mail.Logger(log.Info)
+}
+
+// mailConfig reads YAML data and returns a signup.MailConfig
+// 	apikey: SENDGRID_API_KEY
+// 	notify: notify-signups@email.com
+// 	from: sender@email.com
+//	project: test
+func mailConfig(data []byte) (*signup.MailConfig, error) {
+	var c struct{ APIKey, Project, Notify, From string }
+	if err := yaml.Unmarshal(data, &c); err != nil {
+		return nil, errors.E(errors.IO, err)
 	}
-	lines := strings.SplitN(strings.TrimSpace(string(data)), "\n", 2)
-	apiKey = strings.TrimSpace(lines[0])
-	return
+	mc := &signup.MailConfig{
+		Project: c.Project,
+		Notify:  c.Notify,
+		From:    c.From,
+	}
+	if key := c.APIKey; key != "" {
+		mc.Mail = sendgrid.New(key)
+	} else {
+		logMails(mc)
+	}
+	return mc, nil
 }
