@@ -14,7 +14,6 @@ import (
 
 	"upspin.io/cloud/mail"
 	"upspin.io/cloud/mail/sendgrid"
-	"upspin.io/cloud/storage"
 	"upspin.io/config"
 	"upspin.io/errors"
 	"upspin.io/flags"
@@ -50,19 +49,9 @@ func Main(setup func(upspin.KeyServer)) {
 	case "inprocess":
 		key = inprocess.New()
 	case "server":
-		var opts []storage.DialOpts
-		for _, o := range flags.ServerConfig {
-			opts = append(opts, storage.WithOptions(o))
-		}
-		var s storage.Storage
-		s, err = storage.Dial("GCS", opts...)
-		if err != nil {
-			break
-		}
-		key = server.New(s)
+		key, err = server.New(flags.ServerConfig...)
 	default:
 		err = errors.Errorf("bad -kind %q", flags.ServerKind)
-
 	}
 	if err != nil {
 		log.Fatalf("Setting up KeyServer: %v", err)
