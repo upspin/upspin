@@ -55,7 +55,7 @@ func TestSignup(t *testing.T) {
 			Transport: upspin.Remote,
 			NetAddr:   storeServer,
 		})
-		if err := MakeRequest(s.URL, cfg); err != nil {
+		if err := MakeRequest(s.URL, cfg, nil); err != nil {
 			t.Fatal(err)
 		}
 
