@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "66625e8c_424540f9",
+        "filename": "serverutil/keyserver/main.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 6197
+      },
+      "writtenOn": "2017-11-06T08:01:57Z",
+      "side": 1,
+      "message": "Just as I suggestion, I would make it a bit more obvious to users that the confirmation email will not be sent. Otherwise this could cause confusion. Something along the lines of: \"WARNING: -mail_config not supplied; signup confirmation email will not be sent, it will be logged here instead\" or similar. \"logging mail messages instead\" doesn\u0027t clearly state that users will not be able to sign up unless they have access to the keyserver console, which they won\u0027t in most cases.",
+      "revId": "83cbb237281eab2c03ec69c8f0e373eba211b363",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
