@@ -20,6 +20,7 @@ import (
 	"os/exec"
 	"strings"
 
+	"upspin.io/log"
 	"upspin.io/upbox"
 )
 
@@ -30,6 +31,7 @@ var (
 
 func main() {
 	flag.Parse()
+	log.SetLevel(*logLevel)
 
 	sc, err := upbox.SchemaFromFile(*schema)
 	if err != nil {
