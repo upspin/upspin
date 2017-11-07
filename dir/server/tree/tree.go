@@ -142,7 +142,7 @@ func (t *Tree) Lookup(p path.Parsed) (de *upspin.DirEntry, dirty bool, err error
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
-	node, _, err := t.loadPath(p)
+	node, err := t.loadPath(p)
 	if err == upspin.ErrFollowLink {
 		return &node.entry, node.dirty, err
 	}
@@ -195,28 +195,30 @@ func (t *Tree) put(p path.Parsed, de *upspin.DirEntry) (*node, []*watcher, error
 	de.Sequence = t.sequence
 	// If putting a/b/c/d, ensure a/b/c is loaded.
 	parentPath := p.Drop(1)
-	parent, watchers, err := t.loadPath(parentPath)
+	parent, watchers, childWatchers, err := t.loadPathWatchers(p)
+
 	if err == upspin.ErrFollowLink { // encountered a link along the path.
-		return parent, watchers, err
+		return parent, nil, err
 	}
 	if err != nil {
-		return nil, watchers, err
+		return nil, nil, err
 	}
 	if parent.entry.IsLink() {
-		return parent, watchers, upspin.ErrFollowLink
+		return parent, nil, upspin.ErrFollowLink
 	}
 	// Now add this dirEntry as a new node
 	node := &node{
-		entry: *de,
+		entry:    *de,
+		watchers: childWatchers,
 	}
 	// If any parent watchers were watching this node, move them to this
 	// node.
 	moveDownWatchers(node, parent)
 	err = t.addKid(node, p, parent, parentPath)
 	if err != nil {
-		return nil, watchers, err
+		return nil, nil, err
 	}
-	return node, watchers, nil
+	return node, append(watchers, childWatchers...), nil
 }
 
 // PutDir puts a DirEntry representing an existing directory (with existing
@@ -233,7 +235,7 @@ func (t *Tree) PutDir(dstDir path.Parsed, de *upspin.DirEntry) (*upspin.DirEntry
 	}
 
 	// The destination must not exist nor cross a link.
-	if node, _, err := t.loadPath(dstDir); errors.Is(errors.NotExist, err) {
+	if node, err := t.loadPath(dstDir); errors.Is(errors.NotExist, err) {
 		// Destination does not exist; OK.
 	} else if err == upspin.ErrFollowLink {
 		return nil, errors.E(dstDir.Path(), errors.Errorf("destination path crosses link: %s", node.entry.Name))
@@ -361,39 +363,76 @@ func (t *Tree) setNodeDirtyAt(level int, n *node) {
 	n.entry.Sequence = t.sequence
 }
 
-// loadPath ensures the tree contains all nodes up to p and returns p's node.
-// If any node is not already in memory, it is loaded from the store server.
-// If while loading the path a link is discovered, the link is returned and if
-// it's not the last element of the path, ErrFollowLink is returned. If the node
-// does not exist, loadPath returns a NotExist error and the closest existing
-// ancestor of p, if any. Along with node, loadPath also returns all watchers on
-// p's node and in all of p's node's ancestors.
-// t.mu must be held.
-func (t *Tree) loadPath(p path.Parsed) (*node, []*watcher, error) {
+// loadPathWatchers is a variant of loadPath that also returns the
+// watchers for the path, in two parts:
+// The first part is for the watchers of the parent directory of the path;
+// the second is for the watchers of the node itself, if it it exists.
+func (t *Tree) loadPathWatchers(fullPath path.Parsed) (*node, []*watcher, []*watcher, error) {
+	p := fullPath.Drop(1)
 	err := t.loadRoot()
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, nil, err
 	}
 	node := t.root
-	// Keep track of all of p's ancestors watchers.
+	// Keep track of all of p's ancestors' watchers.
 	removeDeadWatchers(node)
 	watchers := append([]*watcher(nil), node.watchers...)
 	for i := 0; i < p.NElem(); i++ {
 		child, err := t.loadNode(node, p.Elem(i))
 		if errors.Is(errors.NotExist, err) {
-			return node, watchers, err
+			return node, watchers, nil, err
 		}
 		node = child
 		if err != nil {
-			return node, watchers, err // err could be upspin.ErrFollowLink.
+			return node, watchers, nil, err // err could be upspin.ErrFollowLink.
 		}
 		removeDeadWatchers(node)
 		watchers = append(watchers, node.watchers...)
 	}
 	if node.entry.Name != p.Path() {
-		return node, watchers, errors.E(errors.NotExist, p.Path())
+		return node, watchers, nil, errors.E(errors.NotExist, p.Path())
 	}
-	return node, watchers, nil
+
+	// The actual item might already exist. If so, grab that node's watchers too.
+	if !fullPath.IsRoot() {
+		child, err := t.loadNode(node, fullPath.Elem(fullPath.NElem()-1))
+		if err == nil {
+			// The file already exists. Add any watchers.
+			// watchers = append(watchers, child.watchers...)
+			return node, watchers, child.watchers, nil
+		}
+	}
+
+	return node, watchers, nil, nil
+}
+
+// loadPath ensures the tree contains all nodes up to p and returns p's node.
+// If any node is not already in memory, it is loaded from the store server.
+// If while loading the path a link is discovered, the link is returned and if
+// it's not the last element of the path, ErrFollowLink is returned. If the node
+// does not exist, loadPath returns a NotExist error and the closest existing
+// ancestor of p, if any.
+// t.mu must be held.
+func (t *Tree) loadPath(p path.Parsed) (*node, error) {
+	err := t.loadRoot()
+	if err != nil {
+		return nil, err
+	}
+	node := t.root
+	for i := 0; i < p.NElem(); i++ {
+		child, err := t.loadNode(node, p.Elem(i))
+		if errors.Is(errors.NotExist, err) {
+			return node, err
+		}
+		node = child
+		if err != nil {
+			return node, err // err could be upspin.ErrFollowLink.
+		}
+	}
+	if node.entry.Name != p.Path() {
+		return node, errors.E(errors.NotExist, p.Path())
+	}
+	return node, nil
 }
 
 // loadDir loads the contents of a directory's node if it's not already loaded.
@@ -527,7 +566,7 @@ func (t *Tree) List(prefix path.Parsed) ([]*upspin.DirEntry, bool, error) {
 	t.mu.Lock()
 	defer t.mu.Unlock()
 
-	node, _, err := t.loadPath(prefix)
+	node, err := t.loadPath(prefix)
 	if err == upspin.ErrFollowLink {
 		return []*upspin.DirEntry{node.entry.Copy()}, node.dirty, err
 	}
@@ -594,27 +633,27 @@ func (t *Tree) Delete(p path.Parsed) (*upspin.DirEntry, error) {
 // t.mu must be held.
 func (t *Tree) delete(p path.Parsed) (*node, []*watcher, error) {
 	parentPath := p.Drop(1)
-	parent, watchers, err := t.loadPath(parentPath)
+	parent, watchers, childWatchers, err := t.loadPathWatchers(p)
 	if err == upspin.ErrFollowLink {
-		return parent, watchers, err
+		return parent, nil, err
 	}
 	if err != nil {
-		return nil, watchers, err
+		return nil, nil, err
 	}
 	// Load the node of interest, which is the NElem-th element in its
 	// parent's path.
 	elem := p.Elem(parentPath.NElem())
 	node, err := t.loadNode(parent, elem)
 	if err == upspin.ErrFollowLink {
-		return node, watchers, err
+		return node, nil, err
 	}
 	if err != nil {
 		// Can't load parent.
-		return nil, watchers, err
+		return nil, nil, err
 	}
 	if len(node.kids) > 0 {
 		// Node is a non-empty directory.
-		return nil, watchers, errors.E(errors.NotEmpty, p.Path())
+		return nil, nil, errors.E(errors.NotEmpty, p.Path())
 	}
 
 	t.sequence++                     // We know it will succeed now.
@@ -635,9 +674,9 @@ func (t *Tree) delete(p path.Parsed) (*node, []*watcher, error) {
 	if err != nil {
 		// In practice this can't happen, since the entire path is
 		// already loaded.
-		return nil, watchers, err
+		return nil, nil, err
 	}
-	return node, watchers, nil
+	return node, append(watchers, childWatchers...), nil
 }
 
 // deleteRoot deletes the root, if it's empty.
@@ -739,7 +778,6 @@ func (t *Tree) flush() error {
 // used by the tree. Further uses of the tree will have unpredictable
 // results.
 func (t *Tree) Close() error {
-
 	// Notify watchers and any other goroutine that the tree is closing
 	// immediately.
 	t.mu.Lock()
