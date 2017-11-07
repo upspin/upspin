@@ -45,7 +45,9 @@ func New(options ...string) (upspin.StoreServer, error) {
 		// Pass other options to the storage backend.
 		dialOpts = append(dialOpts, storage.WithOptions(option))
 	}
-
+	if backend == "" {
+		return nil, errors.E(op, errors.Invalid, "storage 'backend' option is missing")
+	}
 	s, err := storage.Dial(backend, dialOpts...)
 	if err != nil {
 		return nil, errors.E(op, err)
