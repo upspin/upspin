@@ -120,6 +120,7 @@ import (
 
 	"upspin.io/config"
 	"upspin.io/rpc/local"
+	"upspin.io/test/testutil"
 	"upspin.io/upspin"
 
 	yaml "gopkg.in/yaml.v2"
@@ -206,7 +207,7 @@ domain: example.com
 
 // SchemaFromFile parses a Schema from the named file.
 // If no name is provided the DefaultSchema is used.
-func SchemaFromFile(name string, basePort int) (*Schema, error) {
+func SchemaFromFile(name string) (*Schema, error) {
 	var doc string
 	if name == "" {
 		doc = DefaultSchema
@@ -217,11 +218,11 @@ func SchemaFromFile(name string, basePort int) (*Schema, error) {
 		}
 		doc = string(data)
 	}
-	return SchemaFromYAML(doc, basePort)
+	return SchemaFromYAML(doc)
 }
 
 // SchemaFromYAML parses a Schema from the given YAML document.
-func SchemaFromYAML(doc string, basePort int) (*Schema, error) {
+func SchemaFromYAML(doc string) (*Schema, error) {
 	var sc Schema
 	if err := yaml.Unmarshal([]byte(doc), &sc); err != nil {
 		return nil, err
@@ -256,7 +257,6 @@ func SchemaFromYAML(doc string, basePort int) (*Schema, error) {
 		sc.user[u.Name] = u
 	}
 
-	port := basePort
 	for i, s := range sc.Servers {
 		if s.Name == "" {
 			return nil, fmt.Errorf("server[%d] must specify a name", i)
@@ -284,8 +284,11 @@ func SchemaFromYAML(doc string, basePort int) (*Schema, error) {
 		}
 
 		// Pick address for this service.
-		s.addr = fmt.Sprintf("localhost:%d", port)
-		port++
+		port, err := testutil.PickPort()
+		if err != nil {
+			return nil, err
+		}
+		s.addr = "localhost:" + port
 
 		// Set the global keyserver, if none provided.
 		if s.Name == "keyserver" && sc.KeyServer == "" {
