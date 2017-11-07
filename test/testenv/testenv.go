@@ -11,7 +11,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
-	"strconv"
 	"strings"
 
 	"upspin.io/bind"
@@ -153,18 +152,13 @@ func New(setup *Setup) (*Env, error) {
 	case "inprocess", "server":
 		if setup.UpBox {
 			// Use upbox.
-			portS, err := testutil.PickPort()
-			if err != nil {
-				return nil, err
-			}
-			port, _ := strconv.Atoi(portS)
 			yaml := fmt.Sprintf(upboxYAML,
 				TestServerName,
 				setup.OwnerName,
 				setup.Cache,
 				setup.Kind,
 			)
-			schema, err := upbox.SchemaFromYAML(yaml, port)
+			schema, err := upbox.SchemaFromYAML(yaml)
 			if err != nil {
 				return nil, err
 			}

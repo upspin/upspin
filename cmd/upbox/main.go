@@ -25,14 +25,13 @@ import (
 
 var (
 	logLevel = flag.String("log", "error", "log `level`")
-	basePort = flag.Int("port", 8000, "base `port` number for upspin servers")
 	schema   = flag.String("schema", "", "schema `file` name")
 )
 
 func main() {
 	flag.Parse()
 
-	sc, err := upbox.SchemaFromFile(*schema, *basePort)
+	sc, err := upbox.SchemaFromFile(*schema)
 	if err != nil {
 		fail(fmt.Errorf("parsing schema: %v", err))
 	}
