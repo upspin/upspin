@@ -453,6 +453,27 @@ func (r *Runner) GetErrorEvent(want error) bool {
 	return r.match(want, r.lastErr)
 }
 
+// GetDeleteEvent gets one event from the user's Event channel and expects
+// it to be a deletion of the file.
+func (r *Runner) GetDeleteEvent(p upspin.PathName) bool {
+	if r.Failed() {
+		return false
+	}
+	event := r.getNextEvent()
+	if r.Failed() {
+		return false
+	}
+	if event.Entry.Name != p {
+		r.lastErr = errors.E(errors.Errorf("path was %q; expected %q", event.Entry.Name, p))
+		return false
+	}
+	if !event.Delete {
+		r.lastErr = errors.E(errors.Errorf("event for %q was not Delete", event.Entry.Name))
+		return false
+	}
+	return true
+}
+
 func (r *Runner) getNextEvent() *upspin.Event {
 	var e upspin.Event
 	var ok bool

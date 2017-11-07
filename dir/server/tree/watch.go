@@ -176,7 +176,7 @@ func (t *Tree) Watch(p path.Parsed, sequence int64, done <-chan struct{}) (<-cha
 // addWatcher adds a watcher to the node at a given path location.
 // t.mu must be held.
 func (t *Tree) addWatcher(p path.Parsed, w *watcher) error {
-	n, _, err := t.loadPath(p)
+	n, err := t.loadPath(p)
 	if err != nil && !errors.Is(errors.NotExist, err) {
 		return err
 	}
@@ -197,7 +197,7 @@ func (t *Tree) addWatcher(p path.Parsed, w *watcher) error {
 func (w *watcher) sendCurrentAndWatch(clone, orig *Tree, p path.Parsed, offset int64) {
 	defer clone.Close()
 
-	n, _, err := clone.loadPath(p)
+	n, err := clone.loadPath(p)
 	if err != nil && !errors.Is(errors.NotExist, err) {
 		w.sendError(err)
 		w.close()
@@ -424,7 +424,7 @@ func moveDownWatchers(node, parent *node) {
 		// next ith watcher to the curr watcher. Otherwise just shrink
 		// the slice.
 		// Note: The node is newly-put, so it does not have watchers yet
-		// and hence there's not need to look for duplicate watchers
+		// and hence there's no need to look for duplicate watchers
 		// here.
 		node.watchers = append(node.watchers, w)
 		if i > curr {
