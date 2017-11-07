@@ -36,6 +36,24 @@
     },
     {
       "key": {
+        "uuid": "73b1aeaf_1ad35427",
+        "filename": "serverutil/keyserver/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 6197
+      },
+      "writtenOn": "2017-11-07T09:22:21Z",
+      "side": 1,
+      "message": "I\u0027m confused. The given suggestion is not a valid alternative. This is a pointer and is used as such below. parseMailConfig returns a pointer too.",
+      "parentUuid": "a0a20a70_d6d8c089",
+      "revId": "c5a268982cdbbf75acbcb020a1175ce157187ae5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "7786cfea_51174301",
         "filename": "serverutil/keyserver/main.go",
         "patchSetId": 2
@@ -50,6 +68,24 @@
       "revId": "c5a268982cdbbf75acbcb020a1175ce157187ae5",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5897219a_86ac6f60",
+        "filename": "serverutil/keyserver/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 6197
+      },
+      "writtenOn": "2017-11-07T09:22:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7786cfea_51174301",
+      "revId": "c5a268982cdbbf75acbcb020a1175ce157187ae5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -70,6 +106,24 @@
     },
     {
       "key": {
+        "uuid": "41668a22_8d5bb348",
+        "filename": "serverutil/keyserver/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 6197
+      },
+      "writtenOn": "2017-11-07T09:22:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6def6e09_611bb8d9",
+      "revId": "c5a268982cdbbf75acbcb020a1175ce157187ae5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ace5b4bd_4ca58652",
         "filename": "serverutil/keyserver/main.go",
         "patchSetId": 2
@@ -87,6 +141,24 @@
     },
     {
       "key": {
+        "uuid": "8d0d76de_0873466a",
+        "filename": "serverutil/keyserver/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 6197
+      },
+      "writtenOn": "2017-11-07T09:22:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ace5b4bd_4ca58652",
+      "revId": "c5a268982cdbbf75acbcb020a1175ce157187ae5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d604bc06_88cd9cc5",
         "filename": "serverutil/signup/signup.go",
         "patchSetId": 2
@@ -101,6 +173,24 @@
       "revId": "c5a268982cdbbf75acbcb020a1175ce157187ae5",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "989f8259_f3204dac",
+        "filename": "serverutil/signup/signup.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 6197
+      },
+      "writtenOn": "2017-11-07T09:22:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d604bc06_88cd9cc5",
+      "revId": "c5a268982cdbbf75acbcb020a1175ce157187ae5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
