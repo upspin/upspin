@@ -136,7 +136,7 @@ func (wbq *writebackQueue) enqueueWritebackFile(relPath string) {
 		log.Error.Printf("%s: writeback file %s but running as writethrough", op, relPath)
 		return
 	}
-	elems := filepath.SplitList(relPath)
+	elems := strings.Split(relPath, string(filepath.Separator))
 	if len(elems) != 3 {
 		log.Error.Printf("%s: odd writeback file %s", op, relPath)
 		return
