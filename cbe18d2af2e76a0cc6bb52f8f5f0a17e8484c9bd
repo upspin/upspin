@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4e772ddd_56053624",
+        "filename": "bind/bind.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-11-07T19:14:18Z",
+      "side": 1,
+      "message": "You could indent less stuff if you reversed the sense of the if.  True of the old code too...",
+      "range": {
+        "startLine": 162,
+        "startChar": 0,
+        "endLine": 162,
+        "endChar": 13
+      },
+      "revId": "cbe18d2af2e76a0cc6bb52f8f5f0a17e8484c9bd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
