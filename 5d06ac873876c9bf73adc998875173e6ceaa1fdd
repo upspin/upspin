@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7893cbda_77f52742",
+        "filename": "store/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-11-07T21:16:37Z",
+      "side": 1,
+      "message": "quote differently and use errors.Str whenever you\u0027re passing a non-op string to errors.E\n\nreturn nil, errors.E(op, errors.Invalid, errors.Str(`storage \"backend\" option is missing`))",
+      "revId": "5d06ac873876c9bf73adc998875173e6ceaa1fdd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
