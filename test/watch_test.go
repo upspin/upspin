@@ -321,6 +321,59 @@ func testWatchSubtree(t *testing.T, r *testenv.Runner) {
 	watchEventsValid(t, r)
 }
 
+func testWatchFile(t *testing.T, r *testenv.Runner) {
+	const (
+		base      = ownerName + "/watch-file"
+		file      = base + "/aFile"
+		hasBlocks = true
+	)
+
+	r.As(ownerName)
+	r.MakeDirectory(base)
+	if r.Failed() {
+		t.Fatal(r.Diag())
+	}
+
+	r.DirWatch(file, upspin.WatchCurrent)
+	if !watchSupported(t, r) {
+		return
+	}
+
+	// Do it all twice to check it works after deletion.
+	for i := 0; i < 2; i++ {
+		// Create file. It doesn't exist yet. Should see event.
+		r.Put(file, "something")
+		r.GetNEvents(1)
+		if !r.GotEvent(file, hasBlocks) {
+			t.Fatal(r.Diag())
+		}
+		watchEventsValid(t, r)
+
+		// Modify file. Should see event.
+		r.Put(file, "something else")
+		r.GetNEvents(1)
+		if !r.GotEvent(file, hasBlocks) {
+			t.Fatal(r.Diag())
+		}
+		watchEventsValid(t, r)
+
+		// Modify file again. Should see event. (This didn't work at one point.)
+		r.Put(file, "something else again")
+		r.GetNEvents(1)
+		if !r.GotEvent(file, hasBlocks) {
+			t.Fatal(r.Diag())
+		}
+		watchEventsValid(t, r)
+
+		// Delete file. Should see event.
+		r.Delete(file)
+		r.GetDeleteEvent(file)
+		if r.Failed() {
+			t.Fatal(r.Diag())
+		}
+	}
+}
+
 func testWatchNonExistentRoot(t *testing.T, r *testenv.Runner) {
 	r.As(ownerName)
 	r.DirWatch(readerName+"/", upspin.WatchCurrent)
