@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1d0d8da8_c5026ea5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-11-07T22:37:47Z",
+      "side": 1,
+      "message": "I don\u0027t really understand this, too many unbound \u0027it\u0027s.\n\nI am assuming:\n\n\u0027dir\u0027, if set, is the local directory in which to store server\nconfiguration. upbox will read the information in that directory\nand create anything that is missing. If \u0027dir\u0027 is not set, upbox\nwill create a temporary...",
+      "range": {
+        "startLine": 11,
+        "startChar": 42,
+        "endLine": 15,
+        "endChar": 40
+      },
+      "revId": "5f05833c58dd757e3becbaf889d7aa96367d3e06",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
