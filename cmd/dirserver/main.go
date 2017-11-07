@@ -19,6 +19,8 @@ import (
 
 	// Load required transports
 	_ "upspin.io/transports"
+
+	_ "upspin.io/cloud/storage/disk"
 )
 
 func main() {
