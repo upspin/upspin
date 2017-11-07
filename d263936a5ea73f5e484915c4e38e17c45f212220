@@ -22,6 +22,30 @@
       "revId": "d263936a5ea73f5e484915c4e38e17c45f212220",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b8af15e3_72dbc5de",
+        "filename": "serverutil/ratecounter.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 6226
+      },
+      "writtenOn": "2017-11-07T16:51:33Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "cf82c7e4_4995e892",
+      "range": {
+        "startLine": 67,
+        "startChar": 20,
+        "endLine": 67,
+        "endChar": 34
+      },
+      "revId": "d263936a5ea73f5e484915c4e38e17c45f212220",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
