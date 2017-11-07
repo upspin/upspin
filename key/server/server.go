@@ -44,7 +44,7 @@ func New(options ...string) (upspin.KeyServer, error) {
 		dialOpts = append(dialOpts, storage.WithOptions(option))
 	}
 	if backend == "" {
-		return nil, errors.E(op, errors.Invalid, "storage 'backend' option is missing")
+		return nil, errors.E(op, errors.Invalid, errors.Str(`storage "backend" option is missing`))
 	}
 	s, err := storage.Dial(backend, dialOpts...)
 	if err != nil {
