@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "98ced1c0_180a1c67",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 6197
+      },
+      "writtenOn": "2017-11-08T09:12:15Z",
+      "side": 1,
+      "message": "Yes, you\u0027re right. I didn\u0027t quite know how to put it in English. Thanks. I\u0027ve used your suggestions to rephrase. Hope it\u0027s better now.\n\nI\u0027ve also simplified the schema.",
+      "parentUuid": "1d0d8da8_c5026ea5",
+      "range": {
+        "startLine": 11,
+        "startChar": 42,
+        "endLine": 15,
+        "endChar": 40
+      },
+      "revId": "5f05833c58dd757e3becbaf889d7aa96367d3e06",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "93134fe1_3cf34896",
         "filename": "cmd/dirserver/main.go",
         "patchSetId": 2
@@ -39,6 +63,24 @@
       "revId": "5f05833c58dd757e3becbaf889d7aa96367d3e06",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "43a23e60_22e56bdc",
+        "filename": "cmd/dirserver/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 6197
+      },
+      "writtenOn": "2017-11-08T09:12:15Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "93134fe1_3cf34896",
+      "revId": "5f05833c58dd757e3becbaf889d7aa96367d3e06",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -59,6 +101,24 @@
     },
     {
       "key": {
+        "uuid": "8b8c58df_1a7a7549",
+        "filename": "upbox/schema.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 6197
+      },
+      "writtenOn": "2017-11-08T09:12:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "be48f881_d5e4cadd",
+      "revId": "5f05833c58dd757e3becbaf889d7aa96367d3e06",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "b8239e51_f0aeefe3",
         "filename": "upbox/schema.go",
         "patchSetId": 2
@@ -73,6 +133,24 @@
       "revId": "5f05833c58dd757e3becbaf889d7aa96367d3e06",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7932ac43_08a1fcc8",
+        "filename": "upbox/schema.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 6197
+      },
+      "writtenOn": "2017-11-08T09:12:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b8239e51_f0aeefe3",
+      "revId": "5f05833c58dd757e3becbaf889d7aa96367d3e06",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -93,6 +171,24 @@
     },
     {
       "key": {
+        "uuid": "08c7167a_5cde38e7",
+        "filename": "upbox/schema.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 405,
+      "author": {
+        "id": 6197
+      },
+      "writtenOn": "2017-11-08T09:12:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0d5b8dec_2ec8be7b",
+      "revId": "5f05833c58dd757e3becbaf889d7aa96367d3e06",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8a4d4f30_5aa46d98",
         "filename": "upbox/schema.go",
         "patchSetId": 2
@@ -104,6 +200,24 @@
       "writtenOn": "2017-11-08T00:49:33Z",
       "side": 1,
       "message": "Since Dir can now be set by the user, this test is no longer sufficient. I think we need an unexported field \"started bool\" instead.",
+      "revId": "5f05833c58dd757e3becbaf889d7aa96367d3e06",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "102c3a92_8d8ec5db",
+        "filename": "upbox/schema.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 563,
+      "author": {
+        "id": 6197
+      },
+      "writtenOn": "2017-11-08T09:12:15Z",
+      "side": 1,
+      "message": "I\u0027ve added a \"started\" field which gets set to true after Dir is created. It gets set back to false at the end of Stop.",
+      "parentUuid": "8a4d4f30_5aa46d98",
       "revId": "5f05833c58dd757e3becbaf889d7aa96367d3e06",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
