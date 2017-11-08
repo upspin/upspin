@@ -54,6 +54,24 @@
     },
     {
       "key": {
+        "uuid": "52f4f404_e934c583",
+        "filename": "serverutil/keyserver/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-08T00:28:06Z",
+      "side": 1,
+      "message": "oh I think what you want is\n\nvar mc *signup.MailConfig\n\nno need to allocate it if parseMailConfig will do it.",
+      "parentUuid": "73b1aeaf_1ad35427",
+      "revId": "c5a268982cdbbf75acbcb020a1175ce157187ae5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "7786cfea_51174301",
         "filename": "serverutil/keyserver/main.go",
         "patchSetId": 2
@@ -156,6 +174,23 @@
       "revId": "c5a268982cdbbf75acbcb020a1175ce157187ae5",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "19df1131_8ad69cda",
+        "filename": "serverutil/keyserver/main_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-08T00:28:06Z",
+      "side": 1,
+      "message": "needs copyright header (make sure to leave a blank between the package decl and the copyright)",
+      "revId": "c5a268982cdbbf75acbcb020a1175ce157187ae5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     },
     {
       "key": {
