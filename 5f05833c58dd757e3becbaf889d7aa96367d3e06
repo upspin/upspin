@@ -22,6 +22,57 @@
       "revId": "5f05833c58dd757e3becbaf889d7aa96367d3e06",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b8239e51_f0aeefe3",
+        "filename": "upbox/schema.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-08T00:49:33Z",
+      "side": 1,
+      "message": "Update this comment, and move it above the unexported fields",
+      "revId": "5f05833c58dd757e3becbaf889d7aa96367d3e06",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0d5b8dec_2ec8be7b",
+        "filename": "upbox/schema.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 405,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-08T00:49:33Z",
+      "side": 1,
+      "message": "!pathExists(sc.Dir)",
+      "revId": "5f05833c58dd757e3becbaf889d7aa96367d3e06",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8a4d4f30_5aa46d98",
+        "filename": "upbox/schema.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 563,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-08T00:49:33Z",
+      "side": 1,
+      "message": "Since Dir can now be set by the user, this test is no longer sufficient. I think we need an unexported field \"started bool\" instead.",
+      "revId": "5f05833c58dd757e3becbaf889d7aa96367d3e06",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
