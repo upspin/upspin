@@ -117,12 +117,12 @@ func (s *server) Lookup(reqBytes []byte) (pb.Message, error) {
 	if err := pb.Unmarshal(reqBytes, &req); err != nil {
 		return nil, err
 	}
-	logfOnceInN(100, "Lookup %q", req.UserName)
+	logfOnceInN(100, "Lookup(%q)", req.UserName)
 	s.incLookupCounters()
 
 	user, err := s.key.Lookup(upspin.UserName(req.UserName))
 	if err != nil {
-		logf("Lookup %q failed: %s", req.UserName, err)
+		logf(nil, "Lookup(%q) failed: %s", req.UserName, err)
 		return &proto.KeyLookupResponse{Error: errors.MarshalError(err)}, nil
 	}
 	return &proto.KeyLookupResponse{User: proto.UserProto(user)}, nil
@@ -135,7 +135,7 @@ func (s *server) Put(session rpc.Session, reqBytes []byte) (pb.Message, error) {
 	if err != nil {
 		return nil, err
 	}
-	op := logf("Put %v", req)
+	op := logf(session, "Put(%v)", req)
 	s.incPutCounters()
 
 	user := proto.UpspinUser(req.User)
@@ -154,14 +154,18 @@ func putError(err error) *proto.KeyPutResponse {
 // logOnceInN logs an operation probabilistically once for every n calls.
 func logfOnceInN(n int, format string, args ...interface{}) {
 	if n <= 1 || rand.Intn(n) == 0 {
-		logf(format, args...)
+		logf(nil, format, args...)
 	}
 }
 
-func logf(format string, args ...interface{}) operation {
-	s := fmt.Sprintf(format, args...)
-	log.Print("rpc/keyserver: " + s)
-	return operation(s)
+func logf(sess rpc.Session, format string, args ...interface{}) operation {
+	op := "rpc/keyserver: "
+	if sess != nil {
+		op += fmt.Sprintf("%q: ", sess.User())
+	}
+	op += "key." + fmt.Sprintf(format, args...)
+	log.Debug.Print(op)
+	return operation(op)
 }
 
 type operation string

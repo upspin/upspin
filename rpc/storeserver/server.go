@@ -66,7 +66,7 @@ func (s *server) Get(session rpc.Session, reqBytes []byte) (pb.Message, error) {
 	if err != nil {
 		return nil, err
 	}
-	op := logf("Get %q", req.Reference)
+	op := s.logf(session, "Get(%q)", req.Reference)
 
 	data, refdata, locs, err := store.Get(upspin.Reference(req.Reference))
 	if err != nil {
@@ -88,7 +88,7 @@ func (s *server) Put(session rpc.Session, reqBytes []byte) (pb.Message, error) {
 	if err != nil {
 		return nil, err
 	}
-	op := logf("Put %.30x...", req.Data)
+	op := s.logf(session, "Put(%.16x...) (%d bytes)", req.Data, len(req.Data))
 
 	refdata, err := store.Put(req.Data)
 	if err != nil {
@@ -111,7 +111,7 @@ func (s *server) Delete(session rpc.Session, reqBytes []byte) (pb.Message, error
 	if err != nil {
 		return nil, err
 	}
-	op := logf("Delete %q", req.Reference)
+	op := s.logf(session, "Delete(%q)", req.Reference)
 
 	err = store.Delete(upspin.Reference(req.Reference))
 	if err != nil {
@@ -121,14 +121,15 @@ func (s *server) Delete(session rpc.Session, reqBytes []byte) (pb.Message, error
 	return &deleteResponse, nil
 }
 
-func logf(format string, args ...interface{}) operation {
-	s := fmt.Sprintf(format, args...)
-	log.Debug.Print("rpc/storeserver: " + s)
-	return operation(s)
+func (s *server) logf(sess rpc.Session, format string, args ...interface{}) operation {
+	op := fmt.Sprintf("rpc/storeserver: %q: store.", sess.User())
+	op += fmt.Sprintf(format, args...)
+	log.Debug.Print(op)
+	return operation(op)
 }
 
 type operation string
 
 func (op operation) log(err error) {
-	logf("%v failed: %v", op, err)
+	log.Debug.Print(op)
 }
