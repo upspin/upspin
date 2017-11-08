@@ -72,6 +72,24 @@
     },
     {
       "key": {
+        "uuid": "f4c3760e_d39514b4",
+        "filename": "serverutil/keyserver/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 6197
+      },
+      "writtenOn": "2017-11-08T08:23:15Z",
+      "side": 1,
+      "message": "Right, but the first branch of the if statement needed an allocated pointer. I\u0027ve done it your way and changed the log in that branch to accommodate.",
+      "parentUuid": "52f4f404_e934c583",
+      "revId": "c5a268982cdbbf75acbcb020a1175ce157187ae5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "7786cfea_51174301",
         "filename": "serverutil/keyserver/main.go",
         "patchSetId": 2
@@ -191,6 +209,24 @@
       "revId": "c5a268982cdbbf75acbcb020a1175ce157187ae5",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d0682aa1_2b1bc098",
+        "filename": "serverutil/keyserver/main_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 6197
+      },
+      "writtenOn": "2017-11-08T08:23:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "19df1131_8ad69cda",
+      "revId": "c5a268982cdbbf75acbcb020a1175ce157187ae5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
