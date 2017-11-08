@@ -14,8 +14,10 @@ upspin.io/upbox.
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"os/exec"
 	"strings"
@@ -51,7 +53,7 @@ func main() {
 	shell := exec.Command("upspin", args...)
 	shell.Stdin = os.Stdin
 	shell.Stdout = os.Stdout
-	shell.Stderr = os.Stderr
+	shell.Stderr = prefix("shell:\t", os.Stderr)
 	err = shell.Run()
 	err2 := sc.Stop()
 	if err != nil {
@@ -65,4 +67,15 @@ func main() {
 func fail(err error) {
 	fmt.Fprintln(os.Stderr, "upbox:", err)
 	os.Exit(1)
+}
+
+func prefix(p string, out io.Writer) io.Writer {
+	r, w := io.Pipe()
+	go func() {
+		s := bufio.NewScanner(r)
+		for s.Scan() {
+			fmt.Fprintf(out, "%s%s\n", p, s.Bytes())
+		}
+	}()
+	return w
 }
