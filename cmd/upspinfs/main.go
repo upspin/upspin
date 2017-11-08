@@ -71,7 +71,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("can't determine absolute path to mount point %s: %s", flag.Arg(0), err)
 	}
-	done := do(cfg, mountpoint, flags.CacheDir)
+	done := do(cfg, mountpoint, filepath.Join(flags.CacheDir, string(cfg.UserName())))
 
 	// Serve expvar data.
 	ln, err := local.Listen("tcp", local.LocalName(cfg, cmdName))
