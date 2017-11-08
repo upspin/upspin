@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "76e1c263_56e97580",
+        "filename": "upbox/schema.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-08T22:17:49Z",
+      "side": 1,
+      "message": "add period at the end of the sentence",
+      "range": {
+        "startLine": 185,
+        "startChar": 47,
+        "endLine": 185,
+        "endChar": 0
+      },
+      "revId": "83d376d04551f3b28db360f15eb6485457cb0189",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
