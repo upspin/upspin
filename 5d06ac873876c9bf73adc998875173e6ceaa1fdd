@@ -16,6 +16,24 @@
       "revId": "5d06ac873876c9bf73adc998875173e6ceaa1fdd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "46a94819_de1743c4",
+        "filename": "store/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 6197
+      },
+      "writtenOn": "2017-11-08T07:55:09Z",
+      "side": 1,
+      "message": "Ah, yes. I\u0027ve noticed now that if I do this op gets replaced. Done.",
+      "parentUuid": "7893cbda_77f52742",
+      "revId": "5d06ac873876c9bf73adc998875173e6ceaa1fdd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
