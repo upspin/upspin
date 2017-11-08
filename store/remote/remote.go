@@ -93,7 +93,7 @@ func (r *remote) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Lo
 
 // Put implements upspin.StoreServer.Put.
 func (r *remote) Put(data []byte) (*upspin.Refdata, error) {
-	op := r.opf("Put", "%v bytes", len(data))
+	op := r.opf("Put", "%.16x...) (%v bytes", data, len(data))
 
 	req := &proto.StorePutRequest{
 		Data: data,
@@ -218,7 +218,7 @@ func init() {
 
 func (r *remote) opf(method string, format string, args ...interface{}) *operation {
 	ep := r.cfg.endpoint.String()
-	s := fmt.Sprintf("store/remote.%s(%q)", method, ep)
+	s := fmt.Sprintf("->%q store.%s", ep, method)
 	op := &operation{s, fmt.Sprintf(format, args...)}
 	log.Debug.Print(op)
 	return op
