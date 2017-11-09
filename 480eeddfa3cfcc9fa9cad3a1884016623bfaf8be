@@ -16,6 +16,24 @@
       "revId": "480eeddfa3cfcc9fa9cad3a1884016623bfaf8be",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1f2efb0d_6d7afcb2",
+        "filename": "serverutil/signup/signup.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 6197
+      },
+      "writtenOn": "2017-11-09T17:21:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "62a50805_eaaf6a55",
+      "revId": "480eeddfa3cfcc9fa9cad3a1884016623bfaf8be",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
