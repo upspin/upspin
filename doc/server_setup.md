@@ -192,6 +192,7 @@ in the event of a disk failure all your Upspin data will be lost.**
 
 + [Google Cloud Services](/doc/server_setup_gcp.md)
 + [Amazon Web Services](/doc/server_setup_aws.md)
++ [Dropbox](/doc/server_setup_dropbox.md)
 
 ## Set up a server and deploy the `upspinserver` binary {#deploy}
 
