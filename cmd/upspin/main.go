@@ -13,6 +13,7 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"sort"
 	"strings"
 
@@ -287,10 +288,26 @@ func (s *State) init() {
 	// signup is special since there is no user yet.
 	// keygen simply does not require a config or anything else.
 	if s.Name != "signup" && s.Name != "keygen" {
+		// Read the config file and pass it to config.InitConfig
+		// instead of calling config.FromFile, so that we can stash its
+		// contents away for later use by the "config" sub-command.
 		data, err := ioutil.ReadFile(flags.Config)
+		// Duplicate the logic of config.FromFile that looks for the
+		// config in $HOME/upspin/config if it can't be found at its
+		// specified location.
+		if os.IsNotExist(err) {
+			home, err2 := config.Homedir()
+			if err2 == nil {
+				data, err2 = ioutil.ReadFile(filepath.Join(home, "upspin", flags.Config))
+				if err2 == nil {
+					err = nil
+				}
+			}
+		}
 		if err != nil {
 			s.Exit(err)
 		}
+
 		cfg, err := config.InitConfig(bytes.NewReader(data))
 		if err != nil && err != config.ErrNoFactotum {
 			s.Exit(err)
