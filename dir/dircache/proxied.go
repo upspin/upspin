@@ -203,9 +203,10 @@ func (d *proxiedDir) watch(ep upspin.Endpoint) error {
 	if err != nil {
 		return err
 	}
+	name := upspin.PathName(string(d.user) + "/")
 	done := make(chan struct{})
 	defer close(done)
-	event, err := dir.Watch(upspin.PathName(string(d.user)+"/"), d.sequence, done)
+	event, err := dir.Watch(name, d.sequence, done)
 	if err != nil {
 		return err
 	}
@@ -221,6 +222,11 @@ func (d *proxiedDir) watch(ep upspin.Endpoint) error {
 		case e, ok := <-event:
 			if !ok {
 				return errors.Str("Watch event stream closed")
+			}
+			if e.Error != nil {
+				log.Debug.Printf("dir/dircache: Watch(%q) error: %s", name, e.Error)
+			} else {
+				log.Debug.Printf("dir/dircache: Watch(%q) entry: %s (delete=%t)", name, e.Entry.Name, e.Delete)
 			}
 			if err := d.handleEvent(&e); err != nil {
 				return err
@@ -239,7 +245,6 @@ func (d *proxiedDir) handleEvent(e *upspin.Event) error {
 	if d.sequence == -1 {
 		d.l.wipeLog(d.user)
 	}
-	log.Debug.Printf("watch entry %s %v", e.Entry.Name, e)
 
 	// Is this a file we are watching? We always watch Access files since ones we never
 	// saw before can affect our cached state.
