@@ -22,6 +22,30 @@
       "revId": "0f2f0d4f0d0d8615c91518ac1c73251606354ca2",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fca234e1_80b3e831",
+        "filename": "upbox/schema.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 6197
+      },
+      "writtenOn": "2017-11-09T22:39:38Z",
+      "side": 1,
+      "message": "Thanks! I didn\u0027t quite know what to put here.",
+      "parentUuid": "db502faf_1f4902c1",
+      "range": {
+        "startLine": 28,
+        "startChar": 6,
+        "endLine": 28,
+        "endChar": 18
+      },
+      "revId": "0f2f0d4f0d0d8615c91518ac1c73251606354ca2",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
