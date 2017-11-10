@@ -35,8 +35,12 @@ import (
 )
 
 const (
-	defaultValid          = 2 * time.Minute
-	defaultEnoentDuration = time.Minute
+	defaultValid          = 1 * time.Second
+	defaultEnoentDuration = 1 * time.Second
+
+	// Period node information is good for until being refreshed. Can be removed
+	// when we start using the Watch interface.
+	refreshPeriod = 3 * time.Second
 
 	// Files and directories will appear in the host OS with
 	// these permissions, regardless of Access file contents.
@@ -86,6 +90,9 @@ type node struct {
 	// cached info.
 	cf *cachedFile        // Local file system contents of this node.
 	de []*upspin.DirEntry // Directory contents of this node.
+
+	// Time after which node info has to be refreshed.
+	refreshTime time.Time
 }
 
 func (n *node) String() string {
@@ -216,7 +223,11 @@ func (h *handle) freeNoLock() {
 
 // Attr implements fs.Node.Attr.
 func (n *node) Attr(addscontext gContext.Context, attr *fuse.Attr) error {
-	log.Debug.Printf("Attr %s", n)
+	const op = "Attr"
+	log.Debug.Printf("Attr %s %v %s", n, n.attr, n.attr.Mtime)
+	if _, err := n.refresh(op); err != nil {
+		return err
+	}
 	*attr = n.attr
 	return nil
 }
@@ -340,6 +351,24 @@ func (n *node) openDir(context gContext.Context, req *fuse.OpenRequest, resp *fu
 	h := allocHandle(n)
 	n.de = de
 	h.flags = req.Flags
+
+	// Directory mtime is largest of its direct descendants and itself.
+	for _, child := range de {
+		t := child.Time.Go()
+		if t.After(n.attr.Mtime) {
+			n.attr.Mtime = t
+		}
+	}
+
+	// Update any known nodes.
+	for _, child := range de {
+		if cn, ok := n.f.nodeMap[child.Name]; ok {
+			if sz, err := child.Size(); err == nil {
+				cn.attr.Size = uint64(sz)
+			}
+			cn.attr.Mtime = child.Time.Go()
+		}
+	}
 	return h, nil
 }
 
@@ -368,7 +397,11 @@ func (n *node) openFile(context gContext.Context, req *fuse.OpenRequest, resp *f
 
 // directoryLookup return the DirServer and DirEntry for the given name.
 func (n *node) directoryLookup(uname upspin.PathName) (upspin.DirServer, *upspin.DirEntry, error) {
-	if n.attr.Mode&os.ModeDir != os.ModeDir {
+	return n.directoryLookupWithCheck(uname, true)
+}
+
+func (n *node) directoryLookupWithCheck(uname upspin.PathName, check bool) (upspin.DirServer, *upspin.DirEntry, error) {
+	if check && n.attr.Mode&os.ModeDir != os.ModeDir {
 		return nil, nil, errors.E(errors.NotDir, n.uname)
 	}
 	f := n.f
@@ -472,14 +505,14 @@ func (n *node) Remove(context gContext.Context, req *fuse.RemoveRequest) error {
 func (n *node) Lookup(context gContext.Context, name string) (fs.Node, error) {
 	const op = "Lookup"
 	n.Lock()
-	defer n.Unlock()
 	uname := path.Join(n.uname, name)
+	n.Unlock()
 
 	f := n.f
 	f.Lock()
 	if n, ok := f.nodeMap[uname]; ok {
 		f.Unlock()
-		return n, nil
+		return n.refresh(op)
 	}
 	f.Unlock()
 
@@ -492,9 +525,13 @@ func (n *node) Lookup(context gContext.Context, name string) (fs.Node, error) {
 		return nil, e2e(errors.E(op, errors.NotExist, uname))
 	}
 
+	n.Lock()
+	defer n.Unlock()
+
 	// Ask the Dirserver.
 	_, de, err := n.directoryLookup(uname)
 	if err != nil {
+		f.removeFromMap(uname)
 		return nil, e2e(errors.E(op, uname, err))
 	}
 
@@ -508,6 +545,7 @@ func (n *node) Lookup(context gContext.Context, name string) (fs.Node, error) {
 	}
 	size, err := de.Size()
 	if err != nil {
+		f.removeFromMap(uname)
 		return nil, e2e(errors.E(op, n.uname, err))
 	}
 	nn := n.f.allocNode(n, name, mode, uint64(size), de.Time.Go())
@@ -519,8 +557,57 @@ func (n *node) Lookup(context gContext.Context, name string) (fs.Node, error) {
 	if n.t == rootNode {
 		n.f.addUserDir(name)
 	}
+	nn.refreshTime = time.Now().Add(refreshPeriod)
 	nn.exists()
 	return nn, nil
+}
+
+func (n *node) refresh(op string) (*node, error) {
+	n.Lock()
+	defer n.Unlock()
+
+	// Don't refresh special nodes.
+	if n.t != otherNode {
+		return n, nil
+	}
+
+	// Don't refresh nodes for files we currently have open since
+	// we are the correct source.
+	if len(n.handles) > 0 {
+		return n, nil
+	}
+
+	if n.refreshTime.After(time.Now()) {
+		return n, nil
+	}
+
+	// Ask the Dirserver.
+	_, de, err := n.directoryLookupWithCheck(n.uname, false)
+	if err != nil {
+		n.f.removeFromMap(n.uname)
+		return nil, e2e(errors.E(op, n.uname, err))
+	}
+
+	// Make a node to hand back to fuse.
+	mode := os.FileMode(unixPermissions)
+	if de.IsDir() {
+		mode |= os.ModeDir
+	}
+	if de.IsLink() {
+		mode |= os.ModeSymlink
+	}
+	size, err := de.Size()
+	if err != nil {
+		n.f.removeFromMap(n.uname)
+		return nil, e2e(errors.E(op, n.uname, err))
+	}
+	n.attr.Size = uint64(size)
+	n.attr.Mode = mode
+	if de.IsLink() {
+		n.link = upspin.PathName(de.Link)
+	}
+	n.refreshTime = time.Now().Add(refreshPeriod)
+	return n, nil
 }
 
 func (f *upspinFS) addUserDir(name string) {
@@ -528,6 +615,12 @@ func (f *upspinFS) addUserDir(name string) {
 	if _, ok := f.userDirs[name]; !ok {
 		f.userDirs[name] = true
 	}
+	f.Unlock()
+}
+
+func (f *upspinFS) removeFromMap(uname upspin.PathName) {
+	f.Lock()
+	delete(f.nodeMap, uname)
 	f.Unlock()
 }
 
