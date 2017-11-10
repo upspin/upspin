@@ -9,19 +9,24 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"math/rand"
 	"os"
-	"path"
+	"path/filepath"
 	rtdebug "runtime/debug"
 	"testing"
+	"time"
 
 	"bazil.org/fuse"
 
 	"upspin.io/bind"
+	"upspin.io/client"
 	"upspin.io/config"
 	"upspin.io/factotum"
+	"upspin.io/log"
+	"upspin.io/path"
 	"upspin.io/test/testutil"
 	"upspin.io/upspin"
 
@@ -35,6 +40,7 @@ var testConfig struct {
 	cacheDir   string
 	root       string
 	user       string
+	cfg        upspin.Config
 }
 
 const (
@@ -116,6 +122,7 @@ func mount() error {
 	if err != nil {
 		return err
 	}
+	testConfig.cfg = cfg
 
 	// A directory for cache files.
 	testConfig.cacheDir, err = ioutil.TempDir("", "upspincache")
@@ -124,10 +131,13 @@ func mount() error {
 	}
 
 	// Mount the file system. It will be served in a separate go routine.
+	if false {
+		log.SetLevel("debug")
+	}
 	do(cfg, testConfig.mountpoint, testConfig.cacheDir)
 
 	// Create the user root, all tests will need it.
-	testConfig.root = path.Join(testConfig.mountpoint, testConfig.user)
+	testConfig.root = filepath.Join(testConfig.mountpoint, testConfig.user)
 	return os.Mkdir(testConfig.root, 0777)
 }
 
@@ -154,7 +164,7 @@ func TestMain(m *testing.M) {
 }
 
 func mkTestDir(t *testing.T, name string) string {
-	testDir := path.Join(testConfig.root, name)
+	testDir := filepath.Join(testConfig.root, name)
 	if err := os.Mkdir(testDir, perm); err != nil {
 		fatal(t, err)
 	}
@@ -186,25 +196,33 @@ func writeFile(t *testing.T, fn string, buf []byte) *os.File {
 	return f
 }
 
-func readAndCheckContents(t *testing.T, fn string, buf []byte) {
-	f, err := os.Open(fn)
+func readAndCheckContentsOrDie(t *testing.T, fn string, buf []byte) {
+	err := readAndCheckContents(t, fn, buf)
 	if err != nil {
 		fatal(t, err)
+	}
+}
+
+func readAndCheckContents(t *testing.T, fn string, buf []byte) error {
+	f, err := os.Open(fn)
+	if err != nil {
+		return err
 	}
 	defer f.Close()
 	rbuf := make([]byte, len(buf))
 	n, err := f.Read(rbuf)
 	if err != nil {
-		fatal(t, err)
+		return err
 	}
 	if n != len(buf) {
-		fatalf(t, "%s: read %d bytes, expected %d", fn, n, len(buf))
+		return fmt.Errorf("%s: read %d bytes, expected %d", fn, n, len(buf))
 	}
 	for i := range buf {
 		if buf[i] != rbuf[i] {
-			fatalf(t, "%s: error at byte %d", fn, i)
+			return fmt.Errorf("%s: error at byte %d", fn, i)
 		}
 	}
+	return nil
 }
 
 func mkFile(t *testing.T, fn string, buf []byte) {
@@ -239,17 +257,17 @@ func TestFile(t *testing.T) {
 	buf := randomBytes(t, 16*1024)
 
 	// Create and write a file.
-	fn := path.Join(testDir, "file")
+	fn := filepath.Join(testDir, "file")
 	wf := writeFile(t, fn, buf)
 
 	// Read before close.
-	readAndCheckContents(t, fn, buf)
+	readAndCheckContentsOrDie(t, fn, buf)
 
 	// Read after close.
 	if err := wf.Close(); err != nil {
 		t.Fatal(err)
 	}
-	readAndCheckContents(t, fn, buf)
+	readAndCheckContentsOrDie(t, fn, buf)
 
 	// Test Rewriting part of the file.
 	for i := 0; i < len(buf)/2; i++ {
@@ -259,7 +277,7 @@ func TestFile(t *testing.T) {
 	if err := wf.Close(); err != nil {
 		t.Fatal(err)
 	}
-	readAndCheckContents(t, fn, buf)
+	readAndCheckContentsOrDie(t, fn, buf)
 	remove(t, fn)
 
 	if err := os.RemoveAll(testDir); err != nil {
@@ -280,26 +298,26 @@ func TestSymlink(t *testing.T) {
 	//     real2 - a real file
 	//     uplink - a link to dir/real
 	//
-	dir := path.Join(testDir, "dir")
+	dir := filepath.Join(testDir, "dir")
 	mkDir(t, dir)
-	real1 := path.Join(dir, "real1")
+	real1 := filepath.Join(dir, "real1")
 	mkFile(t, real1, []byte(real1))
-	subdir := path.Join(dir, "subdir")
+	subdir := filepath.Join(dir, "subdir")
 	mkDir(t, subdir)
-	real2 := path.Join(subdir, "real2")
+	real2 := filepath.Join(subdir, "real2")
 	mkFile(t, real2, []byte(real2))
 
 	// Test each link.
-	testSymlink(t, path.Join(dir, "sidelink"), real1, "real1", []byte(real1))
-	testSymlink(t, path.Join(dir, "downlink"), real2, "subdir/real2", []byte(real2))
-	testSymlink(t, path.Join(subdir, "uplink"), real1, "../real1", []byte(real1))
+	testSymlink(t, filepath.Join(dir, "sidelink"), real1, "real1", []byte(real1))
+	testSymlink(t, filepath.Join(dir, "downlink"), real2, "subdir/real2", []byte(real2))
+	testSymlink(t, filepath.Join(subdir, "uplink"), real1, "../real1", []byte(real1))
 
 	// Test a relative path that ..'s out and back in again.
 	outIn := fmt.Sprintf("../../../../%s/testsymlinks/dir/real1", testConfig.user)
-	testSymlink(t, path.Join(subdir, "updown"), outIn, "../real1", []byte(real2))
+	testSymlink(t, filepath.Join(subdir, "updown"), outIn, "../real1", []byte(real2))
 
 	// Test a path that leaves Upspin. It should fail.
-	if err := os.Symlink("../../../../quux", path.Join(subdir, "wontwork")); err == nil {
+	if err := os.Symlink("../../../../quux", filepath.Join(subdir, "wontwork")); err == nil {
 		fatal(t, err)
 	}
 
@@ -341,13 +359,13 @@ func TestRename(t *testing.T) {
 	testDir := mkTestDir(t, "testrename")
 
 	// Check that file is renamed and old name is no longer valid.
-	original := path.Join(testDir, "original")
-	newname := path.Join(testDir, "newname")
+	original := filepath.Join(testDir, "original")
+	newname := filepath.Join(testDir, "newname")
 	mkFile(t, original, []byte(original))
 	if err := os.Rename(original, newname); err != nil {
 		t.Fatal(err)
 	}
-	readAndCheckContents(t, newname, []byte(original))
+	readAndCheckContentsOrDie(t, newname, []byte(original))
 	notExist(t, original, "rename")
 	remove(t, newname)
 
@@ -357,7 +375,7 @@ func TestRename(t *testing.T) {
 	if err := os.Rename(original, newname); err != nil {
 		t.Fatal(err)
 	}
-	readAndCheckContents(t, newname, []byte(original))
+	readAndCheckContentsOrDie(t, newname, []byte(original))
 	notExist(t, original, "rename")
 
 	if err := os.RemoveAll(testDir); err != nil {
@@ -371,15 +389,15 @@ func TestAccess(t *testing.T) {
 	testDir := mkTestDir(t, "testaccess")
 
 	// First check that we can create a file.
-	fn := path.Join(testDir, "newname")
+	fn := filepath.Join(testDir, "newname")
 	mkFile(t, fn, []byte(fn))
 
 	// Now create an access fn allowing only read and list.
-	access := path.Join(testDir, "Access")
+	access := filepath.Join(testDir, "Access")
 	mkFile(t, access, []byte("r,l: "+testConfig.user+"\n"))
 
 	// We should still be able to read.
-	readAndCheckContents(t, fn, []byte(fn))
+	readAndCheckContentsOrDie(t, fn, []byte(fn))
 
 	// Rewrite should fail.
 	if _, err := os.OpenFile(fn, os.O_WRONLY, perm); err == nil {
@@ -405,6 +423,109 @@ func TestAccess(t *testing.T) {
 	}
 }
 
+// TestEventualConsistency tests upspinfs's ability to notice changes
+// done behind its back. Because this is eventual concurrency, every
+// test requires a loop waiting for the changes to appear.
+func TestEventualConsistency(t *testing.T) {
+	testDir := mkTestDir(t, "TestEventualConsistency")
+	cl := client.New(testConfig.cfg)
+
+	// Create and write a file.
+	buf := randomBytes(t, 128)
+	fn := filepath.Join(testDir, "file")
+	ufn := path.Join(upspin.PathName(testConfig.user), "TestEventualConsistency/file")
+	mkFile(t, fn, buf)
+
+	// Rewrite the file directly. Test that upspinfs sees the contents change.
+	buf2 := randomBytes(t, 128)
+	if _, err := cl.Put(ufn, buf2); err != nil {
+		fatal(t, err)
+	}
+	eventually(t, func() error { return readAndCheckContents(t, fn, buf2) }, 5*time.Second)
+
+	// Create a new file directly. Test that upspinfs can read it.
+	fn = filepath.Join(testDir, "file2")
+	ufn = path.Join(upspin.PathName(testConfig.user), "TestEventualConsistency/file2")
+	if _, err := cl.Put(ufn, buf2); err != nil {
+		fatal(t, err)
+	}
+	eventually(t, func() error { return readAndCheckContents(t, fn, buf2) }, 5*time.Second)
+
+	// Create a new file directly. Test that upspinfs can stat it.
+	fn = filepath.Join(testDir, "file3")
+	ufn = path.Join(upspin.PathName(testConfig.user), "TestEventualConsistency/file3")
+	if _, err := cl.Put(ufn, buf2); err != nil {
+		fatal(t, err)
+	}
+	eventually(t, func() error { _, err := os.Stat(fn); return err }, 5*time.Second)
+
+	// Remove a file directly. Test that upspinfs eventually notices.
+	if err := cl.Delete(ufn); err != nil {
+		fatal(t, err)
+	}
+	f := func() error {
+		_, err := os.Stat(fn)
+		if err != nil {
+			return nil
+		}
+		return errors.New("still there")
+	}
+	eventually(t, f, 5*time.Second)
+
+	// Create a file directly. Test that Readdir finds it.
+	fn = filepath.Join(testDir, "file4")
+	ufn = path.Join(upspin.PathName(testConfig.user), "TestEventualConsistency/file4")
+	if _, err := cl.Put(ufn, buf2); err != nil {
+		fatal(t, err)
+	}
+	f = func() error {
+		file, err := os.Open(testDir)
+		if err != nil {
+			return err
+		}
+		infos, err := file.Readdir(0)
+		if err != nil {
+			return nil
+		}
+		file.Close()
+		for _, info := range infos {
+			if info.Name() == "file4" {
+				return nil
+			}
+		}
+		return errors.New("not there")
+	}
+	eventually(t, f, 5*time.Second)
+
+	// Delete a file directly. Test that Readdir loses it.
+	if err := cl.Delete(ufn); err != nil {
+		fatal(t, err)
+	}
+	f = func() error {
+		file, err := os.Open(testDir)
+		if err != nil {
+			return err
+		}
+		infos, err := file.Readdir(0)
+		if err != nil {
+			return nil
+		}
+		file.Close()
+		found := false
+		for _, info := range infos {
+			if info.Name() == "file4" {
+				found = true
+				break
+			}
+		}
+		if !found {
+			return nil
+		}
+		return errors.New("still there")
+	}
+	eventually(t, f, 5*time.Second)
+}
+
 func fatal(t *testing.T, args ...interface{}) {
 	t.Log(fmt.Sprintln(args...))
 	t.Log(string(rtdebug.Stack()))
@@ -415,4 +536,20 @@ func fatalf(t *testing.T, format string, args ...interface{}) {
 	t.Log(fmt.Sprintf(format, args...))
 	t.Log(string(rtdebug.Stack()))
 	t.FailNow()
+}
+
+// eventually attempts the function every 100 ms till period expires. If
+// the function doesn't succeed by then, it fatals.
+func eventually(t *testing.T, f func() error, d time.Duration) {
+	end := time.Now().Add(d)
+	for {
+		err := f()
+		if err == nil {
+			return
+		}
+		if time.Now().After(end) {
+			fatal(t, err)
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
 }
