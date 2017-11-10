@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"upspin.io/errors"
-	"upspin.io/path"
 	"upspin.io/upspin"
 )
 
@@ -372,88 +371,6 @@ func TestCannotWatchNonExistentRoot(t *testing.T) {
 	}
 }
 
-// Tests internal functionality that can be tricky.
-func TestRemoveDeadWatchers(t *testing.T) {
-	d := make(chan struct{})
-	close(d)
-	done := &watcher{
-		events: make(chan *upspin.Event),
-		done:   d,
-		closed: 1,
-	}
-
-	open := &watcher{
-		events: make(chan *upspin.Event),
-		done:   make(chan struct{}),
-		closed: 0,
-	}
-
-	for i, tc := range []struct {
-		watchers []*watcher
-		open     int
-	}{
-		{[]*watcher{}, 0},
-		{[]*watcher{open}, 1},
-		{[]*watcher{done}, 0},
-		{[]*watcher{open, open}, 2},
-		{[]*watcher{open, done}, 1},
-		{[]*watcher{done, open}, 1},
-		{[]*watcher{done, done}, 0},
-		{[]*watcher{done, open, done}, 1},
-		{[]*watcher{open, done, done}, 1},
-		{[]*watcher{open, open, open}, 3},
-		{[]*watcher{done, done, done}, 0},
-		{[]*watcher{open, done, done, open, done}, 2},
-	} {
-		n := &node{
-			watchers: tc.watchers,
-		}
-		removeDeadWatchers(n)
-
-		// Verify that only the expected number of open watchers remain.
-		if got, want := len(n.watchers), tc.open; got != want {
-			t.Fatalf("%d: open = %d, want = %d", i, got, want)
-		}
-	}
-}
-
-func TestMoveDownWatchers(t *testing.T) {
-	wp, err := path.Parse("foo@bar.com/p/n1")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	tests := []struct {
-		node   *node
-		parent *node
-		moved  bool
-	}{
-		{
-			node: &node{entry: upspin.DirEntry{Name: "foo@bar.com/p/n1"}},
-			parent: &node{
-				entry:    upspin.DirEntry{Name: "foo@bar.com/p/"},
-				watchers: []*watcher{&watcher{path: wp}},
-			},
-			moved: true,
-		},
-		{
-			node: &node{entry: upspin.DirEntry{Name: "foo@bar.com/p/n111"}},
-			parent: &node{
-				entry:    upspin.DirEntry{Name: "foo@bar.com/p/"},
-				watchers: []*watcher{&watcher{path: wp}},
-			},
-			moved: false,
-		},
-	}
-
-	for i, test := range tests {
-		moveDownWatchers(test.node, test.parent)
-		if moved := len(test.node.watchers) == 1; moved != test.moved {
-			t.Errorf("#%d: moved = %v, want %v", i, moved, test.moved)
-		}
-	}
-}
-
 func TestClosingTreeTerminatesWatcher(t *testing.T) {
 	config, user := newConfigForTesting(t, userName)
 	tree, err := New(config, user)
@@ -471,10 +388,11 @@ func TestClosingTreeTerminatesWatcher(t *testing.T) {
 	}
 
 	// Find the watcher internally.
-	if len(tree.root.watchers) != 1 {
-		t.Fatalf("Expected exactly one watcher, got %d", len(tree.root.watchers))
+	ws := tree.watchers[upspin.PathName(userName+"/")]
+	if l := len(ws); l != 1 {
+		t.Fatalf("Expected exactly one watcher, got %d", l)
 	}
-	w := tree.root.watchers[0]
+	w := ws[0]
 
 	tree.Close()
 
