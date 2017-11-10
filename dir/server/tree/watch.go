@@ -108,7 +108,14 @@ func (t *Tree) Watch(p path.Parsed, sequence int64, done <-chan struct{}) (<-cha
 		log:      cLog,
 		closed:   0,
 		shutdown: t.shutdown,
-		doneFunc: t.watchers.Done,
+	}
+	w.doneFunc = func() {
+		// Remove this watcher from watchers when done.
+		t.mu.Lock()
+		t.removeWatcher(p, w)
+		t.mu.Unlock()
+		// Signal to the closing tree that we're done.
+		t.watcherWG.Done()
 	}
 
 	if sequence == upspin.WatchCurrent {
@@ -137,7 +144,7 @@ func (t *Tree) Watch(p path.Parsed, sequence int64, done <-chan struct{}) (<-cha
 
 		// Start sending the current state of the cloned tree and setup
 		// the watcher for this tree once the current state is sent.
-		t.watchers.Add(1)
+		t.watcherWG.Add(1)
 		go w.sendCurrentAndWatch(clone, t, p, offset)
 	} else {
 		var (
@@ -160,33 +167,60 @@ func (t *Tree) Watch(p path.Parsed, sequence int64, done <-chan struct{}) (<-cha
 			}
 		}
 
-		// Set up the notification hook. Don't overwrite any pending error.
-		if err := t.addWatcher(p, w); err != nil {
-			return nil, err
-		}
+		// Set up the notification hook.
+		t.addWatcher(p, w)
 
 		// Start the watcher.
-		t.watchers.Add(1)
+		t.watcherWG.Add(1)
 		go w.watch(offset, offsetErr)
 	}
 
 	return w.events, nil
 }
 
-// addWatcher adds a watcher to the node at a given path location.
+// addWatcher adds a watcher at the given path.
 // t.mu must be held.
-func (t *Tree) addWatcher(p path.Parsed, w *watcher) error {
-	n, err := t.loadPath(p)
-	if err != nil && !errors.Is(errors.NotExist, err) {
-		return err
-	}
-	if err != nil && n == nil {
-		return err
-	}
-	// Add watcher to node, or to an ancestor.
-	n.watchers = append(n.watchers, w)
+func (t *Tree) addWatcher(p path.Parsed, w *watcher) {
+	name := p.Path()
+	t.watchers[name] = append(t.watchers[name], w)
+}
 
-	return nil
+// removeWatcher removes the given watcher from the given path.
+// t.mu must be held.
+func (t *Tree) removeWatcher(p path.Parsed, w *watcher) {
+	name := p.Path()
+	ws := t.watchers[name]
+	for i := range ws {
+		if ws[i] == w {
+			ws = append(ws[:i], ws[i+1:]...)
+			break
+		}
+	}
+	if len(ws) == 0 {
+		delete(t.watchers, name)
+	} else {
+		t.watchers[name] = ws
+	}
+}
+
+// notifyWatchers wakes any watchers that are watching the given path (or any
+// of its ancestors).
+// t.mu must be held.
+func (t *Tree) notifyWatchers(name upspin.PathName) {
+	p, _ := path.Parse(name)
+	for {
+		ws := t.watchers[p.Path()]
+		for _, w := range ws {
+			select {
+			case w.hasWork <- true:
+			default:
+			}
+		}
+		if p.IsRoot() {
+			break
+		}
+		p = p.Drop(1)
+	}
 }
 
 // sendCurrentAndWatch takes an original tree and its clone and sends the state
@@ -226,13 +260,8 @@ func (w *watcher) sendCurrentAndWatch(clone, orig *Tree, p path.Parsed, offset i
 	}
 	// Set up the notification hook on the original tree. We must lock it.
 	orig.mu.Lock()
-	err = orig.addWatcher(p, w)
+	orig.addWatcher(p, w)
 	orig.mu.Unlock()
-	if err != nil {
-		w.sendError(err)
-		w.close()
-		return
-	}
 	// Start the watcher (in this goroutine -- don't start a new one here).
 	w.watch(offset, nil)
 }
@@ -376,75 +405,6 @@ func (w *watcher) close() {
 	atomic.StoreInt32(&w.closed, 1)
 	close(w.events)
 	w.doneFunc()
-}
-
-// removeDeadWatchers removes all watchers on a node that have closed their done
-// or Event channels.
-func removeDeadWatchers(n *node) {
-	curr := 0
-	for i := 0; i < len(n.watchers); i++ {
-		doneCh := n.watchers[i].done
-
-		closed := n.watchers[i].isClosed()
-		if !closed {
-			// If the done channel is ready, it's been closed.
-			select {
-			case <-doneCh:
-				closed = true
-			default:
-			}
-		}
-		if closed {
-			// Remove this entry. If there are more, simply copy the
-			// next one over the ith entry. Otherwise just shrink
-			// the slice.
-			if i > curr {
-				n.watchers[curr] = n.watchers[i]
-			}
-			continue
-		}
-		curr++
-	}
-	n.watchers = n.watchers[:curr]
-}
-
-// moveDownWatchers moves watchers from the parent to the node if and only if
-// the parent watcher is watching node.
-func moveDownWatchers(node, parent *node) {
-	curr := 0
-	p, _ := path.Parse(node.entry.Name) // err can't happen.
-	for i := 0; i < len(parent.watchers); i++ {
-		w := parent.watchers[i]
-		if w.path.NElem() < p.NElem() || w.path.First(p.NElem()).Path() != p.Path() {
-			curr++
-			continue
-		}
-		// Remove this watcher from the parent and add it to the node.
-		// If there are more watchers beyond curr, simply copy the
-		// next ith watcher to the curr watcher. Otherwise just shrink
-		// the slice.
-		// Note: The node is newly-put, so it does not have watchers yet
-		// and hence there's no need to look for duplicate watchers
-		// here.
-		node.watchers = append(node.watchers, w)
-		if i > curr {
-			parent.watchers[curr] = parent.watchers[i]
-		}
-	}
-	parent.watchers = parent.watchers[:curr]
-}
-
-// notifyWatchers tells all watchers there are new entries in the log to be
-// processed.
-func notifyWatchers(watchers []*watcher) {
-	for _, w := range watchers {
-		select {
-		case w.hasWork <- true:
-			// OK, sent.
-		default:
-			// Watcher is busy. It will get to it eventually.
-		}
-	}
 }
 
 // isPrefixPath reports whether the path has a pathwise prefix.
