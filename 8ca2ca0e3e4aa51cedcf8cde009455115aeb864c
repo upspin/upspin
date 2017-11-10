@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2eb12784_ae3292a0",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-10T06:21:16Z",
+      "side": 1,
+      "message": "This was a bug introduced by the previous change to these files.",
+      "range": {
+        "startLine": 199,
+        "startChar": 27,
+        "endLine": 199,
+        "endChar": 37
+      },
+      "revId": "8ca2ca0e3e4aa51cedcf8cde009455115aeb864c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a4da3e57_a2654e69",
+        "filename": "dir/server/tree/tree.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 589,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-10T06:21:16Z",
+      "side": 1,
+      "message": "Also the same bug",
+      "range": {
+        "startLine": 589,
+        "startChar": 27,
+        "endLine": 589,
+        "endChar": 37
+      },
+      "revId": "8ca2ca0e3e4aa51cedcf8cde009455115aeb864c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
