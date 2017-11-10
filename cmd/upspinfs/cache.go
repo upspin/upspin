@@ -22,6 +22,7 @@ import (
 	"upspin.io/client/clientutil"
 	os "upspin.io/cmd/upspinfs/internal/ose"
 	"upspin.io/errors"
+	"upspin.io/log"
 	"upspin.io/pack"
 	"upspin.io/path"
 	"upspin.io/upspin"
@@ -44,6 +45,7 @@ type cachedFile struct {
 	fname   string // Filename in cache.
 	inStore bool   // True if this is a cached version of something in the store.
 	dirty   bool   // True if it needs to be written back on close.
+	seq     int64  // Sequence number of cached file.
 
 	file *os.File // The cached file.
 }
@@ -121,7 +123,7 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 	entry, err := dir.Lookup(name)
 	if err != nil {
 		// We don't implement links in the standard way. Instead we
-		// let FUSE to it but stating every file it walks.
+		// let FUSE do it by stating every file it walks.
 		return errors.E(op, err)
 	}
 
@@ -144,6 +146,9 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 			}
 		}
 	}
+
+	// Invalidate the kernel cache, this is a new version.
+	n.f.invalidateChan <- n
 
 	// Create an unpacker to decrypt the file blocks.
 	packer := pack.Lookup(entry.Packing)
@@ -191,6 +196,7 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 	cf.inStore = true
 	cf.fname = fname
 	cf.file = file
+	n.seq = entry.Sequence
 	h.flags = flags
 	n.attr.Size = uint64(offset)
 	n.cf = cf
@@ -224,6 +230,18 @@ func (cf *cachedFile) close() {
 		return
 	}
 	cf.file.Close()
+	cf.file = nil
+}
+
+// forget is called when the cached version is no longer correct.
+func (cf *cachedFile) forget() {
+	if cf == nil {
+		return
+	}
+	cf.close()
+	if err := os.Remove(cf.fname); err != nil {
+		log.Debug.Printf("%s", err)
+	}
 }
 
 // clone copies the first size bytes of the old cf.file into a new temp file that replaces it.
@@ -337,6 +355,7 @@ func (cf *cachedFile) writeback(h *handle) error {
 	for tries := 0; ; tries++ {
 		de, err = cf.c.client.Put(n.uname, cleartext)
 		if err == nil {
+			n.seq = de.Sequence
 			n.attr.Mtime = de.Time.Go()
 			break
 		}
@@ -359,8 +378,7 @@ func (cf *cachedFile) writeback(h *handle) error {
 	}
 
 	// Rename it to reflect the actual reference in the store so that new
-	// opens will find the cached version.  Assume a single block.
-	// TODO(p): what if it isn't a single block?
+	// opens will find the cached version.
 	cdir, fname := cf.c.cacheName(de)
 	if err := os.Rename(cf.fname, fname); err != nil {
 		// Otherwise rename to the common name.
