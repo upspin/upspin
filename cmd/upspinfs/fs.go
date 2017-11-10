@@ -35,8 +35,12 @@ import (
 )
 
 const (
-	defaultValid          = 2 * time.Minute
-	defaultEnoentDuration = time.Minute
+	defaultValid          = 1 * time.Second
+	defaultEnoentDuration = 1 * time.Second
+
+	// Valid period for node information derived from DirEntries. Can be removed
+	// when we start using the Watch interface.
+	refreshPeriod = 3 * time.Second
 
 	// Files and directories will appear in the host OS with
 	// these permissions, regardless of Access file contents.
@@ -47,18 +51,20 @@ const (
 
 // upspinFS represents an instance of the mounted file system.
 type upspinFS struct {
-	sync.Mutex                               // Protects concurrent access to the rest of this struct.
-	mountpoint string                        // Absolute Unix path to mountpoint.
-	config     upspin.Config                 // Upspin config used for all requests.
-	client     upspin.Client                 // A client to use for client methods.
-	root       *node                         // The root of the Upspin file system.
-	uid        int                           // OS user id of this process' owner.
-	gid        int                           // OS group id of this process' owner.
-	lastID     fuse.NodeID                   // The last node ID created and assigned to a file.
-	userDirs   map[string]bool               // Set of known user directories.
-	cache      *cache                        // A cache of files read from or to be written to dir/store.
-	nodeMap    map[upspin.PathName]*node     // All in use nodes.
-	enoentMap  map[upspin.PathName]time.Time // A map of non-existent names.
+	sync.Mutex                                   // Protects concurrent access to the rest of this struct.
+	mountpoint     string                        // Absolute Unix path to mountpoint.
+	config         upspin.Config                 // Upspin config used for all requests.
+	client         upspin.Client                 // A client to use for client methods.
+	root           *node                         // The root of the Upspin file system.
+	uid            int                           // OS user id of this process' owner.
+	gid            int                           // OS group id of this process' owner.
+	lastID         fuse.NodeID                   // The last node ID created and assigned to a file.
+	userDirs       map[string]bool               // Set of known user directories.
+	cache          *cache                        // A cache of files read from or to be written to dir/store.
+	nodeMap        map[upspin.PathName]*node     // All in use nodes.
+	enoentMap      map[upspin.PathName]time.Time // A map of non-existent names
+	server         *fs.Server                    // The Bazil server interface
+	invalidateChan chan *node                    // For requesting invalidations
 }
 
 type nodeType uint8
@@ -86,6 +92,9 @@ type node struct {
 	// cached info.
 	cf *cachedFile        // Local file system contents of this node.
 	de []*upspin.DirEntry // Directory contents of this node.
+
+	// Time after which node info has to be refreshed.
+	refreshTime time.Time
 }
 
 func (n *node) String() string {
@@ -110,18 +119,20 @@ func newUpspinFS(config upspin.Config, mountpoint string, cacheDir string) *upsp
 		mountpoint = mountpoint + sep
 	}
 	f := &upspinFS{
-		mountpoint: mountpoint,
-		config:     config,
-		client:     client.New(config),
-		uid:        os.Getuid(),
-		gid:        os.Getgid(),
-		userDirs:   make(map[string]bool),
-		nodeMap:    make(map[upspin.PathName]*node),
-		enoentMap:  make(map[upspin.PathName]time.Time),
+		mountpoint:     mountpoint,
+		config:         config,
+		client:         client.New(config),
+		uid:            os.Getuid(),
+		gid:            os.Getgid(),
+		userDirs:       make(map[string]bool),
+		nodeMap:        make(map[upspin.PathName]*node),
+		enoentMap:      make(map[upspin.PathName]time.Time),
+		invalidateChan: make(chan *node, 100),
 	}
 	f.cache = newCache(config, cacheDir+"/fscache")
 	// Preallocate root node.
 	f.root = f.allocNode(nil, "", 0500|os.ModeDir, 0, time.Now())
+	go f.invalidateProc()
 	return f
 }
 
@@ -216,7 +227,11 @@ func (h *handle) freeNoLock() {
 
 // Attr implements fs.Node.Attr.
 func (n *node) Attr(addscontext gContext.Context, attr *fuse.Attr) error {
-	log.Debug.Printf("Attr %s", n)
+	const op = "Attr"
+	log.Debug.Printf("Attr %s %v %s", n, n.attr, n.attr.Mtime)
+	if _, err := n.refresh(op); err != nil {
+		return err
+	}
 	*attr = n.attr
 	return nil
 }
@@ -340,12 +355,31 @@ func (n *node) openDir(context gContext.Context, req *fuse.OpenRequest, resp *fu
 	h := allocHandle(n)
 	n.de = de
 	h.flags = req.Flags
+
+	// Directory mtime is largest of its direct descendants and itself.
+	for _, child := range de {
+		t := child.Time.Go()
+		if t.After(n.attr.Mtime) {
+			n.attr.Mtime = t
+		}
+	}
+
+	// Update any known nodes.
+	for _, child := range de {
+		if cn, ok := n.f.nodeMap[child.Name]; ok {
+			if sz, err := child.Size(); err == nil {
+				cn.attr.Size = uint64(sz)
+			}
+			cn.attr.Mtime = child.Time.Go()
+		}
+	}
 	return h, nil
 }
 
 // openFile opens the file and reads its contents.  If the file is not plain text, we will reuse the cached version of the file.
 func (n *node) openFile(context gContext.Context, req *fuse.OpenRequest, resp *fuse.OpenResponse) (fs.Handle, error) {
 	const op = "Open"
+	n.refresh(op)
 	n.Lock()
 	defer n.Unlock()
 	if n.attr.Mode&os.ModeDir != 0 {
@@ -366,11 +400,18 @@ func (n *node) openFile(context gContext.Context, req *fuse.OpenRequest, resp *f
 	return h, nil
 }
 
-// directoryLookup return the DirServer and DirEntry for the given name.
+// directoryLookup returns the DirServer and DirEntry for uname.
+// n represents uname's parent directory.
 func (n *node) directoryLookup(uname upspin.PathName) (upspin.DirServer, *upspin.DirEntry, error) {
 	if n.attr.Mode&os.ModeDir != os.ModeDir {
 		return nil, nil, errors.E(errors.NotDir, n.uname)
 	}
+	return n.lookup(uname)
+}
+
+// lookup returns the DirServer and DirEntry for uname.
+// n represents uname's parent directory or uname itself.
+func (n *node) lookup(uname upspin.PathName) (upspin.DirServer, *upspin.DirEntry, error) {
 	f := n.f
 	if f.isEnoent(uname) {
 		return nil, nil, errors.E(errors.NotExist)
@@ -472,14 +513,14 @@ func (n *node) Remove(context gContext.Context, req *fuse.RemoveRequest) error {
 func (n *node) Lookup(context gContext.Context, name string) (fs.Node, error) {
 	const op = "Lookup"
 	n.Lock()
-	defer n.Unlock()
 	uname := path.Join(n.uname, name)
+	n.Unlock()
 
 	f := n.f
 	f.Lock()
 	if n, ok := f.nodeMap[uname]; ok {
 		f.Unlock()
-		return n, nil
+		return n.refresh(op)
 	}
 	f.Unlock()
 
@@ -492,9 +533,13 @@ func (n *node) Lookup(context gContext.Context, name string) (fs.Node, error) {
 		return nil, e2e(errors.E(op, errors.NotExist, uname))
 	}
 
+	n.Lock()
+	defer n.Unlock()
+
 	// Ask the Dirserver.
 	_, de, err := n.directoryLookup(uname)
 	if err != nil {
+		f.removeFromMap(uname)
 		return nil, e2e(errors.E(op, uname, err))
 	}
 
@@ -508,6 +553,7 @@ func (n *node) Lookup(context gContext.Context, name string) (fs.Node, error) {
 	}
 	size, err := de.Size()
 	if err != nil {
+		f.removeFromMap(uname)
 		return nil, e2e(errors.E(op, n.uname, err))
 	}
 	nn := n.f.allocNode(n, name, mode, uint64(size), de.Time.Go())
@@ -519,8 +565,72 @@ func (n *node) Lookup(context gContext.Context, name string) (fs.Node, error) {
 	if n.t == rootNode {
 		n.f.addUserDir(name)
 	}
+	nn.refreshTime = time.Now().Add(refreshPeriod)
 	nn.exists()
 	return nn, nil
+}
+
+func (n *node) refresh(op string) (*node, error) {
+	n.Lock()
+	defer n.Unlock()
+
+	// Don't refresh special nodes.
+	if n.t != otherNode {
+		return n, nil
+	}
+
+	// Don't refresh nodes for files we currently have open since
+	// we are the correct source.
+	if len(n.handles) > 0 {
+		return n, nil
+	}
+
+	if n.refreshTime.After(time.Now()) {
+		return n, nil
+	}
+
+	// Ask the Dirserver.
+	_, de, err := n.lookup(n.uname)
+	if err != nil {
+		n.f.removeFromMap(n.uname)
+		return nil, e2e(errors.E(op, n.uname, err))
+	}
+
+	// Update cached info for node.
+	mode := os.FileMode(unixPermissions)
+	if de.IsDir() {
+		mode |= os.ModeDir
+	}
+	if de.IsLink() {
+		mode |= os.ModeSymlink
+	}
+	size, err := de.Size()
+	if err != nil {
+		n.f.removeFromMap(n.uname)
+		return nil, e2e(errors.E(op, n.uname, err))
+	}
+	n.attr.Size = uint64(size)
+	n.attr.Mode = mode
+	if de.IsLink() {
+		n.link = upspin.PathName(de.Link)
+	}
+
+	// If sequence number changed, forget cached data.
+	if n.cf != nil && n.cf.seq != de.Sequence {
+		n.f.invalidateChan <- n
+		n.cf.forget()
+		n.cf = nil
+	}
+	n.refreshTime = time.Now().Add(refreshPeriod)
+	return n, nil
+}
+
+func (f *upspinFS) invalidateProc() {
+	for {
+		n := <-f.invalidateChan
+		f.server.InvalidateNodeAttr(n)
+		f.server.InvalidateNodeData(n)
+	}
 }
 
 func (f *upspinFS) addUserDir(name string) {
@@ -528,6 +638,12 @@ func (f *upspinFS) addUserDir(name string) {
 	if _, ok := f.userDirs[name]; !ok {
 		f.userDirs[name] = true
 	}
+	f.Unlock()
+}
+
+func (f *upspinFS) removeFromMap(uname upspin.PathName) {
+	f.Lock()
+	delete(f.nodeMap, uname)
 	f.Unlock()
 }
 
@@ -952,7 +1068,8 @@ func do(cfg upspin.Config, mountpoint string, cacheDir string) chan bool {
 	// Serve in a go routine.
 	done := make(chan bool)
 	go func() {
-		err = fs.Serve(c, f)
+		f.server = fs.New(c, nil)
+		err := f.server.Serve(f)
 		if err != nil {
 			log.Debug.Fatal(err)
 		}
