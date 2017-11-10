@@ -48,6 +48,7 @@ characters. (Leading @ signs are always expanded.)
 		}
 
 		de := e.Entry
+		seq := fmt.Sprintf("%10d", de.Sequence)
 		attr := []byte("file")
 		if de.IsDir() {
 			copy(attr, "dir ")
@@ -64,6 +65,6 @@ characters. (Leading @ signs are always expanded.)
 			d, _ := de.Size()
 			size = fmt.Sprintf("%10d", d)
 		}
-		s.Printf("%s [%s] %s %s\n", de.Time, attr, size, de.Name)
+		s.Printf("%s %s [%s] %s %s\n", de.Time, seq, attr, size, de.Name)
 	}
 }
