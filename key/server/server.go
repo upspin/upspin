@@ -60,7 +60,7 @@ func New(options ...string) (upspin.KeyServer, error) {
 	}, nil
 }
 
-// server is the implementation of the KeyServer Service on GCP.
+// server is the implementation of the KeyServer Service.
 type server struct {
 	storage storage.Storage
 	*refCount
@@ -260,7 +260,7 @@ func (s *server) canPut(op string, target upspin.UserName, isTargetNew bool, spa
 	return errors.E(op, errors.Permission, s.user, err)
 }
 
-// fetchUserEntry reads the user entry for a given user from permanent storage on GCP.
+// fetchUserEntry reads the user entry for a given user from the storage.
 func (s *server) fetchUserEntry(op string, name upspin.UserName) (*userEntry, error) {
 	log.Debug.Printf("%s: %s", op, name)
 	b, err := s.storage.Download(string(name))
@@ -275,7 +275,7 @@ func (s *server) fetchUserEntry(op string, name upspin.UserName) (*userEntry, er
 	return &entry, nil
 }
 
-// putUserEntry writes the user entry for a user to permanent storage on GCP.
+// putUserEntry writes the user entry for a user to the storage.
 func (s *server) putUserEntry(op string, entry *userEntry) error {
 	log.Debug.Printf("%s: %s", op, entry.User.Name)
 	if entry == nil {
