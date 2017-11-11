@@ -16,5 +16,18 @@ td {
   border: 1px solid #666;
   padding: .25em .45em;
 }
+.menu {
+ float: right;
+}
+{{end}}
+{{define "before-content"}}
+	<div class="menu">
+		{{if ne .FileName "index.md"}}
+			{{if ne .FileName "doc.md"}}
+				<a href="/doc/">Documentation</a>
+			{{end}}
+			<a href="/">Upspin</a>
+		{{end}}
+	</div>
 {{end}}
 {{define "content"}}{{.Content}}{{end}}

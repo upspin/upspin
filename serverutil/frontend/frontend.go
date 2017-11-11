@@ -154,8 +154,9 @@ func (w isWriter) IsWriter(u upspin.UserName) bool {
 }
 
 type pageData struct {
-	Title   string
-	Content interface{}
+	Title    string
+	Content  interface{}
+	FileName string
 }
 
 func (s *server) handleDoc(w http.ResponseWriter, r *http.Request) {
@@ -191,8 +192,9 @@ func (s *server) renderDoc(w http.ResponseWriter, fn string) {
 		return
 	}
 	if err := s.tmpl.doc.Execute(w, pageData{
-		Title:   s.docTitle[fn] + " · Upspin",
-		Content: template.HTML(b),
+		Title:    s.docTitle[fn] + " · Upspin",
+		Content:  template.HTML(b),
+		FileName: fn,
 	}); err != nil {
 		log.Error.Printf("Error executing doc content template: %s", err)
 		return
