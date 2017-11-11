@@ -27,7 +27,7 @@ func main() {
 		return
 	}
 
-	output := fmt.Sprintf(outputFormat, time.Now().In(time.UTC).Format(time.Stamp+" UTC"), version)
+	output := fmt.Sprintf(outputFormat, time.Now().In(time.UTC).Format(time.UnixDate), version)
 
 	err := ioutil.WriteFile("git_version.go", []byte(output), 0664)
 	if err != nil {
@@ -47,7 +47,7 @@ import (
 
 func init() {
 	var err error
-	BuildTime, err = time.Parse(time.Stamp + " UTC", %[1]q)
+	BuildTime, err = time.Parse(time.UnixDate, %[1]q)
 	if err != nil {
 		panic(err)
 	}
