@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "61188d44_76bbfd62",
+        "filename": "cmd/upspinfs/fs.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 399,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-11-11T19:49:32Z",
+      "side": 1,
+      "message": "it\u0027s worth mentioning what the extra check is for.",
+      "revId": "c813b87812a261b2b0d97d09983014622f0e53f1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
