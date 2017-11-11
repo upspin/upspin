@@ -68,6 +68,7 @@ blockquote {
 </style>
 <main>
   <div class="container">
+    {{block "before-content" .}}{{end}}
     {{block "content" .}}Hello, Upspin!{{end}}
   </div>
 </main>
