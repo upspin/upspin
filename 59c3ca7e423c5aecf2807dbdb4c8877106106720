@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "257f0403_42879437",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-11-11T08:15:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "44751f34_643d079c",
+      "revId": "59c3ca7e423c5aecf2807dbdb4c8877106106720",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "9eb0600e_73dd3442",
         "filename": "cmd/upspinfs/fs.go",
         "patchSetId": 2
@@ -30,6 +48,24 @@
       "writtenOn": "2017-11-11T06:59:17Z",
       "side": 1,
       "message": "check what? comment please\n\nbut the check itself is only used for the first if. why not put in directoryLookup and rename that? you have a boolean and two entry points. you can just have two entry points.",
+      "revId": "59c3ca7e423c5aecf2807dbdb4c8877106106720",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e8f51979_5a04ca54",
+        "filename": "cmd/upspinfs/fs.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 403,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-11-11T08:15:20Z",
+      "side": 1,
+      "message": "clearly I was getting tired. Fixed.",
+      "parentUuid": "9eb0600e_73dd3442",
       "revId": "59c3ca7e423c5aecf2807dbdb4c8877106106720",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
