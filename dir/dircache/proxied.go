@@ -158,7 +158,7 @@ func (d *proxiedDir) watcher(ep upspin.Endpoint) {
 	defer close(d.dying)
 
 	// If we don't know better, always read in the whole state. It
-	// is shorter than the the history of all operations.
+	// is shorter than the history of all operations.
 	if d.sequence == 0 {
 		d.sequence = -1
 	}
