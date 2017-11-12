@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9aa31651_569bd28a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 6197
+      },
+      "writtenOn": "2017-11-12T15:07:35Z",
+      "side": 1,
+      "message": "The first word represents the package this change affects. In this case you can use the word “multiple”, since it affects multiple packages. We don’t have a “docs” package. Perhaps something like this would be more appropriate if I may suggest:\n\n  multiple: fix stuttering in documentation\n\n  Fixes some occurrences of “the the” in the documentation.",
+      "revId": "ff9963477a278f5e8706fbc7f1858130c53fbbf6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
