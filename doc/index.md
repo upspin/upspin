@@ -31,7 +31,7 @@ Using these elements as building blocks, Upspin provides a global name space
 for all your data and the power to expand that space to include services such
 as sensors, social media, and more.
 
-To get started, [**download the Upspin client**](/dl/) and follow the the
+To get started, [**download the Upspin client**](/dl/) and follow the
 [**signup process**](/doc/signup.md).
 
 ## Documentation

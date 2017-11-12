@@ -104,7 +104,7 @@ func (devNull) Close() error                { return nil }
 type runner struct {
 	// fs, not flag.CommandLine, holds the flags for the upspin state.
 	fs *flag.FlagSet
-	// state is the the internal state of the upspin command.
+	// state is the internal state of the upspin command.
 	state *State
 	// schema holds the running upbox instance.
 	schema *upbox.Schema

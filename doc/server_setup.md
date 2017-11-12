@@ -73,7 +73,7 @@ To deploy an `upspinserver` you need to decide on values for:
 
 ## Sign up for an Upspin account {#signup}
 
-To register your public key with the the central key server run `upspin signup`,
+To register your public key with the central key server run `upspin signup`,
 passing your chosen host name as its `-server` argument
 and your chosen Upspin user name as its final argument.
 Then follow the onscreen instructions.

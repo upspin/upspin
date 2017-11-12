@@ -53,7 +53,7 @@ const (
 	// All is a shorthand for AllUsers. Its appearance in a user list
 	// grants access to everyone who can authenticate to the Upspin system.
 	// This constant can be used in Access files, but will always be expanded
-	// to the the full name ("all@upspin.io") when returned from Access.Users
+	// to the full name ("all@upspin.io") when returned from Access.Users
 	// and such.
 	// If it is present with the Read or "*" rights, it must be the only read write
 	// explicitly granted. (Another user can have "*" rights.)
