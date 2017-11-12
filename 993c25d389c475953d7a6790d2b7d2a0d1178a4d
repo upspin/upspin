@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4f5fd193_46044810",
+        "filename": "cmd/upspinfs/fs.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 1054,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-11-12T20:42:38Z",
+      "side": 1,
+      "message": "For help in testing on other platforms, what property of the FUSE extension are you assuming here?",
+      "revId": "993c25d389c475953d7a6790d2b7d2a0d1178a4d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "475e3abc_cd22307e",
+        "filename": "cmd/upspinfs/upspinfs_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 440,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-11-12T20:42:38Z",
+      "side": 1,
+      "message": "Just to confirm I understand...\n\"directly\" here means send the file to the InProcess upspinserver without any proxy.\n\"upspinfs\" means OS file operations -\u003e FUSE -\u003e cacheserver -\u003e upspinserver.\n\nA handholding comment would let the reader confirm that they understand fn and ufn.\nFeel free to ignore this suggestion, since it was obvious to Rob and therefore\nadding a comment might be insulting to the reader\u0027s intelligence.  I\u0027m slow.",
+      "revId": "993c25d389c475953d7a6790d2b7d2a0d1178a4d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
