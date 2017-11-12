@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "36813166_672cbb6d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-11-12T22:25:27Z",
+      "side": 1,
+      "message": "Only that Linux was worse than macOS because of its call pattern that didn\u0027t reLookup files as often.  I\u0027ll drop the On Linux since it is indeed both systems.",
+      "parentUuid": "d6ff0ba5_06a443ba",
+      "range": {
+        "startLine": 7,
+        "startChar": 31,
+        "endLine": 7,
+        "endChar": 36
+      },
+      "revId": "993c25d389c475953d7a6790d2b7d2a0d1178a4d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "4f5fd193_46044810",
         "filename": "cmd/upspinfs/fs.go",
         "patchSetId": 8
@@ -42,6 +66,24 @@
     },
     {
       "key": {
+        "uuid": "a6bb6be8_cd8d69b5",
+        "filename": "cmd/upspinfs/fs.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 1054,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-11-12T22:25:27Z",
+      "side": 1,
+      "message": "Only that older osx fuse extensions would never actually signal readiness, hence the timer.  I\u0027ll fix the comment.",
+      "parentUuid": "4f5fd193_46044810",
+      "revId": "993c25d389c475953d7a6790d2b7d2a0d1178a4d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "475e3abc_cd22307e",
         "filename": "cmd/upspinfs/upspinfs_test.go",
         "patchSetId": 8
@@ -56,6 +98,24 @@
       "revId": "993c25d389c475953d7a6790d2b7d2a0d1178a4d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6eb947b3_b0bdd21f",
+        "filename": "cmd/upspinfs/upspinfs_test.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 440,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-11-12T22:25:27Z",
+      "side": 1,
+      "message": "Reworded to remove ambiguity.",
+      "parentUuid": "475e3abc_cd22307e",
+      "revId": "993c25d389c475953d7a6790d2b7d2a0d1178a4d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
