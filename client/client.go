@@ -636,7 +636,7 @@ func (c *Client) Glob(pattern string) ([]*upspin.DirEntry, error) {
 				//	u@g.c/a/foo
 				// and target
 				// 	v@x.y/d/e/f.
-				// Replace the the pattern that matches the link name
+				// Replace the pattern that matches the link name
 				// with the link target and try that the next time:
 				// 	v@x.y/d/e/f/b.
 				linkName, err := path.Parse(link.Name)

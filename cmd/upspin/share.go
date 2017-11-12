@@ -208,7 +208,7 @@ func (s *State) shareCommand(fs *flag.FlagSet) {
 }
 
 // readers returns two lists, the list of users with access according to the
-// access file, and the the pretty-printed string of user names recovered from
+// access file, and the pretty-printed string of user names recovered from
 // looking at the list of hashed keys in the packdata.
 // It also returns a boolean reporting whether key rewrapping is needed for self.
 func (s *Sharer) readers(entry *upspin.DirEntry) (userList, string, bool, error) {
