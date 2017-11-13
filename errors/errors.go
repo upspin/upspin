@@ -73,7 +73,7 @@ const (
 	Exist                     // Item already exists.
 	NotExist                  // Item does not exist.
 	IsDir                     // Item is a directory.
-	NotDir                    // Item is not a directory..
+	NotDir                    // Item is not a directory.
 	NotEmpty                  // Directory not empty.
 	Private                   // Information withheld.
 	Internal                  // Internal error or inconsistency.
