@@ -19,10 +19,7 @@ func TestRateCounter(t *testing.T) {
 	}()
 
 	tick := make(chan time.Time)
-	rc, err := newRateCounter(3, time.Second, tick)
-	if err != nil {
-		t.Fatal(err)
-	}
+	rc := newRateCounter(3, time.Second, tick)
 
 	for _, c := range []struct {
 		add  int64

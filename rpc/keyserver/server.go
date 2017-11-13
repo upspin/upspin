@@ -9,7 +9,6 @@ package keyserver // import "upspin.io/rpc/keyserver"
 import (
 	"expvar"
 	"fmt"
-	"math/rand"
 	"net/http"
 	"time"
 
@@ -33,15 +32,15 @@ type server struct {
 	// The underlying keyserver implementation.
 	key upspin.KeyServer
 
+	// Counter for throttling Lookup log messages.
+	lookupLogCounter *serverutil.RateCounter
+
 	// Counters for tracking Lookup load.
 	lookupCounter [3]*serverutil.RateCounter
 
 	// Counters for tracking Put load.
 	putCounter [3]*serverutil.RateCounter
 }
-
-// How often to sample, where each sample is a second.
-var defaultSampling = []int{10, 60, 300}
 
 // New creates a new instance of the RPC key server.
 func New(cfg upspin.Config, key upspin.KeyServer, addr upspin.NetAddr) http.Handler {
@@ -53,7 +52,7 @@ func New(cfg upspin.Config, key upspin.KeyServer, addr upspin.NetAddr) http.Hand
 		},
 		key: key,
 	}
-	s.registerCounters()
+	s.initCounters()
 	return rpc.NewServer(cfg, rpc.Service{
 		Name: "Key",
 		Methods: map[string]rpc.Method{
@@ -72,18 +71,18 @@ func New(cfg upspin.Config, key upspin.KeyServer, addr upspin.NetAddr) http.Hand
 	})
 }
 
-func (s *server) registerCounters() {
-	var err error
+// Sample buckets: last 10s, 1m, and 5m.
+var defaultSampling = []int{10, 60, 300}
+
+// Maxmimum Lookups to log per second.
+const lookupLogMaxRate = 1
+
+func (s *server) initCounters() {
+	s.lookupLogCounter = serverutil.NewRateCounter(10, 1*time.Second)
 	for i, samples := range defaultSampling {
-		s.lookupCounter[i], err = serverutil.NewRateCounter(samples, time.Second)
-		if err != nil {
-			panic(err)
-		}
+		s.lookupCounter[i] = serverutil.NewRateCounter(samples, 1*time.Second)
 		expvar.Publish(fmt.Sprintf("lookup-%ds", samples), s.lookupCounter[i])
-		s.putCounter[i], err = serverutil.NewRateCounter(samples, time.Second)
-		if err != nil {
-			panic(err)
-		}
+		s.putCounter[i] = serverutil.NewRateCounter(samples, time.Second)
 		expvar.Publish(fmt.Sprintf("put-%ds", samples), s.putCounter[i])
 	}
 }
@@ -117,12 +116,23 @@ func (s *server) Lookup(reqBytes []byte) (pb.Message, error) {
 	if err := pb.Unmarshal(reqBytes, &req); err != nil {
 		return nil, err
 	}
-	logfOnceInN(100, "Lookup(%q)", req.UserName)
 	s.incLookupCounters()
+	doLog := s.lookupLogCounter.Rate() < lookupLogMaxRate
+	if doLog {
+		s.lookupLogCounter.Add(1)
+		logf(nil, "Lookup(%q)", req.UserName)
+	}
 
 	user, err := s.key.Lookup(upspin.UserName(req.UserName))
 	if err != nil {
-		logf(nil, "Lookup(%q) failed: %s", req.UserName, err)
+		if doLog {
+			logf(nil, "Lookup(%q) failed: %s", req.UserName, err)
+		}
+		if errors.Is(errors.NotExist, err) {
+			// The end user doesn't care about the backend
+			// error if it's a "not exist" error.
+			err = errors.E("rpc/keyserver", req.UserName, errors.NotExist)
+		}
 		return &proto.KeyLookupResponse{Error: errors.MarshalError(err)}, nil
 	}
 	return &proto.KeyLookupResponse{User: proto.UserProto(user)}, nil
@@ -149,13 +159,6 @@ func (s *server) Put(session rpc.Session, reqBytes []byte) (pb.Message, error) {
 
 func putError(err error) *proto.KeyPutResponse {
 	return &proto.KeyPutResponse{Error: errors.MarshalError(err)}
-}
-
-// logOnceInN logs an operation probabilistically once for every n calls.
-func logfOnceInN(n int, format string, args ...interface{}) {
-	if n <= 1 || rand.Intn(n) == 0 {
-		logf(nil, format, args...)
-	}
 }
 
 func logf(sess rpc.Session, format string, args ...interface{}) operation {
