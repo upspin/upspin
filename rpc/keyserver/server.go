@@ -9,7 +9,6 @@ package keyserver // import "upspin.io/rpc/keyserver"
 import (
 	"expvar"
 	"fmt"
-	"math/rand"
 	"net/http"
 	"time"
 
@@ -23,6 +22,8 @@ import (
 	"upspin.io/upspin"
 	"upspin.io/upspin/proto"
 )
+
+const lookupLogMaxRate = 1 // Maxmimum Lookups to log per second.
 
 type server struct {
 	config upspin.Config
@@ -117,12 +118,22 @@ func (s *server) Lookup(reqBytes []byte) (pb.Message, error) {
 	if err := pb.Unmarshal(reqBytes, &req); err != nil {
 		return nil, err
 	}
-	logfOnceInN(100, "Lookup(%q)", req.UserName)
 	s.incLookupCounters()
+	doLog := s.lookupCounter[0].Rate() < lookupLogMaxRate
+	if doLog {
+		logf(nil, "Lookup(%q)", req.UserName)
+	}
 
 	user, err := s.key.Lookup(upspin.UserName(req.UserName))
 	if err != nil {
-		logf(nil, "Lookup(%q) failed: %s", req.UserName, err)
+		if doLog {
+			logf(nil, "Lookup(%q) failed: %s", req.UserName, err)
+		}
+		if errors.Is(errors.NotExist, err) {
+			// The end user doesn't care about the backend
+			// error if it's a "not exist" error.
+			err = errors.E("rpc/keyserver", req.UserName, errors.NotExist)
+		}
 		return &proto.KeyLookupResponse{Error: errors.MarshalError(err)}, nil
 	}
 	return &proto.KeyLookupResponse{User: proto.UserProto(user)}, nil
@@ -149,13 +160,6 @@ func (s *server) Put(session rpc.Session, reqBytes []byte) (pb.Message, error) {
 
 func putError(err error) *proto.KeyPutResponse {
 	return &proto.KeyPutResponse{Error: errors.MarshalError(err)}
-}
-
-// logOnceInN logs an operation probabilistically once for every n calls.
-func logfOnceInN(n int, format string, args ...interface{}) {
-	if n <= 1 || rand.Intn(n) == 0 {
-		logf(nil, format, args...)
-	}
 }
 
 func logf(sess rpc.Session, format string, args ...interface{}) operation {
