@@ -16,6 +16,24 @@
       "revId": "009fa1d38c236c1d85c1f76fac982ba784dfd6ea",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e5573bdf_89b3d2f1",
+        "filename": "rpc/keyserver/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-13T03:19:50Z",
+      "side": 1,
+      "message": "As someone who reads the server logs, my gut feeling is that 1 QPS of Lookup logs will give me sufficient data to tell me the system is working, without creating a big mess.",
+      "parentUuid": "88775609_fa87c178",
+      "revId": "009fa1d38c236c1d85c1f76fac982ba784dfd6ea",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
