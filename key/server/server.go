@@ -262,10 +262,8 @@ func (s *server) canPut(op string, target upspin.UserName, isTargetNew bool, spa
 
 // fetchUserEntry reads the user entry for a given user from the storage.
 func (s *server) fetchUserEntry(op string, name upspin.UserName) (*userEntry, error) {
-	log.Debug.Printf("%s: %s", op, name)
 	b, err := s.storage.Download(string(name))
 	if err != nil {
-		log.Error.Printf("%s: error fetching %q: %v", op, name, err)
 		return nil, errors.E(op, name, err)
 	}
 	var entry userEntry
@@ -277,7 +275,6 @@ func (s *server) fetchUserEntry(op string, name upspin.UserName) (*userEntry, er
 
 // putUserEntry writes the user entry for a user to the storage.
 func (s *server) putUserEntry(op string, entry *userEntry) error {
-	log.Debug.Printf("%s: %s", op, entry.User.Name)
 	if entry == nil {
 		return errors.E(op, errors.Invalid, errors.Str("nil userEntry"))
 	}
@@ -308,8 +305,9 @@ func (s *server) verifyOwns(u upspin.UserName, pubKey upspin.PublicKey, domain s
 		if !strings.HasPrefix(txt, prefix) {
 			continue
 		}
+		txt = txt[len(prefix):]
 		// Is there a signature with two segments after the prefix?
-		sigFields := strings.Split(txt[len(prefix):], "-")
+		sigFields := strings.Split(txt, "-")
 		if len(sigFields) != 2 {
 			continue
 		}
@@ -327,13 +325,13 @@ func (s *server) verifyOwns(u upspin.UserName, pubKey upspin.PublicKey, domain s
 		sig.R = &rs
 		sig.S = &ss
 
-		log.Debug.Printf("Verifying if %q owns %q with pubKey: %q. Got sig: %q", u, domain, pubKey, txt[len(prefix):])
 		hash := sha256.Sum256([]byte("upspin-domain:" + domain + "-" + string(u)))
 		err := factotum.Verify(hash[:], sig, pubKey)
 		if err == nil {
 			// Success!
 			return nil
 		}
+		log.Debug.Printf("key/server: failed to verify that %q owns %q with pubKey %q, sig %q: %v", u, domain, pubKey, txt, err)
 		lastErr = errors.E(errors.Errorf("%s: verifying ownership of domain %s; re-run cmd/upspin setupdomain?", err, domain))
 	}
 	return lastErr
