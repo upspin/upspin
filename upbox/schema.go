@@ -102,26 +102,22 @@ the Start method and removed by the Stop method.
 
 If the "dir" property is set, upbox will use that path to store its data and
 will not clean up inside Stop. Upon a restart, upbox will use whatever it finds,
-filling in any missing gaps in regards to the schema. If a "port" is set
-on each server and persistent storage (eg. 'disk') is used, this allows bringing
-back a previously finished session. An example restorable schema could be:
+filling in any missing gaps in regards to the schema. If persistent storage
+(eg. 'disk') is used, it allows bringing back a previously finished session.
+An example minimum configuration for a restorable schema could be:
 
 	dir: /tmp/upbox
 	users:
-	- name: jonas
-	- name: jane
+	- name: john
 	servers:
 	- name: storeserver
-	  port: 6061
 	  flags:
 	    kind: server
 	    serverconfig: backend=Disk,basePath=/tmp/upbox/store
 	- name: dirserver
-	  port: 6062
 	  flags:
 	    kind: server
 	- name: keyserver
-	  port: 6063
 	domain: local.host
 
 */
@@ -131,6 +127,7 @@ import (
 	"bufio"
 	"bytes"
 	"crypto/tls"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -184,6 +181,10 @@ type Schema struct {
 
 	// started indicates whether upbox has started.
 	started bool
+
+	// session specifies information about a previously started upbox session.
+	// It is read from the session file found in the output directory, if set.
+	session session
 }
 
 // User defines an Upspin user to be created and used within a schema.
@@ -223,9 +224,6 @@ type Server struct {
 
 	// Flags specifies command-line flags to supply to this server.
 	Flags map[string]string
-
-	// Port specifies the port to bind this server to on the local host.
-	Port string
 
 	addr string // the host:port of this server; set by SchemaFromYAML
 
@@ -271,6 +269,12 @@ func SchemaFromYAML(doc string) (*Schema, error) {
 
 	if len(sc.Users) == 0 {
 		return nil, errors.New("at least one user must be specified")
+	}
+
+	if sc.Dir != "" {
+		if err := sc.session.read(sc.Dir); err != nil {
+			return nil, fmt.Errorf("error reading session file: %v", err)
+		}
 	}
 
 	// Add domain to usernames without domains,
@@ -321,16 +325,11 @@ func SchemaFromYAML(doc string) (*Schema, error) {
 			s.User += "@" + sc.Domain
 		}
 
-		// Pick address for this service.
-		port := s.Port
-		if port == "" {
-			var err error
-			port, err = testutil.PickPort()
-			if err != nil {
-				return nil, err
-			}
+		// Pick or restore address for this service.
+		var err error
+		if s.addr, err = sc.session.serverAddress(s.Name); err != nil {
+			return nil, fmt.Errorf("error getting server address: %v", err)
 		}
-		s.addr = "localhost:" + port
 
 		// Set the global keyserver, if none provided.
 		if s.Name == "keyserver" && sc.KeyServer == "" {
@@ -378,6 +377,60 @@ func newUserFor(s *Server) *User {
 		// will be set up later in this func.
 	}
 	return u
+}
+
+// sessionFile specifies the name of the file holding session information.
+const sessionFile = "session"
+
+// session holds information on a started upbox session.
+type session struct {
+	// ServerAddr maps server names to the addresses that they should
+	// be listening on.
+	ServerAddr map[string]string
+}
+
+// read attempts to read session information from the given directory.
+func (s *session) read(dir string) error {
+	b, err := ioutil.ReadFile(filepath.Join(dir, sessionFile))
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+	return json.Unmarshal(b, s)
+}
+
+// write attempts to save the current session data to the given directory.
+func (s *session) write(dir string) error {
+	b, err := json.Marshal(s)
+	if err != nil {
+		return err
+	}
+	return ioutil.WriteFile(filepath.Join(dir, sessionFile), b, 0644)
+}
+
+// setServerAddress sets the address that the given server is listening on in
+// this session.
+func (s *session) setServerAddress(server, addr string) {
+	if s.ServerAddr == nil {
+		s.ServerAddr = make(map[string]string)
+	}
+	s.ServerAddr[server] = addr
+}
+
+// serverAddress returns the address that the server with the given name
+// should be listening on during this session.
+func (s *session) serverAddress(name string) (string, error) {
+	if addr, ok := s.ServerAddr[name]; ok {
+		return addr, nil
+	}
+	port, err := testutil.PickPort()
+	if err != nil {
+		return "", err
+	}
+	s.setServerAddress(name, "localhost:"+port)
+	return s.serverAddress(name)
 }
 
 func setServer(sc *Schema, field *string, kind string) error {
@@ -583,6 +636,10 @@ func (sc *Schema) Start() error {
 		if err := waitReady(u.cacheAddr()); err != nil {
 			return err
 		}
+	}
+
+	if err := sc.session.write(sc.Dir); err != nil {
+		return err
 	}
 
 	shutdown = false // Exiting successfully, so don't clean up.
