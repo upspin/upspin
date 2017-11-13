@@ -115,7 +115,6 @@ back a previously finished session. An example restorable schema could be:
 	  port: 6061
 	  flags:
 	    kind: server
-	    serverconfig: backend=Disk,basePath=/tmp/upbox/store
 	- name: dirserver
 	  port: 6062
 	  flags:
@@ -691,8 +690,13 @@ func (sc *Schema) startServer(s *Server) (*exec.Cmd, error) {
 	_, hasServerConfigFlag := s.Flags["serverconfig"]
 	for k, v := range s.Flags {
 		args = append(args, fmt.Sprintf("-%s=%v", k, v))
-		if !hasServerConfigFlag && s.Name == "dirserver" && k == "kind" && v == "server" {
-			args = append(args, "-serverconfig", "logDir="+sc.Dir)
+		if !hasServerConfigFlag && k == "kind" && v == "server" {
+			switch s.Name {
+			case "dirserver":
+				args = append(args, "-serverconfig", "logDir="+filepath.Join(sc.Dir, "logdir"))
+			case "storeserver":
+				args = append(args, "-serverconfig", "backend=Disk,basePath="+filepath.Join(sc.Dir, "storage"))
+			}
 		}
 	}
 	cmd := exec.Command(s.Name, args...)
