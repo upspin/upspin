@@ -34,6 +34,24 @@
       "revId": "009fa1d38c236c1d85c1f76fac982ba784dfd6ea",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b742dc5f_305b6849",
+        "filename": "rpc/keyserver/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-11-13T03:28:43Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "e5573bdf_89b3d2f1",
+      "revId": "009fa1d38c236c1d85c1f76fac982ba784dfd6ea",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
