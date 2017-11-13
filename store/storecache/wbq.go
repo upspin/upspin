@@ -112,9 +112,9 @@ func newWritebackQueue(sc *storeCache) *writebackQueue {
 		die:          make(chan bool),
 		terminated:   make(chan bool),
 	}
-	wbq.goodput, _ = serverutil.NewRateCounter(60, 5*time.Second)
+	wbq.goodput = serverutil.NewRateCounter(60, 5*time.Second)
 	expvar.Publish("storecache-goodput", wbq.goodput)
-	wbq.output, _ = serverutil.NewRateCounter(60, 5*time.Second)
+	wbq.output = serverutil.NewRateCounter(60, 5*time.Second)
 	expvar.Publish("storecache-output", wbq.output)
 
 	// Start scheduler.

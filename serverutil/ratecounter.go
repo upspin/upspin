@@ -8,8 +8,6 @@ import (
 	"fmt"
 	"sync/atomic"
 	"time"
-
-	"upspin.io/errors"
 )
 
 // RateCounter is a counter that tracks how many values have been added per
@@ -26,16 +24,16 @@ type RateCounter struct {
 // added per unit of time, averaged over a rolling window with a given number of
 // samples. For example, to measure unit per second averaged over the last sixty
 // one-second samples: NewRateCount(60, time.Second).
-func NewRateCounter(samples int, d time.Duration) (*RateCounter, error) {
+func NewRateCounter(samples int, d time.Duration) *RateCounter {
 	return newRateCounter(samples, d, time.NewTicker(d).C)
 }
 
 // onReady is called when the rate counter's loop has advanced. Used in testing.
 var onReady = func() {}
 
-func newRateCounter(numSamples int, sampleDuration time.Duration, tick <-chan time.Time) (*RateCounter, error) {
-	if numSamples < 1 {
-		return nil, errors.E("serverutil.NewRatecounter", errors.Invalid, errors.Str("samples must be positive"))
+func newRateCounter(numSamples int, sampleDuration time.Duration, tick <-chan time.Time) *RateCounter {
+	if numSamples <= 0 {
+		panic(fmt.Sprintf("numSamples=%d, must be >0", numSamples))
 	}
 	r := &RateCounter{
 		samples: make([]int64, numSamples),
@@ -43,7 +41,7 @@ func newRateCounter(numSamples int, sampleDuration time.Duration, tick <-chan ti
 		tick:    tick,
 	}
 	go r.loop()
-	return r, nil
+	return r
 }
 
 // Add adds val to the counter.
