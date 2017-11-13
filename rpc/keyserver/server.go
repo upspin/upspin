@@ -131,7 +131,7 @@ func (s *server) Lookup(reqBytes []byte) (pb.Message, error) {
 		if errors.Is(errors.NotExist, err) {
 			// The end user doesn't care about the backend
 			// error if it's a "not exist" error.
-			err = errors.E("rpc/keyserver", req.UserName, errors.NotExist)
+			err = errors.E("rpc/keyserver", upspin.UserName(req.UserName), errors.NotExist)
 		}
 		return &proto.KeyLookupResponse{Error: errors.MarshalError(err)}, nil
 	}
