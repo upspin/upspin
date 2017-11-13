@@ -37,7 +37,7 @@ import (
 const (
 	// devaultValid is how long the kernel can cache
 	// addtribute information that upspinfs gives it.
-	defaultValid = 1 * time.Second
+	defaultValid = 100 * time.Second
 
 	// defaultEnoentDuration is how long upspinfs will remember
 	// non-existant entries to avoid overburdening the Upspin
@@ -248,6 +248,10 @@ func (n *node) Attr(addscontext gContext.Context, attr *fuse.Attr) error {
 // Access implements fs.NodeAccesser.Access.
 func (n *node) Access(context gContext.Context, req *fuse.AccessRequest) error {
 	// Allow all access.
+	const op = "Access"
+	if _, err := n.refresh(op); err != nil {
+		return err
+	}
 	return nil
 }
 

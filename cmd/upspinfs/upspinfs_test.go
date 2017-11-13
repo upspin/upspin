@@ -25,7 +25,6 @@ import (
 	"upspin.io/client"
 	"upspin.io/config"
 	"upspin.io/factotum"
-	"upspin.io/log"
 	"upspin.io/path"
 	"upspin.io/test/testutil"
 	"upspin.io/upspin"
@@ -131,9 +130,6 @@ func mount() error {
 	}
 
 	// Mount the file system. It will be served in a separate go routine.
-	if false {
-		log.SetLevel("debug")
-	}
 	do(cfg, testConfig.mountpoint, testConfig.cacheDir)
 
 	// Create the user root, all tests will need it.
@@ -472,7 +468,7 @@ func TestEventualConsistency(t *testing.T) {
 		if err != nil {
 			return nil
 		}
-		return errors.New("still there")
+		return errors.New("still there 1")
 	}
 	eventually(t, f, 5*time.Second)
 
@@ -525,7 +521,7 @@ func TestEventualConsistency(t *testing.T) {
 		if !found {
 			return nil
 		}
-		return errors.New("still there")
+		return errors.New("still there 2")
 	}
 	eventually(t, f, 5*time.Second)
 }
