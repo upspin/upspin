@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0f6aa821_4c9c5454",
+        "filename": "key/server/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 334,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-11-13T03:27:30Z",
+      "side": 1,
+      "message": "Marginally ok, but makes me mildly nervous that we\u0027re displaying a replay-able signature in a log that might not be well protected.  That is, if anyone finds a way to temporarily pretend to be u, they can take over the domain.   Would it be just as useful for your debugging to show, say, the first few bytes of the signature?",
+      "revId": "340d55a94e3e4d1c34ab95a4cc839048c0239f88",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
