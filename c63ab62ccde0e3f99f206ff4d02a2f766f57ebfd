@@ -1,0 +1,107 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "dd911888_f1557f74",
+        "filename": "dir/dircache/proxied.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-13T23:51:57Z",
+      "side": 1,
+      "message": "directories",
+      "range": {
+        "startLine": 24,
+        "startChar": 56,
+        "endLine": 24,
+        "endChar": 66
+      },
+      "revId": "c63ab62ccde0e3f99f206ff4d02a2f766f57ebfd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6780489b_d462ae83",
+        "filename": "dir/dircache/proxied.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-13T23:51:57Z",
+      "side": 1,
+      "message": "hasWatch ?\nwatchSupported?",
+      "revId": "c63ab62ccde0e3f99f206ff4d02a2f766f57ebfd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ec650369_13b608bb",
+        "filename": "dir/dircache/proxied.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-13T23:51:57Z",
+      "side": 1,
+      "message": "or should the variable be named \u0027cacheable\u0027 ?",
+      "range": {
+        "startLine": 64,
+        "startChar": 19,
+        "endLine": 64,
+        "endChar": 27
+      },
+      "revId": "c63ab62ccde0e3f99f206ff4d02a2f766f57ebfd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ca27aa39_96a65575",
+        "filename": "dir/dircache/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-13T23:51:57Z",
+      "side": 1,
+      "message": "need a doc comment to explain what the boolean means",
+      "revId": "c63ab62ccde0e3f99f206ff4d02a2f766f57ebfd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2685419e_ad6c9f4a",
+        "filename": "dir/dircache/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-13T23:51:57Z",
+      "side": 1,
+      "message": "cacheable ?",
+      "range": {
+        "startLine": 73,
+        "startChar": 6,
+        "endLine": 73,
+        "endChar": 15
+      },
+      "revId": "c63ab62ccde0e3f99f206ff4d02a2f766f57ebfd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
