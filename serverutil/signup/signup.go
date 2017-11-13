@@ -166,6 +166,7 @@ func (m *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		// Create user.
 		err = m.createUser(u)
 		if err != nil {
+			log.Error.Printf("signup: error creating user %#v: %v", u, err)
 			errorf(http.StatusInternalServerError, "could not create user: %v", err)
 			return
 		}
@@ -174,9 +175,10 @@ func (m *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		body := fmt.Sprintf("%s signed up on %s on %s", u.Name, m.mail.Project, time.Now().Format(time.Stamp))
 		err = m.mail.Send(m.mail.Notify, m.mail.From, subject, body, noHTML)
 		if err != nil {
-			log.Error.Printf("Error sending mail to %q: %v", m.mail.Notify, err)
+			log.Error.Printf("signup: error sending mail to %q: %v", m.mail.Notify, err)
 			// Don't prevent signup if this fails.
 		}
+		log.Info.Printf("signup: registration complete for %q", u.Name)
 
 		// TODO(adg): display user friendly welcome message
 		fmt.Fprintf(w, "An account for %q has been registered with the key server.", u.Name)
@@ -245,10 +247,11 @@ func (m *handler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	const subject = "Upspin signup confirmation"
 	err = m.mail.Send(string(u.Name), m.mail.From, subject, body.String(), noHTML)
 	if err != nil {
-		log.Error.Printf("Error sending mail to %q: %v", u.Name, err)
+		log.Error.Printf("signup: error sending mail to %q: %v", u.Name, err)
 		errorf(http.StatusInternalServerError, "could not send signup email")
 		return
 	}
+	log.Info.Printf("signup: sent message to %q", u.Name)
 
 	fmt.Fprintln(w, "OK")
 }
