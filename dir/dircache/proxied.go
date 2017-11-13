@@ -18,6 +18,7 @@ import (
 	"upspin.io/log"
 	"upspin.io/path"
 	"upspin.io/upspin"
+	"upspin.io/user"
 )
 
 // proxiedDir contains information about a proxied user directoies.
@@ -41,6 +42,9 @@ type proxiedDir struct {
 	// For retrying a watch.
 	retryInterval time.Duration
 	wake          chan bool
+
+	// supported is true if watch is supported.
+	supported bool
 }
 
 // proxiedDirs is used to translate between a user name and the relevant cached directory.
@@ -56,18 +60,19 @@ func newProxiedDirs(l *clog) *proxiedDirs {
 	return &proxiedDirs{m: make(map[upspin.UserName]*proxiedDir), l: l}
 }
 
-// proxyFor saves the endpoint and makes sure it is being watched.
-func (p *proxiedDirs) proxyFor(name upspin.PathName, ep *upspin.Endpoint) {
+// proxyFor saves the endpoint and makes sure it is being watched. It returns
+// true of this is cachable.
+func (p *proxiedDirs) proxyFor(name upspin.PathName, ep *upspin.Endpoint) bool {
 	p.Lock()
 	defer p.Unlock()
 	if p.closing {
-		return
+		return false
 	}
 
 	parsed, err := path.Parse(name)
 	if err != nil {
 		log.Info.Printf("parse error on a cleaned name: %s", name)
-		return
+		return false
 	}
 	u := parsed.User()
 	d := p.m[u]
@@ -92,11 +97,20 @@ func (p *proxiedDirs) proxyFor(name upspin.PathName, ep *upspin.Endpoint) {
 
 	// Start a watcher if none is running.
 	if d.die == nil {
-		d.die = make(chan bool)
-		d.dying = make(chan bool)
-		d.wake = make(chan bool, 1)
-		go d.watcher(*ep)
+		// Don't start a watcher for snapshots and remember
+		// not to cache anything that might change.
+		// TODO(p): once snapshots start returning ErrNotSupported for Watch,
+		// just set d.supported to true and wait for the first Watch to fix it.
+		_, suffix, _, err := user.Parse(u)
+		d.supported = err == nil && suffix != "snapshot"
+		if d.supported {
+			d.die = make(chan bool)
+			d.dying = make(chan bool)
+			d.wake = make(chan bool, 1)
+			go d.watcher(*ep)
+		}
 	}
+	return d.supported
 }
 
 // retryWatch wakes up watcher (if it exists) to try the Watch again.
@@ -174,6 +188,7 @@ func (d *proxiedDir) watcher(ep upspin.Endpoint) {
 		}
 		if err == upspin.ErrNotSupported {
 			// Can't survive this.
+			d.supported = false
 			log.Debug.Printf("dir/dircache.watcher: %s: %s", d.user, err)
 			return
 		}
