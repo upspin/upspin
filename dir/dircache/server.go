@@ -53,16 +53,17 @@ func (s *server) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service, 
 	return &s2, nil
 }
 
-// dirFor returns a DirServer instance.
-func (s *server) dirFor(path upspin.PathName) (upspin.DirServer, error) {
+// dirFor returns a DirServer instance and a boolean that is true if
+// path is cacheable.
+func (s *server) dirFor(path upspin.PathName) (upspin.DirServer, bool, error) {
 	if s.authority.Transport == upspin.Unassigned {
-		return nil, errors.Str("not yet configured")
+		return nil, false, errors.Str("not yet configured")
 	}
 	dir, err := bind.DirServer(s.cfg, s.authority)
-	if err == nil {
-		s.clog.proxyFor(path, &s.authority)
+	if err != nil {
+		return nil, false, err
 	}
-	return dir, err
+	return dir, s.clog.cacheable(path, &s.authority), nil
 }
 
 // Lookup implements upspin.DirServer.
@@ -70,10 +71,13 @@ func (s *server) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
 	op := logf("Lookup %q", name)
 
 	name = path.Clean(name)
-	dir, err := s.dirFor(name)
+	dir, cacheable, err := s.dirFor(name)
 	if err != nil {
 		op.log(err)
 		return nil, err
+	}
+	if !cacheable {
+		return dir.Lookup(name)
 	}
 
 	s.clog.globalLock.RLock()
@@ -97,10 +101,13 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	op := logf("Glob %q", pattern)
 
 	name := path.Clean(upspin.PathName(pattern))
-	dir, err := s.dirFor(name)
+	dir, cacheable, err := s.dirFor(name)
 	if err != nil {
 		op.log(err)
 		return nil, err
+	}
+	if !cacheable {
+		return dir.Glob(string(name))
 	}
 
 	s.clog.globalLock.RLock()
@@ -125,10 +132,13 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		return nil, errors.E(entry.Name, errors.Invalid, errors.Str("non-canonical name"))
 	}
 
-	dir, err := s.dirFor(name)
+	dir, cacheable, err := s.dirFor(name)
 	if err != nil {
 		op.log(err)
 		return nil, err
+	}
+	if !cacheable {
+		return dir.Put(entry)
 	}
 
 	// Since the directory server needs to read the Access/Group file
@@ -165,10 +175,13 @@ func (s *server) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
 	op := logf("Delete %q", name)
 
 	name = path.Clean(name)
-	dir, err := s.dirFor(name)
+	dir, cacheable, err := s.dirFor(name)
 	if err != nil {
 		op.log(err)
 		return nil, err
+	}
+	if !cacheable {
+		return dir.Delete(name)
 	}
 
 	s.clog.globalLock.Lock()
@@ -185,10 +198,13 @@ func (s *server) WhichAccess(name upspin.PathName) (*upspin.DirEntry, error) {
 	op := logf("WhichAccess %q", name)
 
 	name = path.Clean(name)
-	dir, err := s.dirFor(name)
+	dir, cacheable, err := s.dirFor(name)
 	if err != nil {
 		op.log(err)
 		return nil, err
+	}
+	if !cacheable {
+		return dir.WhichAccess(name)
 	}
 
 	s.clog.globalLock.RLock()
@@ -208,7 +224,7 @@ func (s *server) Watch(name upspin.PathName, sequence int64, done <-chan struct{
 	op := logf("Watch %q", name)
 
 	name = path.Clean(name)
-	dir, err := s.dirFor(name)
+	dir, _, err := s.dirFor(name)
 	if err != nil {
 		op.log(err)
 		return nil, err

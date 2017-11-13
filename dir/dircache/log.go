@@ -178,8 +178,8 @@ func openLog(cfg upspin.Config, dir string, maxDisk int64) (*clog, error) {
 	return l, nil
 }
 
-func (l *clog) proxyFor(path upspin.PathName, ep *upspin.Endpoint) {
-	l.proxied.proxyFor(path, ep)
+func (l *clog) cacheable(path upspin.PathName, ep *upspin.Endpoint) bool {
+	return l.proxied.cacheable(path, ep)
 }
 
 func (l *clog) retryWatch(parsed path.Parsed) {
