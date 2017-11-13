@@ -2,6 +2,40 @@
   "comments": [
     {
       "key": {
+        "uuid": "2dd3107f_00aaaa4a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-11-13T23:57:18Z",
+      "side": 1,
+      "message": "s/D/d/",
+      "revId": "c63ab62ccde0e3f99f206ff4d02a2f766f57ebfd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "78ddcec2_e3ab2c39",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-11-13T23:57:18Z",
+      "side": 1,
+      "message": "please reference https://github.com/upspin/upspin/issues/536",
+      "revId": "c63ab62ccde0e3f99f206ff4d02a2f766f57ebfd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "dd911888_f1557f74",
         "filename": "dir/dircache/proxied.go",
         "patchSetId": 1
@@ -53,6 +87,30 @@
       "writtenOn": "2017-11-13T23:51:57Z",
       "side": 1,
       "message": "or should the variable be named \u0027cacheable\u0027 ?",
+      "range": {
+        "startLine": 64,
+        "startChar": 19,
+        "endLine": 64,
+        "endChar": 27
+      },
+      "revId": "c63ab62ccde0e3f99f206ff4d02a2f766f57ebfd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "97840b15_5508195f",
+        "filename": "dir/dircache/proxied.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-11-13T23:57:18Z",
+      "side": 1,
+      "message": "whatever the function is called, the spelling is cacheable.\n\nin any case s/of/if/\n\ni agree the function should be renamed however it\u0027s spelled. proxyFor does not sound like a predicate",
+      "parentUuid": "ec650369_13b608bb",
       "range": {
         "startLine": 64,
         "startChar": 19,
