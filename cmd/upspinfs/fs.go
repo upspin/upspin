@@ -632,6 +632,7 @@ func (n *node) refresh(op string) (*node, error) {
 	// If sequence number changed, invalidate cached data.
 	if n.seq != de.Sequence {
 		n.f.invalidateChan <- n
+		n.seq = de.Sequence
 	}
 	n.refreshTime = time.Now().Add(refreshPeriod)
 	return n, nil
