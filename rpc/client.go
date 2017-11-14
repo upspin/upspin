@@ -217,7 +217,11 @@ func (c *httpClient) Invoke(method string, req, resp pb.Message, stream Response
 			msg, _ := ioutil.ReadAll(httpResp.Body)
 			httpResp.Body.Close()
 			if httpResp.Header.Get("Content-type") == "application/octet-stream" {
-				return errors.E(op, errors.UnmarshalError(msg))
+				err := errors.UnmarshalError(msg)
+				if err.Error() == upspin.ErrNotSupported.Error() {
+					return upspin.ErrNotSupported
+				}
+				return errors.E(op, err)
 			}
 			// TODO(edpin,adg): unmarshal and check as it's more robust.
 			if bytes.Contains(msg, []byte(errUnauthenticated.Error())) {
@@ -303,6 +307,7 @@ func decodeStream(stream ResponseChan, r io.ReadCloser, done <-chan struct{}) {
 	}
 	if ok[0] != 'O' || ok[1] != 'K' {
 		stream.Error(errors.E(errors.IO, errors.Str("unexpected stream preamble")))
+		return
 	}
 
 	var msgLen [4]byte

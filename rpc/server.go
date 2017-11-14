@@ -201,10 +201,6 @@ func sendResponse(w http.ResponseWriter, resp pb.Message, err error) {
 }
 
 func sendError(w http.ResponseWriter, err error) {
-	if _, ok := err.(*errors.Error); !ok {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
 	h := w.Header()
 	h.Set("Content-type", "application/octet-stream")
 	w.WriteHeader(http.StatusInternalServerError)
