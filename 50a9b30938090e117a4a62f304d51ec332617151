@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "79377896_6b2a6b58",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-11-14T00:25:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "946b570d_be7cf8cc",
+      "range": {
+        "startLine": 7,
+        "startChar": 19,
+        "endLine": 7,
+        "endChar": 27
+      },
+      "revId": "50a9b30938090e117a4a62f304d51ec332617151",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "04aa2556_a2ec95d7",
         "filename": "cmd/upspinfs/fs.go",
         "patchSetId": 2
@@ -39,6 +63,24 @@
       "revId": "50a9b30938090e117a4a62f304d51ec332617151",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "818e23f2_bb56e194",
+        "filename": "cmd/upspinfs/fs.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 252,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-11-14T00:25:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "04aa2556_a2ec95d7",
+      "revId": "50a9b30938090e117a4a62f304d51ec332617151",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
