@@ -674,6 +674,12 @@ func (s *server) Watch(name upspin.PathName, sequence int64, done <-chan struct{
 		return nil, errors.E(op, name, err)
 	}
 
+	// Don't permit Watches of snapshot trees.
+	// See issue #536.
+	if isSnapshotUser(p.User()) {
+		return nil, upspin.ErrNotSupported
+	}
+
 	tree, err := s.loadTreeFor(p.User(), o)
 	if err != nil {
 		return nil, errors.E(op, err)
