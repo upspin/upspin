@@ -7,7 +7,6 @@ package test
 import (
 	"crypto/rand"
 	"fmt"
-	"strings"
 	"testing"
 	"time"
 
@@ -66,32 +65,25 @@ func testSnapshot(t *testing.T, r *testenv.Runner) {
 
 	// Verify snapshot was taken today and has the correct data in it.
 	r.As(ownerName)
-	snapPattern := snapshotDir + time.Now().UTC().Format("2006/01/02") + "/"
+	snapPattern := snapshotDir + time.Now().UTC().Format("2006/01/02") + "/*"
 
-	// Watch the snapshot root for the new snapshot.
-	done := r.DirWatch(upspin.PathName(snapPattern), -1)
-	if r.Failed() {
-		t.Fatal(r.Diag())
-	}
-	// We need should see two entries: the top directory
-	// with the date, and the subdirectory with the time.
+	// Use repeated Globs to find the snapshot; we can't use Watch because
+	// it is not supported for snapshots. See issue #536.
 	var snapshot upspin.PathName
-	for i := 0; i < 2; i++ {
-		// We use GetNEvents because we don't have a fixed name to use
-		// with r.GotEvent(name).
-		if !r.GetNEvents(1) {
-			t.Fatal(r.Diag())
+	for i := 0; i < 100; i++ {
+		r.Glob(snapPattern)
+		err := r.Err()
+		if err == nil && len(r.Entries) > 0 {
+			snapshot = r.Entries[0].Name
+			break
 		}
-		entry := r.Events[0].Entry
-		if !strings.Contains(string(entry.Name), ":") {
-			// This is not the snapshot directory.
-			continue
+		if err != nil && !errors.Is(errors.NotExist, err) {
+			t.Fatal(err)
 		}
-		snapshot = entry.Name
+		time.Sleep(100 * time.Millisecond)
 	}
-	close(done)
 	if snapshot == "" {
-		t.Fatalf("Unable to find a snapshot in %s", snapPattern)
+		t.Fatal("timed out waiting for snapshot in %q", snapPattern)
 	}
 	fileInSnapshot := path.Join(snapshot, "snapshot-test", "dir", "file")
 
