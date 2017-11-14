@@ -145,6 +145,9 @@ func (r *remote) Watch(name upspin.PathName, sequence int64, done <-chan struct{
 
 	if err := r.Invoke("Dir/Watch", req, nil, stream, done); err != nil {
 		close(stream)
+		if err == upspin.ErrNotSupported {
+			return nil, err
+		}
 		return nil, op.error(err)
 	}
 	return events, nil
