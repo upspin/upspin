@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "618fcbe7_720c8881",
+        "filename": "serverutil/frontend/frontend.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-11-15T02:16:01Z",
+      "side": 1,
+      "message": "I would hope that github.com and googlesource.com are free of any XSRF, but just to be on the safe side would you be willing to limit the suffix to [0-9a-zA-Z]* with possibly [-_.] but not slashes?",
+      "revId": "a7180f6cc0347632629dff1f33f5ecb9f68d36df",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
