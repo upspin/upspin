@@ -136,6 +136,8 @@ func newServer(cfg upspin.Config, docs string) (http.Handler, error) {
 	mux := http.NewServeMux()
 	mux.Handle("/", http.HandlerFunc(s.handleDoc))
 	mux.Handle("/images/", http.FileServer(http.Dir(docs)))
+	mux.Handle("/issue/", redirectHandler("/issue/", "https://github.com/upspin/upspin/issues/"))
+	mux.Handle("/cl/", redirectHandler("/cl/", "https://upspin-review.googlesource.com/c/"))
 	if cfg != nil {
 		mux.Handle(downloadPath, newDownloadHandler(cfg, s.tmpl.download))
 		mux.Handle("/"+releaseUser+"/", web.New(cfg, isWriter(releaseUser)))
