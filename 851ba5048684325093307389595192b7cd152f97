@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5112b976_23f31880",
+        "filename": "upbox/schema.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 385,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-16T01:44:20Z",
+      "side": 1,
+      "message": "session.json",
+      "range": {
+        "startLine": 385,
+        "startChar": 21,
+        "endLine": 385,
+        "endChar": 28
+      },
+      "revId": "851ba5048684325093307389595192b7cd152f97",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "61376275_fb3c226b",
+        "filename": "upbox/schema.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 396,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-16T01:44:20Z",
+      "side": 1,
+      "message": "make this a constructor \n\nsessionFromDir\n\nwith the side-effect that it allocates one if it doesn\u0027t exist",
+      "revId": "851ba5048684325093307389595192b7cd152f97",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8a88e9c6_b73c919b",
+        "filename": "upbox/schema.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 427,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-16T01:44:20Z",
+      "side": 1,
+      "message": "server",
+      "range": {
+        "startLine": 427,
+        "startChar": 26,
+        "endLine": 427,
+        "endChar": 30
+      },
+      "revId": "851ba5048684325093307389595192b7cd152f97",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
