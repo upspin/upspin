@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "571fb30d_ed8efd4c",
+        "filename": "upbox/schema.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 385,
+      "author": {
+        "id": 6197
+      },
+      "writtenOn": "2017-11-16T08:26:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5112b976_23f31880",
+      "range": {
+        "startLine": 385,
+        "startChar": 21,
+        "endLine": 385,
+        "endChar": 28
+      },
+      "revId": "851ba5048684325093307389595192b7cd152f97",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "61376275_fb3c226b",
         "filename": "upbox/schema.go",
         "patchSetId": 2
@@ -36,6 +60,24 @@
       "writtenOn": "2017-11-16T01:44:20Z",
       "side": 1,
       "message": "make this a constructor \n\nsessionFromDir\n\nwith the side-effect that it allocates one if it doesn\u0027t exist",
+      "revId": "851ba5048684325093307389595192b7cd152f97",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f9f24d4b_58edf1d6",
+        "filename": "upbox/schema.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 396,
+      "author": {
+        "id": 6197
+      },
+      "writtenOn": "2017-11-16T08:26:15Z",
+      "side": 1,
+      "message": "My reasoning was that \"session\" would be immediately usable without the need for initialisation. This only gets called if `sc.Dir !\u003d \"\"` (line 275). Even if it doesn\u0027t get called, `session` is still usable further down in the file where the addresses are obtained for each server.\n\nIf I turn this into a constructor and session into a pointer, then I will have to initialise it inside Start both when sc.Dir is set and when it is not. I feel it would add a bit of extra logic and complexity. If this is what you want I am happy to make the change. I\u0027m just trying to make sure I understand correctly.",
+      "parentUuid": "61376275_fb3c226b",
       "revId": "851ba5048684325093307389595192b7cd152f97",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
@@ -62,6 +104,30 @@
       "revId": "851ba5048684325093307389595192b7cd152f97",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a776dde5_7bd6a1b7",
+        "filename": "upbox/schema.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 427,
+      "author": {
+        "id": 6197
+      },
+      "writtenOn": "2017-11-16T08:26:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8a88e9c6_b73c919b",
+      "range": {
+        "startLine": 427,
+        "startChar": 26,
+        "endLine": 427,
+        "endChar": 30
+      },
+      "revId": "851ba5048684325093307389595192b7cd152f97",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
