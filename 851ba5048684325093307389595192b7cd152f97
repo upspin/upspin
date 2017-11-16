@@ -84,6 +84,24 @@
     },
     {
       "key": {
+        "uuid": "dc787274_af1e4d63",
+        "filename": "upbox/schema.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 396,
+      "author": {
+        "id": 6197
+      },
+      "writtenOn": "2017-11-16T08:28:27Z",
+      "side": 1,
+      "message": "An alternative for the constructor would be to call it regardless whether sc.Dir is set or not, and check inside of it if `dir` is empty, and if it is, return an empty allocated session. But this also seems a bit unintuitive.",
+      "parentUuid": "f9f24d4b_58edf1d6",
+      "revId": "851ba5048684325093307389595192b7cd152f97",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "8a88e9c6_b73c919b",
         "filename": "upbox/schema.go",
         "patchSetId": 2
