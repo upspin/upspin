@@ -41,12 +41,11 @@ cryptographic packages.
 
 The basic idea is to choose a random number as an encryption key K, use AES to
 encrypt the data, and store the encrypted data in the storage server.
-Then, we encrypt K again, repeatedly using the public key of each potential
-reader of the file.
-We store those encrypted keys in the `DirEntry` for the item along with a
-digital signature of the data.
-To read the data, the reader looks in the `DirEntry` for the reader's
-encryption of K, decrypts K, and uses that to decrypt the data.
+Then, for each potential reader of the file, we encrypt K using that user's public key.
+We store the set of encrypted keys in the DirEntry of the item along with a digital
+signature of the data. To read the data, the reader looks in the DirEntry for the
+appearance of K that was encrypted with their public key, decrypts it to recover K, and 
+then uses K to decrypt the data.
 
 The next few paragraphs explain this process in detail for security experts and
 can be skipped by less dedicated readers.
