@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "eab3d340_e960dc9a",
+        "filename": "doc/security.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-11-16T09:32:44Z",
+      "side": 1,
+      "message": "maybe \n\ndecrypts it to recover K, and then uses K ...",
+      "revId": "d45c30364502e3b176fa665d5995093cd6339ab3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
