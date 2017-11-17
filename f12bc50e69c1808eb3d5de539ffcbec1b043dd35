@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5b71b9f5_1b4dc22e",
+        "filename": "doc/server_setup_dropbox.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-17T03:18:39Z",
+      "side": 1,
+      "message": "trailing space",
+      "range": {
+        "startLine": 32,
+        "startChar": 118,
+        "endLine": 32,
+        "endChar": 119
+      },
+      "revId": "f12bc50e69c1808eb3d5de539ffcbec1b043dd35",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ce33cc06_6a145a5a",
+        "filename": "doc/server_setup_dropbox.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-17T03:18:39Z",
+      "side": 1,
+      "message": "trailing space",
+      "revId": "f12bc50e69c1808eb3d5de539ffcbec1b043dd35",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "72a48198_699311a8",
+        "filename": "doc/server_setup_dropbox.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-17T03:18:39Z",
+      "side": 1,
+      "message": "trailing space",
+      "revId": "f12bc50e69c1808eb3d5de539ffcbec1b043dd35",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
