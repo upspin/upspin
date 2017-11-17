@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "58b3b167_798f504b",
+        "filename": "doc/server_setup_dropbox.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 6188
+      },
+      "writtenOn": "2017-11-17T15:13:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5b71b9f5_1b4dc22e",
+      "range": {
+        "startLine": 32,
+        "startChar": 118,
+        "endLine": 32,
+        "endChar": 119
+      },
+      "revId": "f12bc50e69c1808eb3d5de539ffcbec1b043dd35",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ce33cc06_6a145a5a",
         "filename": "doc/server_setup_dropbox.md",
         "patchSetId": 1
@@ -42,6 +66,24 @@
     },
     {
       "key": {
+        "uuid": "5176a7c3_5e56ff6e",
+        "filename": "doc/server_setup_dropbox.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 6188
+      },
+      "writtenOn": "2017-11-17T15:13:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ce33cc06_6a145a5a",
+      "revId": "f12bc50e69c1808eb3d5de539ffcbec1b043dd35",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "72a48198_699311a8",
         "filename": "doc/server_setup_dropbox.md",
         "patchSetId": 1
@@ -56,6 +98,24 @@
       "revId": "f12bc50e69c1808eb3d5de539ffcbec1b043dd35",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e2ede36e_b3b3c89b",
+        "filename": "doc/server_setup_dropbox.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 6188
+      },
+      "writtenOn": "2017-11-17T15:13:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "72a48198_699311a8",
+      "revId": "f12bc50e69c1808eb3d5de539ffcbec1b043dd35",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
