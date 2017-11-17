@@ -102,6 +102,24 @@
     },
     {
       "key": {
+        "uuid": "e34fa887_3649cdeb",
+        "filename": "upbox/schema.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 396,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-17T03:15:48Z",
+      "side": 1,
+      "message": "That makes sense. I think what you have is fine.",
+      "parentUuid": "dc787274_af1e4d63",
+      "revId": "851ba5048684325093307389595192b7cd152f97",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "8a88e9c6_b73c919b",
         "filename": "upbox/schema.go",
         "patchSetId": 2
