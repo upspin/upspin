@@ -7,7 +7,7 @@ Before you sign up, you may want to read the
 It introduces the concepts and terminology you'll need to understand to use the
 system.
 
-## Install the Upspin tools
+## Install the Upspin tools {#install}
 
 Download an archive of the Upspin command-line tools from [the download
 page](/dl/), and extract it to a directory that's in your system `PATH`.
@@ -33,7 +33,7 @@ $ go get upspin.io/cmd/...
 > This will install the Upspin commands to `$GOPATH/bin`, which you should add
 > to your system `PATH` if you haven't already.
 
-## Create an Upspin user
+## Create an Upspin user {#signup}
 
 You will need to choose an Upspin user name, which is just an email address you
 own.
@@ -101,7 +101,7 @@ that you are registering and completes the signup process.
 > In fact, even if the email account is later hijacked, the
 > attacker will not be able to get access to your Upspin account.
 
-## Nominate (and maybe deploy) your Upspin servers
+## Nominate (and maybe deploy) your Upspin servers {#deploy}
 
 Next you need to decide whether you are going to deploy your own Upspin
 directory and store servers, use those maintained by someone else, or
@@ -130,7 +130,7 @@ Choose the third option if you wish to use Upspin as a read-only user.
 > To go back, edit your `$HOME/upspin/config` file and remove its `dirserver:`
 > and `storeserver:` lines and restart `upspin-ui`.
 
-## Creating your Upspin directory
+## Creating your Upspin directory {#mkdir}
 
 If you choose to use existing servers or to deploy your own, the `upspin-ui`
 program will attempt to create a directory in the nominated directory server
@@ -146,7 +146,7 @@ With the servers running and granting you access permission, and with your
 correct information registered in the key server, `upspin-ui` will create
 your user root and display its contents.
 
-## Hello, world
+## Hello, world {#hello}
 
 To prove that your user root was created successfully, try copying a file to
 the system.
@@ -177,7 +177,7 @@ the system, for smoother operation you may want to install the FUSE daemon,
 The cache server is particularly important, and the setup instructions are in
 the [Upspin configuration](/doc/config.md) document.
 
-## Browsing Upspin Files on Linux and macOS
+## Browsing Upspin Files on Linux and macOS {#upspinfs}
 
 Upspin includes a tool called `upspinfs` that creates a virtual filesystem
 where you can access the Upspin name space as a regular mounted file system.
