@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "93a41cfd_7e8a91aa",
+        "filename": "doc/doc.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-11-22T03:14:55Z",
+      "side": 1,
+      "message": "`upspinserver` ?",
+      "revId": "ff48e68b10c7bbf4b492dcfb3ac2d8dece9bc1d7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
