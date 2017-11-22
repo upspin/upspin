@@ -26,7 +26,23 @@ is part of #336. --->
 - The [Upspin Configuration](/doc/config.md) document describes Upspin's
   configuration file format and settings.
 
-- TODO: A user guide to keys.<!--- #355 --->
+## Tools
+
+- The [`upspin`](https://godoc.org/upspin.io/cmd/upspin) command is a
+  command-line tool for creating and administering Upspin files, users,
+  and servers.
+
+- The [`upspin-ui`](https://godoc.org/augie.upspin.io/cmd/upspin-ui) tool
+  presents a web interface to the Upspin name space, and also provides a
+  facility to sign up an Upspin user and deploy an upspinserver to Google Cloud
+  Platform.
+
+- The [`cacheserver`](https://godoc.org/upspin.io/cmd/cacheserver)
+  is a client-side directory and storage cache for Upspin.
+
+- The [`upspinfs`](https://godoc.org/upspin.io/cmd/upspinfs) command
+  is a [FUSE](https://en.wikipedia.org/wiki/Filesystem_in_Userspace)
+  interface for Upspin.
 
 ## Architecture
 
@@ -37,7 +53,6 @@ is part of #336. --->
 - The [Upspin Access Control](/doc/access_control.md) document describes
   Upspin's access control mechanisms. TODO: Break into user-level pieces
   and implementation details. TODO: Server-level access control: Writers file etc.
-
 
 - The [Upspin Security](/doc/security.md) document describes Upspin's security
   model.
@@ -51,10 +66,14 @@ is part of #336. --->
 
 ## Programming
 
+- The [`upspin` package](https://godoc.org/upspin.io/upspin) specifies the core
+  interfaces that define the Upspin protocol.
+
+- The [`rpc` package](https://godoc.org/upspin.io/rpc) includes a semiformal
+  description of the wire protocol used to communicate between clients and
+  servers.
+
+- The [`client` package](https://godoc.org/upspin.io/client) provides a
+  simple client interface for communicating with Upspin servers.
+
 - TODO: A worked example (implementer's guide).
-
-- The [RPC](https://godoc.org/upspin.io/rpc) page from [`godoc.org`](godoc.org)
-  is a programmer's reference that includes a semiformal description of the wire
-  protocol used to communicate between clients and servers.<!--- --->
-
-- TODO: Link to upspin.io/upspin, upspin.io/client, ...
