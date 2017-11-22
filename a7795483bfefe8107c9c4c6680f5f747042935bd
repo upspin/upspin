@@ -38,6 +38,24 @@
     },
     {
       "key": {
+        "uuid": "eacb21c8_137c8a02",
+        "filename": "doc/doc.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-11-22T03:07:46Z",
+      "side": 1,
+      "message": "I don\u0027t feel strongly.  Originally I had my comment at line 35 suggesting moving \"tool\" outside the brackets for consistency, then noticed the programming section.  No chance of confusion either way.",
+      "parentUuid": "5ca8cb42_e9303a0e",
+      "revId": "a7795483bfefe8107c9c4c6680f5f747042935bd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "009c7d14_9c94d553",
         "filename": "doc/doc.md",
         "patchSetId": 1
