@@ -172,15 +172,25 @@ func initServer(mode initMode) (*subcmd.ServerConfig, upspin.Config, *perm.Perm,
 }
 
 // fmtStoreConfig formats a ServerConfig.StoreConfig value as a string,
-// ommitting any privateKeyData fields as they include sensitive information.
+// omitting any fields that may include sensitive information.
 func fmtStoreConfig(cfg []string) string {
 	var out []string
 	for _, s := range cfg {
-		if !strings.HasPrefix(s, "privateKeyData=") {
+		if !containsAny(s, "appkey", "token", "private") {
 			out = append(out, s)
 		}
 	}
 	return strings.Join(out, " ")
+}
+
+func containsAny(s string, lowerCaseNeedles ...string) bool {
+	ls := strings.ToLower(s)
+	for _, n := range lowerCaseNeedles {
+		if strings.Contains(ls, n) {
+			return true
+		}
+	}
+	return false
 }
 
 type setupHandler struct {
