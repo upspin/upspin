@@ -362,7 +362,6 @@ func (n *node) openDir(context gContext.Context, req *fuse.OpenRequest, resp *fu
 		return nil, e2e(errors.E(op, err, n.uname))
 	}
 	n.Lock()
-	defer n.Unlock()
 	h := allocHandle(n)
 	n.de = de
 	h.flags = req.Flags
@@ -374,15 +373,22 @@ func (n *node) openDir(context gContext.Context, req *fuse.OpenRequest, resp *fu
 			n.attr.Mtime = t
 		}
 	}
+	n.Unlock()
 
 	// Update any known nodes.
 	for _, child := range de {
-		if cn, ok := n.f.nodeMap[child.Name]; ok {
-			if sz, err := child.Size(); err == nil {
-				cn.attr.Size = uint64(sz)
-			}
-			cn.attr.Mtime = child.Time.Go()
+		n.f.Lock()
+		cn, ok := n.f.nodeMap[child.Name]
+		n.f.Unlock()
+		if !ok {
+			continue
 		}
+		cn.Lock()
+		if sz, err := child.Size(); err == nil {
+			cn.attr.Size = uint64(sz)
+		}
+		cn.attr.Mtime = child.Time.Go()
+		cn.Unlock()
 	}
 	return h, nil
 }
