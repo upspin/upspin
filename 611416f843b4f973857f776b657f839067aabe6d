@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8983fd38_5690c6e5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-23T00:53:04Z",
+      "side": 1,
+      "message": "do\nlowercase",
+      "range": {
+        "startLine": 7,
+        "startChar": 25,
+        "endLine": 7,
+        "endChar": 27
+      },
+      "revId": "611416f843b4f973857f776b657f839067aabe6d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3bcbb2f9_cfc1c2be",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-23T00:53:04Z",
+      "side": 1,
+      "message": "This change extends",
+      "range": {
+        "startLine": 13,
+        "startChar": 30,
+        "endLine": 13,
+        "endChar": 54
+      },
+      "revId": "611416f843b4f973857f776b657f839067aabe6d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5e2515ad_9e374cf8",
+        "filename": "serverutil/upspinserver/main_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-23T00:53:04Z",
+      "side": 1,
+      "message": "drop the \"input:\" and \"output:\" keys in these struct literals\ntheir implication suffices.",
+      "range": {
+        "startLine": 16,
+        "startChar": 3,
+        "endLine": 16,
+        "endChar": 11
+      },
+      "revId": "611416f843b4f973857f776b657f839067aabe6d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
