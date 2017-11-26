@@ -1052,19 +1052,29 @@ func do(cfg upspin.Config, mountpoint string, cacheDir string) chan bool {
 
 	f := newUpspinFS(cfg, mountpoint, cacheDir)
 
-	c, err := fuse.Mount(
-		mountpoint,
-		fuse.FSName("upspin"),
-		fuse.Subtype("fs"),
-		fuse.LocalVolume(),
-		fuse.VolumeName(fmt.Sprintf("%s-%s", f.config.DirEndpoint().NetAddr, f.config.UserName())),
-		fuse.DaemonTimeout("240"),
-		//fuse.OSXDebugFuseKernel(),
-		//fuse.NoAppleDouble(),
-		//fuse.NoAppleXattr(),
-	)
-	if err == fuse.ErrOSXFUSENotFound {
-		log.Fatal("FUSE for macOS is not installed. See https://osxfuse.github.io/")
+	var c *fuse.Conn
+	var err error
+	for retry := true; ; retry = false {
+		c, err = fuse.Mount(
+			mountpoint,
+			fuse.FSName("upspin"),
+			fuse.Subtype("fs"),
+			fuse.LocalVolume(),
+			fuse.VolumeName(fmt.Sprintf("%s-%s", f.config.DirEndpoint().NetAddr, f.config.UserName())),
+			fuse.DaemonTimeout("240"),
+			//fuse.OSXDebugFuseKernel(),
+			//fuse.NoAppleDouble(),
+			//fuse.NoAppleXattr(),
+		)
+		if err == fuse.ErrOSXFUSENotFound {
+			log.Fatal("FUSE for macOS is not installed. See https://osxfuse.github.io/")
+		}
+		if err != nil && retry {
+			if err2 := fuse.Unmount(mountpoint); err2 == nil {
+				continue
+			}
+		}
+		break
 	}
 	if err != nil {
 		log.Fatalf("fuse.Mount failed: %s", err)

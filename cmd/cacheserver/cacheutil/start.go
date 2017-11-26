@@ -31,6 +31,7 @@ var detach = func(*exec.Cmd) {}
 
 // Start starts the cacheserver if the config requires it and it is not already running.
 func Start(cfg upspin.Config) {
+	return // disable XXX
 	if cfg == nil {
 		return
 	}
