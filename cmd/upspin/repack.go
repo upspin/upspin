@@ -18,8 +18,8 @@ import (
 
 func (s *State) repack(args ...string) {
 	const help = `
-Repack rewrites the data referred to by each path , storing it again using the
-packing specificied by its -pack option, ee by default. If the data is already
+Repack rewrites the data referred to by each path, storing it again using the
+packing specified by its -pack option, ee by default. If the data is already
 packed with the specified packing, the data is untouched unless the -f (force)
 flag is specified, which can be helpful if the data is to be repacked using a
 fresh key.

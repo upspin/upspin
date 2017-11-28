@@ -388,8 +388,8 @@ Sub-command repack
 
 Usage: upspin repack [-pack ee] [flags] path...
 
-Repack rewrites the data referred to by each path , storing it again using the
-packing specificied by its -pack option, ee by default. If the data is already
+Repack rewrites the data referred to by each path, storing it again using the
+packing specified by its -pack option, ee by default. If the data is already
 packed with the specified packing, the data is untouched unless the -f (force)
 flag is specified, which can be helpful if the data is to be repacked using a
 fresh key.
@@ -701,6 +701,8 @@ Flags:
     	create a new user even if keys and config file exist
   -help
     	print more information about the command
+  -key address
+    	Key server address (default "key.upspin.io:443")
   -secrets directory
     	directory to store key pair
   -secretseed string
