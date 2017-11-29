@@ -136,7 +136,8 @@ var flags = map[string]*flagVar{
 	"addr": strVar(&NetAddr, "addr", NetAddr, "publicly accessible network address (`host:port`)"),
 	"blocksize": &flagVar{
 		set: func(fs *flag.FlagSet) {
-			fs.Var(&blockSize, "blocksize", "`size` of blocks when writing large files")
+			usage := fmt.Sprintf("`size` of blocks when writing large files (default %d)", defaultBlockSize)
+			fs.Var(&blockSize, "blocksize", usage)
 		},
 		arg: func() string {
 			if BlockSize == defaultBlockSize {
