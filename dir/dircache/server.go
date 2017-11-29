@@ -10,7 +10,6 @@ import (
 	"fmt"
 	ospath "path"
 
-	"upspin.io/access"
 	"upspin.io/bind"
 	"upspin.io/errors"
 	"upspin.io/log"
@@ -141,9 +140,8 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		return dir.Put(entry)
 	}
 
-	// Since the directory server needs to read the Access/Group file
-	// we need to ensure that it is flushed from any cache before the Put.
-	if s.flushBlock != nil && access.IsAccessControlFile(entry.Name) {
+	// Don't write DirEntry until the blocks are written.
+	if s.flushBlock != nil {
 		for _, b := range entry.Blocks {
 			s.flushBlock(b.Location)
 		}
