@@ -29,6 +29,7 @@ validity. If it is a link, the command attempts to access the target
 of the link.
 `
 	fs := flag.NewFlagSet("info", flag.ExitOnError)
+	recur := fs.Bool("R", false, "recur into subdirectories")
 	s.ParseFlags(fs, args, help, "info path...")
 
 	if fs.NArg() == 0 {
@@ -36,19 +37,29 @@ of the link.
 	}
 
 	for _, name := range fs.Args() {
-		name := s.AtSign(name)
-		entries, err := s.DirServer(name).Glob(string(name))
-		// ErrFollowLink is OK; we still get the relevant entry.
-		if err != nil && err != upspin.ErrFollowLink {
-			s.Exit(err)
-		}
-		for _, entry := range entries {
-			s.printInfo(entry)
-			switch {
-			case access.IsAccessFile(entry.Name):
-				s.checkAccessFile(entry.Name)
-			case access.IsGroupFile(entry.Name):
-				s.checkGroupFile(entry.Name)
+		s.doInfo(string(s.AtSign(name)), *recur, true)
+	}
+}
+
+func (s *State) doInfo(pattern string, recur, first bool) {
+	entries, err := s.DirServer(upspin.PathName(pattern)).Glob(pattern)
+	// ErrFollowLink is OK: we show the link itself.
+	if err != nil && err != upspin.ErrFollowLink {
+		s.Exit(err)
+	}
+	if len(entries) == 0 && first {
+		s.Exitf("no such file %q", pattern)
+	}
+	for _, entry := range entries {
+		s.printInfo(entry)
+		switch {
+		case access.IsAccessFile(entry.Name):
+			s.checkAccessFile(entry.Name)
+		case access.IsGroupFile(entry.Name):
+			s.checkGroupFile(entry.Name)
+		case entry.IsDir():
+			if recur {
+				s.doInfo(upspin.AllFilesGlob(entry.Name), recur, false)
 			}
 		}
 	}
@@ -228,7 +239,8 @@ func attrFormat(attr upspin.Attribute) string {
 
 var infoTmpl = template.Must(template.New("info").Parse(infoText))
 
-const infoText = `{{.Name}}
+const infoText = `
+{{.Name}}
 	packing:	{{.Packing}}
 	size:	{{.Size}}
 	time:	{{.TimeString}}

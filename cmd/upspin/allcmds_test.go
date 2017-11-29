@@ -97,6 +97,11 @@ var basicCmdTests = []cmdTest{
 	},
 	putFile(
 		ann,
+		"@/Group/Access",
+		"r:*@example.com\n",
+	),
+	putFile(
+		ann,
 		"@/Group/friends",
 		"chris@example.com\n", // We will add kelly@ in the share test.
 	),
@@ -188,6 +193,20 @@ var basicCmdTests = []cmdTest{
 			"key holders:", "all@upspin.io ann@example.com",
 			"Target of link", "ann@example.com/linkdir:",
 			"ann@example.com/Public/Photo",
+		),
+	},
+	{
+		"info -R",
+		ann,
+		do(
+			"info -R @/Friends",
+		),
+		"",
+		expect(
+			"\nann@example.com/Friends\n", // Each file info starts with the file name on a line.
+			"\nann@example.com/Friends/Access\n",
+			"\nann@example.com/Friends/Photo\n",
+			"\nann@example.com/Friends/Photo/friends.jpg\n",
 		),
 	},
 	{

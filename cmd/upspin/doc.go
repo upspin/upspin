@@ -276,6 +276,7 @@ validity. If it is a link, the command attempts to access the target
 of the link.
 
 Flags:
+  -R	recur into subdirectories
   -help
     	print more information about the command
 
