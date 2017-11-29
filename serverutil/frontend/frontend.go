@@ -75,6 +75,7 @@ const (
 	extMarkdown  = ".md"
 	docHostname  = "upspin.io"      // redirect doc requests to this host
 	testHostname = "test.upspin.io" // don't redirect requests to this host
+	augieUser    = "augie@upspin.io"
 )
 
 // sourceRepo is a map from each custom domain to their repo base URLs.
@@ -142,6 +143,7 @@ func newServer(cfg upspin.Config, docs string) (http.Handler, error) {
 	if cfg != nil {
 		mux.Handle(downloadPath, newDownloadHandler(cfg, s.tmpl.download))
 		mux.Handle("/"+releaseUser+"/", web.New(cfg, isWriter(releaseUser)))
+		mux.Handle("/"+augieUser+"/", web.New(cfg, isWriter(augieUser)))
 	}
 	s.handlers = goGetHandler{gziphandler.GzipHandler(canonicalHostHandler{mux})}
 
