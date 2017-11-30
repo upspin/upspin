@@ -31,8 +31,10 @@ import (
 
 const cmdName = "upspinfs"
 
+var mountpointFlag = flag.String("mountpoint", "", "`directory` on which to mount file system")
+
 func usage() {
-	fmt.Fprintf(os.Stderr, "Usage: %s <mountpoint>\n", os.Args[0])
+	fmt.Fprintf(os.Stderr, "Usage: %s [mount point]\n", os.Args[0])
 	flag.PrintDefaults()
 }
 
@@ -43,11 +45,6 @@ func main() {
 	if flags.Version {
 		fmt.Print(version.Version())
 		return
-	}
-
-	if flag.NArg() != 1 {
-		usage()
-		os.Exit(2)
 	}
 
 	// Normal setup, get configuration from file and push user cache onto config.
@@ -67,9 +64,20 @@ func main() {
 	cacheutil.Start(cfg)
 
 	// Mount the file system and start serving.
-	mountpoint, err := filepath.Abs(flag.Arg(0))
+	if *mountpointFlag != "" {
+		if flag.NArg() > 0 {
+			log.Fatalf("mount point specified as both flag and argument\n")
+		}
+	} else {
+		if flag.NArg() != 1 {
+			usage()
+			os.Exit(2)
+		}
+		*mountpointFlag = flag.Arg(0)
+	}
+	mountpoint, err := filepath.Abs(*mountpointFlag)
 	if err != nil {
-		log.Fatalf("can't determine absolute path to mount point %s: %s", flag.Arg(0), err)
+		log.Fatalf("can't determine absolute path to mount point %s: %s", *mountpointFlag, err)
 	}
 	done := do(cfg, mountpoint, filepath.Join(flags.CacheDir, string(cfg.UserName())))
 
