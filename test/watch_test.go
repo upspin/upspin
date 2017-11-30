@@ -93,7 +93,7 @@ func testWatchCurrent(t *testing.T, r *testenv.Runner) {
 	// Reader can set a watcher, but will get no data due to lack of rights.
 	r.As(readerName)
 	done = r.DirWatch(base, upspin.WatchCurrent)
-	if !r.GetErrorEvent(errors.E(errors.Str("no response on event channel after one second"))) {
+	if !r.GetErrorEvent(errors.E("no response on event channel after one second")) {
 		t.Fatal(r.Diag())
 	}
 	close(done)

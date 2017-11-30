@@ -122,24 +122,24 @@ type options struct {
 
 // New creates a new instance of DirServer with the given options
 func New(cfg upspin.Config, options ...string) (upspin.DirServer, error) {
-	const op = "dir/server.New"
+	const op errors.Op = "dir/server.New"
 	if cfg == nil {
-		return nil, errors.E(op, errors.Invalid, errors.Str("nil config"))
+		return nil, errors.E(op, errors.Invalid, "nil config")
 	}
 	if cfg.DirEndpoint().Transport == upspin.Unassigned {
-		return nil, errors.E(op, errors.Invalid, errors.Str("directory endpoint cannot be unassigned"))
+		return nil, errors.E(op, errors.Invalid, "directory endpoint cannot be unassigned")
 	}
 	if cfg.KeyEndpoint().Transport == upspin.Unassigned {
-		return nil, errors.E(op, errors.Invalid, errors.Str("key endpoint cannot be unassigned"))
+		return nil, errors.E(op, errors.Invalid, "key endpoint cannot be unassigned")
 	}
 	if cfg.StoreEndpoint().Transport == upspin.Unassigned {
-		return nil, errors.E(op, errors.Invalid, errors.Str("store endpoint cannot be unassigned"))
+		return nil, errors.E(op, errors.Invalid, "store endpoint cannot be unassigned")
 	}
 	if cfg.UserName() == "" {
-		return nil, errors.E(op, errors.Invalid, errors.Str("empty user name"))
+		return nil, errors.E(op, errors.Invalid, "empty user name")
 	}
 	if cfg.Factotum() == nil {
-		return nil, errors.E(op, errors.Invalid, errors.Str("nil factotum"))
+		return nil, errors.E(op, errors.Invalid, "nil factotum")
 	}
 	// Check which options are present and pick suitable defaults.
 	var (
@@ -205,13 +205,13 @@ func New(cfg upspin.Config, options ...string) (upspin.DirServer, error) {
 
 // Lookup implements upspin.DirServer.
 func (s *server) Lookup(name upspin.PathName) (*upspin.DirEntry, error) {
-	const op = "dir/server.Lookup"
+	const op errors.Op = "dir/server.Lookup"
 	o, m := newOptMetric(op)
 	defer m.Done()
 	return s.lookupWithPermissions(op, name, o)
 }
 
-func (s *server) lookupWithPermissions(op string, name upspin.PathName, opts ...options) (*upspin.DirEntry, error) {
+func (s *server) lookupWithPermissions(op errors.Op, name upspin.PathName, opts ...options) (*upspin.DirEntry, error) {
 	p, err := path.Parse(name)
 	if err != nil {
 		return nil, errors.E(op, name, err)
@@ -238,7 +238,7 @@ func (s *server) lookupWithPermissions(op string, name upspin.PathName, opts ...
 	// Check for Read access permission.
 	canRead, _, err := s.hasRight(access.Read, p, opts...)
 	if err == upspin.ErrFollowLink {
-		return nil, errors.E(op, errors.Internal, p.Path(), errors.Str("can't be link at this point"))
+		return nil, errors.E(op, errors.Internal, p.Path(), "can't be link at this point")
 	}
 	if err != nil {
 		return nil, errors.E(op, err)
@@ -285,7 +285,7 @@ func (s *server) lookup(p path.Parsed, entryMustBeClean bool, opts ...options) (
 			return nil, err
 		}
 		if dirty {
-			return nil, errors.E(errors.Internal, errors.Str("flush didn't clean entry"))
+			return nil, errors.E(errors.Internal, "flush didn't clean entry")
 		}
 	}
 	if entry.IsLink() {
@@ -296,7 +296,7 @@ func (s *server) lookup(p path.Parsed, entryMustBeClean bool, opts ...options) (
 
 // Put implements upspin.DirServer.
 func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
-	const op = "dir/server.Put"
+	const op errors.Op = "dir/server.Put"
 	o, m := newOptMetric(op)
 	defer m.Done()
 
@@ -332,12 +332,12 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	// Links can't be named Access or Group.
 	if isLink {
 		if isAccess || isGroup {
-			return nil, errors.E(op, p.Path(), errors.Invalid, errors.Str("link cannot be named Access or Group"))
+			return nil, errors.E(op, p.Path(), errors.Invalid, "link cannot be named Access or Group")
 		}
 	}
 	// Directories cannot have reserved names.
 	if isAccess && entry.IsDir() {
-		return nil, errors.E(op, errors.Invalid, entry.Name, errors.Str("cannot make directory named Access"))
+		return nil, errors.E(op, errors.Invalid, entry.Name, "cannot make directory named Access")
 	}
 
 	// Special files must use integrity pack (plain text + signature).
@@ -352,7 +352,7 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 			return nil, errors.E(op, err)
 		}
 		if !ok {
-			return nil, errors.E(op, p.Path(), errors.Str("Access or Group files must be readable by all"))
+			return nil, errors.E(op, p.Path(), "Access or Group files must be readable by all")
 		}
 	}
 
@@ -389,7 +389,7 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		// OK; entry not found as expected. Can we create it?
 		canCreate, _, err := s.hasRight(access.Create, p, o)
 		if err == upspin.ErrFollowLink {
-			return nil, errors.E(op, p.Path(), errors.Internal, errors.Str("unexpected ErrFollowLink"))
+			return nil, errors.E(op, p.Path(), errors.Internal, "unexpected ErrFollowLink")
 		}
 		if err != nil {
 			return nil, errors.E(op, err)
@@ -400,7 +400,7 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 
 		// The provided sequence number for a new item may be only SeqNotExist or SeqIgnore.
 		if entry.Sequence != upspin.SeqNotExist && entry.Sequence != upspin.SeqIgnore {
-			return nil, errors.E(op, p.Path(), errors.Invalid, errors.Str("invalid sequence number"))
+			return nil, errors.E(op, p.Path(), errors.Invalid, "invalid sequence number")
 		}
 	} else if err != nil {
 		// Some unexpected error happened looking up path. Abort.
@@ -413,15 +413,15 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		}
 		// Check if we can overwrite.
 		if existingEntry.IsDir() {
-			return nil, errors.E(op, p.Path(), errors.Exist, errors.Str("can't overwrite directory"))
+			return nil, errors.E(op, p.Path(), errors.Exist, "can't overwrite directory")
 		}
 		if entry.IsDir() {
-			return nil, errors.E(op, p.Path(), errors.Exist, errors.Str("can't overwrite file with directory"))
+			return nil, errors.E(op, p.Path(), errors.Exist, "can't overwrite file with directory")
 		}
 		// To overwrite a file, we need Write permission.
 		canWrite, _, err := s.hasRight(access.Write, p, o)
 		if err == upspin.ErrFollowLink {
-			return nil, errors.E(op, p.Path(), errors.Internal, errors.Str("unexpected ErrFollowLink"))
+			return nil, errors.E(op, p.Path(), errors.Internal, "unexpected ErrFollowLink")
 		}
 		if err != nil {
 			return nil, errors.E(op, err)
@@ -436,7 +436,7 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		// We also must have the correct sequence number or SeqIgnore.
 		if entry.Sequence != upspin.SeqIgnore {
 			if entry.Sequence != existingEntry.Sequence {
-				return nil, errors.E(op, entry.Name, errors.Invalid, errors.Str("sequence number"))
+				return nil, errors.E(op, entry.Name, errors.Invalid, "sequence number")
 			}
 		}
 
@@ -469,7 +469,7 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 }
 
 // put performs Put on the user's tree.
-func (s *server) put(op string, p path.Parsed, entry *upspin.DirEntry, opts ...options) (*upspin.DirEntry, error) {
+func (s *server) put(op errors.Op, p path.Parsed, entry *upspin.DirEntry, opts ...options) (*upspin.DirEntry, error) {
 	o, ss := subspan("put", opts)
 	defer ss.End()
 
@@ -490,20 +490,20 @@ func (s *server) put(op string, p path.Parsed, entry *upspin.DirEntry, opts ...o
 
 // Glob implements upspin.DirServer.
 func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
-	const op = "dir/server.Glob"
+	const op errors.Op = "dir/server.Glob"
 	o, m := newOptMetric(op)
 	defer m.Done()
 
 	// lookup implements serverutil.LookupFunc. It checks permissions.
 	lookup := func(name upspin.PathName) (*upspin.DirEntry, error) {
-		const op = "dir/server.Lookup"
+		const op errors.Op = "dir/server.Lookup"
 		o, ss := subspan(op, []options{o})
 		defer ss.End()
 		return s.lookupWithPermissions(op, name, o)
 	}
 	// lookup implements serverutil.ListFunc. It checks permissions.
 	listDir := func(dirName upspin.PathName) ([]*upspin.DirEntry, error) {
-		const op = "dir/server.listDir"
+		const op errors.Op = "dir/server.listDir"
 		o, ss := subspan(op, []options{o})
 		defer ss.End()
 		return s.listDir(op, dirName, o)
@@ -518,7 +518,7 @@ func (s *server) Glob(pattern string) ([]*upspin.DirEntry, error) {
 
 // listDir implements serverutil.ListFunc, with an additional options variadic.
 // dirName should always be a directory. It checks permissions.
-func (s *server) listDir(op string, dirName upspin.PathName, opts ...options) ([]*upspin.DirEntry, error) {
+func (s *server) listDir(op errors.Op, dirName upspin.PathName, opts ...options) ([]*upspin.DirEntry, error) {
 	parsed, err := path.Parse(dirName)
 	if err != nil {
 		return nil, errors.E(op, err)
@@ -579,7 +579,7 @@ func (s *server) listDir(op string, dirName upspin.PathName, opts ...options) ([
 
 // Delete implements upspin.DirServer.
 func (s *server) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
-	const op = "dir/server.Delete"
+	const op errors.Op = "dir/server.Delete"
 	o, m := newOptMetric(op)
 	defer m.Done()
 
@@ -639,7 +639,7 @@ func (s *server) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
 
 // WhichAccess implements upspin.DirServer.
 func (s *server) WhichAccess(name upspin.PathName) (*upspin.DirEntry, error) {
-	const op = "dir/server.WhichAccess"
+	const op errors.Op = "dir/server.WhichAccess"
 	o, m := newOptMetric(op)
 	defer m.Done()
 
@@ -665,7 +665,7 @@ func (s *server) WhichAccess(name upspin.PathName) (*upspin.DirEntry, error) {
 
 // Watch implements upspin.DirServer.Watch.
 func (s *server) Watch(name upspin.PathName, sequence int64, done <-chan struct{}) (<-chan upspin.Event, error) {
-	const op = "dir/server.Watch"
+	const op errors.Op = "dir/server.Watch"
 	o, m := newOptMetric(op)
 	defer m.Done()
 
@@ -701,7 +701,7 @@ func (s *server) Watch(name upspin.PathName, sequence int64, done <-chan struct{
 // watcher runs in a goroutine reading events from the tree and passing them
 // along to the original caller, but first verifying whether the user has rights
 // to know about the event.
-func (s *server) watch(op string, treeEvents <-chan *upspin.Event, outEvents chan<- upspin.Event) {
+func (s *server) watch(op errors.Op, treeEvents <-chan *upspin.Event, outEvents chan<- upspin.Event) {
 	const sendTimeout = time.Minute
 
 	t := time.NewTimer(sendTimeout)
@@ -770,9 +770,9 @@ func (s *server) watch(op string, treeEvents <-chan *upspin.Event, outEvents cha
 
 // Dial implements upspin.Dialer.
 func (s *server) Dial(ctx upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
-	const op = "dir/server.Dial"
+	const op errors.Op = "dir/server.Dial"
 	if e.Transport == upspin.Unassigned {
-		return nil, errors.E(op, errors.Invalid, errors.Str("transport must not be unassigned"))
+		return nil, errors.E(op, errors.Invalid, "transport must not be unassigned")
 	}
 	if err := valid.UserName(ctx.UserName()); err != nil {
 		return nil, errors.E(op, errors.Invalid, err)
@@ -804,7 +804,7 @@ func (s *server) Endpoint() upspin.Endpoint {
 
 // Close implements upspin.Service.
 func (s *server) Close() {
-	const op = "dir/server.Close"
+	const op errors.Op = "dir/server.Close"
 
 	// Remove this user's tree from the cache. This allows it to be
 	// garbage-collected even if other servers have pointers into the
@@ -903,7 +903,7 @@ func (s *server) canCreateRoot(user upspin.UserName) bool {
 // errPerm checks whether the user has any right to the given path, and if so
 // returns a Permission error. Otherwise it returns a Private error.
 // This is used to prevent probing of the name space.
-func (s *server) errPerm(op string, p path.Parsed, opts ...options) error {
+func (s *server) errPerm(op errors.Op, p path.Parsed, opts ...options) error {
 	// Before returning, check that the user has the right to know,
 	// to prevent leaking the name space.
 	if hasAny, _, err := s.hasRight(access.AnyRight, p, opts...); err != nil {
@@ -920,7 +920,7 @@ func (s *server) errPerm(op string, p path.Parsed, opts ...options) error {
 // returns the entry and ErrFollowLink. If the use has no rights, it returns a
 // NotExist error. This is used to prevent probing of the name space using
 // links.
-func (s *server) errLink(op string, link *upspin.DirEntry, opts ...options) (*upspin.DirEntry, error) {
+func (s *server) errLink(op errors.Op, link *upspin.DirEntry, opts ...options) (*upspin.DirEntry, error) {
 	p, err := path.Parse(link.Name)
 	if err != nil {
 		return nil, errors.E(op, errors.Internal, link.Name, err)
@@ -953,7 +953,7 @@ func (s *server) shutdown() {
 }
 
 // newOptMetric creates a new options populated with a metric for operation op.
-func newOptMetric(op string) (options, *metric.Metric) {
+func newOptMetric(op errors.Op) (options, *metric.Metric) {
 	m, sp := metric.NewSpan(op)
 	opts := options{
 		span: sp,
@@ -975,7 +975,7 @@ func span(opts []options) *metric.Span {
 
 // subspan creates a span for an operation op in the given option. It returns
 // a new option with the new span, for passing along subfunctions.
-func subspan(op string, opts []options) (options, *metric.Span) {
+func subspan(op errors.Op, opts []options) (options, *metric.Span) {
 	s := span(opts).StartSpan(op)
 	return options{span: s}, s
 }

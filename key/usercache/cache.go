@@ -79,7 +79,7 @@ func ResetGlobal() {
 
 // Lookup implements upspin.KeyServer.
 func (c *userCacheServer) Lookup(name upspin.UserName) (*upspin.User, error) {
-	const op = "key/usercache.Lookup"
+	const op errors.Op = "key/usercache.Lookup"
 
 	// If we have an unexpired cache entry, use it.
 	if v, ok := c.cache.entries.Get(name); ok {
@@ -108,7 +108,7 @@ func (c *userCacheServer) Lookup(name upspin.UserName) (*upspin.User, error) {
 
 // Put implements upspin.KeyServer.
 func (c *userCacheServer) Put(user *upspin.User) error {
-	const op = "key/usercache.Put"
+	const op errors.Op = "key/usercache.Put"
 	if err := c.dial(); err != nil {
 		return errors.E(op, err)
 	}

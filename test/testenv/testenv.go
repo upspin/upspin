@@ -138,7 +138,7 @@ domain: example.com
 
 // New creates a new Env for testing.
 func New(setup *Setup) (*Env, error) {
-	const op = "testenv.New"
+	const op errors.Op = "testenv.New"
 	env := &Env{
 		Setup: setup,
 	}
@@ -222,7 +222,7 @@ func New(setup *Setup) (*Env, error) {
 
 	case "remote":
 		if setup.UpBox {
-			return nil, errors.E(op, errors.Str("UpBox set with incompatible Kind (remote)"))
+			return nil, errors.E(op, "UpBox set with incompatible Kind (remote)")
 		}
 
 		cfg = config.SetKeyEndpoint(cfg, upspin.Endpoint{
@@ -261,10 +261,10 @@ func New(setup *Setup) (*Env, error) {
 
 // Exit indicates the end of the test environment. It must only be called once. If Setup.Cleanup exists it is called.
 func (e *Env) Exit() error {
-	const op = "testenv.Exit"
+	const op errors.Op = "testenv.Exit"
 
 	if e.exitCalled {
-		return errors.E(op, errors.Invalid, errors.Str("exit already called"))
+		return errors.E(op, errors.Invalid, "exit already called")
 	}
 	e.exitCalled = true
 
@@ -319,7 +319,7 @@ func (e *Env) cleanup() error {
 // have a root created. Callers should use the client to make a root directory if
 // necessary.
 func (e *Env) NewUser(userName upspin.UserName) (upspin.Config, error) {
-	const op = "testenv.NewUser"
+	const op errors.Op = "testenv.NewUser"
 
 	if e.Setup.UpBox {
 		switch userName {

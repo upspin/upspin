@@ -83,7 +83,7 @@ func FromFile(name string) (upspin.Config, error) {
 		}
 	}
 	if err != nil {
-		const op = "config.FromFile"
+		const op errors.Op = "config.FromFile"
 		if os.IsNotExist(err) {
 			return nil, errors.E(op, errors.NotExist, err)
 		}
@@ -127,7 +127,7 @@ func FromFile(name string) (upspin.Config, error) {
 // The default value for tlscerts is the empty string,
 // in which case just the system roots are used.
 func InitConfig(r io.Reader) (upspin.Config, error) {
-	const op = "config.InitConfig"
+	const op errors.Op = "config.InitConfig"
 	vals := map[string]string{
 		username:    string(defaultUserName),
 		packing:     defaultPacking.String(),
@@ -259,7 +259,7 @@ func asString(v interface{}) (string, error) {
 	return "", errors.E(errors.Invalid, errors.Errorf("unrecognized value %T", v))
 }
 
-func parseEndpoint(op string, vals map[string]string, key string, errorp *error) upspin.Endpoint {
+func parseEndpoint(op errors.Op, vals map[string]string, key string, errorp *error) upspin.Endpoint {
 	text, ok := vals[key]
 	if !ok || text == "" {
 		return upspin.Endpoint{}
@@ -437,7 +437,7 @@ func (cfg cfgValueMap) Value(key string) string {
 // SetFlagValues updates any flag that is still at its default value.
 // It will apply all the flags possible and return the last error seen.
 func SetFlagValues(cfg upspin.Config, cmd string) error {
-	const op = "config.SetFlagValues"
+	const op errors.Op = "config.SetFlagValues"
 	flagYAML := cfg.Value("cmdflags")
 	if flagYAML == "" {
 		return nil
@@ -491,7 +491,7 @@ func Homedir() (string, error) {
 	}
 	h := u.HomeDir
 	if h == "" {
-		return "", errors.E(errors.NotExist, errors.Str("user home directory not found"))
+		return "", errors.E(errors.NotExist, "user home directory not found")
 	}
 	if err := isDir(h); err != nil {
 		return "", err
@@ -536,7 +536,7 @@ func isDir(p string) error {
 		return errors.E(errors.IO, err)
 	}
 	if !fi.IsDir() {
-		return errors.E(errors.NotDir, errors.Str(p))
+		return errors.E(errors.NotDir, p)
 	}
 	return nil
 }

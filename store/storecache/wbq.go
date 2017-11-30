@@ -130,7 +130,7 @@ func newWritebackQueue(sc *storeCache) *writebackQueue {
 
 // enqueueWritebackFile populates the writeback queue on startup.
 func (wbq *writebackQueue) enqueueWritebackFile(relPath string) {
-	const op = "store/storecache.isWritebackFile"
+	const op errors.Op = "store/storecache.isWritebackFile"
 
 	if wbq == nil {
 		log.Error.Printf("%s: writeback file %s but running as writethrough", op, relPath)
@@ -157,7 +157,7 @@ var emptyLocation upspin.Location
 
 // scheduler puts requests into the ready queue for the writers to work on.
 func (wbq *writebackQueue) scheduler() {
-	const op = "store/storecache.scheduler"
+	const op errors.Op = "store/storecache.scheduler"
 	p := newParallelism(initialMaxParallel)
 	for {
 		select {
@@ -424,7 +424,7 @@ func newParallelism(max int) *parallelism {
 // failure is called when a writeback fails. It returns true if it
 // has dealt with the error.
 func (p *parallelism) failure(err error) bool {
-	const op = "store/storecache.failure"
+	const op errors.Op = "store/storecache.failure"
 
 	p.inFlight--
 
@@ -457,7 +457,7 @@ func (p *parallelism) failure(err error) bool {
 
 // success is called whenever a writeback succeeds.
 func (p *parallelism) success() {
-	const op = "store/storecache.success"
+	const op errors.Op = "store/storecache.success"
 
 	p.inFlight--
 

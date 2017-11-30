@@ -86,7 +86,7 @@ func (ee ee) String() string {
 }
 
 func (ee ee) Pack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockPacker, error) {
-	const op = "pack/ee.Pack"
+	const op errors.Op = "pack/ee.Pack"
 	if err := pack.CheckPacking(ee, d); err != nil {
 		return nil, errors.E(op, errors.Invalid, d.Name, err)
 	}
@@ -141,7 +141,7 @@ type blockPacker struct {
 }
 
 func (bp *blockPacker) Pack(cleartext []byte) (ciphertext []byte, err error) {
-	const op = "pack/ee.blockPacker.Pack"
+	const op errors.Op = "pack/ee.blockPacker.Pack"
 	if err := internal.CheckLocationSet(bp.entry); err != nil {
 		return nil, err
 	}
@@ -181,7 +181,7 @@ func (bp *blockPacker) SetLocation(l upspin.Location) {
 }
 
 func (bp *blockPacker) Close() error {
-	const op = "pack/ee.blockPacker.Close"
+	const op errors.Op = "pack/ee.blockPacker.Close"
 	// Zero out encryption key when we're done.
 	defer zeroSlice(&bp.dkey)
 
@@ -252,7 +252,7 @@ func (bp *blockPacker) Close() error {
 }
 
 func (ee ee) Unpack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker, error) {
-	const op = "pack/ee.Unpack"
+	const op errors.Op = "pack/ee.Unpack"
 	if err := pack.CheckPacking(ee, d); err != nil {
 		return nil, errors.E(op, errors.Invalid, d.Name, err)
 	}
@@ -269,7 +269,7 @@ func (ee ee) Unpack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker
 
 	// Check that our stored+signed block checksum matches the sum of the actual blocks.
 	if !bytes.Equal(internal.BlockSum(d.Blocks), pd.blockSum) {
-		return nil, errors.E(op, d.Name, errors.Str("checksum mismatch"))
+		return nil, errors.E(op, d.Name, "checksum mismatch")
 	}
 
 	// Fetch writer public key.
@@ -342,12 +342,12 @@ type blockUnpacker struct {
 }
 
 func (bp *blockUnpacker) Unpack(ciphertext []byte) (cleartext []byte, err error) {
-	const op = "pack/ee.blockUnpacker.Unpack"
+	const op errors.Op = "pack/ee.blockUnpacker.Unpack"
 	// Validate checksum.
 	b := sha256.Sum256(ciphertext)
 	sum := b[:]
 	if got, want := sum, bp.entry.Blocks[bp.Block].Packdata; !bytes.Equal(got, want) {
-		return nil, errors.E(op, bp.entry.Name, errors.Str("checksum mismatch"))
+		return nil, errors.E(op, bp.entry.Name, "checksum mismatch")
 	}
 
 	cleartext = bp.buf.Bytes(len(ciphertext))
@@ -367,7 +367,7 @@ func (bp *blockUnpacker) Close() error {
 // ReaderHashes returns SHA-256 hashes of the public keys able to decrypt the
 // associated ciphertext.
 func (ee ee) ReaderHashes(pd []byte) (readers [][]byte, err error) {
-	const op = "pack/ee.ReaderHashes"
+	const op errors.Op = "pack/ee.ReaderHashes"
 	var d packdata
 	if err := d.Unmarshal(pd); err != nil {
 		return nil, errors.E(op, errors.Invalid, err)
@@ -381,7 +381,6 @@ func (ee ee) ReaderHashes(pd []byte) (readers [][]byte, err error) {
 
 // Share extracts the file decryption key from the packdata, wraps it for a revised list of readers, and updates packdata.
 func (ee ee) Share(cfg upspin.Config, readers []upspin.PublicKey, packdataSlice []*[]byte) {
-
 	// A Packdata holds a cipherSum, a Signature, and a list of wrapped keys.
 	// Share updates the wrapped keys, leaving the other two fields unchanged.
 	// For efficiency, Share() reuses the wrapped key for readers common to the old and new lists.
@@ -404,7 +403,6 @@ func (ee ee) Share(cfg upspin.Config, readers []upspin.PublicKey, packdataSlice 
 
 	// For each packdata, wrap for new readers.
 	for j, d := range packdataSlice {
-
 		// Extract dkey and existing wrapped keys from packdata.
 		var dkey []byte
 		alreadyWrapped := make(map[keyHashArray]*wrappedKey)
@@ -477,17 +475,17 @@ func (ee ee) Share(cfg upspin.Config, readers []upspin.PublicKey, packdataSlice 
 
 // Name implements upspin.Name.
 func (ee ee) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName) error {
-	const op = "pack/ee.Name"
+	const op errors.Op = "pack/ee.Name"
 	return ee.updateDirEntry(op, cfg, d, newName, d.Time)
 }
 
 // SetTime implements upspin.SetTime.
 func (ee ee) SetTime(cfg upspin.Config, d *upspin.DirEntry, t upspin.Time) error {
-	const op = "pack/ee.SetTime"
+	const op errors.Op = "pack/ee.SetTime"
 	return ee.updateDirEntry(op, cfg, d, d.Name, t)
 }
 
-func (ee ee) updateDirEntry(op string, cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName, newTime upspin.Time) error {
+func (ee ee) updateDirEntry(op errors.Op, cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName, newTime upspin.Time) error {
 	parsed, err := path.Parse(d.Name)
 	if err != nil {
 		return errors.E(op, err)
@@ -499,7 +497,7 @@ func (ee ee) updateDirEntry(op string, cfg upspin.Config, d *upspin.DirEntry, ne
 	newName = parsedNew.Path()
 
 	if d.IsDir() && !parsed.Equal(parsedNew) {
-		return errors.E(op, d.Name, errors.IsDir, errors.Str("cannot rename directory"))
+		return errors.E(op, d.Name, errors.IsDir, "cannot rename directory")
 	}
 	if err := pack.CheckPacking(ee, d); err != nil {
 		return errors.E(op, errors.Invalid, d.Name, err)
@@ -555,7 +553,7 @@ func (ee ee) updateDirEntry(op string, cfg upspin.Config, d *upspin.DirEntry, ne
 		// Decode my wrapped key using my private key
 		dkey, err = aesUnwrap(f, w)
 		if err != nil {
-			return errors.E(op, d.Name, errors.Str("unwrap failed"))
+			return errors.E(op, d.Name, "unwrap failed")
 		}
 	}
 
@@ -594,9 +592,9 @@ func (ee ee) updateDirEntry(op string, cfg upspin.Config, d *upspin.DirEntry, ne
 
 // Countersign uses the key in factotum f to add a signature to a DirEntry that is already signed by oldKey.
 func (ee ee) Countersign(oldKey upspin.PublicKey, f upspin.Factotum, d *upspin.DirEntry) error {
-	const op = "pack/ee.Countersign"
+	const op errors.Op = "pack/ee.Countersign"
 	if d.IsDir() {
-		return errors.E(op, d.Name, errors.IsDir, errors.Str("cannot sign directory"))
+		return errors.E(op, d.Name, errors.IsDir, "cannot sign directory")
 	}
 
 	// Get ECDSA form of old key.
@@ -626,19 +624,19 @@ func (ee ee) Countersign(oldKey upspin.PublicKey, f upspin.Factotum, d *upspin.D
 	}
 	dkey, err := aesUnwrap(f, w)
 	if err != nil {
-		return errors.E(op, d.Name, errors.Str("unwrap failed"))
+		return errors.E(op, d.Name, "unwrap failed")
 	}
 
 	// Verify existing signature with oldKey.
 	vhash := f.DirEntryHash(d.SignedName, d.Link, d.Attr, d.Packing, d.Time, dkey, pd.blockSum)
 	if !ecdsa.Verify(oldPubKey, vhash, pd.sig.R, pd.sig.S) {
-		return errors.E(op, d.Name, errVerify, errors.Str("unable to verify existing signature"))
+		return errors.E(op, d.Name, errVerify, "unable to verify existing signature")
 	}
 
 	// Sign with newKey.
 	sig1, err := f.FileSign(vhash)
 	if err != nil {
-		return errors.E(op, d.Name, errVerify, errors.Str("unable to make new signature"))
+		return errors.E(op, d.Name, errVerify, "unable to make new signature")
 	}
 	pd.sig2 = pd.sig
 	pd.sig = sig1
@@ -646,7 +644,7 @@ func (ee ee) Countersign(oldKey upspin.PublicKey, f upspin.Factotum, d *upspin.D
 }
 
 func (ee ee) UnpackableByAll(d *upspin.DirEntry) (bool, error) {
-	const op = "pack/ee.UnpackableByAll"
+	const op errors.Op = "pack/ee.UnpackableByAll"
 
 	if d.Packing != upspin.EEPack {
 		p := pack.Lookup(d.Packing)

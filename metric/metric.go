@@ -11,13 +11,14 @@ import (
 	"sync/atomic"
 	"time"
 
+	"upspin.io/errors"
 	"upspin.io/log"
 )
 
 // Metric is a named collection of spans. A span measures time from the beginning of an event
 // (for example, an RPC request) until its completion.
 type Metric struct {
-	Name string
+	Name errors.Op
 
 	mu    sync.Mutex // protects all fields below
 	spans []*Span
@@ -33,7 +34,7 @@ func (m *Metric) Spans() []*Span {
 
 // A Span measures time from the beginning of an event (for example, an RPC request) until its completion.
 type Span struct {
-	Name       string
+	Name       errors.Op
 	StartTime  time.Time
 	EndTime    time.Time
 	Kind       Kind    // Server, Client or Other kind of metric span.
@@ -70,14 +71,14 @@ var saveQueue = make(chan *Metric, SaveQueueLength)
 
 // New creates a new named metric. If name is non-empty, it will prefix every
 // descendant's Span name.
-func New(name string) *Metric {
+func New(name errors.Op) *Metric {
 	return &Metric{
 		Name: name,
 	}
 }
 
 // NewSpan creates a new unamed metric with a newly-started named span.
-func NewSpan(name string) (*Metric, *Span) {
+func NewSpan(name errors.Op) (*Metric, *Span) {
 	m := New(name)
 	return m, m.StartSpan(name)
 }
@@ -97,7 +98,7 @@ func RegisterSaver(saver Saver) {
 
 // StartSpan starts a new span of the metric with implicit start time being the current time and Kind being Server.
 // Spans need not be contiguous and may or may not overlap.
-func (m *Metric) StartSpan(name string) *Span {
+func (m *Metric) StartSpan(name errors.Op) *Span {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 	// Lazily allocate the spans slice.
@@ -151,7 +152,7 @@ func (s *Span) End() *Metric {
 
 // StartSpan starts a new span as a child of s with start time set to the current time.
 // It may return nil if the parent Metric of s is Done.
-func (s *Span) StartSpan(name string) *Span {
+func (s *Span) StartSpan(name errors.Op) *Span {
 	if s.Parent == nil {
 		log.Error.Printf("metric: parent metric of span %q is nil", s.Name)
 		return nil

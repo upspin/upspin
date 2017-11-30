@@ -30,7 +30,7 @@ const cacheSize = 10000
 // New initializes an instance of the KeyServer
 // that stores its data in the given Storage implementation.
 func New(options ...string) (upspin.KeyServer, error) {
-	const op = "key/server.New"
+	const op errors.Op = "key/server.New"
 
 	var backend string
 	var dialOpts []storage.DialOpts
@@ -44,7 +44,7 @@ func New(options ...string) (upspin.KeyServer, error) {
 		dialOpts = append(dialOpts, storage.WithOptions(option))
 	}
 	if backend == "" {
-		return nil, errors.E(op, errors.Invalid, errors.Str(`storage "backend" option is missing`))
+		return nil, errors.E(op, errors.Invalid, `storage "backend" option is missing`)
 	}
 	s, err := storage.Dial(backend, dialOpts...)
 	if err != nil {
@@ -99,7 +99,7 @@ type userEntry struct {
 
 // Lookup implements upspin.KeyServer.
 func (s *server) Lookup(name upspin.UserName) (*upspin.User, error) {
-	const op = "key/server.Lookup"
+	const op errors.Op = "key/server.Lookup"
 	m, span := metric.NewSpan(op)
 	defer m.Done()
 
@@ -114,7 +114,7 @@ func (s *server) Lookup(name upspin.UserName) (*upspin.User, error) {
 }
 
 // lookup looks up the internal user record, using caches when available.
-func (s *server) lookup(op string, name upspin.UserName, span *metric.Span) (*userEntry, error) {
+func (s *server) lookup(op errors.Op, name upspin.UserName, span *metric.Span) (*userEntry, error) {
 	// Check positive cache first.
 	if entry, found := s.cache.Get(name); found {
 		return entry.(*userEntry), nil
@@ -144,12 +144,12 @@ func (s *server) lookup(op string, name upspin.UserName, span *metric.Span) (*us
 
 // Put implements upspin.KeyServer.
 func (s *server) Put(u *upspin.User) error {
-	const op = "key/server.Put"
+	const op errors.Op = "key/server.Put"
 	m, span := metric.NewSpan(op)
 	defer m.Done()
 
 	if s.user == "" {
-		return errors.E(op, errors.Internal, errors.Str("not bound to user"))
+		return errors.E(op, errors.Internal, "not bound to user")
 	}
 	if err := valid.User(u); err != nil {
 		return errors.E(op, err)
@@ -211,7 +211,7 @@ func (s *server) Put(u *upspin.User) error {
 
 // canPut reports whether the current logged-in user can Put the (new or
 // existing) target user.
-func (s *server) canPut(op string, target upspin.UserName, isTargetNew bool, span *metric.Span) error {
+func (s *server) canPut(op errors.Op, target upspin.UserName, isTargetNew bool, span *metric.Span) error {
 	sp := span.StartSpan("canPut")
 	defer sp.End()
 
@@ -221,7 +221,7 @@ func (s *server) canPut(op string, target upspin.UserName, isTargetNew bool, spa
 	}
 	// Do not allow * wildcard in name.
 	if name == "*" {
-		return errors.E(op, errors.Invalid, target, errors.Str("user has wildcard '*' in name"))
+		return errors.E(op, errors.Invalid, target, "user has wildcard '*' in name")
 	}
 	// If the current user is the same as target, it can proceed.
 	if s.user == target {
@@ -261,7 +261,7 @@ func (s *server) canPut(op string, target upspin.UserName, isTargetNew bool, spa
 }
 
 // fetchUserEntry reads the user entry for a given user from the storage.
-func (s *server) fetchUserEntry(op string, name upspin.UserName) (*userEntry, error) {
+func (s *server) fetchUserEntry(op errors.Op, name upspin.UserName) (*userEntry, error) {
 	b, err := s.storage.Download(string(name))
 	if err != nil {
 		return nil, errors.E(op, name, err)
@@ -274,9 +274,9 @@ func (s *server) fetchUserEntry(op string, name upspin.UserName) (*userEntry, er
 }
 
 // putUserEntry writes the user entry for a user to the storage.
-func (s *server) putUserEntry(op string, entry *userEntry) error {
+func (s *server) putUserEntry(op errors.Op, entry *userEntry) error {
 	if entry == nil {
-		return errors.E(op, errors.Invalid, errors.Str("nil userEntry"))
+		return errors.E(op, errors.Invalid, "nil userEntry")
 	}
 	b, err := json.Marshal(entry)
 	if err != nil {
@@ -315,11 +315,11 @@ func (s *server) verifyOwns(u upspin.UserName, pubKey upspin.PublicKey, domain s
 		var sig upspin.Signature
 		var rs, ss big.Int
 		if _, ok := rs.SetString(sigFields[0], 16); !ok {
-			lastErr = errors.E(errors.Invalid, errors.Str("invalid signature field0"))
+			lastErr = errors.E(errors.Invalid, "invalid signature field0")
 			continue
 		}
 		if _, ok := ss.SetString(sigFields[1], 16); !ok {
-			lastErr = errors.E(errors.Invalid, errors.Str("invalid signature field1"))
+			lastErr = errors.E(errors.Invalid, "invalid signature field1")
 			continue
 		}
 		sig.R = &rs
@@ -339,7 +339,7 @@ func (s *server) verifyOwns(u upspin.UserName, pubKey upspin.PublicKey, domain s
 
 // Log implements Logger.
 func (s *server) Log() ([]byte, error) {
-	const op = "key/server.Log"
+	const op errors.Op = "key/server.Log"
 
 	data, err := s.logger.ReadAll()
 	if err != nil {

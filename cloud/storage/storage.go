@@ -48,7 +48,7 @@ type DialOpts func(*Opts) error
 
 // Register registers a new Storage under a name. It is typically used in init functions.
 func Register(name string, fn StorageConstructor) error {
-	const op = "cloud/storage.Register"
+	const op errors.Op = "cloud/storage.Register"
 	if _, exists := registration[name]; exists {
 		return errors.E(op, errors.Exist)
 	}
@@ -60,7 +60,7 @@ func Register(name string, fn StorageConstructor) error {
 // are specific to each storage backend. Neither key nor value may contain the characters "," or "=".
 // Use WithKeyValue repeatedly if these characters need to be used.
 func WithOptions(options string) DialOpts {
-	const op = "cloud/storage.WithOptions"
+	const op errors.Op = "cloud/storage.WithOptions"
 	return func(o *Opts) error {
 		pairs := strings.Split(options, ",")
 		for _, p := range pairs {
@@ -84,7 +84,7 @@ func WithKeyValue(key, value string) DialOpts {
 
 // Dial dials the named storage backend using the dial options opts.
 func Dial(name string, opts ...DialOpts) (Storage, error) {
-	const op = "cloud/storage.Dial"
+	const op errors.Op = "cloud/storage.Dial"
 	fn, found := registration[name]
 	if !found {
 		return nil, errors.E(op, errors.Invalid, errors.Errorf("unknown storage backend type %q", name))

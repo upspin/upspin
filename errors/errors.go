@@ -27,7 +27,7 @@ type Error struct {
 	User upspin.UserName
 	// Op is the operation being performed, usually the name of the method
 	// being invoked (Get, Put, etc.). It should not contain an at sign @.
-	Op string
+	Op Op
 	// Kind is the class of error, such as permission failure,
 	// or "Other" if its class is unknown or irrelevant.
 	Kind Kind
@@ -47,6 +47,10 @@ var (
 	_ encoding.BinaryUnmarshaler = (*Error)(nil)
 	_ encoding.BinaryMarshaler   = (*Error)(nil)
 )
+
+// Op describes an operation, usually as the package and method,
+// such as "key/server.Lookup".
+type Op string
 
 // Separator is the string used to separate nested errors. By
 // default, to make errors easier on the eye, nested errors are
@@ -127,9 +131,15 @@ func (k Kind) String() string {
 //		The Upspin path name of the item being accessed.
 //	upspin.UserName
 //		The Upspin name of the user attempting the operation.
-//	string
+//	errors.Op
 //		The operation being performed, usually the method
-//		being invoked (Get, Put, etc.)
+//		being invoked (Get, Put, etc.).
+//	string
+//		Treated as an error message and assigned to the
+//		Err field after a call to errors.Str. To avoid a common
+//		class of misuse, if the string contains an @, it will be
+//		treated as a PathName or UserName, as appropriate. Use
+//		errors.Str explicitly to avoid this special-casing.
 //	errors.Kind
 //		The class of error, such as permission failure.
 //	error
@@ -152,6 +162,8 @@ func E(args ...interface{}) error {
 			e.Path = arg
 		case upspin.UserName:
 			e.User = arg
+		case Op:
+			e.Op = arg
 		case string:
 			// Someone might accidentally call us with a user or path name
 			// that is not of the right type. Take care of that and log it.
@@ -169,7 +181,7 @@ func E(args ...interface{}) error {
 				}
 				continue
 			}
-			e.Op = arg
+			e.Err = Str(arg)
 		case Kind:
 			e.Kind = arg
 		case *Error:
@@ -239,7 +251,7 @@ func (e *Error) Error() string {
 	}
 	if e.Op != "" {
 		pad(b, ": ")
-		b.WriteString(e.Op)
+		b.WriteString(string(e.Op))
 	}
 	if e.Kind != 0 {
 		pad(b, ": ")
@@ -296,7 +308,7 @@ func (e *Error) MarshalAppend(b []byte) []byte {
 	}
 	b = appendString(b, string(e.Path))
 	b = appendString(b, string(e.User))
-	b = appendString(b, e.Op)
+	b = appendString(b, string(e.Op))
 	var tmp [16]byte // For use by PutVarint.
 	N := binary.PutVarint(tmp[:], int64(e.Kind))
 	b = append(b, tmp[:N]...)
@@ -356,7 +368,7 @@ func (e *Error) UnmarshalBinary(b []byte) error {
 	}
 	data, b = getBytes(b)
 	if data != nil {
-		e.Op = string(data)
+		e.Op = Op(data)
 	}
 	k, N := binary.Varint(b)
 	e.Kind = Kind(k)

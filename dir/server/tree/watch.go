@@ -34,8 +34,8 @@ const (
 )
 
 var (
-	errTimeout = errors.E(errors.IO, errors.Str("channel operation timed out"))
-	errClosed  = errors.E(errors.IO, errors.Str("channel closed"))
+	errTimeout = errors.E(errors.IO, "channel operation timed out")
+	errClosed  = errors.E(errors.IO, "channel closed")
 )
 
 // watcher holds together the done channel and the event channel for a given

@@ -22,31 +22,31 @@ var unassignedErr = errors.Str("request to unassigned service")
 
 // Glob implements upspin.DirServer.Glob.
 func (Server) Glob(pattern string) ([]*upspin.DirEntry, error) {
-	const op = "dir/Server.Glob"
+	const op errors.Op = "dir/Server.Glob"
 	return nil, errors.E(op, errors.Invalid, unassignedErr)
 }
 
 // Put implements upspin.DirServer.Put.
 func (Server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
-	const op = "dir/Server.Put"
+	const op errors.Op = "dir/Server.Put"
 	return nil, errors.E(op, errors.Invalid, unassignedErr)
 }
 
 // WhichAccess implements upspin.DirServer.WhichAccess.
 func (Server) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, error) {
-	const op = "dir/Server.WhichAccess"
+	const op errors.Op = "dir/Server.WhichAccess"
 	return nil, errors.E(op, errors.Invalid, unassignedErr)
 }
 
 // Delete implements upspin.DirServer.Delete.
 func (Server) Delete(pathName upspin.PathName) (*upspin.DirEntry, error) {
-	const op = "dir/Server.Delete"
+	const op errors.Op = "dir/Server.Delete"
 	return nil, errors.E(op, errors.Invalid, unassignedErr)
 }
 
 // Lookup implements upspin.DirServer.Lookup.
 func (Server) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
-	const op = "dir/Server.Lookup"
+	const op errors.Op = "dir/Server.Lookup"
 	return nil, errors.E(op, errors.Invalid, unassignedErr)
 }
 
@@ -66,9 +66,9 @@ func (Server) Close() {
 
 // Dial implements upspin.Service.
 func (Server) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
-	const op = "dir/Server.Dial"
+	const op errors.Op = "dir/Server.Dial"
 	if e.Transport != upspin.Unassigned {
-		return nil, errors.E(op, errors.Invalid, errors.Str("unrecognized transport"))
+		return nil, errors.E(op, errors.Invalid, "unrecognized transport")
 	}
 
 	return Server{e}, nil

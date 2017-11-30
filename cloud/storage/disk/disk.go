@@ -20,11 +20,11 @@ import (
 // options. The single, required option is "basePath" that must be an absolute
 // path under which all objects should be stored.
 func New(opts *storage.Opts) (storage.Storage, error) {
-	const op = "cloud/storage/disk.New"
+	const op errors.Op = "cloud/storage/disk.New"
 
 	base, ok := opts.Opts["basePath"]
 	if !ok {
-		return nil, errors.E(op, errors.Str("the basePath option must be specified"))
+		return nil, errors.E(op, "the basePath option must be specified")
 	}
 	if err := os.MkdirAll(base, 0700); err != nil {
 		return nil, errors.E(op, errors.IO, err)
@@ -103,19 +103,19 @@ func (s *storageImpl) LinkBase() (base string, err error) {
 
 // Download implements Storage.
 func (s *storageImpl) Download(ref string) ([]byte, error) {
-	const op = "cloud/storage/disk.Download"
+	const op errors.Op = "cloud/storage/disk.Download"
 	b, err := ioutil.ReadFile(s.path(ref))
 	if os.IsNotExist(err) {
-		return nil, errors.E(op, errors.NotExist, errors.Str(ref))
+		return nil, errors.E(op, errors.NotExist, ref)
 	} else if err != nil {
-		return nil, errors.E(op, errors.IO, errors.Str(ref))
+		return nil, errors.E(op, errors.IO, ref)
 	}
 	return b, nil
 }
 
 // Put implements Storage.
 func (s *storageImpl) Put(ref string, contents []byte) error {
-	const op = "cloud/storage/disk.Put"
+	const op errors.Op = "cloud/storage/disk.Put"
 	p := s.path(ref)
 	if err := os.MkdirAll(filepath.Dir(p), 0700); err != nil {
 		return errors.E(op, errors.IO, err)
@@ -128,11 +128,11 @@ func (s *storageImpl) Put(ref string, contents []byte) error {
 
 // Delete implements Storage.
 func (s *storageImpl) Delete(ref string) error {
-	const op = "cloud/storage/disk.Delete"
+	const op errors.Op = "cloud/storage/disk.Delete"
 	if err := os.Remove(s.path(ref)); os.IsNotExist(err) {
-		return errors.E(op, errors.NotExist, errors.Str(ref))
+		return errors.E(op, errors.NotExist, ref)
 	} else if err != nil {
-		return errors.E(op, errors.IO, errors.Str(ref))
+		return errors.E(op, errors.IO, ref)
 	}
 	return nil
 }

@@ -13,8 +13,6 @@ import (
 	"upspin.io/upspin"
 )
 
-var errNoKnownKeysForUser = errors.Str("no known keys for user")
-
 // PutBytes stores the varint-encoded length of src in dst, followed by a copy of src.
 // It returns the number of bytes written to dst.
 func PutBytes(dst, src []byte) int {
@@ -38,7 +36,6 @@ func GetBytes(dst *[]byte, src []byte) int {
 
 // GetPublicKey returns the string representation of a user's public key.
 func GetPublicKey(cfg upspin.Config, user upspin.UserName) (upspin.PublicKey, error) {
-
 	// Are we requesting our own public key?
 	if string(user) == string(cfg.UserName()) {
 		return cfg.Factotum().PublicKey(), nil
@@ -52,7 +49,7 @@ func GetPublicKey(cfg upspin.Config, user upspin.UserName) (upspin.PublicKey, er
 		return "", err
 	}
 	if len(u.PublicKey) == 0 {
-		return "", errors.E(user, errors.NotExist, errNoKnownKeysForUser)
+		return "", errors.E(user, errors.NotExist, "no known keys for user")
 	}
 	return u.PublicKey, nil
 }

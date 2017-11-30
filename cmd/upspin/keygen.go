@@ -94,7 +94,7 @@ func (s *State) createKeys(curveName, secretFlag string) (public, private, secre
 	if !keygen.ValidSecretSeed(secretFlag) {
 		data, err := ioutil.ReadFile(subcmd.Tilde(secretFlag))
 		if err != nil {
-			return "", "", "", errors.E("keygen", errors.IO, err)
+			return "", "", "", errors.E(errors.Op("keygen"), errors.IO, err)
 		}
 		secretFlag = strings.TrimSpace(string(data))
 	}

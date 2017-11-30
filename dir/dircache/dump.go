@@ -21,8 +21,6 @@ import (
 
 // DumpLog writes human readable logs to stdout.
 func DumpLog(cfg upspin.Config, dir string) error {
-	const op = "rpc/dircache.dumpLog"
-
 	l := &clog{
 		cfg: cfg,
 		dir: dir,

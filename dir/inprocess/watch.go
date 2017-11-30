@@ -85,7 +85,7 @@ func (l *listener) sendAll(events []upspin.Event) bool {
 // If it returns false, it attempts to send an error event unless the
 // problem was an unresponsive client.
 func (l *listener) sendTree(name upspin.PathName) bool {
-	const op = "dir/inprocess.Watch"
+	const op errors.Op = "dir/inprocess.Watch"
 	parsed, err := path.Parse(name)
 	if err != nil {
 		// Shouldn't happen.
@@ -227,7 +227,7 @@ func (e *eventManager) delete(which *listener) {
 
 // watch is the implementation of DirServer.Watch after basic checking is done.
 func (e *eventManager) watch(server *server, root path.Parsed, sequence int64, done <-chan struct{}) (<-chan upspin.Event, error) {
-	const op = "dir/inprocess.Watch"
+	const op errors.Op = "dir/inprocess.Watch"
 	events := make(chan upspin.Event, 10)
 	l := &listener{
 		eventMgr: e,
@@ -245,7 +245,7 @@ func (e *eventManager) watch(server *server, root path.Parsed, sequence int64, d
 	// The special case of an invalid sequence is returned as an event with an "invalid" error.
 	if sequence != 0 && sequence != -1 {
 		if sequence < 0 || int64(len(eventsSoFar)) < sequence {
-			events <- upspin.Event{Error: errors.E(op, errors.Invalid, errors.Str("bad sequence"))}
+			events <- upspin.Event{Error: errors.E(op, errors.Invalid, "bad sequence")}
 			close(events)
 			return events, nil
 		}

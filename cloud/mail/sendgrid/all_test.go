@@ -60,7 +60,7 @@ func TestSendError(t *testing.T) {
 	sg := New("mykey")
 
 	err := sg.Send("to@you.com", "from_me", "hello", "", "")
-	expectedErr := errors.E(errors.Invalid, errors.Str("text or html body must be provided"))
+	expectedErr := errors.E(errors.Invalid, "text or html body must be provided")
 	if !errors.Match(expectedErr, err) {
 		t.Fatalf("err = %q, want = %q", err, expectedErr)
 	}

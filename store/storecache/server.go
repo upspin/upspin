@@ -120,5 +120,5 @@ type operation string
 
 func (op operation) error(err error) error {
 	logf("%v failed: %v", op, err)
-	return errors.E("store/storecache."+string(op), err)
+	return errors.E(errors.Op("store/storecache."+string(op)), err)
 }

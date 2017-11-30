@@ -91,7 +91,7 @@ type httpClient struct {
 // it indicates that this connection is being used to proxy request to that
 // endpoint.
 func NewClient(cfg upspin.Config, netAddr upspin.NetAddr, security SecurityLevel, proxyFor upspin.Endpoint) (Client, error) {
-	const op = "rpc.NewClient"
+	const op errors.Op = "rpc.NewClient"
 
 	c := &httpClient{
 		proxyFor: proxyFor,
@@ -140,7 +140,7 @@ func NewClient(cfg upspin.Config, netAddr upspin.NetAddr, security SecurityLevel
 	return c, nil
 }
 
-func (c *httpClient) makeAuthenticatedRequest(op, method string, req pb.Message) (*http.Response, bool, error) {
+func (c *httpClient) makeAuthenticatedRequest(op errors.Op, method string, req pb.Message) (*http.Response, bool, error) {
 	token, haveToken := c.authToken()
 	header := make(http.Header)
 	needServerAuth := false
@@ -163,7 +163,7 @@ func (c *httpClient) makeAuthenticatedRequest(op, method string, req pb.Message)
 	return resp, needServerAuth, err
 }
 
-func (c *httpClient) makeRequest(op, method string, req pb.Message, header http.Header) (*http.Response, error) {
+func (c *httpClient) makeRequest(op errors.Op, method string, req pb.Message, header http.Header) (*http.Response, error) {
 	// Encode the payload.
 	payload, err := pb.Marshal(req)
 	if err != nil {
@@ -187,7 +187,7 @@ func (c *httpClient) makeRequest(op, method string, req pb.Message, header http.
 
 // InvokeUnauthenticated implements Client.
 func (c *httpClient) InvokeUnauthenticated(method string, req, resp pb.Message) error {
-	const op = "rpc.InvokeUnauthenticated"
+	const op errors.Op = "rpc.InvokeUnauthenticated"
 
 	httpResp, err := c.makeRequest(op, method, req, make(http.Header))
 	if err != nil {
@@ -199,10 +199,10 @@ func (c *httpClient) InvokeUnauthenticated(method string, req, resp pb.Message) 
 
 // Invoke implements Client.
 func (c *httpClient) Invoke(method string, req, resp pb.Message, stream ResponseChan, done <-chan struct{}) error {
-	const op = "rpc.Invoke"
+	const op errors.Op = "rpc.Invoke"
 
 	if (resp == nil) == (stream == nil) {
-		return errors.E(op, errors.Str("exactly one of resp and stream must be nil"))
+		return errors.E(op, "exactly one of resp and stream must be nil")
 	}
 
 	var httpResp *http.Response
@@ -250,7 +250,7 @@ func (c *httpClient) Invoke(method string, req, resp pb.Message, stream Response
 		authErr := httpResp.Header.Get(authErrorHeader)
 		if len(authErr) > 0 {
 			body.Close()
-			return errors.E(op, errors.Permission, errors.Str(authErr))
+			return errors.E(op, errors.Permission, authErr)
 		}
 		// No authentication token returned, but no error either.
 		// Proceed.
@@ -263,7 +263,7 @@ func (c *httpClient) Invoke(method string, req, resp pb.Message, stream Response
 		msg, ok := httpResp.Header[authRequestHeader]
 		if !ok {
 			body.Close()
-			return errors.E(op, errors.Permission, errors.Str("proxy server must authenticate"))
+			return errors.E(op, errors.Permission, "proxy server must authenticate")
 		}
 		if err := c.verifyServerUser(msg); err != nil {
 			body.Close()
@@ -277,7 +277,7 @@ func (c *httpClient) Invoke(method string, req, resp pb.Message, stream Response
 	return nil
 }
 
-func readResponse(op string, body io.ReadCloser, resp pb.Message) error {
+func readResponse(op errors.Op, body io.ReadCloser, resp pb.Message) error {
 	respBytes, err := ioutil.ReadAll(body)
 	body.Close()
 	if err != nil {
@@ -306,7 +306,7 @@ func decodeStream(stream ResponseChan, r io.ReadCloser, done <-chan struct{}) {
 		return
 	}
 	if ok[0] != 'O' || ok[1] != 'K' {
-		stream.Error(errors.E(errors.IO, errors.Str("unexpected stream preamble")))
+		stream.Error(errors.E(errors.IO, "unexpected stream preamble"))
 		return
 	}
 

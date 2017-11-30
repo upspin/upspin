@@ -13,7 +13,7 @@ import (
 // PublicUserKeyService returns a Lookup function that looks up user's public keys.
 // The lookup function returned is bound to a well-known public Upspin user service.
 func PublicUserKeyService(cfg upspin.Config) func(userName upspin.UserName) (upspin.PublicKey, error) {
-	const op = "rpc.PublicUserKeyService"
+	const op errors.Op = "rpc.PublicUserKeyService"
 	return func(userName upspin.UserName) (upspin.PublicKey, error) {
 		key, err := bind.KeyServer(cfg, cfg.KeyEndpoint())
 		if err != nil {

@@ -57,7 +57,7 @@ var AllUsersKeyHash = KeyHash(upspin.AllUsersKey)
 // best local means of protecting private keys. Please do not break the abstraction
 // by hand coding direct generation or use of private keys.
 func NewFromDir(dir string) (upspin.Factotum, error) {
-	const op = "factotum.NewFromDir"
+	const op errors.Op = "factotum.NewFromDir"
 
 	privBytes, err := readFile(op, dir, "secret.upspinkey")
 	if err != nil {
@@ -77,19 +77,19 @@ func NewFromDir(dir string) (upspin.Factotum, error) {
 	}
 	s2 = stripCR(s2)
 
-	return newFactotum(fmt.Sprintf("%s(%q)", op, dir), pubBytes, privBytes, s2)
+	return newFactotum(errors.Op(fmt.Sprintf("%s(%q)", op, dir)), pubBytes, privBytes, s2)
 }
 
 // NewFromKeys returns a new Factotum by providing it with the raw
 // representation of an Upspin user's public, private and optionally, archived
 // keys.
 func NewFromKeys(public, private, archived []byte) (upspin.Factotum, error) {
-	const op = "factotum.NewFromKeys"
+	const op errors.Op = "factotum.NewFromKeys"
 	return newFactotum(op, public, private, archived)
 }
 
 // newFactotum creates a new Factotum using the given keys.
-func newFactotum(op string, public, private, archived []byte) (upspin.Factotum, error) {
+func newFactotum(op errors.Op, public, private, archived []byte) (upspin.Factotum, error) {
 	pfk, err := makeKey(upspin.PublicKey(public), string(private))
 	if err != nil {
 		return nil, errors.E(op, err)
@@ -237,7 +237,7 @@ func (f factotum) FileSign(hash upspin.DEHash) (upspin.Signature, error) {
 
 // ScalarMult is the bare private key operator, used in unwrapping packed data.
 func (f factotum) ScalarMult(keyHash []byte, curve elliptic.Curve, x, y *big.Int) (sx, sy *big.Int, err error) {
-	const op = "factotum.ScalarMult"
+	const op errors.Op = "factotum.ScalarMult"
 	var h keyHashArray
 	copy(h[:], keyHash)
 	fk, ok := f.keys[h]
@@ -258,7 +258,7 @@ func (f factotum) Sign(hash []byte) (upspin.Signature, error) {
 	fk := f.keys[f.current]
 	curveLength := (fk.ecdsaKeyPair.Curve.Params().N.BitLen() + 7) / 8
 	if len(hash) > curveLength {
-		return sig0, errors.E(errors.Invalid, errors.Str("hash is too long to Sign"))
+		return sig0, errors.E(errors.Invalid, "hash is too long to Sign")
 	}
 	r, s, err := ecdsa.Sign(rand.Reader, &fk.ecdsaKeyPair, hash)
 	if err != nil {
@@ -275,7 +275,7 @@ func Verify(hash []byte, sig upspin.Signature, key upspin.PublicKey) error {
 		return err
 	}
 	if !ecdsa.Verify(ecdsaPubKey, hash, sig.R, sig.S) {
-		return errors.E(errors.Invalid, errors.Str("signature does not match"))
+		return errors.E(errors.Invalid, "signature does not match")
 	}
 	return nil
 }
@@ -294,15 +294,15 @@ func (f factotum) PublicKey() upspin.PublicKey {
 
 // PublicKeyFromHash returns the user's public key with matching keyHash.
 func (f factotum) PublicKeyFromHash(keyHash []byte) (upspin.PublicKey, error) {
-	const op = "factotum.PublicKeyFromHash"
+	const op errors.Op = "factotum.PublicKeyFromHash"
 	if len(keyHash) == 0 {
-		return "", errors.E(op, errors.Invalid, errors.Errorf("invalid keyHash"))
+		return "", errors.E(op, errors.Invalid, "invalid keyHash")
 	}
 	var h keyHashArray
 	copy(h[:], keyHash)
 	fk, ok := f.keys[h]
 	if !ok {
-		return "", errors.E(op, errors.NotExist, errors.Errorf("no such key"))
+		return "", errors.E(op, errors.NotExist, "no such key")
 	}
 	return fk.public, nil
 }
@@ -318,7 +318,7 @@ func clean(s string) string {
 // parsePrivateKey returns an ECDSA private key given a user's ECDSA public key and a
 // string representation of the private key.
 func parsePrivateKey(publicKey *ecdsa.PublicKey, privateKey string) (priv *ecdsa.PrivateKey, err error) {
-	const op = "factotum.PublicKeyFromHash"
+	const op errors.Op = "factotum.PublicKeyFromHash"
 	var d big.Int
 	err = d.UnmarshalText([]byte(clean(privateKey)))
 	if err != nil {
@@ -326,7 +326,7 @@ func parsePrivateKey(publicKey *ecdsa.PublicKey, privateKey string) (priv *ecdsa
 	}
 	x, y := publicKey.Curve.ScalarBaseMult(d.Bytes())
 	if x.Cmp(publicKey.X) != 0 || y.Cmp(publicKey.Y) != 0 {
-		return nil, errors.E(op, errors.Invalid, errors.Errorf("public and private keys do not correspond"))
+		return nil, errors.E(op, errors.Invalid, "public and private keys do not correspond")
 	}
 	return &ecdsa.PrivateKey{PublicKey: *publicKey, D: &d}, nil
 }
@@ -334,7 +334,7 @@ func parsePrivateKey(publicKey *ecdsa.PublicKey, privateKey string) (priv *ecdsa
 // ParsePublicKey takes an Upspin representation of a public key and converts it into an ECDSA public key.
 // The Upspin string representation uses \n as newline no matter what native OS it runs on.
 func ParsePublicKey(public upspin.PublicKey) (*ecdsa.PublicKey, error) {
-	const op = "factotum.ParsePublicKey"
+	const op errors.Op = "factotum.ParsePublicKey"
 	fields := strings.Split(string(public), "\n")
 	if len(fields) != 4 { // 4 is because string should be terminated by \n, hence fields[3]==""
 		return nil, errors.E(op, errors.Invalid, errors.Errorf("expected keytype, two big ints and a newline; got %d %v", len(fields), fields))
@@ -364,7 +364,7 @@ func ParsePublicKey(public upspin.PublicKey) (*ecdsa.PublicKey, error) {
 	return &ecdsa.PublicKey{Curve: curve, X: &x, Y: &y}, nil
 }
 
-func readFile(op, dir, name string) ([]byte, error) {
+func readFile(op errors.Op, dir, name string) ([]byte, error) {
 	b, err := ioutil.ReadFile(filepath.Join(dir, name))
 	if os.IsNotExist(err) {
 		return nil, errors.E(op, errors.NotExist, err)

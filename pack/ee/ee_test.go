@@ -398,7 +398,7 @@ type dummyKey struct {
 var _ upspin.KeyServer = (*dummyKey)(nil)
 
 func (d *dummyKey) Lookup(userName upspin.UserName) (*upspin.User, error) {
-	const op = "pack/ee.dummyKey.Lookup"
+	const op errors.Op = "pack/ee.dummyKey.Lookup"
 	for i, u := range d.userToMatch {
 		if u == userName {
 			d.returnedKeys++
@@ -409,7 +409,7 @@ func (d *dummyKey) Lookup(userName upspin.UserName) (*upspin.User, error) {
 			return user, nil
 		}
 	}
-	return nil, errors.E(op, userName, errors.NotExist, errors.Str("user not found"))
+	return nil, errors.E(op, userName, errors.NotExist, "user not found")
 }
 func (d *dummyKey) Dial(cc upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
 	return d, nil

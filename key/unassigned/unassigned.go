@@ -22,13 +22,13 @@ var unassignedErr = errors.Str("request to unassigned service")
 
 // Lookup implements upspin.KeysServer.Lookup.
 func (Server) Lookup(name upspin.UserName) (*upspin.User, error) {
-	const op = "key/Server.Lookup"
+	const op errors.Op = "key/Server.Lookup"
 	return nil, errors.E(op, errors.Invalid, unassignedErr)
 }
 
 // Put implements upspin.KeysServer.Put.
 func (Server) Put(user *upspin.User) error {
-	const op = "key/Server.Put"
+	const op errors.Op = "key/Server.Put"
 	return errors.E(op, errors.Invalid, unassignedErr)
 }
 
@@ -43,9 +43,9 @@ func (Server) Close() {
 
 // Dial implements upspin.Service.
 func (Server) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
-	const op = "key/Server.Dial"
+	const op errors.Op = "key/Server.Dial"
 	if e.Transport != upspin.Unassigned {
-		return nil, errors.E(op, errors.Invalid, errors.Str("unrecognized transport"))
+		return nil, errors.E(op, errors.Invalid, "unrecognized transport")
 	}
 
 	return Server{e}, nil

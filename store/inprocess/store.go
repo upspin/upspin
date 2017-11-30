@@ -72,7 +72,7 @@ func (s *service) Put(ciphertext []byte) (*upspin.Refdata, error) {
 
 // Delete implements upspin.StoreServer
 func (s *service) Delete(ref upspin.Reference) error {
-	const op = "store/inprocess.Delete"
+	const op errors.Op = "store/inprocess.Delete"
 	s.data.mu.Lock()
 	defer s.data.mu.Unlock()
 	_, ok := s.data.blob[ref]
@@ -93,9 +93,9 @@ func (s *service) DeleteAll() {
 // Get implements upspin.StoreServer
 // TODO: Get should provide alternate location if missing.
 func (s *service) Get(ref upspin.Reference) (ciphertext []byte, refdata *upspin.Refdata, other []upspin.Location, err error) {
-	const op = "store/inprocess.Get"
+	const op errors.Op = "store/inprocess.Get"
 	if ref == "" {
-		return nil, nil, nil, errors.E(op, errors.Invalid, errors.Str("empty reference"))
+		return nil, nil, nil, errors.E(op, errors.Invalid, "empty reference")
 	}
 	s.data.mu.Lock()
 	data, ok := s.data.blob[ref]
@@ -104,7 +104,7 @@ func (s *service) Get(ref upspin.Reference) (ciphertext []byte, refdata *upspin.
 		return nil, nil, nil, errors.E(op, errors.NotExist, errors.Errorf("no such blob: %s", ref))
 	}
 	if upspin.Reference(sha256key.Of(data).String()) != ref {
-		return nil, nil, nil, errors.E(op, errors.Invalid, errors.Str("internal hash mismatch in StoreServer.Get"))
+		return nil, nil, nil, errors.E(op, errors.Invalid, "internal hash mismatch in StoreServer.Get")
 	}
 	refdata = &upspin.Refdata{
 		Reference: ref,
@@ -119,9 +119,9 @@ func (s *service) Get(ref upspin.Reference) (ciphertext []byte, refdata *upspin.
 // Dial ignores the address within the endpoint but requires that the transport be InProcess.
 // TODO: Authenticate the caller.
 func (s *service) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
-	const op = "store/inprocess.Dial"
+	const op errors.Op = "store/inprocess.Dial"
 	if e.Transport != upspin.InProcess {
-		return nil, errors.E(op, errors.Invalid, errors.Str("unrecognized transport"))
+		return nil, errors.E(op, errors.Invalid, "unrecognized transport")
 	}
 	s.data.mu.Lock()
 	defer s.data.mu.Unlock()
