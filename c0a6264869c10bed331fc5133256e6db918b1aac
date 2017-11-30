@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "095ce23e_7694d118",
+        "filename": "cmd/upspinfs/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-30T23:43:18Z",
+      "side": 1,
+      "message": "this could be a local variable in main, but I don\u0027t mind.",
+      "revId": "c0a6264869c10bed331fc5133256e6db918b1aac",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a55a9fc0_824ad8d4",
+        "filename": "cmd/upspinfs/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-30T23:43:18Z",
+      "side": 1,
+      "message": "[mountpoint] ?",
+      "range": {
+        "startLine": 37,
+        "startChar": 35,
+        "endLine": 37,
+        "endChar": 47
+      },
+      "revId": "c0a6264869c10bed331fc5133256e6db918b1aac",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
