@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6ad2d498_9e235346",
+        "filename": "errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-30T02:55:45Z",
+      "side": 1,
+      "message": "Is this restriction necessary anymore?",
+      "range": {
+        "startLine": 29,
+        "startChar": 36,
+        "endLine": 29,
+        "endChar": 71
+      },
+      "revId": "e64f2e0c78a5b4e94e5892d76f3e6863d681428a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "af4e8eeb_11e23a74",
+        "filename": "errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-11-30T02:55:45Z",
+      "side": 1,
+      "message": "What about this? Do we still want this now? Seems it might accidentally coerce string errors into path names.",
+      "range": {
+        "startLine": 168,
+        "startChar": 0,
+        "endLine": 183,
+        "endChar": 4
+      },
+      "revId": "e64f2e0c78a5b4e94e5892d76f3e6863d681428a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
