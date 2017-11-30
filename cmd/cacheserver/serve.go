@@ -35,8 +35,11 @@ var (
 )
 
 func serve(cfg upspin.Config, addr string) (<-chan error, error) {
-	// Stop the cache server recursing.
-	cfg = config.SetValue(cfg, "cache", "no")
+	// Configs that both do and don't direct RPCs through the cache server.
+	// The former is used by the dircache to send StoreServer requests to
+	// to the store server cache.
+	cachedCfg := cfg
+	uncachedCfg := config.SetValue(cfg, "cache", "no")
 
 	// Calculate limits.
 	maxRefBytes := (9 * (*cacheSizeFlag)) / 10
@@ -51,13 +54,13 @@ func serve(cfg upspin.Config, addr string) (<-chan error, error) {
 	if err != nil {
 		return nil, err
 	}
-	ss := storeserver.New(cfg, sc, "")
+	ss := storeserver.New(uncachedCfg, sc, "")
 
-	dc, err := dircache.New(cfg, myCacheDir, maxLogBytes, blockFlusher)
+	dc, err := dircache.New(uncachedCfg, cachedCfg, myCacheDir, maxLogBytes, blockFlusher)
 	if err != nil {
 		return nil, err
 	}
-	ds := dirserver.New(cfg, dc, "")
+	ds := dirserver.New(uncachedCfg, dc, "")
 
 	ln, err := local.Listen("tcp", addr)
 	if err != nil {
