@@ -36,6 +36,7 @@ var (
 
 func serve(cfg upspin.Config, addr string) (<-chan error, error) {
 	// Stop the cache server recursing.
+	recurseCfg := cfg
 	cfg = config.SetValue(cfg, "cache", "no")
 
 	// Calculate limits.
@@ -53,7 +54,7 @@ func serve(cfg upspin.Config, addr string) (<-chan error, error) {
 	}
 	ss := storeserver.New(cfg, sc, "")
 
-	dc, err := dircache.New(cfg, myCacheDir, maxLogBytes, blockFlusher)
+	dc, err := dircache.New(cfg, recurseCfg, myCacheDir, maxLogBytes, blockFlusher)
 	if err != nil {
 		return nil, err
 	}
