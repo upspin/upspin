@@ -321,7 +321,7 @@ func (m *handler) dialForUser(name upspin.UserName) (upspin.KeyServer, error) {
 	}
 	keyServer, ok := service.(upspin.KeyServer)
 	if !ok {
-		return nil, errors.E(errors.Internal, errors.Str("dialed service not an instance of upspin.KeyServer"))
+		return nil, errors.E(errors.Internal, "dialed service not an instance of upspin.KeyServer")
 	}
 	return keyServer, nil
 }

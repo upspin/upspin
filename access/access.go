@@ -165,7 +165,7 @@ func (a *Access) Path() upspin.PathName {
 
 // Parse parses the contents of the path name, in data, and returns the parsed Access.
 func Parse(pathName upspin.PathName, data []byte) (*Access, error) {
-	const op = "access.Parse"
+	const op errors.Op = "access.Parse"
 	a, parsed, err := newAccess(pathName)
 	if err != nil {
 		return nil, err
@@ -558,7 +558,7 @@ func AddGroup(pathName upspin.PathName, contents []byte) error {
 // RemoveGroup undoes the installation of a group added by AddGroup.
 // It returns an error if the path is bad or the group is not present.
 func RemoveGroup(pathName upspin.PathName) error {
-	const op = "access.RemoveGroup"
+	const op errors.Op = "access.RemoveGroup"
 	parsed, err := path.Parse(pathName)
 	if err != nil {
 		return err
@@ -566,7 +566,7 @@ func RemoveGroup(pathName upspin.PathName) error {
 	mu.Lock()
 	defer mu.Unlock()
 	if _, found := groups[parsed.Path()]; !found {
-		return errors.E(op, errors.NotExist, errors.Str("group does not exist"))
+		return errors.E(op, errors.NotExist, "group does not exist")
 	}
 	delete(groups, parsed.Path())
 	return nil
@@ -574,7 +574,7 @@ func RemoveGroup(pathName upspin.PathName) error {
 
 // ParseGroup parses a group file but does not call AddGroup to install it.
 func ParseGroup(parsed path.Parsed, contents []byte) (group []path.Parsed, err error) {
-	const op = "access.ParseGroup"
+	const op errors.Op = "access.ParseGroup"
 	// Temporary. Pre-allocate so it can be reused in the loop, saving allocations.
 	users := make([][]byte, 10)
 	s := bufio.NewScanner(bytes.NewReader(contents))
@@ -902,7 +902,7 @@ func (a *Access) Users(right Right, load func(upspin.PathName) ([]byte, error)) 
 
 // MarshalJSON returns a JSON-encoded representation of this Access struct.
 func (a *Access) MarshalJSON() ([]byte, error) {
-	const op = "access.MarshalJSON"
+	const op errors.Op = "access.MarshalJSON"
 	// We need to export a field of Access but we don't want to make it public,
 	// so we encode it separately.
 	var buf bytes.Buffer
@@ -915,7 +915,7 @@ func (a *Access) MarshalJSON() ([]byte, error) {
 
 // UnmarshalJSON returns an Access given its path name and its JSON encoding.
 func UnmarshalJSON(name upspin.PathName, jsonAccess []byte) (*Access, error) {
-	const op = "access.UnmarshalJSON"
+	const op errors.Op = "access.UnmarshalJSON"
 	var list [numRights][]path.Parsed
 	err := json.Unmarshal(jsonAccess, &list)
 	if err != nil {

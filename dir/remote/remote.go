@@ -208,7 +208,7 @@ func (r *remote) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service, 
 	op := r.opf("Dial", "%q, %q", config.UserName(), e)
 
 	if e.Transport != upspin.Remote {
-		return nil, op.error(errors.Invalid, errors.Str("unrecognized transport"))
+		return nil, op.error(errors.Invalid, "unrecognized transport")
 	}
 
 	// First try a cache
@@ -256,13 +256,13 @@ func unmarshalError(b []byte) error {
 func (r *remote) opf(method string, format string, args ...interface{}) *operation {
 	ep := r.cfg.endpoint.String()
 	s := fmt.Sprintf("dir/remote: %q: dir.%s", ep, method)
-	op := &operation{s, fmt.Sprintf(format, args...)}
+	op := &operation{errors.Op(s), fmt.Sprintf(format, args...)}
 	log.Debug.Print(op)
 	return op
 }
 
 type operation struct {
-	op   string
+	op   errors.Op
 	args string
 }
 

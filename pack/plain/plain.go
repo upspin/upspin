@@ -59,7 +59,7 @@ func (plainPack) Share(cfg upspin.Config, readers []upspin.PublicKey, packdata [
 }
 
 func (p plainPack) Pack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockPacker, error) {
-	const op = "pack/plain.Pack"
+	const op errors.Op = "pack/plain.Pack"
 	if err := pack.CheckPacking(p, d); err != nil {
 		return nil, errors.E(op, errors.Invalid, d.Name, err)
 	}
@@ -79,7 +79,7 @@ type blockPacker struct {
 }
 
 func (bp *blockPacker) Pack(cleartext []byte) (ciphertext []byte, err error) {
-	const op = "pack/plain.blockPacker.Pack"
+	const op errors.Op = "pack/plain.blockPacker.Pack"
 	if err := internal.CheckLocationSet(bp.entry); err != nil {
 		return nil, errors.E(op, err)
 	}
@@ -108,7 +108,7 @@ func (bp *blockPacker) SetLocation(l upspin.Location) {
 
 // Close implements upspin.BlockPacker.
 func (bp *blockPacker) Close() error {
-	const op = "pack/plain.blockPacker.Close"
+	const op errors.Op = "pack/plain.blockPacker.Close"
 	if err := internal.CheckLocationSet(bp.entry); err != nil {
 		return errors.E(op, err)
 	}
@@ -127,7 +127,7 @@ func (bp *blockPacker) Close() error {
 
 // Unpack implements upspin.Packer.
 func (p plainPack) Unpack(cfg upspin.Config, d *upspin.DirEntry) (upspin.BlockUnpacker, error) {
-	const op = "pack/plain.Unpack"
+	const op errors.Op = "pack/plain.Unpack"
 	if err := pack.CheckPacking(p, d); err != nil {
 		return nil, errors.E(op, errors.Invalid, d.Name, err)
 	}
@@ -191,17 +191,17 @@ func (bp *blockUnpacker) Close() error {
 
 // Name implements upspin.Name.
 func (p plainPack) Name(cfg upspin.Config, d *upspin.DirEntry, newName upspin.PathName) error {
-	const op = "pack/plain.Name"
+	const op errors.Op = "pack/plain.Name"
 	return p.updateDirEntry(op, cfg, d, newName, d.Time)
 }
 
 // SetTime implements upspin.SetTime.
 func (p plainPack) SetTime(cfg upspin.Config, d *upspin.DirEntry, t upspin.Time) error {
-	const op = "pack/plain.SetTime"
+	const op errors.Op = "pack/plain.SetTime"
 	return p.updateDirEntry(op, cfg, d, d.Name, t)
 }
 
-func (p plainPack) updateDirEntry(op string, cfg upspin.Config, dirEntry *upspin.DirEntry, newName upspin.PathName, newTime upspin.Time) error {
+func (p plainPack) updateDirEntry(op errors.Op, cfg upspin.Config, dirEntry *upspin.DirEntry, newName upspin.PathName, newTime upspin.Time) error {
 	parsed, err := path.Parse(dirEntry.Name)
 	if err != nil {
 		return errors.E(op, err)
@@ -213,7 +213,7 @@ func (p plainPack) updateDirEntry(op string, cfg upspin.Config, dirEntry *upspin
 	newName = parsedNew.Path()
 
 	if dirEntry.IsDir() && !parsed.Equal(parsedNew) {
-		return errors.E(op, dirEntry.Name, errors.IsDir, errors.Str("cannot rename directory"))
+		return errors.E(op, dirEntry.Name, errors.IsDir, "cannot rename directory")
 	}
 	dirEntry.Name = newName
 	dirEntry.SignedName = dirEntry.Name
@@ -233,9 +233,9 @@ func (p plainPack) updateDirEntry(op string, cfg upspin.Config, dirEntry *upspin
 
 // Countersign uses the key in factotum f to add a signature to a DirEntry that is already signed by oldKey.
 func (p plainPack) Countersign(oldKey upspin.PublicKey, f upspin.Factotum, d *upspin.DirEntry) error {
-	const op = "pack/plain.Countersign"
+	const op errors.Op = "pack/plain.Countersign"
 	if d.IsDir() {
-		return errors.E(op, d.Name, errors.IsDir, errors.Str("cannot sign directory"))
+		return errors.E(op, d.Name, errors.IsDir, "cannot sign directory")
 	}
 
 	// Get ECDSA form of old key.
@@ -255,13 +255,13 @@ func (p plainPack) Countersign(oldKey upspin.PublicKey, f upspin.Factotum, d *up
 	sum := make([]byte, sha256.Size)
 	vhash := f.DirEntryHash(d.SignedName, d.Link, d.Attr, d.Packing, d.Time, dkey, sum)
 	if !ecdsa.Verify(oldPubKey, vhash, sig.R, sig.S) {
-		return errors.E(op, d.Name, errVerify, errors.Str("unable to verify existing signature"))
+		return errors.E(op, d.Name, errVerify, "unable to verify existing signature")
 	}
 
 	// Sign with newKey.
 	sig1, err := f.FileSign(vhash)
 	if err != nil {
-		return errors.E(op, d.Name, errVerify, errors.Str("unable to make new signature"))
+		return errors.E(op, d.Name, errVerify, "unable to make new signature")
 	}
 	pdMarshal(&d.Packdata, sig1, sig)
 	return nil

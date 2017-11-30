@@ -7,6 +7,8 @@ package metric
 import (
 	"fmt"
 	"testing"
+
+	"upspin.io/errors"
 )
 
 func TestAll(t *testing.T) {
@@ -23,18 +25,18 @@ func TestAll(t *testing.T) {
 	if len(m.spans) != 3 {
 		t.Fatalf("Expected 3 spans, got %d", len(m.spans))
 	}
-	expected := "getRoot"
+	expected := errors.Op("getRoot")
 	if m.spans[0].Name != expected {
 		t.Errorf("Expected span named %q, got %q", expected, m.spans[0].Name)
 	}
-	expected = "getInnerRoot"
+	expected = errors.Op("getInnerRoot")
 	if m.spans[1].Name != expected {
 		t.Errorf("Expected span named %q, got %q", expected, m.spans[1].Name)
 	}
 	if m.spans[1].ParentSpan != m.spans[0] {
 		t.Errorf("Expected parent span to be %q, got %v", m.spans[0].Name, m.spans[1].ParentSpan)
 	}
-	expected = "getCloudBytes"
+	expected = errors.Op("getCloudBytes")
 	if m.spans[2].Name != expected {
 		t.Errorf("Expected span named %q, got %q", expected, m.spans[2].Name)
 	}
@@ -61,8 +63,7 @@ func TestAll(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	expected = "hello"
-	if saver.metricsReceived[0].spans[2].Annotation != expected {
+	if saver.metricsReceived[0].spans[2].Annotation != "hello" {
 		t.Errorf("Expected annotation %q, got %q", expected, saver.metricsReceived[0].spans[2].Annotation)
 	}
 }
@@ -74,7 +75,7 @@ func TestFullChannel(t *testing.T) {
 	// If we block, this test will never finish.
 }
 
-func verifyMetric(t *testing.T, m *Metric, expectedName string, expectedSpanNames ...string) error {
+func verifyMetric(t *testing.T, m *Metric, expectedName errors.Op, expectedSpanNames ...errors.Op) error {
 	if m.Name != expectedName {
 		return fmt.Errorf("Expected %q, got %q", expectedName, m.Name)
 	}

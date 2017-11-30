@@ -86,10 +86,10 @@ func (c *cache) mkTemp() string {
 // create creates a file in the cache.
 // The corresponding node should be locked.
 func (c *cache) create(h *handle) error {
-	const op = "cache.create"
+	const op errors.Op = "cache.create"
 
 	if h.n.cf != nil {
-		return errors.E(op, errors.IO, errors.Str("create of an open file"))
+		return errors.E(op, errors.IO, "create of an open file")
 	}
 	cf := &cachedFile{c: c, dirty: true}
 	cf.fname = c.mkTemp()
@@ -104,7 +104,7 @@ func (c *cache) create(h *handle) error {
 // open opens the cached version of a file.  If it isn't cached, first retrieve it from the store.
 // The corresponding node should be locked.
 func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
-	const op = "cache.open"
+	const op errors.Op = "cache.open"
 
 	n := h.n
 	name := n.uname
@@ -246,7 +246,7 @@ func (cf *cachedFile) forget() {
 
 // clone copies the first size bytes of the old cf.file into a new temp file that replaces it.
 func (cf *cachedFile) clone(size int64) error {
-	const op = "cache.clone"
+	const op errors.Op = "cache.clone"
 
 	fname := cf.c.mkTemp()
 	var err error
@@ -284,7 +284,7 @@ func (cf *cachedFile) clone(size int64) error {
 // truncate truncates a currently open cached file.  If it represents a reference in the store,
 // copy it rather than truncating in place.
 func (cf *cachedFile) truncate(n *node, size int64) error {
-	const op = "cache.truncate"
+	const op errors.Op = "cache.truncate"
 
 	// This is the easy case.
 	if cf.dirty {
@@ -322,7 +322,7 @@ func (cf *cachedFile) writeAt(buf []byte, offset int64) (int, error) {
 
 // writeback writes the cached file to the store if it is dirty. Called with node locked.
 func (cf *cachedFile) writeback(h *handle) error {
-	const op = "cache.writeback"
+	const op errors.Op = "cache.writeback"
 	n := h.n
 
 	// Nothing to do if the cache file isn't dirty.
@@ -395,7 +395,7 @@ func (cf *cachedFile) writeback(h *handle) error {
 
 // putRedirect assumes that the target fits in a single block.
 func (c *cache) putRedirect(n *node, target upspin.PathName) error {
-	const op = "cache.putRedirect"
+	const op errors.Op = "cache.putRedirect"
 
 	// Use the client library to write it.
 	_, err := c.client.PutLink(target, n.uname)

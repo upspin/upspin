@@ -52,12 +52,13 @@ func Generate(curveName string) (public, private, secretStr string, err error) {
 
 // FromSecret generates a key pair with the given curve and secret seed.
 func FromSecret(curveName, secret string) (public, private, secretStr string, err error) {
+	const op errors.Op = "keygen.FromSecret"
 	secretStr = secret
 	if !ValidSecretSeed(secretStr) {
 		err := errors.Errorf("expected secret like\n"+
 			"\tlusab-babad-gutih-tugad.gutuk-bisog-mudof-sakat\n"+
 			"got\n\t%q", secretStr)
-		return "", "", "", errors.E("keygen.FromSecret", errors.Invalid, err)
+		return "", "", "", errors.E(op, errors.Invalid, err)
 	}
 	b := secretFromProquint(secretStr)
 	pub, priv, err := ee.CreateKeys(curveName, b[:])

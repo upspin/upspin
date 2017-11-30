@@ -138,7 +138,7 @@ func TestNotAdminPutOther(t *testing.T) {
 		PublicKey: upspin.PublicKey("going to change your key, haha"),
 	}
 	err := u.Put(otherU)
-	expectedErr := errors.E(errors.Permission, upspin.UserName(myName), errors.Str("not an administrator for buddy.com"))
+	expectedErr := errors.E(errors.Permission, upspin.UserName(myName), "not an administrator for buddy.com")
 	if !errors.Match(expectedErr, err) {
 		t.Errorf("err = %s, want = %s", err, expectedErr)
 	}

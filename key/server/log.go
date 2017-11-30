@@ -42,8 +42,9 @@ type loggerImpl struct {
 // PutAttempt records a KeyServer.Put attempt
 // by the given actor for the given user record.
 func (l *loggerImpl) PutAttempt(actor upspin.UserName, u *upspin.User) error {
+	const op errors.Op = errors.Op("key/gcp.Logger.PutAttempt")
 	if err := l.put(time.Now(), "put attempt", actor, u); err != nil {
-		return errors.E("key/gcp.Logger.PutAttempt", err)
+		return errors.E(op, err)
 	}
 	return nil
 }
@@ -51,8 +52,9 @@ func (l *loggerImpl) PutAttempt(actor upspin.UserName, u *upspin.User) error {
 // PutSuccess records a successful KeyServer.Put
 // by the given actor for the given user record.
 func (l *loggerImpl) PutSuccess(actor upspin.UserName, u *upspin.User) error {
+	const op errors.Op = errors.Op("key/gcp.Logger.PutSuccess")
 	if err := l.put(time.Now(), "put success", actor, u); err != nil {
-		return errors.E("key/gcp.Logger.PutSuccess", err)
+		return errors.E(op, err)
 	}
 	return nil
 }
@@ -99,7 +101,7 @@ func (l *loggerImpl) put(now time.Time, kind string, actor upspin.UserName, u *u
 
 // ReadAll returns the log bytes.
 func (l *loggerImpl) ReadAll() ([]byte, error) {
-	const op = "key/gcp.Logger.ReadAll"
+	const op errors.Op = "key/gcp.Logger.ReadAll"
 	l.mu.Lock()
 	defer l.mu.Unlock()
 

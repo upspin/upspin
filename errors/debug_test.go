@@ -72,7 +72,7 @@ func func1() error {
 type T struct{}
 
 func (T) func2() error {
-	return errors.E("op", upspin.PathName("user@home/path"), func3())
+	return errors.E(errors.Op("op"), upspin.PathName("user@home/path"), func3())
 }
 
 func func3() error {

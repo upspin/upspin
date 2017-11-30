@@ -12,7 +12,7 @@ import (
 // CheckLocationSet checks whether the previous block's Location field
 // was set, to prevent misuse of the BlockPacker API.
 func CheckLocationSet(d *upspin.DirEntry) error {
-	const op = "pack.CheckLocationSet"
+	const op errors.Op = "pack.CheckLocationSet"
 	if bs := d.Blocks; len(bs) > 0 {
 		if i := len(bs) - 1; bs[i].Location == (upspin.Location{}) {
 			return errors.E(op, d.Name, errors.Errorf("location not set for block %v", i))

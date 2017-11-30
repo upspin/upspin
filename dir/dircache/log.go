@@ -189,7 +189,7 @@ func (l *clog) retryWatch(parsed path.Parsed) {
 // rotateLog creates a new log file and removes enough old ones to stay under
 // the l.maxDisk limit.
 func (l *clog) rotateLog() {
-	const op = "rpc/dircache.rotateLog"
+	const op errors.Op = "rpc/dircache.rotateLog"
 
 	l.flush()
 
@@ -358,7 +358,7 @@ func (l *clog) rotater() {
 
 // readLogFile reads a single log file. The log file must begin and end with a version record.
 func (l *clog) readLogFile(fn string) error {
-	const op = "rpc/dircache.readLogFile"
+	const op errors.Op = "rpc/dircache.readLogFile"
 
 	log.Debug.Printf("%s: %s", op, fn)
 
@@ -938,9 +938,9 @@ func cacheableError(err error) bool {
 	return err == upspin.ErrFollowLink
 }
 
-var tooShort = errors.E(errors.Invalid, errors.Errorf("log entry too short"))
-var tooLong = errors.E(errors.Invalid, errors.Errorf("log entry too long"))
-var badVersion = errors.E(errors.Invalid, errors.Errorf("bad log file version"))
+var tooShort = errors.E(errors.Invalid, "log entry too short")
+var tooLong = errors.E(errors.Invalid, "log entry too long")
+var badVersion = errors.E(errors.Invalid, "bad log file version")
 
 // A marshalled entry is of the form:
 //   request-type: byte
@@ -1046,7 +1046,7 @@ func (e *clogEntry) unmarshal(b []byte) (err error) {
 		e.complete = true
 	}
 	if len(b) != 0 {
-		return errors.E(errors.Invalid, errors.Errorf("log entry too long"))
+		return errors.E(errors.Invalid, "log entry too long")
 	}
 	return
 }

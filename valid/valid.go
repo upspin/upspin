@@ -20,23 +20,23 @@ import (
 // UserName verifies that the name is a syntactically valid user's email address.
 // It also requires that the domain name be lower-cased to avoid ambiguity.
 func UserName(userName upspin.UserName) error {
-	const op = "valid.UserName"
+	const op errors.Op = "valid.UserName"
 	u, _, d, err := user.Parse(userName)
 	if err != nil {
 		return errors.E(op, err)
 	}
 	if string(userName) != u+"@"+d {
-		return errors.E(op, errors.Invalid, userName, errors.Str("not canonically formatted"))
+		return errors.E(op, errors.Invalid, userName, "not canonically formatted")
 	}
 	if userName == access.AllUsers {
-		return errors.E(op, errors.Invalid, userName, errors.Str("reserved user name"))
+		return errors.E(op, errors.Invalid, userName, "reserved user name")
 	}
 	return nil
 }
 
 // User verifies that the User struct is valid, that is, that all its fields are syntactically valid.
 func User(user *upspin.User) error {
-	const op = "valid.User"
+	const op errors.Op = "valid.User"
 	if err := UserName(user.Name); err != nil {
 		return errors.E(op, errors.Invalid, err)
 	}
@@ -71,7 +71,7 @@ func validPathName(name upspin.PathName) error {
 // DirBlock verifies that the block is valid, that is, that it has a
 // greater-than-zero Size, non-negative Offset, and valid Location.
 func DirBlock(block upspin.DirBlock) error {
-	const op = "valid.DirBlock"
+	const op errors.Op = "valid.DirBlock"
 	if block.Size <= 0 {
 		return errors.E(op, errors.Invalid, errors.Errorf("non-positive block size %d", block.Size))
 	}
@@ -90,7 +90,7 @@ func DirBlock(block upspin.DirBlock) error {
 // Endpoint verifies that the endpoint looks syntactically valid. It does not check that the
 // endpoint defines a reachable server.
 func Endpoint(endpoint upspin.Endpoint) error {
-	const op = "valid.Endpoint"
+	const op errors.Op = "valid.Endpoint"
 	switch endpoint.Transport {
 	case upspin.InProcess:
 		// OK if there is a netaddr, or not.
@@ -122,19 +122,19 @@ func Endpoint(endpoint upspin.Endpoint) error {
 // - Sequence must have a known special value or be non-negative
 // - for non-directory entries, a Writer field is required.
 func DirEntry(entry *upspin.DirEntry) error {
-	const op = "valid.DirEntry"
+	const op errors.Op = "valid.DirEntry"
 	// SignedName must be good.
 	if err := validPathName(entry.SignedName); err != nil {
 		return errors.E(op, errors.Invalid, entry.SignedName, err)
 	}
 	// Name must match.
 	if entry.Name != entry.SignedName {
-		return errors.E(op, errors.Invalid, entry.Name, errors.Str("Name and SignedName must match"))
+		return errors.E(op, errors.Invalid, entry.Name, "Name and SignedName must match")
 	}
 	// Is the entry incomplete? Servers must not accept such entries.
 	// (Although they may return them.)
 	if entry.IsIncomplete() {
-		return errors.E(op, errors.Invalid, entry.Name, errors.Str("entry must not be incomplete"))
+		return errors.E(op, errors.Invalid, entry.Name, "entry must not be incomplete")
 	}
 
 	// Attribute must be valid and consistent with entry.
@@ -151,12 +151,12 @@ func DirEntry(entry *upspin.DirEntry) error {
 
 	// Blocks only for AttrNone
 	if entry.Attr != upspin.AttrNone && len(entry.Blocks) > 0 {
-		return errors.E(op, errors.Invalid, entry.Name, errors.Str("link or directory cannot have data"))
+		return errors.E(op, errors.Invalid, entry.Name, "link or directory cannot have data")
 	}
 
 	// Link only for AttrLink
 	if entry.Attr != upspin.AttrLink && entry.Link != "" {
-		return errors.E(op, errors.Invalid, entry.Name, errors.Str("only links can have Link set"))
+		return errors.E(op, errors.Invalid, entry.Name, "only links can have Link set")
 	}
 
 	// Packing must be valid.
@@ -180,7 +180,7 @@ func DirEntry(entry *upspin.DirEntry) error {
 	offset := int64(0)
 	for _, block := range entry.Blocks {
 		if block.Offset != offset {
-			return errors.E(op, errors.Invalid, entry.Name, errors.Str("data blocks are not contiguous"))
+			return errors.E(op, errors.Invalid, entry.Name, "data blocks are not contiguous")
 		}
 		offset += block.Size
 		if err := DirBlock(block); err != nil {
@@ -192,7 +192,7 @@ func DirEntry(entry *upspin.DirEntry) error {
 		return nil
 	}
 	if err := UserName(entry.Writer); err != nil {
-		return errors.E(op, errors.Str("invalid writer"), err)
+		return errors.E(op, "invalid writer", err)
 	}
 	return nil
 }
@@ -202,9 +202,9 @@ func DirEntry(entry *upspin.DirEntry) error {
 // printable, the replacement rune (U+FFFD) is considered invalid, even if it is explicitly
 // present, as it usually indicates erroneous UTF-8 or Unicode.
 func Reference(ref upspin.Reference) error {
-	const op = "valid.Reference"
+	const op errors.Op = "valid.Reference"
 	if ref == "" {
-		return errors.E(op, errors.Invalid, errors.Str("empty reference"))
+		return errors.E(op, errors.Invalid, "empty reference")
 	}
 	previ := 0
 	for i, r := range ref {

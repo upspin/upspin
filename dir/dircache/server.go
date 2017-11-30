@@ -129,7 +129,7 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	op := logf("Put %q", entry.Name)
 	name := path.Clean(entry.Name)
 	if name != entry.Name {
-		return nil, errors.E(entry.Name, errors.Invalid, errors.Str("non-canonical name"))
+		return nil, errors.E(entry.Name, errors.Invalid, "non-canonical name")
 	}
 
 	dir, cacheable, err := s.dirFor(name)

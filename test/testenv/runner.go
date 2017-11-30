@@ -480,12 +480,12 @@ func (r *Runner) getNextEvent() *upspin.Event {
 	select {
 	case e, ok = <-r.events[r.user]:
 	case <-time.After(time.Second):
-		r.lastErr = errors.E(errors.Str("no response on event channel after one second"))
+		r.lastErr = errors.E("no response on event channel after one second")
 		_, r.errFile, r.errLine, _ = runtime.Caller(2)
 		return nil
 	}
 	if !ok {
-		r.lastErr = errors.E(errors.Str("event channel closed"))
+		r.lastErr = errors.E("event channel closed")
 		_, r.errFile, r.errLine, _ = runtime.Caller(2)
 		return nil
 	}

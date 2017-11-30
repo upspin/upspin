@@ -68,7 +68,7 @@ type watchFunc func(upspin.PathName, int64, <-chan struct{}) (<-chan upspin.Even
 // resolving the DirServer using the given config. The target user is
 // typically the user name of a server, such as a StoreServer or a DirServer.
 func New(cfg upspin.Config, ready <-chan struct{}, target upspin.UserName) *Perm {
-	const op = "serverutil/perm.New"
+	const op errors.Op = "serverutil/perm.New"
 	return newPerm(op, cfg, ready, target, nil, nil, noop, retry, nil)
 }
 
@@ -76,7 +76,7 @@ func New(cfg upspin.Config, ready <-chan struct{}, target upspin.UserName) *Perm
 // file which must reside on the given DirServer. The target user is typically
 // the user name of a server, such as a StoreServer or a DirServer.
 func NewWithDir(cfg upspin.Config, ready <-chan struct{}, target upspin.UserName, dir upspin.DirServer) *Perm {
-	const op = "serverutil/perm.NewFromDir"
+	const op errors.Op = "serverutil/perm.NewFromDir"
 	return newPerm(op, cfg, ready, target, dir.Lookup, dir.Watch, noop, retry, nil)
 }
 
@@ -90,7 +90,7 @@ func retry() { time.Sleep(retryTimeout) }
 // watch changes on the writers file. If lookup or watch are nil the DirServer
 // is resolved using bind and the given config. The target user is typically
 // the user name of a server, such as a StoreServer or a DirServer.
-func newPerm(op string, cfg upspin.Config, ready <-chan struct{}, target upspin.UserName, lookup lookupFunc, watch watchFunc, onUpdate, onRetry func(), done <-chan struct{}) *Perm {
+func newPerm(op errors.Op, cfg upspin.Config, ready <-chan struct{}, target upspin.UserName, lookup lookupFunc, watch watchFunc, onUpdate, onRetry func(), done <-chan struct{}) *Perm {
 	p := &Perm{
 		cfg:        cfg,
 		targetUser: target,
@@ -117,7 +117,7 @@ func newPerm(op string, cfg upspin.Config, ready <-chan struct{}, target upspin.
 
 // updateLoop continuously watches for updates on WritersGroupFile.
 // It must be run in a goroutine.
-func (p *Perm) updateLoop(op string) {
+func (p *Perm) updateLoop(op errors.Op) {
 	var (
 		events    <-chan upspin.Event
 		accessSeq int64 = -1

@@ -41,7 +41,7 @@ type database struct {
 // with the earlier entries being the best choice; later entries are
 // fallbacks and the user's public keys, if known.
 func (s *server) Lookup(name upspin.UserName) (*upspin.User, error) {
-	const op = "key/inprocess.Lookup"
+	const op errors.Op = "key/inprocess.Lookup"
 	if err := valid.UserName(name); err != nil {
 		return nil, errors.E(op, err)
 	}
@@ -69,7 +69,7 @@ func dup(u *upspin.User) *upspin.User {
 
 // Put implements upspin.KeyServer.
 func (s *server) Put(u *upspin.User) error {
-	const op = "key/inprocess.Put"
+	const op errors.Op = "key/inprocess.Put"
 	if err := valid.User(u); err != nil {
 		return errors.E(op, err)
 	}
@@ -78,7 +78,7 @@ func (s *server) Put(u *upspin.User) error {
 		return errors.E(op, err)
 	}
 	if name == "*" {
-		return errors.E(op, errors.Invalid, u.Name, errors.Str("user has wildcard '*' in name"))
+		return errors.E(op, errors.Invalid, u.Name, "user has wildcard '*' in name")
 	}
 
 	s.db.mu.Lock()
@@ -98,9 +98,9 @@ func (s *server) Endpoint() upspin.Endpoint {
 // Dial always returns the same instance of the service. The Transport must be InProcess
 // but the NetAddr is ignored.
 func (s *server) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
-	const op = "key/inprocess.Dial"
+	const op errors.Op = "key/inprocess.Dial"
 	if e.Transport != upspin.InProcess {
-		return nil, errors.E(op, errors.Invalid, errors.Str("unrecognized transport"))
+		return nil, errors.E(op, errors.Invalid, "unrecognized transport")
 	}
 	return s, nil
 }

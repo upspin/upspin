@@ -41,7 +41,7 @@ func lookup(user upspin.UserName) (upspin.PublicKey, error) {
 	if user == joeUser {
 		return upspin.PublicKey(joePublic), nil
 	}
-	return "", errors.E(errors.NotExist, errors.Str("No user here"))
+	return "", errors.E(errors.NotExist, "No user here")
 }
 
 type server struct {

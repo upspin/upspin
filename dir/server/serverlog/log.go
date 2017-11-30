@@ -981,7 +981,7 @@ func (r *root) get() (*upspin.DirEntry, error) {
 		return nil, errors.E(errors.IO, err)
 	}
 	if len(buf) == 0 {
-		return nil, errors.E(errors.NotExist, errors.Str("no root for user"))
+		return nil, errors.E(errors.NotExist, "no root for user")
 	}
 	var root upspin.DirEntry
 	more, err := root.Unmarshal(buf)
@@ -1112,11 +1112,11 @@ func (cp *checkpoint) readOffset() (int64, error) {
 		return 0, errors.E(errors.IO, err)
 	}
 	if len(buf) == 0 {
-		return 0, errors.E(errors.NotExist, cp.user.Name(), errors.Str("no log offset for user"))
+		return 0, errors.E(errors.NotExist, cp.user.Name(), "no log offset for user")
 	}
 	offset, n := binary.Varint(buf)
 	if n <= 0 {
-		return 0, errors.E(errors.IO, errors.Str("invalid offset read"))
+		return 0, errors.E(errors.IO, "invalid offset read")
 	}
 	return offset, nil
 }
@@ -1129,7 +1129,7 @@ func (u *User) SaveOffset(offset int64) error {
 // saveOffset saves to stable storage the offset to process next.
 func (cp *checkpoint) saveOffset(offset int64) error {
 	if offset < 0 {
-		return errors.E(errors.Invalid, errors.Str("negative offset"))
+		return errors.E(errors.Invalid, "negative offset")
 	}
 	var tmp [16]byte // For use by PutVarint.
 	n := binary.PutVarint(tmp[:], offset)

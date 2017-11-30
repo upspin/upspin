@@ -100,7 +100,7 @@ func DirServer(cc upspin.Config, e upspin.Endpoint) (upspin.DirServer, error) {
 // the given user. If the name is empty, it returns the directory endpoint
 // in the config.
 func DirServerFor(cc upspin.Config, userName upspin.UserName) (upspin.DirServer, error) {
-	const op = "bind.DirServerFor"
+	const op errors.Op = "bind.DirServerFor"
 	if userName == "" {
 		// If name is empty just return the directory at cc.DirEndpoint().
 		d, err := DirServer(cc, cc.DirEndpoint())
@@ -137,7 +137,7 @@ func DirServerFor(cc upspin.Config, userName upspin.UserName) (upspin.DirServer,
 	if firstErr != nil {
 		return nil, errors.E(op, firstErr)
 	}
-	return nil, errors.E(op, userName, errors.Str("no directory endpoints found"))
+	return nil, errors.E(op, userName, "no directory endpoints found")
 
 }
 
@@ -176,12 +176,12 @@ func (s *servers) reachableService(cc upspin.Config, e upspin.Endpoint) (upspin.
 	return service, nil
 }
 
-func (s *servers) registerOp() string {
-	return "bind.Register" + s.kind + "Server" // "bind.RegisterKeyServer"
+func (s *servers) registerOp() errors.Op {
+	return errors.Op("bind.Register" + s.kind + "Server") // "bind.RegisterKeyServer"
 }
 
-func (s *servers) serverOp() string {
-	return "bind." + s.kind + "Server" // "bind.KeyServer"
+func (s *servers) serverOp() errors.Op {
+	return errors.Op("bind." + s.kind + "Server") // "bind.KeyServer"
 }
 
 // NoCache supresses the caching of dial results. This was added for

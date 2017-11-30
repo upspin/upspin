@@ -19,10 +19,10 @@ import (
 // the necessary keys loaded in the config to unpack the cipher if the entry
 // is encrypted.
 func ReadAll(cfg upspin.Config, entry *upspin.DirEntry) ([]byte, error) {
-	const op = "client/clientutil.ReadAll"
+	const op errors.Op = "client/clientutil.ReadAll"
 
 	if entry.IsLink() {
-		return nil, errors.E(op, entry.Name, errors.Invalid, errors.Str("can't read a link entry"))
+		return nil, errors.E(op, entry.Name, errors.Invalid, "can't read a link entry")
 	}
 	if entry.IsIncomplete() {
 		return nil, errors.E(op, entry.Name, errors.Permission)
@@ -31,7 +31,7 @@ func ReadAll(cfg upspin.Config, entry *upspin.DirEntry) ([]byte, error) {
 		// Access files must be written by their owners only.
 		p, _ := path.Parse(entry.SignedName)
 		if p.User() != entry.Writer {
-			return nil, errors.E(errors.Invalid, p.User(), errors.Str("writer of Access file does not match owner"))
+			return nil, errors.E(errors.Invalid, p.User(), "writer of Access file does not match owner")
 		}
 	}
 
@@ -67,7 +67,7 @@ func ReadAll(cfg upspin.Config, entry *upspin.DirEntry) ([]byte, error) {
 // ReadLocation uses the provided Config to fetch the contents of the given
 // Location, following any StoreServer.Get redirects.
 func ReadLocation(cfg upspin.Config, loc upspin.Location) ([]byte, error) {
-	const op = "client/clientutil.ReadLocation"
+	const op errors.Op = "client/clientutil.ReadLocation"
 
 	// firstError remembers the first error we saw.
 	// If we fail completely we return it.

@@ -903,7 +903,7 @@ func TestOverwriteFileWithWrongSequence(t *testing.T) {
 		Sequence:   99,
 	}
 	_, err = s.Put(de)
-	expectedErr := errors.E(errors.Invalid, errors.Str("sequence number"))
+	expectedErr := errors.E(errors.Invalid, "sequence number")
 	if !errors.Match(expectedErr, err) {
 		t.Fatalf("err = %v, want = %v", err, expectedErr)
 	}

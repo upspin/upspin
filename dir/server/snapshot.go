@@ -97,7 +97,7 @@ func (s *server) snapshotLoop() {
 // snapshotAll scans all roots that have a +snapshot suffix, determines whether
 // it's time to perform a new snapshot for them and if so snapshots them.
 func (s *server) snapshotAll() error {
-	const op = "dir/server.snapshotAll"
+	const op errors.Op = "dir/server.snapshotAll"
 	users, err := serverlog.ListUsersWithSuffix(snapshotSuffix, s.logDir)
 	if err != nil {
 		log.Error.Printf("%s: error listing snapshot users: %s", op, err)
@@ -148,7 +148,7 @@ func (s *server) snapshotDir(cfg *snapshotConfig) (path.Parsed, error) {
 // shouldSnapshot reports whether it's time to snapshot the given configuration.
 // It also returns the parsed path of where the snapshot will be made.
 func (s *server) shouldSnapshot(cfg *snapshotConfig) (bool, path.Parsed, error) {
-	const op = "dir/server.shouldSnapshot"
+	const op errors.Op = "dir/server.shouldSnapshot"
 
 	p, err := s.snapshotDir(cfg)
 	if err != nil {
@@ -163,7 +163,7 @@ func (s *server) shouldSnapshot(cfg *snapshotConfig) (bool, path.Parsed, error) 
 	entries, _, err := tree.List(p)
 	if err == upspin.ErrFollowLink {
 		// We need to get the real entry and we cannot resolve links on our own.
-		return false, path.Parsed{}, errors.E(op, errors.Internal, p.Path(), errors.Str("cannot follow a link to snapshot"))
+		return false, path.Parsed{}, errors.E(op, errors.Internal, p.Path(), "cannot follow a link to snapshot")
 	} else if err != nil && !errors.Is(errors.NotExist, err) {
 		// Some other error. Abort.
 		return false, path.Parsed{}, errors.E(op, err)
@@ -274,7 +274,7 @@ func (s *server) mkDirIfNotExist(name path.Parsed) error {
 	}
 	_, _, err = tree.Lookup(name)
 	if err == upspin.ErrFollowLink {
-		return errors.E(errors.Internal, errors.Str("cannot mkdir through a link"))
+		return errors.E(errors.Internal, "cannot mkdir through a link")
 	}
 	if err != nil && !errors.Is(errors.NotExist, err) {
 		// Real error. Abort.
@@ -331,7 +331,7 @@ func isSnapshotControlFile(p path.Parsed) bool {
 // control entry we expect in order to start a new snapshot.
 func isValidSnapshotControlEntry(entry *upspin.DirEntry) error {
 	if len(entry.Blocks) != 0 || entry.IsLink() || entry.IsDir() {
-		return errors.E(errors.Invalid, entry.Name, errors.Str("snapshot control entry must be an empty file"))
+		return errors.E(errors.Invalid, entry.Name, "snapshot control entry must be an empty file")
 	}
 	return nil
 }

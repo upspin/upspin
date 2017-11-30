@@ -45,15 +45,15 @@ func New(config upspin.Config) upspin.Client {
 
 // PutLink implements upspin.Client.
 func (c *Client) PutLink(oldName, linkName upspin.PathName) (*upspin.DirEntry, error) {
-	const op = "client.PutLink"
+	const op errors.Op = "client.PutLink"
 	m, s := newMetric(op)
 	defer m.Done()
 
 	if access.IsAccessControlFile(oldName) {
-		return nil, errors.E(op, oldName, errors.Invalid, errors.Str("cannot link to Access or Group file"))
+		return nil, errors.E(op, oldName, errors.Invalid, "cannot link to Access or Group file")
 	}
 	if access.IsAccessControlFile(linkName) {
-		return nil, errors.E(op, linkName, errors.Invalid, errors.Str("cannot create link named Access or Group"))
+		return nil, errors.E(op, linkName, errors.Invalid, "cannot create link named Access or Group")
 	}
 
 	parsed, err := path.Parse(oldName)
@@ -100,7 +100,7 @@ func putLookupFn(dir upspin.DirServer, entry *upspin.DirEntry, s *metric.Span) (
 
 // Put implements upspin.Client.
 func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error) {
-	const op = "client.Put"
+	const op errors.Op = "client.Put"
 	m, s := newMetric(op)
 	defer m.Done()
 
@@ -215,7 +215,7 @@ func (c *Client) validSigner(entry *upspin.DirEntry) error {
 	if canWrite {
 		return nil
 	}
-	return errors.E(errors.Invalid, parsed.User(), errors.Str("signer does not have write permission"))
+	return errors.E(errors.Invalid, parsed.User(), "signer does not have write permission")
 }
 
 // access returns an Access struct for the applicable, parsed Access file.
@@ -302,7 +302,7 @@ func validateWhichAccess(name upspin.PathName, accessEntry *upspin.DirEntry) err
 		return err
 	}
 	if !access.IsAccessFile(accessEntry.Name) {
-		return errors.E(errors.Internal, accessEntry.Name, errors.Str("not an Access file"))
+		return errors.E(errors.Internal, accessEntry.Name, "not an Access file")
 	}
 	accessPath, err := path.Parse(accessEntry.Name)
 	if err != nil {
@@ -317,7 +317,7 @@ func validateWhichAccess(name upspin.PathName, accessEntry *upspin.DirEntry) err
 	// unpacks correctly, that validates the signing key is that of Writer.
 	// So, here we validate that Writer is parsedName.User().
 	if accessEntry.Writer != namePath.User() {
-		return errors.E(errors.Invalid, accessPath.Path(), namePath.User(), errors.Str("writer of Access file is not the user of the requested path"))
+		return errors.E(errors.Invalid, accessPath.Path(), namePath.User(), "writer of Access file is not the user of the requested path")
 	}
 	return nil
 }
@@ -326,7 +326,7 @@ func validateWhichAccess(name upspin.PathName, accessEntry *upspin.DirEntry) err
 // This call, if successful, will replace entry.Name with the value, after any
 // link evaluation, from the final call to WhichAccess. The caller may then
 // use that name or entry to avoid evaluating the links again.
-func (c *Client) addReaders(op string, entry *upspin.DirEntry, packer upspin.Packer, readers []upspin.UserName) error {
+func (c *Client) addReaders(op errors.Op, entry *upspin.DirEntry, packer upspin.Packer, readers []upspin.UserName) error {
 	if packer.Packing() != upspin.EEPack {
 		return nil
 	}
@@ -337,7 +337,7 @@ func (c *Client) addReaders(op string, entry *upspin.DirEntry, packer upspin.Pac
 	readersPublicKey := make([]upspin.PublicKey, 0, len(readers)+2)
 	f := c.config.Factotum()
 	if f == nil {
-		return errors.E(op, name, errors.Permission, errors.Str("no factotum available"))
+		return errors.E(op, name, errors.Permission, "no factotum available")
 	}
 	readersPublicKey = append(readersPublicKey, f.PublicKey())
 	all := access.IsAccessControlFile(entry.Name)
@@ -374,7 +374,7 @@ func (c *Client) addReaders(op string, entry *upspin.DirEntry, packer upspin.Pac
 // according to the Access file.
 // If the Access file cannot be read because of lack of permissions,
 // it returns the owner of the file (but only if we are not the owner).
-func (c *Client) getReaders(op string, name upspin.PathName, accessEntry *upspin.DirEntry) ([]upspin.UserName, error) {
+func (c *Client) getReaders(op errors.Op, name upspin.PathName, accessEntry *upspin.DirEntry) ([]upspin.UserName, error) {
 	if accessEntry == nil {
 		// No Access file present, therefore we must be the owner.
 		return nil, nil
@@ -433,7 +433,7 @@ func makeDirectoryLookupFn(dir upspin.DirServer, entry *upspin.DirEntry, s *metr
 
 // MakeDirectory implements upspin.Client.
 func (c *Client) MakeDirectory(name upspin.PathName) (*upspin.DirEntry, error) {
-	const op = "client.MakeDirectory"
+	const op errors.Op = "client.MakeDirectory"
 	m, s := newMetric(op)
 	defer m.Done()
 
@@ -451,7 +451,7 @@ func (c *Client) MakeDirectory(name upspin.PathName) (*upspin.DirEntry, error) {
 
 // Get implements upspin.Client.
 func (c *Client) Get(name upspin.PathName) ([]byte, error) {
-	const op = "client.Get"
+	const op errors.Op = "client.Get"
 	m, s := newMetric(op)
 	defer m.Done()
 
@@ -491,7 +491,7 @@ func lookupLookupFn(dir upspin.DirServer, entry *upspin.DirEntry, s *metric.Span
 
 // Lookup implements upspin.Client.
 func (c *Client) Lookup(name upspin.PathName, followFinal bool) (*upspin.DirEntry, error) {
-	const op = "client.Lookup"
+	const op errors.Op = "client.Lookup"
 	m, s := newMetric(op)
 	defer m.Done()
 
@@ -518,7 +518,7 @@ type lookupFn func(upspin.DirServer, *upspin.DirEntry, *metric.Span) (*upspin.Di
 // the operation followed by the argument to the last successful
 // call to fn, which for instance will contain the actual path that
 // resulted in a successful call to WhichAccess.
-func (c *Client) lookup(op string, entry *upspin.DirEntry, fn lookupFn, followFinal bool, s *metric.Span) (resultEntry, finalSuccessfulEntry *upspin.DirEntry, err error) {
+func (c *Client) lookup(op errors.Op, entry *upspin.DirEntry, fn lookupFn, followFinal bool, s *metric.Span) (resultEntry, finalSuccessfulEntry *upspin.DirEntry, err error) {
 	ss := s.StartSpan("lookup")
 	defer ss.End()
 
@@ -550,7 +550,7 @@ func (c *Client) lookup(op string, entry *upspin.DirEntry, fn lookupFn, followFi
 		}
 		// Misbehaving servers could return a nil entry. Handle that explicitly. Issue 451.
 		if resultEntry == nil {
-			return nil, nil, errors.E(op, errors.Internal, prevEntry.Name, errors.Str("server returned nil entry for link"))
+			return nil, nil, errors.E(op, errors.Internal, prevEntry.Name, "server returned nil entry for link")
 		}
 		// We have a link.
 		// First, allocate a new entry if necessary so we don't overwrite user's memory.
@@ -567,7 +567,7 @@ func (c *Client) lookup(op string, entry *upspin.DirEntry, fn lookupFn, followFi
 		resultPath := parsedResult.Path()
 		// The result entry's name must be a prefix of the name we're looking up.
 		if !strings.HasPrefix(parsed.String(), string(resultPath)) {
-			return nil, nil, errors.E(op, resultPath, errors.Internal, errors.Str("link path not prefix"))
+			return nil, nil, errors.E(op, resultPath, errors.Internal, "link path not prefix")
 		}
 		// Update the entry to have the new Name field.
 		if resultPath == parsed.Path() {
@@ -582,7 +582,7 @@ func (c *Client) lookup(op string, entry *upspin.DirEntry, fn lookupFn, followFi
 			entry.Name = path.Join(resultEntry.Link, string(parsed.Path()[len(resultPath):]))
 		}
 	}
-	return nil, nil, errors.E(op, errors.IO, originalName, errors.Str("link loop"))
+	return nil, nil, errors.E(op, errors.IO, originalName, "link loop")
 }
 
 func deleteLookupFn(dir upspin.DirServer, entry *upspin.DirEntry, s *metric.Span) (*upspin.DirEntry, error) {
@@ -592,7 +592,7 @@ func deleteLookupFn(dir upspin.DirServer, entry *upspin.DirEntry, s *metric.Span
 
 // Delete implements upspin.Client.
 func (c *Client) Delete(name upspin.PathName) error {
-	const op = "client.Delete"
+	const op errors.Op = "client.Delete"
 	m, s := newMetric(op)
 	defer m.Done()
 
@@ -602,7 +602,7 @@ func (c *Client) Delete(name upspin.PathName) error {
 
 // Glob implements upspin.Client.
 func (c *Client) Glob(pattern string) ([]*upspin.DirEntry, error) {
-	const op = "client.Glob"
+	const op errors.Op = "client.Glob"
 	m, s := newMetric(op)
 	defer m.Done()
 
@@ -652,7 +652,7 @@ func (c *Client) Glob(pattern string) ([]*upspin.DirEntry, error) {
 	}
 	if len(next) > 0 {
 		// TODO: Return partial results?
-		return nil, errors.E(op, upspin.PathName(pattern), errors.Str("link loop"))
+		return nil, errors.E(op, upspin.PathName(pattern), "link loop")
 	}
 	results = upspin.SortDirEntries(results, true)
 	return results, nil
@@ -699,13 +699,13 @@ func (c *Client) Create(name upspin.PathName) (upspin.File, error) {
 
 // Open implements upspin.Client.
 func (c *Client) Open(name upspin.PathName) (upspin.File, error) {
-	const op = "client.Open"
+	const op errors.Op = "client.Open"
 	entry, err := c.Lookup(name, followFinalLink)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
 	if entry.IsDir() {
-		return nil, errors.E(op, errors.IsDir, name, errors.Str("cannot Open a directory"))
+		return nil, errors.E(op, errors.IsDir, name, "cannot Open a directory")
 	}
 	if err = c.validSigner(entry); err != nil {
 		return nil, errors.E(op, name, err)
@@ -719,7 +719,7 @@ func (c *Client) Open(name upspin.PathName) (upspin.File, error) {
 
 // DirServer implements upspin.Client.
 func (c *Client) DirServer(name upspin.PathName) (upspin.DirServer, error) {
-	const op = "Client.DirServer"
+	const op errors.Op = "Client.DirServer"
 	parsed, err := path.Parse(name)
 	if err != nil {
 		return nil, errors.E(op, err)
@@ -734,7 +734,7 @@ func (c *Client) DirServer(name upspin.PathName) (upspin.DirServer, error) {
 // PutDuplicate implements upspin.Client.
 // If one of the two files is later modified, the copy and the original will differ.
 func (c *Client) PutDuplicate(oldName, newName upspin.PathName) (*upspin.DirEntry, error) {
-	const op = "client.PutDuplicate"
+	const op errors.Op = "client.PutDuplicate"
 	m, s := newMetric(op)
 	defer m.Done()
 
@@ -743,7 +743,7 @@ func (c *Client) PutDuplicate(oldName, newName upspin.PathName) (*upspin.DirEntr
 
 // Rename implements upspin.Client.
 func (c *Client) Rename(oldName, newName upspin.PathName) error {
-	const op = "client.Rename"
+	const op errors.Op = "client.Rename"
 	m, s := newMetric(op)
 	defer m.Done()
 
@@ -753,7 +753,7 @@ func (c *Client) Rename(oldName, newName upspin.PathName) error {
 
 // SetTime implements upspin.Client.
 func (c *Client) SetTime(name upspin.PathName, t upspin.Time) error {
-	const op = "client.SetTime"
+	const op errors.Op = "client.SetTime"
 	m, s := newMetric(op)
 	defer m.Done()
 
@@ -778,13 +778,13 @@ func (c *Client) SetTime(name upspin.PathName, t upspin.Time) error {
 	return nil
 }
 
-func (c *Client) dupOrRename(op string, oldName, newName upspin.PathName, rename bool, s *metric.Span) (*upspin.DirEntry, error) {
+func (c *Client) dupOrRename(op errors.Op, oldName, newName upspin.PathName, rename bool, s *metric.Span) (*upspin.DirEntry, error) {
 	entry, _, err := c.lookup(op, &upspin.DirEntry{Name: oldName}, lookupLookupFn, doNotFollowFinalLink, s)
 	if err != nil {
 		return nil, err
 	}
 	if entry.IsDir() {
-		return nil, errors.E(op, oldName, errors.IsDir, errors.Str("cannot link or rename directories"))
+		return nil, errors.E(op, oldName, errors.IsDir, "cannot link or rename directories")
 	}
 	trueOldName := entry.Name
 
@@ -793,7 +793,7 @@ func (c *Client) dupOrRename(op string, oldName, newName upspin.PathName, rename
 		return nil, errors.E(op, oldName, errors.Invalid, errors.Errorf("unrecognized Packing %d", c.config.Packing()))
 	}
 	if access.IsAccessControlFile(newName) {
-		return nil, errors.E(op, newName, errors.Invalid, errors.Str("Access or Group files cannot be renamed"))
+		return nil, errors.E(op, newName, errors.Invalid, "Access or Group files cannot be renamed")
 	}
 
 	// Update the directory entry with the new name and sequence.
@@ -846,7 +846,7 @@ func (c *Client) dupOrRename(op string, oldName, newName upspin.PathName, rename
 	return entry, nil
 }
 
-func newMetric(op string) (*metric.Metric, *metric.Span) {
+func newMetric(op errors.Op) (*metric.Metric, *metric.Span) {
 	m := metric.New("")
 	s := m.StartSpan(op).SetKind(metric.Client)
 	return m, s

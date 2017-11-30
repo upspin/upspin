@@ -270,7 +270,7 @@ func (s *service) add(name string) {
 }
 
 func (s *service) Lookup(name upspin.UserName) (*upspin.User, error) {
-	const op = "key/usercache.service.Lookup"
+	const op errors.Op = "key/usercache.service.Lookup"
 	s.lookups++
 	if u, ok := s.entries[string(name)]; ok {
 		u2 := *u // Copy to avoid problems.

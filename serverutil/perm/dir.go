@@ -14,7 +14,7 @@ import (
 // permissions. It will only start polling the store permissions after the
 // ready channel is closed.
 func WrapDir(cfg upspin.Config, ready <-chan struct{}, target upspin.UserName, dir upspin.DirServer) upspin.DirServer {
-	const op = "serverutil/perm.WrapDir"
+	const op errors.Op = "serverutil/perm.WrapDir"
 	p := newPerm(op, cfg, ready, target, dir.Lookup, dir.Watch, noop, retry, nil)
 	return p.WrapDir(dir)
 }
@@ -40,20 +40,20 @@ type dirWrapper struct {
 
 // Put implements upspin.DirServer.
 func (d *dirWrapper) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
-	const op = "serverutil/perm.Put"
+	const op errors.Op = "serverutil/perm.Put"
 	p, err := path.Parse(entry.Name)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
 	if p.IsRoot() && !d.perm.IsWriter(d.user) {
-		return nil, errors.E(op, d.user, errors.Permission, errors.Str("user not authorized"))
+		return nil, errors.E(op, d.user, errors.Permission, "user not authorized")
 	}
 	return d.DirServer.Put(entry)
 }
 
 // Dial implements upspin.Service.
 func (d *dirWrapper) Dial(config upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
-	const op = "serverutil/perm.Dial"
+	const op errors.Op = "serverutil/perm.Dial"
 	service, err := d.DirServer.Dial(config, e)
 	if err != nil {
 		return nil, errors.E(op, err)

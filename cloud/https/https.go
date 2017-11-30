@@ -229,7 +229,7 @@ func ListenAndServe(ready chan<- struct{}, opt *Options) {
 
 // newDefaultTLSConfig creates a new TLS config based on the certificate files given.
 func newDefaultTLSConfig(certFile string, certKeyFile string) (*tls.Config, error) {
-	const op = "cloud/https.newDefaultTLSConfig"
+	const op errors.Op = "cloud/https.newDefaultTLSConfig"
 	certReadable, err := isReadableFile(certFile)
 	if err != nil {
 		return nil, errors.E(op, errors.Invalid, errors.Errorf("SSL certificate in %q: %q", certFile, err))

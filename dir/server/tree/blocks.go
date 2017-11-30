@@ -28,7 +28,7 @@ func (t *Tree) store(entry *upspin.DirEntry, kids map[string]*node) error {
 
 	// Can't pack a non-dir entry. Something went bad if we got here.
 	if !entry.IsDir() {
-		err := errors.E(errors.Internal, errors.Str("can't pack non-dir entry"))
+		err := errors.E(errors.Internal, "can't pack non-dir entry")
 		return err
 	}
 
@@ -50,14 +50,14 @@ func (t *Tree) store(entry *upspin.DirEntry, kids map[string]*node) error {
 	for _, kid := range kids {
 		if kid.dirty {
 			// We should write nodes from the bottom up, so this should never happen.
-			return errors.E(kid.entry.Name, errors.Internal, errors.Str("kid node is dirty"))
+			return errors.E(kid.entry.Name, errors.Internal, "kid node is dirty")
 		}
 		// Check whether there are any empty Blocks or locations that
 		// are non-empty dirs or files.
 		if len(kid.kids) != 0 {
 			for _, b := range kid.entry.Blocks {
 				if len(b.Location.Reference) == 0 || b.Size == 0 {
-					return errors.E(kid.entry.Name, errors.Internal, errors.Str("empty directory block when there exist kid blocks"))
+					return errors.E(kid.entry.Name, errors.Internal, "empty directory block when there exist kid blocks")
 				}
 			}
 		}
@@ -171,8 +171,7 @@ func (t *Tree) load(entry *upspin.DirEntry) (kids map[string]*node, err error) {
 		}
 		if _, exists := kids[elem]; exists {
 			// Trying to re-add an existing child. Something is amiss.
-			return nil, errors.E(errors.Internal, kid.Name,
-				errors.Str("re-adding an existing element in the Tree"))
+			return nil, errors.E(errors.Internal, kid.Name, "re-adding an existing element in the Tree")
 		}
 		kids[elem] = &node{entry: kid}
 	}

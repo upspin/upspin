@@ -458,7 +458,7 @@ func TestGlobSyntaxError(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expectErr := errors.E("dir/inprocess.Glob", errors.Invalid)
+	expectErr := errors.E(errors.Op("dir/inprocess.Glob"), errors.Invalid)
 	_, err = directory.Glob(string(config.UserName()) + "/[]")
 	if !errors.Match(expectErr, err) {
 		t.Fatalf("err = %v; expected %v", err, expectErr)

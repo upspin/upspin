@@ -64,9 +64,9 @@ type message struct {
 
 // Send implements cloud/mail.Mail.
 func (s *sendgrid) Send(to, from, subject, text, html string) error {
-	const op = "cloud/mail/sendgrid.Send"
+	const op errors.Op = "cloud/mail/sendgrid.Send"
 	if text == "" && html == "" {
-		return errors.E(op, errors.Invalid, errors.Str("text or html body must be provided"))
+		return errors.E(op, errors.Invalid, "text or html body must be provided")
 	}
 	msg := message{
 		Personalizations: []personalizations{{
@@ -110,7 +110,7 @@ func (s *sendgrid) Send(to, from, subject, text, html string) error {
 		if err != nil {
 			return errors.E(op, errors.IO, err)
 		}
-		return errors.E(op, errors.IO, errors.Str(string(errStr)))
+		return errors.E(op, errors.IO, string(errStr))
 	}
 
 	return nil

@@ -259,7 +259,7 @@ func serveStream(s Stream, sess Session, w http.ResponseWriter, body []byte) {
 }
 
 func (s *serverImpl) SessionForRequest(w http.ResponseWriter, r *http.Request) (session Session, err error) {
-	const op = "rpc.SessionForRequest"
+	const op errors.Op = "rpc.SessionForRequest"
 
 	defer func() {
 		if err == nil {
@@ -279,20 +279,20 @@ func (s *serverImpl) SessionForRequest(w http.ResponseWriter, r *http.Request) (
 
 	proxyRequest, ok := r.Header[proxyRequestHeader]
 	if ok && len(proxyRequest) != 1 {
-		return nil, errors.E(errors.Invalid, errors.Str("invalid proxy request in header"))
+		return nil, errors.E(errors.Invalid, "invalid proxy request in header")
 	}
 
 	// Clients send a single header line with comma-separated values.
 	authRequest, ok := r.Header[authRequestHeader]
 	if !ok {
-		return nil, errors.E(errors.Invalid, errors.Str("missing auth request header"))
+		return nil, errors.E(errors.Invalid, "missing auth request header")
 	} else if len(authRequest) == 5 {
 		// Old-style authentication tokens should now fail,
 		// but provide an informative error message when they do.
 		// TODO(adg): Remove this if/else block on April 15.
-		return nil, errors.E(errors.Invalid, errors.Str("invalid auth request header (please update your Upspin clients and servers)"))
+		return nil, errors.E(errors.Invalid, "invalid auth request header (please update your Upspin clients and servers)")
 	} else if len(authRequest) != 1 {
-		return nil, errors.E(errors.Invalid, errors.Str("invalid auth request header"))
+		return nil, errors.E(errors.Invalid, "invalid auth request header")
 	}
 	authRequest = strings.Split(authRequest[0], ",")
 
@@ -301,7 +301,7 @@ func (s *serverImpl) SessionForRequest(w http.ResponseWriter, r *http.Request) (
 
 func (s *serverImpl) validateToken(authToken string) (Session, error) {
 	if len(authToken) < authTokenEntropyLen {
-		return nil, errors.E(errors.Invalid, errors.Str("invalid auth token"))
+		return nil, errors.E(errors.Invalid, "invalid auth token")
 	}
 
 	// Get the session for this authToken
@@ -430,7 +430,7 @@ func signUser(cfg upspin.Config, magic, host string) ([]string, error) {
 	}
 	f := cfg.Factotum()
 	if f == nil {
-		return nil, errors.E(cfg.UserName(), errors.Str("no factotum available"))
+		return nil, errors.E(cfg.UserName(), "no factotum available")
 	}
 
 	user := string(cfg.UserName())

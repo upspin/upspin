@@ -92,25 +92,25 @@ func (t *Tree) User() *serverlog.User {
 // returning an inconsistent new tree if log is unprocessed.
 func New(config upspin.Config, user *serverlog.User) (*Tree, error) {
 	if config == nil {
-		return nil, errors.E(errors.Invalid, errors.Str("config is nil"))
+		return nil, errors.E(errors.Invalid, "config is nil")
 	}
 	if user == nil {
-		return nil, errors.E(errors.Invalid, errors.Str("user is nil"))
+		return nil, errors.E(errors.Invalid, "user is nil")
 	}
 	if config.StoreEndpoint().Transport == upspin.Unassigned {
-		return nil, errors.E(errors.Invalid, errors.Str("unassigned store endpoint"))
+		return nil, errors.E(errors.Invalid, "unassigned store endpoint")
 	}
 	if config.KeyEndpoint().Transport == upspin.Unassigned {
-		return nil, errors.E(errors.Invalid, errors.Str("unassigned key endpoint"))
+		return nil, errors.E(errors.Invalid, "unassigned key endpoint")
 	}
 	if config.Factotum() == nil {
-		return nil, errors.E(errors.Invalid, errors.Str("factotum is nil"))
+		return nil, errors.E(errors.Invalid, "factotum is nil")
 	}
 	if config.UserName() == "" {
-		return nil, errors.E(errors.Invalid, errors.Str("username in tree config is empty"))
+		return nil, errors.E(errors.Invalid, "username in tree config is empty")
 	}
 	if user.Name() == "" {
-		return nil, errors.E(errors.Invalid, errors.Str("username in log is empty"))
+		return nil, errors.E(errors.Invalid, "username in log is empty")
 	}
 	packer := pack.Lookup(config.Packing())
 	if packer == nil {
@@ -227,7 +227,7 @@ func (t *Tree) PutDir(dstDir path.Parsed, de *upspin.DirEntry) (*upspin.DirEntry
 
 	if dstDir.IsRoot() {
 		// TODO: handle this later. It might come in handy for reinstating an old root.
-		return nil, errors.E(errors.Invalid, errors.Str("can't PutDir at the root"))
+		return nil, errors.E(errors.Invalid, "can't PutDir at the root")
 	}
 
 	// The destination must not exist nor cross a link.
@@ -254,7 +254,7 @@ func (t *Tree) PutDir(dstDir path.Parsed, de *upspin.DirEntry) (*upspin.DirEntry
 	// Put the synthetic node into the tree at dst.
 	n, err := t.put(dstDir, &existingEntryNode.entry)
 	if err == upspin.ErrFollowLink {
-		return nil, errors.E(errors.Invalid, dstDir.Path(), errors.Str("path cannot contain a link"))
+		return nil, errors.E(errors.Invalid, dstDir.Path(), "path cannot contain a link")
 	}
 	if err != nil {
 		return nil, err
@@ -298,7 +298,7 @@ func (t *Tree) addKid(n *node, nodePath path.Parsed, parent *node, parentPath pa
 	}
 	nElem := parentPath.NElem()
 	if nodePath.Drop(1).Path() != parentPath.Path() {
-		err := errors.E(nodePath.Path(), errors.Internal, errors.Str("parent path does match parent of dir path"))
+		err := errors.E(nodePath.Path(), errors.Internal, "parent path does match parent of dir path")
 		log.Error.Print(err)
 		return err
 	}
@@ -338,7 +338,7 @@ func (t *Tree) markDirty(p path.Parsed) error {
 		// only their parents (directories), which have their kids'
 		// names and references packed in them.
 		if !n.entry.IsDir() {
-			err := errors.E(errors.Internal, n.entry.Name, errors.Str("marking non-dir dirty"))
+			err := errors.E(errors.Internal, n.entry.Name, "marking non-dir dirty")
 			log.Error.Printf("%s", err)
 			return err
 		}
@@ -429,12 +429,10 @@ func (t *Tree) loadNode(parent *node, elem string) (*node, error) {
 // t.mu must be held.
 func (t *Tree) loadKids(parent *node) error {
 	if parent.dirty {
-		return errors.E(errors.Internal, parent.entry.Name,
-			errors.Str("trying to load a block from storage when the node is dirty"))
+		return errors.E(errors.Internal, parent.entry.Name, "trying to load a block from storage when the node is dirty")
 	}
 	if len(parent.kids) > 0 {
-		return errors.E(errors.Internal, parent.entry.Name,
-			errors.Str("attempt to reload kids for populated node"))
+		return errors.E(errors.Internal, parent.entry.Name, "attempt to reload kids for populated node")
 	}
 	kids, err := t.load(&parent.entry)
 	if err != nil {
@@ -470,11 +468,11 @@ func (t *Tree) createRoot(p path.Parsed, de *upspin.DirEntry) error {
 	// Do we have a root already?
 	if t.root != nil {
 		// Root already exists.
-		return errors.E(errors.Exist, errors.Str("root already created"))
+		return errors.E(errors.Exist, "root already created")
 	}
 	// Check that we're trying to create a root for the owner of the Tree only.
 	if p.User() != t.user.Name() {
-		return errors.E(p.User(), p.Path(), errors.Invalid, errors.Str("can't create root for another user"))
+		return errors.E(p.User(), p.Path(), errors.Invalid, "can't create root for another user")
 	}
 	_, err := t.user.Root()
 	if err != nil && !errors.Is(errors.NotExist, err) {
@@ -483,7 +481,7 @@ func (t *Tree) createRoot(p path.Parsed, de *upspin.DirEntry) error {
 	}
 	// To be sure, the log must be empty too (or t.root wouldn't be empty).
 	if t.user.AppendOffset() != 0 {
-		err := errors.E(errors.Internal, errors.Str("index not empty, but root not found"))
+		err := errors.E(errors.Internal, "index not empty, but root not found")
 		log.Error.Print(err)
 		return err
 	}
@@ -633,7 +631,7 @@ func (t *Tree) delete(p path.Parsed) (*node, error) {
 // t.mu must be held.
 func (t *Tree) deleteRoot() error {
 	if t.root == nil {
-		return errors.E(errors.NotExist, errors.Str("root does not exist"))
+		return errors.E(errors.NotExist, "root does not exist")
 	}
 	log.Debug.Printf("Deleting root %q", t.root.entry.Name)
 	if len(t.root.kids) > 0 {

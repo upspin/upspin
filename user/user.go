@@ -62,10 +62,10 @@ import (
 // follow the "ignore" rules.
 //
 func Parse(userName upspin.UserName) (user, suffix, domain string, err error) {
-	const op = "user.Parse"
+	const op = errors.Op("user.Parse")
 	name := string(userName)
 	if len(userName) >= 254 {
-		return "", "", "", errors.E(op, errors.Invalid, userName, errors.Str("name too long"))
+		return "", "", "", errors.E(op, errors.Invalid, userName, "name too long")
 	}
 	if strings.Count(name, "@") != 1 {
 		return "", "", "", errors.E(op, errors.Invalid, userName, errors.Str("user name must contain one @ symbol"))
@@ -92,12 +92,12 @@ func Parse(userName upspin.UserName) (user, suffix, domain string, err error) {
 // documentation for Parse except that "*" is not a valid user and the user name
 // itself must be less than 255 bytes long.
 func ParseUser(user string) (userName, suffix string, err error) {
-	return parseUser("user.ParseUser", upspin.UserName(user), user)
+	return parseUser(errors.Op("user.ParseUser"), upspin.UserName(user), user)
 }
 
 // parseUser is the implementation of ParseUser, also called by Parse.
 // It takes the full UserName as well as the user component, to aid in error reporting.
-func parseUser(op string, userName upspin.UserName, user string) (string, string, error) {
+func parseUser(op errors.Op, userName upspin.UserName, user string) (string, string, error) {
 	if len(user) >= 255 {
 		return errParseUser(op, userName, "user name too long")
 	}
@@ -141,12 +141,12 @@ func parseUser(op string, userName upspin.UserName, user string) (string, string
 // documentation for Parse except the domain name itself must be less than 255
 // bytes long.
 func ParseDomain(domain string) (string, error) {
-	return parseDomain("user.ParseDomain", upspin.UserName(domain), domain)
+	return parseDomain(errors.Op("user.ParseDomain"), upspin.UserName(domain), domain)
 }
 
 // parseDomain is the implementation of ParseDomain, also called by Parse.
 // It takes the full UserName as well as the domain component, to aid in error reporting.
-func parseDomain(op string, userName upspin.UserName, domain string) (string, error) {
+func parseDomain(op errors.Op, userName upspin.UserName, domain string) (string, error) {
 	if len(domain) >= 255 {
 		return errParseDomain(op, userName, "domain name too long")
 	}
@@ -189,12 +189,12 @@ func parseDomain(op string, userName upspin.UserName, domain string) (string, er
 	return domain, nil
 }
 
-func errParseUser(op string, userName upspin.UserName, msg string) (u, s string, err error) {
-	return "", "", errors.E(op, errors.Invalid, userName, errors.Str(msg))
+func errParseUser(op errors.Op, userName upspin.UserName, msg string) (u, s string, err error) {
+	return "", "", errors.E(op, errors.Invalid, userName, msg)
 }
 
-func errParseDomain(op string, userName upspin.UserName, msg string) (d string, err error) {
-	return "", errors.E(op, errors.Invalid, userName, errors.Str(msg))
+func errParseDomain(op errors.Op, userName upspin.UserName, msg string) (d string, err error) {
+	return "", errors.E(op, errors.Invalid, userName, msg)
 }
 
 func canonicalize(user string) (string, error) {

@@ -25,7 +25,7 @@ var (
 func Register(packer upspin.Packer) error {
 	packing := packer.Packing()
 	if packing == upspin.UnassignedPack {
-		return errors.E(errors.Invalid, errors.Str("unassigned pack cannot be registered"))
+		return errors.E(errors.Invalid, "unassigned pack cannot be registered")
 	}
 	mu.Lock()
 	defer mu.Unlock()

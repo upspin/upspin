@@ -49,7 +49,7 @@ var _ upspin.File = (*File)(nil)
 // using the given Config.
 func Readable(cfg upspin.Config, entry *upspin.DirEntry) (*File, error) {
 	// TODO(adg): check if this is a dir or link?
-	const op = "client/file.Readable"
+	const op errors.Op = "client/file.Readable"
 
 	packer := pack.Lookup(entry.Packing)
 	if packer == nil {
@@ -93,7 +93,7 @@ func (f *File) Name() upspin.PathName {
 
 // Read implements upspin.File.
 func (f *File) Read(b []byte) (n int, err error) {
-	const op = "file.Read"
+	const op errors.Op = "file.Read"
 	n, err = f.readAt(op, b, f.offset)
 	if err == nil {
 		f.offset += int64(n)
@@ -103,19 +103,19 @@ func (f *File) Read(b []byte) (n int, err error) {
 
 // ReadAt implements upspin.File.
 func (f *File) ReadAt(b []byte, off int64) (n int, err error) {
-	const op = "file.ReadAt"
+	const op errors.Op = "file.ReadAt"
 	return f.readAt(op, b, off)
 }
 
-func (f *File) readAt(op string, dst []byte, off int64) (n int, err error) {
+func (f *File) readAt(op errors.Op, dst []byte, off int64) (n int, err error) {
 	if f.closed {
 		return 0, f.errClosed(op)
 	}
 	if f.writable {
-		return 0, errors.E(op, errors.Invalid, f.name, errors.Errorf("not open for read"))
+		return 0, errors.E(op, errors.Invalid, f.name, "not open for read")
 	}
 	if off < 0 {
-		return 0, errors.E(op, errors.Invalid, f.name, errors.Errorf("negative offset"))
+		return 0, errors.E(op, errors.Invalid, f.name, "negative offset")
 	}
 	if off > f.size {
 		return 0, errors.E(op, errors.Invalid, f.name, errors.Errorf("offset (%d) beyond end of file (%d)", off, f.size))
@@ -175,7 +175,7 @@ func (f *File) readAt(op string, dst []byte, off int64) (n int, err error) {
 
 // Seek implements upspin.File.
 func (f *File) Seek(offset int64, whence int) (ret int64, err error) {
-	const op = "file.Seek"
+	const op errors.Op = "file.Seek"
 	if f.closed {
 		return 0, f.errClosed(op)
 	}
@@ -191,10 +191,10 @@ func (f *File) Seek(offset int64, whence int) (ret int64, err error) {
 			ret = f.size + offset
 		}
 	default:
-		return 0, errors.E(op, errors.Invalid, f.name, errors.Str("bad whence"))
+		return 0, errors.E(op, errors.Invalid, f.name, "bad whence")
 	}
 	if ret < 0 || offset > maxInt || !f.writable && ret > f.size {
-		return 0, errors.E(op, errors.Invalid, f.name, errors.Str("bad offset"))
+		return 0, errors.E(op, errors.Invalid, f.name, "bad offset")
 	}
 	f.offset = ret
 	return ret, nil
@@ -202,7 +202,7 @@ func (f *File) Seek(offset int64, whence int) (ret int64, err error) {
 
 // Write implements upspin.File.
 func (f *File) Write(b []byte) (n int, err error) {
-	const op = "file.Write"
+	const op errors.Op = "file.Write"
 	n, err = f.writeAt(op, b, f.offset)
 	if err == nil {
 		f.offset += int64(n)
@@ -212,23 +212,23 @@ func (f *File) Write(b []byte) (n int, err error) {
 
 // WriteAt implements upspin.File.
 func (f *File) WriteAt(b []byte, off int64) (n int, err error) {
-	const op = "file.WriteAt"
+	const op errors.Op = "file.WriteAt"
 	return f.writeAt(op, b, off)
 }
 
-func (f *File) writeAt(op string, b []byte, off int64) (n int, err error) {
+func (f *File) writeAt(op errors.Op, b []byte, off int64) (n int, err error) {
 	if f.closed {
 		return 0, f.errClosed(op)
 	}
 	if !f.writable {
-		return 0, errors.E(op, errors.Invalid, f.name, errors.Errorf("not open for write"))
+		return 0, errors.E(op, errors.Invalid, f.name, "not open for write")
 	}
 	if off < 0 {
-		return 0, errors.E(op, errors.Invalid, f.name, errors.Errorf("negative offset"))
+		return 0, errors.E(op, errors.Invalid, f.name, "negative offset")
 	}
 	end := off + int64(len(b))
 	if end > maxInt {
-		return 0, errors.E(op, errors.Invalid, f.name, errors.Errorf("file too long"))
+		return 0, errors.E(op, errors.Invalid, f.name, "file too long")
 	}
 	if end > int64(cap(f.data)) {
 		// Grow the capacity of f.data but keep length the same.
@@ -251,7 +251,7 @@ func (f *File) writeAt(op string, b []byte, off int64) (n int, err error) {
 
 // Close implements upspin.File.
 func (f *File) Close() error {
-	const op = "file.Close"
+	const op errors.Op = "file.Close"
 	if f.closed {
 		return f.errClosed(op)
 	}
@@ -269,6 +269,6 @@ func (f *File) Close() error {
 	return err
 }
 
-func (f *File) errClosed(op string) error {
-	return errors.E(op, errors.Invalid, f.name, errors.Str("is closed"))
+func (f *File) errClosed(op errors.Op) error {
+	return errors.E(op, errors.Invalid, f.name, "is closed")
 }

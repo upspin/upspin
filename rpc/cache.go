@@ -13,7 +13,7 @@ import (
 )
 
 func CacheEndpoint(cfg upspin.Config) (*upspin.Endpoint, error) {
-	const op = "rpc.CacheEndpoint"
+	const op errors.Op = "rpc.CacheEndpoint"
 
 	v := cfg.Value("cache")
 	switch v {
