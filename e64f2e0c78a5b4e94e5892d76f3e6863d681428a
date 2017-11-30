@@ -45,6 +45,30 @@
       "revId": "e64f2e0c78a5b4e94e5892d76f3e6863d681428a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "913ed746_1404ea5d",
+        "filename": "errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-11-30T03:30:10Z",
+      "side": 1,
+      "message": "We could delete this code and trust we never make the mistake. I\u0027m happy to leave it in but will remove it if pushed.",
+      "parentUuid": "af4e8eeb_11e23a74",
+      "range": {
+        "startLine": 168,
+        "startChar": 0,
+        "endLine": 183,
+        "endChar": 4
+      },
+      "revId": "e64f2e0c78a5b4e94e5892d76f3e6863d681428a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
