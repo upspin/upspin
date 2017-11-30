@@ -69,6 +69,30 @@
       "revId": "e64f2e0c78a5b4e94e5892d76f3e6863d681428a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "570b9ffa_e01466a0",
+        "filename": "errors/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-11-30T03:31:52Z",
+      "side": 1,
+      "message": "Actually I think it should stay in this CL. It\u0027s a separate concern and should be handled separately.\\",
+      "parentUuid": "913ed746_1404ea5d",
+      "range": {
+        "startLine": 168,
+        "startChar": 0,
+        "endLine": 183,
+        "endChar": 4
+      },
+      "revId": "e64f2e0c78a5b4e94e5892d76f3e6863d681428a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
