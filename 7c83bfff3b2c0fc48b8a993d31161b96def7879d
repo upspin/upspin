@@ -16,6 +16,24 @@
       "revId": "7c83bfff3b2c0fc48b8a993d31161b96def7879d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "be68df97_1d393dc9",
+        "filename": "cmd/upspinfs/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-12-01T00:04:49Z",
+      "side": 1,
+      "message": "That still means that the mount point is optional. I guess it should be\n\n[-mountpoint] \u003cmount point\u003e\n\nI include the \u003c\u003e because making noun phrases as arguments is confusing since it looks like two arguments.  Is there a better way?",
+      "parentUuid": "d157dfee_cc86e788",
+      "revId": "7c83bfff3b2c0fc48b8a993d31161b96def7879d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
