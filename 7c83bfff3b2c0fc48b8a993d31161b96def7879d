@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d157dfee_cc86e788",
+        "filename": "cmd/upspinfs/main.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-01T00:01:12Z",
+      "side": 1,
+      "message": "you could go with\n\nfmt.Fprintf(os.Stderr, \"Usage: %s [[-mountpoint] mount point]\\n\", os.Args[0])",
+      "revId": "7c83bfff3b2c0fc48b8a993d31161b96def7879d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
