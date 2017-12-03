@@ -325,6 +325,11 @@ func decodeStream(stream ResponseChan, r io.ReadCloser, done <-chan struct{}) {
 
 		l := binary.BigEndian.Uint32(msgLen[:])
 
+		const reasonableMessageSize = 1 << 26 // 64MB
+		if l > reasonableMessageSize {
+			stream.Error(errors.E(errors.Invalid, errors.Errorf("message too long (%d bytes)", l)))
+			return
+		}
 		if cap(buf) < int(l) {
 			buf = make([]byte, l)
 		} else {
