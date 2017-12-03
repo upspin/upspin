@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "022da771_42811e4e",
+        "filename": "rpc/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-03T23:43:26Z",
+      "side": 1,
+      "message": "64MB is small. flags.BlockSize is clamped to 1GB. it seems wrong to choose a smaller value here.",
+      "revId": "234fc21d727304cbcf6955e1611325b918b03835",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
