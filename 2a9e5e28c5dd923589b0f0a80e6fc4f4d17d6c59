@@ -16,6 +16,24 @@
       "revId": "2a9e5e28c5dd923589b0f0a80e6fc4f4d17d6c59",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e2ac0f5b_15edcbf6",
+        "filename": "log/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-12-04T21:50:25Z",
+      "side": 1,
+      "message": "By that do you mean, it should be something like this?\n\nvar state \u003d struct {\n sync.RWMutex\n level Level\n logger Logger\n external ExternalLogger\n}{\n level: InfoLevel,\n logger: newDefaultLogger(os.Stderr),\n}",
+      "parentUuid": "ef87121a_eac61165",
+      "revId": "2a9e5e28c5dd923589b0f0a80e6fc4f4d17d6c59",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
