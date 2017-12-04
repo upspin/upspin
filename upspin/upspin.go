@@ -88,6 +88,12 @@ var (
 	// FlushWritebacksMetadata is used as a signal to flush the cache.
 	// A Get will return only after all writebacks have completed.
 	FlushWritebacksMetadata Reference = "metadata:FlushWritebacks"
+
+	// ListReferencesMetadata is used by administrators to enumerate the
+	// references held by a StoreServer. Callers pass this value verbatim
+	// for the initial request and append a pagination token for subsequent
+	// requests.
+	ListReferencesMetadata Reference = "metadata:ListReferences:"
 )
 
 // Signature is an ECDSA signature.
