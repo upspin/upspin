@@ -157,6 +157,7 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		// If the put worked, remember it.
 		if de != nil {
 			entry.Sequence = de.Sequence
+			s.clog.updateSequenceLRU(entry.Name, entry.Sequence)
 		}
 		s.clog.logRequest(putReq, name, err, entry)
 
