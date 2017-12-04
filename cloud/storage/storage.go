@@ -31,6 +31,15 @@ type Storage interface {
 	Delete(ref string) error
 }
 
+type Lister interface {
+	List() ([]RefInfo, error)
+}
+
+type RefInfo struct {
+	Ref  string
+	Size int64
+}
+
 // StorageConstructor is a function that initializes and returns a Storage
 // implementation with the given options.
 type StorageConstructor func(*Opts) (Storage, error)
