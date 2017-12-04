@@ -88,7 +88,33 @@ var (
 	// FlushWritebacksMetadata is used as a signal to flush the cache.
 	// A Get will return only after all writebacks have completed.
 	FlushWritebacksMetadata Reference = "metadata:FlushWritebacks"
+
+	// ListRefsMetadata is used by administrators to enumerate the
+	// references held by a StoreServer. Callers pass this value verbatim
+	// for the initial request and append a pagination token for subsequent
+	// requests. The response from such a request is a JSON-encoded
+	// ListRefsResponse.
+	ListRefsMetadata Reference = "metadata:ListRefs:"
 )
+
+// ListRefsResponse describes a response from a StoreServer.Get
+// call for ListReferencesMetadata.
+type ListRefsResponse struct {
+	// Refs holds the reference information.
+	Refs []ListRefsItem
+	// Next holds the token to fetch the next page,
+	// or the empty string if this is the last page.
+	Next string
+}
+
+// ListRefsItem describes a reference in a StoreServer,
+// returned as part of a ListRefsResponse.
+type ListRefsItem struct {
+	// Ref holds the reference name.
+	Ref Reference
+	// Size the length of the reference data.
+	Size int64
+}
 
 // Signature is an ECDSA signature.
 type Signature struct {
