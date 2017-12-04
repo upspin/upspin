@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "4e0f71a0_e1d37085",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-12-04T22:08:41Z",
+      "side": 1,
+      "message": "applied",
+      "range": {
+        "startLine": 153,
+        "startChar": 20,
+        "endLine": 153,
+        "endChar": 28
+      },
+      "revId": "233d9d7f05d90410eccc97bd1dc062971991ce5b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d25752dc_0aa0dfff",
+        "filename": "dir/dircache/log.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 902,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-12-04T22:08:41Z",
+      "side": 1,
+      "message": "Rather than naming this after what it does, I think it would be clearer to name it what it means. Perhaps \"latestSequence\"?\n\nso the call sites become \n\n  if l.latestSequence(name, sequence) {\n    ...",
+      "revId": "233d9d7f05d90410eccc97bd1dc062971991ce5b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
