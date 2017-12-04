@@ -28,7 +28,7 @@ func TestLogLevel(t *testing.T) {
 	Info.Print(msg2)                // logged
 	Error.Printf("hello: %s", msg3) // logged
 
-	defaultLogger.(*mockLogger).Verify(t)
+	globals().defaultLogger.(*mockLogger).Verify(t)
 }
 
 func TestDisable(t *testing.T) {
@@ -37,7 +37,7 @@ func TestDisable(t *testing.T) {
 	Debug.Printf("Starting server...")
 	SetLevel("disabled")
 	Error.Printf("Important stuff you'll miss!")
-	defaultLogger.(*mockLogger).Verify(t)
+	globals().defaultLogger.(*mockLogger).Verify(t)
 }
 
 func TestFatal(t *testing.T) {
@@ -48,7 +48,7 @@ func TestFatal(t *testing.T) {
 	SetLevel("error")
 	Info.Fatal(msg)
 
-	defaultLogger.(*mockLogger).Verify(t)
+	globals().defaultLogger.(*mockLogger).Verify(t)
 }
 
 func TestAt(t *testing.T) {
@@ -76,7 +76,7 @@ func TestRemoteLogging(t *testing.T) {
 	Print(msg)
 
 	mockExternal.Verify(t)
-	defaultLogger.(*mockLogger).Verify(t)
+	globals().defaultLogger.(*mockLogger).Verify(t)
 }
 
 func TestDisableLocal(t *testing.T) {
@@ -85,7 +85,7 @@ func TestDisableLocal(t *testing.T) {
 }
 
 func setMockLogger(expected string, fatalExpected bool) {
-	defaultLogger = &mockLogger{
+	state.defaultLogger = &mockLogger{
 		expected:      expected,
 		fatalExpected: fatalExpected,
 	}

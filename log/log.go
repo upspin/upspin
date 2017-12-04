@@ -11,6 +11,7 @@ import (
 	"io"
 	"log"
 	"os"
+	"sync"
 )
 
 // Logger is the interface for logging messages.
@@ -55,11 +56,25 @@ var (
 	Error = &logger{ErrorLevel}
 )
 
-var (
-	currentLevel         = InfoLevel
-	defaultLogger Logger = newDefaultLogger(os.Stderr)
+type globalState struct {
+	currentLevel  Level
+	defaultLogger Logger
 	external      ExternalLogger
+}
+
+var (
+	mu    sync.RWMutex
+	state = globalState{
+		currentLevel:  InfoLevel,
+		defaultLogger: newDefaultLogger(os.Stderr),
+	}
 )
+
+func globals() globalState {
+	mu.RLock()
+	defer mu.RUnlock()
+	return state
+}
 
 func newDefaultLogger(w io.Writer) Logger {
 	return log.New(w, "", log.Ldate|log.Ltime|log.LUTC|log.Lmicroseconds)
@@ -68,19 +83,25 @@ func newDefaultLogger(w io.Writer) Logger {
 // Register connects an ExternalLogger to the default logger. This may only be
 // called once.
 func Register(e ExternalLogger) {
-	if external != nil {
+	mu.Lock()
+	defer mu.Unlock()
+
+	if state.external != nil {
 		panic("cannot register second external logger")
 	}
-	external = e
+	state.external = e
 }
 
 // SetOutput sets the default loggers to write to w.
 // If w is nil, the default loggers are disabled.
 func SetOutput(w io.Writer) {
+	mu.Lock()
+	defer mu.Unlock()
+
 	if w == nil {
-		defaultLogger = nil
+		state.defaultLogger = nil
 	} else {
-		defaultLogger = newDefaultLogger(w)
+		state.defaultLogger = newDefaultLogger(w)
 	}
 }
 
@@ -92,53 +113,61 @@ var _ Logger = (*logger)(nil)
 
 // Printf writes a formatted message to the log.
 func (l *logger) Printf(format string, v ...interface{}) {
-	if l.level < currentLevel {
+	g := globals()
+
+	if l.level < g.currentLevel {
 		return // Don't log at lower levels.
 	}
-	if external != nil {
-		external.Log(l.level, fmt.Sprintf(format, v...))
+	if g.external != nil {
+		g.external.Log(l.level, fmt.Sprintf(format, v...))
 	}
-	if defaultLogger != nil {
-		defaultLogger.Printf(format, v...)
+	if g.defaultLogger != nil {
+		g.defaultLogger.Printf(format, v...)
 	}
 }
 
 // Print writes a message to the log.
 func (l *logger) Print(v ...interface{}) {
-	if l.level < currentLevel {
+	g := globals()
+
+	if l.level < g.currentLevel {
 		return // Don't log at lower levels.
 	}
-	if external != nil {
-		external.Log(l.level, fmt.Sprint(v...))
+	if g.external != nil {
+		g.external.Log(l.level, fmt.Sprint(v...))
 	}
-	if defaultLogger != nil {
-		defaultLogger.Print(v...)
+	if g.defaultLogger != nil {
+		g.defaultLogger.Print(v...)
 	}
 }
 
 // Println writes a line to the log.
 func (l *logger) Println(v ...interface{}) {
-	if l.level < currentLevel {
+	g := globals()
+
+	if l.level < g.currentLevel {
 		return // Don't log at lower levels.
 	}
-	if external != nil {
-		external.Log(l.level, fmt.Sprintln(v...))
+	if g.external != nil {
+		g.external.Log(l.level, fmt.Sprintln(v...))
 	}
-	if defaultLogger != nil {
-		defaultLogger.Println(v...)
+	if g.defaultLogger != nil {
+		g.defaultLogger.Println(v...)
 	}
 }
 
 // Fatal writes a message to the log and aborts, regardless of the current log level.
 func (l *logger) Fatal(v ...interface{}) {
-	if external != nil {
-		external.Log(l.level, fmt.Sprint(v...))
+	g := globals()
+
+	if g.external != nil {
+		g.external.Log(l.level, fmt.Sprint(v...))
 		// Make sure we get the Fatal recorded.
-		external.Flush()
+		g.external.Flush()
 		// Fall through to ensure we record it locally too.
 	}
-	if defaultLogger != nil {
-		defaultLogger.Fatal(v...)
+	if g.defaultLogger != nil {
+		g.defaultLogger.Fatal(v...)
 	} else {
 		log.Fatal(v...)
 	}
@@ -147,14 +176,16 @@ func (l *logger) Fatal(v ...interface{}) {
 // Fatalf writes a formatted message to the log and aborts, regardless of the
 // current log level.
 func (l *logger) Fatalf(format string, v ...interface{}) {
-	if external != nil {
-		external.Log(l.level, fmt.Sprintf(format, v...))
+	g := globals()
+
+	if g.external != nil {
+		g.external.Log(l.level, fmt.Sprintf(format, v...))
 		// Make sure we get the Fatal recorded.
-		external.Flush()
+		g.external.Flush()
 		// Fall through to ensure we record it locally too.
 	}
-	if defaultLogger != nil {
-		defaultLogger.Fatalf(format, v...)
+	if g.defaultLogger != nil {
+		g.defaultLogger.Fatalf(format, v...)
 	} else {
 		log.Fatalf(format, v...)
 	}
@@ -162,9 +193,7 @@ func (l *logger) Fatalf(format string, v ...interface{}) {
 
 // Flush implements ExternalLogger.
 func (l *logger) Flush() {
-	if external != nil {
-		external.Flush()
-	}
+	Flush()
 }
 
 // String returns the name of the logger.
@@ -202,7 +231,9 @@ func toLevel(level string) (Level, error) {
 
 // GetLevel returns the current logging level.
 func GetLevel() string {
-	return toString(currentLevel)
+	g := globals()
+
+	return toString(g.currentLevel)
 }
 
 // SetLevel sets the current level of logging.
@@ -211,17 +242,21 @@ func SetLevel(level string) error {
 	if err != nil {
 		return err
 	}
-	currentLevel = l
+	mu.Lock()
+	state.currentLevel = l
+	mu.Unlock()
 	return nil
 }
 
 // At returns whether the level will be logged currently.
 func At(level string) bool {
+	g := globals()
+
 	l, err := toLevel(level)
 	if err != nil {
 		return false
 	}
-	return currentLevel <= l
+	return g.currentLevel <= l
 }
 
 // Printf writes a formatted message to the log.
@@ -251,7 +286,9 @@ func Fatalf(format string, v ...interface{}) {
 
 // Flush flushes the external logger, if any.
 func Flush() {
-	if external != nil {
-		external.Flush()
+	g := globals()
+
+	if g.external != nil {
+		g.external.Flush()
 	}
 }
