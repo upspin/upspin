@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"upspin.io/errors"
+	"upspin.io/upspin"
 )
 
 // Storage is a low-level storage interface for services to store their data
@@ -29,6 +30,19 @@ type Storage interface {
 	// Delete permanently removes all storage space associated
 	// with a ref.
 	Delete(ref string) error
+}
+
+// Lister provides a mechanism to report the set of items held in a
+// StoreServer. Clients can use a type assertion to verify whether
+// the StoreServer implements this interface.
+type Lister interface {
+	// List returns a list of references contained by the storage backend.
+	// The token argument is for pagination: it specifies a starting point
+	// for the list. To obtain a complete list of references, pass an empty
+	// string for the first call, and the last nextToken value for for each
+	// subsequent call. The pagination tokens are opaque values particular
+	// to the storage implementation.
+	List(token string) (refs []upspin.ListRefsItem, nextToken string, err error)
 }
 
 // StorageConstructor is a function that initializes and returns a Storage
