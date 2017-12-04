@@ -34,6 +34,24 @@
       "revId": "2a9e5e28c5dd923589b0f0a80e6fc4f4d17d6c59",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "77c1ebb6_09ce6432",
+        "filename": "log/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-04T21:53:08Z",
+      "side": 1,
+      "message": "Yes, but in two parts (type and init) so the struct can be returned from the globals func.",
+      "parentUuid": "e2ac0f5b_15edcbf6",
+      "revId": "2a9e5e28c5dd923589b0f0a80e6fc4f4d17d6c59",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
