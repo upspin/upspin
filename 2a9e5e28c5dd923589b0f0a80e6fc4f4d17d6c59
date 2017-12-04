@@ -52,6 +52,24 @@
       "revId": "2a9e5e28c5dd923589b0f0a80e6fc4f4d17d6c59",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "013a5ec1_574aca34",
+        "filename": "log/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 6267
+      },
+      "writtenOn": "2017-12-04T23:31:58Z",
+      "side": 1,
+      "message": "I had that before but found it not particularly clean, because some functions modify the state and will do the locking themselves. And we can\u0027t make the mutex part of the struct, because it would mean copying a lock. So a big part of the neat packing gets lost anyway.",
+      "parentUuid": "77c1ebb6_09ce6432",
+      "revId": "2a9e5e28c5dd923589b0f0a80e6fc4f4d17d6c59",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
