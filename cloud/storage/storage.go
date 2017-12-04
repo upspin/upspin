@@ -31,6 +31,23 @@ type Storage interface {
 	Delete(ref string) error
 }
 
+// Lister specifies a method that Storage implementations may provide.
+type Lister interface {
+	// List returns a list of references contained by the storage backend.
+	// The token argument is for pagination: it specifies a starting point
+	// for the list. To obtain a complete list of references, pass an empty
+	// string for the first call, and the last nextToken value for for each
+	// subsequent call. The pagination tokens are opaque values particular
+	// to the storage implementation.
+	List(token string) (refs []RefInfo, nextToken string, err error)
+}
+
+// RefInfo describes a reference in a storage backend.
+type RefInfo struct {
+	Ref  string
+	Size int64
+}
+
 // StorageConstructor is a function that initializes and returns a Storage
 // implementation with the given options.
 type StorageConstructor func(*Opts) (Storage, error)
