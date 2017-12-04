@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ef87121a_eac61165",
+        "filename": "log/log.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-04T21:45:53Z",
+      "side": 1,
+      "message": "This looks to me now like a global struct rather than some variables.",
+      "revId": "2a9e5e28c5dd923589b0f0a80e6fc4f4d17d6c59",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
