@@ -16,6 +16,24 @@
       "revId": "234fc21d727304cbcf6955e1611325b918b03835",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d449dec6_9caedbb2",
+        "filename": "rpc/client.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-12-04T01:35:33Z",
+      "side": 1,
+      "message": "I don\u0027t see the relationship between this streaming RPC implementation and the theoretical maximum size of a block. Streaming RPC should not be used to send blocks.\n\nThis needs to be constrained to some reasonable size; 1GB is too high.\n64MB would easily cover the extant uses of this streaming RPC system.\n\n...",
+      "parentUuid": "022da771_42811e4e",
+      "revId": "234fc21d727304cbcf6955e1611325b918b03835",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
