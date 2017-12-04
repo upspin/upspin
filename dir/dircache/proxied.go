@@ -277,6 +277,12 @@ func (d *proxiedDir) handleEvent(e *upspin.Event) error {
 	}
 
 	// This is an event we care about.
+
+	// Ignore old events.
+	if !d.l.inSequence(e.Entry.Name, e.Entry.Sequence) {
+		return nil
+	}
+
 	d.sequence = e.Entry.Sequence
 	op := lookupReq
 	if e.Delete {

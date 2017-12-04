@@ -122,6 +122,11 @@ type clog struct {
 	logSize        int64 // current log file size in bytes
 	highestLogFile int   // highest numbered logfile
 
+	// sequenceLRU contains the highest sequence number seen
+	// for a path. Watch will ignore any events with an equal or
+	// lower sequence.
+	sequenceLRU *cache.LRU // [PathName]int64
+
 	pathLocks hashLockArena
 	globLocks hashLockArena
 }
@@ -138,8 +143,16 @@ type lruKey struct {
 	glob bool
 }
 
-// LRUMax is the maximum number of entries in the LRU.
-const LRUMax = 10000
+const (
+	// LRUMax is the maximum number of entries in the LRU.
+	LRUMax = 10000
+
+	// SequenceLRUMax is the maximum number of paths that
+	// whose sequence we will remember. This is used to
+	// avoid reapplying Watch Events that reflect actions
+	// we have already applied or overridden.
+	SequenceLRUMax = 2000
+)
 
 // openLog reads the current log.
 // - dir is the directory for log files.
@@ -158,6 +171,7 @@ func openLog(cfg upspin.Config, dir string, maxDisk int64) (*clog, error) {
 		exit:          make(chan bool),
 		rotate:        make(chan bool),
 		rotaterExited: make(chan bool),
+		sequenceLRU:   cache.NewLRU(SequenceLRUMax),
 	}
 	l.proxied = newProxiedDirs(l)
 
@@ -264,6 +278,9 @@ func (l *clog) wipeLog(user upspin.UserName) {
 		}
 		e.request = obsoleteReq
 	}
+
+	// Forget any sequence numbers since they may no longer make sense.
+	l.sequenceLRU = cache.NewLRU(SequenceLRUMax)
 }
 
 func (l *clog) flush() {
@@ -880,6 +897,18 @@ func (l *clog) fixAccess(e *clogEntry) {
 		}
 		p = p.Drop(1)
 	}
+}
+
+// inSequence returns true if the sequence number is a valid new
+// sequence number for name while updating the cached sequence.
+func (l *clog) inSequence(name upspin.PathName, seq int64) bool {
+	if v, ok := l.sequenceLRU.Get(name); ok {
+		if v.(int64) >= seq {
+			return false
+		}
+	}
+	l.sequenceLRU.Add(name, seq)
+	return true
 }
 
 // invalidate invalidates an entry but leaves it in the LRU to remember
