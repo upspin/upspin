@@ -88,6 +88,8 @@ var (
 	// FlushWritebacksMetadata is used as a signal to flush the cache.
 	// A Get will return only after all writebacks have completed.
 	FlushWritebacksMetadata Reference = "metadata:FlushWritebacks"
+
+	ListRefsMetadata Reference = "metadata:ListReferences"
 )
 
 // Signature is an ECDSA signature.

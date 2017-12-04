@@ -49,12 +49,22 @@ type storeWrapper struct {
 	perm *Perm
 }
 
+// Get implements upspin.StoreServer.
+func (s *storeWrapper) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Location, error) {
+	const op errors.Op = "store/perm.Get"
+
+	if ref == upspin.ListRefsMetadata && !s.perm.IsWriter(s.user) {
+		return nil, nil, nil, errors.E(op, s.user, errors.Permission, "user not authorized")
+	}
+	return s.StoreServer.Get(ref)
+}
+
 // Put implements upspin.StoreServer.
 func (s *storeWrapper) Put(data []byte) (*upspin.Refdata, error) {
 	const op errors.Op = "store/perm.Put"
 
 	if !s.perm.IsWriter(s.user) {
-		return nil, errors.E(op, s.user, errors.Permission, errors.Errorf("user not authorized"))
+		return nil, errors.E(op, s.user, errors.Permission, "user not authorized")
 	}
 	return s.StoreServer.Put(data)
 }
@@ -64,7 +74,7 @@ func (s *storeWrapper) Delete(ref upspin.Reference) error {
 	const op errors.Op = "store/perm.Delete"
 
 	if s.perm.targetUser != s.user {
-		return errors.E(op, s.user, errors.Permission, errors.Errorf("user not authorized"))
+		return errors.E(op, s.user, errors.Permission, "user not authorized")
 	}
 	return s.StoreServer.Delete(ref)
 }
