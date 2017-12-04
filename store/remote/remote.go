@@ -11,6 +11,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"strings"
 	"sync"
 
 	"upspin.io/bind"
@@ -46,7 +47,7 @@ var _ upspin.StoreServer = (*remote)(nil)
 func (r *remote) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Location, error) {
 	op := r.opf("Get", "%q", ref)
 
-	if ref != upspin.HTTPBaseMetadata {
+	if !strings.HasPrefix(string(ref), "metadata:") {
 		if err := r.probeDirect(); err != nil {
 			op.error(err)
 		}

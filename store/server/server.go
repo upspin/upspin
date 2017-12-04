@@ -7,6 +7,7 @@
 package server // import "upspin.io/store/server"
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 	"sync"
@@ -87,7 +88,8 @@ func (s *server) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Lo
 	defer m.Done()
 	defer sp.End()
 
-	if ref == upspin.HTTPBaseMetadata {
+	switch ref {
+	case upspin.HTTPBaseMetadata:
 		refData := &upspin.Refdata{Reference: ref}
 		s.mu.Lock()
 		base := s.linkBase
@@ -106,19 +108,39 @@ func (s *server) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []upspin.Lo
 		s.linkBase = base
 		s.mu.Unlock()
 		return base, refData, nil, nil
-	}
 
-	data, err := s.storage.Download(string(ref))
-	if err != nil {
-		return nil, nil, nil, errors.E(op, err)
+	case upspin.ListRefsMetadata:
+		ls, ok := s.storage.(storage.Lister)
+		if !ok {
+			return nil, nil, nil, upspin.ErrNotSupported
+		}
+		info, err := ls.List()
+		if err != nil {
+			return nil, nil, nil, errors.E(op, err)
+		}
+		b, err := json.Marshal(info)
+		if err != nil {
+			return nil, nil, nil, errors.E(op, err)
+		}
+		refdata := &upspin.Refdata{
+			Reference: ref,
+			Volatile:  true,
+		}
+		return b, refdata, nil, nil
+
+	default:
+		data, err := s.storage.Download(string(ref))
+		if err != nil {
+			return nil, nil, nil, errors.E(op, err)
+		}
+		refdata := &upspin.Refdata{
+			Reference: ref,
+			Volatile:  false,
+			Duration:  0,
+		}
+		sp.SetAnnotation(fmt.Sprintf("refsize=%d", len(ref)))
+		return data, refdata, nil, nil
 	}
-	refdata := &upspin.Refdata{
-		Reference: ref,
-		Volatile:  false,
-		Duration:  0,
-	}
-	sp.SetAnnotation(fmt.Sprintf("refsize=%d", len(ref)))
-	return data, refdata, nil, nil
 }
 
 // Delete implements upspin.StoreServer.
