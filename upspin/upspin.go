@@ -553,7 +553,7 @@ const BlockSize = 1024 * 1024
 const MaxBlockSize = 1024 * 1024 * 1024
 
 // DirBlock describes a block of data representing a contiguous section of a file.
-// The block my be of any non-negative size, but in large files is usually
+// The block may be of any non-negative size, but in large files is usually
 // BlockSize long.
 type DirBlock struct {
 	Location Location // Location of data in store.
