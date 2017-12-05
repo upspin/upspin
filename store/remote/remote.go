@@ -219,7 +219,7 @@ func init() {
 
 func (r *remote) opf(method string, format string, args ...interface{}) *operation {
 	ep := r.cfg.endpoint.String()
-	s := fmt.Sprintf("store/remote: %q: store.%s", ep, method)
+	s := fmt.Sprintf("store/remote(%q).%s", ep, method)
 	op := &operation{errors.Op(s), fmt.Sprintf(format, args...)}
 	log.Debug.Print(op)
 	return op
