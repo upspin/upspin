@@ -75,7 +75,7 @@ func TestSeparator(t *testing.T) {
 	// Nested error.
 	e2 := E(Op("Read"), path, user, Other, e1)
 
-	want := "jane@doe.com/file, user joe@blow.com: Read: I/O error:: Get: network unreachable"
+	want := "Read: jane@doe.com/file, user joe@blow.com: I/O error:: Get: network unreachable"
 	if errorAsString(e2) != want {
 		t.Errorf("expected %q; got %q", want, e2)
 	}
