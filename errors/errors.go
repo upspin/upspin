@@ -236,6 +236,10 @@ func pad(b *bytes.Buffer, str string) {
 func (e *Error) Error() string {
 	b := new(bytes.Buffer)
 	e.printStack(b)
+	if e.Op != "" {
+		pad(b, ": ")
+		b.WriteString(string(e.Op))
+	}
 	if e.Path != "" {
 		pad(b, ": ")
 		b.WriteString(string(e.Path))
@@ -248,10 +252,6 @@ func (e *Error) Error() string {
 		}
 		b.WriteString("user ")
 		b.WriteString(string(e.User))
-	}
-	if e.Op != "" {
-		pad(b, ": ")
-		b.WriteString(string(e.Op))
 	}
 	if e.Kind != 0 {
 		pad(b, ": ")

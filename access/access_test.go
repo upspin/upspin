@@ -638,7 +638,7 @@ func TestParseBadGroupFile(t *testing.T) {
 
 func TestParseBadGroupMember(t *testing.T) {
 	expectedErr := errors.E(upspin.PathName(testGroupFile), errors.Invalid,
-		errors.Str(`bad group users list on line 1: user fred@: user.Parse: invalid operation: missing domain name`))
+		errors.Str(`bad group users list on line 1: user.Parse: user fred@: invalid operation: missing domain name`))
 
 	parsed, err := path.Parse(testGroupFile)
 	if err != nil {
