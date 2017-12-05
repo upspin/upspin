@@ -402,8 +402,6 @@ func (s *server) put(op errors.Op, entry *upspin.DirEntry, parsed path.Parsed, d
 	return entry, nil
 }
 
-var notExist = errors.E(errors.NotExist)
-
 // WhichAccess implements upspin.DirServer.WhichAccess.
 func (s *server) WhichAccess(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	const op errors.Op = "dir/inprocess.WhichAccess"
@@ -554,7 +552,7 @@ func (s *server) Lookup(pathName upspin.PathName) (*upspin.DirEntry, error) {
 	}
 	entry, err := s.lookup(op, parsed, true)
 	if err != nil {
-		if errors.Match(notExist, err) {
+		if errors.Is(errors.NotExist, err) {
 			if canAny, err := s.can(access.AnyRight, parsed); err != nil {
 				return nil, err
 			} else if !canAny {
