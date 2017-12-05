@@ -546,7 +546,7 @@ func (c *Client) lookup(op errors.Op, entry *upspin.DirEntry, fn lookupFn, follo
 		}
 		prevEntry = resultEntry
 		if err != upspin.ErrFollowLink {
-			return resultEntry, nil, errors.E(op, err)
+			return resultEntry, nil, errors.E(op, originalName, err)
 		}
 		// Misbehaving servers could return a nil entry. Handle that explicitly. Issue 451.
 		if resultEntry == nil {
@@ -726,7 +726,7 @@ func (c *Client) DirServer(name upspin.PathName) (upspin.DirServer, error) {
 	}
 	dir, err := bind.DirServerFor(c.config, parsed.User())
 	if err != nil {
-		return nil, errors.E(op, err)
+		return nil, errors.E(op, name, err)
 	}
 	return dir, nil
 }
