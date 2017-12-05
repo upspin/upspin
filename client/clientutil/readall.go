@@ -19,13 +19,11 @@ import (
 // the necessary keys loaded in the config to unpack the cipher if the entry
 // is encrypted.
 func ReadAll(cfg upspin.Config, entry *upspin.DirEntry) ([]byte, error) {
-	const op errors.Op = "client/clientutil.ReadAll"
-
 	if entry.IsLink() {
-		return nil, errors.E(op, entry.Name, errors.Invalid, "can't read a link entry")
+		return nil, errors.E(entry.Name, errors.Invalid, "can't read a link entry")
 	}
 	if entry.IsIncomplete() {
-		return nil, errors.E(op, entry.Name, errors.Permission)
+		return nil, errors.E(entry.Name, errors.Permission)
 	}
 	if access.IsAccessFile(entry.SignedName) {
 		// Access files must be written by their owners only.
@@ -38,11 +36,11 @@ func ReadAll(cfg upspin.Config, entry *upspin.DirEntry) ([]byte, error) {
 	var data []byte
 	packer := pack.Lookup(entry.Packing)
 	if packer == nil {
-		return nil, errors.E(op, entry.Name, errors.Errorf("unrecognized Packing %d", entry.Packing))
+		return nil, errors.E(entry.Name, errors.Errorf("unrecognized Packing %d", entry.Packing))
 	}
 	bu, err := packer.Unpack(cfg, entry)
 	if err != nil {
-		return nil, errors.E(op, entry.Name, err) // Showstopper.
+		return nil, errors.E(entry.Name, err) // Showstopper.
 	}
 	for {
 		block, ok := bu.NextBlock()
@@ -53,11 +51,11 @@ func ReadAll(cfg upspin.Config, entry *upspin.DirEntry) ([]byte, error) {
 
 		cipher, err := ReadLocation(cfg, block.Location)
 		if err != nil {
-			return nil, errors.E(op, err)
+			return nil, errors.E(err)
 		}
 		clear, err := bu.Unpack(cipher)
 		if err != nil {
-			return nil, errors.E(op, entry.Name, err)
+			return nil, errors.E(entry.Name, err)
 		}
 		data = append(data, clear...) // TODO: Could avoid a copy if only one block.
 	}
@@ -67,8 +65,6 @@ func ReadAll(cfg upspin.Config, entry *upspin.DirEntry) ([]byte, error) {
 // ReadLocation uses the provided Config to fetch the contents of the given
 // Location, following any StoreServer.Get redirects.
 func ReadLocation(cfg upspin.Config, loc upspin.Location) ([]byte, error) {
-	const op errors.Op = "client/clientutil.ReadLocation"
-
 	// firstError remembers the first error we saw.
 	// If we fail completely we return it.
 	var firstError error
@@ -113,7 +109,7 @@ func ReadLocation(cfg upspin.Config, loc upspin.Location) ([]byte, error) {
 
 	// If we arrive here, we have failed to find a block.
 	if firstError != nil {
-		return nil, errors.E(op, firstError)
+		return nil, errors.E(firstError)
 	}
-	return nil, errors.E(op, errors.IO, errors.Errorf("data for location %v not found on any store server", loc))
+	return nil, errors.E(errors.IO, errors.Errorf("data for location %v not found on any store server", loc))
 }
