@@ -321,17 +321,9 @@ func (cf *cachedFile) writeAt(buf []byte, offset int64) (int, error) {
 }
 
 // writeback writes the cached file to the store if it is dirty. Called with node locked.
-func (cf *cachedFile) writeback(n *node) error {
+func (cf *cachedFile) writeback(h *handle) error {
 	const op errors.Op = "cache.writeback"
-
-	if n.noWB {
-		return nil
-	}
-
-	// Nothing to do if file isn't open.
-	if cf == nil {
-		return nil
-	}
+	n := h.n
 
 	// Nothing to do if the cache file isn't dirty.
 	if !cf.dirty {

@@ -735,14 +735,6 @@ func (n *node) Setattr(context gContext.Context, req *fuse.SetattrRequest, resp 
 	if req.Valid.Mtime() {
 		n.Lock()
 		defer n.Unlock()
-
-		// If we are in the middle of creating the file, go ahead and flush now.
-		// If we make more changes we'll flush again later.
-		if err := n.cf.writeback(n); err != nil {
-			return e2e(errors.E(op, n.uname, err))
-		}
-
-		// Set the time.
 		if err := n.f.client.SetTime(n.uname, upspin.TimeFromGo(req.Mtime)); err != nil {
 			return e2e(errors.E(op, err))
 		}
@@ -759,11 +751,14 @@ func (h *handle) Flush(context gContext.Context, req *fuse.FlushRequest) error {
 	// Write back to upspin.
 	h.n.Lock()
 	defer h.n.Unlock()
-	err := h.n.cf.writeback(h.n)
-	if err != nil {
-		return e2e(errors.E(op, h.n.uname, err))
+	var err error
+	if h.n.cf != nil && !h.n.noWB {
+		err = h.n.cf.writeback(h)
+		if err != nil {
+			err = e2e(errors.E(op, h.n.uname, err))
+		}
 	}
-	return nil
+	return err
 }
 
 // ReadDirAll implements fs.HandleReadDirAller.ReadDirAll.
@@ -829,9 +824,12 @@ func (h *handle) Release(context gContext.Context, req *fuse.ReleaseRequest) err
 	// Write back to upspin.
 	h.n.Lock()
 	defer h.n.Unlock()
-	err := h.n.cf.writeback(h.n)
-	if err != nil {
-		err = e2e(errors.E(op, h.n.uname, err))
+	var err error
+	if h.n.cf != nil && !h.n.noWB {
+		err = h.n.cf.writeback(h)
+		if err != nil {
+			err = e2e(errors.E(op, h.n.uname, err))
+		}
 	}
 	h.freeNoLock()
 	return err
