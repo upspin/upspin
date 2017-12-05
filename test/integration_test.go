@@ -418,8 +418,10 @@ func testSelectedOnePacking(t *testing.T, setup testenv.Setup) {
 		t.Run(test.name, func(t *testing.T) { test.fn(t, r) })
 	}
 
-	err = env.Exit()
-	if err != nil {
+	if err := r.FlushCache(); err != nil {
+		t.Fatal(err)
+	}
+	if err := env.Exit(); err != nil {
 		t.Fatal(err)
 	}
 }
