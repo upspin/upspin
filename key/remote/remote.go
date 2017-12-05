@@ -109,8 +109,8 @@ func init() {
 }
 
 func (r *remote) opf(method string, format string, args ...interface{}) *operation {
-	ep := r.cfg.endpoint.String()
-	s := fmt.Sprintf("key/remote: %q: key.%s", ep, method)
+	addr := r.cfg.endpoint.NetAddr
+	s := fmt.Sprintf("key/remote(%q).%s", addr, method)
 	op := &operation{errors.Op(s), fmt.Sprintf(format, args...)}
 	log.Debug.Print(op)
 	return op
