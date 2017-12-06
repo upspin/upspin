@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "37df0878_09add40c",
+        "filename": "cloud/storage/storage.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-06T23:35:19Z",
+      "side": 1,
+      "message": "// Lister provides a mechanism to report the set of items held in a\n// StoreServer. Clients can use a type assertion to verify whether\n// the StoreServer implements this interface.",
+      "revId": "5c2418b15d7cfc9f3081c7986d57497d96e3ad92",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
