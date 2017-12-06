@@ -47,8 +47,8 @@ Finally, use the `gcloud` tool to enable the required APIs:
 local$ gcloud components install beta
 local$ gcloud config set project example-com
 local$ gcloud auth login
-local$ gcloud beta service-management enable iam.googleapis.com
-local$ gcloud beta service-management enable storage_api
+local$ gcloud beta services enable iam.googleapis.com
+local$ gcloud beta services enable storage_api
 ```
 
 ## Create a Google Cloud Storage bucket
