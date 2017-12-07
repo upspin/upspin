@@ -736,6 +736,11 @@ func (n *node) Setattr(context gContext.Context, req *fuse.SetattrRequest, resp 
 		n.Lock()
 		defer n.Unlock()
 
+		// Upspin doesn't allow rewriting directory DirEntries.
+		if n.attr.Mode&os.ModeDir == os.ModeDir {
+			return nil
+		}
+
 		// Write back the file to create it.
 		if err := n.cf.writeback(n); err != nil {
 			return e2e(errors.E(op, n.uname, err))
