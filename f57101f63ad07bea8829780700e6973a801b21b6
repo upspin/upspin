@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "c8965bc6_cf13a3f0",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-07T02:10:36Z",
+      "side": 1,
+      "message": "\"specifies\" is a bit fussy. maybe\n// Next holds the token to fetch the next page.\nfor parallel structure",
+      "revId": "f57101f63ad07bea8829780700e6973a801b21b6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "91a6a40f_99b1296a",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-07T02:10:36Z",
+      "side": 1,
+      "message": "// returned as JSON-encoded data by ....",
+      "revId": "f57101f63ad07bea8829780700e6973a801b21b6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "612f4798_b4a19bec",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-07T02:10:36Z",
+      "side": 1,
+      "message": "// line comments\n\nalso this is a string not a Reference. could it be a Reference?",
+      "revId": "f57101f63ad07bea8829780700e6973a801b21b6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
