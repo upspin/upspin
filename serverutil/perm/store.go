@@ -56,7 +56,7 @@ func (s *storeWrapper) Get(ref upspin.Reference) ([]byte, *upspin.Refdata, []ups
 	const op errors.Op = "store/perm.Get"
 
 	// Only storage administrators should be permitted to list references.
-	if strings.HasPrefix(string(ref), string(upspin.ListRefsMetadata)) && !s.perm.IsWriter(s.user) {
+	if strings.HasPrefix(string(ref), string(upspin.ListRefsMetadata)) && s.user != s.perm.targetUser {
 		return nil, nil, nil, errors.E(op, s.user, errors.Permission, "user not authorized")
 	}
 	return s.StoreServer.Get(ref)
@@ -76,7 +76,7 @@ func (s *storeWrapper) Put(data []byte) (*upspin.Refdata, error) {
 func (s *storeWrapper) Delete(ref upspin.Reference) error {
 	const op errors.Op = "store/perm.Delete"
 
-	if s.perm.targetUser != s.user {
+	if s.user != s.perm.targetUser {
 		return errors.E(op, s.user, errors.Permission, "user not authorized")
 	}
 	return s.StoreServer.Delete(ref)
