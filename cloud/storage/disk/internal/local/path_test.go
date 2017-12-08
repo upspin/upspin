@@ -38,10 +38,25 @@ var pathTests = []pathTest{
 func TestPath(t *testing.T) {
 	for _, test := range pathTests {
 		got := Path("B", test.ref)
-		// Joy. Convert to a local path name, so test is not Unix-specific.
-		got = strings.Join(filepath.SplitList(got), "/")
+		// Convert from a local path name, so test is not Unix-specific.
+		got = filepath.ToSlash(got)
 		if got != test.file {
-			t.Errorf("path(%q) = %q; expected %q", test.ref, got, test.file)
+			t.Errorf("Path(%q) = %q; expected %q", test.ref, got, test.file)
+		}
+	}
+}
+
+func TestRef(t *testing.T) {
+	for _, test := range pathTests {
+		// Convert to a local path name, so test is not Unix-specific.
+		file := filepath.FromSlash(test.file)
+		got, err := Ref(strings.TrimPrefix(file, "B/"))
+		if err != nil {
+			t.Errorf("Ref(%q): %v", file, err)
+			continue
+		}
+		if got != test.ref {
+			t.Errorf("Ref(%q) = %q; expected %q", file, got, test.ref)
 		}
 	}
 }
