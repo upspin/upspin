@@ -9,6 +9,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"upspin.io/cloud/storage"
 	"upspin.io/cloud/storage/disk/internal/local"
@@ -94,14 +95,17 @@ type storageImpl struct {
 	base string
 }
 
-var _ storage.Storage = (*storageImpl)(nil)
+var (
+	_ storage.Storage = (*storageImpl)(nil)
+	_ storage.Lister  = (*storageImpl)(nil)
+)
 
-// LinkBase implements Storage.
+// LinkBase implements storage.Storage.
 func (s *storageImpl) LinkBase() (base string, err error) {
 	return "", upspin.ErrNotSupported
 }
 
-// Download implements Storage.
+// Download implements storage.Storage.
 func (s *storageImpl) Download(ref string) ([]byte, error) {
 	const op errors.Op = "cloud/storage/disk.Download"
 	b, err := ioutil.ReadFile(s.path(ref))
@@ -113,7 +117,7 @@ func (s *storageImpl) Download(ref string) ([]byte, error) {
 	return b, nil
 }
 
-// Put implements Storage.
+// Put implements storage.Storage.
 func (s *storageImpl) Put(ref string, contents []byte) error {
 	const op errors.Op = "cloud/storage/disk.Put"
 	p := s.path(ref)
@@ -126,7 +130,7 @@ func (s *storageImpl) Put(ref string, contents []byte) error {
 	return nil
 }
 
-// Delete implements Storage.
+// Delete implements storage.Storage.
 func (s *storageImpl) Delete(ref string) error {
 	const op errors.Op = "cloud/storage/disk.Delete"
 	if err := os.Remove(s.path(ref)); os.IsNotExist(err) {
@@ -135,6 +139,64 @@ func (s *storageImpl) Delete(ref string) error {
 		return errors.E(op, errors.IO, ref)
 	}
 	return nil
+}
+
+var maxRefsPerCall = 1000 // A variable so that it may be overridden by tests.
+
+// List implements storage.Lister.
+func (s *storageImpl) List(token string) (refs []upspin.ListRefsItem, next string, err error) {
+	const op errors.Op = "cloud/storage/disk.List"
+	err = filepath.Walk(s.base, func(path string, fi os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		// Convert path into its base path.
+		path = strings.TrimPrefix(strings.TrimPrefix(path, s.base), string(filepath.Separator))
+
+		// Ignore the root.
+		if path == "" {
+			return nil
+		}
+
+		// Stop walking when we've gathered enough refs.
+		if len(refs) >= maxRefsPerCall {
+			if next == "" {
+				next = path
+			}
+			return filepath.SkipDir
+		}
+
+		// Don't process paths that come before our pagination token.
+		if path < token {
+			if fi.IsDir() && !strings.HasPrefix(token, path) {
+				// Don't descend into irrelevant directories.
+				return filepath.SkipDir
+			}
+			return nil
+		}
+
+		if fi.IsDir() {
+			// Nothing more to do for directories.
+			return nil
+		}
+
+		// Convert the file path into its reference name
+		// and append it to refs.
+		ref, err := local.Ref(path)
+		if err != nil {
+			return err
+		}
+		refs = append(refs, upspin.ListRefsItem{
+			Ref:  upspin.Reference(ref),
+			Size: fi.Size(),
+		})
+		return nil
+	})
+	if err != nil {
+		return nil, "", errors.E(op, err)
+	}
+	return refs, next, nil
 }
 
 // path returns the absolute path that should contain ref.
