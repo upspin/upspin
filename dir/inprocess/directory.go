@@ -867,6 +867,7 @@ func (s *server) installEntry(op errors.Op, dirName upspin.PathName, dirEntry *u
 		if !found {
 			return nil, nil, errors.E(op, newEntry.Name, errors.NotExist)
 		}
+		newEntry.Sequence = seq
 	} else {
 		if !found {
 			// The provided sequence number may be only SeqNotExist or SeqIgnore.
