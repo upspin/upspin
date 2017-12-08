@@ -71,6 +71,24 @@
       "revId": "59e2ab5109f572a08e1bd464dca63fd7d67759c9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dabdbb02_f48e21f1",
+        "filename": "cloud/storage/disk/disk.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-08T01:50:30Z",
+      "side": 1,
+      "message": "You might be safe, but my worry is a case like\n\ntoken \u003d a/bug\npath \u003d a/b\n\nCan that ever arise?",
+      "parentUuid": "82467bf0_d7b9d0f2",
+      "revId": "59e2ab5109f572a08e1bd464dca63fd7d67759c9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
