@@ -89,6 +89,24 @@
       "revId": "59e2ab5109f572a08e1bd464dca63fd7d67759c9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8697c7c0_742829dc",
+        "filename": "cloud/storage/disk/disk.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-12-08T01:54:06Z",
+      "side": 1,
+      "message": "I don\u0027t think so.\n\nFor path to be \"a/b\" here then \"a/b\" must be a directory. If there\u0027s a directory named \"a/b\" then the storage mapping here must necessarily put anything named \"abug\" in \"a/b/ug\".",
+      "parentUuid": "dabdbb02_f48e21f1",
+      "revId": "59e2ab5109f572a08e1bd464dca63fd7d67759c9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
