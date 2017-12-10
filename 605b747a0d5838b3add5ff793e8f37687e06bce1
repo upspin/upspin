@@ -1,0 +1,107 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8e2c2c59_d276a746",
+        "filename": "dir/dircache/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-12-10T23:35:15Z",
+      "side": 1,
+      "message": "recurseCfg is a somewhat mysterious argument. I don\u0027t have suggestions for another name, but the doc comment (and struct field comment) should explain what this is and is for.",
+      "revId": "605b747a0d5838b3add5ff793e8f37687e06bce1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "cfb14e2a_8b84d6dc",
+        "filename": "dir/dircache/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-12-10T23:35:15Z",
+      "side": 1,
+      "message": "Error?",
+      "range": {
+        "startLine": 175,
+        "startChar": 7,
+        "endLine": 175,
+        "endChar": 11
+      },
+      "revId": "605b747a0d5838b3add5ff793e8f37687e06bce1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7baf52be_a17b2ef4",
+        "filename": "dir/dircache/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-12-10T23:35:15Z",
+      "side": 1,
+      "message": "maybe add a comment about how we are ignoring this error and only using it for logging?",
+      "revId": "605b747a0d5838b3add5ff793e8f37687e06bce1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c2ca7350_23e979ee",
+        "filename": "dir/dircache/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-12-10T23:35:15Z",
+      "side": 1,
+      "message": "must not",
+      "range": {
+        "startLine": 293,
+        "startChar": 8,
+        "endLine": 293,
+        "endChar": 14
+      },
+      "revId": "605b747a0d5838b3add5ff793e8f37687e06bce1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ecac6c0b_1d72c874",
+        "filename": "dir/dircache/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 374,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-12-10T23:35:15Z",
+      "side": 1,
+      "message": "shouldn\u0027t this lookup use recurseCfg too?",
+      "range": {
+        "startLine": 374,
+        "startChar": 1,
+        "endLine": 374,
+        "endChar": 26
+      },
+      "revId": "605b747a0d5838b3add5ff793e8f37687e06bce1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
