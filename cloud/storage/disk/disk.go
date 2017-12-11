@@ -110,9 +110,9 @@ func (s *storageImpl) Download(ref string) ([]byte, error) {
 	const op errors.Op = "cloud/storage/disk.Download"
 	b, err := ioutil.ReadFile(s.path(ref))
 	if os.IsNotExist(err) {
-		return nil, errors.E(op, errors.NotExist, ref)
+		return nil, errors.E(op, errors.NotExist, errors.Str(ref))
 	} else if err != nil {
-		return nil, errors.E(op, errors.IO, ref)
+		return nil, errors.E(op, errors.IO, err)
 	}
 	return b, nil
 }
@@ -134,9 +134,9 @@ func (s *storageImpl) Put(ref string, contents []byte) error {
 func (s *storageImpl) Delete(ref string) error {
 	const op errors.Op = "cloud/storage/disk.Delete"
 	if err := os.Remove(s.path(ref)); os.IsNotExist(err) {
-		return errors.E(op, errors.NotExist, ref)
+		return errors.E(op, errors.NotExist, errors.Str(ref))
 	} else if err != nil {
-		return errors.E(op, errors.IO, ref)
+		return errors.E(op, errors.IO, err)
 	}
 	return nil
 }
