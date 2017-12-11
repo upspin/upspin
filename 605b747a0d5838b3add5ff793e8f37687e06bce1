@@ -102,6 +102,30 @@
       "revId": "605b747a0d5838b3add5ff793e8f37687e06bce1",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "99193180_4fbf40ed",
+        "filename": "dir/dircache/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 374,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-12-11T15:58:56Z",
+      "side": 1,
+      "message": "No, that is a direct call to this server\u0027s Lookup which is what recurseCfg is trying to achieve.  You are right, I need both a better name and an explanation.",
+      "parentUuid": "ecac6c0b_1d72c874",
+      "range": {
+        "startLine": 374,
+        "startChar": 1,
+        "endLine": 374,
+        "endChar": 26
+      },
+      "revId": "605b747a0d5838b3add5ff793e8f37687e06bce1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
