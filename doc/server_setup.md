@@ -191,6 +191,7 @@ in the event of a disk failure all your Upspin data will be lost.**
 ### Specific instructions for cloud services {#cloud}
 
 + [Google Cloud Services](/doc/server_setup_gcp.md)
++ [Google Drive](/doc/server_setup_drive.md)
 + [Amazon Web Services](/doc/server_setup_aws.md)
 + [Dropbox](/doc/server_setup_dropbox.md)
 
