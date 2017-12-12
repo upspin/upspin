@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1837a49e_ad8e4723",
+        "filename": "doc/server_setup_drive.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-12T02:18:07Z",
+      "side": 1,
+      "message": "Google Drive-specific\n\nyay English. use hyphens to make an adjective. but use only one here because you\u0027re joining a noun phrase to another part of speech",
+      "revId": "21100097e50b5adf6ffa73a05a9eb49bf432bf7b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4dc14fca_106d92ce",
+        "filename": "doc/server_setup_drive.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-12T02:18:07Z",
+      "side": 1,
+      "message": "s/now have installed/install/\n\nno reason to change verb tense.",
+      "revId": "21100097e50b5adf6ffa73a05a9eb49bf432bf7b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2316f5db_da48807e",
+        "filename": "doc/server_setup_drive.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-12T02:18:07Z",
+      "side": 1,
+      "message": "s/In order to/To/",
+      "revId": "21100097e50b5adf6ffa73a05a9eb49bf432bf7b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "545f48a8_7ffec942",
+        "filename": "doc/server_setup_drive.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-12T02:18:07Z",
+      "side": 1,
+      "message": "ditto :)",
+      "revId": "21100097e50b5adf6ffa73a05a9eb49bf432bf7b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5712cce0_d9c7ad0e",
+        "filename": "doc/server_setup_drive.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-12T02:18:07Z",
+      "side": 1,
+      "message": "s/simply //\n\nit doesn\u0027t matter how you run it. (this is a common english unneccessarism, like \"In order to\")",
+      "revId": "21100097e50b5adf6ffa73a05a9eb49bf432bf7b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
