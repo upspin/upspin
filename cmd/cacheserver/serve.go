@@ -35,8 +35,8 @@ var (
 )
 
 func serve(cfg upspin.Config, addr string) (<-chan error, error) {
-	// Stop the cache server recursing.
-	cfg = config.SetValue(cfg, "cache", "no")
+	cachedCfg := cfg
+	uncachedCfg := config.SetValue(cfg, "cache", "no")
 
 	// Calculate limits.
 	maxRefBytes := (9 * (*cacheSizeFlag)) / 10
@@ -47,17 +47,17 @@ func serve(cfg upspin.Config, addr string) (<-chan error, error) {
 	// Link old structure cache files into the new structure.
 	relocate(flags.CacheDir, myCacheDir)
 
-	sc, blockFlusher, err := storecache.New(cfg, myCacheDir, maxRefBytes, *writethrough)
+	sc, blockFlusher, err := storecache.New(uncachedCfg, myCacheDir, maxRefBytes, *writethrough)
 	if err != nil {
 		return nil, err
 	}
-	ss := storeserver.New(cfg, sc, "")
+	ss := storeserver.New(uncachedCfg, sc, "")
 
-	dc, err := dircache.New(cfg, myCacheDir, maxLogBytes, blockFlusher)
+	dc, err := dircache.New(uncachedCfg, cachedCfg, myCacheDir, maxLogBytes, blockFlusher)
 	if err != nil {
 		return nil, err
 	}
-	ds := dirserver.New(cfg, dc, "")
+	ds := dirserver.New(uncachedCfg, dc, "")
 
 	ln, err := local.Listen("tcp", addr)
 	if err != nil {
