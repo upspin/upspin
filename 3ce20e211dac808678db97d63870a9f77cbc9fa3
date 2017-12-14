@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "345ed3e1_c35b5f0c",
+        "filename": "cloud/storage/storagetest/memory.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-12-14T21:42:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e5d494f1_ad433264",
+      "revId": "3ce20e211dac808678db97d63870a9f77cbc9fa3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "d6d35282_bb5bd975",
         "filename": "factotum/factotum.go",
         "patchSetId": 2
@@ -42,6 +60,30 @@
     },
     {
       "key": {
+        "uuid": "23215b63_cd9b2512",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-12-14T21:42:54Z",
+      "side": 1,
+      "message": "Yes, mixing is the technical term but I\u0027m only trying to give an impression here.",
+      "parentUuid": "d6d35282_bb5bd975",
+      "range": {
+        "startLine": 286,
+        "startChar": 18,
+        "endLine": 286,
+        "endChar": 29
+      },
+      "revId": "3ce20e211dac808678db97d63870a9f77cbc9fa3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "de3d9f58_28b24315",
         "filename": "factotum/factotum.go",
         "patchSetId": 2
@@ -53,6 +95,24 @@
       "writtenOn": "2017-12-14T19:44:44Z",
       "side": 1,
       "message": "Can you say more about the arguments in this comment?\n\nWhat are salt and info? Are they just arbitrary values?\n\nCan \u0027out\u0027 be any length? Or must it be a specific length?\n\nAnd of course any changes here need to be made in package upspin too.",
+      "revId": "3ce20e211dac808678db97d63870a9f77cbc9fa3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "00a943bb_2c076e10",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-12-14T21:42:54Z",
+      "side": 1,
+      "message": "I\u0027ve added a pointer for reading more.\nYes, they\u0027re fairly arbitrary values.  We are using the salt just to protect against replay of the string here in some other context.\nOut can be almost any length, but 8 bytes is plenty for our \"no guessing\" purpose.  If you pick an outlandishly large len(out) then an error will be returned saying there is not enough entropy.",
+      "parentUuid": "de3d9f58_28b24315",
       "revId": "3ce20e211dac808678db97d63870a9f77cbc9fa3",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
