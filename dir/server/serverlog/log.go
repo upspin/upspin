@@ -5,7 +5,6 @@
 package serverlog
 
 import (
-	"crypto/sha256"
 	"encoding/binary"
 	"fmt"
 	"io"
@@ -151,17 +150,17 @@ type root struct {
 // name for the backup.
 func newRoot(rootFile string, fac upspin.Factotum, s storage.Storage) (*root, error) {
 	var rootRef string
+	var err error
 	if s != nil {
 		// Use the provided factotum to generate the secret reference.
 		if fac == nil {
 			return nil, errors.Str("cannot backup root: config has no factotum")
 		}
 		base := filepath.Base(rootFile)
-		sig, err := fac.Sign(hashRoot(base))
+		rootRef, err = hashRoot(base, fac)
 		if err != nil {
 			return nil, err
 		}
-		rootRef = fmt.Sprintf("%s.%s-%s", base, sig.R, sig.S)
 
 		// Try to access the storage backend now
 		// so a misconfiguration is caught at startup.
@@ -184,11 +183,14 @@ func newRoot(rootFile string, fac upspin.Factotum, s storage.Storage) (*root, er
 	return r, nil
 }
 
-func hashRoot(base string) []byte {
-	h := sha256.New()
-	h.Write([]byte("@@hashRoot!!")) // Don't sign raw user string.
-	h.Write([]byte(base))
-	return h.Sum(nil)
+func hashRoot(base string, fac upspin.Factotum) (string, error) {
+	salt := []byte("@@hashRoot!!")
+	suffix := make([]byte, 8)
+	err := fac.HKDF(salt, []byte(base), suffix)
+	if err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%s.%x", base, suffix), nil
 }
 
 func (r *root) saveLoop(s storage.Storage) {
