@@ -1,0 +1,124 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b15cb8b1_813d3076",
+        "filename": "dir/dircache/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-12-14T01:00:25Z",
+      "side": 1,
+      "message": "I\u0027m a little confused about the locking semantics here. Can we not reach a deadlock situation if the locks are held while calling into ourselves? I\u0027ll take your word for it if not, but maybe the comment could expand on why this won\u0027t/can\u0027t happen.",
+      "revId": "adf643ffde35bfe05d4bedfe7a8714885fa98599",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "35108941_e1107488",
+        "filename": "dir/dircache/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-12-14T01:00:25Z",
+      "side": 1,
+      "message": "accessEntry ?",
+      "range": {
+        "startLine": 313,
+        "startChar": 5,
+        "endLine": 313,
+        "endChar": 7
+      },
+      "revId": "adf643ffde35bfe05d4bedfe7a8714885fa98599",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ab7333f6_2850a588",
+        "filename": "dir/dircache/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 360,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-12-14T01:00:25Z",
+      "side": 1,
+      "message": "I think this line is redundant. The next two error returns will fire if the entry exists or is a link, otherwise entry does not exist and so right will be set to Create on line 373 (assuming my comment on 372 applies).",
+      "revId": "adf643ffde35bfe05d4bedfe7a8714885fa98599",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0a0e92be_64888666",
+        "filename": "dir/dircache/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 372,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-12-14T01:00:25Z",
+      "side": 1,
+      "message": "should this be NotExist ?",
+      "range": {
+        "startLine": 372,
+        "startChar": 21,
+        "endLine": 372,
+        "endChar": 26
+      },
+      "revId": "adf643ffde35bfe05d4bedfe7a8714885fa98599",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "acec8c94_8f215340",
+        "filename": "dir/dircache/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 409,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-12-14T01:00:25Z",
+      "side": 1,
+      "message": "what does pa stand for?",
+      "range": {
+        "startLine": 409,
+        "startChar": 1,
+        "endLine": 409,
+        "endChar": 3
+      },
+      "revId": "adf643ffde35bfe05d4bedfe7a8714885fa98599",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a41fbba0_df753554",
+        "filename": "dir/dircache/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 431,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-12-14T01:00:25Z",
+      "side": 1,
+      "message": "should this be loadThroughCache ?",
+      "revId": "adf643ffde35bfe05d4bedfe7a8714885fa98599",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
