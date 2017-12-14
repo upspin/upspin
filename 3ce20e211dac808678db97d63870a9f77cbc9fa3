@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e5d494f1_ad433264",
+        "filename": "cloud/storage/storagetest/memory.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-12-14T19:44:44Z",
+      "side": 1,
+      "message": "delete",
+      "revId": "3ce20e211dac808678db97d63870a9f77cbc9fa3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d6d35282_bb5bd975",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-12-14T19:44:44Z",
+      "side": 1,
+      "message": "is \"mixed value\" a term of art in crypto?",
+      "range": {
+        "startLine": 286,
+        "startChar": 18,
+        "endLine": 286,
+        "endChar": 29
+      },
+      "revId": "3ce20e211dac808678db97d63870a9f77cbc9fa3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "de3d9f58_28b24315",
+        "filename": "factotum/factotum.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-12-14T19:44:44Z",
+      "side": 1,
+      "message": "Can you say more about the arguments in this comment?\n\nWhat are salt and info? Are they just arbitrary values?\n\nCan \u0027out\u0027 be any length? Or must it be a specific length?\n\nAnd of course any changes here need to be made in package upspin too.",
+      "revId": "3ce20e211dac808678db97d63870a9f77cbc9fa3",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
