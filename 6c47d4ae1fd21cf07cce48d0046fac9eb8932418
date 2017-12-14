@@ -16,6 +16,24 @@
       "revId": "6c47d4ae1fd21cf07cce48d0046fac9eb8932418",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1c8e9bb0_99bdf217",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2017-12-14T22:14:22Z",
+      "side": 1,
+      "message": "Exactly right.   I wasn\u0027t sure if there was some idiomatic way to say that a slice is passed as a parameter in order to supply the desired length and a place to store the contents of the result.  But the input contents are ignored.\n\nSeems like this would be a common convention.",
+      "parentUuid": "bb74d0d1_03017404",
+      "revId": "6c47d4ae1fd21cf07cce48d0046fac9eb8932418",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
