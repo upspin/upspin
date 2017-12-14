@@ -558,6 +558,15 @@ func TestIndex(t *testing.T) {
 		t.Errorf("recoveredRoot = %v, want = %v", recoveredRoot, root)
 	}
 
+	// Check that root.ref is stable.
+	rootRef, err := hashRoot("tree.root.reallylongusernamefoo@bar.com", fac)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if rootRef != user.root.ref {
+		t.Errorf("rootRef = %v, want = %v", rootRef, user.root.ref)
+	}
+
 	// Check that the root was put to the storage backend.
 	<-store.onPut
 	b, err := store.Storage.Download(user.root.ref)
