@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bb74d0d1_03017404",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-12-14T22:09:59Z",
+      "side": 1,
+      "message": "Now I\u0027m really confused. Is out used for input as well? Here\u0027s me taking a stab at what I think this does:\n\nHKDF cryptographically mixes salt, info, and the Factotum secret\nand writes the result to out, which may be of any length but is\ntypically 8 or 16 bytes. The result is unguessable without the\nsecret, and does not leak the secret. For more information, see\npackage golang.org/x/crypto/hkdf.",
+      "revId": "6c47d4ae1fd21cf07cce48d0046fac9eb8932418",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
