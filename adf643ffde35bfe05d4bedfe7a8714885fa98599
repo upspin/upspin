@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "ef4e3564_78e3157d",
+        "filename": "dir/dircache/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-12-14T03:05:54Z",
+      "side": 1,
+      "message": "of course you are confused.  I left out one important word; not.  Should have read \u0027while not holding locks\u0027.",
+      "parentUuid": "b15cb8b1_813d3076",
+      "revId": "adf643ffde35bfe05d4bedfe7a8714885fa98599",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "35108941_e1107488",
         "filename": "dir/dircache/server.go",
         "patchSetId": 1
@@ -42,6 +60,30 @@
     },
     {
       "key": {
+        "uuid": "5733e6df_61daa21a",
+        "filename": "dir/dircache/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-12-14T03:05:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "35108941_e1107488",
+      "range": {
+        "startLine": 313,
+        "startChar": 5,
+        "endLine": 313,
+        "endChar": 7
+      },
+      "revId": "adf643ffde35bfe05d4bedfe7a8714885fa98599",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ab7333f6_2850a588",
         "filename": "dir/dircache/server.go",
         "patchSetId": 1
@@ -56,6 +98,24 @@
       "revId": "adf643ffde35bfe05d4bedfe7a8714885fa98599",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c675289b_cf374e02",
+        "filename": "dir/dircache/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 360,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-12-14T03:05:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ab7333f6_2850a588",
+      "revId": "adf643ffde35bfe05d4bedfe7a8714885fa98599",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -82,6 +142,30 @@
     },
     {
       "key": {
+        "uuid": "2668f9ee_674d9449",
+        "filename": "dir/dircache/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 372,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-12-14T03:05:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0a0e92be_64888666",
+      "range": {
+        "startLine": 372,
+        "startChar": 21,
+        "endLine": 372,
+        "endChar": 26
+      },
+      "revId": "adf643ffde35bfe05d4bedfe7a8714885fa98599",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "acec8c94_8f215340",
         "filename": "dir/dircache/server.go",
         "patchSetId": 1
@@ -105,6 +189,30 @@
     },
     {
       "key": {
+        "uuid": "9a2b1619_10877809",
+        "filename": "dir/dircache/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 409,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-12-14T03:05:54Z",
+      "side": 1,
+      "message": "parsed access file",
+      "parentUuid": "acec8c94_8f215340",
+      "range": {
+        "startLine": 409,
+        "startChar": 1,
+        "endLine": 409,
+        "endChar": 3
+      },
+      "revId": "adf643ffde35bfe05d4bedfe7a8714885fa98599",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a41fbba0_df753554",
         "filename": "dir/dircache/server.go",
         "patchSetId": 1
@@ -119,6 +227,24 @@
       "revId": "adf643ffde35bfe05d4bedfe7a8714885fa98599",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "266cd5d9_6c9aad5c",
+        "filename": "dir/dircache/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 431,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2017-12-14T03:05:54Z",
+      "side": 1,
+      "message": "sure, why not",
+      "parentUuid": "a41fbba0_df753554",
+      "revId": "adf643ffde35bfe05d4bedfe7a8714885fa98599",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
