@@ -35,7 +35,7 @@ func (m *mem) Download(ref string) ([]byte, error) {
 
 	b, ok := m.m[ref]
 	if !ok {
-		return nil, errors.E(errors.NotExist, ref)
+		return nil, errors.E(errors.NotExist, errors.Str(ref))
 	}
 	return append([]byte{}, b...), nil
 }
@@ -55,6 +55,7 @@ func (m *mem) Delete(ref string) error {
 	_, ok := m.m[ref]
 	if !ok {
 		return errors.E(errors.NotExist, ref)
+		return errors.E(errors.NotExist, errors.Str(ref))
 	}
 	delete(m.m, ref)
 	return nil

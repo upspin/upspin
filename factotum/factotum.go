@@ -12,11 +12,14 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"math/big"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"golang.org/x/crypto/hkdf"
 
 	"upspin.io/errors"
 	"upspin.io/upspin"
@@ -278,6 +281,16 @@ func Verify(hash []byte, sig upspin.Signature, key upspin.PublicKey) error {
 		return errors.E(errors.Invalid, "signature does not match")
 	}
 	return nil
+}
+
+// HKDF creates a mixed value from salt, info, and the Factotum secret.
+// out is unguessable without the secret, and does not leak the secret.
+func (f factotum) HKDF(salt, info, out []byte) error {
+	hash := sha256.New
+	secret := []byte(f.keys[f.current].private)
+	hkdf := hkdf.New(hash, secret, salt, info)
+	_, err := io.ReadFull(hkdf, out)
+	return err
 }
 
 // Pop derives a Factotum by switching default from the current to the previous key.
