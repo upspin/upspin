@@ -144,6 +144,10 @@ type Factotum interface {
 	// no longer than your key's curve order. Don't use without a security consult.
 	Sign(hash []byte) (Signature, error)
 
+	// HKDF creates a mixed value from salt, info, and the Factotum secret.
+	// out is unguessable without the secret, and does not leak the secret.
+	HKDF(salt, info, out []byte) error
+
 	// Pop derives a Factotum that defaults to the previous key.
 	Pop() Factotum
 
