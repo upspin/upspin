@@ -144,6 +144,11 @@ type Factotum interface {
 	// no longer than your key's curve order. Don't use without a security consult.
 	Sign(hash []byte) (Signature, error)
 
+	// HKDF cryptographically mixes salt, info, and the Factotum secret.
+	// out is unguessable without the secret, and does not leak the secret.
+	// For more information, see golang.org/x/crypto/hkdf.
+	HKDF(salt, info, out []byte) error
+
 	// Pop derives a Factotum that defaults to the previous key.
 	Pop() Factotum
 
