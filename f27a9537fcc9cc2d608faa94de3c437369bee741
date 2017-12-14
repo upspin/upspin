@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f36e5c90_3c9c1a71",
+        "filename": "dir/dircache/server.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-12-14T04:01:24Z",
+      "side": 1,
+      "message": "still wrong?",
+      "revId": "f27a9537fcc9cc2d608faa94de3c437369bee741",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
