@@ -77,7 +77,7 @@ Upspin commands:
 	whichaccess
 Global flags:
   -blocksize size
-    	size of blocks when writing large files
+    	size of blocks when writing large files (default 1048576)
   -cachesize bytes
     	max disk bytes for cache (default 5000000000)
   -config file
@@ -150,6 +150,8 @@ Flags:
   -R	recursively copy directories
   -help
     	print more information about the command
+  -overwrite
+    	overwrite existing files (default true)
   -v	log each file as it is copied
 
 
