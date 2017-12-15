@@ -40,8 +40,9 @@ very efficient, copying only the references to the data rather than
 the data itself.
 `
 	fs := flag.NewFlagSet("cp", flag.ExitOnError)
-	fs.Bool("v", false, "log each file as it is copied")
-	fs.Bool("R", false, "recursively copy directories")
+	verbose := fs.Bool("v", false, "log each file as it is copied")
+	recur := fs.Bool("R", false, "recursively copy directories")
+	overwrite := fs.Bool("overwrite", true, "overwrite existing files")
 	s.ParseFlags(fs, args, help, "cp [opts] file... file or cp [opts] file... directory")
 
 	var err error
@@ -53,10 +54,11 @@ the data itself.
 	}
 
 	cs := &copyState{
-		state:   s,
-		flagSet: fs,
-		recur:   subcmd.BoolFlag(fs, "R"),
-		verbose: subcmd.BoolFlag(fs, "v"),
+		state:     s,
+		flagSet:   fs,
+		overwrite: *overwrite,
+		recur:     *recur,
+		verbose:   *verbose,
 	}
 
 	// Do all the glob processing here.
@@ -76,10 +78,11 @@ the data itself.
 }
 
 type copyState struct {
-	state   *State
-	flagSet *flag.FlagSet // Used only to call Usage.
-	verbose bool
-	recur   bool
+	state     *State
+	flagSet   *flag.FlagSet // Used only to call Usage.
+	overwrite bool
+	recur     bool
+	verbose   bool
 }
 
 func (c *copyState) logf(format string, args ...interface{}) {
@@ -112,6 +115,13 @@ func (s *State) copyCommand(cs *copyState, srcFiles []cpFile, dstFile cpFile) {
 	if err != nil {
 		s.Exit(err)
 	}
+	if !cs.overwrite {
+		if ok, err := s.exists(dstFile); err != nil {
+			s.Exit(err)
+		} else if ok {
+			return
+		}
+	}
 	s.copyToFile(cs, reader, srcFiles[0], dstFile)
 }
 
@@ -130,6 +140,28 @@ func (s *State) isDir(cf cpFile) bool {
 	// Not an Upspin name. Is it a local directory?
 	info, err := os.Stat(cf.path)
 	return err == nil && info.IsDir()
+}
+
+// exists reports whether the file exists.
+func (s *State) exists(file cpFile) (bool, error) {
+	if file.isUpspin {
+		_, err := s.Client.Lookup(upspin.PathName(file.path), true)
+		if err == nil {
+			return true, nil
+		}
+		if errors.Is(errors.NotExist, err) {
+			return false, nil
+		}
+		return false, err
+	}
+	_, err := os.Stat(file.path)
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return false, err
 }
 
 // open opens the file regardless of its location.
@@ -203,6 +235,13 @@ func (s *State) copyToDir(cs *copyState, src []cpFile, dir cpFile) {
 			path:     string(dstPath),
 			isUpspin: dir.isUpspin,
 		}
+		if !cs.overwrite {
+			if ok, err := s.exists(dst); err != nil {
+				s.Exit(err)
+			} else if ok {
+				return
+			}
+		}
 		s.copyToFile(cs, reader, from, dst)
 	}
 }
@@ -219,6 +258,7 @@ func (s *State) copyToFile(cs *copyState, reader io.ReadCloser, src, dst cpFile)
 		if err == nil {
 			return
 		}
+		s.Fail(err) // Failed at fastCopy; but try normal copy.
 	}
 	writer, err := s.create(dst)
 	if err != nil {
@@ -248,8 +288,6 @@ func (s *State) fastCopy(src, dst upspin.PathName) error {
 		// Oops, we have a directory. Retry.
 		return err
 	}
-	// Unexpected error. Die.
-	s.Fail(err)
 	return nil
 }
 
