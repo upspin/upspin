@@ -254,6 +254,8 @@ func (l *clog) rotateLog() {
 // were most recently interested in. The watcher should eventually
 // replace them with trusted information.
 func (l *clog) wipeLog(user upspin.UserName) {
+	log.Info.Printf("wiping log")
+
 	l.globalLock.Lock()
 	defer l.globalLock.Unlock()
 
