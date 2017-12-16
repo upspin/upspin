@@ -40,7 +40,7 @@ const (
 	defaultValid = 1 * time.Second
 
 	// defaultEnoentDuration is how long upspinfs will remember
-	// non-existant entries to avoid overburdening the Upspin
+	// non-existent entries to avoid overburdening the Upspin
 	// directory server. Programs like git seem to ask the same
 	// thing over and over again in short order.
 	defaultEnoentDuration = 1 * time.Second
@@ -439,7 +439,9 @@ func (n *node) lookup(uname upspin.PathName) (upspin.DirServer, *upspin.DirEntry
 	user := n.user
 	if n.t == rootNode {
 		if parsed, err := path.Parse(uname); err != nil {
-			return nil, nil, err
+			// If the name doesn't parse, just treat it
+			// as a nonexistent name.
+			return nil, nil, errors.E(errors.NotExist)
 		} else {
 			user = parsed.User()
 		}
