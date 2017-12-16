@@ -439,7 +439,9 @@ func (n *node) lookup(uname upspin.PathName) (upspin.DirServer, *upspin.DirEntry
 	user := n.user
 	if n.t == rootNode {
 		if parsed, err := path.Parse(uname); err != nil {
-			return nil, nil, err
+			// If the name doesn't parse, just treat it
+			// as a nonexistant name.
+			return nil, nil, errors.E(errors.NotExist)
 		} else {
 			user = parsed.User()
 		}
