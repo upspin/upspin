@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f4e8cc5a_3624f713",
+        "filename": "doc/faq.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 562,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-12-19T02:04:58Z",
+      "side": 1,
+      "message": "\"other such tasks\" feels repetitive with \"other tasks such\" in the next sentence. Maybe drop it and add an and before \"to create...\" ?",
+      "range": {
+        "startLine": 561,
+        "startChar": 61,
+        "endLine": 562,
+        "endChar": 11
+      },
+      "revId": "19c1919838765a54b9f4ca22ab37a91196735d83",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
