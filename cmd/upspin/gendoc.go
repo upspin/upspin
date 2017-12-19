@@ -114,12 +114,12 @@ Without:
 		if strings.HasPrefix(line, "upspin: ") && strings.HasSuffix(line, ": exit status 2") {
 			continue Without
 		}
+		line = strings.Replace(line, home, "/home/user", -1)
 		for _, flagLine := range flagDocs {
 			if line == flagLine {
 				continue Without
 			}
 		}
-		line = strings.Replace(line, home, "/home/user", -1)
 		fmt.Fprintf(out, "%s\n", line)
 	}
 }
