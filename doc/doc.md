@@ -44,7 +44,7 @@ is part of #336. --->
   is a [FUSE](https://en.wikipedia.org/wiki/Filesystem_in_Userspace)
   interface for Upspin.
 
-- The [`upspin-audit`](https://godoc.org/upspin.io/cmd/upspin-audit) command
+- The [`upspin-audit`](https://godoc.org/upspin.io/cmd/upspin#hdr-Sub_command_audit) command
   provides subcommands for auditing storage consumption.
 
 ## Architecture
