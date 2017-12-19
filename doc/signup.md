@@ -18,7 +18,8 @@ The archive includes:
   stored in Upspin),
 - the `upspin-ui` graphical user interface (a visual helper for signing up,
   deploying Upspin servers, and working with Upspin data),
-- the `cacheserver` daemon (a cache for remote Upspin data), 
+- the `cacheserver` daemon (a cache for remote Upspin data),
+- the `upspin-audit` command-line tool (for auditing storage consumption),
 - and, on macOS and Linux systems, the `upspinfs` program
   (a [FUSE](https://github.com/libfuse/libfuse) filesystem, to mount the Upspin
   file system in your local file tree).
