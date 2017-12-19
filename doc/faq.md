@@ -91,7 +91,13 @@ like account management and sharing.
 
 ### Can I access Upspin from a web browser? {#browser}
 
-TODO
+To access arbitrary Upspin content from a web browser,
+the [`upspin-ui`](https://godoc.org/augie.upspin.io/cmd/upspin-ui) command
+provides a web interface for working with Upspin trees.
+
+Portions of Upspin may be made publicly accessible from the web,
+as is the case with the [release tree](https://upspin.io/release@upspin.io),
+but there is no general web gateway for accessing Upspin content.
 
 ### Why do writes always go to my own store server, even when writing to someone else's directory? {#my-store}
 
