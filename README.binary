@@ -39,4 +39,9 @@ upspinfs (Linux and macOS only)
 
 	https://godoc.org/upspin.io/cmd/upspinfs
 
+upspin-audit
+	Audit provides subcommands for auditing storage consumption.
+
+	https://godoc.org/upspin.io/cmd/upspin-audit
+
 These binaries were built for {{.OSArch}} at{{range .Commits}} {{.Repo}}/{{.ShortHash}}{{end}}.
