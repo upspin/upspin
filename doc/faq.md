@@ -552,3 +552,28 @@ Then edit it locally and copy it back once done:
 $ upspin -config=$HOME/upspin/deploy/example.com/config cp /tmp/Writers upspin@example.com/Group/Writers
 ```
 
+
+### How do I delete unused blocks from my storage server?
+
+The `upspin audit` command has a number of subcommands that allow an
+administrator to determine how much storage a given user is consuming,
+to see how much storage is used overall by the storage server,
+to create a list of active blocks in the storage server, and other
+such tasks.
+After collecting such data, it can perform other tasks such as removing
+blocks from the storage server that are not referenced by the directory
+server.
+
+Run
+
+```
+$ upspin audit help
+```
+
+for more information.
+
+**The `upspin audit` command is simpleminded in its accounting
+and should be used with great care.
+In the presence of snapshots or multiple users sharing a storage
+server it is easy to make a mistake and delete active data.
+Use `upspin audit` with great care.**
