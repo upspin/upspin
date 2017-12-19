@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "81c8ad25_5b5a87fc",
+        "filename": "cmd/upspin-audit/main.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-12-19T02:03:55Z",
+      "side": 1,
+      "message": "// import \"upspin.io/cmd/upspin-audit\"",
+      "revId": "e280081e3b1680d272695c0b00b09999f61dac5d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d0e67d06_e6dec913",
+        "filename": "cmd/upspin/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-12-19T02:03:55Z",
+      "side": 1,
+      "message": "Audit\n\nto keep it parallel to the others",
+      "range": {
+        "startLine": 97,
+        "startChar": 0,
+        "endLine": 97,
+        "endChar": 12
+      },
+      "revId": "e280081e3b1680d272695c0b00b09999f61dac5d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
