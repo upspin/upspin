@@ -3,8 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // Audit provides subcommands for auditing storage consumption.
-// It has several subcommands that should be used in a way yet to be
-// determined.
+// See the command's usage method for documentation.
 package main // import "upspin.io/cmd/upspin-audit"
 
 // TODO:
