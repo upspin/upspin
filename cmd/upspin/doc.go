@@ -98,29 +98,30 @@ Audit provides subcommands for auditing storage consumption.
 
 The subcommands are:
 
-scan-dir
-scan-store
-	Scan the directory and store servers, creating a list of blocks
-	each uses, and report the total storage held by those blocks.
+  scan-dir
+  scan-store
+  	Scan the directory and store servers, creating a list of blocks
+  	each uses, and report the total storage held by those blocks.
 
-find-garbage
-	Use the results of scan-dir and scan-store operations to create a list
-	of blocks that are present in a store server but not referenced
-	by the scanned directory servers.
+  find-garbage
+  	Use the results of scan-dir and scan-store operations to create a list
+  	of blocks that are present in a store server but not referenced
+  	by the scanned directory servers.
 
-delete-garbage
-	Delete the blocks found by find-garbage from the store server.
+  delete-garbage
+  	Delete the blocks found by find-garbage from the store server.
 
 To delete the garbage references in a given store server:
-1. Run scan-store (as the store server user) to generate a list of references
-   to blocks in the store server.
-2. Run scan-dir for each Upspin tree that stores data in the store server (as
-   the Upspin users that own those trees) to generate lists of block
-   references mentioned by those trees.
-3. Run find-garbage to compile a list of references that are in the scan-store
-   output but not in the combined output of the scan-dir runs.
-4. Run delete-garbage (as the store server user) to delete the blocks in the
-   find-garbage output.
+
+  1. Run scan-store (as the store server user) to generate a list of references
+     to blocks in the store server.
+  2. Run scan-dir for each Upspin tree that stores data in the store server (as
+     the Upspin users that own those trees) to generate lists of block
+     references mentioned by those trees.
+  3. Run find-garbage to compile a list of references that are in the scan-store
+     output but not in the combined output of the scan-dir runs.
+  4. Run delete-garbage (as the store server user) to delete the blocks in the
+     find-garbage output.
 
 Usage of upspin audit:
 	upspin [globalflags] audit <command> [flags] ...
