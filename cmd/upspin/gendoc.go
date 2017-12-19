@@ -45,8 +45,14 @@ func (s *State) gendoc(args ...string) {
 		names = append(names, name)
 	}
 	names = append(names, externalCommands...)
+
 	// Shell is not in "commands" to prevent init loops.
 	names = append(names, "shell")
+
+	// Audit is a separate binary but we want to promote it in the
+	// default help output.
+	names = append(names, "audit")
+
 	sort.Strings(names)
 
 	var b bytes.Buffer
