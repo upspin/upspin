@@ -8,6 +8,7 @@ import (
 	"flag"
 	"os"
 	"strings"
+	"sync"
 
 	"upspin.io/bind"
 	"upspin.io/cloud/storage"
@@ -73,6 +74,7 @@ Misuse of this command may result in permanent data loss. Use with caution.
 			refs:   make(chan upspin.Reference),
 			stop:   make(chan bool, numWorkers),
 		}
+		d.done.Add(numWorkers)
 		for i := 0; i < numWorkers; i++ {
 			go d.worker()
 		}
@@ -89,6 +91,7 @@ Misuse of this command may result in permanent data loss. Use with caution.
 			}
 		}
 		close(d.refs)
+		d.done.Wait()
 	}
 }
 
@@ -99,11 +102,13 @@ type deleter struct {
 	backup storage.Storage // skip backup if nil
 	refs   chan upspin.Reference
 	stop   chan bool
+	done   sync.WaitGroup // zero when all workers return
 }
 
 // worker receives refs from refs and deletes them from store. If the store
 // return a permission error then worker sends a value to stop.
 func (d *deleter) worker() {
+	defer d.done.Done()
 	for ref := range d.refs {
 		if d.backup != nil {
 			b, _, _, err := d.store.Get(ref)
