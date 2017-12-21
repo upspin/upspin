@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "398b8c18_e1e5347f",
+        "filename": "doc/faq.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 294,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-21T00:40:28Z",
+      "side": 1,
+      "message": "tag this. maybe {#share-one-user}",
+      "revId": "e5a8cd4a082d16106d04c0cdc47a6ebcbee7b272",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "98b10a20_f0a2b5fc",
+        "filename": "doc/faq.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-21T00:40:28Z",
+      "side": 1,
+      "message": "s/file/\u0026 unless it is the only file in the directory/",
+      "revId": "e5a8cd4a082d16106d04c0cdc47a6ebcbee7b272",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
