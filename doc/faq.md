@@ -291,7 +291,7 @@ encrypted in StoreServer, but the decryption key is stored in clear text in the
 directory entry on the DirServer. This means that anyone with access to read
 the DirEntry may decrypt the objects in the StoreServer.
 
-### Can I share an individual file with a specific user? {#share-one-file}
+### Can I share an individual file with other users? {#share-one-file}
 
 Upspin's [access control mechanism](access_control.md) works at the directory
 level and so there is no way to specify the access control rights for a
