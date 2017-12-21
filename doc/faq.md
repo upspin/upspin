@@ -291,6 +291,20 @@ encrypted in StoreServer, but the decryption key is stored in clear text in the
 directory entry on the DirServer. This means that anyone with access to read
 the DirEntry may decrypt the objects in the StoreServer.
 
+### Can I share an individual file with a specific user?
+
+Upspin's [access control mechanism](access_control.md) works at the directory
+level and so there is no way to specify the access control rights for a
+specific file. This seems inconvenient when you wish to share a specific file
+while keeping the others in that directory private, but there is a workaround.
+
+File copies in Upspin are essentially free: if you `upspin cp` a file from one
+Upspin location to another then both files share the same underlying storage.
+To share a specific file with a specific user, create a directory for that user
+(`you@gmail.com/them@example.org`, for example), put an `Access` file in that
+directory granting them read rights, and then use `upspin cp` to copy the file
+there.
+
 ## Keys
 
 Upspin users have a key pair for authentication and security.
