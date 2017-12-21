@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "9142e068_2f5ddcfd",
+        "filename": "doc/faq.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 294,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-21T00:41:24Z",
+      "side": 1,
+      "message": "actually this is about sharing one file, so drop the thing about specific.\n\n### Can I share a single file with other users? {#share-one-file}",
+      "parentUuid": "398b8c18_e1e5347f",
+      "revId": "e5a8cd4a082d16106d04c0cdc47a6ebcbee7b272",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "98b10a20_f0a2b5fc",
         "filename": "doc/faq.md",
         "patchSetId": 1
