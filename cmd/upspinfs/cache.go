@@ -18,6 +18,7 @@ import (
 
 	"bazil.org/fuse"
 
+	lrucache "upspin.io/cache"
 	"upspin.io/client"
 	"upspin.io/client/clientutil"
 	os "upspin.io/cmd/upspinfs/internal/ose"
@@ -38,20 +39,34 @@ type cache struct {
 	dir    string        // Directory for in-the-clear cached files.
 	next   int           // The next sequence to use for temp files.
 	client upspin.Client // A client for writing back files.
+
+	// lru is a cache closed but not yet deleted files.
+	lru         *lrucache.LRU
+	lruBytes    int64 // Sum of storage bytes represented by files in lru.
+	lruMaxBytes int64 // Maximum storage bytes allowed for files in lru.
 }
+
+const (
+	maxRefs = 20
+)
 
 type cachedFile struct {
-	c       *cache // cache this belongs to.
-	fname   string // Filename in cache.
-	inStore bool   // True if this is a cached version of something in the store.
-	dirty   bool   // True if it needs to be written back on close.
-	seq     int64  // Sequence number of cached file.
-
-	file *os.File // The cached file.
+	c       *cache   // cache this belongs to.
+	n       *node    // node representing this file.
+	fname   string   // Filename in cache.
+	inStore bool     // True if this is a cached version of something in the store.
+	dirty   bool     // True if it needs to be written back on close.
+	seq     int64    // Sequence number of cached file.
+	file    *os.File // The cached file.
 }
 
-func newCache(config upspin.Config, dir string) *cache {
-	c := &cache{dir: dir, client: client.New(config)}
+type cachedClosedFile struct {
+	c    *cache // cache this file belongs to
+	size int64  // size in bytes
+}
+
+func newCache(config upspin.Config, dir string, cacheSize int64) *cache {
+	c := &cache{dir: dir, client: client.New(config), lru: lrucache.NewLRU(maxRefs), lruMaxBytes: cacheSize}
 	os.Mkdir(dir, 0700)
 
 	// Clean out all cache files.
@@ -98,6 +113,7 @@ func (c *cache) create(h *handle) error {
 		return errors.E(op, err)
 	}
 	h.n.cf = cf
+	cf.n = h.n
 	return nil
 }
 
@@ -134,17 +150,22 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 	cf := &cachedFile{c: c}
 	cdir, fname := c.cacheName(entry)
 	if entry.Packing != upspin.PlainPack {
+		c.Lock()
 		// Look for a dirty cached version.
 		cf.file, err = os.OpenFile(fname, os.O_RDWR, 0700)
 		if err == nil {
 			h.flags = flags
 			if info, err := cf.file.Stat(); err == nil {
+				c.lru.Remove(fname)
+				c.Unlock()
 				n.cf = cf
+				cf.n = n
 				n.attr.Size = uint64(info.Size())
 				cf.fname = fname
 				return nil
 			}
 		}
+		c.Unlock()
 	}
 
 	// Invalidate the kernel cache, this is a new version.
@@ -200,6 +221,7 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 	h.flags = flags
 	n.attr.Size = uint64(offset)
 	n.cf = cf
+	cf.n = n
 	return nil
 }
 
@@ -231,6 +253,33 @@ func (cf *cachedFile) close() {
 	}
 	cf.file.Close()
 	cf.file = nil
+	cf.c.Lock()
+	cf.c.lru.Add(cf.fname, &cachedClosedFile{c: cf.c, size: int64(cf.n.attr.Size)})
+	if cf.c.lruBytes < 0 {
+		log.Error.Print("lruBytes < 0")
+		cf.c.lruBytes = 0
+	}
+	cf.c.lruBytes += int64(cf.n.attr.Size)
+	for cf.c.lruBytes > cf.c.lruMaxBytes {
+		// removing the oldest entry triggers OnEviction so
+		// we don't do anything here.
+		if k, _ := cf.c.lru.RemoveOldest(); k == nil {
+			log.Error.Print("lruBytes > 0 but cache empty")
+			cf.c.lruBytes = 0
+			break
+		}
+	}
+	cf.c.Unlock()
+}
+
+// OnEviction is called whenever a file is evicted from the LRU.
+// This is only called from lru.Add and lry.RemoveOldest which
+// are both only called with ccf.c locked.
+func (ccf *cachedClosedFile) OnEviction(k interface{}) {
+	ccf.c.lruBytes -= ccf.size
+	if err := os.Remove(k.(string)); err != nil {
+		log.Debug.Printf("%s", err)
+	}
 }
 
 // forget is called when the cached version is no longer correct.

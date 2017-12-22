@@ -40,7 +40,7 @@ func usage() {
 
 func main() {
 	flag.Usage = usage
-	flags.Parse(flags.Server, "cachedir", "prudent", "version")
+	flags.Parse(flags.Server, "cachedir", "cachesize", "prudent", "version")
 
 	if flags.Version {
 		fmt.Print(version.Version())
@@ -60,8 +60,11 @@ func main() {
 
 	transports.Init(cfg)
 
-	// Start the cache if needed.
-	cacheutil.Start(cfg)
+	// Start the cacheserver if needed.
+	if cacheutil.Start(cfg) {
+		// Using a cacheserver, adjust cache size for upspinfs down.
+		flags.CacheSize = flags.CacheSize / 10
+	}
 
 	// Mount the file system and start serving.
 	if *mountpointFlag != "" {
@@ -79,7 +82,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("can't determine absolute path to mount point %s: %s", *mountpointFlag, err)
 	}
-	done := do(cfg, mountpoint, filepath.Join(flags.CacheDir, string(cfg.UserName())))
+	done := do(cfg, mountpoint, filepath.Join(flags.CacheDir, string(cfg.UserName())), flags.CacheSize)
 
 	// Serve expvar data.
 	ln, err := local.Listen("tcp", local.LocalName(cfg, cmdName))

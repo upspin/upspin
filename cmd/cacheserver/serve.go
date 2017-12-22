@@ -30,8 +30,7 @@ import (
 )
 
 var (
-	cacheSizeFlag = flag.Int64("cachesize", 5e9, "max disk `bytes` for cache")
-	writethrough  = flag.Bool("writethrough", false, "make storage cache writethrough")
+	writethrough = flag.Bool("writethrough", false, "make storage cache writethrough")
 )
 
 func serve(cfg upspin.Config, addr string) (<-chan error, error) {
@@ -39,7 +38,7 @@ func serve(cfg upspin.Config, addr string) (<-chan error, error) {
 	uncachedCfg := config.SetValue(cfg, "cache", "no")
 
 	// Calculate limits.
-	maxRefBytes := (9 * (*cacheSizeFlag)) / 10
+	maxRefBytes := (9 * (flags.CacheSize)) / 10
 	maxLogBytes := maxRefBytes / 9
 
 	myCacheDir := filepath.Join(flags.CacheDir, string(cfg.UserName()))
