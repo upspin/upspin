@@ -122,7 +122,7 @@ func (h *handle) String() string {
 }
 
 // newUpspinFS creates a new Upspin file system.
-func newUpspinFS(config upspin.Config, mountpoint string, cacheDir string) *upspinFS {
+func newUpspinFS(config upspin.Config, mountpoint string, cacheDir string, cacheSize int64) *upspinFS {
 	sep := string(filepath.Separator)
 	if !strings.HasSuffix(mountpoint, sep) {
 		mountpoint = mountpoint + sep
@@ -138,7 +138,7 @@ func newUpspinFS(config upspin.Config, mountpoint string, cacheDir string) *upsp
 		enoentMap:      make(map[upspin.PathName]time.Time),
 		invalidateChan: make(chan *node, 100),
 	}
-	f.cache = newCache(config, cacheDir+"/fscache")
+	f.cache = newCache(config, cacheDir+"/fscache", cacheSize)
 	// Preallocate root node.
 	f.root = f.allocNode(nil, "", 0500|os.ModeDir, 0, time.Now())
 	go f.invalidateProc()
@@ -1053,12 +1053,12 @@ func debug(msg interface{}) {
 
 // do is called both by main and testing to mount a FUSE file system. It exits on failure
 // and returns when the file system has been mounted and is ready for requests.
-func do(cfg upspin.Config, mountpoint string, cacheDir string) chan bool {
+func do(cfg upspin.Config, mountpoint string, cacheDir string, cacheSize int64) chan bool {
 	if log.GetLevel() == "debug" {
 		fuse.Debug = debug
 	}
 
-	f := newUpspinFS(cfg, mountpoint, cacheDir)
+	f := newUpspinFS(cfg, mountpoint, cacheDir, cacheSize)
 
 	c, err := fuse.Mount(
 		mountpoint,
