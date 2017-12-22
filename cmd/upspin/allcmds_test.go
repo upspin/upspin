@@ -416,6 +416,19 @@ var cpTests = []cmdTest{
 		"",
 		expect("this is @/cp/file", "this is @/cp/subdir/file"),
 	},
+	{
+		"cp without overwrite",
+		ann,
+		do(
+			"put @/cp/file",
+			"rm @/cp/subdir/file",
+			"cp -R -overwrite=false "+testTempGlob("cp")+" @/cp",
+			"get @/cp/file",
+			"get @/cp/subdir/file",
+		),
+		"this is @/cp/file new content",
+		expect("this is @/cp/file new content", "this is @/cp/subdir/file"),
+	},
 }
 
 // lsTests tests the ls command, in particular its handling of links.
