@@ -33,6 +33,7 @@ const (
 	defaultHTTPSAddr  = ":443"
 	defaultLog        = "info"
 	defaultServerKind = "inprocess"
+	defaultCacheSize  = int64(5e9)
 )
 
 var (
@@ -76,6 +77,10 @@ var (
 	// CacheDir ("cachedir") specifies the directory for the various file
 	// caches.
 	CacheDir = defaultCacheDir
+
+	// CacheSize ("cachesize") specifies the maximum bytes used by
+	// the various file caches. This is only approximate.
+	CacheSize = defaultCacheSize
 
 	// Config ("config") names the Upspin configuration file to use.
 	Config = defaultConfig
@@ -147,9 +152,20 @@ var flags = map[string]*flagVar{
 		},
 	},
 	"cachedir": strVar(&CacheDir, "cachedir", CacheDir, "`directory` containing all file caches"),
-	"config":   strVar(&Config, "config", Config, "user's configuration `file`"),
-	"http":     strVar(&HTTPAddr, "http", HTTPAddr, "`address` for incoming insecure network connections"),
-	"https":    strVar(&HTTPSAddr, "https", HTTPSAddr, "`address` for incoming secure network connections"),
+	"cachesize": &flagVar{
+		set: func(fs *flag.FlagSet) {
+			fs.Int64Var(&CacheSize, "cachesize", defaultCacheSize, "maximum bytes for file caches")
+		},
+		arg: func() string {
+			if CacheSize == defaultCacheSize {
+				return ""
+			}
+			return fmt.Sprintf("-cachesize=%d", CacheSize)
+		},
+	},
+	"config": strVar(&Config, "config", Config, "user's configuration `file`"),
+	"http":   strVar(&HTTPAddr, "http", HTTPAddr, "`address` for incoming insecure network connections"),
+	"https":  strVar(&HTTPSAddr, "https", HTTPSAddr, "`address` for incoming secure network connections"),
 	"insecure": &flagVar{
 		set: func(fs *flag.FlagSet) {
 			fs.BoolVar(&InsecureHTTP, "insecure", false, "whether to serve insecure HTTP instead of HTTPS")

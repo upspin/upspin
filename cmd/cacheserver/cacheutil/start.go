@@ -22,7 +22,6 @@ import (
 
 var (
 	writethrough = flag.Bool("writethrough", false, "make storage cache writethrough")
-	cacheSize    = flag.Int64("cachesize", 5e9, "max disk `bytes` for cache")
 )
 
 // detach detaches a process from the parent process group,
@@ -30,7 +29,7 @@ var (
 var detach = func(*exec.Cmd) {}
 
 // Start starts the cacheserver if the config requires it and it is not already running.
-func Start(cfg upspin.Config) {
+func Start(cfg upspin.Config) (usingCache bool) {
 	if cfg == nil {
 		return
 	}
@@ -39,6 +38,7 @@ func Start(cfg upspin.Config) {
 		// TODO(adg): log error message?
 		return // not using a cache server
 	}
+	usingCache = true
 
 	// Ping the cache server.
 	if err := ping(cfg, ce); err == nil {
@@ -79,6 +79,7 @@ func Start(cfg upspin.Config) {
 	}
 
 	fmt.Fprintf(os.Stderr, "Timed out waiting for cacheserver to start.\n")
+	return
 }
 
 // addFlag adds a flag to the command if it is at a non-default value.

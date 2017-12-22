@@ -20,7 +20,7 @@ const cmdName = "cacheserver"
 
 func main() {
 	flag.Usage = usage
-	flags.Parse(flags.Server, "cachedir", "version")
+	flags.Parse(flags.Server, "cachedir", "cachesize", "version")
 
 	if flags.Version {
 		fmt.Print(version.Version())
