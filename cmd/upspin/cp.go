@@ -115,13 +115,6 @@ func (s *State) copyCommand(cs *copyState, srcFiles []cpFile, dstFile cpFile) {
 	if err != nil {
 		s.Exit(err)
 	}
-	if !cs.overwrite {
-		if ok, err := s.exists(dstFile); err != nil {
-			s.Exit(err)
-		} else if ok {
-			return
-		}
-	}
 	s.copyToFile(cs, reader, srcFiles[0], dstFile)
 }
 
@@ -235,19 +228,19 @@ func (s *State) copyToDir(cs *copyState, src []cpFile, dir cpFile) {
 			path:     string(dstPath),
 			isUpspin: dir.isUpspin,
 		}
-		if !cs.overwrite {
-			if ok, err := s.exists(dst); err != nil {
-				s.Exit(err)
-			} else if ok {
-				return
-			}
-		}
 		s.copyToFile(cs, reader, from, dst)
 	}
 }
 
 // copyToFile copies the source to the destination. The source file has already been opened.
 func (s *State) copyToFile(cs *copyState, reader io.ReadCloser, src, dst cpFile) {
+	if !cs.overwrite {
+		if ok, err := s.exists(dst); err != nil {
+			s.Exit(err)
+		} else if ok {
+			return
+		}
+	}
 	cs.logf("start cp %s %s", src.path, dst.path)
 	defer cs.logf("end cp %s %s", src.path, dst.path)
 	// If both are in Upspin, we can avoid touching the data by copying
