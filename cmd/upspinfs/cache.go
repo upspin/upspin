@@ -102,8 +102,9 @@ func (c *cache) create(h *handle) error {
 }
 
 // open opens the cached version of a file.  If it isn't cached, first retrieve it from the store.
+// Returns true if the caller needs to invalidate the kernel info.
 // The corresponding node should be locked.
-func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
+func (c *cache) open(h *handle, flags fuse.OpenFlags) (bool, error) {
 	const op errors.Op = "cache.open"
 
 	n := h.n
@@ -111,20 +112,20 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 	if n.cf != nil {
 		// We already have a cached version open.
 		h.flags = flags
-		return nil
+		return false, nil
 	}
 
 	// At this point we may have the reference cached but we first need to look in
 	// the directory to see what the reference is.
 	dir, err := n.f.dirLookup(n.user)
 	if err != nil {
-		return errors.E(op, err)
+		return false, errors.E(op, err)
 	}
 	entry, err := dir.Lookup(name)
 	if err != nil {
 		// We don't implement links in the standard way. Instead we
 		// let FUSE do it by stating every file it walks.
-		return errors.E(op, err)
+		return false, errors.E(op, err)
 	}
 
 	// If we have a cached version, just return it.
@@ -142,22 +143,19 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 				n.cf = cf
 				n.attr.Size = uint64(info.Size())
 				cf.fname = fname
-				return nil
+				return false, nil
 			}
 		}
 	}
 
-	// Invalidate the kernel cache, this is a new version.
-	n.f.invalidateChan <- n
-
 	// Create an unpacker to decrypt the file blocks.
 	packer := pack.Lookup(entry.Packing)
 	if packer == nil {
-		return errors.E(op, name, errors.Errorf("unrecognized Packing %d", entry.Packing))
+		return false, errors.E(op, name, errors.Errorf("unrecognized Packing %d", entry.Packing))
 	}
 	bu, err := packer.Unpack(n.f.config, entry)
 	if err != nil {
-		return errors.E(op, name, err) // Showstopper.
+		return false, errors.E(op, name, err) // Showstopper.
 	}
 
 	// Read into a temporary file. We don't want to use it
@@ -166,7 +164,7 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 	var file *os.File // The open cache file.
 	var offset int64  // The write offset into the cache file.
 	if file, err = os.OpenFile(tmpName, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0700); err != nil {
-		return errors.E(op, err)
+		return false, errors.E(op, err)
 	}
 
 	for b := 0; ; b++ {
@@ -179,7 +177,7 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 		if err != nil {
 			file.Close()
 			os.Remove(tmpName)
-			return errors.E(op, name, err)
+			return false, errors.E(op, name, err)
 		}
 	}
 
@@ -200,7 +198,7 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 	h.flags = flags
 	n.attr.Size = uint64(offset)
 	n.cf = cf
-	return nil
+	return true, nil
 }
 
 // CopyBlock reads a block from the store, decrypts it, and writes to the local file.
