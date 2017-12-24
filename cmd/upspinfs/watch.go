@@ -1,0 +1,387 @@
+// Copyright 2016 The Upspin Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+// TODO(p): Similarities between this and dir/dircache are not accidental,
+// this was derived from dir/dircache/peroxied.go. I may eventually
+// merge them after they stop changing and I have a better idea of
+// exactly what need to be abstracted.
+
+// +build !windows
+// +build !openbsd
+
+package main // import "upspin.io/cmd/upspinfs"
+
+import (
+	"os"
+	"sync"
+	"time"
+
+	"upspin.io/errors"
+	"upspin.io/log"
+	"upspin.io/path"
+	"upspin.io/upspin"
+)
+
+const (
+	initialRetryInterval = time.Second
+	maxRetryInterval     = time.Minute
+	refreshInterval      = 3 * time.Second
+)
+
+// watchedDir contains information about watched user directories.
+type watchedDir struct {
+	f     *upspinFS
+	atime time.Time // time of last access
+	user  upspin.UserName
+
+	// ref is a count of user files we are watching in user's directory.
+	ref int
+
+	// sequence is the last sequence number seen in a watch. It is only
+	// set outside the watcher before any watcher starts
+	// while reading the log files.
+	sequence int64
+
+	// ep is only used outside the watcher and is the
+	// endpoint of the server being watched.
+	ep upspin.Endpoint
+
+	die   chan bool // channel used to tell watcher to die
+	dying chan bool // channel used to confirm watcher is dying
+
+	// For retrying a watch.
+	retryInterval time.Duration
+
+	watchSupported bool
+}
+
+// watchedDirs is used to translate between a user name and the relevant cached directory.
+type watchedDirs struct {
+	sync.Mutex
+
+	closing        bool      // when this is true do not allocate any new watchers
+	f              *upspinFS // File system we are watching for.
+	m              map[upspin.UserName]*watchedDir
+	invalidateChan chan *node
+}
+
+func newWatchedDirs(f *upspinFS) *watchedDirs {
+	w := &watchedDirs{f: f, m: make(map[upspin.UserName]*watchedDir), invalidateChan: make(chan *node, 100)}
+	go w.invalidater()
+	return w
+}
+
+// add increments the reference count for the relevant directory and
+// creates a watcher if none is running for it.
+func (w *watchedDirs) add(name upspin.PathName) {
+	p, err := path.Parse(name)
+	if err != nil {
+		log.Debug.Printf("upspinfs.watch: %s", err)
+		return
+	}
+	w.Lock()
+	defer w.Unlock()
+	user := p.User()
+
+	d, ok := w.m[user]
+	if ok {
+		d.ref++
+		return
+	}
+	d = &watchedDir{f: w.f, user: user, die: make(chan bool), dying: make(chan bool)}
+	w.m[user] = d
+	go d.watcher()
+}
+
+// remove decrements the reference count for the relevant directory and
+// kills any watcher if the reference count goes to zero.
+func (w *watchedDirs) remove(name upspin.PathName) {
+	p, err := path.Parse(name)
+	if err != nil {
+		log.Debug.Printf("upspinfs.watch: %s", err)
+		return
+	}
+	w.Lock()
+	defer w.Unlock()
+	user := p.User()
+
+	d, ok := w.m[user]
+	if ok {
+		d.ref--
+		if d.ref == 0 {
+			delete(w.m, user)
+			close(d.die)
+		}
+		return
+	}
+}
+
+// refresh refreshes the node if the relevant directory does not support Watch.
+// Assumes n is locked.
+func (w *watchedDirs) refresh(n *node) error {
+	const op errors.Op = "refresh"
+
+	// Watch is handling refreshes.
+	if n.doNotRefresh {
+		return nil
+	}
+
+	// Don't refresh special nodes.
+	if n.t != otherNode {
+		return nil
+	}
+
+	if n.refreshTime.After(time.Now()) {
+		return nil
+	}
+
+	// Don't refresh nodes for files we currently have open since
+	// we are the correct source.
+	if len(n.handles) > 0 {
+		return nil
+	}
+
+	p, err := path.Parse(n.uname)
+	if err != nil {
+		return e2e(errors.E(op, err))
+	}
+	w.Lock()
+	user := p.User()
+
+	d, ok := w.m[user]
+	if ok && d.watchSupported {
+		// Don't refresh if the DirServer supports Watch.
+		n.doNotRefresh = true
+		w.Unlock()
+		return nil
+	}
+	w.Unlock()
+
+	// Ask the Dirserver.
+	_, de, err := n.lookup(n.uname)
+	if err != nil {
+		n.refreshTime = time.Now().Add(refreshInterval / 4)
+		n.f.removeMapping(n.uname)
+		return e2e(errors.E(op, err))
+	}
+
+	// Nothing changed.
+	if n.seq == de.Sequence {
+		n.refreshTime = time.Now().Add(refreshInterval)
+		return nil
+	}
+	n.seq = de.Sequence
+
+	// Update cached info for node.
+	mode := os.FileMode(unixPermissions)
+	if de.IsDir() {
+		mode |= os.ModeDir
+	}
+	if de.IsLink() {
+		mode |= os.ModeSymlink
+	}
+	size, err := de.Size()
+	if err != nil {
+		n.f.removeMapping(n.uname)
+		return e2e(errors.E(op, err))
+	}
+	n.attr.Size = uint64(size)
+	n.attr.Mode = mode
+	if de.IsLink() {
+		n.link = upspin.PathName(de.Link)
+	}
+
+	select {
+	default:
+		n.refreshTime = time.Now().Add(refreshInterval / 4)
+	case w.invalidateChan <- n:
+		n.refreshTime = time.Now().Add(refreshInterval)
+	}
+	return nil
+}
+
+// invalidate tells kernel to purge data about a node. It must be called
+// with no locks held or the system could deadlock.
+func (f *upspinFS) invalidate(n *node) {
+	f.server.InvalidateNodeAttr(n)
+	f.server.InvalidateNodeData(n)
+}
+
+// invalidater is a go routine that loops calling invalidate. It exists so
+// that invalidations can be done outside of FUSE RPCs.  Otherwise there
+// are deadlocking possibilities.
+func (w *watchedDirs) invalidater() {
+	for {
+		n := <-w.invalidateChan
+		n.f.invalidate(n)
+	}
+}
+
+// watcher watches a directory and caches any changes to something already in the LRU.
+func (d *watchedDir) watcher() {
+	log.Debug.Printf("upspinfs.Watcher %s", d.user)
+	defer close(d.dying)
+
+	// We have no past so just watch what happens from now on.
+	d.sequence = upspin.WatchNew
+
+	d.retryInterval = initialRetryInterval
+	d.watchSupported = true
+	for {
+		err := d.watch()
+		if err == nil {
+			log.Debug.Printf("upspinfs.Watcher %s exiting", d.user)
+			// watch() only returns if the watcher has been told to die
+			// or if there is an error requiring a new Watch.
+			return
+		}
+		if err == upspin.ErrNotSupported {
+			// Can't survive this.
+			d.watchSupported = false
+			log.Debug.Printf("upspinfs.watcher: %s: %s", d.user, err)
+			return
+		}
+		if errors.Is(errors.Invalid, err) {
+			// A bad record in the log or a bad sequence number. Reread current state.
+			log.Info.Printf("upspinfs.watcher restarting Watch: %s: %s", d.user, err)
+			d.sequence = upspin.WatchNew
+		} else {
+			log.Info.Printf("upspinfs.watcher: %s: %s", d.user, err)
+		}
+
+		select {
+		case <-time.After(d.retryInterval):
+			d.retryInterval *= 2
+			if d.retryInterval > maxRetryInterval {
+				d.retryInterval = maxRetryInterval
+			}
+		}
+	}
+}
+
+// watch loops receiving watch events. It returns nil if told to die.
+// Otherwise it returns whatever error was encountered.
+func (d *watchedDir) watch() error {
+	dir, err := d.f.dirLookup(d.user)
+	if err != nil {
+		return err
+	}
+	name := upspin.PathName(string(d.user) + "/")
+	done := make(chan struct{})
+	event, err := dir.Watch(name, d.sequence, done)
+	if err != nil {
+		close(done)
+		return err
+	}
+
+	// If Watch succeeds, go back to the initial interval.
+	d.retryInterval = initialRetryInterval
+
+	// Loop receiving events until we are told to stop or the event stream is closed.
+	for {
+		select {
+		case <-d.die:
+			break
+		case e, ok := <-event:
+			if !ok {
+				close(done)
+				return errors.Str("Watch event stream closed")
+			}
+			if e.Error != nil {
+				log.Debug.Printf("upspinfs: Watch(%q) error: %s", name, e.Error)
+			} else {
+				log.Debug.Printf("upspinfs: Watch(%q) entry: %s (delete=%t)", name, e.Entry.Name, e.Delete)
+			}
+			if err := d.handleEvent(&e); err != nil {
+				close(done)
+				return err
+			}
+		}
+	}
+
+	// Drain events after the close or future RPCs on the same
+	// connection could hang.
+	close(done)
+	for {
+		_, ok := <-event
+		if !ok {
+			break
+		}
+	}
+	return nil
+}
+
+func (d *watchedDir) handleEvent(e *upspin.Event) error {
+	// Something odd happened?
+	if e.Error != nil {
+		return e.Error
+	}
+	f := d.f
+
+	// Is this a file we are watching?
+	f.Lock()
+	n, ok := f.nodeMap[e.Entry.Name]
+	if f.enoentMap[e.Entry.Name] && !e.Delete {
+		// We can't check for insequence since we don't have a
+		// sequence for when we put it in the enoentMap so
+		// just take it out. Worst case is we just forgot
+		// an optimization.
+		delete(f.enoentMap, e.Entry.Name)
+	}
+	f.Unlock()
+	if !ok {
+		return nil
+	}
+
+	// Ignore events that precede what we have done to a file.
+	n.Lock()
+	if e.Entry.Sequence <= n.seq {
+		n.Unlock()
+		return nil
+	}
+
+	// Don't update files being written.
+	if n.cf != nil && n.cf.dirty {
+		n.Unlock()
+		return nil
+	}
+
+	if e.Delete {
+		f.doesNotExist(n.uname)
+		n.deleted = true
+	} else if n.cf != nil {
+		// If we've changed an open file, forget the
+		// mapping of name to node so that new opens
+		// will get the new file.
+		f.removeMapping(n.uname)
+		n.deleted = false
+	} else {
+		// Update cached info for node.
+		mode := os.FileMode(unixPermissions)
+		if e.Entry.IsDir() {
+			mode |= os.ModeDir
+		}
+		if e.Entry.IsLink() {
+			mode |= os.ModeSymlink
+		}
+		size, err := e.Entry.Size()
+		if err == nil {
+			n.attr.Size = uint64(size)
+		} else {
+			log.Debug.Printf("upspinfs.watch: %s", err)
+		}
+		n.attr.Mode = mode
+		if e.Entry.IsLink() {
+			n.link = upspin.PathName(e.Entry.Link)
+		}
+		n.attr.Mtime = e.Entry.Time.Go()
+		n.deleted = false
+	}
+	n.Unlock()
+
+	// invalidate has to be outside of locks because it can trigger
+	// another FUSE requests deadlocking the system.
+	f.invalidate(n)
+	return nil
+}
