@@ -147,9 +147,6 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 		}
 	}
 
-	// Invalidate the kernel cache, this is a new version.
-	n.f.invalidateChan <- n
-
 	// Create an unpacker to decrypt the file blocks.
 	packer := pack.Lookup(entry.Packing)
 	if packer == nil {
