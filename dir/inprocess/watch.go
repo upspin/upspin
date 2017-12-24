@@ -241,9 +241,9 @@ func (e *eventManager) watch(server *server, root path.Parsed, sequence int64, d
 
 	eventsSoFar := <-e.eventsSoFar
 
-	// A sequence other than the special cases 0 and -1 must exist.
+	// A sequence other than the special cases must exist.
 	// The special case of an invalid sequence is returned as an event with an "invalid" error.
-	if sequence != 0 && sequence != -1 {
+	if sequence != upspin.WatchCurrent && sequence != upspin.WatchStart && sequence != upspin.WatchNew {
 		if sequence < 0 || int64(len(eventsSoFar)) < sequence {
 			events <- upspin.Event{Error: errors.E(op, errors.Invalid, "bad sequence")}
 			close(events)

@@ -480,7 +480,7 @@ func (l *clog) lookup(name upspin.PathName) (*upspin.DirEntry, error, bool) {
 	if ge == nil {
 		return nil, nil, false
 	}
-	if !l.complete(ge) {
+	if !ge.complete {
 		return nil, nil, false
 	}
 	if ge.children[lastElem(name)] {
