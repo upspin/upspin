@@ -27,9 +27,11 @@ The archive includes:
 > If your operating system is not listed on the download page, you can obtain
 > the binaries by installing Upspin from source.
 > First [install Go](https://golang.org/doc/install) and then use `go get` to
-> fetch Upspin and its dependencies and build them:
-> ```
+> fetch Upspin, upspin-ui and its dependencies and build them:
+>
+```
 $ go get upspin.io/cmd/...
+$ go get augie.upspin.io/cmd/upspin-ui
 ```
 > This will install the Upspin commands to `$GOPATH/bin`, which you should add
 > to your system `PATH` if you haven't already.
