@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "378f1fe8_5d93abf2",
+        "filename": "doc/signup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-12-26T20:47:37Z",
+      "side": 1,
+      "message": "fetch the Upspin tools and their dependencies...",
+      "range": {
+        "startLine": 30,
+        "startChar": 2,
+        "endLine": 30,
+        "endChar": 34
+      },
+      "revId": "c4c5fb05fdb10c806a8b2e23f36b6e211946339f",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
