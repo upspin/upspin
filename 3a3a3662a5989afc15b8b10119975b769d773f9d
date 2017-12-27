@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0b09b861_2b5d7f49",
+        "filename": "flags/flags.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-12-27T01:18:50Z",
+      "side": 1,
+      "message": "approximate",
+      "range": {
+        "startLine": 82,
+        "startChar": 42,
+        "endLine": 82,
+        "endChar": 52
+      },
+      "revId": "3a3a3662a5989afc15b8b10119975b769d773f9d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e50315c2_c8ef1705",
+        "filename": "flags/flags.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2017-12-27T01:18:50Z",
+      "side": 1,
+      "message": "defaultCacheSize ?",
+      "range": {
+        "startLine": 157,
+        "startChar": 40,
+        "endLine": 157,
+        "endChar": 43
+      },
+      "revId": "3a3a3662a5989afc15b8b10119975b769d773f9d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
