@@ -70,8 +70,12 @@ func FromSecret(curveName, secret string) (public, private, secretStr string, er
 
 // ValidSecretSeed reports whether a seed conforms to the proquint format.
 func ValidSecretSeed(seed string) bool {
-	// TODO: this could be more strict.
-	return len(seed) == 47 && seed[5] == '-'
+	if len(seed) != 47 {
+		return false
+	}
+
+	// Check if the seed can be converted to a secret and back to the same seed.
+	return seed == secretFromProquint(seed).proquint()
 }
 
 // writeKeyFile writes a single key to its file, removing the file
