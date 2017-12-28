@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "442c61e6_4c063875",
+        "filename": "key/keygen/keygen.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-28T22:41:37Z",
+      "side": 1,
+      "message": "Please don\u0027t use a regexp for this. Besides being a huge dependency, the pattern is incomprehensible.\n\nI\u0027m happy to have a more precise validation, but using simpler and more readable technology.\n\nRelated background: https://commandcenter.blogspot.com.au/2011/08/regular-expressions-in-lexing-and.html",
+      "revId": "b6a667da65ed6bb1536398cf7e1ce3192debd7f7",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
