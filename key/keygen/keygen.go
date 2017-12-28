@@ -12,6 +12,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"upspin.io/errors"
@@ -70,8 +71,14 @@ func FromSecret(curveName, secret string) (public, private, secretStr string, er
 
 // ValidSecretSeed reports whether a seed conforms to the proquint format.
 func ValidSecretSeed(seed string) bool {
-	// TODO: this could be more strict.
-	return len(seed) == 47 && seed[5] == '-'
+	con := "[bdfghjklmnprstvz]"
+	vo := "[aiou]"
+
+	pq := con + vo + con + vo + con
+
+	rx := fmt.Sprintf("^(%[1]s-){3}%[1]s\\.(%[1]s-){3}%[1]s$", pq)
+
+	return regexp.MustCompile(rx).MatchString(seed)
 }
 
 // writeKeyFile writes a single key to its file, removing the file
