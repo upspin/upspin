@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8963c0fc_1bdaf8c6",
+        "filename": "cmd/upspin/allcmds_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 600,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-29T01:57:33Z",
+      "side": 1,
+      "message": "why are these changed?",
+      "revId": "0145436c82d3633afcd25956af508b7e838366bd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "73cf19e0_11d42123",
+        "filename": "key/keygen/keygen.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-29T01:57:33Z",
+      "side": 1,
+      "message": "s/ensure/Ensure/\ns/$/./",
+      "revId": "0145436c82d3633afcd25956af508b7e838366bd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "0c7c0bf4_2de6abb2",
+        "filename": "key/keygen/keygen.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-29T01:57:33Z",
+      "side": 1,
+      "message": "no need for the temporaries\n\nreturn secretFromProquint(seed).proquint() \u003d\u003d seed",
+      "revId": "0145436c82d3633afcd25956af508b7e838366bd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "af8100db_dd8ed4fc",
+        "filename": "key/keygen/keygen_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-29T01:57:33Z",
+      "side": 1,
+      "message": "s/%s/%q/g",
+      "revId": "0145436c82d3633afcd25956af508b7e838366bd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ce57cf9a_9b8d6a36",
+        "filename": "key/keygen/keygen_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-29T01:57:33Z",
+      "side": 1,
+      "message": "ditto (and instances below)",
+      "revId": "0145436c82d3633afcd25956af508b7e838366bd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5a3ac930_eaa3aec1",
+        "filename": "key/keygen/keygen_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-29T01:57:33Z",
+      "side": 1,
+      "message": "these names are needlessly cryptic.\ncurve\nproquint\netc .",
+      "revId": "0145436c82d3633afcd25956af508b7e838366bd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
