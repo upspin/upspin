@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5592aa8d_ecdf44ea",
+        "filename": "cmd/upspinfs/fs.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-29T05:00:04Z",
+      "side": 1,
+      "message": "s/the/of the/",
+      "revId": "29980604e701d32d5b998b233c851773a50bf958",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a67536e5_a7395dce",
+        "filename": "cmd/upspinfs/watch.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-29T05:00:04Z",
+      "side": 1,
+      "message": "s/need/needs/",
+      "revId": "29980604e701d32d5b998b233c851773a50bf958",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f334651a_0801abe2",
+        "filename": "cmd/upspinfs/watch.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-29T05:00:04Z",
+      "side": 1,
+      "message": "s/channel // here and next line",
+      "revId": "29980604e701d32d5b998b233c851773a50bf958",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c47a3517_7ffba6ee",
+        "filename": "cmd/upspinfs/watch.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-29T05:00:04Z",
+      "side": 1,
+      "message": "/is used to translate/translates/",
+      "revId": "29980604e701d32d5b998b233c851773a50bf958",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a9897a3a_e341f8b5",
+        "filename": "cmd/upspinfs/watch.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-29T05:00:04Z",
+      "side": 1,
+      "message": "you are inconsistent about punctuation and capitalization in comments.",
+      "revId": "29980604e701d32d5b998b233c851773a50bf958",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4888d634_c8a44668",
+        "filename": "cmd/upspinfs/watch.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-29T05:00:04Z",
+      "side": 1,
+      "message": "kind of a lot for one line to hold",
+      "revId": "29980604e701d32d5b998b233c851773a50bf958",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "de02e024_938c9abc",
+        "filename": "cmd/upspinfs/watch.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-29T05:00:04Z",
+      "side": 1,
+      "message": "should this be done in a goroutine?",
+      "revId": "29980604e701d32d5b998b233c851773a50bf958",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a3a3e83b_f0c454d2",
+        "filename": "cmd/upspinfs/watch.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 384,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-29T05:00:04Z",
+      "side": 1,
+      "message": "s/requests/request,/",
+      "revId": "29980604e701d32d5b998b233c851773a50bf958",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
