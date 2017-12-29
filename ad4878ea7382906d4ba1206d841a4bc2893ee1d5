@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "9aef6ac9_ddca1a74",
+        "filename": "key/keygen/keygen_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-29T06:26:29Z",
+      "side": 1,
+      "message": "why is this a function? just make a map variable.\n\nbut also: there\u0027s no reason to be a map. a slice of two-element structs would be simple, clear, and more efficient.",
+      "revId": "ad4878ea7382906d4ba1206d841a4bc2893ee1d5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ccc07756_87cbb2fe",
+        "filename": "key/keygen/keygen_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-29T06:26:29Z",
+      "side": 1,
+      "message": "again, why a map?\nthis could be a slice of structs or even two slices of strings.",
+      "revId": "ad4878ea7382906d4ba1206d841a4bc2893ee1d5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
