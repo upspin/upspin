@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "071c5739_cd3130ad",
+        "filename": "cmd/upspin/allcmds_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 600,
+      "author": {
+        "id": 6284
+      },
+      "writtenOn": "2017-12-29T02:28:50Z",
+      "side": 1,
+      "message": "They are invalid seeds (e, w are invalid bytes) and fail with the new key/keygen.ValidSecretSeed functionality.\n\nE.g. \"deter-gonad-pivot-rotor.visit-roman-widow-woman\" would become \"zuzur-gonad-pivot-rotor.visit-roman-zuzuz-zoman\" when converted to a secret and back to a proquint.",
+      "parentUuid": "8963c0fc_1bdaf8c6",
+      "revId": "0145436c82d3633afcd25956af508b7e838366bd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "73cf19e0_11d42123",
         "filename": "key/keygen/keygen.go",
         "patchSetId": 5
@@ -33,6 +51,24 @@
       "revId": "0145436c82d3633afcd25956af508b7e838366bd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "adc01031_c9396888",
+        "filename": "key/keygen/keygen.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 6284
+      },
+      "writtenOn": "2017-12-29T02:28:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "73cf19e0_11d42123",
+      "revId": "0145436c82d3633afcd25956af508b7e838366bd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "a22575ee_f26e34b4",
+        "filename": "key/keygen/keygen.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 6284
+      },
+      "writtenOn": "2017-12-29T02:28:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0c7c0bf4_2de6abb2",
+      "revId": "0145436c82d3633afcd25956af508b7e838366bd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "af8100db_dd8ed4fc",
         "filename": "key/keygen/keygen_test.go",
         "patchSetId": 5
@@ -67,6 +121,24 @@
       "revId": "0145436c82d3633afcd25956af508b7e838366bd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f2d644b1_62dbec1b",
+        "filename": "key/keygen/keygen_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 6284
+      },
+      "writtenOn": "2017-12-29T02:28:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "af8100db_dd8ed4fc",
+      "revId": "0145436c82d3633afcd25956af508b7e838366bd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -87,6 +159,24 @@
     },
     {
       "key": {
+        "uuid": "27864ee1_fc19a830",
+        "filename": "key/keygen/keygen_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 6284
+      },
+      "writtenOn": "2017-12-29T02:28:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ce57cf9a_9b8d6a36",
+      "revId": "0145436c82d3633afcd25956af508b7e838366bd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5a3ac930_eaa3aec1",
         "filename": "key/keygen/keygen_test.go",
         "patchSetId": 5
@@ -101,6 +191,24 @@
       "revId": "0145436c82d3633afcd25956af508b7e838366bd",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "46b09f7d_2e9e43f1",
+        "filename": "key/keygen/keygen_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 6284
+      },
+      "writtenOn": "2017-12-29T02:28:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5a3ac930_eaa3aec1",
+      "revId": "0145436c82d3633afcd25956af508b7e838366bd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
