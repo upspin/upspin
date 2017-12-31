@@ -35,8 +35,8 @@ import (
 )
 
 const (
-	// devaultValid is how long the kernel can cache
-	// addtribute information that upspinfs gives it.
+	// defaultValid is how long the kernel can cache
+	// attribute information that upspinfs gives it.
 	defaultValid = 1 * time.Second
 
 	// defaultEnoentDuration is how long upspinfs will remember
