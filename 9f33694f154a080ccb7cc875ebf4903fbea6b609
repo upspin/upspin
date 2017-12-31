@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "91cc1952_985d2dca",
+        "filename": "cmd/upspinfs/cache.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-31T23:39:15Z",
+      "side": 1,
+      "message": "fold together 277 and 278 and s/which //",
+      "revId": "9f33694f154a080ccb7cc875ebf4903fbea6b609",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c0a7890f_3b96df76",
+        "filename": "cmd/upspinfs/upspinfs_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 574,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2017-12-31T23:39:15Z",
+      "side": 1,
+      "message": "func bytesUsed(dir string) int64 {\n  var sum int64\n  fn :\u003d func(path string, info os.FileInfo, err error) error {\n    if err !\u003d nil { panic(err) } // Shouldn\u0027t happen, want to catch it.\n    sum +\u003d info.Size()\n  }\n  err :\u003d filepath.Walk(dir, fn)\n  if err !\u003d nil { panic(err) }\n  return sum\n}",
+      "revId": "9f33694f154a080ccb7cc875ebf4903fbea6b609",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
