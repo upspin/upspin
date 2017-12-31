@@ -16,6 +16,7 @@ import (
 	"os"
 	"path/filepath"
 	rtdebug "runtime/debug"
+	"strconv"
 	"testing"
 	"time"
 
@@ -43,7 +44,8 @@ var testConfig struct {
 }
 
 const (
-	perm = 0777
+	perm     = 0777
+	maxBytes = 1e8
 )
 
 // testSetup creates a temporary user config with inprocess services.
@@ -130,7 +132,7 @@ func mount() error {
 	}
 
 	// Mount the file system. It will be served in a separate go routine.
-	do(cfg, testConfig.mountpoint, testConfig.cacheDir, 1e9)
+	do(cfg, testConfig.mountpoint, testConfig.cacheDir, maxBytes)
 
 	// Create the user root, all tests will need it.
 	testConfig.root = filepath.Join(testConfig.mountpoint, testConfig.user)
@@ -524,6 +526,51 @@ func TestEventualConsistency(t *testing.T) {
 		return errors.New("still there 2")
 	}
 	eventually(t, f, 5*time.Second)
+}
+
+func TestCleanup(t *testing.T) {
+	testDir := mkTestDir(t, "testcleanup")
+	bufSize := int(maxBytes / 10)
+	buf := randomBytes(t, bufSize)
+
+	for i := 0; i < 20; i++ {
+		fn := filepath.Join(testDir, strconv.Itoa(i))
+		wf := writeFile(t, fn, buf)
+		wf.Close()
+		inUse := bytesUsed(testConfig.cacheDir)
+
+		// Give it a little slack since we are doing this in parallel with the
+		// other tests. The limit only covers closed files and, since this
+		// executes in parallel with other tests, the total cache used could
+		// be larger than the limit.
+		if inUse > 5*maxBytes/4 {
+			fatal(t, fmt.Errorf("cache too large %d > %d", inUse, maxBytes))
+		}
+	}
+}
+
+// bytesUsed does a recursive walk of the cache directories summing the bytes used.
+func bytesUsed(dir string) int64 {
+	var sum int64
+
+	f, err := os.Open(dir)
+	if err != nil {
+		return 0
+	}
+	info, err := f.Readdir(0)
+	f.Close()
+	if err != nil {
+		return 0
+	}
+	for _, i := range info {
+		p := filepath.Join(dir, i.Name())
+		if i.IsDir() {
+			sum += bytesUsed(p)
+			continue
+		}
+		sum += i.Size()
+	}
+	return sum
 }
 
 func fatal(t *testing.T, args ...interface{}) {
