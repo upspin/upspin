@@ -210,6 +210,7 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 		if err := os.Rename(tmpName, fname); err != nil {
 			file.Close()
 			os.Remove(tmpName)
+			return errors.E(op, name, err)
 		}
 	}
 
@@ -261,20 +262,19 @@ func (cf *cachedFile) close() {
 	}
 	cf.c.lruBytes += int64(cf.n.attr.Size)
 	for cf.c.lruBytes > cf.c.lruMaxBytes {
-		// removing the oldest entry triggers OnEviction so
-		// we don't do anything here.
-		if k, _ := cf.c.lru.RemoveOldest(); k == nil {
+		k, v := cf.c.lru.RemoveOldest()
+		if k == nil {
 			log.Error.Print("lruBytes > 0 but cache empty")
 			cf.c.lruBytes = 0
 			break
 		}
+		v.(*cachedClosedFile).OnEviction(k)
 	}
 	cf.c.Unlock()
 }
 
 // OnEviction is called whenever a file is evicted from the LRU.
-// This is only called from lru.Add and lry.RemoveOldest which
-// are both only called with ccf.c locked.
+// This is called from lru.Add and cf.close with ccf.c locked.
 func (ccf *cachedClosedFile) OnEviction(k interface{}) {
 	ccf.c.lruBytes -= ccf.size
 	if err := os.Remove(k.(string)); err != nil {
