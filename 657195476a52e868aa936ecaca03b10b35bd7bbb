@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "fd0f56a7_e79615bb",
+        "filename": "key/keygen/keygen_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2018-01-01T23:08:02Z",
+      "side": 1,
+      "message": "there should be continues after these Error(f) calls or failure output will be messy",
+      "revId": "657195476a52e868aa936ecaca03b10b35bd7bbb",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
