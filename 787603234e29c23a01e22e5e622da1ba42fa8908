@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "61be0d50_9efe33eb",
+        "filename": "cmd/upspinfs/upspinfs_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 560,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2018-01-01T03:47:54Z",
+      "side": 1,
+      "message": "you could just do\nsum +\u003d info.Size()\nreturn err",
+      "revId": "787603234e29c23a01e22e5e622da1ba42fa8908",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
