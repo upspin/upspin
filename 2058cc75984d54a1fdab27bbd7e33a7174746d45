@@ -1,0 +1,259 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "0da67c82_df4fdd8d",
+        "filename": "cmd/upspinfs/fs.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2018-01-01T22:50:51Z",
+      "side": 1,
+      "message": "missing periods on the ends of some comments.",
+      "revId": "2058cc75984d54a1fdab27bbd7e33a7174746d45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "618ca047_15020e60",
+        "filename": "cmd/upspinfs/upspinfs_test.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2018-01-01T22:50:51Z",
+      "side": 1,
+      "message": "???",
+      "revId": "2058cc75984d54a1fdab27bbd7e33a7174746d45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fd6e4836_b787f681",
+        "filename": "cmd/upspinfs/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2018-01-01T22:50:51Z",
+      "side": 1,
+      "message": "watchedRoot is a better name. i think",
+      "revId": "2058cc75984d54a1fdab27bbd7e33a7174746d45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c26a8758_16548bbc",
+        "filename": "cmd/upspinfs/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2018-01-01T22:50:51Z",
+      "side": 1,
+      "message": "-,.s/$/./  -,.s/c/C/",
+      "revId": "2058cc75984d54a1fdab27bbd7e33a7174746d45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "806ea6e6_793eeec3",
+        "filename": "cmd/upspinfs/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2018-01-01T22:50:51Z",
+      "side": 1,
+      "message": "retryInterval is ...\n\n(for consistency if nothing else.)",
+      "revId": "2058cc75984d54a1fdab27bbd7e33a7174746d45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "61da724f_38916512",
+        "filename": "cmd/upspinfs/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2018-01-01T22:50:51Z",
+      "side": 1,
+      "message": "watchedRoots?",
+      "revId": "2058cc75984d54a1fdab27bbd7e33a7174746d45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "4c5711ed_d14b32fd",
+        "filename": "cmd/upspinfs/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2018-01-01T22:50:51Z",
+      "side": 1,
+      "message": "multiple lines would be easier to read",
+      "revId": "2058cc75984d54a1fdab27bbd7e33a7174746d45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ee41dc2f_6ba05897",
+        "filename": "cmd/upspinfs/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2018-01-01T22:50:51Z",
+      "side": 1,
+      "message": "you can do just\nif d :\u003d w.m[user]; d !\u003d nil {\nmaps return the zero value when the item is missing",
+      "revId": "2058cc75984d54a1fdab27bbd7e33a7174746d45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "626e24f9_6654ca4f",
+        "filename": "cmd/upspinfs/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2018-01-01T22:50:51Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "2058cc75984d54a1fdab27bbd7e33a7174746d45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "490cd745_f662fd5c",
+        "filename": "cmd/upspinfs/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2018-01-01T22:50:51Z",
+      "side": 1,
+      "message": "needless",
+      "revId": "2058cc75984d54a1fdab27bbd7e33a7174746d45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a2a4dabd_367d31f6",
+        "filename": "cmd/upspinfs/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2018-01-01T22:50:51Z",
+      "side": 1,
+      "message": "the kernel",
+      "revId": "2058cc75984d54a1fdab27bbd7e33a7174746d45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "960f1df0_2eba5511",
+        "filename": "cmd/upspinfs/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2018-01-01T22:50:51Z",
+      "side": 1,
+      "message": "s/held.*/held./\nbecause deadlock is implied by the condition. unless it\u0027s the OS you\u0027re referring to.",
+      "revId": "2058cc75984d54a1fdab27bbd7e33a7174746d45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c98cd0d3_c92e6ec5",
+        "filename": "cmd/upspinfs/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2018-01-01T22:50:51Z",
+      "side": 1,
+      "message": "goroutine",
+      "revId": "2058cc75984d54a1fdab27bbd7e33a7174746d45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7afdbdd0_1cf3b5df",
+        "filename": "cmd/upspinfs/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 240,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2018-01-01T22:50:51Z",
+      "side": 1,
+      "message": "s/watch()/Watch/",
+      "revId": "2058cc75984d54a1fdab27bbd7e33a7174746d45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d03f8122_01ad8c2f",
+        "filename": "cmd/upspinfs/watch.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2018-01-01T22:50:51Z",
+      "side": 1,
+      "message": "again, is this the OS? if so, please make that clear.",
+      "revId": "2058cc75984d54a1fdab27bbd7e33a7174746d45",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
