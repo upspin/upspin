@@ -143,6 +143,8 @@ func MkdirAll(name string, mode os.FileMode) error {
 
 // Remove removes the named file.
 func Remove(name string) error {
+	state.Lock()
+	defer state.Unlock()
 	delete(state.nameToFile, name)
 	return os.Remove(name)
 }
