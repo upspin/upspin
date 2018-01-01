@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "b2772f79_b24156f7",
+        "filename": "doc/signup.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2018-01-01T22:05:02Z",
+      "side": 1,
+      "message": "tools and their dependencies",
+      "range": {
+        "startLine": 30,
+        "startChar": 24,
+        "endLine": 30,
+        "endChar": 25
+      },
+      "revId": "0c5a2783545c4745805beb62cd6ab407cad94454",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
