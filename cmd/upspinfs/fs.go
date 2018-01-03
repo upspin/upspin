@@ -35,8 +35,8 @@ import (
 )
 
 const (
-	// devaultValid is how long the kernel can cache
-	// addtribute information that upspinfs gives it.
+	// defaultValid is how long the kernel can cache
+	// attribute information that upspinfs gives it.
 	defaultValid = 1 * time.Minute
 
 	// Files and directories will appear in the host OS with
@@ -327,11 +327,11 @@ func (n *node) Mkdir(context gContext.Context, req *fuse.MkdirRequest) (fs.Node,
 // For both, we read the contents on open.
 func (n *node) Open(context gContext.Context, req *fuse.OpenRequest, resp *fuse.OpenResponse) (fs.Handle, error) {
 	const op errors.Op = "Open"
-	if req.Dir {
-		return n.openDir(context, req, resp)
-	}
 	if n.deleted {
 		return nil, e2e(errors.E(op, errors.NotExist, n.uname))
+	}
+	if req.Dir {
+		return n.openDir(context, req, resp)
 	}
 	return n.openFile(context, req, resp)
 }
@@ -401,16 +401,15 @@ func (n *node) openDir(context gContext.Context, req *fuse.OpenRequest, resp *fu
 func (n *node) openFile(context gContext.Context, req *fuse.OpenRequest, resp *fuse.OpenResponse) (fs.Handle, error) {
 	const op errors.Op = "Open"
 	n.Lock()
+	defer n.Unlock()
 	n.f.watched.refresh(n)
 	if n.attr.Mode&os.ModeDir != 0 {
-		n.Unlock()
 		return nil, e2e(errors.E(op, errors.IsDir, n.uname))
 	}
 
 	// Make sure we can actually write this node if requested.
 	if req.Flags.IsWriteOnly() || req.Flags.IsReadWrite() {
 		if err := n.f.checkAccess(n.uname, n.user, access.Write); err != nil {
-			n.Unlock()
 			return nil, e2e(errors.E(op, err))
 		}
 	}
@@ -418,10 +417,8 @@ func (n *node) openFile(context gContext.Context, req *fuse.OpenRequest, resp *f
 	h := allocHandle(n)
 	err := n.f.cache.open(h, req.Flags)
 	if err != nil {
-		n.Unlock()
 		return nil, e2e(errors.E(op, err, n.uname))
 	}
-	n.Unlock()
 	return h, nil
 }
 
@@ -560,11 +557,8 @@ func (n *node) Lookup(context gContext.Context, name string) (fs.Node, error) {
 	// file "<name>" is implemented as an Upspin file named "._<name>".
 	// Because a user's root is represented as a file, this often
 	// results in lookups of "._<user name>" . We short circuit these
-	// requests here. Hopefully no user valid name starts with "._".
+	// requests here. Hopefully no valid user name starts with "._".
 	if strings.HasPrefix(string(uname), "._") {
-		return nil, e2e(errors.E(op, errors.NotExist, uname))
-	}
-	if strings.HasPrefix(string(name), "._") {
 		return nil, e2e(errors.E(op, errors.NotExist, uname))
 	}
 
@@ -606,9 +600,7 @@ func (n *node) Lookup(context gContext.Context, name string) (fs.Node, error) {
 
 func (f *upspinFS) addUserDir(name string) {
 	f.Lock()
-	if _, ok := f.userDirs[name]; !ok {
-		f.userDirs[name] = true
-	}
+	f.userDirs[name] = true
 	f.Unlock()
 }
 
