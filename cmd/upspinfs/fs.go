@@ -46,7 +46,7 @@ const (
 	unixPermissions = 0700
 
 	// enoentValidInterval is the interval after which we stop
-	// remembering the non existance of files for files not being
+	// remembering the non existence of files for files not being
 	// watched.
 	enoentValidInterval = time.Minute
 )
@@ -64,9 +64,9 @@ type upspinFS struct {
 	userDirs   map[string]bool               // Set of known user directories.
 	cache      *cache                        // A cache of files read from or to be written to dir/store.
 	nodeMap    map[upspin.PathName]*node     // All in use nodes.
-	enoentMap  map[upspin.PathName]time.Time // A map of non-existent names
-	server     *fs.Server                    // The Bazil server interface
-	watched    *watchedRoots                 // Directory servers being watched
+	enoentMap  map[upspin.PathName]time.Time // A map of non-existent names.
+	server     *fs.Server                    // The Bazil server interface.
+	watched    *watchedRoots                 // Directory servers being watched.
 }
 
 type nodeType uint8

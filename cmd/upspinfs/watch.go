@@ -123,7 +123,7 @@ func (w *watchedRoots) remove(name upspin.PathName) {
 	}
 }
 
-// watchSupported if name is on a server that supports watch. If name
+// watchSupported reports whether name is on a server that supports watch. If name
 // is invalid, we know nothing about it, or watch isn't supported return false.
 func (w *watchedRoots) watchSupported(name upspin.PathName) bool {
 	p, err := path.Parse(name)
