@@ -2,6 +2,23 @@
   "comments": [
     {
       "key": {
+        "uuid": "8b44a6b3_48db8618",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2018-01-03T21:45:24Z",
+      "side": 1,
+      "message": "cmd/upspinfs: fix bug that made enoentMap useless after Watch added",
+      "revId": "d8da0de31e753850d062573c8ae515a506eca464",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "46e7aeaf_d3945344",
         "filename": "/COMMIT_MSG",
         "patchSetId": 1
