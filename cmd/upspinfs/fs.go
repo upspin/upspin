@@ -44,24 +44,29 @@ const (
 	// TODO(p): consider reflecting the actual Access file
 	// permissions.
 	unixPermissions = 0700
+
+	// enoentValidInterval is the interval after which we stop
+	// remembering the non existance of files for files not being
+	// watched.
+	enoentValidInterval = time.Minute
 )
 
 // upspinFS represents an instance of the mounted file system.
 type upspinFS struct {
-	sync.Mutex                           // Protects concurrent access to the rest of this struct.
-	mountpoint string                    // Absolute Unix path to mountpoint.
-	config     upspin.Config             // Upspin config used for all requests.
-	client     upspin.Client             // A client to use for client methods.
-	root       *node                     // The root of the Upspin file system.
-	uid        int                       // OS user id of this process' owner.
-	gid        int                       // OS group id of this process' owner.
-	lastID     fuse.NodeID               // The last node ID created and assigned to a file.
-	userDirs   map[string]bool           // Set of known user directories.
-	cache      *cache                    // A cache of files read from or to be written to dir/store.
-	nodeMap    map[upspin.PathName]*node // All in use nodes.
-	enoentMap  map[upspin.PathName]bool  // A map of non-existent names
-	server     *fs.Server                // The Bazil server interface
-	watched    *watchedRoots             // Directory servers being watched
+	sync.Mutex                               // Protects concurrent access to the rest of this struct.
+	mountpoint string                        // Absolute Unix path to mountpoint.
+	config     upspin.Config                 // Upspin config used for all requests.
+	client     upspin.Client                 // A client to use for client methods.
+	root       *node                         // The root of the Upspin file system.
+	uid        int                           // OS user id of this process' owner.
+	gid        int                           // OS group id of this process' owner.
+	lastID     fuse.NodeID                   // The last node ID created and assigned to a file.
+	userDirs   map[string]bool               // Set of known user directories.
+	cache      *cache                        // A cache of files read from or to be written to dir/store.
+	nodeMap    map[upspin.PathName]*node     // All in use nodes.
+	enoentMap  map[upspin.PathName]time.Time // A map of non-existent names
+	server     *fs.Server                    // The Bazil server interface
+	watched    *watchedRoots                 // Directory servers being watched
 }
 
 type nodeType uint8
@@ -125,7 +130,7 @@ func newUpspinFS(config upspin.Config, mountpoint string, cacheDir string, cache
 		gid:        os.Getgid(),
 		userDirs:   make(map[string]bool),
 		nodeMap:    make(map[upspin.PathName]*node),
-		enoentMap:  make(map[upspin.PathName]bool),
+		enoentMap:  make(map[upspin.PathName]time.Time),
 	}
 	f.cache = newCache(config, cacheDir+"/fscache", cacheSize)
 	f.watched = newWatchedDirs(f)
@@ -624,8 +629,8 @@ func (n *node) exists() {
 // the old node if there was a mapping, nil otherwise.
 func (f *upspinFS) doesNotExist(uname upspin.PathName) *node {
 	f.Lock()
+	f.enoentMap[uname] = f.enoentInvalidTime(uname)
 	fn, ok := f.nodeMap[uname]
-	f.enoentMap[uname] = true
 	if ok {
 		delete(f.nodeMap, uname)
 		f.watched.remove(uname)
@@ -634,11 +639,18 @@ func (f *upspinFS) doesNotExist(uname upspin.PathName) *node {
 	return fn
 }
 
+// enoentInvalidTime is the time an enoentMap entry becomes invalid.
+func (f *upspinFS) enoentInvalidTime(uname upspin.PathName) time.Time {
+	if f.watched.watchSupported(uname) {
+		return time.Now().Add(1000 * time.Hour)
+	}
+	return time.Now().Add(enoentValidInterval)
+}
+
 // removeMapping removes the pathname to node mapping.
 func (f *upspinFS) removeMapping(uname upspin.PathName) {
 	f.Lock()
 	_, ok := f.nodeMap[uname]
-	delete(f.enoentMap, uname)
 	if ok {
 		delete(f.nodeMap, uname)
 		f.watched.remove(uname)
@@ -872,7 +884,7 @@ func (n *node) Rename(ctx gContext.Context, req *fuse.RenameRequest, newDir fs.N
 	// Fix the noent map.
 	oldn, oldOk = f.nodeMap[oldPath]
 	delete(f.enoentMap, newPath)
-	f.enoentMap[oldPath] = true
+	f.enoentMap[oldPath] = f.enoentInvalidTime(oldPath)
 
 	// If we had cached the old node, update it to the new one.
 	if oldOk {
@@ -991,7 +1003,7 @@ func (n *node) Readlink(ctx gContext.Context, req *fuse.ReadlinkRequest) (string
 func (f *upspinFS) isEnoent(uname upspin.PathName) bool {
 	f.Lock()
 	defer f.Unlock()
-	return f.enoentMap[uname]
+	return f.enoentMap[uname].After(time.Now())
 }
 
 // debug is used by the FUSE library to output error messages.
