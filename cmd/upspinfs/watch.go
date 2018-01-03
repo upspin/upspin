@@ -123,6 +123,19 @@ func (w *watchedRoots) remove(name upspin.PathName) {
 	}
 }
 
+// watchSupported if name is on a server that supports watch. If name
+// is invalid, we know nothing about it, or watch isn't supported return false.
+func (w *watchedRoots) watchSupported(name upspin.PathName) bool {
+	p, err := path.Parse(name)
+	if err != nil {
+		return false
+	}
+	w.Lock()
+	defer w.Unlock()
+	d, ok := w.m[p.User()]
+	return ok && d.watchSupported
+}
+
 // refresh refreshes the node if the relevant directory does not support Watch.
 // Assumes n is locked.
 func (w *watchedRoots) refresh(n *node) error {
@@ -325,7 +338,7 @@ func (d *watchedRoot) handleEvent(e *upspin.Event) error {
 	// Is this a file we are watching?
 	f.Lock()
 	n, ok := f.nodeMap[e.Entry.Name]
-	if f.enoentMap[e.Entry.Name] && !e.Delete {
+	if _, enoentOk := f.enoentMap[e.Entry.Name]; enoentOk && !e.Delete {
 		// We can't check for insequence since we don't have a
 		// sequence for when we put it in the enoentMap so
 		// just take it out. Worst case is we just forgot
