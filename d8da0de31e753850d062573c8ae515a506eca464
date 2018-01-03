@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "d79c86d9_4018025b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2018-01-03T22:59:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8b44a6b3_48db8618",
+      "revId": "d8da0de31e753850d062573c8ae515a506eca464",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "46e7aeaf_d3945344",
         "filename": "/COMMIT_MSG",
         "patchSetId": 1
@@ -33,6 +51,24 @@
       "revId": "d8da0de31e753850d062573c8ae515a506eca464",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6b0611c2_e91006f5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2018-01-03T22:59:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "46e7aeaf_d3945344",
+      "revId": "d8da0de31e753850d062573c8ae515a506eca464",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "8ddc8ac1_021c368e",
+        "filename": "cmd/upspinfs/fs.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2018-01-03T22:59:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "762d7690_ed7d7e1e",
+      "revId": "d8da0de31e753850d062573c8ae515a506eca464",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "db7604e4_296e4846",
         "filename": "cmd/upspinfs/fs.go",
         "patchSetId": 1
@@ -70,6 +124,24 @@
     },
     {
       "key": {
+        "uuid": "44759adc_bfed5882",
+        "filename": "cmd/upspinfs/fs.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2018-01-03T22:59:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "db7604e4_296e4846",
+      "revId": "d8da0de31e753850d062573c8ae515a506eca464",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1ad2e5ec_0c397aa5",
         "filename": "cmd/upspinfs/watch.go",
         "patchSetId": 1
@@ -84,6 +156,24 @@
       "revId": "d8da0de31e753850d062573c8ae515a506eca464",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5e33b622_18320a83",
+        "filename": "cmd/upspinfs/watch.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2018-01-03T22:59:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1ad2e5ec_0c397aa5",
+      "revId": "d8da0de31e753850d062573c8ae515a506eca464",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
