@@ -44,8 +44,8 @@ var testConfig struct {
 }
 
 const (
-	perm     = 0777
-	maxBytes = 1e8
+	perm           = 0777
+	maxBytes int64 = 1e8
 )
 
 // testSetup creates a temporary user config with inprocess services.
