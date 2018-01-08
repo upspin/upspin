@@ -24,6 +24,9 @@ Audit scan-store produces a list of references to the blocks held
 by the given store server.
 By default it scans the store endpoint specified by the given config.
 
+The list is written to a file named "store_EP_TS" in the directory nominated
+by -data, where "EP" is the store endpoint and "TS" is the current time.
+
 It must be run as the same Upspin user as the store server itself,
 as only that user has permission to list references.
 `

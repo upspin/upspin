@@ -40,6 +40,10 @@ func (s *State) scanDirectories(args []string) {
 Audit scan-dir scans the directory trees of the named user roots and produces a
 list of store block references mentioned in those trees.
 
+The list is written to files named "dir_EP_USER_TS" in the directory nominated
+by -data, where "EP" is the store endpoint, "USER" is the directory user name,
+and "TS" is the current time.
+
 It should be run as a user that has full read access to the named roots.
 `
 
