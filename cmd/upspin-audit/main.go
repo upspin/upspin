@@ -13,8 +13,10 @@ package main // import "upspin.io/cmd/upspin-audit"
 
 import (
 	"bufio"
+	"bytes"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"path/filepath"
@@ -39,6 +41,7 @@ const (
 	dirFilePrefix     = "dir_"
 	storeFilePrefix   = "store_"
 	garbageFilePrefix = "garbage_"
+	missingFilePrefix = "missing_"
 )
 
 type State struct {
@@ -210,25 +213,37 @@ func (s *State) writeItems(file string, items []refInfo) {
 	}
 }
 
-// readItems reads a list of reference/size pairs from the given file and
-// returns them as a map. The asymmetry with writeItems, which takes a slice,
-// is to fit the most common usage pattern.
-func (s *State) readItems(file string) (map[upspin.Reference]int64, error) {
+// readItems reads a list of refInfo structs from the given file and returns
+// them as a map. The asymmetry with writeItems, which takes a slice, is to fit
+// the most common usage pattern.
+func (s *State) readItems(file string) (refMap, error) {
 	f, err := os.Open(file)
 	if err != nil {
 		return nil, err
 	}
 	defer f.Close()
 	sc := bufio.NewScanner(f)
-	items := make(map[upspin.Reference]int64)
-	for sc.Scan() {
-		var ref string
-		var size int64
-		_, err := fmt.Sscanf(sc.Text(), "%q %d", &ref, &size)
+	items := make(refMap)
+
+	for line := 0; sc.Scan(); line++ {
+		var ri refInfo
+		r := bytes.NewReader(sc.Bytes())
+		_, err := fmt.Fscanf(r, "%q %d", &ri.Ref, &ri.Size)
 		if err != nil {
-			return nil, errors.Errorf("malformed line in %q: %v", file, err)
+			return nil, errors.Errorf("malformed line %d in %q: %v", line, file, err)
 		}
-		items[upspin.Reference(ref)] = size
+		for {
+			var p upspin.PathName
+			_, err := fmt.Fscanf(r, "%q", &p)
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				return nil, errors.Errorf("malformed line %d in %q: %v", line, file, err)
+			}
+			ri.Path = append(ri.Path, p)
+		}
+		items[ri.Ref] = ri
 	}
 	if err := sc.Err(); err != nil {
 		return nil, err
