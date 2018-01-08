@@ -10,15 +10,18 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
-	"upspin.io/upspin"
 )
 
 func (s *State) findGarbage(args []string) {
 	const help = `
 Audit find-garbage analyses the output of scan-dir and scan-store to finds
 blocks that are present in the store server but not referred to by the scanned
-directory trees.
+directory trees (garbage blocks). It also finds blocks that are referred to by
+directory entries but not present in the store server (missing blocks).
+
+If garbage or missing blocks are found they are written to a files named
+"garbage_EP_TS" and "missing_EP_TS" in the directory nominated by -data, where
+"EP" is the store endpoint and "TS" is the time at which the store was scanned.
 `
 	fs := flag.NewFlagSet("find-garbage", flag.ExitOnError)
 	dataDir := dataDirFlag(fs)
@@ -75,9 +78,11 @@ directory trees.
 			s.Exit(err)
 		}
 		dirsMissing := make(refMap)
-		for ref, size := range storeItems {
-			dirsMissing.addRef(ref, size, "")
+		for _, ri := range storeItems {
+			dirsMissing.addRef(ri.Ref, ri.Size, "")
 		}
+		storeMissing := make(refMap)
+
 		var users []string
 		for _, dir := range latest {
 			if dir.User == "" {
@@ -96,21 +101,26 @@ directory trees.
 			if err != nil {
 				s.Exit(err)
 			}
-			storeMissing := make(map[upspin.Reference]int64)
-			for ref, size := range dirItems {
-				if _, ok := storeItems[ref]; !ok {
-					storeMissing[ref] = size
+			for _, ri := range dirItems {
+				if _, ok := storeItems[ri.Ref]; !ok {
+					for _, p := range ri.Path {
+						storeMissing.addRef(ri.Ref, ri.Size, p)
+					}
 				}
-				delete(dirsMissing, ref)
-			}
-			if len(storeMissing) > 0 {
-				fmt.Printf("Store %q missing %d references present in %q.\n", store.Addr, len(storeMissing), dir.User)
+				delete(dirsMissing, ri.Ref)
 			}
 		}
+		if len(storeMissing) > 0 {
+			file := fmt.Sprintf("%s%s_%d", missingFilePrefix, store.Addr, store.Time.Unix())
+			fmt.Printf("Store %q is missing %d blocks referred to by the scanned trees, written to:\n\t%s\n",
+				store.Addr, len(storeMissing), file)
+			s.writeItems(filepath.Join(*dataDir, file), storeMissing.slice())
+		}
 		if len(dirsMissing) > 0 {
-			fmt.Printf("Store %q contains %d references not present in these trees:\n\t%s\n", store.Addr, len(dirsMissing), strings.Join(users, "\n\t"))
-			file := filepath.Join(*dataDir, fmt.Sprintf("%s%s_%d", garbageFilePrefix, store.Addr, store.Time.Unix()))
-			s.writeItems(file, dirsMissing.slice())
+			file := fmt.Sprintf("%s%s_%d", garbageFilePrefix, store.Addr, store.Time.Unix())
+			fmt.Printf("Store %q contains %d blocks not present in these trees:\n\t%s\nwritten to:\n\t%s\n",
+				store.Addr, len(dirsMissing), strings.Join(users, "\n\t"), file)
+			s.writeItems(filepath.Join(*dataDir, file), dirsMissing.slice())
 		}
 	}
 }
