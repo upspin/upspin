@@ -74,9 +74,9 @@ directory trees.
 		if err != nil {
 			s.Exit(err)
 		}
-		dirsMissing := make(map[upspin.Reference]int64)
+		dirsMissing := make(refMap)
 		for ref, size := range storeItems {
-			dirsMissing[ref] = size
+			dirsMissing.addRef(ref, size, "")
 		}
 		var users []string
 		for _, dir := range latest {
@@ -110,7 +110,7 @@ directory trees.
 		if len(dirsMissing) > 0 {
 			fmt.Printf("Store %q contains %d references not present in these trees:\n\t%s\n", store.Addr, len(dirsMissing), strings.Join(users, "\n\t"))
 			file := filepath.Join(*dataDir, fmt.Sprintf("%s%s_%d", garbageFilePrefix, store.Addr, store.Time.Unix()))
-			s.writeItems(file, itemMapToSlice(dirsMissing))
+			s.writeItems(file, dirsMissing.slice())
 		}
 	}
 }

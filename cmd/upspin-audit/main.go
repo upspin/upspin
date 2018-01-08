@@ -136,8 +136,50 @@ func dataDirFlag(fs *flag.FlagSet) *string {
 	return &dataDir
 }
 
+// refInfo holds a block's reference and size and the paths of the directory
+// entries that refer to those blocks.
+type refInfo struct {
+	Ref  upspin.Reference
+	Size int64
+	Path []upspin.PathName
+}
+
+type refMap map[upspin.Reference]refInfo
+
+func (m refMap) addRef(ref upspin.Reference, size int64, p upspin.PathName) {
+	ri, ok := m[ref]
+	if !ok {
+		ri = refInfo{
+			Ref:  ref,
+			Size: size,
+		}
+	}
+	if p != "" {
+		ri.Path = append(ri.Path, p)
+	}
+	m[ref] = ri
+}
+
+func (m refMap) slice() (s []refInfo) {
+	for _, ri := range m {
+		s = append(s, ri)
+	}
+	return
+}
+
+type refsByEndpoint map[upspin.Endpoint]refMap
+
+func (m refsByEndpoint) addRef(ep upspin.Endpoint, ref upspin.Reference, size int64, p upspin.PathName) {
+	refs := m[ep]
+	if refs == nil {
+		refs = make(map[upspin.Reference]refInfo)
+		m[ep] = refs
+	}
+	refs.addRef(ref, size, p)
+}
+
 // writeItems sorts and writes a list of reference/size pairs to file.
-func (s *State) writeItems(file string, items []upspin.ListRefsItem) {
+func (s *State) writeItems(file string, items []refInfo) {
 	sort.Slice(items, func(i, j int) bool { return items[i].Ref < items[j].Ref })
 
 	f, err := os.Create(file)
@@ -151,7 +193,15 @@ func (s *State) writeItems(file string, items []upspin.ListRefsItem) {
 	}()
 	w := bufio.NewWriter(f)
 	for _, ri := range items {
-		if _, err := fmt.Fprintf(w, "%q %d\n", ri.Ref, ri.Size); err != nil {
+		if _, err := fmt.Fprintf(w, "%q %d", ri.Ref, ri.Size); err != nil {
+			s.Exit(err)
+		}
+		for _, p := range ri.Path {
+			if _, err := fmt.Fprintf(w, " %q", p); err != nil {
+				s.Exit(err)
+			}
+		}
+		if _, err := fmt.Fprintln(w); err != nil {
 			s.Exit(err)
 		}
 	}
@@ -172,20 +222,11 @@ func (s *State) readItems(file string) (map[upspin.Reference]int64, error) {
 	sc := bufio.NewScanner(f)
 	items := make(map[upspin.Reference]int64)
 	for sc.Scan() {
-		line := sc.Text()
-		i := strings.LastIndex(line, " ")
-		if i < 0 {
-			return nil, errors.Errorf("malformed line in %q: %q", file, line)
-		}
-		quotedRef, sizeString := line[:i], line[i+1:]
-
-		ref, err := strconv.Unquote(quotedRef)
+		var ref string
+		var size int64
+		_, err := fmt.Sscanf(sc.Text(), "%q %d", &ref, &size)
 		if err != nil {
-			return nil, errors.Errorf("malformed ref in %q: %v", file, err)
-		}
-		size, err := strconv.ParseInt(sizeString, 10, 64)
-		if err != nil {
-			return nil, errors.Errorf("malformed size in %q: %v", file, err)
+			return nil, errors.Errorf("malformed line in %q: %v", file, err)
 		}
 		items[upspin.Reference(ref)] = size
 	}
@@ -193,13 +234,6 @@ func (s *State) readItems(file string) (map[upspin.Reference]int64, error) {
 		return nil, err
 	}
 	return items, nil
-}
-
-func itemMapToSlice(m map[upspin.Reference]int64) (items []upspin.ListRefsItem) {
-	for ref, size := range m {
-		items = append(items, upspin.ListRefsItem{Ref: ref, Size: size})
-	}
-	return
 }
 
 // fileInfo holds a description of a reference list file written by scan-store
