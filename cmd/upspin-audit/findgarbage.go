@@ -10,8 +10,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
-	"upspin.io/upspin"
 )
 
 func (s *State) findGarbage(args []string) {
@@ -75,9 +73,11 @@ directory trees.
 			s.Exit(err)
 		}
 		dirsMissing := make(refMap)
-		for ref, size := range storeItems {
-			dirsMissing.addRef(ref, size, "")
+		for _, ri := range storeItems {
+			dirsMissing.addRef(ri.Ref, ri.Size, "")
 		}
+		storeMissing := make(refMap)
+
 		var users []string
 		for _, dir := range latest {
 			if dir.User == "" {
@@ -96,19 +96,22 @@ directory trees.
 			if err != nil {
 				s.Exit(err)
 			}
-			storeMissing := make(map[upspin.Reference]int64)
-			for ref, size := range dirItems {
-				if _, ok := storeItems[ref]; !ok {
-					storeMissing[ref] = size
+			for _, ri := range dirItems {
+				if _, ok := storeItems[ri.Ref]; !ok {
+					for _, p := range ri.Path {
+						storeMissing.addRef(ri.Ref, ri.Size, p)
+					}
 				}
-				delete(dirsMissing, ref)
-			}
-			if len(storeMissing) > 0 {
-				fmt.Printf("Store %q missing %d references present in %q.\n", store.Addr, len(storeMissing), dir.User)
+				delete(dirsMissing, ri.Ref)
 			}
 		}
+		if len(storeMissing) > 0 {
+			fmt.Printf("Store %q missing %d blocks.\n", store.Addr, len(storeMissing))
+			file := filepath.Join(*dataDir, fmt.Sprintf("%s%s_%d", missingFilePrefix, store.Addr, store.Time.Unix()))
+			s.writeItems(file, storeMissing.slice())
+		}
 		if len(dirsMissing) > 0 {
-			fmt.Printf("Store %q contains %d references not present in these trees:\n\t%s\n", store.Addr, len(dirsMissing), strings.Join(users, "\n\t"))
+			fmt.Printf("Store %q contains %d blocks not present in these trees:\n\t%s\n", store.Addr, len(dirsMissing), strings.Join(users, "\n\t"))
 			file := filepath.Join(*dataDir, fmt.Sprintf("%s%s_%d", garbageFilePrefix, store.Addr, store.Time.Unix()))
 			s.writeItems(file, dirsMissing.slice())
 		}
