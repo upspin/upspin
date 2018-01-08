@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "04572b81_9f62995a",
+        "filename": "cmd/upspin-audit/findgarbage.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2018-01-08T03:34:04Z",
+      "side": 1,
+      "message": "needs documentation for the files it writes and what they contain.",
+      "revId": "0eece6e00fd1921262b8e65672e751db56f034fa",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
