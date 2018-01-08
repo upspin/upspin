@@ -35,17 +35,6 @@ type dirScanner struct {
 	done     chan *upspin.DirEntry // Send entries here once it is completely done, including children.
 }
 
-type sizeMap map[upspin.Endpoint]map[upspin.Reference]int64
-
-func (m sizeMap) addRef(ep upspin.Endpoint, ref upspin.Reference, size int64) {
-	refs := m[ep]
-	if refs == nil {
-		refs = make(map[upspin.Reference]int64)
-		m[ep] = refs
-	}
-	refs[ref] = size
-}
-
 func (s *State) scanDirectories(args []string) {
 	const help = `
 Audit scan-dir scans the directory trees of the named user roots and produces a
@@ -119,8 +108,8 @@ It should be run as a user that has full read access to the named roots.
 	}()
 
 	// Receive and collect the data.
-	size := make(sizeMap)
-	users := make(map[upspin.UserName]sizeMap)
+	endpoints := make(refsByEndpoint)
+	users := make(map[upspin.UserName]refsByEndpoint)
 	for de := range sc.done {
 		p, err := path.Parse(de.Name)
 		if err != nil {
@@ -129,27 +118,27 @@ It should be run as a user that has full read access to the named roots.
 		}
 		userSize := users[p.User()]
 		if userSize == nil {
-			userSize = make(sizeMap)
+			userSize = make(refsByEndpoint)
 			users[p.User()] = userSize
 		}
 		for _, block := range de.Blocks {
 			ep := block.Location.Endpoint
-			size.addRef(ep, block.Location.Reference, block.Size)
-			userSize.addRef(ep, block.Location.Reference, block.Size)
+			endpoints.addRef(ep, block.Location.Reference, block.Size, p.Path())
+			userSize.addRef(ep, block.Location.Reference, block.Size, p.Path())
 		}
 	}
 
 	// Print a summary.
 	total := int64(0)
-	for ep, refs := range size {
+	for ep, refs := range endpoints {
 		sum := int64(0)
-		for _, s := range refs {
-			sum += s
+		for _, ri := range refs {
+			sum += ri.Size
 		}
 		total += sum
 		fmt.Printf("%s: %d bytes (%s) (%d references)\n", ep.NetAddr, sum, ByteSize(sum), len(refs))
 	}
-	if len(size) > 1 {
+	if len(endpoints) > 1 {
 		fmt.Printf("%d bytes total (%s)\n", total, ByteSize(total))
 	}
 
@@ -157,7 +146,7 @@ It should be run as a user that has full read access to the named roots.
 	for u, size := range users {
 		for ep, refs := range size {
 			file := filepath.Join(*dataDir, fmt.Sprintf("%s%s_%s_%d", dirFilePrefix, ep.NetAddr, u, now.Unix()))
-			s.writeItems(file, itemMapToSlice(refs))
+			s.writeItems(file, refs.slice())
 		}
 	}
 }
