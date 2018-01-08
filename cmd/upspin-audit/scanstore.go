@@ -57,7 +57,7 @@ as only that user has permission to list references.
 	var (
 		token string
 		sum   int64
-		items []upspin.ListRefsItem
+		items []refInfo
 	)
 	for {
 		b, _, _, err := store.Get(upspin.ListRefsMetadata + upspin.Reference(token))
@@ -73,7 +73,10 @@ as only that user has permission to list references.
 		}
 		for _, ri := range refs.Refs {
 			sum += ri.Size
-			items = append(items, ri)
+			items = append(items, refInfo{
+				Ref:  ri.Ref,
+				Size: ri.Size,
+			})
 		}
 		token = refs.Next
 		if token == "" {
