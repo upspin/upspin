@@ -28,8 +28,15 @@ import (
 // outside GCE. The default is the self-signed certificate in
 // upspin.io/rpc/testdata.
 type Options struct {
-	// Addr specifies the host and port on which the server should listen.
+	// Addr specifies the host and port on which the server should serve
+	// HTTPS requests (or HTTP requests if InsecureHTTP is set).
+	// If empty, ":443" is used.
 	Addr string
+
+	// HTTPAddr specifies the host and port on which the server should
+	// serve HTTP requests. If empty and InsecureHTTP is true, Addr is
+	// used.  If empty otherwise, ":80" is used.
+	HTTPAddr string
 
 	// AutocertCache provides a cache for use with Let's Encrypt.
 	// If non-nil, enables Let's Encrypt certificates for this server.
@@ -89,6 +96,16 @@ func findTestKeyDir() string {
 }
 
 func (opt *Options) applyDefaults() {
+	if opt.Addr == "" {
+		opt.Addr = ":443"
+	}
+	if opt.HTTPAddr == "" {
+		if opt.InsecureHTTP {
+			opt.HTTPAddr = opt.Addr
+		} else {
+			opt.HTTPAddr = ":80"
+		}
+	}
 	if opt.CertFile == "" {
 		opt.CertFile = defaultOptions.CertFile
 	}
@@ -108,12 +125,9 @@ func OptionsFromFlags() *Options {
 		}
 		hosts = []string{host}
 	}
-	addr := flags.HTTPSAddr
-	if flags.InsecureHTTP {
-		addr = flags.HTTPAddr
-	}
 	return &Options{
-		Addr:             addr,
+		Addr:             flags.HTTPSAddr,
+		HTTPAddr:         flags.HTTPAddr,
 		LetsEncryptCache: flags.LetsEncryptCache,
 		LetsEncryptHosts: hosts,
 		CertFile:         flags.TLSCertFile,
@@ -147,10 +161,10 @@ func ListenAndServe(ready chan<- struct{}, opt *Options) {
 	hasAutocertCache := opt.AutocertCache != nil
 	hasCert := opt.CertFile != defaultOptions.CertFile || opt.KeyFile != defaultOptions.KeyFile
 
-	var m autocert.Manager
-	m.Prompt = autocert.AcceptTOS
+	var manager autocert.Manager
+	manager.Prompt = autocert.AcceptTOS
 	if h := opt.LetsEncryptHosts; len(h) > 0 {
-		m.HostPolicy = autocert.HostWhitelist(h...)
+		manager.HostPolicy = autocert.HostWhitelist(h...)
 	}
 
 	addr := opt.Addr
@@ -172,15 +186,14 @@ func ListenAndServe(ready chan<- struct{}, opt *Options) {
 		log.Info.Printf("https: serving HTTPS on %q using Let's Encrypt certificates", addr)
 		log.Info.Printf("https: caching Let's Encrypt certificates in %v", dir)
 		if err := os.MkdirAll(dir, 0700); err != nil {
-			log.Fatalf("https: could not create or read -letscache directory: %v", err)
+			log.Fatalf("https: could not create -letscache directory: %v", err)
 		}
-		m.Cache = autocert.DirCache(dir)
-		config = &tls.Config{GetCertificate: m.GetCertificate}
+		manager.Cache = autocert.DirCache(dir)
+		config = &tls.Config{GetCertificate: manager.GetCertificate}
 	case hasAutocertCache:
-		addr = ":443"
 		log.Info.Printf("https: serving HTTPS on %q using Let's Encrypt certificates", addr)
-		m.Cache = opt.AutocertCache
-		config = &tls.Config{GetCertificate: m.GetCertificate}
+		manager.Cache = opt.AutocertCache
+		config = &tls.Config{GetCertificate: manager.GetCertificate}
 	default:
 		log.Info.Printf("https: serving HTTPS on %q using provided certificates", addr)
 		if opt.CertFile == defaultOptions.CertFile || opt.KeyFile == defaultOptions.KeyFile {
@@ -192,36 +205,57 @@ func ListenAndServe(ready chan<- struct{}, opt *Options) {
 			log.Fatalf("https: setting up TLS config: %v", err)
 		}
 	}
-	// WriteTimeout is set to 0 because it also pertains to streaming
-	// replies, e.g., the DirServer.Watch interface.
+
+	// Set up the main listener for HTTPS (or HTTP if InsecureHTTP is set).
+	ln, err := net.Listen("tcp", addr)
+	if err != nil {
+		log.Fatalf("https: %v", err)
+	}
+	shutdown.Handle(func() { ln.Close() })
+
+	if manager.Cache != nil {
+		// If we're using LetsEncrypt then we need to serve the http-01
+		// challenge by plain HTTP. We also serve a redirect to HTTPS
+		// for all other requests.
+		httpLn, err := net.Listen("tcp", opt.HTTPAddr)
+		if err != nil {
+			log.Fatalf("https: %v", err)
+		}
+		shutdown.Handle(func() { httpLn.Close() })
+		httpServer := &http.Server{Handler: manager.HTTPHandler(nil)}
+		go func() {
+			err := httpServer.Serve(httpLn)
+			log.Printf("https: %v", err)
+			shutdown.Now(1)
+		}()
+	}
+
+	if ready != nil {
+		// Notify the calling packages that
+		// we're ready to accept requests.
+		close(ready)
+	}
+
+	// If we're serving HTTPS then wrap the listener with a TLS listener.
+	if !opt.InsecureHTTP {
+		ln = tls.NewListener(ln, config)
+	}
+
+	// Set up the main server.
 	server := &http.Server{
 		ReadHeaderTimeout: 5 * time.Second,
 		ReadTimeout:       15 * time.Second,
-		WriteTimeout:      0,
-		IdleTimeout:       60 * time.Second,
-		TLSConfig:         config,
+		// WriteTimeout is set to 0 because it also pertains to
+		// streaming replies, e.g., the DirServer.Watch interface.
+		WriteTimeout: 0,
+		IdleTimeout:  60 * time.Second,
+		TLSConfig:    config,
 	}
 	// TODO(adg): enable HTTP/2 once it's fast enough
 	//err := http2.ConfigureServer(server, nil)
 	//if err != nil {
 	//	log.Fatalf("https: %v", err)
 	//}
-
-	ln, err := net.Listen("tcp", addr)
-	if err != nil {
-		log.Fatalf("https: %v", err)
-	}
-	if ready != nil {
-		close(ready)
-	}
-	shutdown.Handle(func() {
-		// Stop accepting connections and forces the server to stop
-		// its serving loop.
-		ln.Close()
-	})
-	if !opt.InsecureHTTP {
-		ln = tls.NewListener(ln, config)
-	}
 	err = server.Serve(ln)
 	log.Printf("https: %v", err)
 	shutdown.Now(1)
