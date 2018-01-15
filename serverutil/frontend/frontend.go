@@ -62,13 +62,6 @@ func Main() {
 		}
 		http.Handle("/", s)
 	}
-
-	if !flags.InsecureHTTP {
-		go func() {
-			log.Printf("Serving HTTP->HTTPS redirect on %q", flags.HTTPAddr)
-			log.Fatal(http.ListenAndServe(flags.HTTPAddr, http.HandlerFunc(redirectHTTP)))
-		}()
-	}
 }
 
 const (
@@ -99,18 +92,6 @@ func defaultDocPath() string {
 		return ""
 	}
 	return p.Dir
-}
-
-func redirectHTTP(w http.ResponseWriter, r *http.Request) {
-	if r.TLS != nil || r.Host == "" {
-		http.NotFound(w, r)
-		return
-	}
-
-	u := r.URL
-	u.Host = r.Host
-	u.Scheme = "https"
-	http.Redirect(w, r, u.String(), http.StatusFound)
 }
 
 type server struct {
