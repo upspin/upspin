@@ -90,10 +90,10 @@ Restart=on-failure
 WantedBy=multi-user.target
 ```
 
-### Allow `upspinserver` to listen on port `443`
+### Allow `upspinserver` to listen on ports `80` and `443`
 
-The `upspinserver` binary needs to listen on port `443` in order to obtain
-its TLS certificates through [LetsEncrypt](https://letsencrypt.org/).
+The `upspinserver` binary needs to listen on ports `80` and `443` in order to
+obtain its TLS certificates through [LetsEncrypt](https://letsencrypt.org/).
 
 Normally only user `root` can bind ports below `1024`.
 Instead of running `upspinserver` as `root` (which is generally discouraged),
