@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "39685fe7_1ca1ed81",
+        "filename": "vendor/golang.org/x/crypto/acme/autocert/autocert.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2018-01-15T00:08:12Z",
+      "side": 1,
+      "message": "This is vendored code.",
+      "parentUuid": "e8dd1048_39ea76c8",
+      "revId": "673e6e5d1a5693f06ba7eb82268bfcf77809135a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "e36e319e_b7ff881a",
         "filename": "vendor/golang.org/x/crypto/acme/autocert/autocert.go",
         "patchSetId": 2
@@ -33,6 +51,24 @@
       "revId": "673e6e5d1a5693f06ba7eb82268bfcf77809135a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e2bb9cb9_ab36f1ac",
+        "filename": "vendor/golang.org/x/crypto/acme/autocert/autocert.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2018-01-15T00:08:12Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "e36e319e_b7ff881a",
+      "revId": "673e6e5d1a5693f06ba7eb82268bfcf77809135a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -53,6 +89,24 @@
     },
     {
       "key": {
+        "uuid": "9c9ab88f_0fa9147c",
+        "filename": "vendor/golang.org/x/crypto/acme/autocert/autocert.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2018-01-15T00:08:12Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "3dcf6cd3_3dfd2bcb",
+      "revId": "673e6e5d1a5693f06ba7eb82268bfcf77809135a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "c0593a97_b22f94cc",
         "filename": "vendor/golang.org/x/crypto/acme/autocert/autocert.go",
         "patchSetId": 2
@@ -67,6 +121,24 @@
       "revId": "673e6e5d1a5693f06ba7eb82268bfcf77809135a",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d5d04f60_ed0c3bbc",
+        "filename": "vendor/golang.org/x/crypto/acme/autocert/autocert.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2018-01-15T00:08:12Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "c0593a97_b22f94cc",
+      "revId": "673e6e5d1a5693f06ba7eb82268bfcf77809135a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
