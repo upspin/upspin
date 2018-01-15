@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e8dd1048_39ea76c8",
+        "filename": "vendor/golang.org/x/crypto/acme/autocert/autocert.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2018-01-15T00:04:50Z",
+      "side": 1,
+      "message": "try the \"http-01\" challenge\n\nadd \u0027the\u0027 for sure, maybe drop \u0027type\u0027",
+      "revId": "673e6e5d1a5693f06ba7eb82268bfcf77809135a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "e36e319e_b7ff881a",
+        "filename": "vendor/golang.org/x/crypto/acme/autocert/autocert.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2018-01-15T00:04:50Z",
+      "side": 1,
+      "message": "the server name",
+      "revId": "673e6e5d1a5693f06ba7eb82268bfcf77809135a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "3dcf6cd3_3dfd2bcb",
+        "filename": "vendor/golang.org/x/crypto/acme/autocert/autocert.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2018-01-15T00:04:50Z",
+      "side": 1,
+      "message": "a \"302 Found\"",
+      "revId": "673e6e5d1a5693f06ba7eb82268bfcf77809135a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c0593a97_b22f94cc",
+        "filename": "vendor/golang.org/x/crypto/acme/autocert/autocert.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 250,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2018-01-15T00:04:50Z",
+      "side": 1,
+      "message": "\"400 Bad Request\"",
+      "revId": "673e6e5d1a5693f06ba7eb82268bfcf77809135a",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
