@@ -34,7 +34,6 @@ func startServer() {
 	mux.Handle("/_test", canonicalHostHandler{http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, testResponse)
 	})})
-	mux.HandleFunc("/_redirect", redirectHTTP)
 	testServer := httptest.NewServer(mux)
 	addr = testServer.Listener.Addr().String()
 }
@@ -43,18 +42,6 @@ var noRedirectClient = &http.Client{
 	CheckRedirect: func(req *http.Request, via []*http.Request) error {
 		return http.ErrUseLastResponse
 	},
-}
-
-func TestHTTPSRedirect(t *testing.T) {
-	once.Do(startServer)
-	resp, err := noRedirectClient.Get("http://" + addr + "/_redirect")
-	if err != nil {
-		t.Fatalf("unexpected error making request: %v", err)
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode != http.StatusFound {
-		t.Errorf("expected status code to be %v, got %v", http.StatusFound, resp.StatusCode)
-	}
 }
 
 func TestHostnameRedirect(t *testing.T) {
