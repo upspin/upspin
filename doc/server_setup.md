@@ -233,7 +233,7 @@ IP address.
 ### Deploy `upspinserver`
 
 Now deploy your `upspinserver` binary to your server and configure it to run on
-startup and serve on port `443`.
+startup and serve on ports `80` and `443`.
 
 You may do this however you like, but you may wish to follow one of these
 guides:
