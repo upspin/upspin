@@ -302,7 +302,12 @@ func (d *watchedRoot) watch() error {
 	for {
 		select {
 		case <-d.die:
-			break
+			// Drain events after the close or future RPCs on the same
+			// connection could hang.
+			close(done)
+			for range event {
+			}
+			return nil
 		case e, ok := <-event:
 			if !ok {
 				close(done)
@@ -319,13 +324,6 @@ func (d *watchedRoot) watch() error {
 			}
 		}
 	}
-
-	// Drain events after the close or future RPCs on the same
-	// connection could hang.
-	close(done)
-	for range event {
-	}
-	return nil
 }
 
 func (d *watchedRoot) handleEvent(e *upspin.Event) error {
