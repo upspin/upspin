@@ -289,10 +289,11 @@ func (n *node) Create(context gContext.Context, req *fuse.CreateRequest, resp *f
 	if err := f.cache.create(h); err != nil {
 		return nil, nil, e2e(errors.E(op, err))
 	}
-
-	resp.Node = nn.id
-	resp.Attr = nn.attr
-	resp.EntryValid = defaultValid // TODO(p): figure out what would be right.
+	if resp != nil {
+		resp.Node = nn.id
+		resp.Attr = nn.attr
+		resp.EntryValid = defaultValid
+	}
 	nn.exists()
 	return nn, h, nil
 }
@@ -326,6 +327,37 @@ func (n *node) Mkdir(context gContext.Context, req *fuse.MkdirRequest) (fs.Node,
 	}
 	nn.exists()
 	return nn, nil
+}
+
+// Mknod implements fs.NodeMknoder.Mknod. Creates a file or a directory.
+func (n *node) Mknod(context gContext.Context, req *fuse.MknodRequest) (fs.Node, error) {
+	const op errors.Op = "Mknod"
+
+	// Only allow regular files and directories.
+	if req.Mode&(os.ModeDevice|os.ModeNamedPipe|os.ModeSocket|os.ModeCharDevice|os.ModeSymlink) != 0 {
+		return nil, e2e(errors.E(op, errors.Invalid, "special nodes not supported"))
+	}
+
+	// Use Mkdir to create a directory.
+	if req.Mode&os.ModeDir != 0 {
+		mkdirReq := &fuse.MkdirRequest{
+			Header: req.Header,
+			Name:   req.Name,
+		}
+		return n.Mkdir(context, mkdirReq)
+	}
+
+	// Use Create to create a regular file.
+	createReq := &fuse.CreateRequest{
+		Header: req.Header,
+		Name:   req.Name,
+	}
+	nn, h, err := n.Create(context, createReq, nil)
+	if err != nil {
+		return nn, err
+	}
+	h.(*handle).Release(context, nil)
+	return nn, err
 }
 
 // Open implements fs.NodeOpener.Open.  Pertains to files and directories.
