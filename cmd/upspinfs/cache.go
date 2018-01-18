@@ -305,7 +305,11 @@ func (cf *cachedFile) clone(size int64) error {
 	}
 	buf := make([]byte, 128*1024)
 	for at := int64(0); size < 0 || at < size; {
-		rn, rerr := cf.file.ReadAt(buf, at)
+		bsize := size - at
+		if bsize > int64(len(buf)) {
+			bsize = int64(len(buf))
+		}
+		rn, rerr := cf.file.ReadAt(buf[:bsize], at)
 		if rn > 0 {
 			wn, werr := file.WriteAt(buf[:rn], at)
 			if werr != nil {
@@ -330,21 +334,52 @@ func (cf *cachedFile) clone(size int64) error {
 	return nil
 }
 
-// truncate truncates a currently open cached file.  If it represents a reference in the store,
+// truncate truncates or extends with zeros a currently open cached file. If it represents a reference in the store,
 // copy it rather than truncating in place.
 func (cf *cachedFile) truncate(n *node, size int64) error {
 	const op errors.Op = "cache.truncate"
-
-	// This is the easy case.
-	if cf.dirty {
-		if err := os.Truncate(cf.fname, size); err != nil {
-			return errors.E(op, err)
-		}
+	usize := uint64(size)
+	if usize == n.attr.Size || size < 0 {
 		return nil
 	}
 
-	// This represents an unmodified reference from the store.  Copy it truncating as you go.
-	return cf.clone(size)
+	if cf.dirty {
+		// This is already a tenporary file, just change it.
+		if usize < n.attr.Size {
+			if err := os.Truncate(cf.fname, size); err != nil {
+				return errors.E(op, err)
+			}
+		}
+	} else {
+		// This represents an unmodified reference from the store.
+		// Copy it truncating as you go.
+		if err := cf.clone(size); err != nil {
+			return errors.E(op, err)
+		}
+	}
+
+	// If this was a true truncation, we're done.
+	if size < int64(n.attr.Size) {
+		n.attr.Size = usize
+		return nil
+	}
+
+	// Extend with zeros. At this point, we're guaranteed that this is a dirty file.
+	for usize > n.attr.Size {
+		// Reinitialize the buf every round since writeAt changes it.
+		buf := make([]byte, 4096)
+
+		toWrite := usize - n.attr.Size
+		if toWrite > uint64(len(buf)) {
+			toWrite = uint64(len(buf))
+		}
+		m, err := cf.writeAt(buf[:toWrite], int64(n.attr.Size))
+		n.attr.Size += uint64(m)
+		if err != nil {
+			return errors.E(op, err)
+		}
+	}
+	return nil
 }
 
 // makeDirty writes the cached file to the store if it is dirty. Called with node locked.

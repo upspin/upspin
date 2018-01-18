@@ -194,7 +194,7 @@ func (file *File) ReadAt(b []byte, off int64) (int, error) {
 }
 
 // WriteAt encrypts the content and writes it to the file.
-// Unlile os.WriteAt, this changes the contents of b.
+// Unlike os.WriteAt, this changes the contents of b.
 func (file *File) WriteAt(b []byte, off int64) (int, error) {
 	file.xor(b, off)
 	return file.f.WriteAt(b, off)
