@@ -4,7 +4,6 @@
 //
 
 // +build !windows
-// +build !openbsd
 
 package main
 
@@ -194,6 +193,12 @@ func writeFile(t *testing.T, fn string, buf []byte) *os.File {
 	return f
 }
 
+func truncateFile(t *testing.T, fn string, size int64) {
+	if err := os.Truncate(fn, size); err != nil {
+		fatal(t, err)
+	}
+}
+
 func readAndCheckContentsOrDie(t *testing.T, fn string, buf []byte) {
 	err := readAndCheckContents(t, fn, buf)
 	if err != nil {
@@ -207,7 +212,7 @@ func readAndCheckContents(t *testing.T, fn string, buf []byte) error {
 		return err
 	}
 	defer f.Close()
-	rbuf := make([]byte, len(buf))
+	rbuf := make([]byte, len(buf)+10)
 	n, err := f.Read(rbuf)
 	if err != nil {
 		return err
@@ -217,7 +222,7 @@ func readAndCheckContents(t *testing.T, fn string, buf []byte) error {
 	}
 	for i := range buf {
 		if buf[i] != rbuf[i] {
-			return fmt.Errorf("%s: error at byte %d", fn, i)
+			return fmt.Errorf("%s: error at byte %d, %x != %x", fn, i, buf[i], rbuf[i])
 		}
 	}
 	return nil
@@ -274,6 +279,35 @@ func TestFile(t *testing.T) {
 	wf = writeFile(t, fn, buf[:len(buf)/2])
 	if err := wf.Close(); err != nil {
 		t.Fatal(err)
+	}
+	readAndCheckContentsOrDie(t, fn, buf)
+	remove(t, fn)
+
+	if err := os.RemoveAll(testDir); err != nil {
+		t.Fatal(err)
+	}
+}
+
+// TestTruncateFile tests changing a file's size.
+func TestTruncateFile(t *testing.T) {
+	testDir := mkTestDir(t, "testtruncatefile")
+	buf := randomBytes(t, 16*1024)
+
+	// Create and write a file.
+	fn := filepath.Join(testDir, "file")
+	wf := writeFile(t, fn, buf)
+	if err := wf.Close(); err != nil {
+		t.Fatal(err)
+	}
+
+	// Truncate file and check.
+	truncateFile(t, fn, 8*1024)
+	readAndCheckContentsOrDie(t, fn, buf[:8*1024])
+
+	// Extend file and check.
+	truncateFile(t, fn, 16*1024)
+	for i := 8 * 1024; i < 16*1024; i++ {
+		buf[i] = 0
 	}
 	readAndCheckContentsOrDie(t, fn, buf)
 	remove(t, fn)

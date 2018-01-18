@@ -8,7 +8,6 @@
 // exactly what needs to be abstracted.
 
 // +build !windows
-// +build !openbsd
 
 package main // import "upspin.io/cmd/upspinfs"
 
