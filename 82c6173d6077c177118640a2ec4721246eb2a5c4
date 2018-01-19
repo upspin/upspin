@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1425e1a5_9d31de42",
+        "filename": "cmd/upspinfs/cache.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 339,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2018-01-19T18:15:17Z",
+      "side": 1,
+      "message": "very minor suggestion...\nMay as well break line at the period.",
+      "revId": "82c6173d6077c177118640a2ec4721246eb2a5c4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
