@@ -16,6 +16,24 @@
       "revId": "82c6173d6077c177118640a2ec4721246eb2a5c4",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8a9b6ae6_4da38ad8",
+        "filename": "cmd/upspinfs/cache.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 339,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2018-01-19T20:15:04Z",
+      "side": 1,
+      "message": "done",
+      "parentUuid": "1425e1a5_9d31de42",
+      "revId": "82c6173d6077c177118640a2ec4721246eb2a5c4",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
