@@ -32,12 +32,53 @@
 
 # Please keep the list sorted.
 
+Adrian Lopez <adrianlzt@gmail.com>
 Andrew Bonventre <andybons@gmail.com>
 Andrew Gerrand <adg@golang.org>
+Andrew Lytvynov <awly@google.com>
+Andrew O'Neill <foolusion@gmail.com>
+Andy Bursavich <bursavich@google.com>
+Axel Wagner <axel.wagner.hh@googlemail.com>
+Benjamin Campbell <i@benjic.me>
+Borja Clemente <borja.clemente@gmail.com>
+Bruce Downs <bruce.downs@jivesoftware.com>
+Carl Henrik Lunde <chlunde@ifi.uio.no>
+Chris Morrow <morrowc@ops-netman.net>
+Christopher Waldon <christopher.waldon.dev@gmail.com>
+Dave Cohen <davecohen10@gmail.com>
 David Presotto <presotto@gmail.com>
+Derek Chiang <derekchiang93@gmail.com>
+Dmitri Shuralyov <shurcooL@gmail.com>
 Ed Knapp <edknapp@google.com>
 Eduardo Pinheiro <edpin@edpin.com>
+Emil Hessman <emil@hessman.se>
 Eric Grosse <grosse@gmail.com>
+Fabian Wickborn <fabian@wickborn.net>
+Fazlul Shahriar <fshahriar@gmail.com>
 Frank Rehwinkel <frankrehwinkel@gmail.com>
-Rob Pike <r@golang.org>
+Gabriel Aszalos <gabriel.aszalos@gmail.com>
+Gildas Chabot <gildaschbt@gmail.com>
+Gurjant Kalsi <gurjantkalsi@gmail.com>
+Jacek Masiulaniec <jacek.masiulaniec@gmail.com>
+Jeff R. Allen <jra@nella.org>
+Kaviraj <kavirajkanagaraj@gmail.com>
+Kris Foster <kris.foster@gmail.com>
+Leon Klingele <git@leonklingele.de>
+Levi Gross <levi@levigross.com>
+Martin Palma <m@palma.bz>
+Mate Hajzso <ajz@lambd.ax>
+Mathieu Lonjaret <mathieu.lonjaret@gmail.com>
+Matt Croydon <mcroydon@gmail.com>
+Michael Stapelberg <stapelberg@google.com>
+Michaelian Ennis <mennis@corvus.net>
+Mikkel Oscar Lyderik Larsen <m@moscar.net>
+Nate Rosenblum <natr@google.com>
+Nicola Girardi <idrarig.alocin@gmail.com>
 Quan Nguyen <quannguyen@google.com>
+Rob Pike <r@golang.org>
+Ross Light <light@google.com>
+Sebastian Zaha <sebastian.zaha@gmail.com>
+Shawn Smith <shawnpsmith@gmail.com>
+Steven Hiscocks <steven@hiscocks.me.uk>
+Stuart Auld <sja@marsupialmusic.net>
+Xiang Li <xiangli.cs@gmail.com>
