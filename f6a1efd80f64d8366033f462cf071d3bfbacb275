@@ -16,6 +16,24 @@
       "revId": "f6a1efd80f64d8366033f462cf071d3bfbacb275",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "6ef709b4_dee412f6",
+        "filename": "cmd/upspin/findbinaries.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2018-01-22T01:34:26Z",
+      "side": 1,
+      "message": "Editing glitch.",
+      "parentUuid": "744539a9_75b16ee1",
+      "revId": "f6a1efd80f64d8366033f462cf071d3bfbacb275",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
