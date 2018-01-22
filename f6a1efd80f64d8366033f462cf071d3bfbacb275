@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "744539a9_75b16ee1",
+        "filename": "cmd/upspin/findbinaries.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2018-01-22T00:49:18Z",
+      "side": 1,
+      "message": "delete this? windows uses this file too right?",
+      "revId": "f6a1efd80f64d8366033f462cf071d3bfbacb275",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
