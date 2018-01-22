@@ -6,43 +6,6 @@
 
 package main
 
-import (
-	"os"
-	"path/filepath"
-	"strings"
-)
+const envPath = "PATH"
 
-// findUpspinBinaries finds all the upspin-* binaries in $PATH.
-// It may return the same name multiple times; the caller should
-// filter. (But all it's going to do is sort and print them, so it's easy.)
-func findUpspinBinaries() []string {
-	path := os.Getenv("PATH")
-	var cmds []string
-	for _, dir := range filepath.SplitList(path) {
-		if dir == "" {
-			dir = "."
-		}
-		fd, err := os.Open(dir)
-		if err != nil {
-			continue
-		}
-		files, err := fd.Readdir(0)
-		fd.Close()
-		if err != nil {
-			continue
-		}
-		for _, info := range files {
-			if !strings.HasPrefix(info.Name(), "upspin-") {
-				continue
-			}
-			if !info.Mode().IsRegular() {
-				continue
-			}
-			if info.Mode().Perm()&0100 == 0 {
-				continue
-			}
-			cmds = append(cmds, info.Name()[len("upspin-"):])
-		}
-	}
-	return cmds
-}
+func windowsPathExtensions() []string { return nil }
