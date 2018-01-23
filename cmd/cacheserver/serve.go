@@ -26,6 +26,7 @@ import (
 
 	// Load useful packers
 	_ "upspin.io/pack/ee"
+	_ "upspin.io/pack/eeintegrity"
 	_ "upspin.io/pack/plain"
 )
 
