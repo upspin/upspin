@@ -19,6 +19,21 @@ import (
 	"upspin.io/upspin"
 )
 
+const (
+	// doAccessChecks true allows the dircache to perform access checks
+	// before going to the directory server. This is in preparation to
+	// moving from writethrough to writeback semantics.
+	//
+	// TODO(p): I have set it to false to disable access checks for the
+	// moment. The problem is that access checks need to be done via the
+	// store cache but all other operations need to go directly to the
+	// store server. Having different configs for the two methods to
+	// retrieve storage blocks should have been enough. Unfortunately,
+	// connection caching defeats that. Until we figure out a way to fix
+	// this, we have commented out the access checks.
+	doAccessChecks = false
+)
+
 // parsedAccess contains a parsed Access file and its sequence number.
 type parsedAccess struct {
 	a   *access.Access
@@ -164,7 +179,11 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	// we have correctly matched the access semantics of the server. In the near
 	// future it will be used to allow writebacks rather than writethroughs of
 	// DirEntries.
-	granted, accErr := s.canPut(name, entry)
+	var granted bool
+	var accErr error
+	if doAccessChecks {
+		granted, accErr = s.canPut(name, entry)
+	}
 
 	// Wait for Access and Group block writes to flush.
 	if s.flushBlock != nil && access.IsAccessControlFile(entry.Name) {
@@ -180,7 +199,7 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 	if err != nil {
 		// Keep track of our access checks until we are sure they
 		// match the server.
-		if granted && errors.Is(errors.Permission, err) {
+		if doAccessChecks && granted && errors.Is(errors.Permission, err) {
 			log.Error.Printf("put access refused but we predicted granted: %s, %s, %s", name, s.uncachedCfg.UserName(), err)
 		}
 		return de, err
@@ -191,7 +210,9 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 		entry.Sequence = de.Sequence
 		s.clog.inSequence(entry.Name, entry.Sequence)
 	}
-	s.clog.logRequest(putReq, name, err, entry)
+	if err == nil {
+		s.clog.logRequest(putReq, name, err, entry)
+	}
 
 	// If this was a Put of the root, retry the watch.
 	parsed, perr := path.Parse(entry.Name)
@@ -201,7 +222,7 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 
 	// Keep track of our access checks until we are sure they
 	// match the server.
-	if !granted {
+	if doAccessChecks && !granted {
 		log.Error.Printf("put access granted but we predicted refused: %s, %s, %s", name, s.uncachedCfg.UserName(), accErr)
 	}
 	return de, err
@@ -226,7 +247,11 @@ func (s *server) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
 	// we have correctly matched the access semantics of the server. In the near
 	// future it will be used to allow writebacks rather than writethroughs of
 	// DirEntries.
-	granted, accErr := s.can(name, access.Delete)
+	var granted bool
+	var accErr error
+	if doAccessChecks {
+		granted, accErr = s.can(name, access.Delete)
+	}
 
 	s.clog.globalLock.Lock()
 	defer s.clog.globalLock.Unlock()
@@ -236,13 +261,15 @@ func (s *server) Delete(name upspin.PathName) (*upspin.DirEntry, error) {
 
 	// Keep track of our access checks until we are sure they
 	// match the server.
-	if granted {
-		if err != nil && errors.Is(errors.Permission, err) {
-			log.Error.Printf("delete access refused but we predicted granted: %s, %s, %s", name, s.uncachedCfg.UserName(), err)
-		}
-	} else {
-		if err == nil {
-			log.Error.Printf("delete access granted but we predicted refused: %s, %s, %s", name, s.uncachedCfg.UserName(), accErr)
+	if doAccessChecks {
+		if granted {
+			if err != nil && errors.Is(errors.Permission, err) {
+				log.Error.Printf("delete access refused but we predicted granted: %s, %s, %s", name, s.uncachedCfg.UserName(), err)
+			}
+		} else {
+			if err == nil {
+				log.Error.Printf("delete access granted but we predicted refused: %s, %s, %s", name, s.uncachedCfg.UserName(), accErr)
+			}
 		}
 	}
 

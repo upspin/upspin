@@ -279,7 +279,9 @@ func (d *proxiedDir) handleEvent(e *upspin.Event) error {
 	// This is an event we care about.
 
 	// Ignore old events.
+	d.l.globalLock.Lock()
 	if !d.l.inSequence(e.Entry.Name, e.Entry.Sequence) {
+		d.l.globalLock.Unlock()
 		return nil
 	}
 
@@ -288,7 +290,6 @@ func (d *proxiedDir) handleEvent(e *upspin.Event) error {
 	if e.Delete {
 		op = deleteReq
 	}
-	d.l.globalLock.Lock()
 	d.l.logRequestWithSequence(op, e.Entry.Name, nil, e.Entry, e.Entry.Sequence)
 	d.l.globalLock.Unlock()
 
