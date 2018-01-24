@@ -78,8 +78,6 @@ Upspin commands:
 Global flags:
   -blocksize size
     	size of blocks when writing large files (default 1048576)
-  -cachesize bytes
-    	max disk bytes for cache (default 5000000000)
   -config file
     	user's configuration file (default "/home/user/upspin/config")
   -log level
@@ -104,9 +102,11 @@ The subcommands are:
   	each uses, and report the total storage held by those blocks.
 
   find-garbage
-  	Use the results of scan-dir and scan-store operations to create a list
-  	of blocks that are present in a store server but not referenced
-  	by the scanned directory servers.
+	Use the results of scan-dir and scan-store operations to create a list
+	of blocks that are present in a store server but not referenced by the
+	scanned directory servers. It also creates a list of blocks that are
+	referenced by the scanned directory servers but not present in the
+	store server.
 
   delete-garbage
   	Delete the blocks found by find-garbage from the store server.
