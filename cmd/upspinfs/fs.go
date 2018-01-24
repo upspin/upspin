@@ -879,19 +879,28 @@ func (n *node) Link(ctx gContext.Context, req *fuse.LinkRequest, old fs.Node) (f
 // Rename implements fs.Renamer.Rename. It renames the old node to r.NewName in directory n.
 func (n *node) Rename(ctx gContext.Context, req *fuse.RenameRequest, newDir fs.Node) error {
 	const op errors.Op = "Rename"
-	n.Lock()
-	defer n.Unlock()
-	oldPath := path.Join(n.uname, req.OldName)
-	newPath := path.Join(newDir.(*node).uname, req.NewName)
-	// If we still have the old node, lock it for the duration.
-	f := n.f
-	f.Lock()
-	oldn, oldOk := f.nodeMap[oldPath]
-	if oldOk {
-		oldn.Lock()
-		defer oldn.Unlock()
+	nn := newDir.(*node)
+
+	// Lock both dirs in fixed order to avoid deadlock. Obey lock ordering.
+	if n.uname == nn.uname {
+		n.Lock()
+		defer n.Unlock()
+	} else if n.uname < nn.uname {
+		n.Lock()
+		defer n.Unlock()
+		nn.Lock()
+		defer nn.Unlock()
+	} else {
+		nn.Lock()
+		defer nn.Unlock()
+		n.Lock()
+		defer n.Unlock()
 	}
-	f.Unlock()
+	oldPath := path.Join(n.uname, req.OldName)
+	newPath := path.Join(nn.uname, req.NewName)
+
+	// At this point we are safe from changes in the directories since the
+	// directories are locked for creation and deletion of their contents.
 	if err := n.f.client.Rename(oldPath, newPath); err != nil {
 		// FUSE semantics state that a rename should
 		// remove the target if it exists.
@@ -910,27 +919,15 @@ func (n *node) Rename(ctx gContext.Context, req *fuse.RenameRequest, newDir fs.N
 			return e2e(errors.E(op, oldPath, err))
 		}
 	}
-	f.Lock()
 
-	// Fix the noent map.
-	oldn, oldOk = f.nodeMap[oldPath]
-	delete(f.enoentMap, newPath)
-	f.enoentMap[oldPath] = f.enoentInvalidTime(oldPath)
-
-	// If we had cached the old node, update it to the new one.
-	if oldOk {
-		_, newOk := f.nodeMap[oldPath]
-		if !newOk {
-			f.watched.add(newPath)
-		}
-		oldn.uname = newPath
-		f.nodeMap[newPath] = oldn
-
-		// Forget the old one.
-		delete(f.nodeMap, oldPath)
-		f.watched.remove(oldPath)
-	}
-	f.Unlock()
+	// Forget what we know about them.
+	// NOTE(p): This means that a close of a dirty renamed file will recreate the old file.
+	// Not sure what acceptable semantics would be here.
+	n.f.removeMapping(oldPath)
+	n.f.removeMapping(newPath)
+	n.f.Lock()
+	delete(n.f.enoentMap, newPath)
+	n.f.Unlock()
 	return nil
 }
 
