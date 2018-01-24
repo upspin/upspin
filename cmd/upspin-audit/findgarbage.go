@@ -14,7 +14,7 @@ import (
 
 func (s *State) findGarbage(args []string) {
 	const help = `
-Audit find-garbage analyses the output of scan-dir and scan-store to finds
+Audit find-garbage analyses the output of scan-dir and scan-store to find
 blocks that are present in the store server but not referred to by the scanned
 directory trees (garbage blocks). It also finds blocks that are referred to by
 directory entries but not present in the store server (missing blocks).
