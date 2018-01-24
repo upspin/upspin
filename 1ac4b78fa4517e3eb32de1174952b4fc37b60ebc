@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "f86c4e30_ccf7bc92",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2018-01-24T23:00:05Z",
+      "side": 1,
+      "message": "a plethora of\n\nit\u0027s a noun not an adjective",
+      "revId": "1ac4b78fa4517e3eb32de1174952b4fc37b60ebc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "eeb7e73b_d9859c1f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2018-01-24T23:00:05Z",
+      "side": 1,
+      "message": "could",
+      "revId": "1ac4b78fa4517e3eb32de1174952b4fc37b60ebc",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
