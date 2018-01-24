@@ -92,6 +92,7 @@ func (w *watchedRoots) add(name upspin.PathName) {
 		return
 	}
 	d := &watchedRoot{
+		ref:   1,
 		f:     w.f,
 		user:  user,
 		die:   make(chan bool),
@@ -118,6 +119,9 @@ func (w *watchedRoots) remove(name upspin.PathName) {
 		if d.ref == 0 {
 			delete(w.m, user)
 			close(d.die)
+		}
+		if d.ref < 0 {
+			log.Error.Printf("watchedRoots.remove ref %d", d.ref)
 		}
 	}
 }
@@ -349,7 +353,8 @@ func (d *watchedRoot) handleEvent(e *upspin.Event) error {
 
 	// Ignore events that precede what we have done to a file.
 	n.Lock()
-	if e.Entry.Sequence <= n.seq {
+	if n.uname != e.Entry.Name || e.Entry.Sequence <= n.seq {
+		// The node changed before we locked it.
 		n.Unlock()
 		return nil
 	}
@@ -360,6 +365,8 @@ func (d *watchedRoot) handleEvent(e *upspin.Event) error {
 		return nil
 	}
 
+	// At this point we know that n is an old version of the node
+	// for e.Entry.Name and that it hasn't been changed locally.
 	if e.Delete {
 		f.doesNotExist(n.uname)
 		n.deleted = true
