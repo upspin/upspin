@@ -60,5 +60,20 @@ for read, it is read in its entirety and cached locally.
 - Hard links are really copy on write.
 The two names will refer to the original data until either file is changed.
 They will then diverge.
+
+Note to developers:
+
+There are many locks in this code. To avoid dedlocks when holding
+multiple locks, we always obtain them in the following ascending order:
+
+- parent directory node.Lock()
+- target file node.Lock()
+- upspinFS.Lock()
+
+If we need to hold more than one lock of each type node, we obtain
+them in the lexigraphic order of the upspin file names they
+represent.  For example, when renaming a a@b/c/d to a@b/e/f,
+we first lock the parent node for a@b/c, then a@b/e. We then lock
+the upspinFS struct to update any mappings.
 */
 package main
