@@ -53,6 +53,24 @@
     },
     {
       "key": {
+        "uuid": "9bca2b4e_38fedfe7",
+        "filename": "dir/dircache/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2018-01-25T08:03:00Z",
+      "side": 1,
+      "message": "The log exists as a replay log to recreate state. While the Put failed,there may actually be a file there. For example,the Put may have failed for permissions. Remembering the error doesn\u0027t really tell me anything about the existence or non-existence of the file, only that the change of the file did not work which doesn\u0027t help.\n\nHowever, a failed Lookup really does tell me something that I need to replay state so saving that error is important.",
+      "parentUuid": "7296d3d0_4192b402",
+      "revId": "738d2650bcd0d654f68dd69d7e2fec79833e607d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "dbdbe18e_7bd9aa1e",
         "filename": "dir/dircache/server.go",
         "patchSetId": 1
@@ -64,6 +82,24 @@
       "writtenOn": "2018-01-25T07:16:42Z",
       "side": 1,
       "message": "if doAccessChecks \u0026\u0026 !granted {",
+      "revId": "738d2650bcd0d654f68dd69d7e2fec79833e607d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b429d95b_1541a5ef",
+        "filename": "dir/dircache/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2018-01-25T08:03:00Z",
+      "side": 1,
+      "message": "I want to just rip out the doAccessChecks ifs when I fix the problem. Not collapsing just makes it easier to undo without making a mistake.",
+      "parentUuid": "dbdbe18e_7bd9aa1e",
       "revId": "738d2650bcd0d654f68dd69d7e2fec79833e607d",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
