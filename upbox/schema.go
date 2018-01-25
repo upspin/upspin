@@ -134,6 +134,7 @@ import (
 	"net/http"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -459,23 +460,12 @@ func pathExists(p string) bool {
 	return !os.IsNotExist(err)
 }
 
+func (sc *Schema) Command(name string) string {
+	return filepath.Join(sc.Dir, name)
+}
+
 // Start sets up the Users and Servers specified by the Schema.
 func (sc *Schema) Start() error {
-	// Build servers and commands.
-	args := []string{"install",
-		"upspin.io/cmd/upspin",
-		"upspin.io/cmd/cacheserver",
-	}
-	for _, s := range sc.Servers {
-		args = append(args, s.ImportPath)
-	}
-	cmd := exec.Command("go", args...)
-	cmd.Stdout = prefix("build: ", os.Stdout)
-	cmd.Stderr = prefix("build: ", os.Stderr)
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("build error: %v", err)
-	}
-
 	if sc.Dir == "" {
 		// No directory set, so we use a temporary one.
 		tmpDir, err := ioutil.TempDir("", "upbox")
@@ -488,6 +478,23 @@ func (sc *Schema) Start() error {
 		// A directory is set, but it doesn't exist. Create it.
 		if err := os.MkdirAll(sc.Dir, 0700); err != nil {
 			return err
+		}
+	}
+
+	// Build servers and commands.
+	cmds := []string{
+		"upspin.io/cmd/upspin",
+		"upspin.io/cmd/cacheserver",
+	}
+	for _, s := range sc.Servers {
+		cmds = append(cmds, s.ImportPath)
+	}
+	for _, p := range cmds {
+		cmd := exec.Command("go", "build", "-o", sc.Command(path.Base(p)), p)
+		cmd.Stdout = prefix("build: ", os.Stdout)
+		cmd.Stderr = prefix("build: ", os.Stderr)
+		if err := cmd.Run(); err != nil {
+			return fmt.Errorf("%q build error: %v", p, err)
 		}
 	}
 
@@ -519,7 +526,7 @@ func (sc *Schema) Start() error {
 			return err
 		}
 		var buf bytes.Buffer
-		keygen := exec.Command("upspin", "keygen", dir)
+		keygen := exec.Command(sc.Command("upspin"), "keygen", dir)
 		keygen.Stdout = prefix("keygen: ", &buf)
 		keygen.Stderr = prefix("keygen: ", &buf)
 		if err := keygen.Run(); err != nil {
@@ -579,7 +586,7 @@ func (sc *Schema) Start() error {
 		if err != nil {
 			return err
 		}
-		cmd := exec.Command("upspin",
+		cmd := exec.Command(sc.Command("upspin"),
 			"-config="+sc.Config(keyUser),
 			"-log="+sc.logLevel(),
 			"user", "-put",
@@ -619,7 +626,7 @@ func (sc *Schema) Start() error {
 		if !u.Cache {
 			continue
 		}
-		cmd := exec.Command("cacheserver",
+		cmd := exec.Command(sc.Command("cacheserver"),
 			"-config="+sc.Config(u.Name),
 			"-log="+sc.logLevel(),
 			"-cachedir="+sc.Dir,
@@ -756,7 +763,7 @@ func (sc *Schema) startServer(s *Server) (*exec.Cmd, error) {
 			}
 		}
 	}
-	cmd := exec.Command(s.Name, args...)
+	cmd := exec.Command(sc.Command(path.Base(s.ImportPath)), args...)
 	cmd.Stdout = prefix(s.Name+":\t", os.Stdout)
 	cmd.Stderr = prefix(s.Name+":\t", os.Stderr)
 	if err := cmd.Start(); err != nil {
