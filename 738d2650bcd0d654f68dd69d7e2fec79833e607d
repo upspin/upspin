@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cc3b834c_9ac1e7bc",
+        "filename": "dir/dircache/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2018-01-25T07:16:42Z",
+      "side": 1,
+      "message": "Please add a comment.",
+      "revId": "738d2650bcd0d654f68dd69d7e2fec79833e607d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "13341dd3_9de578d6",
+        "filename": "dir/dircache/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2018-01-25T07:16:42Z",
+      "side": 1,
+      "message": "if doAccessChecks \u0026\u0026 granted \u0026\u0026 errors.Is(...) {",
+      "revId": "738d2650bcd0d654f68dd69d7e2fec79833e607d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "7296d3d0_4192b402",
+        "filename": "dir/dircache/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2018-01-25T07:16:42Z",
+      "side": 1,
+      "message": "I\u0027m not seeing why the request should only be logged if err \u003d\u003d nil.\nWe call logRequest for the other methods even if err !\u003d nil.\nWhy is this special?",
+      "revId": "738d2650bcd0d654f68dd69d7e2fec79833e607d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "dbdbe18e_7bd9aa1e",
+        "filename": "dir/dircache/server.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2018-01-25T07:16:42Z",
+      "side": 1,
+      "message": "if doAccessChecks \u0026\u0026 !granted {",
+      "revId": "738d2650bcd0d654f68dd69d7e2fec79833e607d",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
