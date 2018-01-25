@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "da30557e_f4e00505",
+        "filename": "cmd/upspinfs/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2018-01-25T20:01:55Z",
+      "side": 1,
+      "message": "I wouldn\u0027t put this in the package/command documents, which are meant for users. Instead I\u0027d put them after the package clause in fs.go, which is where developers go. And then you can drop the \"Note to developers\" qualifier.",
+      "revId": "3dfa621f2d5d2e9503195b07748cbb1bdc2d0efd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
