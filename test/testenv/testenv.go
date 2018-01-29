@@ -329,7 +329,7 @@ func (e *Env) NewUser(userName upspin.UserName) (upspin.Config, error) {
 	}
 
 	cfg := config.SetUserName(e.Config, userName)
-	cfg = config.SetValue(cfg, "cache", "")
+	cfg = config.SetCacheEndpoint(cfg, upspin.Endpoint{})
 	cfg = config.SetPacking(cfg, e.Setup.Packing)
 
 	// Set up a factotum for the user.

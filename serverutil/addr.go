@@ -7,7 +7,7 @@ package serverutil
 import (
 	"net"
 
-	"upspin.io/rpc/local"
+	"upspin.io/config"
 )
 
 // IsLoopback returns true if the name only resolves to loopback addresses.
@@ -20,7 +20,7 @@ func IsLoopback(addr string) bool {
 		return true
 	}
 	// Check for local IPC.
-	if local.IsLocal(host) {
+	if config.IsLocal(host) {
 		return true
 	}
 	// Check for loopback network.

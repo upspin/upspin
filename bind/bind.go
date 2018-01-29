@@ -14,8 +14,9 @@ import (
 )
 
 type dialKey struct {
-	user     upspin.UserName
-	endpoint upspin.Endpoint
+	user        upspin.UserName
+	endpoint    upspin.Endpoint
+	cacheserver upspin.Endpoint
 }
 
 type dialers map[upspin.Transport]upspin.Dialer
@@ -155,7 +156,7 @@ func (s *servers) register(transport upspin.Transport, key upspin.Dialer) error 
 // reachableService finds a bound and reachable service in the cache or dials a
 // fresh one and saves it in the cache.
 func (s *servers) reachableService(cc upspin.Config, e upspin.Endpoint) (upspin.Service, error) {
-	key := dialKey{user: cc.UserName(), endpoint: e}
+	key := dialKey{user: cc.UserName(), endpoint: e, cacheserver: cc.CacheEndpoint()}
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	service, cached := s.services[key]
@@ -182,10 +183,4 @@ func (s *servers) registerOp() errors.Op {
 
 func (s *servers) serverOp() errors.Op {
 	return errors.Op("bind." + s.kind + "Server") // "bind.KeyServer"
-}
-
-// NoCache supresses the caching of dial results. This was added for
-// debugging.
-func NoCache() {
-	noCache = true
 }

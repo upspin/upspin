@@ -84,7 +84,7 @@ func main() {
 	done := do(cfg, mountpoint, filepath.Join(flags.CacheDir, string(cfg.UserName())), flags.CacheSize)
 
 	// Serve expvar data.
-	ln, err := local.Listen("tcp", local.LocalName(cfg, cmdName))
+	ln, err := local.Listen("tcp", config.LocalName(cfg, cmdName))
 	if err != nil {
 		log.Fatal(err)
 	}
