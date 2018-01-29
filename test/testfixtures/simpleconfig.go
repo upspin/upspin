@@ -66,6 +66,11 @@ func (cfg *simpleConfig) StoreEndpoint() upspin.Endpoint {
 	return ep0
 }
 
+// CacheEndpoint implements upspin.Config.
+func (cfg *simpleConfig) CacheEndpoint() upspin.Endpoint {
+	return ep0
+}
+
 // Value implements upspin.Config.
 func (cfg *simpleConfig) Value(string) string {
 	return ""

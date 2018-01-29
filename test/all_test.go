@@ -116,7 +116,8 @@ func testFileSequentialAccess(t *testing.T, env *testenv.Env) {
 
 func testSequenceNumbers(t *testing.T, r *testenv.Runner) {
 	r.As(ownerName)
-	if r.Config().Value("cache") != "" {
+	ce := r.Config().CacheEndpoint()
+	if !ce.Unassigned() {
 		t.Skip("skipping sequence number test with cacheserver")
 	}
 

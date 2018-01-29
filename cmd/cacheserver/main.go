@@ -12,7 +12,6 @@ import (
 	"upspin.io/config"
 	"upspin.io/flags"
 	"upspin.io/log"
-	"upspin.io/rpc"
 	"upspin.io/version"
 )
 
@@ -40,11 +39,8 @@ func main() {
 
 	// Serving address comes from config with flag overriding.
 	var addr string
-	ce, err := rpc.CacheEndpoint(cfg)
-	if err != nil {
-		log.Fatal(err)
-	}
-	if ce != nil {
+	ce := cfg.CacheEndpoint()
+	if !ce.Unassigned() {
 		addr = string(ce.NetAddr)
 	}
 	if flags.NetAddr != "" {

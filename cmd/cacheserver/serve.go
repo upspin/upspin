@@ -36,7 +36,7 @@ var (
 
 func serve(cfg upspin.Config, addr string) (<-chan error, error) {
 	cachedCfg := cfg
-	uncachedCfg := config.SetValue(cfg, "cache", "no")
+	uncachedCfg := config.SetCacheEndpoint(cfg, upspin.Endpoint{})
 
 	// Calculate limits.
 	maxRefBytes := (9 * (flags.CacheSize)) / 10
