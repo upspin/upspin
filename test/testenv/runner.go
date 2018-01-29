@@ -511,7 +511,8 @@ func (r *Runner) Diag() string {
 
 // FlushCache flushes a user's Store cache.
 func (r *Runner) FlushCache() error {
-	if r.Config().Value("cache") == "" {
+	ce := r.Config().CacheEndpoint()
+	if ce.Unassigned() {
 		return nil
 	}
 	store, err := bind.StoreServer(r.Config(), r.Config().StoreEndpoint())

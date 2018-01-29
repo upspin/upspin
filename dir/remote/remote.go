@@ -180,11 +180,8 @@ func (r *remote) Endpoint() upspin.Endpoint {
 
 func dialCache(config upspin.Config, proxyFor upspin.Endpoint) (upspin.Service, error) {
 	// Are we using a cache?
-	ce, err := rpc.CacheEndpoint(config)
-	if err != nil {
-		return nil, err
-	}
-	if ce == nil {
+	ce := config.CacheEndpoint()
+	if ce.Unassigned() {
 		return nil, nil
 	}
 

@@ -98,3 +98,8 @@ func (ep *Endpoint) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	*ep = *p
 	return nil
 }
+
+// Uninitialized returns true if the endpoint is uninitialized.
+func (ep *Endpoint) Unassigned() bool {
+	return ep == nil || ep.Transport == Unassigned
+}
