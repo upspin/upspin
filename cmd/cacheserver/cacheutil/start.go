@@ -16,7 +16,6 @@ import (
 
 	"upspin.io/bind"
 	"upspin.io/log"
-	"upspin.io/rpc"
 	"upspin.io/upspin"
 )
 
@@ -33,15 +32,15 @@ func Start(cfg upspin.Config) (usingCache bool) {
 	if cfg == nil {
 		return
 	}
-	ce, err := rpc.CacheEndpoint(cfg)
-	if err != nil || ce == nil {
+	ce := cfg.CacheEndpoint()
+	if ce.Unassigned() {
 		// TODO(adg): log error message?
 		return // not using a cache server
 	}
 	usingCache = true
 
 	// Ping the cache server.
-	if err := ping(cfg, ce); err == nil {
+	if err := ping(cfg, &ce); err == nil {
 		return // cache server running
 	}
 
@@ -73,7 +72,7 @@ func Start(cfg upspin.Config) (usingCache bool) {
 			return
 		default:
 		}
-		if err := ping(cfg, ce); err == nil {
+		if err := ping(cfg, &ce); err == nil {
 			return
 		}
 	}

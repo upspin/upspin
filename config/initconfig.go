@@ -41,6 +41,7 @@ func (base) Packing() upspin.Packing        { return defaultPacking }
 func (base) KeyEndpoint() upspin.Endpoint   { return defaultKeyEndpoint }
 func (base) DirEndpoint() upspin.Endpoint   { return upspin.Endpoint{} }
 func (base) StoreEndpoint() upspin.Endpoint { return upspin.Endpoint{} }
+func (base) CacheEndpoint() upspin.Endpoint { return upspin.Endpoint{} }
 func (base) Value(string) string            { return "" }
 
 // New returns a config with all fields set as defaults.
@@ -65,6 +66,7 @@ const (
 	storeserver = "storeserver"
 	packing     = "packing"
 	secrets     = "secrets"
+	cache       = "cache"
 )
 
 // ErrNoFactotum indicates that the returned config contains no Factotum, and
@@ -134,6 +136,7 @@ func InitConfig(r io.Reader) (upspin.Config, error) {
 		keyserver:   defaultKeyEndpoint.String(),
 		dirserver:   "",
 		storeserver: "",
+		cache:       "",
 	}
 	other := make(map[string]interface{})
 
@@ -208,6 +211,7 @@ func InitConfig(r io.Reader) (upspin.Config, error) {
 	cfg = SetKeyEndpoint(cfg, parseEndpoint(op, vals, keyserver, &err))
 	cfg = SetStoreEndpoint(cfg, parseEndpoint(op, vals, storeserver, &err))
 	cfg = SetDirEndpoint(cfg, parseEndpoint(op, vals, dirserver, &err))
+	cfg = parseCacheValue(op, cfg, vals, &err)
 
 	valueMap := make(map[string]string)
 	for k, v := range other {
@@ -289,6 +293,34 @@ func parseEndpoint(op errors.Op, vals map[string]string, key string, errorp *err
 	}
 
 	return *ep
+}
+
+// parseCacheValue parses the cache value and returns a config containing the cacheserver endpoint.
+func parseCacheValue(op errors.Op, cfg upspin.Config, vals map[string]string, errorp *error) upspin.Config {
+	text := vals["cache"]
+	switch text {
+	case "", "n", "no", "false":
+		// nothing to do
+	case "y", "yes", "true":
+		name := "remote," + LocalName(cfg, "cacheserver") + ":80"
+		ep, err := upspin.ParseEndpoint(name)
+		if err != nil {
+			*errorp = errors.E(op, errors.Errorf("cannot parse cache value %q: %v", text, err))
+			break
+		}
+		cfg = SetCacheEndpoint(cfg, *ep)
+	default:
+		if !strings.Contains(text, ",") {
+			text = "remote," + text
+		}
+		ep, err := upspin.ParseEndpoint(text)
+		if err != nil {
+			*errorp = errors.E(op, errors.Errorf("cannot parse cache value %q: %v", text, err))
+			break
+		}
+		cfg = SetCacheEndpoint(cfg, *ep)
+	}
+	return cfg
 }
 
 type cfgUserName struct {
@@ -396,6 +428,24 @@ func SetDirEndpoint(cfg upspin.Config, e upspin.Endpoint) upspin.Config {
 	return cfgDirEndpoint{
 		Config:      cfg,
 		dirEndpoint: e,
+	}
+}
+
+type cfgCacheEndpoint struct {
+	upspin.Config
+	cacheEndpoint upspin.Endpoint
+}
+
+func (cfg cfgCacheEndpoint) CacheEndpoint() upspin.Endpoint {
+	return cfg.cacheEndpoint
+}
+
+// SetDirEndpoint returns a config derived from the given config
+// with the given dir endpoint.
+func SetCacheEndpoint(cfg upspin.Config, e upspin.Endpoint) upspin.Config {
+	return cfgCacheEndpoint{
+		Config:        cfg,
+		cacheEndpoint: e,
 	}
 }
 
