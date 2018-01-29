@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d60c7c0d_959e4f3a",
+        "filename": "upspin/endpoint.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2018-01-29T23:45:48Z",
+      "side": 1,
+      "message": "Unassigned (sic) reports whether the endpoint is nil or has value Unassigned.",
+      "revId": "c15d5ca8a08abbe5297b4a888cbeaca092ceaeb6",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
