@@ -45,11 +45,6 @@ func TestCache(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// If bind caches dials to the servers, it will
-	// confuse the direct dial to the combined server
-	// with the indirect one via the cacheserver.
-	bind.NoCache()
-
 	// The client and all servers will run as the same user.
 	cfg := config.New()
 	cfg = config.SetUserName(cfg, upspin.UserName("tester@google.com"))
@@ -82,8 +77,7 @@ func TestCache(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	cfg = config.SetValue(cfg, "cache", cep.String())
-	cl := newClient(cfg, sep, cep)
+	cfg, cl := newClient(cfg, sep, cep)
 
 	// Create a root directory.
 	root := upspin.PathName(cfg.UserName())
@@ -215,12 +209,12 @@ func startCacheServer(cfg upspin.Config) (*upspin.Endpoint, error) {
 }
 
 // newClient returns a client using the given servers and cache.
-func newClient(cfg upspin.Config, server, cache *upspin.Endpoint) upspin.Client {
+func newClient(cfg upspin.Config, server, cache *upspin.Endpoint) (upspin.Config, upspin.Client) {
 	cfg = setCertPool(cfg)
 	cfg = config.SetStoreEndpoint(cfg, *server)
 	cfg = config.SetDirEndpoint(cfg, *server)
-	cfg = config.SetValue(cfg, "cache", cache.String())
-	return client.New(cfg)
+	cfg = config.SetCacheEndpoint(cfg, *cache)
+	return cfg, client.New(cfg)
 }
 
 // setCertPool adds trusted certs to the Config.

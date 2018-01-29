@@ -729,7 +729,7 @@ func (sc *Schema) writeConfig(user string) error {
 }
 
 func (u *User) cacheAddr() string {
-	return local.LocalName(
+	return config.LocalName(
 		config.SetUserName(config.New(), upspin.UserName(u.Name)),
 		"upbox.cacheserver",
 	) + ":80"
@@ -793,7 +793,7 @@ func prefix(p string, out io.Writer) io.Writer {
 
 func waitReady(addr string) error {
 	url := "https://" + addr
-	if local.IsLocal(addr) {
+	if config.IsLocal(addr) {
 		url = "http://" + addr
 	}
 	rt := &http.Transport{

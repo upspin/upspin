@@ -834,6 +834,9 @@ type Config interface {
 	// StoreEndpoint is the endpoint of the StoreServer in which to place new data items.
 	StoreEndpoint() Endpoint
 
+	// CacheEndpoint is the endpoint of the cache server between the client and the StoreServer and DirServers.
+	CacheEndpoint() Endpoint
+
 	// Value returns the value for the given configuration key.
 	Value(key string) string
 }
