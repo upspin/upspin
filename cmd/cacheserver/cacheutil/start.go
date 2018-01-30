@@ -58,8 +58,7 @@ func Start(cfg upspin.Config) (usingCache bool) {
 		cmd.Stdout = os.Stdout
 		cmd.Stderr = os.Stderr
 		if err := cmd.Run(); err != nil {
-			log.Info.Printf("Starting cacheserver: %s", err)
-			fmt.Fprintf(os.Stderr, "Failed to start cacheserver; continuing without.\n")
+			log.Info.Printf("cacheserver terminated or not started: %s", err)
 			close(cacheErrorChan)
 		}
 	}()
