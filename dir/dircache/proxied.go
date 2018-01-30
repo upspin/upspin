@@ -223,6 +223,7 @@ func (d *proxiedDir) watch(ep upspin.Endpoint) error {
 	if err != nil {
 		return err
 	}
+	log.Info.Printf("dir/dircache: Watch(%q) started", name)
 
 	// If Watch succeeds, go back to the initial interval.
 	d.retryInterval = initialRetryInterval
