@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "af2b0b63_840c5b9d",
+        "filename": "upspin/endpoint.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2018-01-30T04:28:30Z",
+      "side": 1,
+      "message": "please take the text from my previous review.\nwe try to encourage a style that avoids the hanging question created by the construct, \"returns true if\"",
+      "revId": "960cdf2f24fca70038c7b4f4869785a449ff27d5",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
