@@ -16,6 +16,24 @@
       "revId": "88bb7261ab0ae78d56a97c528258336b91e26b0c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "fbdecfcd_c3914943",
+        "filename": "cmd/upspinfs/watch.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2018-02-03T19:46:56Z",
+      "side": 1,
+      "message": "Yup, same is true about n because it is no longer locked.  It a basic problem with invalidate since I have to do it outside of all locks. Hopefully the worst that will happen is causing unnecessary work by invalidating the caching of something unrelated. I am a bit worried about referencing a node that no longer has a kernel mapping.  Bazil protects itself against this.  Any kernel worth its salt would too but I\u0027ve often been surprised by the inadequacies of kernel parameter checking.",
+      "parentUuid": "132ec71c_c38a78a5",
+      "revId": "88bb7261ab0ae78d56a97c528258336b91e26b0c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
