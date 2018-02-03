@@ -336,6 +336,9 @@ func (d *watchedRoot) handleEvent(e *upspin.Event) error {
 	}
 	f := d.f
 
+	// We will have to invalidate the directory also.
+	dir := path.DropPath(e.Entry.Name, 1)
+
 	// Is this a file we are watching?
 	f.Lock()
 	n, ok := f.nodeMap[e.Entry.Name]
@@ -346,6 +349,11 @@ func (d *watchedRoot) handleEvent(e *upspin.Event) error {
 		// an optimization.
 		delete(f.enoentMap, e.Entry.Name)
 	}
+	dirn := f.nodeMap[dir]
+	// If a file has just been put to or deleted from a directory,
+	// the directory certainly exists. Make sure we don't think that
+	// it isn't there.
+	delete(f.enoentMap, dir)
 	f.Unlock()
 	if !ok {
 		return nil
@@ -400,8 +408,14 @@ func (d *watchedRoot) handleEvent(e *upspin.Event) error {
 	}
 	n.Unlock()
 
+	// Invalidate what the kernel knows about the file and its
+	// directory.
+	//
 	// invalidate has to be outside of locks because it can trigger
 	// another FUSE request deadlocking the kernel.
 	f.invalidate(n)
+	if dirn != nil && dir != e.Entry.Name {
+		f.invalidate(dirn)
+	}
 	return nil
 }
