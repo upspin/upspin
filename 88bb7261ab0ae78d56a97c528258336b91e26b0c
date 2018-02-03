@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "132ec71c_c38a78a5",
+        "filename": "cmd/upspinfs/watch.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2018-02-03T19:15:07Z",
+      "side": 1,
+      "message": "Might the dirn node have been reused to point to something else by the time we get here?\n\nI guess no harm done, we\u0027re just going to cause something to get re-fetched in that scenario.",
+      "revId": "88bb7261ab0ae78d56a97c528258336b91e26b0c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
