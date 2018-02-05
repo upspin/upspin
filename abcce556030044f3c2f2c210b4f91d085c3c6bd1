@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "ab290491_5d554d66",
+        "filename": "cmd/upspin/countersign.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 5010
+      },
+      "writtenOn": "2018-02-05T21:15:04Z",
+      "side": 1,
+      "message": "What is the nature of the brokenness?",
+      "range": {
+        "startLine": 55,
+        "startChar": 5,
+        "endLine": 55,
+        "endChar": 39
+      },
+      "revId": "abcce556030044f3c2f2c210b4f91d085c3c6bd1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "805be050_29439d25",
         "filename": "config/initconfig.go",
         "patchSetId": 2
