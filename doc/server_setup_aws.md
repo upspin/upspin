@@ -66,7 +66,7 @@ local$ upspin setupstorage-aws -clean -role_name=upspinstorage -domain=example.c
   [instance profile](http://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_use_switch-role-ec2_instance-profiles.html)
   you should use to provision the instance.
 - If you are running `upspinserver` on an EC2 instance, ensure that your
-  security group allows inbound TCP traffic at least on port 443.
+  security group allows inbound TCP traffic on ports 80 and 443.
 
 ## Continue
 
