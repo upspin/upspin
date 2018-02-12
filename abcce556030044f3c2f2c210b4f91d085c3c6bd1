@@ -69,6 +69,30 @@
       "revId": "abcce556030044f3c2f2c210b4f91d085c3c6bd1",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "a06c4ce4_483fe6e8",
+        "filename": "config/initconfig.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2018-02-12T02:24:26Z",
+      "side": 1,
+      "message": "No. You only need \"secrets:\" if your keys are in a non-standard location.",
+      "parentUuid": "805be050_29439d25",
+      "range": {
+        "startLine": 211,
+        "startChar": 38,
+        "endLine": 211,
+        "endChar": 53
+      },
+      "revId": "abcce556030044f3c2f2c210b4f91d085c3c6bd1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
