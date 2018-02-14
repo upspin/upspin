@@ -782,11 +782,7 @@ func (t *Tree) recoverFromLog() error {
 		logEntry, next, err := lrd.ReadAt(curr)
 		if err != nil {
 			log.Error.Printf("recoverFromLog: Error in log recovery, possible data loss at offset %d: %s", lastProcessed, err)
-			err = t.user.Truncate(curr)
-			if err != nil {
-				return err
-			}
-			return nil
+			return t.user.Truncate(curr)
 		}
 		if next == curr {
 			break
