@@ -839,7 +839,7 @@ func TestVersion0Logs(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	err = filepath.Walk("testdata", func(path string, info os.FileInfo, err error) error {
+	err = filepath.Walk("testdata", func(path string, info os.FileInfo, _ error) error {
 		if info.IsDir() {
 			return nil
 		}
@@ -915,9 +915,12 @@ func TestVersion0Logs(t *testing.T) {
 	// This was a bug.
 	err = user.Close()
 	if err != nil {
-		t.Error(err)
+		t.Fatal(err)
 	}
 	user, err = Open("user@example.com", dir, nil, nil)
+	if err != nil {
+		t.Fatal(err)
+	}
 	got = user.V1Transition()
 	if got < startTime {
 		t.Fatalf("got transition time %s; want a time after %s", got, startTime)
