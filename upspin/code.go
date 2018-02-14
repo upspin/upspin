@@ -402,29 +402,6 @@ func (d *DirEntry) Unmarshal(b []byte) ([]byte, error) {
 	return cons.remainder()
 }
 
-// getBytes unmarshals the byte slice at b (varint count followed by bytes)
-// and returns the slice followed by the remaining bytes.
-// If there is insufficient data, both return values will be nil.
-func getBytes(b []byte) (data, remaining []byte) {
-	u, n := binary.Varint(b)
-	// If n <= 0, Varint returned an error. Otherwise we know n <= len(b).
-	// We also test that u is good and u bytes remain in the buffer after the count.
-	if n <= 0 || u < 0 || len(b[n:]) < int(u) {
-		return nil, nil
-	}
-	return getNBytes(b[n:], int(u))
-}
-
-// getNBytes unmarshals n bytes from b and returns the slice followed by the
-// remaining bytes. If there is insufficient data, both return values will be
-// nil.
-func getNBytes(b []byte, n int) (data, remaining []byte) {
-	if len(b) < n {
-		return nil, nil
-	}
-	return b[:n], b[n:]
-}
-
 // String returns a default string representation of the time,
 // in the format similar to RFC 3339: "2006-01-02T15:04:05 UTC"
 // The time zone is always UTC.
