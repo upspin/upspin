@@ -58,7 +58,6 @@ var (
 	errNoWrappedKey     = errors.Str("no wrapped key for me")
 	errKeyLength        = errors.Str("wrong key length for AES-256")
 	errSignedNameNotSet = errors.Str("empty SignedName")
-	sig0                upspin.Signature // for returning error of correct type
 )
 
 var errNotOnCurve = errors.Str("a crypto attack was attempted against you; see safecurves.cr.yp.to/twist.html for details")
