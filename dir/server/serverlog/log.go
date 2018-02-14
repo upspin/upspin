@@ -195,7 +195,7 @@ func hashRoot(base string, fac upspin.Factotum) (string, error) {
 
 func (r *root) saveLoop(s storage.Storage) {
 	defer close(r.saveDone)
-	for _ = range r.saveRoot {
+	for range r.saveRoot {
 		r.mu.Lock()
 		buf := r.root
 		r.mu.Unlock()
@@ -317,12 +317,12 @@ func Open(userName upspin.UserName, directory string, fac upspin.Factotum, store
 		// Must create new file with current version.
 		// We can only write to files with the latest version.
 		file := u.files[last]
-		size, err := sizeOfFile(file.name)
+		var size int64
+		size, err = sizeOfFile(file.name)
 		if err != nil {
 			break
 		}
 		_, fd, err = u.createLogFile(file.offset + size)
-		fd, err = os.OpenFile(u.files[len(u.files)-1].name, os.O_APPEND|os.O_WRONLY, 0600)
 	case u.files[last].version > version:
 		// Cannot happen!
 		return nil, errors.E(errors.Internal, errors.Errorf("bad version number for log file %q", u.files[last].name))
