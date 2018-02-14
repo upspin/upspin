@@ -84,11 +84,7 @@ func (t *Tree) store(entry *upspin.DirEntry, kids map[string]*node) error {
 			return err
 		}
 	}
-	err = bp.Close()
-	if err != nil {
-		return err
-	}
-	return nil
+	return bp.Close()
 }
 
 // storeBlock stores a single block of data to the StoreServer as part of a block packing operation.
