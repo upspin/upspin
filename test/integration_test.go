@@ -343,6 +343,7 @@ var integrationTests = []struct {
 	{"ReadAccess", testReadAccess},
 	{"GroupAccess", testGroupAccess},
 	{"WriteReadAllAccessFile", testWriteReadAllAccessFile},
+	{"CreateAccessFile", testCreateAccessFile},
 	{"Metacharacters", testMetacharacters},
 
 	{"Watch", testWatchCurrent},
