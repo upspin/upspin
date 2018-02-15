@@ -392,11 +392,6 @@ func (c *Client) Lookup(name upspin.PathName, followFinal bool) (*upspin.DirEntr
 	return entry, err
 }
 
-// A lookupFn is called by the evaluation loop in lookup. It calls the underlying
-// DirServer operation and may return ErrFollowLink, some other error, or success.
-// If it is ErrFollowLink, lookup will step through the link and try again.
-type lookupFn func(upspin.DirServer, *upspin.DirEntry, *metric.Span) (*upspin.DirEntry, error)
-
 // lookup returns the DirEntry referenced by the argument entry,
 // evaluated by following any links in the path except maybe for one detail:
 // The boolean states whether, if the final path element is a link,
@@ -411,71 +406,12 @@ type lookupFn func(upspin.DirServer, *upspin.DirEntry, *metric.Span) (*upspin.Di
 // the operation followed by the argument to the last successful
 // call to fn, which for instance will contain the actual path that
 // resulted in a successful call to WhichAccess.
-func (c *Client) lookup(op errors.Op, entry *upspin.DirEntry, fn lookupFn, followFinal bool, s *metric.Span) (resultEntry, finalSuccessfulEntry *upspin.DirEntry, err error) {
-	ss := s.StartSpan("lookup")
-	defer ss.End()
-
-	// As we run, we want to maintain the incoming DirEntry to track the name,
-	// leaving the rest alone. As the fn will return a newly allocated entry,
-	// after each link we update the entry to achieve this.
-	originalName := entry.Name
-	var prevEntry *upspin.DirEntry
-	copied := false // Do we need to allocate a new entry to modify its name?
-	for loop := 0; loop < upspin.MaxLinkHops; loop++ {
-		parsed, err := path.Parse(entry.Name)
-		if err != nil {
-			return nil, nil, errors.E(op, err)
-		}
-		dir, err := c.DirServer(parsed.Path())
-		if err != nil {
-			return nil, nil, errors.E(op, err)
-		}
-		resultEntry, err := fn(dir, entry, ss)
-		if err == nil {
-			return resultEntry, entry, nil
-		}
-		if prevEntry != nil && errors.Is(errors.NotExist, err) {
-			return resultEntry, nil, errors.E(op, errors.BrokenLink, prevEntry.Name, err)
-		}
-		prevEntry = resultEntry
-		if err != upspin.ErrFollowLink {
-			return resultEntry, nil, errors.E(op, originalName, err)
-		}
-		// Misbehaving servers could return a nil entry. Handle that explicitly. Issue 451.
-		if resultEntry == nil {
-			return nil, nil, errors.E(op, errors.Internal, prevEntry.Name, "server returned nil entry for link")
-		}
-		// We have a link.
-		// First, allocate a new entry if necessary so we don't overwrite user's memory.
-		if !copied {
-			tmp := *entry
-			entry = &tmp
-			copied = true
-		}
-		// Take the prefix of the result entry and substitute that section of the existing name.
-		parsedResult, err := path.Parse(resultEntry.Name)
-		if err != nil {
-			return nil, nil, errors.E(op, err)
-		}
-		resultPath := parsedResult.Path()
-		// The result entry's name must be a prefix of the name we're looking up.
-		if !strings.HasPrefix(parsed.String(), string(resultPath)) {
-			return nil, nil, errors.E(op, resultPath, errors.Internal, "link path not prefix")
-		}
-		// Update the entry to have the new Name field.
-		if resultPath == parsed.Path() {
-			// We're on the last element. We may be done.
-			if followFinal {
-				entry.Name = resultEntry.Link
-			} else {
-				// Yes, we are done. Return this entry, which is a link.
-				return resultEntry, entry, nil
-			}
-		} else {
-			entry.Name = path.Join(resultEntry.Link, string(parsed.Path()[len(resultPath):]))
-		}
+func (c *Client) lookup(op errors.Op, entry *upspin.DirEntry, fn clientutil.LookupFn, followFinal bool, s *metric.Span) (resultEntry, finalSuccessfulEntry *upspin.DirEntry, err error) {
+	resultEntry, finalSuccessfulEntry, err = clientutil.Lookup(c.config, entry, fn, followFinal, s)
+	if err != nil {
+		err = errors.E(op, err)
 	}
-	return nil, nil, errors.E(op, errors.IO, originalName, "link loop")
+	return
 }
 
 func deleteLookupFn(dir upspin.DirServer, entry *upspin.DirEntry, s *metric.Span) (*upspin.DirEntry, error) {
