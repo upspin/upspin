@@ -13,14 +13,16 @@ import (
 	"upspin.io/upspin"
 )
 
-func WrapKeys(cfg upspin.Config, getFn func(name upspin.PathName) ([]byte, error), entry, accessEntry *upspin.DirEntry) error {
+type GetFn func(name upspin.PathName) ([]byte, error)
+
+func WrapKeys(cfg upspin.Config, get GetFn, entry, accessEntry *upspin.DirEntry) error {
 	const op = errors.Op("clientutil.WrapKeys")
 
 	packer := pack.Lookup(entry.Packing)
 	if packer == nil {
 		return errors.E(op, entry.Name, errors.Invalid, errors.Errorf("unrecognized Packing %d", entry.Packing))
 	}
-	readers, err := GetReaders(cfg, getFn, entry.Name, accessEntry)
+	readers, err := GetReaders(cfg, get, entry.Name, accessEntry)
 	if err != nil {
 		return errors.E(op, err)
 	}
@@ -34,14 +36,14 @@ func WrapKeys(cfg upspin.Config, getFn func(name upspin.PathName) ([]byte, error
 // according to the Access file.
 // If the Access file cannot be read because of lack of permissions,
 // it returns the owner of the file (but only if we are not the owner).
-func GetReaders(cfg upspin.Config, getFn func(name upspin.PathName) ([]byte, error), name upspin.PathName, accessEntry *upspin.DirEntry) ([]upspin.UserName, error) {
+func GetReaders(cfg upspin.Config, get GetFn, name upspin.PathName, accessEntry *upspin.DirEntry) ([]upspin.UserName, error) {
 	const op = errors.Op("clientutil.GetReaders")
 
 	if accessEntry == nil {
 		// No Access file present, therefore we must be the owner.
 		return nil, nil
 	}
-	accessData, err := getFn(accessEntry.Name)
+	accessData, err := get(accessEntry.Name)
 	if errors.Is(errors.NotExist, err) || errors.Is(errors.Permission, err) || errors.Is(errors.Private, err) {
 		// If we failed to get the Access file for access-control
 		// reasons, then we must not have read access and thus
@@ -67,7 +69,7 @@ func GetReaders(cfg upspin.Config, getFn func(name upspin.PathName) ([]byte, err
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
-	readers, err := acc.Users(access.Read, getFn)
+	readers, err := acc.Users(access.Read, get)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}
