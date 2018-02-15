@@ -777,7 +777,7 @@ func (c *Client) dupOrRename(op errors.Op, oldName, newName upspin.PathName, ren
 
 	packer := pack.Lookup(entry.Packing)
 	if packer == nil {
-		return nil, errors.E(op, oldName, errors.Invalid, errors.Errorf("unrecognized Packing %d", c.config.Packing()))
+		return nil, errors.E(op, oldName, errors.Invalid, errors.Errorf("unrecognized Packing %d", entry.Packing))
 	}
 	if access.IsAccessControlFile(newName) {
 		return nil, errors.E(op, newName, errors.Invalid, "Access or Group files cannot be renamed")
