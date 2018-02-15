@@ -116,10 +116,6 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 		return nil, errors.E(op, err)
 	}
 	name = evalEntry.Name
-	readers, err := clientutil.GetReaders(c.config, c.Get, name, accessEntry)
-	if err != nil {
-		return nil, errors.E(op, name, err)
-	}
 
 	// Encrypt data according to the preferred packer
 	packer := pack.Lookup(c.config.Packing())
@@ -158,8 +154,8 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 		return nil, errors.E(op, err)
 	}
 	ss.End()
-	ss = s.StartSpan("addReaders")
-	if err := clientutil.AddReaders(c.config, entry, packer, readers); err != nil {
+	ss = s.StartSpan("WrapKeys")
+	if err := clientutil.WrapKeys(c.config, c.Get, entry, accessEntry); err != nil {
 		return nil, err
 	}
 	ss.End()
@@ -715,11 +711,7 @@ func (c *Client) dupOrRename(op errors.Op, oldName, newName upspin.PathName, ren
 		if err != nil {
 			return nil, errors.E(op, trueOldName, err)
 		}
-		readers, err := clientutil.GetReaders(c.config, c.Get, trueOldName, accessEntry)
-		if err != nil {
-			return nil, errors.E(op, trueOldName, err)
-		}
-		if err := clientutil.AddReaders(c.config, entry, packer, readers); err != nil {
+		if err := clientutil.WrapKeys(c.config, c.Get, entry, accessEntry); err != nil {
 			return nil, errors.E(trueOldName, err)
 		}
 	}
