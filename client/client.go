@@ -116,7 +116,7 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 		return nil, errors.E(op, err)
 	}
 	name = evalEntry.Name
-	readers, err := c.getReaders(op, name, accessEntry)
+	readers, err := clientutil.GetReaders(c.config, c.Get, name, accessEntry)
 	if err != nil {
 		return nil, errors.E(op, name, err)
 	}
@@ -159,7 +159,7 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 	}
 	ss.End()
 	ss = s.StartSpan("addReaders")
-	if err := c.addReaders(op, entry, packer, readers); err != nil {
+	if err := clientutil.AddReaders(c.config, entry, packer, readers); err != nil {
 		return nil, err
 	}
 	ss.End()
@@ -320,96 +320,6 @@ func validateWhichAccess(name upspin.PathName, accessEntry *upspin.DirEntry) err
 		return errors.E(errors.Invalid, accessPath.Path(), namePath.User(), "writer of Access file is not the user of the requested path")
 	}
 	return nil
-}
-
-// For EE, update the packing for the other readers as specified by the Access file.
-// This call, if successful, will replace entry.Name with the value, after any
-// link evaluation, from the final call to WhichAccess. The caller may then
-// use that name or entry to avoid evaluating the links again.
-func (c *Client) addReaders(op errors.Op, entry *upspin.DirEntry, packer upspin.Packer, readers []upspin.UserName) error {
-	if packer.Packing() != upspin.EEPack {
-		return nil
-	}
-
-	name := entry.Name
-
-	// Add other readers to Packdata.
-	readersPublicKey := make([]upspin.PublicKey, 0, len(readers)+2)
-	f := c.config.Factotum()
-	if f == nil {
-		return errors.E(op, name, errors.Permission, "no factotum available")
-	}
-	readersPublicKey = append(readersPublicKey, f.PublicKey())
-	all := access.IsAccessControlFile(entry.Name)
-	for _, r := range readers {
-		if r == access.AllUsers {
-			all = true
-			continue
-		}
-		key, err := bind.KeyServer(c.config, c.config.KeyEndpoint())
-		if err != nil {
-			return errors.E(op, err)
-		}
-		u, err := key.Lookup(r)
-		if err != nil || len(u.PublicKey) == 0 {
-			// TODO warn that we can't process one of the readers?
-			continue
-		}
-		if u.PublicKey != readersPublicKey[0] { // don't duplicate self
-			// TODO(ehg) maybe should check for other duplicates?
-			readersPublicKey = append(readersPublicKey, u.PublicKey)
-		}
-	}
-	if all {
-		readersPublicKey = append(readersPublicKey, upspin.AllUsersKey)
-	}
-
-	packdata := make([]*[]byte, 1)
-	packdata[0] = &entry.Packdata
-	packer.Share(c.config, readersPublicKey, packdata)
-	return nil
-}
-
-// getReaders returns the list of intended readers for the given name
-// according to the Access file.
-// If the Access file cannot be read because of lack of permissions,
-// it returns the owner of the file (but only if we are not the owner).
-func (c *Client) getReaders(op errors.Op, name upspin.PathName, accessEntry *upspin.DirEntry) ([]upspin.UserName, error) {
-	if accessEntry == nil {
-		// No Access file present, therefore we must be the owner.
-		return nil, nil
-	}
-	accessData, err := c.Get(accessEntry.Name)
-	if errors.Is(errors.NotExist, err) || errors.Is(errors.Permission, err) || errors.Is(errors.Private, err) {
-		// If we failed to get the Access file for access-control
-		// reasons, then we must not have read access and thus
-		// cannot know the list of readers.
-		// Instead, just return the owner as the only reader.
-		parsed, err := path.Parse(name)
-		if err != nil {
-			return nil, err
-		}
-		owner := parsed.User()
-		if owner == c.config.UserName() {
-			// We are the owner, but the caller always
-			// adds the us, so return an empty list.
-			return nil, nil
-		}
-		return []upspin.UserName{owner}, nil
-	} else if err != nil {
-		// We failed to fetch the Access file for some unexpected reason,
-		// so bubble the error up.
-		return nil, err
-	}
-	acc, err := access.Parse(accessEntry.Name, accessData)
-	if err != nil {
-		return nil, err
-	}
-	readers, err := acc.Users(access.Read, c.Get)
-	if err != nil {
-		return nil, err
-	}
-	return readers, nil
 }
 
 func makeDirectoryLookupFn(dir upspin.DirServer, entry *upspin.DirEntry, s *metric.Span) (*upspin.DirEntry, error) {
@@ -805,11 +715,11 @@ func (c *Client) dupOrRename(op errors.Op, oldName, newName upspin.PathName, ren
 		if err != nil {
 			return nil, errors.E(op, trueOldName, err)
 		}
-		readers, err := c.getReaders(op, trueOldName, accessEntry)
+		readers, err := clientutil.GetReaders(c.config, c.Get, trueOldName, accessEntry)
 		if err != nil {
 			return nil, errors.E(op, trueOldName, err)
 		}
-		if err := c.addReaders(op, entry, packer, readers); err != nil {
+		if err := clientutil.AddReaders(c.config, entry, packer, readers); err != nil {
 			return nil, errors.E(trueOldName, err)
 		}
 	}
