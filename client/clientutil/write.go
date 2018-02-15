@@ -8,9 +8,27 @@ import (
 	"upspin.io/access"
 	"upspin.io/bind"
 	"upspin.io/errors"
+	"upspin.io/pack"
 	"upspin.io/path"
 	"upspin.io/upspin"
 )
+
+func WrapKeys(cfg upspin.Config, getFn func(name upspin.PathName) ([]byte, error), entry, accessEntry *upspin.DirEntry) error {
+	const op = errors.Op("clientutil.WrapKeys")
+
+	packer := pack.Lookup(entry.Packing)
+	if packer == nil {
+		return errors.E(op, entry.Name, errors.Invalid, errors.Errorf("unrecognized Packing %d", entry.Packing))
+	}
+	readers, err := GetReaders(cfg, getFn, entry.Name, accessEntry)
+	if err != nil {
+		return errors.E(op, err)
+	}
+	if err := AddReaders(cfg, entry, packer, readers); err != nil {
+		return errors.E(op, err)
+	}
+	return nil
+}
 
 // getReaders returns the list of intended readers for the given name
 // according to the Access file.
