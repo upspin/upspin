@@ -230,6 +230,12 @@ func (f *File) writeAt(op errors.Op, b []byte, off int64) (n int, err error) {
 	if end > maxInt {
 		return 0, errors.E(op, errors.Invalid, f.name, "file too long")
 	}
+
+	data, err := f.client.Get(f.name)
+	if err == nil {
+		f.data = data
+	}
+
 	if end > int64(cap(f.data)) {
 		// Grow the capacity of f.data but keep length the same.
 		// Be careful not to ask for more than an int's worth of length.

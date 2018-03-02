@@ -43,6 +43,49 @@ func TestWriteAndClose(t *testing.T) {
 	}
 }
 
+func TestWriteAt(t *testing.T) {
+	testCases := []struct {
+		init   string
+		add    string
+		offset int64
+		want   string
+	}{
+		{"Hello", ", Augie!", int64(len("Hello")), "Hello, Augie!"},
+		{"", "Hello, Augie!", 0, "Hello, Augie!"},
+		{"Hello, Gopher!", "Augie!", int64(len("Hello, ")), "Hello, Augie!!"},
+	}
+
+	for _, tc := range testCases {
+		c := &dummyClient{}
+
+		if tc.init != "" {
+			if _, err := c.Put(fileName, []byte(tc.init)); err != nil {
+				t.Fatalf("Expected no error, got %v", err)
+			}
+		}
+
+		f := Writable(c, fileName)
+		if _, err := f.WriteAt([]byte(tc.add), tc.offset); err != nil {
+			t.Fatalf("Expected no error, got %v", err)
+		}
+
+		if err := f.Close(); err != nil {
+			t.Fatalf("Expected no error, got %v", err)
+		}
+
+		got, err := c.Get(fileName)
+		if err != nil {
+			t.Fatalf("Expected no error, got %v", err)
+		}
+
+		if string(got) != tc.want {
+			t.Errorf("Expected '%s', got '%s'", tc.want, got)
+		}
+
+	}
+
+}
+
 func TestFileOverflow(t *testing.T) {
 	maxInt = 100
 	defer func() { maxInt = int64(^uint(0) >> 1) }()
@@ -110,7 +153,7 @@ type dummyClient struct {
 var _ upspin.Client = (*dummyClient)(nil)
 
 func (d *dummyClient) Get(name upspin.PathName) ([]byte, error) {
-	return nil, nil
+	return d.putData, nil
 }
 func (d *dummyClient) Lookup(name upspin.PathName, followFinal bool) (*upspin.DirEntry, error) {
 	return nil, nil
