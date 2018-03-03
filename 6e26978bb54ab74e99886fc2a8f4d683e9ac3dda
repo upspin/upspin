@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "2a2158c7_408ad6d9",
+        "filename": "client/file/file.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 6293
+      },
+      "writtenOn": "2018-03-03T17:31:01Z",
+      "side": 1,
+      "message": "I think you want to do this in the constructor. Otherwise, it might be too inefficient, especially if there is not cache server running.\n\nA bigger issue is that the current API doesn\u0027t provide a way to truncate the file when opening it for writing. You wouldn\u0027t have to do a Get if the user wants to truncate it anyway. This is what I did as a workaround this issue: https://github.com/fhs/9upspinfs/blob/55abb960636d4ead26ce11add497fddc08a9d747/file.go#L54",
+      "revId": "6e26978bb54ab74e99886fc2a8f4d683e9ac3dda",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "647a46b3_87847287",
+        "filename": "client/file/file_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 6293
+      },
+      "writtenOn": "2018-03-03T17:31:01Z",
+      "side": 1,
+      "message": "s/\u0027%s\u0027/%q/",
+      "revId": "6e26978bb54ab74e99886fc2a8f4d683e9ac3dda",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
