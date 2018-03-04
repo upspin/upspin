@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "598556d0_beef7791",
+        "filename": "client/file/file.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2018-03-04T22:32:35Z",
+      "side": 1,
+      "message": "Agree, it\u0027s not efficient to do a Get in each Write call.\n\nWe do need to change the upspin.io/file package API as you describe. \n\nI\u0027ve been doing a bunch of work toward this in trying to solve issue 143 \nhttps://github.com/upspin/upspin/issues/143\n\nYou can see the work-in-progress here:\n\nhttps://upspin-review.googlesource.com/c/upspin/+/18641\nhttps://upspin-review.googlesource.com/c/upspin/+/18642\nhttps://upspin-review.googlesource.com/c/upspin/+/18643\nhttps://upspin-review.googlesource.com/c/upspin/+/18644",
+      "parentUuid": "2a2158c7_408ad6d9",
+      "revId": "6e26978bb54ab74e99886fc2a8f4d683e9ac3dda",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "647a46b3_87847287",
         "filename": "client/file/file_test.go",
         "patchSetId": 1
