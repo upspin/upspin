@@ -37,6 +37,24 @@
     },
     {
       "key": {
+        "uuid": "1dd766c3_df862487",
+        "filename": "client/file/file.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 6188
+      },
+      "writtenOn": "2018-03-05T14:41:32Z",
+      "side": 1,
+      "message": "Sure the Get should be done in the constructor, don\u0027t know what I was thinking.",
+      "parentUuid": "598556d0_beef7791",
+      "revId": "6e26978bb54ab74e99886fc2a8f4d683e9ac3dda",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "647a46b3_87847287",
         "filename": "client/file/file_test.go",
         "patchSetId": 1
