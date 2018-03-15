@@ -7,6 +7,7 @@
 package log // import "upspin.io/log"
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"log"
@@ -78,6 +79,38 @@ func globals() globalState {
 
 func newDefaultLogger(w io.Writer) Logger {
 	return log.New(w, "", log.Ldate|log.Ltime|log.LUTC|log.Lmicroseconds)
+}
+
+// logBridge augments the Logger type with the io.Writer interface enabling
+// NewStdLogger to connect Go's standard library logger to the logger provided
+// by this package.
+type logBridge struct {
+	Logger
+}
+
+// Write parses the standard logging line (configured with log.Lshortfile) and
+// passes its message component to the logger provided by this package.
+func (lb logBridge) Write(b []byte) (n int, err error) {
+	var message string
+	// Split "f.go:42: message" into "f.go", "42", and "message".
+	parts := bytes.SplitN(b, []byte{':'}, 3)
+	if len(parts) != 3 || len(parts[0]) < 1 || len(parts[2]) < 1 {
+		message = fmt.Sprintf("bad log format: %s", b)
+	} else {
+		message = string(parts[2][1:]) // Skip leading space.
+	}
+	lb.Print(message)
+	return len(b), nil
+}
+
+// NewStdLogger creates a *log.Logger ("log" is from the Go standard library)
+// that forwards messages to the provided upspin logger using a logBridge. The
+// standard logger is configured with log.Lshortfile, this log line
+// format which is parsed to extract the log message (skipping the filename,
+// line number) to forward it to the provided upspin logger.
+func NewStdLogger(l Logger) *log.Logger {
+	lb := logBridge{l}
+	return log.New(lb, "", log.Lshortfile)
 }
 
 // Register connects an ExternalLogger to the default logger. This may only be

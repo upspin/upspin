@@ -88,7 +88,9 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	srv := &http.Server{}
+	srv := &http.Server{
+		ErrorLog: log.NewStdLogger(log.Debug),
+	}
 	go func() {
 		log.Fatal(srv.Serve(ln))
 	}()
