@@ -6,6 +6,18 @@
 
 package main // import "upspin.io/cmd/upspinfs"
 
+// Open files and a small cache of previously opened ones are cached
+// locally in disk files. Files blocks are downloaded on demand when
+// read. If an existing file is written to, the whole file is read in
+// since a new encryption key is chosen on writeback and old blocks
+// will no longer be valid even if unchanged.
+//
+// The local disk cache files are encrypted using a key chosen at
+// startup. Therefore all old cache files are removed  startup.
+//
+// TODO(p): Think about changing the encryption key behavior to avoid
+// rewriting unchanged blocks? It has security implications.
+
 import (
 	"crypto/sha256"
 	"fmt"
@@ -13,6 +25,7 @@ import (
 	filepath "path"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"bazil.org/fuse"
@@ -55,14 +68,21 @@ type cachedFile struct {
 	fname   string   // Filename in cache.
 	inStore bool     // True if this is a cached version of something in the store.
 	dirty   bool     // True if it needs to be written back on close.
-	seq     int64    // Sequence number of cached file.
 	file    *os.File // The cached file.
+	size    int64    // size of file in bytes.
+
+	// The following are used when demand loading existing files to keep
+	// track of what blocks have been loaded and an unpacker to do the
+	// decryption.
+	de            *upspin.DirEntry
+	blocksLoaded  []bool // True if the corresponding block has been downloaded.
+	nBlocksLoaded int    // Number of blocks downloaded.
+	bu            upspin.BlockUnpacker
+	cachedSize    int64
 }
 
-type cachedClosedFile struct {
-	c    *cache // cache this file belongs to
-	size int64  // size in bytes
-}
+// Used only in testing. Incremented whenever a cacheblock is downloaded to a local cachefile.
+var cacheBlocksLoaded int64
 
 func newCache(config upspin.Config, dir string, cacheSize int64) *cache {
 	c := &cache{dir: dir, client: client.New(config), lru: lrucache.NewLRU(maxRefs), lruMaxBytes: cacheSize}
@@ -142,73 +162,64 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 		return errors.E(op, err)
 	}
 
-	// If we have a cached version, just return it.
-	//
-	// We assume that plain pack files are mutable and not completely
-	// under our control. They are reread whenever opened.
-	cf := &cachedFile{c: c}
-	cdir, fname := c.cacheName(entry)
-	if entry.Packing != upspin.PlainPack {
-		c.Lock()
-		// Look for a dirty cached version.
-		cf.file, err = os.OpenFile(fname, os.O_RDWR, 0700)
-		if err == nil {
-			h.flags = flags
-			if info, err := cf.file.Stat(); err == nil {
-				c.lru.Remove(fname)
-				c.Unlock()
+	// Look for an already cached version.
+	c.Lock()
+	value, ok := c.lru.Get(name)
+	var cf *cachedFile
+	if ok {
+		// Remove from the cache of closed files since it is now open
+		// or about to be removed.
+		cf = value.(*cachedFile)
+		c.lru.Remove(name)
+		c.lruBytes -= cf.cachedSize
+		c.Unlock()
+
+		// Is it the right version and can we open it?
+		if cf.de.Sequence == entry.Sequence {
+			cf.file, err = os.OpenFile(cf.fname, os.O_RDWR, 0700)
+			if err == nil {
+				h.flags = flags
 				n.cf = cf
 				cf.n = n
-				n.attr.Size = uint64(info.Size())
-				cf.fname = fname
+				n.attr.Size = uint64(cf.size)
 				return nil
 			}
 		}
+
+		// Either the cached version couldn't be opened or had the wrong sequence.
+		os.Remove(cf.fname)
+	} else {
 		c.Unlock()
+	}
+
+	// No cached version found, create a new one.
+	dname, fname := c.cacheName(entry)
+	cf = &cachedFile{
+		c:     c,
+		n:     n,
+		fname: fname,
 	}
 
 	// Invalidate the kernel cache, this is a new version.
 	n.f.watched.invalidateChan <- n
 
-	// Create an unpacker to decrypt the file blocks.
-	packer := pack.Lookup(entry.Packing)
-	if packer == nil {
-		return errors.E(op, name, errors.Errorf("unrecognized Packing %d", entry.Packing))
-	}
-	bu, err := packer.Unpack(n.f.config, entry)
-	if err != nil {
-		return errors.E(op, name, err) // Showstopper.
-	}
-
-	// Read into a temporary file. We don't want to use it
-	// until we've copied over the complete file.
-	tmpName := c.mkTemp()
-	var file *os.File // The open cache file.
-	var offset int64  // The write offset into the cache file.
-	if file, err = os.OpenFile(tmpName, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0700); err != nil {
+	if err := cf.attachDirEntry(n.f.config, entry, false); err != nil {
 		return errors.E(op, err)
 	}
 
-	for b := 0; ; b++ {
-		// Read the next block.
-		block, ok := bu.NextBlock()
-		if !ok {
-			break // EOF
-		}
-		offset, err = copyBlock(n.f.config, offset, &block, bu, file)
-		if err != nil {
-			file.Close()
-			os.Remove(tmpName)
-			return errors.E(op, name, err)
-		}
+	// Create the new cache file.
+	os.Mkdir(dname, 0700)
+	if cf.file, err = os.OpenFile(cf.fname, os.O_CREATE|os.O_RDWR|os.O_TRUNC, 0700); err != nil {
+		return errors.E(op, err)
 	}
 
-	// Rename to indicate it is in the store.
-	if err := os.Rename(tmpName, fname); err != nil {
-		os.Mkdir(cdir, 0700)
-		if err := os.Rename(tmpName, fname); err != nil {
-			file.Close()
-			os.Remove(tmpName)
+	// Get the first block to make sure we can. If we didn't
+	// do this we would have to check accessability and that is
+	// complicated.
+	if cf.size > 0 {
+		if err := cf.download(0, 1); err != nil {
+			cf.file.Close()
+			os.Remove(cf.fname)
 			return errors.E(op, name, err)
 		}
 	}
@@ -216,33 +227,108 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 	// Set its properties and point the node at it.
 	cf.inStore = true
 	cf.fname = fname
-	cf.file = file
 	n.seq = entry.Sequence
 	h.flags = flags
-	n.attr.Size = uint64(offset)
+	n.attr.Size = uint64(cf.size)
 	n.cf = cf
-	cf.n = n
 	return nil
 }
 
-// CopyBlock reads a block from the store, decrypts it, and writes to the local file.
-func copyBlock(cfg upspin.Config, offset int64, block *upspin.DirBlock, bu upspin.BlockUnpacker, file *os.File) (int64, error) {
-	if block.Offset != offset {
-		return 0, errors.Str("inconsistent block offset")
+// fileSize extracts the file size from the DirEntry.
+func fileSize(de *upspin.DirEntry) int64 {
+	if de == nil || len(de.Blocks) == 0 {
+		return 0
 	}
-	cipher, err := clientutil.ReadLocation(cfg, block.Location)
-	if err != nil {
-		return 0, err
+	last := len(de.Blocks) - 1
+	return de.Blocks[last].Offset + de.Blocks[last].Size
+}
+
+// attachDirEntry links a cachedFile and a DirEntry. If the file has not been downloaded,
+// it also creates a block unpacker to be used when demand loading.
+func (cf *cachedFile) attachDirEntry(config upspin.Config, de *upspin.DirEntry, downloaded bool) error {
+	cf.de = de
+	cf.size = fileSize(de)
+	cf.blocksLoaded = make([]bool, len(de.Blocks))
+	if !downloaded {
+		// Create an unpacker to decrypt the file blocks.
+		packer := pack.Lookup(de.Packing)
+		if packer == nil {
+			return errors.E(de.Name, errors.Errorf("unrecognized Packing %d", de.Packing))
+		}
+		bu, err := packer.Unpack(config, de)
+		if err != nil {
+			return errors.E(de.Name, err)
+		}
+		cf.bu = bu
+	} else {
+		cf.nBlocksLoaded = len(de.Blocks)
+		for i := range cf.blocksLoaded {
+			cf.blocksLoaded[i] = true
+		}
 	}
-	clear, err := bu.Unpack(cipher)
-	if err != nil {
-		return 0, err
+	return nil
+}
+
+// detachDirEntry unlinks a DirEntry and a cachedFile.
+func (cf *cachedFile) detachDirEntry() {
+	cf.de = nil
+	cf.blocksLoaded = nil
+	cf.nBlocksLoaded = 0
+	cf.bu = nil
+}
+
+// download insures that the local cache file contains at least the region specified
+// by the offset and length parameters.
+func (cf *cachedFile) download(offset int64, size int64) error {
+	if cf.de == nil || cf.nBlocksLoaded >= len(cf.de.Blocks) {
+		return nil // nothing to download
 	}
-	n, err := file.WriteAt(clear, offset)
-	if err != nil {
-		return 0, err
+	// Find beginning block in sequence.
+	bi := 0
+	for ; bi < len(cf.de.Blocks); bi++ {
+		if offset >= cf.de.Blocks[bi].Offset && offset < cf.de.Blocks[bi].Offset+cf.de.Blocks[bi].Size {
+			break
+		}
 	}
-	return offset + int64(n), nil
+	if bi >= len(cf.de.Blocks) {
+		return nil
+	}
+
+	// Download blocks covering the range.
+	end := offset + size
+	for {
+		// Read the next block.
+		block, ok := cf.bu.SeekBlock(bi)
+		if !ok {
+			return nil // EOF
+		}
+		if block.Offset >= end {
+			return nil
+		}
+		if !cf.blocksLoaded[bi] {
+			// Not yet downloaded, download and decrypt.
+			cipher, err := clientutil.ReadLocation(cf.n.f.config, block.Location)
+			if err != nil {
+				return err
+			}
+			clear, err := cf.bu.Unpack(cipher)
+			if err != nil {
+				return err
+			}
+			for sofar := 0; sofar < len(clear); {
+				n, err := cf.file.WriteAt(clear[sofar:], block.Offset+int64(sofar))
+				if err != nil {
+					return err
+				}
+				sofar += n
+			}
+			cf.nBlocksLoaded++
+			atomic.AddInt64(&cacheBlocksLoaded, 1)
+			cf.blocksLoaded[bi] = true
+		}
+		bi++
+	}
+	return nil
 }
 
 // close is called when the last handle for a node has been closed.
@@ -251,15 +337,28 @@ func (cf *cachedFile) close() {
 	if cf == nil || cf.file == nil {
 		return
 	}
+	// Use the size of bytes cached rather than of the whole file.
+	info, err := cf.file.Stat()
+	if err != nil {
+		// if we can't stat the file (for example, if the user removed it), don't bother remembering it.
+		cf.file.Close()
+		os.Remove(cf.fname)
+		return
+	}
+	cf.cachedSize = info.Size()
 	cf.file.Close()
 	cf.file = nil
+	uname := cf.n.uname
+	cf.n = nil
 	cf.c.Lock()
-	cf.c.lru.Add(cf.fname, &cachedClosedFile{c: cf.c, size: int64(cf.n.attr.Size)})
+	defer cf.c.Unlock()
+	cf.c.lru.Add(uname, cf)
 	if cf.c.lruBytes < 0 {
 		log.Error.Print("lruBytes < 0")
 		cf.c.lruBytes = 0
 	}
-	cf.c.lruBytes += int64(cf.n.attr.Size)
+
+	cf.c.lruBytes += cf.cachedSize
 	for cf.c.lruBytes > cf.c.lruMaxBytes {
 		k, v := cf.c.lru.RemoveOldest()
 		if k == nil {
@@ -267,26 +366,14 @@ func (cf *cachedFile) close() {
 			cf.c.lruBytes = 0
 			break
 		}
-		v.(*cachedClosedFile).OnEviction(k)
+		v.(*cachedFile).OnEviction(k)
 	}
-	cf.c.Unlock()
 }
 
 // OnEviction is called whenever a file is evicted from the LRU.
-// This is called from lru.Add and cf.close with ccf.c locked.
-func (ccf *cachedClosedFile) OnEviction(k interface{}) {
-	ccf.c.lruBytes -= ccf.size
-	if err := os.Remove(k.(string)); err != nil {
-		log.Debug.Printf("%s", err)
-	}
-}
-
-// forget is called when the cached version is no longer correct.
-func (cf *cachedFile) forget() {
-	if cf == nil {
-		return
-	}
-	cf.close()
+// This is called from lru.Add and cf.close, both with cf.c locked.
+func (cf *cachedFile) OnEviction(k interface{}) {
+	cf.c.lruBytes -= cf.cachedSize
 	if err := os.Remove(cf.fname); err != nil {
 		log.Debug.Printf("%s", err)
 	}
@@ -297,6 +384,9 @@ func (cf *cachedFile) clone(size int64) error {
 	const op errors.Op = "cache.clone"
 	if size < 0 {
 		size = 1 << 62
+	}
+	if err := cf.download(0, size); err != nil {
+		return errors.E(op, err)
 	}
 
 	fname := cf.c.mkTemp()
@@ -328,6 +418,7 @@ func (cf *cachedFile) clone(size int64) error {
 			return errors.E(op, rerr)
 		}
 	}
+	cf.detachDirEntry()
 	cf.file.Close()
 	cf.fname = fname
 	cf.file = file
@@ -382,6 +473,7 @@ func (cf *cachedFile) truncate(n *node, size int64) error {
 			return errors.E(op, err)
 		}
 	}
+	cf.size = size
 	return nil
 }
 
@@ -397,6 +489,9 @@ func (cf *cachedFile) markDirty() error {
 
 // readAt reads from a cache file.
 func (cf *cachedFile) readAt(buf []byte, offset int64) (int, error) {
+	if err := cf.download(offset, int64(len(buf))); err != nil {
+		return 0, err
+	}
 	return cf.file.ReadAt(buf, offset)
 }
 
@@ -404,6 +499,12 @@ func (cf *cachedFile) readAt(buf []byte, offset int64) (int, error) {
 func (cf *cachedFile) writeAt(buf []byte, offset int64) (int, error) {
 	cf.markDirty()
 	rv, err := cf.file.WriteAt(buf, offset)
+	if err == nil {
+		end := offset + int64(rv)
+		if end > cf.size {
+			cf.size = end
+		}
+	}
 	return rv, err
 }
 
@@ -449,6 +550,7 @@ func (cf *cachedFile) writeback(n *node) error {
 		de, err = cf.c.client.Put(n.uname, cleartext)
 		if err == nil {
 			n.seq = de.Sequence
+			cf.attachDirEntry(n.f.config, de, true)
 			n.attr.Mtime = de.Time.Go()
 			break
 		}
