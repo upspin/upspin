@@ -16,6 +16,7 @@ import (
 	"path/filepath"
 	rtdebug "runtime/debug"
 	"strconv"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -25,6 +26,7 @@ import (
 	"upspin.io/client"
 	"upspin.io/config"
 	"upspin.io/factotum"
+	"upspin.io/log"
 	"upspin.io/path"
 	"upspin.io/test/testutil"
 	"upspin.io/upspin"
@@ -131,6 +133,7 @@ func mount() error {
 	}
 
 	// Mount the file system. It will be served in a separate go routine.
+	log.SetLevel("info")
 	do(cfg, testConfig.mountpoint, testConfig.cacheDir, maxBytes)
 
 	// Create the user root, all tests will need it.
@@ -199,14 +202,38 @@ func truncateFile(t *testing.T, fn string, size int64) {
 	}
 }
 
-func readAndCheckContentsOrDie(t *testing.T, fn string, buf []byte) {
-	err := readAndCheckContents(t, fn, buf)
+func readAtAndCheckContentsOrDie(t *testing.T, file *os.File, offset int64, buf []byte) {
+	err := readAtAndCheckContents(file, offset, buf)
 	if err != nil {
 		fatal(t, err)
 	}
 }
 
-func readAndCheckContents(t *testing.T, fn string, buf []byte) error {
+func readAtAndCheckContents(file *os.File, offset int64, buf []byte) error {
+	rbuf := make([]byte, len(buf))
+	n, err := file.ReadAt(rbuf, offset)
+	if err != nil {
+		return err
+	}
+	if n != len(buf) {
+		return fmt.Errorf("read %d bytes, expected %d", n, len(buf))
+	}
+	for i := range buf {
+		if buf[i] != rbuf[i] {
+			return fmt.Errorf("error at byte %d: %.2x should be %.2x", i, rbuf[i], buf[i])
+		}
+	}
+	return nil
+}
+
+func openReadAndCheckContentsOrDie(t *testing.T, fn string, buf []byte) {
+	err := openReadAndCheckContents(fn, buf)
+	if err != nil {
+		fatal(t, err)
+	}
+}
+
+func openReadAndCheckContents(fn string, buf []byte) error {
 	f, err := os.Open(fn)
 	if err != nil {
 		return err
@@ -264,13 +291,13 @@ func TestFile(t *testing.T) {
 	wf := writeFile(t, fn, buf)
 
 	// Read before close.
-	readAndCheckContentsOrDie(t, fn, buf)
+	openReadAndCheckContentsOrDie(t, fn, buf)
 
 	// Read after close.
 	if err := wf.Close(); err != nil {
 		t.Fatal(err)
 	}
-	readAndCheckContentsOrDie(t, fn, buf)
+	openReadAndCheckContentsOrDie(t, fn, buf)
 
 	// Test Rewriting part of the file.
 	for i := 0; i < len(buf)/2; i++ {
@@ -280,7 +307,7 @@ func TestFile(t *testing.T) {
 	if err := wf.Close(); err != nil {
 		t.Fatal(err)
 	}
-	readAndCheckContentsOrDie(t, fn, buf)
+	openReadAndCheckContentsOrDie(t, fn, buf)
 	remove(t, fn)
 
 	if err := os.RemoveAll(testDir); err != nil {
@@ -302,14 +329,14 @@ func TestTruncateFile(t *testing.T) {
 
 	// Truncate file and check.
 	truncateFile(t, fn, 8*1024)
-	readAndCheckContentsOrDie(t, fn, buf[:8*1024])
+	openReadAndCheckContentsOrDie(t, fn, buf[:8*1024])
 
 	// Extend file and check.
 	truncateFile(t, fn, 16*1024)
 	for i := 8 * 1024; i < 16*1024; i++ {
 		buf[i] = 0
 	}
-	readAndCheckContentsOrDie(t, fn, buf)
+	openReadAndCheckContentsOrDie(t, fn, buf)
 	remove(t, fn)
 
 	if err := os.RemoveAll(testDir); err != nil {
@@ -397,7 +424,7 @@ func TestRename(t *testing.T) {
 	if err := os.Rename(original, newname); err != nil {
 		t.Fatal(err)
 	}
-	readAndCheckContentsOrDie(t, newname, []byte(original))
+	openReadAndCheckContentsOrDie(t, newname, []byte(original))
 	notExist(t, original, "rename")
 	remove(t, newname)
 
@@ -407,7 +434,7 @@ func TestRename(t *testing.T) {
 	if err := os.Rename(original, newname); err != nil {
 		t.Fatal(err)
 	}
-	readAndCheckContentsOrDie(t, newname, []byte(original))
+	openReadAndCheckContentsOrDie(t, newname, []byte(original))
 	notExist(t, original, "rename")
 
 	if err := os.RemoveAll(testDir); err != nil {
@@ -429,7 +456,7 @@ func TestAccess(t *testing.T) {
 	mkFile(t, access, []byte("r,l: "+testConfig.user+"\n"))
 
 	// We should still be able to read.
-	readAndCheckContentsOrDie(t, fn, []byte(fn))
+	openReadAndCheckContentsOrDie(t, fn, []byte(fn))
 
 	// Rewrite should fail.
 	if _, err := os.OpenFile(fn, os.O_WRONLY, perm); err == nil {
@@ -476,7 +503,7 @@ func TestEventualConsistency(t *testing.T) {
 	if _, err := cl.Put(ufn, buf2); err != nil {
 		fatal(t, err)
 	}
-	eventually(t, func() error { return readAndCheckContents(t, fn, buf2) }, 5*time.Second)
+	eventually(t, func() error { return openReadAndCheckContents(fn, buf2) }, 5*time.Second)
 
 	// Create a new file via the Upspin API. Test that Reads via the host
 	// correctly read it.
@@ -485,7 +512,7 @@ func TestEventualConsistency(t *testing.T) {
 	if _, err := cl.Put(ufn, buf2); err != nil {
 		fatal(t, err)
 	}
-	eventually(t, func() error { return readAndCheckContents(t, fn, buf2) }, 5*time.Second)
+	eventually(t, func() error { return openReadAndCheckContents(fn, buf2) }, 5*time.Second)
 
 	// Create a new file via the Upspin API. Test that Stat on the host sees it.
 	fn = filepath.Join(testDir, "file3")
@@ -560,6 +587,62 @@ func TestEventualConsistency(t *testing.T) {
 		return errors.New("still there 2")
 	}
 	eventually(t, f, 5*time.Second)
+}
+
+// TestDemandLoad tests loading multiple Block files.
+func TestDemandLoad(t *testing.T) {
+	testDir := mkTestDir(t, "TestDemandLoad")
+	uTestDir := path.Join(upspin.PathName(testConfig.user), "TestDemandLoad")
+	cl := client.New(testConfig.cfg)
+
+	// Offsets into the file.
+	first := int64(0)                      // offset of first block
+	second := int64(upspin.BlockSize)      // offset of second block
+	secondPlus := int64(second + 128*1024) // offset to data not cached by the kernel after reading the start of second
+	third := int64(2 * upspin.BlockSize)   // offset of the third block
+
+	// Create and write a file directly via the upspin API
+	fn := filepath.Join(testDir, "file")
+	ufn := path.Join(uTestDir, "file")
+	buf1 := randomBytes(t, 128)
+	buf2 := randomBytes(t, 128)
+	buf2p := randomBytes(t, 128)
+	buf3 := randomBytes(t, 128)
+	buf := make([]byte, 4*upspin.BlockSize)
+	copy(buf[0:128], buf1)
+	copy(buf[second:second+128], buf2)
+	copy(buf[secondPlus:secondPlus+128], buf2p)
+	copy(buf[third:third+128], buf3)
+	if _, err := cl.Put(ufn, buf); err != nil {
+		fatal(t, err)
+	}
+
+	// Discount any blocks loaded up to this point.
+	initial := atomic.LoadInt64(&cacheBlocksLoaded)
+
+	// Read the file via the kernel FUSE file system. Check results and number of blocks demand loaded.
+	file, err := os.Open(fn)
+	if err != nil {
+		fatal(t, err)
+	}
+	readAtAndCheckContentsOrDie(t, file, first, buf1)
+	readAtAndCheckContentsOrDie(t, file, second, buf2)
+	file.Close()
+	if l := atomic.LoadInt64(&cacheBlocksLoaded); l != 2+initial {
+		fatal(t, fmt.Sprintf("cacheBlocksLoaded: got %d expected %d", l, 2+initial))
+	}
+
+	file, err = os.Open(fn)
+	if err != nil {
+		fatal(t, err)
+	}
+	readAtAndCheckContentsOrDie(t, file, 0, buf1)           // already downloaded
+	readAtAndCheckContentsOrDie(t, file, secondPlus, buf2p) // already downloaded
+	readAtAndCheckContentsOrDie(t, file, third, buf3)       // not yet downloaded
+	if l := atomic.LoadInt64(&cacheBlocksLoaded); l != 3+initial {
+		fatal(t, fmt.Sprintf("cacheBlocksLoaded: got %d expected %d", l, 3+initial))
+	}
+	file.Close()
 }
 
 func TestCleanup(t *testing.T) {
