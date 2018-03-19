@@ -4,7 +4,11 @@
 [[projects]]
   branch = "master"
   name = "bazil.org/fuse"
-  packages = [".","fs","fuseutil"]
+  packages = [
+    ".",
+    "fs",
+    "fuseutil"
+  ]
   revision = "371fbbdaa8987b715bdd21d6adc4c9b20155f748"
 
 [[projects]]
@@ -28,8 +32,12 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/crypto"
-  packages = ["acme","acme/autocert","hkdf"]
-  revision = "13931e22f9e72ea58bb73048bc752b48c6d4d4ac"
+  packages = [
+    "acme",
+    "acme/autocert",
+    "hkdf"
+  ]
+  revision = "c3a3ad6d03f7a915c0f7e194b7152974bb73d287"
 
 [[projects]]
   branch = "master"
@@ -40,7 +48,24 @@
 [[projects]]
   branch = "master"
   name = "golang.org/x/text"
-  packages = ["cases","internal","internal/gen","internal/tag","internal/triegen","internal/ucd","language","runes","secure/bidirule","secure/precis","transform","unicode/bidi","unicode/cldr","unicode/norm","unicode/rangetable","width"]
+  packages = [
+    "cases",
+    "internal",
+    "internal/gen",
+    "internal/tag",
+    "internal/triegen",
+    "internal/ucd",
+    "language",
+    "runes",
+    "secure/bidirule",
+    "secure/precis",
+    "transform",
+    "unicode/bidi",
+    "unicode/cldr",
+    "unicode/norm",
+    "unicode/rangetable",
+    "width"
+  ]
   revision = "6eab0e8f74e86c598ec3b6fad4888e0c11482d48"
 
 [[projects]]
