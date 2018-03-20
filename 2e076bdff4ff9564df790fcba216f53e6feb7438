@@ -1,0 +1,101 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "481728f5_25ef1642",
+        "filename": "cmd/upspinfs/cache.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2018-03-20T23:23:49Z",
+      "side": 1,
+      "message": "0600 ?",
+      "range": {
+        "startLine": 212,
+        "startChar": 76,
+        "endLine": 212,
+        "endChar": 79
+      },
+      "revId": "2e076bdff4ff9564df790fcba216f53e6feb7438",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "c0d51970_77393d08",
+        "filename": "cmd/upspinfs/cache.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2018-03-20T23:23:49Z",
+      "side": 1,
+      "message": "*upspin.DirEntry has a method Size for this purpose",
+      "revId": "2e076bdff4ff9564df790fcba216f53e6feb7438",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ccfc5d12_580e6da7",
+        "filename": "cmd/upspinfs/cache.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 287,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2018-03-20T23:23:49Z",
+      "side": 1,
+      "message": "a sanity check for offset\u003c0 || size\u003c0 is probably worth it here, too.",
+      "revId": "2e076bdff4ff9564df790fcba216f53e6feb7438",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d90da76d_eb0e272f",
+        "filename": "cmd/upspinfs/cache.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2018-03-20T23:23:49Z",
+      "side": 1,
+      "message": "A bit clearer perhaps:\n\nfor bi \u003c len(cf.de.Blocks); bi++ {\n  b :\u003d \u0026cf.de.Blocks[bi]\n  if b.Offset \u003c\u003d offset \u0026\u0026 offset \u003c b.Offset+b.Size {\n    break\n  }\n}",
+      "revId": "2e076bdff4ff9564df790fcba216f53e6feb7438",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "786216b2_b289b6de",
+        "filename": "cmd/upspinfs/upspinfs_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2018-03-20T23:23:49Z",
+      "side": 1,
+      "message": "want? expect?",
+      "range": {
+        "startLine": 212,
+        "startChar": 57,
+        "endLine": 212,
+        "endChar": 60
+      },
+      "revId": "2e076bdff4ff9564df790fcba216f53e6feb7438",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
