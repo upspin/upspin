@@ -16,6 +16,24 @@
       "revId": "cdd5e5b24945e7f2b88706f3c9c7ac1154d20300",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d93caaef_332cb681",
+        "filename": "cmd/upspinfs/cache.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2018-03-21T21:14:53Z",
+      "side": 1,
+      "message": "Done.  Thanks.\n\nOdd, I figured it must exist but didn\u0027t find it when I grep\u0027d code.go. Must have spelled Size wrong, it was late.",
+      "parentUuid": "0c72496a_8ea3c3c7",
+      "revId": "cdd5e5b24945e7f2b88706f3c9c7ac1154d20300",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
