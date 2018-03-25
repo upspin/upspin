@@ -125,8 +125,12 @@ func OptionsFromFlags() *Options {
 		}
 		hosts = []string{host}
 	}
+	addr := flags.HTTPSAddr
+	if flags.InsecureHTTP {
+		addr = flags.HTTPAddr
+	}
 	return &Options{
-		Addr:             flags.HTTPSAddr,
+		Addr:             addr,
 		HTTPAddr:         flags.HTTPAddr,
 		LetsEncryptCache: flags.LetsEncryptCache,
 		LetsEncryptHosts: hosts,
