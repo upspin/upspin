@@ -331,7 +331,7 @@ func (wbq *writebackQueue) writeback(r *request) error {
 	data, err := wbq.sc.readFromCacheFile(absPath)
 	if err != nil {
 		// Nothing we can do, log it but act like we succeeded.
-		log.Error.Printf("store/storecache.writer: disappeared before writeback: %s", err)
+		log.Error.Printf("store/storecache.writer: data for %s@%s disappeared before writeback: %s", r.Reference, r.Endpoint, err)
 		return nil
 	}
 	r.len = int64(len(data))
@@ -350,8 +350,9 @@ func (wbq *writebackQueue) writeback(r *request) error {
 		return err
 	}
 	if err := os.Remove(absPath); err != nil {
-		log.Info.Printf("store/storecache.writer: fail remove after writeback: %s", err)
+		log.Error.Printf("store/storecache.writer: fail remove after writeback: %s", err)
 	}
+	log.Info.Printf("store/storecache.writer: %s@%s writeback successful", r.Reference, r.Endpoint)
 	return nil
 }
 
