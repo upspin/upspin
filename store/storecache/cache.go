@@ -123,12 +123,12 @@ func (c *storeCache) walkedWriteBack(relPath string, size int64) {
 		return
 	}
 	if err := os.MkdirAll(filepath.Dir(cachePath), 0700); err != nil {
-		log.Debug.Printf("walkedWriteBack %s: %s", relPath, err)
+		log.Error.Printf("walkedWriteBack %s: %s", relPath, err)
 		return
 	}
 	wbPath := c.absWritebackPath(relPath)
 	if err := os.Link(wbPath, cachePath); err != nil {
-		log.Debug.Printf("walkedWriteBack %s: %s", relPath, err)
+		log.Error.Printf("walkedWriteBack %s: %s", relPath, err)
 	}
 }
 
@@ -155,7 +155,8 @@ func (c *storeCache) walk(root, relDirPath string, action func(string, int64)) e
 	info, err := f.Readdir(0)
 	f.Close()
 	if err != nil {
-		return os.RemoveAll(absDirPath)
+		log.Error.Printf("walking cache dirs: %s", err)
+		return err
 
 	}
 	if len(info) == 0 && len(relDirPath) != 0 {
