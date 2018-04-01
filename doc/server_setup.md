@@ -194,6 +194,7 @@ in the event of a disk failure all your Upspin data will be lost.**
 + [Google Drive](/doc/server_setup_drive.md)
 + [Amazon Web Services](/doc/server_setup_aws.md)
 + [Dropbox](/doc/server_setup_dropbox.md)
++ [Backblaze B2](/doc/server_setup_b2.md)
 
 ## Set up a server and deploy the `upspinserver` binary {#deploy}
 
