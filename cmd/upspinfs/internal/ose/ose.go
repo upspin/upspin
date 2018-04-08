@@ -24,6 +24,7 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"encoding/binary"
+
 	"upspin.io/cache"
 
 	"fmt"
@@ -55,11 +56,13 @@ var state = struct {
 }
 
 // File represents an encrypted file.
+// There are no holes, in other words the disk file is not sparse.
 type File struct {
 	name string
 	f    *os.File
 	benc cipher.Block
 	refs int
+	size int64
 }
 
 // OpenFile opens an encrypted file.
@@ -70,6 +73,10 @@ func OpenFile(name string, flag int, mode os.FileMode) (*File, error) {
 	}
 	state.Lock()
 	defer state.Unlock()
+	st, err := f.Stat()
+	if err != nil {
+		return nil, err
+	}
 	file, ok := state.nameToFile[name]
 	if ok {
 		file.f.Close()
@@ -83,6 +90,7 @@ func OpenFile(name string, flag int, mode os.FileMode) (*File, error) {
 	}
 	file.f = f
 	file.refs++
+	file.size = st.Size()
 	state.toRemove.Remove(file.name)
 	return file, nil
 }
@@ -108,6 +116,7 @@ func Create(name string) (*File, error) {
 	}
 	file.f = f
 	file.refs++
+	file.size = 0
 	state.toRemove.Remove(file.name)
 	return file, nil
 }
@@ -155,7 +164,17 @@ func RemoveAll(subtree string) error {
 
 // Truncate shortens a file.
 func Truncate(name string, size int64) error {
-	return os.Truncate(name, size)
+	state.Lock()
+	defer state.Unlock()
+	file, ok := state.nameToFile[name]
+	if !ok {
+		return fmt.Errorf("file to truncate doesn't exist: %s", name)
+	}
+	err := os.Truncate(name, size)
+	if err == nil {
+		file.size = size
+	}
+	return err
 }
 
 // Close closes a file. If the ref count goes to zero, the file is removed.
@@ -195,8 +214,35 @@ func (file *File) ReadAt(b []byte, off int64) (int, error) {
 // WriteAt encrypts the content and writes it to the file.
 // Unlike os.WriteAt, this changes the contents of b.
 func (file *File) WriteAt(b []byte, off int64) (int, error) {
+	if off > file.size {
+		// This WriteAt implicitly extends the file. Fill the hole.
+		state.Lock()
+		hole := make([]byte, off-file.size)
+		file.xor(hole, file.size)
+		// TODO(grosse)  If the hole is huge, this will either panic
+		// with an allocation error or take a long time in WriteAt.
+		// If so, I expect the correct fix is to change the calling
+		// application to avoid sparse files. If experience shows that
+		// is not so, complicate this implementation by actually
+		// using sparse disk files, either redundantly maintaining a
+		// list of holes in struct File or reading the inode data.
+		n, err := file.f.WriteAt(hole, file.size)
+		file.size += int64(n)
+		state.Unlock()
+		if err != nil {
+			return 0, err
+		} else if n < len(hole) {
+			return 0, fmt.Errorf("in filling hole, wrote %d expected %d", n, len(hole))
+		}
+	}
 	file.xor(b, off)
-	return file.f.WriteAt(b, off)
+	n, err := file.f.WriteAt(b, off)
+	state.Lock()
+	if n > 0 && file.size < off+int64(n) {
+		file.size = off + int64(n)
+	}
+	state.Unlock()
+	return n, err
 }
 
 const aesKeyLen = 32
