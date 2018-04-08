@@ -24,6 +24,7 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"encoding/binary"
+
 	"upspin.io/cache"
 
 	"fmt"
@@ -55,16 +56,22 @@ var state = struct {
 }
 
 // File represents an encrypted file.
+// There are no holes, in other words the disk file is not sparse.
 type File struct {
 	name string
 	f    *os.File
 	benc cipher.Block
 	refs int
+	size int64
 }
 
 // OpenFile opens an encrypted file.
 func OpenFile(name string, flag int, mode os.FileMode) (*File, error) {
 	f, err := os.OpenFile(name, flag, mode)
+	if err != nil {
+		return nil, err
+	}
+	st, err := f.Stat()
 	if err != nil {
 		return nil, err
 	}
@@ -83,6 +90,7 @@ func OpenFile(name string, flag int, mode os.FileMode) (*File, error) {
 	}
 	file.f = f
 	file.refs++
+	file.size = st.Size()
 	state.toRemove.Remove(file.name)
 	return file, nil
 }
@@ -108,6 +116,7 @@ func Create(name string) (*File, error) {
 	}
 	file.f = f
 	file.refs++
+	file.size = 0
 	state.toRemove.Remove(file.name)
 	return file, nil
 }
@@ -155,6 +164,13 @@ func RemoveAll(subtree string) error {
 
 // Truncate shortens a file.
 func Truncate(name string, size int64) error {
+	state.Lock()
+	defer state.Unlock()
+	file, ok := state.nameToFile[name]
+	if !ok {
+		return fmt.Errorf("file to truncate doesn't exist: %s", name)
+	}
+	file.size = size
 	return os.Truncate(name, size)
 }
 
@@ -195,8 +211,24 @@ func (file *File) ReadAt(b []byte, off int64) (int, error) {
 // WriteAt encrypts the content and writes it to the file.
 // Unlike os.WriteAt, this changes the contents of b.
 func (file *File) WriteAt(b []byte, off int64) (int, error) {
+	if off > file.size {
+		// This WriteAt implicitly extends the file. Fill the hole.
+		hole := make([]byte, off-file.size)
+		file.xor(hole, file.size)
+		n, err := file.f.WriteAt(hole, file.size)
+		file.size += int64(n)
+		if err != nil {
+			return 0, err
+		} else if n < len(hole) {
+			// TODO(grosse)  I expect this would happen when off is unintentionally huge,
+			// so for now warn rather than fix.  Update when I understand more.
+			return 0, fmt.Errorf("in filling hole, wrote %d expected %d", n, len(hole))
+		}
+	}
 	file.xor(b, off)
-	return file.f.WriteAt(b, off)
+	n, err := file.f.WriteAt(b, off)
+	file.size += int64(n)
+	return n, err
 }
 
 const aesKeyLen = 32
