@@ -48,6 +48,29 @@
     },
     {
       "key": {
+        "uuid": "be9a03fc_fabab999",
+        "filename": "cmd/upspinfs/internal/ose/ose.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2018-04-10T16:10:47Z",
+      "side": 1,
+      "message": "You want to break this up. What if the first write is at 1 terabyte? You would require a 1 terabyte in memory buffer for the hole. No way that will work.",
+      "range": {
+        "startLine": 214,
+        "startChar": 0,
+        "endLine": 227,
+        "endChar": 1
+      },
+      "revId": "81fc95e046f0bbf5f565088778610eee5e7dca1b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "11447955_29f03df8",
         "filename": "cmd/upspinfs/internal/ose/ose.go",
         "patchSetId": 1
