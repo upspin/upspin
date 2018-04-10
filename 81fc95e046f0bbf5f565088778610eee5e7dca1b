@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "98a05fe1_1975ed25",
+        "filename": "cmd/upspinfs/internal/ose/ose.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2018-04-10T17:54:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1b82dc94_87a668f3",
+      "range": {
+        "startLine": 74,
+        "startChar": 0,
+        "endLine": 78,
+        "endChar": 0
+      },
+      "revId": "81fc95e046f0bbf5f565088778610eee5e7dca1b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "1de8adf8_3ee1ca3c",
         "filename": "cmd/upspinfs/internal/ose/ose.go",
         "patchSetId": 1
@@ -45,6 +69,30 @@
       "revId": "81fc95e046f0bbf5f565088778610eee5e7dca1b",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "2d0d27e3_e6b2d6b9",
+        "filename": "cmd/upspinfs/internal/ose/ose.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2018-04-10T17:54:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1de8adf8_3ee1ca3c",
+      "range": {
+        "startLine": 173,
+        "startChar": 1,
+        "endLine": 174,
+        "endChar": 31
+      },
+      "revId": "81fc95e046f0bbf5f565088778610eee5e7dca1b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "82f38084_eab6bc88",
+        "filename": "cmd/upspinfs/internal/ose/ose.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2018-04-10T17:54:45Z",
+      "side": 1,
+      "message": "Added a comment.  What I\u0027d really like to do is somehow warn the caller if the hole is larger than, say 50MB.  They almost surely should rewrite their client application to avoid sparse files.  But I don\u0027t know how to send such a message.  Log somewhere?",
+      "parentUuid": "be9a03fc_fabab999",
+      "range": {
+        "startLine": 214,
+        "startChar": 0,
+        "endLine": 227,
+        "endChar": 1
+      },
+      "revId": "81fc95e046f0bbf5f565088778610eee5e7dca1b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "11447955_29f03df8",
         "filename": "cmd/upspinfs/internal/ose/ose.go",
         "patchSetId": 1
@@ -82,6 +154,30 @@
       "writtenOn": "2018-04-10T16:05:50Z",
       "side": 1,
       "message": "Once again you need locking around this.  You might be guaranteed that some other part of upspinfs is providing sufficient locking by locking the node, but I would rather not trust that down here.\n\nGiven that this is a potentially expensive operation, this might argue for a per File Lock. Otherwise you will lose asynchrony in upspinfs.\n\nA pity that this makes sparse writing incredibly inefficient. Not much you can do though. You could maintain a list of holes if you don\u0027t mind a bad guy being able to find holes by reading the file...",
+      "range": {
+        "startLine": 214,
+        "startChar": 1,
+        "endLine": 230,
+        "endChar": 22
+      },
+      "revId": "81fc95e046f0bbf5f565088778610eee5e7dca1b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "b834ce46_67ace124",
+        "filename": "cmd/upspinfs/internal/ose/ose.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2018-04-10T17:54:45Z",
+      "side": 1,
+      "message": "I think I\u0027ve now locked it correctly without too much inefficiency, but welcome further advice.",
+      "parentUuid": "11447955_29f03df8",
       "range": {
         "startLine": 214,
         "startChar": 1,
