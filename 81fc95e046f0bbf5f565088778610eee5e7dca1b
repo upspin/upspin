@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "1b82dc94_87a668f3",
+        "filename": "cmd/upspinfs/internal/ose/ose.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2018-04-10T16:05:50Z",
+      "side": 1,
+      "message": "file.Size has added a new concurrency. I would require a lock around it everywhere.  state.Lock() works for this or one could use a per File lock if you are afraid that a single lock would slow things down. Perhaps not worry about it till you are \n\nThis means we also need locking around anything that changes the size of the file. In this case, move the Stat into that lock since you don\u0027t want the file changing size twixt the Stat and the setting of file.size.",
+      "range": {
+        "startLine": 74,
+        "startChar": 0,
+        "endLine": 78,
+        "endChar": 0
+      },
+      "revId": "81fc95e046f0bbf5f565088778610eee5e7dca1b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "1de8adf8_3ee1ca3c",
+        "filename": "cmd/upspinfs/internal/ose/ose.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2018-04-10T16:05:50Z",
+      "side": 1,
+      "message": "You don\u0027t want to change file.size till you know that the Truncate work.",
+      "range": {
+        "startLine": 173,
+        "startChar": 1,
+        "endLine": 174,
+        "endChar": 31
+      },
+      "revId": "81fc95e046f0bbf5f565088778610eee5e7dca1b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "11447955_29f03df8",
+        "filename": "cmd/upspinfs/internal/ose/ose.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2018-04-10T16:05:50Z",
+      "side": 1,
+      "message": "Once again you need locking around this.  You might be guaranteed that some other part of upspinfs is providing sufficient locking by locking the node, but I would rather not trust that down here.\n\nGiven that this is a potentially expensive operation, this might argue for a per File Lock. Otherwise you will lose asynchrony in upspinfs.\n\nA pity that this makes sparse writing incredibly inefficient. Not much you can do though. You could maintain a list of holes if you don\u0027t mind a bad guy being able to find holes by reading the file...",
+      "range": {
+        "startLine": 214,
+        "startChar": 1,
+        "endLine": 230,
+        "endChar": 22
+      },
+      "revId": "81fc95e046f0bbf5f565088778610eee5e7dca1b",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
