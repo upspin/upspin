@@ -22,6 +22,30 @@
       "revId": "018764431ac688a08fe51fd343bf9a9e58aa3200",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bf96be11_4be9a0f0",
+        "filename": "cmd/upspinfs/internal/ose/ose.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2018-04-10T18:33:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ef9198aa_2be04ee3",
+      "range": {
+        "startLine": 222,
+        "startChar": 2,
+        "endLine": 229,
+        "endChar": 2
+      },
+      "revId": "018764431ac688a08fe51fd343bf9a9e58aa3200",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
