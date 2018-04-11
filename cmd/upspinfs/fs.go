@@ -880,6 +880,7 @@ func (n *node) Link(ctx gContext.Context, req *fuse.LinkRequest, old fs.Node) (f
 func (n *node) Rename(ctx gContext.Context, req *fuse.RenameRequest, newDir fs.Node) error {
 	const op errors.Op = "Rename"
 	nn := newDir.(*node)
+	f := n.f
 
 	// Lock both dirs in fixed order to avoid deadlock. Obey lock ordering.
 	if n.uname == nn.uname {
@@ -901,7 +902,7 @@ func (n *node) Rename(ctx gContext.Context, req *fuse.RenameRequest, newDir fs.N
 
 	// At this point we are safe from changes in the directories since the
 	// directories are locked for creation and deletion of their contents.
-	if err := n.f.client.Rename(oldPath, newPath); err != nil {
+	if err := f.client.Rename(oldPath, newPath); err != nil {
 		// FUSE semantics state that a rename should
 		// remove the target if it exists.
 		if !errors.Is(errors.Exist, err) {
@@ -915,19 +916,31 @@ func (n *node) Rename(ctx gContext.Context, req *fuse.RenameRequest, newDir fs.N
 		if _, err := dir.Delete(newPath); err != nil {
 			return e2e(errors.E(op, oldPath, err))
 		}
-		if err := n.f.client.Rename(oldPath, newPath); err != nil {
+		if err := f.client.Rename(oldPath, newPath); err != nil {
 			return e2e(errors.E(op, oldPath, err))
 		}
 	}
 
-	// Forget what we know about them.
-	// NOTE(p): This means that a close of a dirty renamed file will recreate the old file.
-	// Not sure what acceptable semantics would be here.
-	n.f.removeMapping(oldPath)
-	n.f.removeMapping(newPath)
-	n.f.Lock()
-	delete(n.f.enoentMap, newPath)
-	n.f.Unlock()
+	f.Lock()
+	defer f.Unlock()
+	if newn, ok := f.nodeMap[newPath]; ok {
+		// An active node for newPath is still valid but lookups
+		// for newPath must not find it and it cannot be written back
+		// on close.
+		delete(f.nodeMap, newPath)
+		f.watched.remove(newPath)
+		newn.noWB = true
+	}
+	delete(f.enoentMap, newPath)
+	if oldn, ok := f.nodeMap[oldPath]; ok {
+		// Any active node for oldPath must now refer to newPath.
+		delete(f.nodeMap, oldPath)
+		f.watched.remove(oldPath)
+		oldn.uname = newPath
+		oldn.user = nn.user
+		f.nodeMap[newPath] = oldn
+		f.watched.add(newPath)
+	}
 	return nil
 }
 
