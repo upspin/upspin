@@ -585,7 +585,7 @@ func TestPutDuplicateAndRename(t *testing.T) {
 
 	// Rename the new file.
 	renamed := upspin.PathName(fmt.Sprintf("%s/renamed", user))
-	if err := client.Rename(dup, renamed); err != nil {
+	if _, err := client.Rename(dup, renamed); err != nil {
 		t.Fatal("link file:", err)
 	}
 	if _, err := client.Get(dup); err == nil {
@@ -667,12 +667,12 @@ func testRenames(t *testing.T, packing upspin.Packing) {
 		t.Fatal("put file:", err)
 	}
 	renamed := upspin.PathName(fmt.Sprintf("%s/user_renamed", owner))
-	if err := userClient.Rename(original, renamed); err != nil {
+	if _, err := userClient.Rename(original, renamed); err != nil {
 		t.Fatal("rename file:", err)
 	}
 
 	// Owner renames user created file.
-	if err := ownerClient.Rename(renamed, original); err != nil {
+	if _, err := ownerClient.Rename(renamed, original); err != nil {
 		t.Fatal("rename file:", err)
 	}
 	if err := ownerClient.Delete(original); err != nil {
@@ -685,12 +685,12 @@ func testRenames(t *testing.T, packing upspin.Packing) {
 		t.Fatal("put file:", err)
 	}
 	renamed = upspin.PathName(fmt.Sprintf("%s/owner_renamed", owner))
-	if err := userClient.Rename(original, renamed); err != nil {
+	if _, err := userClient.Rename(original, renamed); err != nil {
 		t.Fatal("link file:", err)
 	}
 
 	// User renames owner created file.
-	if err := userClient.Rename(renamed, original); err != nil {
+	if _, err := userClient.Rename(renamed, original); err != nil {
 		t.Fatal("link file:", err)
 	}
 	if err := userClient.Delete(original); err != nil {

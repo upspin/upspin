@@ -116,7 +116,7 @@ func (s *State) repackFileOrDir(entry *upspin.DirEntry, packer upspin.Packer, fo
 		s.Exit(err)
 	}
 	// Scary moment!
-	err = s.Client.Rename(new.Name(), old.Name())
+	_, err = s.Client.Rename(new.Name(), old.Name())
 	if err != nil {
 		log.Printf("rename failed, but repacked contents are now in %q", new.Name())
 		s.Exit(err)

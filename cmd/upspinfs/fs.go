@@ -900,9 +900,20 @@ func (n *node) Rename(ctx gContext.Context, req *fuse.RenameRequest, newDir fs.N
 	oldPath := path.Join(n.uname, req.OldName)
 	newPath := path.Join(nn.uname, req.NewName)
 
+	f.Lock()
+	newn := f.nodeMap[newPath]
+	oldn := f.nodeMap[oldPath]
+	f.Unlock()
+	if oldn != nil {
+		oldn.Lock()
+		defer oldn.Unlock()
+	}
+
 	// At this point we are safe from changes in the directories since the
 	// directories are locked for creation and deletion of their contents.
-	if err := f.client.Rename(oldPath, newPath); err != nil {
+	// We are also safe from changes to oldn.
+	de, err := f.client.Rename(oldPath, newPath)
+	if err != nil {
 		// FUSE semantics state that a rename should
 		// remove the target if it exists.
 		if !errors.Is(errors.Exist, err) {
@@ -916,14 +927,15 @@ func (n *node) Rename(ctx gContext.Context, req *fuse.RenameRequest, newDir fs.N
 		if _, err := dir.Delete(newPath); err != nil {
 			return e2e(errors.E(op, oldPath, err))
 		}
-		if err := f.client.Rename(oldPath, newPath); err != nil {
+		de, err = f.client.Rename(oldPath, newPath)
+		if err != nil {
 			return e2e(errors.E(op, oldPath, err))
 		}
 	}
 
 	f.Lock()
 	defer f.Unlock()
-	if newn, ok := f.nodeMap[newPath]; ok {
+	if newn != nil {
 		// An active node for newPath is still valid but lookups
 		// for newPath must not find it and it cannot be written back
 		// on close.
@@ -938,6 +950,7 @@ func (n *node) Rename(ctx gContext.Context, req *fuse.RenameRequest, newDir fs.N
 		f.watched.remove(oldPath)
 		oldn.uname = newPath
 		oldn.user = nn.user
+		oldn.seq = de.Sequence
 		f.nodeMap[newPath] = oldn
 		f.watched.add(newPath)
 	}

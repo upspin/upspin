@@ -729,13 +729,12 @@ func (c *Client) PutDuplicate(oldName, newName upspin.PathName) (*upspin.DirEntr
 }
 
 // Rename implements upspin.Client.
-func (c *Client) Rename(oldName, newName upspin.PathName) error {
+func (c *Client) Rename(oldName, newName upspin.PathName) (*upspin.DirEntry, error) {
 	const op errors.Op = "client.Rename"
 	m, s := newMetric(op)
 	defer m.Done()
 
-	_, err := c.dupOrRename(op, oldName, newName, true, s)
-	return err
+	return c.dupOrRename(op, oldName, newName, true, s)
 }
 
 // SetTime implements upspin.Client.
