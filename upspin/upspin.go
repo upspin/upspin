@@ -749,7 +749,11 @@ type Client interface {
 	// Rename renames oldName to newName. The old name is no longer valid.
 	// If the final element of the path name is a link, Rename will
 	// Rename the link itself, not the link target.
-	Rename(oldName, newName PathName) error
+	//
+	// A successful PutDuplicate returns an incomplete DirEntry (see the
+	// description of AttrIncomplete) containing only the
+	// new sequence number.
+	Rename(oldName, newName PathName) (*DirEntry, error)
 
 	// SetTime sets the time in name's DirEntry. If the final element
 	// of the path name is a link, SetTime will affect the link itself,
