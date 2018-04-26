@@ -85,6 +85,10 @@ func e2e(err error) *errnoError {
 	return &errnoError{errno, err}
 }
 
+func unsupported(err error) *errnoError {
+	return &errnoError{syscall.ENOTSUP, err}
+}
+
 // classify returns the Kind of error whether or not this is from the upspin errors pkg.
 func classify(err error) errors.Kind {
 	if ue, ok := err.(*errors.Error); ok {
