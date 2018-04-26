@@ -859,21 +859,7 @@ func (n *node) Fsync(ctx gContext.Context, req *fuse.FsyncRequest) error {
 // reference as old.
 func (n *node) Link(ctx gContext.Context, req *fuse.LinkRequest, old fs.Node) (fs.Node, error) {
 	const op errors.Op = "Link"
-	n.Lock()
-	defer n.Unlock()
-	oldPath := old.(*node).uname
-	newPath := path.Join(n.uname, req.NewName)
-	de, err := n.f.client.PutDuplicate(oldPath, newPath)
-	if err != nil {
-		return nil, e2e(errors.E(op, n.uname, err))
-	}
-	size, err := de.Size()
-	if err != nil {
-		return nil, e2e(errors.E(op, n.uname, err))
-	}
-	nn := n.f.allocNode(n, req.NewName, unixPermissions, uint64(size), time.Unix(int64(de.Time), 0))
-	nn.exists()
-	return nn, nil
+	return nil, unsupported(errors.E(op, n.uname, errors.Str("hard link unsuported")))
 }
 
 // Rename implements fs.Renamer.Rename. It renames the old node to r.NewName in directory n.
