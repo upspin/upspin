@@ -144,8 +144,8 @@ func (d *dummyClient) Open(name upspin.PathName) (upspin.File, error) {
 func (d *dummyClient) DirServer(name upspin.PathName) (upspin.DirServer, error) {
 	return nil, nil
 }
-func (d *dummyClient) Rename(oldName, newName upspin.PathName) error {
-	return nil
+func (d *dummyClient) Rename(oldName, newName upspin.PathName) (*upspin.DirEntry, error) {
+	return nil, nil
 }
 func (d *dummyClient) SetTime(name upspin.PathName, t upspin.Time) error {
 	return nil
