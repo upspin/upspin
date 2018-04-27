@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "19f4420d_4f23c24d",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 752,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2018-04-27T03:21:16Z",
+      "side": 1,
+      "message": "does this need\n\n\t// A successful Rename returns an incomplete DirEntry (see the\n\t// description of AttrIncomplete) containing only the\n\t// new sequence number.\n\n?",
+      "revId": "9a9d8a01c644e0e665b47e83cb8e6c92c69a3361",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
