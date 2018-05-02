@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "d053213c_ab36e8dd",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 753,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2018-05-02T23:30:13Z",
+      "side": 1,
+      "message": "Rename ?",
+      "range": {
+        "startLine": 753,
+        "startChar": 17,
+        "endLine": 753,
+        "endChar": 29
+      },
+      "revId": "2cb2b3358f5f3ed8f96c8dbb37c11102563fd313",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
