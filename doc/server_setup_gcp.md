@@ -45,6 +45,7 @@ Finally, use the `gcloud` tool to enable the required APIs:
 
 ```
 local$ gcloud components install beta
+local$ gcloud projects create example-com
 local$ gcloud config set project example-com
 local$ gcloud auth login
 local$ gcloud beta services enable iam.googleapis.com
