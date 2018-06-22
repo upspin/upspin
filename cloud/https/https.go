@@ -213,7 +213,6 @@ func ListenAndServe(ready chan<- struct{}, opt *Options) {
 	}
 	shutdown.Handle(func() { ln.Close() })
 
-	httpLogger := log.NewStdLogger(log.Info)
 	if manager.Cache != nil {
 		// If we're using LetsEncrypt then we need to serve the http-01
 		// challenge by plain HTTP. We also serve a redirect to HTTPS
@@ -223,10 +222,7 @@ func ListenAndServe(ready chan<- struct{}, opt *Options) {
 			log.Fatalf("https: %v", err)
 		}
 		shutdown.Handle(func() { httpLn.Close() })
-		httpServer := &http.Server{
-			Handler:  manager.HTTPHandler(nil),
-			ErrorLog: httpLogger,
-		}
+		httpServer := &http.Server{Handler: manager.HTTPHandler(nil)}
 		go func() {
 			err := httpServer.Serve(httpLn)
 			log.Printf("https: %v", err)
@@ -254,7 +250,6 @@ func ListenAndServe(ready chan<- struct{}, opt *Options) {
 		WriteTimeout: 0,
 		IdleTimeout:  60 * time.Second,
 		TLSConfig:    config,
-		ErrorLog:     httpLogger,
 	}
 	// TODO(adg): enable HTTP/2 once it's fast enough
 	//err := http2.ConfigureServer(server, nil)
