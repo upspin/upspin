@@ -67,10 +67,7 @@ func serve(cfg upspin.Config, addr string) (<-chan error, error) {
 	// Use our own ServerMux so that we can run in the same
 	// process as a server using the default one.
 	mux := &http.ServeMux{}
-	httpServer := &http.Server{
-		Handler:  mux,
-		ErrorLog: log.NewStdLogger(log.Debug),
-	}
+	httpServer := &http.Server{Handler: mux}
 
 	mux.Handle("/api/Store/", ss)
 	mux.Handle("/api/Dir/", ds)
