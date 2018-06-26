@@ -132,7 +132,7 @@ func NewClient(cfg upspin.Config, netAddr upspin.NetAddr, security SecurityLevel
 		TLSHandshakeTimeout:   10 * time.Second,
 		ExpectContinueTimeout: 1 * time.Second,
 	}
-	// TOOD(adg): Re-enable HTTP/2 once it's fast enough to be usable.
+	// TODO(adg): Re-enable HTTP/2 once it's fast enough to be usable.
 	//if err := http2.ConfigureTransport(t); err != nil {
 	//	return nil, errors.E(op, err)
 	//}

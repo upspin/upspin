@@ -147,7 +147,7 @@ func (f *File) readAt(op errors.Op, dst []byte, off int64) (n int, err error) {
 			// If this is the block we last read (will often happen
 			// with sequential reads) then use that content,
 			// to avoid reading and unpacking again.
-			// TOOD(adg): write a test to ensure this is happening.
+			// TODO(adg): write a test to ensure this is happening.
 			clear = f.lastBlockBytes
 		} else {
 			// Otherwise, we need to read the block and unpack.
