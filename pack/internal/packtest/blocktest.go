@@ -165,7 +165,7 @@ func unpackEntryRandomly(ctx upspin.Config, store fakeStore, packer upspin.Packe
 			return err
 		}
 
-		off := (int)(cleartextBlockOffsets[n])
+		off := int(cleartextBlockOffsets[n])
 		want := data[off : off+len(clear)]
 		if !bytes.Equal(clear, want) {
 			return fmt.Errorf("block %d did not decrypt correctly", n)
