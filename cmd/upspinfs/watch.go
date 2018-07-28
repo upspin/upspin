@@ -376,8 +376,15 @@ func (d *watchedRoot) handleEvent(e *upspin.Event) error {
 	// At this point we know that n is an old version of the node
 	// for e.Entry.Name and that it hasn't been changed locally.
 	if e.Delete {
-		f.doesNotExist(n.uname)
-		n.deleted = true
+		// If the uname changed between the time we looked it up a few lines
+		// above and here, it means a Rename intervened, and reused the node.
+		// In that case we must not mark the node as deleted. Since Rename already
+		// made sure that old file is no longer used, it should be OK to skip
+		// this part.
+		if n.uname == e.Entry.Name {
+			f.doesNotExist(n.uname)
+			n.deleted = true
+		}
 	} else if n.cf != nil {
 		// If we've changed an open file, forget the
 		// mapping of name to node so that new opens
