@@ -75,15 +75,16 @@ const (
 var sourceRepo = map[string]string{
 	"upspin.io": "https://upspin.googlesource.com/upspin",
 
-	"android.upspin.io":   "https://upspin.googlesource.com/android",
-	"augie.upspin.io":     "https://upspin.googlesource.com/augie",
-	"aws.upspin.io":       "https://upspin.googlesource.com/aws",
-	"b2.upspin.io":        "https://upspin.googlesource.com/b2",
-	"drive.upspin.io":     "https://upspin.googlesource.com/drive",
-	"dropbox.upspin.io":   "https://upspin.googlesource.com/dropbox",
-	"exp.upspin.io":       "https://upspin.googlesource.com/exp",
-	"gcp.upspin.io":       "https://upspin.googlesource.com/gcp",
-	"openstack.upspin.io": "https://upspin.googlesource.com/openstack",
+	"android.upspin.io":      "https://upspin.googlesource.com/android",
+	"augie.upspin.io":        "https://upspin.googlesource.com/augie",
+	"aws.upspin.io":          "https://upspin.googlesource.com/aws",
+	"b2.upspin.io":           "https://upspin.googlesource.com/b2",
+	"digitalocean.upspin.io": "https://upspin.googlesource.com/digitalocean",
+	"drive.upspin.io":        "https://upspin.googlesource.com/drive",
+	"dropbox.upspin.io":      "https://upspin.googlesource.com/dropbox",
+	"exp.upspin.io":          "https://upspin.googlesource.com/exp",
+	"gcp.upspin.io":          "https://upspin.googlesource.com/gcp",
+	"openstack.upspin.io":    "https://upspin.googlesource.com/openstack",
 }
 
 func defaultDocPath() string {
