@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3aab08d2_2eb874c8",
+        "filename": ".travis.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5455
+      },
+      "writtenOn": "2018-12-16T22:18:23Z",
+      "side": 1,
+      "message": "I\u0027d be happy to just replace 1.9.x with 1.11.x",
+      "revId": "b5513238c3a7b2a26e5e2c96d4d16701d2749084",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
