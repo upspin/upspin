@@ -16,6 +16,24 @@
       "revId": "b5513238c3a7b2a26e5e2c96d4d16701d2749084",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "8016e287_177417b8",
+        "filename": ".travis.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 6408
+      },
+      "writtenOn": "2018-12-17T14:40:07Z",
+      "side": 1,
+      "message": "Even better :)",
+      "parentUuid": "3aab08d2_2eb874c8",
+      "revId": "b5513238c3a7b2a26e5e2c96d4d16701d2749084",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
