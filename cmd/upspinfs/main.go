@@ -30,7 +30,10 @@ import (
 
 const cmdName = "upspinfs"
 
-var mountpointFlag = flag.String("mountpoint", "", "`directory` on which to mount file system")
+var (
+	mountpointFlag = flag.String("mountpoint", "", "`directory` on which to mount file system")
+	allowOther     = flag.Bool("allow_other", false, "if set, allow other users to see the mount point; if using this option ensure that mount point access is strictly controlled")
+)
 
 func usage() {
 	fmt.Fprintf(os.Stderr, "Usage: %s [-mountpoint] <mount point>\n", os.Args[0])
@@ -81,7 +84,8 @@ func main() {
 	if err != nil {
 		log.Fatalf("can't determine absolute path to mount point %s: %s", *mountpointFlag, err)
 	}
-	done := do(cfg, mountpoint, filepath.Join(flags.CacheDir, string(cfg.UserName())), flags.CacheSize)
+	done := do(cfg, mountpoint, filepath.Join(flags.CacheDir, string(cfg.UserName())),
+		flags.CacheSize, *allowOther)
 
 	// Serve expvar data.
 	ln, err := local.Listen("tcp", config.LocalName(cfg, cmdName))

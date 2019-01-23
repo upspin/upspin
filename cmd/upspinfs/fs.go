@@ -1053,15 +1053,14 @@ func debug(msg interface{}) {
 
 // do is called both by main and testing to mount a FUSE file system. It exits on failure
 // and returns when the file system has been mounted and is ready for requests.
-func do(cfg upspin.Config, mountpoint string, cacheDir string, cacheSize int64) chan bool {
+func do(cfg upspin.Config, mountpoint string, cacheDir string, cacheSize int64, allowOther bool) chan bool {
 	if log.GetLevel() == "debug" {
 		fuse.Debug = debug
 	}
 
 	f := newUpspinFS(cfg, mountpoint, cacheDir, cacheSize)
 
-	c, err := fuse.Mount(
-		mountpoint,
+	opts := []fuse.MountOption{
 		fuse.FSName("upspin"),
 		fuse.Subtype("fs"),
 		fuse.LocalVolume(),
@@ -1070,7 +1069,12 @@ func do(cfg upspin.Config, mountpoint string, cacheDir string, cacheSize int64) 
 		//fuse.OSXDebugFuseKernel(),
 		//fuse.NoAppleDouble(),
 		//fuse.NoAppleXattr(),
-	)
+	}
+	if allowOther {
+		opts = append(opts, fuse.AllowOther())
+	}
+
+	c, err := fuse.Mount(mountpoint, opts...)
 	if err == fuse.ErrOSXFUSENotFound {
 		log.Fatal("FUSE for macOS is not installed. See https://osxfuse.github.io/")
 	}
