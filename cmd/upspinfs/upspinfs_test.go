@@ -135,7 +135,7 @@ func mount() error {
 
 	// Mount the file system. It will be served in a separate go routine.
 	log.SetLevel("info")
-	do(cfg, testConfig.mountpoint, testConfig.cacheDir, maxBytes)
+	do(cfg, testConfig.mountpoint, testConfig.cacheDir, maxBytes, false)
 
 	// Create the user root, all tests will need it.
 	testConfig.root = filepath.Join(testConfig.mountpoint, testConfig.user)
