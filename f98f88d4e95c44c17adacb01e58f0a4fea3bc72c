@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "ecd81a20_7174a6c1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6370
+      },
+      "writtenOn": "2019-02-13T07:35:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2afa9ee3_cc86b54e",
+      "revId": "f98f88d4e95c44c17adacb01e58f0a4fea3bc72c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "a36619e0_7f84a111",
         "filename": "/COMMIT_MSG",
         "patchSetId": 2
@@ -33,6 +51,24 @@
       "revId": "f98f88d4e95c44c17adacb01e58f0a4fea3bc72c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "5c305a5e_08a4d3ca",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 6370
+      },
+      "writtenOn": "2019-02-13T07:35:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a36619e0_7f84a111",
+      "revId": "f98f88d4e95c44c17adacb01e58f0a4fea3bc72c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     },
     {
       "key": {
@@ -59,6 +95,30 @@
     },
     {
       "key": {
+        "uuid": "ceac93e4_3bb8105a",
+        "filename": "cmd/upspinfs/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 6370
+      },
+      "writtenOn": "2019-02-13T07:35:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "97d646f7_e818977e",
+      "range": {
+        "startLine": 35,
+        "startChar": 51,
+        "endLine": 35,
+        "endChar": 101
+      },
+      "revId": "f98f88d4e95c44c17adacb01e58f0a4fea3bc72c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "820a5375_a92d69c6",
         "filename": "cmd/upspinfs/main.go",
         "patchSetId": 2
@@ -79,6 +139,30 @@
       "revId": "f98f88d4e95c44c17adacb01e58f0a4fea3bc72c",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "82c96ba2_3862acfa",
+        "filename": "cmd/upspinfs/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 6370
+      },
+      "writtenOn": "2019-02-13T07:35:53Z",
+      "side": 1,
+      "message": "Removed from here. I suppose that \"print defaults\" will print the flag.",
+      "parentUuid": "820a5375_a92d69c6",
+      "range": {
+        "startLine": 39,
+        "startChar": 34,
+        "endLine": 39,
+        "endChar": 49
+      },
+      "revId": "f98f88d4e95c44c17adacb01e58f0a4fea3bc72c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
