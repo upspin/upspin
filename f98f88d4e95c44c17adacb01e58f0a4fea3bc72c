@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "a36619e0_7f84a111",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2019-02-13T02:00:36Z",
+      "side": 1,
+      "message": "admin",
+      "revId": "f98f88d4e95c44c17adacb01e58f0a4fea3bc72c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "97d646f7_e818977e",
+        "filename": "cmd/upspinfs/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2019-02-13T02:00:36Z",
+      "side": 1,
+      "message": "perhaps add some kind of warning message here about security?",
+      "range": {
+        "startLine": 35,
+        "startChar": 51,
+        "endLine": 35,
+        "endChar": 101
+      },
+      "revId": "f98f88d4e95c44c17adacb01e58f0a4fea3bc72c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "820a5375_a92d69c6",
+        "filename": "cmd/upspinfs/main.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2019-02-13T02:00:36Z",
+      "side": 1,
+      "message": "I don\u0027t think it\u0027s necessary to print this here; it\u0027ll be seldom used. Maybe just\n\n\"[flags] \u003cmount point\u003e\"",
+      "range": {
+        "startLine": 39,
+        "startChar": 34,
+        "endLine": 39,
+        "endChar": 49
+      },
+      "revId": "f98f88d4e95c44c17adacb01e58f0a4fea3bc72c",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
