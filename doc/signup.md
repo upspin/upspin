@@ -10,7 +10,7 @@ system.
 ## Install the Upspin tools {#install}
 
 Download an archive of the Upspin command-line tools from [the download
-page](/dl/), and extract it to a directory that's in your system `PATH`.
+page](https://upspin.io/dl/), and extract it to a directory that's in your system `PATH`.
 
 The archive includes:
 
@@ -28,11 +28,12 @@ The archive includes:
 > the binaries by installing Upspin from source.
 > First [install Go](https://golang.org/doc/install) and then use `go get` to
 > fetch the Upspin tools and their dependencies and build them:
->
+
 ```
 $ go get upspin.io/cmd/...
 $ go get augie.upspin.io/cmd/upspin-ui
 ```
+
 > This will install the Upspin commands to `$GOPATH/bin`, which you should add
 > to your system `PATH` if you haven't already.
 
