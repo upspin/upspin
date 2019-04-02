@@ -208,7 +208,10 @@ func (w *watchedRoots) refresh(n *node) error {
 		n.f.removeMapping(n.uname)
 		return e2e(errors.E(op, err))
 	}
-	n.attr.Size = uint64(size)
+	if n.attr.Size, err = fixupSize(uint64(size), de, n); err != nil {
+		return e2e(errors.E(op, err))
+	}
+
 	n.attr.Mode = mode
 	if de.IsLink() {
 		n.link = upspin.PathName(de.Link)
@@ -402,7 +405,10 @@ func (d *watchedRoot) handleEvent(e *upspin.Event) error {
 		}
 		size, err := e.Entry.Size()
 		if err == nil {
-			n.attr.Size = uint64(size)
+			n.attr.Size, err = fixupSize(uint64(size), e.Entry, n)
+			if err != nil {
+				return err
+			}
 		} else {
 			log.Debug.Printf("upspinfs.watch: %s", err)
 		}
