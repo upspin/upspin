@@ -425,7 +425,10 @@ func (n *node) openDir(context gContext.Context, req *fuse.OpenRequest, resp *fu
 		}
 		cn.Lock()
 		if sz, err := child.Size(); err == nil {
-			cn.attr.Size = uint64(sz)
+			var err error
+			if cn.attr.Size, err = fixupSize(uint64(sz), child, n); err != nil {
+				return nil, e2e(errors.E(op, err, n.uname))
+			}
 		}
 		cn.attr.Mtime = child.Time.Go()
 		cn.Unlock()
@@ -568,6 +571,18 @@ func (n *node) Remove(context gContext.Context, req *fuse.RemoveRequest) error {
 	return nil
 }
 
+// fixupSize fixes up symlink size to the size of the content of Readlink(link)
+func fixupSize(size uint64, de *upspin.DirEntry, n *node) (uint64, error) {
+	if de.IsLink() {
+		p, err := n.upspinPathToHostPath(de.Link)
+		if err != nil {
+			return 0, err
+		}
+		return uint64(len(p)), nil
+	}
+	return size, nil
+}
+
 // Lookup implements fs.NodeStringLookuper.Lookup. 'n' must be a directory.
 // We do not use cached knowledge of 'n's contents.
 func (n *node) Lookup(context gContext.Context, name string) (fs.Node, error) {
@@ -621,7 +636,11 @@ func (n *node) Lookup(context gContext.Context, name string) (fs.Node, error) {
 		f.removeMapping(uname)
 		return nil, e2e(errors.E(op, n.uname, err))
 	}
-	nn := n.f.allocNode(n, name, mode, uint64(size), de.Time.Go())
+	var fixSize uint64
+	if fixSize, err = fixupSize(uint64(size), de, n); err != nil {
+		return nil, e2e(errors.E(op, n.uname, err))
+	}
+	nn := n.f.allocNode(n, name, mode, fixSize, de.Time.Go())
 	if de.IsLink() {
 		nn.link = upspin.PathName(de.Link)
 	}
