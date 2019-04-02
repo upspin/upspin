@@ -203,12 +203,12 @@ func (w *watchedRoots) refresh(n *node) error {
 	if de.IsLink() {
 		mode |= os.ModeSymlink
 	}
-	size, err := de.Size()
+	size, err := lstatSize(de, n)
 	if err != nil {
 		n.f.removeMapping(n.uname)
 		return e2e(errors.E(op, err))
 	}
-	n.attr.Size = uint64(size)
+	n.attr.Size = size
 	n.attr.Mode = mode
 	if de.IsLink() {
 		n.link = upspin.PathName(de.Link)
@@ -400,9 +400,9 @@ func (d *watchedRoot) handleEvent(e *upspin.Event) error {
 		if e.Entry.IsLink() {
 			mode |= os.ModeSymlink
 		}
-		size, err := e.Entry.Size()
+		size, err := lstatSize(e.Entry, n)
 		if err == nil {
-			n.attr.Size = uint64(size)
+			n.attr.Size = size
 		} else {
 			log.Debug.Printf("upspinfs.watch: %s", err)
 		}
