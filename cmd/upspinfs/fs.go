@@ -424,8 +424,10 @@ func (n *node) openDir(context gContext.Context, req *fuse.OpenRequest, resp *fu
 			continue
 		}
 		cn.Lock()
-		if sz, err := child.Size(); err == nil {
-			cn.attr.Size = uint64(sz)
+		if sz, err := lstatSize(child, n); err == nil {
+			cn.attr.Size = sz
+		} else {
+			return nil, e2e(errors.E(op, err, n.uname))
 		}
 		cn.attr.Mtime = child.Time.Go()
 		cn.Unlock()
@@ -568,6 +570,33 @@ func (n *node) Remove(context gContext.Context, req *fuse.RemoveRequest) error {
 	return nil
 }
 
+// lstatSize returns a lstat-compatible size for the dir entry.  The size only
+// differs for symlinks.  Upspin's DirEntry size for a link is zero, but for
+// lstat the size of the link is the size of the link content.
+func lstatSize(de *upspin.DirEntry, n *node) (uint64, error) {
+	if !de.IsLink() {
+		s, err := de.Size()
+		return uint64(s), err
+	}
+	p, err := n.upspinPathToHostPath(de.Link)
+	if err != nil {
+		return 0, err
+	}
+	return uint64(len(p)), nil
+}
+
+//// fixupSize fixes up symlink size to the size of the content of Readlink(link)
+//func fixupSize(size uint64, de *upspin.DirEntry, n *node) (uint64, error) {
+//if !de.IsLink() {
+//return size, nil
+//}
+//p, err := n.upspinPathToHostPath(de.Link)
+//if err != nil {
+//return 0, err
+//}
+//return uint64(len(p)), nil
+//}
+
 // Lookup implements fs.NodeStringLookuper.Lookup. 'n' must be a directory.
 // We do not use cached knowledge of 'n's contents.
 func (n *node) Lookup(context gContext.Context, name string) (fs.Node, error) {
@@ -616,12 +645,12 @@ func (n *node) Lookup(context gContext.Context, name string) (fs.Node, error) {
 	if de.IsLink() {
 		mode |= os.ModeSymlink
 	}
-	size, err := de.Size()
+	size, err := lstatSize(de, n)
 	if err != nil {
 		f.removeMapping(uname)
 		return nil, e2e(errors.E(op, n.uname, err))
 	}
-	nn := n.f.allocNode(n, name, mode, uint64(size), de.Time.Go())
+	nn := n.f.allocNode(n, name, mode, size, de.Time.Go())
 	if de.IsLink() {
 		nn.link = upspin.PathName(de.Link)
 	}
