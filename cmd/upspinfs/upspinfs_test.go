@@ -444,11 +444,11 @@ func TestSymlink(t *testing.T) {
 
 	// Test a path that leaves Upspin. It should fail.
 	if err := os.Symlink("../../../../quux", filepath.Join(subdir, "wontwork")); err == nil {
-		fatal(t, err)
+		t.Fatalf("symlink out of upspin worked but should not have")
 	}
 
 	if err := os.RemoveAll(testDir); err != nil {
-		t.Fatalf("symlink out of upspin worked but should not have")
+		fatal(t, err)
 	}
 }
 
