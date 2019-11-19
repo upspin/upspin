@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "3e57032d_7529fb62",
+        "filename": "test/testutil/testutil.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2019-11-19T23:55:42Z",
+      "side": 1,
+      "message": "What is an example of the need for filepath.Dir?  It looks correct, just mysterious.",
+      "revId": "59ed219d44c16faabbdfc0ddcb3bbcae41f56255",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
