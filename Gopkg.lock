@@ -3,50 +3,66 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:af67310ce9c54bb165c418cb7496ea6f52ea3579c5e596ba4a56bdef84630993"
   name = "bazil.org/fuse"
   packages = [
     ".",
     "fs",
-    "fuseutil"
+    "fuseutil",
   ]
+  pruneopts = "NUT"
   revision = "371fbbdaa8987b715bdd21d6adc4c9b20155f748"
 
 [[projects]]
   branch = "master"
+  digest = "1:4b9d65d61c6bfb1e68f34673315341dcbcd51eaa96ea9d3e4a12fadf1a15e585"
   name = "github.com/NYTimes/gziphandler"
   packages = ["."]
+  pruneopts = "NUT"
   revision = "97ae7fbaf81620fe97840685304a78a306a39c64"
 
 [[projects]]
   branch = "master"
+  digest = "1:b1ef763b6334cf7eb68249217b77955fdae4d2475e13d7d38eb4b452f0633944"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
+  pruneopts = "NUT"
   revision = "1643683e1b54a9e88ad26d98f81400c8c9d9f4f9"
 
 [[projects]]
   branch = "master"
+  digest = "1:ed79e22e8070bbe689f17994cc754cf54686be4e357b8280fe77a7400134adac"
   name = "github.com/russross/blackfriday"
   packages = ["."]
+  pruneopts = "NUT"
   revision = "6d1ef893fcb01b4f50cb6e57ed7df3e2e627b6b2"
 
 [[projects]]
   branch = "master"
+  digest = "1:f416f961c181919018f489a9e23101b05607fd7fc09c4ba03dd5982b1779711b"
   name = "golang.org/x/crypto"
   packages = [
     "acme",
     "acme/autocert",
-    "hkdf"
+    "hkdf",
   ]
-  revision = "c3a3ad6d03f7a915c0f7e194b7152974bb73d287"
+  pruneopts = "NUT"
+  revision = "497ca9f6d64f9bb73048a960b4098309edcd2205"
 
 [[projects]]
   branch = "master"
+  digest = "1:5aede487c16d7bb89f268876695d8c96b2ac35decab77fc8b6f6ed309b8b4a37"
   name = "golang.org/x/net"
-  packages = ["context"]
+  packages = [
+    "context",
+    "idna",
+  ]
+  pruneopts = "NUT"
   revision = "4b14673ba32bee7f5ac0f990a48f033919fd418b"
 
 [[projects]]
   branch = "master"
+  digest = "1:9c5926694a02375b22b3de352c51a0fbf984902edaf38fb14fb70679b1499452"
   name = "golang.org/x/text"
   packages = [
     "cases",
@@ -64,19 +80,33 @@
     "unicode/cldr",
     "unicode/norm",
     "unicode/rangetable",
-    "width"
+    "width",
   ]
+  pruneopts = "NUT"
   revision = "6eab0e8f74e86c598ec3b6fad4888e0c11482d48"
 
 [[projects]]
   branch = "v2"
+  digest = "1:c85dc78b3426641ebf2a0bbf5b731b5c4613ddb5987dbe218f7e75468dcd56f5"
   name = "gopkg.in/yaml.v2"
   packages = ["."]
+  pruneopts = "NUT"
   revision = "eb3733d160e74a9c7e442f435eb3bea458e1d19f"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "2246e647ba1c78b0b9f948f9fb072fff1467284fb138709c063e99736f646b90"
+  input-imports = [
+    "bazil.org/fuse",
+    "bazil.org/fuse/fs",
+    "github.com/NYTimes/gziphandler",
+    "github.com/golang/protobuf/proto",
+    "github.com/russross/blackfriday",
+    "golang.org/x/crypto/acme/autocert",
+    "golang.org/x/crypto/hkdf",
+    "golang.org/x/net/context",
+    "golang.org/x/text/secure/precis",
+    "gopkg.in/yaml.v2",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1
