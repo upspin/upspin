@@ -16,6 +16,24 @@
       "revId": "59ed219d44c16faabbdfc0ddcb3bbcae41f56255",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "29365de9_d0ae20e2",
+        "filename": "test/testutil/testutil.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2019-11-19T23:58:02Z",
+      "side": 1,
+      "message": "It\u0027s because build.Import doesn\u0027t recognize \"upspin.io\" as a package path anymore because it contains no package code; we now have to look for \"upspin.io/upspin\" and filepath.Dir turns that package path back into the path to the \"upspin.io\" repo root.",
+      "parentUuid": "3e57032d_7529fb62",
+      "revId": "59ed219d44c16faabbdfc0ddcb3bbcae41f56255",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": false
     }
   ]
 }
