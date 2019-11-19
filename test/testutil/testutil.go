@@ -13,16 +13,18 @@ import (
 	"go/build"
 	"log"
 	"net"
+	"os"
 	"path/filepath"
 )
 
 // Repo returns the local filename of a file in the Upspin repository.
 func Repo(dir ...string) string {
-	p, err := build.Import("upspin.io", "", build.FindOnly)
+	wd, _ := os.Getwd()
+	p, err := build.Import("upspin.io/upspin", wd, build.FindOnly)
 	if err != nil {
 		log.Fatal(err)
 	}
-	return filepath.Join(p.Dir, filepath.Join(dir...))
+	return filepath.Join(filepath.Dir(p.Dir), filepath.Join(dir...))
 }
 
 // PickPort listens to an available port on localhost, closes the listener, and
