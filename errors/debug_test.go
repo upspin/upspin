@@ -18,11 +18,9 @@ import (
 )
 
 var errorLines = strings.Split(strings.TrimSpace(`
-	.*/upspin.io/errors/debug_test.go:\d+: upspin.io/errors_test.func1:
-	.*/upspin.io/errors/debug_test.go:\d+: ...T.func2:
-	.*/upspin.io/errors/debug_test.go:\d+: ...func3:
-	.*/upspin.io/errors/debug_test.go:\d+: ...func4:
-	.*/upspin.io/valid/valid.go:\d+: ...valid.UserName:
+	.*/upspin.io/errors/debug_test.go:\d+: upspin.io/errors_test..*
+	.*/upspin.io/errors/debug_test.go:\d+: .*
+	.*/upspin.io/valid/valid.go:\d+: .*valid.UserName:
 	.*/upspin.io/user/user.go:\d+: ...user.Parse: op: user@home/path: invalid operation:
 	valid.UserName:
 	user.Parse: user bad-username: user name must contain one @ symbol
