@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ea4e7026_8ef46f26",
+        "filename": "doc/signup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2019-11-20T05:51:25Z",
+      "side": 1,
+      "message": "put this after the heading on line 71 and quote it? Then it\u0027ll appear in a callout box, which people will know they can skip over after reading the first line",
+      "revId": "fe270948da32fb712a617520333f0d6335b80747",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
