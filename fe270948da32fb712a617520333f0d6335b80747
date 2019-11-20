@@ -16,6 +16,24 @@
       "revId": "fe270948da32fb712a617520333f0d6335b80747",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "f6051d33_e72c5b91",
+        "filename": "doc/signup.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2019-11-20T05:53:16Z",
+      "side": 1,
+      "message": "Actually I think this is fine here",
+      "parentUuid": "ea4e7026_8ef46f26",
+      "revId": "fe270948da32fb712a617520333f0d6335b80747",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
