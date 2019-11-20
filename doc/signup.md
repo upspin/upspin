@@ -61,6 +61,13 @@ Any valid email address is almost certainly a valid Upspin user name
 > Conversely, if you lose your keys your email account is not useful for
 > recovery.
 
+If you are planning to join an existing Upspin directory and store server,
+before starting the next step with `upspin-ui`,
+make sure to ask the administrator to add your user name to the server's
+`Writers` group. (They'll know what to do.)
+This will grant you permission to create your user root in that directory
+server and store data in that store server.
+
 **Start the `upspin-ui` program to start the signup process.**
 
 The first step asks for your user name, generates a key pair (one secret key,
@@ -135,15 +142,9 @@ Choose the third option if you wish to use Upspin as a read-only user.
 
 ## Creating your Upspin directory {#mkdir}
 
-If you choose to use existing servers or to deploy your own, the `upspin-ui`
+Whether you chose to use existing servers or to deploy your own, the `upspin-ui`
 program will attempt to create a directory in the nominated directory server
 that will host your Upspin tree (your "user root").
-
-> If you are planning to join an existing Upspin directory and store server,
-> make sure to ask the administrator to add your user name to the server's
-> `Writers` group. (They'll know what to do.)
-> This will grant you permission to create your user root in that directory
-> server and store data in that store server.
 
 With the servers running and granting you access permission, and with your
 correct information registered in the key server, `upspin-ui` will create
