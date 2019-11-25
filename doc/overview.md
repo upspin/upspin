@@ -498,7 +498,7 @@ for easy reference, so to install Upspin first install Go if you haven't
 already ([https://golang.org/dl/](https://golang.org/dl/)) and then run
 
 ```
-$ go get -u upspin.io/cmd/...
+$ go get upspin.io/cmd/...
 ```
 
 This will also install its dependencies, including libraries for the
