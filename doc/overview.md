@@ -490,19 +490,18 @@ user's directory.
 ## Installing and Contributing
 
 The source for Upspin is hosted on Gerrit
-([https://upspin.googlesource.com](https://upspin.googlesource.com))
-and mirrored to GitHub
-([https://github.com/upspin/upspin](https://github.com/upspin/upspin)).
-However, the repository is bound to the domain [upspin.io](http://upspin.io)
-for easy reference, so to install Upspin first install Go if you haven't
-already ([https://golang.org/dl/](https://golang.org/dl/)) and then run
+([upspin.googlesource.com](https://upspin.googlesource.com))
+and mirrored to GitHub.
+Install Go if you haven't
+already ([golang.org/dl](https://golang.org/dl/)) and then run
 
 ```
-$ go get -u upspin.io/cmd/...
+$ git clone https://github.com/upspin/upspin
+$ cd upspin
+$ go install cmd/...
 ```
 
-This will also install its dependencies, including libraries for the
-[Google Cloud SDK](https://cloud.google.com/sdk/).
-
-The guidelines for contributing back to the project are in a
+There are useful auxiliary commands and interfaces to various cloud storage
+providers in ([github.com/upspin](https://github.com/upspin)).
+Guidelines for contributing back to the project are in a
 [separate document](https://github.com/upspin/upspin/blob/master/CONTRIBUTING.md).
