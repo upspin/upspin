@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "22d3e271_b507cf7f",
+        "filename": "doc/overview.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 505,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2019-11-27T00:10:42Z",
+      "side": 1,
+      "message": "I think all this is now wrong.\n\nIf you want to grab the repo for development, you should now run\n\n  $ git clone https://upspin.googlesource.com/upspin \n\nand then you can do all your development in the upspin directory it creates.\n\nThe part about the Google Cloud SDK is wrong, and has been for some time, since only cloning the gcp repo will do that.",
+      "range": {
+        "startLine": 496,
+        "startChar": 0,
+        "endLine": 505,
+        "endChar": 50
+      },
+      "revId": "f277fccea199eee76508dcca7685c0e7792668bd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
