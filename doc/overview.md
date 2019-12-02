@@ -496,12 +496,12 @@ Install Go if you haven't
 already ([golang.org/dl](https://golang.org/dl/)) and then run
 
 ```
-$ git clone https://github.com/upspin/upspin
+$ git clone https://upspin.googlesource.com/upspin
 $ cd upspin
 $ go install cmd/...
 ```
 
 There are useful auxiliary commands and interfaces to various cloud storage
-providers in ([github.com/upspin](https://github.com/upspin)).
+providers in ([upspin.googlesource.com](https://upspin.googlesource.com)).
 Guidelines for contributing back to the project are in a
 [separate document](https://github.com/upspin/upspin/blob/master/CONTRIBUTING.md).
