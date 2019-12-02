@@ -22,6 +22,30 @@
       "revId": "2a6f1eba86f6b66bada87c075a08d2cf357baad9",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "ab2090dc_52ad3ae4",
+        "filename": "doc/overview.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 499,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2019-12-02T03:09:06Z",
+      "side": 1,
+      "message": "oversight on my part\nwill send a fix\n\nthanks for catching this!",
+      "parentUuid": "24c1ba5a_d815da96",
+      "range": {
+        "startLine": 499,
+        "startChar": 2,
+        "endLine": 499,
+        "endChar": 44
+      },
+      "revId": "2a6f1eba86f6b66bada87c075a08d2cf357baad9",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
     }
   ]
 }
