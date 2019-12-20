@@ -132,6 +132,60 @@ func TestPutGetTopLevelFile(t *testing.T) {
 	}
 }
 
+func TestPutSequencedGetTopLevelFile(t *testing.T) {
+	const (
+		user = "user1@google.com"
+		root = user + "/"
+	)
+	client := New(setup(baseCfg, user))
+	const (
+		fileName = root + "file"
+		text     = "hello sailor"
+		text2    = "put your lips together and blow"
+	)
+	// Put the initial version, remembering the sequence.
+	d, err := client.PutSequenced(fileName, upspin.SeqIgnore, []byte(text))
+	if err != nil {
+		t.Fatal("put file:", err)
+	}
+	data, err := client.Get(fileName)
+	if err != nil {
+		t.Fatal("get file:", err)
+	}
+	if string(data) != text {
+		t.Fatalf("get of %q has text %q; should be %q", fileName, data, text)
+	}
+	seq := d.Sequence
+	// PutSequenced another version using that sequence number. This should work.
+	d, err = client.PutSequenced(fileName, seq, []byte(text2))
+	if err != nil {
+		t.Fatal("put file:", err)
+	}
+	if d.Sequence == seq {
+		t.Fatalf("sequence number should have advanced")
+	}
+	data, err = client.Get(fileName)
+	if err != nil {
+		t.Fatal("get file:", err)
+	}
+	if string(data) != text2 {
+		t.Fatalf("get of %q has text %q; should be %q", fileName, data, text2)
+	}
+	// Now try it a PutSequenced with the old sequence number. This should fail.
+	_, err = client.PutSequenced(fileName, seq, []byte(text))
+	if err == nil {
+		t.Fatalf("PutSequenced with wrong sequence number should have failed")
+	}
+	// Make sure the data didn't change.
+	data, err = client.Get(fileName)
+	if err != nil {
+		t.Fatal("get file:", err)
+	}
+	if string(data) != text2 {
+		t.Fatalf("get of %q has text %q; should be %q", fileName, data, text2)
+	}
+}
+
 const Max = 100 * 1000 // Must be > 100.
 
 func setupFileIO(user upspin.UserName, fileName upspin.PathName, max int, t *testing.T) (upspin.Client, upspin.File, []byte) {
