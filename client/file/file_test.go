@@ -120,6 +120,11 @@ func (d *dummyClient) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, 
 	copy(d.putData, data)
 	return nil, nil
 }
+func (d *dummyClient) PutSequenced(name upspin.PathName, seq int64, data []byte) (*upspin.DirEntry, error) {
+	d.putData = make([]byte, len(data))
+	copy(d.putData, data)
+	return nil, nil
+}
 func (d *dummyClient) PutLink(oldName, newName upspin.PathName) (*upspin.DirEntry, error) {
 	return nil, nil
 }
