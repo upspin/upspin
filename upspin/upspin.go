@@ -710,6 +710,19 @@ type Client interface {
 	// new sequence number.
 	Put(name PathName, data []byte) (*DirEntry, error)
 
+	// PutSequenced stores the data at the given name only if the
+	// there is no preexisting data stored with that name or if the
+	// sequence number of the preexisting data matches that given.
+	// On success any preexisting data will no longer be available using
+	// the name, although it may still exist in the storage server. (See
+	// the documentation for Delete.) Like Get, it is not the usual
+	// access method. The file-like API is preferred.
+	//
+	// A successful Put returns an incomplete DirEntry (see the
+	// description of AttrIncomplete) containing only the
+	// new sequence number.
+	PutSequenced(name PathName, seq int64, data []byte) (*DirEntry, error)
+
 	// PutLink creates a link from the new name to the old name. The
 	// new name must not look like the path to an Access or Group file.
 	// If something is already stored with the new name, it is first

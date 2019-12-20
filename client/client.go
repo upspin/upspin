@@ -100,6 +100,11 @@ func putLookupFn(dir upspin.DirServer, entry *upspin.DirEntry, s *metric.Span) (
 
 // Put implements upspin.Client.
 func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error) {
+	return c.PutSequenced(name, upspin.SeqIgnore, data)
+}
+
+// PutSequenced implements upspin.Client.
+func (c *Client) PutSequenced(name upspin.PathName, seq int64, data []byte) (*upspin.DirEntry, error) {
 	const op errors.Op = "client.Put"
 	m, s := newMetric(op)
 	defer m.Done()
@@ -147,7 +152,7 @@ func (c *Client) Put(name upspin.PathName, data []byte) (*upspin.DirEntry, error
 		SignedName: name,
 		Packing:    packer.Packing(),
 		Time:       upspin.Now(),
-		Sequence:   upspin.SeqIgnore,
+		Sequence:   seq,
 		Writer:     c.config.UserName(),
 		Link:       "",
 		Attr:       upspin.AttrNone,
