@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e4201a1a_6abc12c0",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 713,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2019-12-20T22:54:52Z",
+      "side": 1,
+      "message": "s/ the$//",
+      "revId": "1bc19c71962634604f908aa91fcacb2180b8d9b1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "d94bcd33_34dc3cfd",
+        "filename": "upspin/upspin.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 723,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2019-12-20T22:54:52Z",
+      "side": 1,
+      "message": "You should mention that PutSequenced with SeqIgnore is the same as Put.",
+      "revId": "1bc19c71962634604f908aa91fcacb2180b8d9b1",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    }
+  ]
+}
