@@ -119,7 +119,8 @@ func (c *cache) mkTemp() string {
 	return filepath.Join(c.dir, fmt.Sprintf("tmp/%d", next))
 }
 
-// create creates a file in the cache.
+// create creates a file in the cache. This file will not be added to the cache LRU
+// until close & writeback.
 // The corresponding node should be locked.
 func (c *cache) create(h *handle) error {
 	const op errors.Op = "cache.create"
@@ -135,6 +136,13 @@ func (c *cache) create(h *handle) error {
 	}
 	h.n.cf = cf
 	cf.n = h.n
+
+	// create is only called in response to a Create request from FUSE. FUSE
+	// only sends Create requests when it believes the file doesn't exist so
+	// set the sequence for this file to SeqNotExist thus conditioning writeback
+	// succeeding on none else having created the file in the mean time.
+	h.n.seq = upspin.SeqNotExist
+
 	return nil
 }
 
@@ -176,14 +184,16 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 		c.lruBytes -= cf.cachedSize
 		c.Unlock()
 
-		// Is it the right version and can we open it?
-		if cf.de.Sequence == entry.Sequence {
+		// Is it the right version and can we open it? cf.de is nil if the cached file
+		// never got committed to the DirServer.xx
+		if cf.de != nil && cf.de.Sequence == entry.Sequence {
 			cf.file, err = os.OpenFile(cf.fname, os.O_RDWR, cachedFilePerms)
 			if err == nil {
 				h.flags = flags
 				n.cf = cf
 				cf.n = n
 				n.attr.Size = uint64(cf.size)
+				h.n.seq = entry.Sequence
 				return nil
 			}
 		}
@@ -201,6 +211,7 @@ func (c *cache) open(h *handle, flags fuse.OpenFlags) error {
 		n:     n,
 		fname: fname,
 	}
+	h.n.seq = entry.Sequence
 
 	// Invalidate the kernel cache, this is a new version.
 	n.f.watched.invalidateChan <- n
@@ -550,7 +561,7 @@ func (cf *cachedFile) writeback(n *node) error {
 	// Use the client library to write it back.  Try multiple times on error.
 	var de *upspin.DirEntry
 	for tries := 0; ; tries++ {
-		de, err = cf.c.client.Put(n.uname, cleartext)
+		de, err = cf.c.client.PutSequenced(n.uname, n.seq, cleartext)
 		if err == nil {
 			n.seq = de.Sequence
 			cf.attachDirEntry(n.f.config, de, true)
