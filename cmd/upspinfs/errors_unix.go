@@ -39,6 +39,7 @@ var errs = []struct {
 	{"no such", syscall.ENOENT},
 	{"permission", syscall.EPERM},
 	{"not empty", syscall.ENOTEMPTY},
+	{"sequence number", syscall.EEXIST},
 }
 
 var errnoToKind = map[syscall.Errno]errors.Kind{
@@ -73,7 +74,8 @@ func e2e(err error) *errnoError {
 		if e, ok := kindToErrno[ue.Kind]; ok {
 			errno = e
 		}
-	} else {
+	}
+	if errno == syscall.EIO {
 		for _, e := range errs {
 			if strings.Contains(err.Error(), e.str) {
 				errno = e.errno
