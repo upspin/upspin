@@ -2,6 +2,29 @@
   "comments": [
     {
       "key": {
+        "uuid": "8504e475_2f13f92b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 5389
+      },
+      "writtenOn": "2020-01-07T20:20:29Z",
+      "side": 1,
+      "message": "\u0027add\u0027",
+      "range": {
+        "startLine": 7,
+        "startChar": 16,
+        "endLine": 7,
+        "endChar": 21
+      },
+      "revId": "8eb26cfec14b59e07cb20171ca902afa969554dd",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03",
+      "unresolved": true
+    },
+    {
+      "key": {
         "uuid": "d30b6e76_06c2eddd",
         "filename": "client/all_test.go",
         "patchSetId": 6
