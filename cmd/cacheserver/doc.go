@@ -43,5 +43,8 @@ The flags are:
 Example $HOME/upspin/config entry:
 
 	cache: yes
+	cmdflags:
+	 cacheserver:
+	  writethrough: true
 */
 package main // import "upspin.io/cmd/cacheserver"
