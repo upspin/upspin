@@ -1,6 +1,6 @@
 # Upspin
 
-<img src="/images/augie.jpg" width="180" height="218" alt="Home"/>
+<img src="/doc/images/augie.jpg" width="180" height="218" alt="Home"/>
 
 When did you last...
 
