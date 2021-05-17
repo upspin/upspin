@@ -225,7 +225,7 @@ Also, a set of rights may be comma-separated for grouping.
 An example:
 
 ```
-r: family, bob@example.com
+r: family, bob@gmail.com
 w,c,list: family
 ```
 
@@ -434,7 +434,7 @@ For snapshots, once the snapshot tree is initialized it behaves as if the tree
 has an `Access` file with (for `ann+snapshot@example.com`):
 
 ```
-ann@example.com, ann+snapshot@example.com: list,read
+list,read: ann@example.com, ann+snapshot@example.com
 ```
 
 and the owner's special rights for `Access` and `Group` files is rescinded.
