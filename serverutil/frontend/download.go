@@ -171,9 +171,13 @@ func (h *downloadHandler) updateLoop(dir upspin.PathName) {
 				continue
 			}
 		}
-		event := <-events
-		if event.Error != nil {
-			log.Error.Printf("download: %v", event.Error)
+		event, ok := <-events
+		if !ok || event.Error != nil {
+			if !ok {
+				log.Error.Printf("download: dir server went away")
+			} else {
+				log.Error.Printf("download: %v", event.Error)
+			}
 			close(done)
 			events = nil
 			time.Sleep(watchRetryInterval)
