@@ -3,6 +3,7 @@
 // license that can be found in the LICENSE file.
 //
 
+//go:build !windows
 // +build !windows
 
 package main
@@ -21,7 +22,7 @@ import (
 	"testing"
 	"time"
 
-	"bazil.org/fuse"
+	"github.com/presotto/fuse"
 
 	"upspin.io/bind"
 	"upspin.io/client"
