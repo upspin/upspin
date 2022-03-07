@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build !windows
 // +build !windows
 
 package main // import "upspin.io/cmd/upspinfs"
@@ -28,7 +29,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"bazil.org/fuse"
+	"github.com/presotto/fuse"
 
 	lrucache "upspin.io/cache"
 	"upspin.io/client"

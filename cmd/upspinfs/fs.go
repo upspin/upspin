@@ -2,6 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+//go:build !windows
 // +build !windows
 
 package main
@@ -18,8 +19,8 @@ import (
 
 	gContext "golang.org/x/net/context"
 
-	"bazil.org/fuse"
-	"bazil.org/fuse/fs"
+	"github.com/presotto/fuse"
+	"github.com/presotto/fuse/fs"
 
 	"upspin.io/access"
 	"upspin.io/bind"
