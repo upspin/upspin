@@ -16,6 +16,8 @@ github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZN
 github.com/presotto/fuse v0.0.0-20220306233610-4e9e37a7e508 h1:5xHy5Nd0zf7W3p9aIw1/57Zqzgw/vFev6xavHU5yonY=
 github.com/presotto/fuse v0.0.0-20220307001854-fc4b2be69f43 h1:GcpFHeRTgJkZwzSNDjy4UX8M11xKj0IyvE4fniSKRjA=
 github.com/presotto/fuse v0.0.0-20220307001854-fc4b2be69f43/go.mod h1:vjhV4Wnt7kY0vn360hioikNp2LXu53SYY2Bsp7REtAs=
+github.com/presotto/fuse v0.0.0-20220402195114-8303eff2e81d h1:ikMgYyz3Mk0sw4jwSY5EjCeZ5emUjPYnfRkXOi7buhA=
+github.com/presotto/fuse v0.0.0-20220402195114-8303eff2e81d/go.mod h1:vjhV4Wnt7kY0vn360hioikNp2LXu53SYY2Bsp7REtAs=
 github.com/russross/blackfriday v0.0.0-20171011182219-6d1ef893fcb0 h1:hgS5QyP981zzGr3UYaoHb5+fpgK1lHleAOq5znvfJxU=
 github.com/russross/blackfriday v0.0.0-20171011182219-6d1ef893fcb0/go.mod h1:JO/DiYxRf+HjHt06OyowR9PTA263kcR/rfWxYHBV53g=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
