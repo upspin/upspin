@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "488f0b65_d260b480",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2022-04-02T21:58:24Z",
+      "side": 1,
+      "message": "Maybe add https://github.com/presotto/fuse 8303eff here just to clarify, but ok as is.",
+      "revId": "4283906daf585fad0022372e0777a87d5926e371",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03"
+    }
+  ]
+}
