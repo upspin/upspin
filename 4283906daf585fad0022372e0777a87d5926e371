@@ -16,6 +16,23 @@
       "message": "Maybe add https://github.com/presotto/fuse 8303eff here just to clarify, but ok as is.",
       "revId": "4283906daf585fad0022372e0777a87d5926e371",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7d094060_e70660e8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5309
+      },
+      "writtenOn": "2022-04-02T22:06:30Z",
+      "side": 1,
+      "message": "done, thanks.\n\nOn Sat, Apr 2, 2022 at 2:58 PM Eric Grosse (Gerrit)\n\u003cnoreply-gerritcodereview-ljmJZj-60fu9BtheoZ4Umg\u003d\u003d@google.com\u003e wrote:",
+      "revId": "4283906daf585fad0022372e0777a87d5926e371",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03"
     }
   ]
 }
