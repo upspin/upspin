@@ -3,7 +3,7 @@ module upspin.io
 go 1.13
 
 require (
-	github.com/presotto/fuse v0.0.0-20220402195114-8303eff2e81d
+	github.com/presotto/fuse v0.0.0-20220404205012-944bbcc73d97
 	github.com/NYTimes/gziphandler v0.0.0-20170916004738-97ae7fbaf816
 	github.com/golang/protobuf v0.0.0-20171021043952-1643683e1b54
 	github.com/kr/pretty v0.1.0 // indirect
