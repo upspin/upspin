@@ -18,6 +18,8 @@ github.com/presotto/fuse v0.0.0-20220307001854-fc4b2be69f43 h1:GcpFHeRTgJkZwzSND
 github.com/presotto/fuse v0.0.0-20220307001854-fc4b2be69f43/go.mod h1:vjhV4Wnt7kY0vn360hioikNp2LXu53SYY2Bsp7REtAs=
 github.com/presotto/fuse v0.0.0-20220402195114-8303eff2e81d h1:ikMgYyz3Mk0sw4jwSY5EjCeZ5emUjPYnfRkXOi7buhA=
 github.com/presotto/fuse v0.0.0-20220402195114-8303eff2e81d/go.mod h1:vjhV4Wnt7kY0vn360hioikNp2LXu53SYY2Bsp7REtAs=
+github.com/presotto/fuse v0.0.0-20220404205012-944bbcc73d97 h1:FWZtn0/GlQMGwNGNVzBOvtvarKGdZcZDOgfloOP/30s=
+github.com/presotto/fuse v0.0.0-20220404205012-944bbcc73d97/go.mod h1:vjhV4Wnt7kY0vn360hioikNp2LXu53SYY2Bsp7REtAs=
 github.com/russross/blackfriday v0.0.0-20171011182219-6d1ef893fcb0 h1:hgS5QyP981zzGr3UYaoHb5+fpgK1lHleAOq5znvfJxU=
 github.com/russross/blackfriday v0.0.0-20171011182219-6d1ef893fcb0/go.mod h1:JO/DiYxRf+HjHt06OyowR9PTA263kcR/rfWxYHBV53g=
 github.com/stretchr/objx v0.1.0/go.mod h1:HFkY916IF+rwdDfMAkV7OtwuqBVzrE8GR6GFx+wExME=
