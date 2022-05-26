@@ -24,6 +24,7 @@ import (
 	"github.com/russross/blackfriday"
 
 	"upspin.io/config"
+	"upspin.io/errors"
 	"upspin.io/flags"
 	"upspin.io/log"
 	"upspin.io/serverutil/web"
@@ -53,7 +54,9 @@ func Main() {
 		})
 	} else {
 		cfg, err := config.FromFile(flags.Config)
-		if err != nil {
+		if errors.Is(errors.NotExist, err) {
+			log.Info.Printf("Upspin config not found; running without downloads page.")
+		} else if err != nil {
 			log.Fatal(err)
 		}
 		s, err := newServer(cfg, *docPath)
