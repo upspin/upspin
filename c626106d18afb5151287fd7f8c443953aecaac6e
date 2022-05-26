@@ -16,6 +16,24 @@
       "message": "Is this also going to be changing?",
       "revId": "c626106d18afb5151287fd7f8c443953aecaac6e",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "631d6a6a_444c5bab",
+        "filename": "serverutil/frontend/frontend.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 5455
+      },
+      "writtenOn": "2022-05-26T07:43:52Z",
+      "side": 1,
+      "message": "Yeah it should change. Probably we just delete this, since on GitHub Pull Requests *are* issues, so we\u0027d only need the /issue/ endpoint",
+      "parentUuid": "56d4db0a_efe2567c",
+      "revId": "c626106d18afb5151287fd7f8c443953aecaac6e",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03"
     }
   ]
 }
