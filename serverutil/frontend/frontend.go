@@ -73,18 +73,18 @@ const (
 
 // sourceRepo is a map from each custom domain to their repo base URLs.
 var sourceRepo = map[string]string{
-	"upspin.io": "https://upspin.googlesource.com/upspin",
+	"upspin.io": "https://github.com/upspin/upspin",
 
-	"android.upspin.io":      "https://upspin.googlesource.com/android",
-	"augie.upspin.io":        "https://upspin.googlesource.com/augie",
-	"aws.upspin.io":          "https://upspin.googlesource.com/aws",
-	"b2.upspin.io":           "https://upspin.googlesource.com/b2",
-	"digitalocean.upspin.io": "https://upspin.googlesource.com/digitalocean",
-	"drive.upspin.io":        "https://upspin.googlesource.com/drive",
-	"dropbox.upspin.io":      "https://upspin.googlesource.com/dropbox",
-	"exp.upspin.io":          "https://upspin.googlesource.com/exp",
-	"gcp.upspin.io":          "https://upspin.googlesource.com/gcp",
-	"openstack.upspin.io":    "https://upspin.googlesource.com/openstack",
+	"android.upspin.io":      "https://github.com/upspin/android",
+	"augie.upspin.io":        "https://github.com/upspin/augie",
+	"aws.upspin.io":          "https://github.com/upspin/aws",
+	"b2.upspin.io":           "https://github.com/upspin/b2",
+	"digitalocean.upspin.io": "https://github.com/upspin/digitalocean",
+	"drive.upspin.io":        "https://github.com/upspin/drive",
+	"dropbox.upspin.io":      "https://github.com/upspin/dropbox",
+	"exp.upspin.io":          "https://github.com/upspin/exp",
+	"gcp.upspin.io":          "https://github.com/upspin/gcp",
+	"openstack.upspin.io":    "https://github.com/upspin/openstack",
 }
 
 func defaultDocPath() string {
@@ -233,7 +233,9 @@ func (s *server) parseDocs(dir string) error {
 
 // docTitle extracts the first Markdown header in the given document body.
 // It expects the first line to be of the form
-// 	# Title string
+//
+//	# Title string
+//
 // If not, it will return "Untitled".
 func docTitle(b []byte) string {
 	if len(b) > 2 && b[0] == '#' {
