@@ -3,10 +3,10 @@ module upspin.io
 go 1.13
 
 require (
-	github.com/presotto/fuse v0.0.0-20220404205012-944bbcc73d97
 	github.com/NYTimes/gziphandler v0.0.0-20170916004738-97ae7fbaf816
 	github.com/golang/protobuf v0.0.0-20171021043952-1643683e1b54
 	github.com/kr/pretty v0.1.0 // indirect
+	github.com/presotto/fuse v0.0.0-20220404205012-944bbcc73d97
 	github.com/russross/blackfriday v0.0.0-20171011182219-6d1ef893fcb0
 	github.com/stretchr/testify v1.4.0 // indirect
 	golang.org/x/crypto v0.0.0-20191117063200-497ca9f6d64f
@@ -14,5 +14,5 @@ require (
 	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e // indirect
 	golang.org/x/text v0.3.0
 	gopkg.in/check.v1 v1.0.0-20190902080502-41f04d3bba15 // indirect
-	gopkg.in/yaml.v2 v2.2.2
+	gopkg.in/yaml.v2 v2.2.8
 )
