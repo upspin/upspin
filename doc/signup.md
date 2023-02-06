@@ -9,10 +9,20 @@ system.
 
 ## Install the Upspin tools {#install}
 
-Download an archive of the Upspin command-line tools from [the download
-page](/dl/), and extract it to a directory that's in your system `PATH`.
+To install the Upspin tools you must build them from source.
 
-The archive includes:
+First [install Go](https://golang.org/doc/install) and then use `go get` to
+fetch the Upspin tools and their dependencies and build them:
+
+```
+$ go install upspin.io/cmd/{upspin,cacheserver,upspin-audit,upspinfs}@latest
+$ go install augie.upspin.io/cmd/upspin-ui@latest
+```
+
+This will install the Upspin commands to `$GOPATH/bin`, which you should add
+to your system `PATH` if you haven't already.
+
+They are:
 
 - the `upspin` command-line tool (to create, access, share, and administer data
   stored in Upspin),
@@ -23,18 +33,6 @@ The archive includes:
 - and, on macOS and Linux systems, the `upspinfs` program
   (a [FUSE](https://github.com/libfuse/libfuse) filesystem, to mount the Upspin
   file system in your local file tree).
-
-> If your operating system is not listed on the download page, you can obtain
-> the binaries by installing Upspin from source.
-> First [install Go](https://golang.org/doc/install) and then use `go get` to
-> fetch the Upspin tools and their dependencies and build them:
->
-```
-$ go get upspin.io/cmd/...
-$ go get augie.upspin.io/cmd/upspin-ui
-```
-> This will install the Upspin commands to `$GOPATH/bin`, which you should add
-> to your system `PATH` if you haven't already.
 
 ## Create an Upspin user {#signup}
 

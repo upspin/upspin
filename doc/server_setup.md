@@ -2,8 +2,8 @@
 
 ## The easy way
 
-The [Upspin tools](/dl/) include a program called `upspin-ui` that automates
-the deployment of an `upspinserver` to Google Cloud Platform.
+The [Upspin tools](signup.md#install) include a program called `upspin-ui` that
+automates the deployment of an `upspinserver` to Google Cloud Platform.
 If you wish to deploy to GCP, try using `upspin-ui` instead of following this
 guide.
 See the [signup document](signup.md) for more information.
