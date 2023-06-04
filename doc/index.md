@@ -56,7 +56,6 @@ mailing lists, user forums, and so on.
     a low-traffic list for important announcements about the project;
     all Upspin users should subscribe.
 - [Contribution guidelines](https://github.com/upspin/upspin/blob/master/CONTRIBUTING.md)
-- [Code review](https://upspin-review.googlesource.com)
 - [@UpspinProject](https://twitter.com/UpspinProject) on Twitter
 
 ## Augie

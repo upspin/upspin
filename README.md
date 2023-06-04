@@ -28,12 +28,7 @@ Upspin has rough edges, and is not yet suitable for non-technical users.
 
 ## Contributing
 
-The code repository lives at
-[upspin.googlesource.com](https://upspin.googlesource.com)
-and is mirrored to [GitHub](https://github.com/upspin/upspin).
-
-Note that the Upspin project does not use GitHub pull requests, and
-that we use the issue tracker for bug reports and proposals only.
+The code repository lives at [GitHub](https://github.com/upspin/upspin).
 
 See the [Contribution Guidelines](CONTRIBUTING.md)
 for more information on contributing to the project.
