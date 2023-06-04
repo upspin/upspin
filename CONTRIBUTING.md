@@ -22,22 +22,10 @@ mailing list.
 
 ## Contributing code
 
-We do not use GitHub pull requests
-(we use [an instance](https://upspin-review.googlesource.com/) of the
-[Gerrit](https://www.gerritcodereview.com/) code review system instead).
+We use GitHub pull requests for code review.
 
-Our code review process is the same as that used by the Go project.
-Please read the Code Review section of
-[Go's Contribution Guidelines](https://golang.org/doc/contribute.html#Code_review)
-to learn how to send patches to Upspin.
-That document covers registering with
-[our Gerrit instance]((https://upspin-review.googlesource.com/)),
-configuring the `git-codereview` tool,
-signing a Contributor License Agreement,
-and the process of creating, reviewing, and submitting changes.
-
-Unless otherwise noted, the Upspin source files are distributed under
-the BSD-style license found in the LICENSE file.
+Unless otherwise noted, the Upspin source files are distributed under the
+Apache 2.0 license found in the LICENSE file.
 
 
 ## Code of Conduct

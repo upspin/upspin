@@ -489,14 +489,12 @@ user's directory.
 
 ## Installing and Contributing
 
-The source for Upspin is hosted on Gerrit
-([upspin.googlesource.com](https://upspin.googlesource.com))
-and mirrored to GitHub.
-Install Go if you haven't
-already ([golang.org/dl](https://golang.org/dl/)) and then run
+The source for Upspin is hosted [on GitHub](https://github.com/upspin/upspin).
+Install Go if you haven't already ([golang.org/dl](https://golang.org/dl/))
+and then run
 
 ```
-$ git clone https://upspin.googlesource.com/upspin
+$ git clone https://github.com/upspin/upspin
 $ cd upspin
 $ go install cmd/...
 ```
