@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3bd7d3c0_4e5aaa75",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5305
+      },
+      "writtenOn": "2023-06-05T00:47:32Z",
+      "side": 1,
+      "message": "Fine with me although the prolixity of OSS licenses is exhausting.",
+      "revId": "c55d0e1237a72bed702d0494fede76d667811e39",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03"
+    }
+  ]
+}
