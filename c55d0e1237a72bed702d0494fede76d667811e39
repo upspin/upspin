@@ -16,6 +16,24 @@
       "message": "Fine with me although the prolixity of OSS licenses is exhausting.",
       "revId": "c55d0e1237a72bed702d0494fede76d667811e39",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e0d55be8_72804d3a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5307
+      },
+      "writtenOn": "2023-06-05T04:43:35Z",
+      "side": 1,
+      "message": "I like 0BSD https://opensource.org/license/0bsd/ myself, but Apache is ok.\n\nCould we invite the Google Open Source Office or its successor or Google Legal to comment on the license change? Since this change only reduces the liability and patent grant from Google, I would be amazed if they object but I am not a lawyer and don\u0027t know what I don\u0027t know. No need to wait on that; ok to push this change now, notify them, and revert if they raise something we hadn\u0027t thought of.",
+      "parentUuid": "3bd7d3c0_4e5aaa75",
+      "revId": "c55d0e1237a72bed702d0494fede76d667811e39",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03"
     }
   ]
 }
