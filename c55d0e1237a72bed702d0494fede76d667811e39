@@ -34,6 +34,24 @@
       "parentUuid": "3bd7d3c0_4e5aaa75",
       "revId": "c55d0e1237a72bed702d0494fede76d667811e39",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6348797e_f998ace1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 5455
+      },
+      "writtenOn": "2023-06-05T04:50:37Z",
+      "side": 1,
+      "message": "Yep I have already asked them - this was at their recommendation. I am expecting sign-off on this CL from someone from Open Source at Google, but I wasn\u0027t able to assign them directly because they haven\u0027t logged into this Gerrit instance yet.",
+      "parentUuid": "e0d55be8_72804d3a",
+      "revId": "c55d0e1237a72bed702d0494fede76d667811e39",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03"
     }
   ]
 }
