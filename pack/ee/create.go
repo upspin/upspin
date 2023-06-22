@@ -11,6 +11,8 @@ import (
 	"crypto/elliptic"
 	"crypto/rand"
 	"encoding/binary"
+	"io"
+	"math/big"
 
 	"upspin.io/errors"
 	"upspin.io/upspin"
@@ -95,9 +97,52 @@ func createKeysFromEntropy(curve elliptic.Curve, entropy []byte) (*ecdsa.Private
 	d.aes = cipher
 
 	// Generate random key-pair.
-	priv, err := ecdsa.GenerateKey(curve, d)
+	priv, err := legacyGenerateKey(curve, d)
 	if err != nil {
 		return nil, err
 	}
+	return priv, nil
+}
+
+// The following excerpt from go1.19.10 crypto/ecdsa/ecdsa.go allows us to
+// preserve old secretseed -> *.upspinkey mappings. Go 1.20 crypto is more
+// secure against timing side channel attacks but is incompatible with upspin
+// users' existing stored data.
+//
+// TODO(ehg) Retire this when we finish migration to post-quantum-crypto
+// many years from now.
+
+var one = new(big.Int).SetInt64(1)
+
+// randFieldElement returns a random element of the order of the given
+// curve using the procedure given in FIPS 186-4, Appendix B.5.1.
+func randFieldElement(c elliptic.Curve, rand io.Reader) (k *big.Int, err error) {
+	params := c.Params()
+	// Note that for P-521 this will actually be 63 bits more than the order, as
+	// division rounds down, but the extra bit is inconsequential.
+	b := make([]byte, params.N.BitLen()/8+8)
+	_, err = io.ReadFull(rand, b)
+	if err != nil {
+		return
+	}
+
+	k = new(big.Int).SetBytes(b)
+	n := new(big.Int).Sub(params.N, one)
+	k.Mod(k, n)
+	k.Add(k, one)
+	return
+}
+
+// legacyGenerateKey generates a public and private key pair.
+func legacyGenerateKey(c elliptic.Curve, rand io.Reader) (*ecdsa.PrivateKey, error) {
+	k, err := randFieldElement(c, rand)
+	if err != nil {
+		return nil, err
+	}
+
+	priv := new(ecdsa.PrivateKey)
+	priv.PublicKey.Curve = c
+	priv.D = k
+	priv.PublicKey.X, priv.PublicKey.Y = c.ScalarBaseMult(k.Bytes())
 	return priv, nil
 }
