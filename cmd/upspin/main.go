@@ -196,7 +196,7 @@ func help(args ...string) {
 		}
 	}
 	if cmd == "" {
-		fmt.Fprintln(os.Stderr, intro)
+		fmt.Fprint(os.Stderr, intro)
 	} else {
 		// Simplest solution is re-execing.
 		command := exec.Command("upspin", cmd, "-help")
