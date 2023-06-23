@@ -52,6 +52,23 @@
       "parentUuid": "e0d55be8_72804d3a",
       "revId": "c55d0e1237a72bed702d0494fede76d667811e39",
       "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2b3dacd2_4541c5ae",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 6682
+      },
+      "writtenOn": "2023-06-23T23:07:15Z",
+      "side": 1,
+      "message": "LGTM on the license update, removing the Google-specific patent grant in the supplemental PATENTS file and moving instead to a unified Apache license granting licensees both copyright and patent licenses.",
+      "revId": "c55d0e1237a72bed702d0494fede76d667811e39",
+      "serverId": "0759ed4b-3fdc-34dc-866b-f2e708168c03"
     }
   ]
 }
