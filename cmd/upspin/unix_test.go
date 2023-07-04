@@ -37,7 +37,6 @@ func TestFindUpspinBinaries(t *testing.T) {
 		paths[d] = true
 		if err = os.MkdirAll(d, 0700); err != nil {
 			t.Fatalf("could not create %s: %v", d, err)
-			continue
 		}
 		perm := os.FileMode(0700)
 		if strings.HasSuffix(tf.n, "unexec") {
@@ -46,7 +45,6 @@ func TestFindUpspinBinaries(t *testing.T) {
 		f, err := os.OpenFile(filepath.Join(tmpDir, tf.n), os.O_RDWR|os.O_CREATE|os.O_TRUNC, perm)
 		if err != nil {
 			t.Fatalf("could not create temporary file %s: %v", tf.n, err)
-			continue
 		}
 		f.Close()
 	}
