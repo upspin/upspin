@@ -170,7 +170,10 @@ func (f *File) readAt(op errors.Op, dst []byte, off int64) (n int, err error) {
 		n += copy(dst[n:], clear[clearIdx:])
 	}
 
-	return n, nil
+	if n < len(dst) {
+		err = io.EOF
+	}
+	return
 }
 
 // Seek implements upspin.File.
