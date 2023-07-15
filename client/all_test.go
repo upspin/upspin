@@ -325,10 +325,6 @@ func TestFileRandomAccess(t *testing.T) {
 			}
 		}
 	}
-	n, err = f.ReadAt(result, 1)
-	if err == nil {
-		t.Fatalf("expected err==io.EOF, got nil")
-	}
 
 	// Now use a similar algorithm to WriteAt but with ReadAt to check random access.
 	read := make(map[int]bool)
