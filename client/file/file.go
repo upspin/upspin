@@ -95,6 +95,9 @@ func (f *File) Name() upspin.PathName {
 func (f *File) Read(b []byte) (n int, err error) {
 	const op errors.Op = "file.Read"
 	n, err = f.readAt(op, b, f.offset)
+	if err == io.EOF { // TODO(ehg) should this also test " && n < len(b)"?
+		err = nil
+	}
 	if err == nil {
 		f.offset += int64(n)
 	}
