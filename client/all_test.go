@@ -7,9 +7,11 @@ package client
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"math/rand"
 	"strings"
 	"testing"
+	"testing/iotest"
 
 	"upspin.io/bind"
 	"upspin.io/config"
@@ -203,6 +205,35 @@ func setupFileIO(user upspin.UserName, fileName upspin.PathName, max int, t *tes
 	return client, f, data
 }
 
+func TestIotest(t *testing.T) {
+	const (
+		user     = "iotest@example.com"
+		fileName = user + "/" + "file"
+	)
+	client, f, data := setupFileIO(user, fileName, 100, t)
+	n, err := f.Write(data)
+	if err != nil {
+		t.Fatalf("Write(%d): %v", len(data), err)
+	}
+	if n != len(data) {
+		t.Fatalf("Write length failed: expected %d got %d", len(data), n)
+	}
+	err = f.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	f, err = client.Open(fileName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+	err = iotest.TestReader(f, data)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestFileSequentialAccess(t *testing.T) {
 	const (
 		user     = "user3@google.com"
@@ -325,6 +356,10 @@ func TestFileRandomAccess(t *testing.T) {
 			}
 		}
 	}
+	n, err = f.ReadAt(result,1)
+	if err == nil {
+		t.Fatal("expected err==io.EOF from ReadAt, got err==nil")
+	}
 
 	// Now use a similar algorithm to WriteAt but with ReadAt to check random access.
 	read := make(map[int]bool)
@@ -359,6 +394,9 @@ func TestFileRandomAccess(t *testing.T) {
 }
 
 func TestFileSeek(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping TestFileSeek in short mode.")
+	}
 	const (
 		user     = "fileseek@google.com"
 		root     = user + "/"
@@ -415,6 +453,7 @@ func TestFileSeek(t *testing.T) {
 			for i := offset; i < offset+length; i++ {
 				written[i] = true
 			}
+			// TODO  Don't we need to check  len(written) != Max  here?
 		}
 	}
 	err := f.Close()
@@ -534,7 +573,7 @@ func TestFileZeroFill(t *testing.T) {
 		buf[i] = 'y'
 	}
 	n, err = f.Read(buf)
-	if err != nil {
+	if err != nil && err != io.EOF {
 		t.Fatal("read file:", err)
 	}
 	if n != N+1 {
