@@ -95,9 +95,7 @@ func (f *File) Name() upspin.PathName {
 func (f *File) Read(b []byte) (n int, err error) {
 	const op errors.Op = "file.Read"
 	n, err = f.readAt(op, b, f.offset)
-	if err == nil {
-		f.offset += int64(n)
-	}
+	f.offset += int64(n)
 	return n, err
 }
 
@@ -170,7 +168,10 @@ func (f *File) readAt(op errors.Op, dst []byte, off int64) (n int, err error) {
 		n += copy(dst[n:], clear[clearIdx:])
 	}
 
-	return n, nil
+	if n < len(dst) {
+		err = io.EOF
+	}
+	return n, err
 }
 
 // Seek implements upspin.File.

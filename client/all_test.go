@@ -7,9 +7,11 @@ package client
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"math/rand"
 	"strings"
 	"testing"
+	"testing/iotest"
 
 	"upspin.io/bind"
 	"upspin.io/config"
@@ -201,6 +203,35 @@ func setupFileIO(user upspin.UserName, fileName upspin.PathName, max int, t *tes
 		data[i] = uint8(i)
 	}
 	return client, f, data
+}
+
+func TestIotest(t *testing.T) {
+	const (
+		user     = "iotest@example.com"
+		fileName = user + "/" + "file"
+	)
+	client, f, data := setupFileIO(user, fileName, 100, t)
+	n, err := f.Write(data)
+	if err != nil {
+		t.Fatalf("Write(%d): %v", len(data), err)
+	}
+	if n != len(data) {
+		t.Fatalf("Write length failed: expected %d got %d", len(data), n)
+	}
+	err = f.Close()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	f, err = client.Open(fileName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+	err = iotest.TestReader(f, data)
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 func TestFileSequentialAccess(t *testing.T) {
@@ -542,7 +573,7 @@ func TestFileZeroFill(t *testing.T) {
 		buf[i] = 'y'
 	}
 	n, err = f.Read(buf)
-	if err != nil {
+	if err != nil && err != io.EOF {
 		t.Fatal("read file:", err)
 	}
 	if n != N+1 {
