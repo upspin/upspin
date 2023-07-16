@@ -325,6 +325,10 @@ func TestFileRandomAccess(t *testing.T) {
 			}
 		}
 	}
+	n, err = f.ReadAt(result,1)
+	if err == nil {
+		t.Fatal("expected err==io.EOF from ReadAt, got err==nil")
+	}
 
 	// Now use a similar algorithm to WriteAt but with ReadAt to check random access.
 	read := make(map[int]bool)
@@ -359,6 +363,9 @@ func TestFileRandomAccess(t *testing.T) {
 }
 
 func TestFileSeek(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping TestFileSeek in short mode.")
+	}
 	const (
 		user     = "fileseek@google.com"
 		root     = user + "/"
@@ -415,6 +422,7 @@ func TestFileSeek(t *testing.T) {
 			for i := offset; i < offset+length; i++ {
 				written[i] = true
 			}
+			// TODO  Don't we need to check  len(written) != Max  here?
 		}
 	}
 	err := f.Close()
