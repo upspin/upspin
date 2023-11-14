@@ -10,7 +10,6 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -291,14 +290,14 @@ func (s *State) init() {
 		// Read the config file and pass it to config.InitConfig
 		// instead of calling config.FromFile, so that we can stash its
 		// contents away for later use by the "config" sub-command.
-		data, err := ioutil.ReadFile(flags.Config)
+		data, err := os.ReadFile(flags.Config)
 		// Duplicate the logic of config.FromFile that looks for the
 		// config in $HOME/upspin/config if it can't be found at its
 		// specified location.
 		if os.IsNotExist(err) {
 			home, err2 := config.Homedir()
 			if err2 == nil {
-				data, err2 = ioutil.ReadFile(filepath.Join(home, "upspin", flags.Config))
+				data, err2 = os.ReadFile(filepath.Join(home, "upspin", flags.Config))
 				if err2 == nil {
 					err = nil
 				}

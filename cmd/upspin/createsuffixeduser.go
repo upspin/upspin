@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -105,7 +104,7 @@ rather than this command.
 		s.Exit(err)
 	}
 	configFN := fmt.Sprintf("%s.%s", flags.Config, suffix)
-	err = ioutil.WriteFile(configFN, configContents.Bytes(), 0640)
+	err = os.WriteFile(configFN, configContents.Bytes(), 0640)
 	if err != nil {
 		// Directory doesn't exist, perhaps.
 		if !os.IsNotExist(err) {
@@ -119,7 +118,7 @@ rather than this command.
 		if mkdirErr := os.Mkdir(dir, 0700); mkdirErr != nil {
 			s.Exit(err)
 		}
-		err = ioutil.WriteFile(configFN, configContents.Bytes(), 0640)
+		err = os.WriteFile(configFN, configContents.Bytes(), 0640)
 		if err != nil {
 			s.Exit(err)
 		}

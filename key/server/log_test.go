@@ -8,8 +8,8 @@ import (
 	"bufio"
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
 	"math/rand"
+	"os"
 	"strconv"
 	"testing"
 	"time"
@@ -53,7 +53,7 @@ func (s *oneRefStorage) Put(ref string, contents []byte) error {
 }
 
 func TestLog(t *testing.T) {
-	origLog, err := ioutil.ReadFile("testdata/log.txt")
+	origLog, err := os.ReadFile("testdata/log.txt")
 	if err != nil {
 		t.Fatal(err)
 	}

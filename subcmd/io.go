@@ -7,7 +7,7 @@
 package subcmd
 
 import (
-	"io/ioutil"
+	"io"
 	"os"
 	osUser "os/user"
 	"path/filepath"
@@ -100,7 +100,7 @@ func Tilde(file string) string {
 // the input file name is empty
 func (s *State) ReadAll(fileName string) []byte {
 	if fileName == "" {
-		data, err := ioutil.ReadAll(s.Stdin)
+		data, err := io.ReadAll(s.Stdin)
 		if err != nil {
 			s.Exit(err)
 		}
@@ -108,7 +108,7 @@ func (s *State) ReadAll(fileName string) []byte {
 	}
 	input := s.OpenLocal(Tilde(fileName))
 	defer input.Close()
-	data, err := ioutil.ReadAll(input)
+	data, err := io.ReadAll(input)
 	if err != nil {
 		s.Exit(err)
 	}

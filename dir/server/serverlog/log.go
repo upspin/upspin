@@ -8,7 +8,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
@@ -1092,7 +1091,7 @@ func readAllFromTop(f *os.File) ([]byte, error) {
 	if err != nil {
 		return nil, errors.E(errors.IO, err)
 	}
-	buf, err := ioutil.ReadAll(f)
+	buf, err := io.ReadAll(f)
 	if err != nil {
 		return nil, errors.E(errors.IO, err)
 	}

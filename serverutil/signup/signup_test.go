@@ -5,7 +5,7 @@
 package signup
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -93,7 +93,7 @@ func TestSignup(t *testing.T) {
 			t.Fatal(err)
 		}
 		if r.StatusCode != http.StatusOK {
-			b, _ := ioutil.ReadAll(r.Body)
+			b, _ := io.ReadAll(r.Body)
 			t.Fatalf("%s: %s", r.Status, b)
 		}
 

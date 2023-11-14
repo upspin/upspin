@@ -6,7 +6,6 @@ package main
 
 import (
 	"bytes"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -58,7 +57,7 @@ func TestSaveKeygen(t *testing.T) {
 	}
 
 	// Write them to a file.
-	dir, err := ioutil.TempDir("", "keygen")
+	dir, err := os.MkdirTemp("", "keygen")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -69,14 +68,14 @@ func TestSaveKeygen(t *testing.T) {
 	}
 
 	// Read them back.
-	data, err := ioutil.ReadFile(filepath.Join(dir, "public.upspinkey"))
+	data, err := os.ReadFile(filepath.Join(dir, "public.upspinkey"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	if string(data) != public {
 		t.Fatalf("reading public key: got %q; want %q", data, public)
 	}
-	data, err = ioutil.ReadFile(filepath.Join(dir, "secret.upspinkey"))
+	data, err = os.ReadFile(filepath.Join(dir, "secret.upspinkey"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -104,14 +103,14 @@ func TestSaveKeygen(t *testing.T) {
 	}
 
 	// Read them back.
-	data, err = ioutil.ReadFile(filepath.Join(dir, "public.upspinkey"))
+	data, err = os.ReadFile(filepath.Join(dir, "public.upspinkey"))
 	if err != nil {
 		t.Fatal(err)
 	}
 	if string(data) != public {
 		t.Fatalf("reading public key: got %q; want %q", data, public)
 	}
-	data, err = ioutil.ReadFile(filepath.Join(dir, "secret.upspinkey"))
+	data, err = os.ReadFile(filepath.Join(dir, "secret.upspinkey"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -121,7 +120,7 @@ func TestSaveKeygen(t *testing.T) {
 	}
 
 	// Now check the archive.
-	data, err = ioutil.ReadFile(filepath.Join(dir, "secret2.upspinkey"))
+	data, err = os.ReadFile(filepath.Join(dir, "secret2.upspinkey"))
 	if err != nil {
 		t.Fatal(err)
 	}

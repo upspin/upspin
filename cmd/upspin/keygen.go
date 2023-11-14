@@ -9,7 +9,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -92,7 +92,7 @@ func (s *State) createKeys(curveName, secretFlag string) (public, private, secre
 		return keygen.Generate(curveName)
 	}
 	if !keygen.ValidSecretSeed(secretFlag) {
-		data, err := ioutil.ReadFile(subcmd.Tilde(secretFlag))
+		data, err := os.ReadFile(subcmd.Tilde(secretFlag))
 		if err != nil {
 			return "", "", "", errors.E(errors.Op("keygen"), errors.IO, err)
 		}

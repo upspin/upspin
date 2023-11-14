@@ -10,7 +10,6 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"strings"
 	"sync"
@@ -215,7 +214,7 @@ func (c *httpClient) Invoke(method string, req, resp pb.Message, stream Response
 			return err
 		}
 		if httpResp.StatusCode != http.StatusOK {
-			msg, _ := ioutil.ReadAll(httpResp.Body)
+			msg, _ := io.ReadAll(httpResp.Body)
 			httpResp.Body.Close()
 			if httpResp.Header.Get("Content-type") == "application/octet-stream" {
 				err := errors.UnmarshalError(msg)
@@ -279,7 +278,7 @@ func (c *httpClient) Invoke(method string, req, resp pb.Message, stream Response
 }
 
 func readResponse(op errors.Op, body io.ReadCloser, resp pb.Message) error {
-	respBytes, err := ioutil.ReadAll(body)
+	respBytes, err := io.ReadAll(body)
 	body.Close()
 	if err != nil {
 		return errors.E(op, errors.IO, err)

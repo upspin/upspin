@@ -6,7 +6,7 @@ package rpc
 
 import (
 	"crypto/x509"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"sync"
 
@@ -44,7 +44,7 @@ func CertPoolFromConfig(cfg upspin.Config) (*x509.CertPool, error) {
 // and returns the resulting pool.
 func certPoolFromDir(dir string) (*x509.CertPool, error) {
 	var pool *x509.CertPool
-	fis, err := ioutil.ReadDir(dir)
+	fis, err := os.ReadDir(dir)
 	if err != nil {
 		return nil, errors.Errorf("reading TLS Certificates in %q: %v", dir, err)
 	}
@@ -53,7 +53,7 @@ func certPoolFromDir(dir string) (*x509.CertPool, error) {
 		if filepath.Ext(name) != ".pem" {
 			continue
 		}
-		pem, err := ioutil.ReadFile(filepath.Join(dir, name))
+		pem, err := os.ReadFile(filepath.Join(dir, name))
 		if err != nil {
 			return nil, errors.Errorf("reading TLS Certificate %q: %v", name, err)
 		}

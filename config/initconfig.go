@@ -10,7 +10,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	osuser "os/user"
 	"path/filepath"
@@ -155,7 +154,7 @@ func InitConfig(r io.Reader) (upspin.Config, error) {
 	}
 
 	// Read the YAML definition.
-	data, err := ioutil.ReadAll(r)
+	data, err := io.ReadAll(r)
 	if err != nil {
 		return nil, errors.E(op, err)
 	}

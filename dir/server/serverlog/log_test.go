@@ -7,7 +7,6 @@ package serverlog
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"math/rand"
 	"os"
 	"path/filepath"
@@ -288,7 +287,7 @@ func TestOldStyleLogs(t *testing.T) {
 
 	// Create an existing old-style log.
 	oldLog := filepath.Join(dir, oldStyleLogFilePrefix+string(name))
-	err := ioutil.WriteFile(oldLog, []byte{}, 0600)
+	err := os.WriteFile(oldLog, []byte{}, 0600)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -314,7 +313,7 @@ func TestOldStyleLogs(t *testing.T) {
 	u.Close()
 
 	// Re-create the old log.
-	err = ioutil.WriteFile(oldLog, []byte{}, 0600)
+	err = os.WriteFile(oldLog, []byte{}, 0600)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -441,7 +440,7 @@ func TestReadRotatedLog(t *testing.T) {
 }
 
 func TestRotateLogAndTruncate(t *testing.T) {
-	dir, err := ioutil.TempDir("", "TestRotateLog")
+	dir, err := os.MkdirTemp("", "TestRotateLog")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -510,7 +509,7 @@ func TestRotateLogAndTruncate(t *testing.T) {
 }
 
 func TestIndex(t *testing.T) {
-	dir, err := ioutil.TempDir("", "TestAppendRead")
+	dir, err := os.MkdirTemp("", "TestAppendRead")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -827,7 +826,7 @@ func TestOffsetOf(t *testing.T) {
 
 func TestVersion0Logs(t *testing.T) {
 	// Copy logs to temporary so we don't overwrite any.
-	dir, err := ioutil.TempDir("", "TestVersion0Logs")
+	dir, err := os.MkdirTemp("", "TestVersion0Logs")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -843,12 +842,12 @@ func TestVersion0Logs(t *testing.T) {
 		if info.IsDir() {
 			return nil
 		}
-		data, err := ioutil.ReadFile(path)
+		data, err := os.ReadFile(path)
 		if err != nil {
 			t.Fatal(err)
 		}
 		tmp := filepath.Join(dir, path[len("testdata/version0/"):])
-		err = ioutil.WriteFile(tmp, data, 0600)
+		err = os.WriteFile(tmp, data, 0600)
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -933,7 +932,7 @@ func TestVersion0Logs(t *testing.T) {
 }
 
 func TestReOpen(t *testing.T) {
-	dir, err := ioutil.TempDir("", "ReOpen")
+	dir, err := os.MkdirTemp("", "ReOpen")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1028,7 +1027,7 @@ func sameUsers(t *testing.T, got, want []upspin.UserName) bool {
 // setup creates a testing directory and returns its name and a cleanup
 // function.
 func setup(t testing.TB, testName string) (string, func()) {
-	dir, err := ioutil.TempDir("", testName)
+	dir, err := os.MkdirTemp("", testName)
 	if err != nil {
 		t.Fatal(err)
 	}

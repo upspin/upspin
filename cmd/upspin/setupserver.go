@@ -9,9 +9,10 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -104,7 +105,7 @@ The calling user must be the same one that ran 'upspin setupdomain'.
 		}
 		fmt.Fprintf(&buf, "%s\n", user)
 	}
-	if err := ioutil.WriteFile(filepath.Join(cfgPath, "Writers"), buf.Bytes(), 0644); err != nil {
+	if err := os.WriteFile(filepath.Join(cfgPath, "Writers"), buf.Bytes(), 0644); err != nil {
 		s.Exit(err)
 	}
 
@@ -121,7 +122,7 @@ The calling user must be the same one that ran 'upspin setupdomain'.
 	}); err != nil {
 		s.Exit(err)
 	}
-	if err := ioutil.WriteFile(configFile, configBody.Bytes(), 0644); err != nil {
+	if err := os.WriteFile(configFile, configBody.Bytes(), 0644); err != nil {
 		s.Exit(err)
 	}
 
@@ -165,7 +166,7 @@ func userFor(cfgPath string, cfg *subcmd.ServerConfig) (*upspin.User, error) {
 func (s *State) configureServer(cfgPath string, cfg *subcmd.ServerConfig) {
 	files := map[string][]byte{}
 	for _, name := range subcmd.SetupServerFiles {
-		b, err := ioutil.ReadFile(filepath.Join(cfgPath, name))
+		b, err := os.ReadFile(filepath.Join(cfgPath, name))
 		if err != nil {
 			s.Exit(err)
 		}
@@ -181,7 +182,7 @@ func (s *State) configureServer(cfgPath string, cfg *subcmd.ServerConfig) {
 	if err != nil {
 		s.Exit(err)
 	}
-	b, _ = ioutil.ReadAll(resp.Body)
+	b, _ = io.ReadAll(resp.Body)
 	resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
 		s.Exitf("upspinserver returned status %v:\n%s", resp.Status, b)

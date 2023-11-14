@@ -11,7 +11,7 @@ import (
 	"crypto/sha256"
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"sort"
 	"strings"
 
@@ -413,7 +413,7 @@ func read(c upspin.Client, file upspin.PathName) ([]byte, error) {
 		return nil, err
 	}
 	defer fd.Close()
-	data, err := ioutil.ReadAll(fd)
+	data, err := io.ReadAll(fd)
 	if err != nil {
 		return nil, err
 	}

@@ -14,8 +14,9 @@ import (
 	"compress/gzip"
 	"fmt"
 	"html/template"
-	"io/ioutil"
+	"io"
 	"net/http"
+	"os"
 	"regexp"
 	"sort"
 	"strings"
@@ -397,7 +398,7 @@ func (a *archive) readme() ([]byte, error) {
 	var b []byte
 	if debug {
 		var err error
-		b, err = ioutil.ReadFile(testutil.Repo("README.binary"))
+		b, err = os.ReadFile(testutil.Repo("README.binary"))
 		if err != nil {
 			return nil, err
 		}
@@ -406,7 +407,7 @@ func (a *archive) readme() ([]byte, error) {
 		if err != nil {
 			return nil, err
 		}
-		b, err = ioutil.ReadAll(r.Body)
+		b, err = io.ReadAll(r.Body)
 		r.Body.Close()
 		if err != nil {
 			return nil, err

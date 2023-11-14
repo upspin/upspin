@@ -7,7 +7,6 @@
 package main
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
@@ -26,7 +25,7 @@ func TestFindUpspinBinaries(t *testing.T) {
 		{"fourth/path/upspin-qux", true},
 		{"yet/another/upspin-foo", true},
 	}
-	tmpDir, err := ioutil.TempDir("", "upspin-binary-test-")
+	tmpDir, err := os.MkdirTemp("", "upspin-binary-test-")
 	if err != nil {
 		t.Fatalf("could not create temp dir: %v", err)
 	}

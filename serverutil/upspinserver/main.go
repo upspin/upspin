@@ -12,7 +12,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -245,7 +244,7 @@ func (h *setupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, fmt.Sprintf("missing config file %q", name), http.StatusBadRequest)
 			return
 		}
-		err := ioutil.WriteFile(filepath.Join(*cfgPath, name), body, 0600)
+		err := os.WriteFile(filepath.Join(*cfgPath, name), body, 0600)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			os.RemoveAll(*cfgPath)
@@ -266,7 +265,7 @@ func (h *setupHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func setupWriters(cfg upspin.Config) error {
-	writers, err := ioutil.ReadFile(filepath.Join(*cfgPath, "Writers"))
+	writers, err := os.ReadFile(filepath.Join(*cfgPath, "Writers"))
 	if err != nil {
 		return err
 	}
@@ -299,7 +298,7 @@ func existsOK(_ *upspin.DirEntry, err error) error {
 
 func readServerConfig() (*subcmd.ServerConfig, error) {
 	cfgFile := filepath.Join(*cfgPath, subcmd.ServerConfigFile)
-	b, err := ioutil.ReadFile(cfgFile)
+	b, err := os.ReadFile(cfgFile)
 	if err != nil {
 		// We can't return the usual errors.E because the caller wants
 		// to match on the raw error.  But give the admin a clue.

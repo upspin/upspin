@@ -6,7 +6,6 @@ package server
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -215,7 +214,7 @@ func benchmarkWhichAccess(b *testing.B, cached bool, dir upspin.PathName, access
 // setupBenchServer sets up the benchmark tests and returns the server to use,
 // the user's config and a clean up function to use after benchmarks are run.
 func setupBenchServer(t testing.TB) (*server, upspin.Config, func()) {
-	testDir, err := ioutil.TempDir("", "DirServer.Bench")
+	testDir, err := os.MkdirTemp("", "DirServer.Bench")
 	if err != nil {
 		panic(err)
 	}

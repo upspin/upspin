@@ -9,7 +9,6 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -146,7 +145,7 @@ func (r *runner) run(cmd *cmdTest) func(t *testing.T) {
 		stderr := new(bytes.Buffer)
 		var stdin io.ReadCloser = devNull{}
 		if cmd.stdin != "" {
-			stdin = ioutil.NopCloser(strings.NewReader(cmd.stdin))
+			stdin = io.NopCloser(strings.NewReader(cmd.stdin))
 		}
 		r.state.SetIO(stdin, stdout, stderr)
 		defer r.state.DefaultIO()
@@ -284,7 +283,7 @@ func keygenVerify(dir, public, secret, secret2 string, persist bool) func(t *tes
 }
 
 func keyVerify(t *testing.T, name, prefix string) {
-	key, err := ioutil.ReadFile(name)
+	key, err := os.ReadFile(name)
 	if err != nil {
 		t.Errorf("cannot read key %q: %v", name, err)
 	}

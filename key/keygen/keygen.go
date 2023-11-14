@@ -9,7 +9,6 @@ package keygen // import "upspin.io/key/keygen"
 import (
 	"encoding/binary"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -133,7 +132,7 @@ func SaveKeys(where string, rotate bool, newPublic, newPrivate, secretStr string
 	)
 
 	// Read existing key pair.
-	private, err := ioutil.ReadFile(privateFile)
+	private, err := os.ReadFile(privateFile)
 	if os.IsNotExist(err) {
 		// There is nothing to save. Did we expect there to be?
 		if rotate {
@@ -151,7 +150,7 @@ func SaveKeys(where string, rotate bool, newPublic, newPrivate, secretStr string
 		return errors.Errorf("prior keys exist in %s; rerun with rotate command to update keys", where)
 	}
 
-	public, err := ioutil.ReadFile(publicFile)
+	public, err := os.ReadFile(publicFile)
 	if err != nil {
 		return err // Halt. Existing files are corrupted and need manual attention.
 	}

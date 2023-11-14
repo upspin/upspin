@@ -130,7 +130,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"os/exec"
@@ -248,7 +247,7 @@ func SchemaFromFile(name string) (*Schema, error) {
 	if name == "" {
 		doc = DefaultSchema
 	} else {
-		data, err := ioutil.ReadFile(name)
+		data, err := os.ReadFile(name)
 		if err != nil {
 			return nil, err
 		}
@@ -391,7 +390,7 @@ type session struct {
 
 // fromDir attempts to read session information from the given directory.
 func (s *session) fromDir(dir string) error {
-	b, err := ioutil.ReadFile(filepath.Join(dir, sessionFile))
+	b, err := os.ReadFile(filepath.Join(dir, sessionFile))
 	if err != nil {
 		if os.IsNotExist(err) {
 			return nil
@@ -407,7 +406,7 @@ func (s *session) toDir(dir string) error {
 	if err != nil {
 		return err
 	}
-	return ioutil.WriteFile(filepath.Join(dir, sessionFile), b, 0644)
+	return os.WriteFile(filepath.Join(dir, sessionFile), b, 0644)
 }
 
 // setServerAddress sets the address that the given server is listening
@@ -469,7 +468,7 @@ func (sc *Schema) Command(name string) string {
 func (sc *Schema) Start() error {
 	if sc.Dir == "" {
 		// No directory set, so we use a temporary one.
-		tmpDir, err := ioutil.TempDir("", "upbox")
+		tmpDir, err := os.MkdirTemp("", "upbox")
 		if err != nil {
 			return err
 		}
@@ -565,7 +564,7 @@ func (sc *Schema) Start() error {
 		if keyUser == "" {
 			continue
 		}
-		pk, err := ioutil.ReadFile(filepath.Join(sc.Dir, u.Name, "public.upspinkey"))
+		pk, err := os.ReadFile(filepath.Join(sc.Dir, u.Name, "public.upspinkey"))
 		if err != nil {
 			return err
 		}
@@ -725,7 +724,7 @@ func (sc *Schema) writeConfig(user string) error {
 		cfg = append(cfg, "cache: "+u.cacheAddr())
 	}
 	cfg = append(cfg, "") // trailing \n
-	return ioutil.WriteFile(filename, []byte(strings.Join(cfg, "\n")), 0644)
+	return os.WriteFile(filename, []byte(strings.Join(cfg, "\n")), 0644)
 }
 
 func (u *User) cacheAddr() string {

@@ -12,7 +12,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"math/rand"
 	"os"
 	"path/filepath"
@@ -129,7 +128,7 @@ func mount() error {
 	testConfig.cfg = cfg
 
 	// A directory for cache files.
-	testConfig.cacheDir, err = ioutil.TempDir("", "upspincache")
+	testConfig.cacheDir, err = os.MkdirTemp("", "upspincache")
 	if err != nil {
 		return err
 	}
