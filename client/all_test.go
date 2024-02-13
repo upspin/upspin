@@ -356,7 +356,7 @@ func TestFileRandomAccess(t *testing.T) {
 			}
 		}
 	}
-	n, err = f.ReadAt(result,1)
+	n, err = f.ReadAt(result, 1)
 	if err == nil {
 		t.Fatal("expected err==io.EOF from ReadAt, got err==nil")
 	}
@@ -453,7 +453,10 @@ func TestFileSeek(t *testing.T) {
 			for i := offset; i < offset+length; i++ {
 				written[i] = true
 			}
-			// TODO  Don't we need to check  len(written) != Max  here?
+			// Avoid entering an infinite loop above
+			if len(written) == Max {
+				break
+			}
 		}
 	}
 	err := f.Close()
@@ -529,6 +532,10 @@ func TestFileSeek(t *testing.T) {
 			curOffset = o + int64(length)
 			for i := offset; i < offset+length; i++ {
 				read[i] = true
+			}
+			// Avoid entering an infinite loop above
+			if len(read) == Max {
+				break
 			}
 		}
 	}
