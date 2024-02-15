@@ -42,6 +42,7 @@ type proxiedDir struct {
 	// For retrying a watch.
 	retryInterval time.Duration
 	wake          chan bool
+	retries       uint
 
 	watchSupported bool
 }
@@ -162,6 +163,11 @@ func (d *proxiedDir) close() {
 const (
 	initialRetryInterval = time.Second
 	maxRetryInterval     = time.Minute
+	// Number of retries before the watcher gives up.
+	// With the constants above, this amounts to
+	//    (1+2+4+8+16+32)*time.Second + 4*time.Minute ≈ 5 minutes
+	// TODO(oec): maybe make this configurable
+	maxRetries = 10
 )
 
 // watcher watches a directory and caches any changes to something already in the LRU.
@@ -176,6 +182,7 @@ func (d *proxiedDir) watcher(ep upspin.Endpoint) {
 	}
 
 	d.retryInterval = initialRetryInterval
+	d.retries = 0
 	for {
 		err := d.watch(ep)
 		if err == nil {
@@ -197,6 +204,14 @@ func (d *proxiedDir) watcher(ep upspin.Endpoint) {
 		} else {
 			log.Info.Printf("dir/dircache.watcher: %s: %s", d.user, err)
 		}
+		if d.retries == maxRetries {
+			// We tried often, we tried hard.  Now is the time to let go.
+			log.Info.Printf("dir/dircache.watcher %s %s maximum retries (%d) reached, giving up", d.user, ep, maxRetries)
+			close(d.die)
+			d.die = nil
+			return
+		}
+		d.retries += 1
 
 		select {
 		case <-time.After(d.retryInterval):
@@ -225,8 +240,9 @@ func (d *proxiedDir) watch(ep upspin.Endpoint) error {
 	}
 	log.Info.Printf("dir/dircache: Watch(%q) started", name)
 
-	// If Watch succeeds, go back to the initial interval.
+	// If Watch succeeds, go back to the initial interval and count.
 	d.retryInterval = initialRetryInterval
+	d.retries = 0
 
 	// Loop receiving events until we are told to stop or the event stream is closed.
 	for {
