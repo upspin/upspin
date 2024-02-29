@@ -482,7 +482,7 @@ directory and storage servers.
 This separation has a number of properties, most important of which is that it
 guarantees that the directory servers are not granted any access to users' data
 beyond knowing where it is located.
-Directory servers never even see user's data, even unencrypted data, other than
+Directory servers never see unencrypted file contents, they only see
 file names and access permission information.
 A user's data need not even be hosted by the same organization that hosts the
 user's directory.
