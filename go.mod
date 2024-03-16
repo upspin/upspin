@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	github.com/NYTimes/gziphandler v1.1.1
-	github.com/golang/protobuf v1.5.3
+	github.com/golang/protobuf v1.5.4
 	github.com/presotto/fuse v0.0.0-20220404205012-944bbcc73d97
 	github.com/russross/blackfriday v1.6.0
 	golang.org/x/crypto v0.14.0
@@ -13,4 +13,4 @@ require (
 	gopkg.in/yaml.v2 v2.4.0
 )
 
-require google.golang.org/protobuf v1.26.0 // indirect
+require google.golang.org/protobuf v1.33.0 // indirect
