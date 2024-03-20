@@ -6,7 +6,7 @@
 package server
 
 import (
-	"io/ioutil"
+	"os"
 	"strings"
 	"sync"
 	"time"
@@ -161,7 +161,7 @@ func New(cfg upspin.Config, options ...string) (upspin.DirServer, error) {
 		storageOpts = append(storageOpts, storage.WithOptions(opt))
 	}
 	if logDir == "" {
-		dir, err := ioutil.TempDir("", "DirServer")
+		dir, err := os.MkdirTemp("", "DirServer")
 		if err != nil {
 			return nil, errors.E(op, errors.IO, err)
 		}

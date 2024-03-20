@@ -5,7 +5,6 @@
 package server
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -99,7 +98,7 @@ func TestNew(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping part of test when network unavailable; depends on credential availability")
 	}
-	dir, err := ioutil.TempDir("", "test-store")
+	dir, err := os.MkdirTemp("", "test-store")
 	if err != nil {
 		t.Fatal(err)
 	}

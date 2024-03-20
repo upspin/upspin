@@ -8,7 +8,6 @@ package subcmd
 
 import (
 	"encoding/json"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -42,7 +41,7 @@ var SetupServerFiles = []string{
 // ReadServerConfig reads and JSON-decodes the ServerConfigFile under cfgPath.
 func (s *State) ReadServerConfig(cfgPath string) *ServerConfig {
 	cfgFile := filepath.Join(cfgPath, ServerConfigFile)
-	b, err := ioutil.ReadFile(cfgFile)
+	b, err := os.ReadFile(cfgFile)
 	if err != nil {
 		if os.IsNotExist(err) {
 			s.Exitf("No server config file found at %q.\nRun 'upspin setupdomain' first.", cfgFile)
@@ -63,7 +62,7 @@ func (s *State) WriteServerConfig(cfgPath string, cfg *ServerConfig) {
 	if err != nil {
 		s.Exit(err)
 	}
-	err = ioutil.WriteFile(cfgFile, b, 0644)
+	err = os.WriteFile(cfgFile, b, 0644)
 	if err != nil {
 		s.Exit(err)
 	}

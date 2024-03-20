@@ -12,7 +12,6 @@ import (
 	"fmt"
 	"go/build"
 	"html/template"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -209,7 +208,7 @@ func (s *server) parseTemplates(dir string) (err error) {
 }
 
 func (s *server) parseDocs(dir string) error {
-	fis, err := ioutil.ReadDir(dir)
+	fis, err := os.ReadDir(dir)
 	if err != nil {
 		return err
 	}
@@ -222,7 +221,7 @@ func (s *server) parseDocs(dir string) error {
 		if filepath.Ext(fn) != extMarkdown {
 			continue
 		}
-		b, err := ioutil.ReadFile(filepath.Join(dir, fn))
+		b, err := os.ReadFile(filepath.Join(dir, fn))
 		if err != nil {
 			return err
 		}

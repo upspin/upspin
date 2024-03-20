@@ -8,7 +8,7 @@ package sendgrid // import "upspin.io/cloud/mail/sendgrid"
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"upspin.io/cloud/mail"
@@ -106,7 +106,7 @@ func (s *sendgrid) Send(to, from, subject, text, html string) error {
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusAccepted {
-		errStr, err := ioutil.ReadAll(resp.Body)
+		errStr, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return errors.E(op, errors.IO, err)
 		}

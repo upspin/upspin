@@ -6,7 +6,7 @@ package frontend
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -73,7 +73,7 @@ func TestNoGzip(t *testing.T) {
 		t.Fatalf("expected no error making request, but got %v", err)
 	}
 	defer resp.Body.Close()
-	b, err := ioutil.ReadAll(resp.Body)
+	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Fatalf("expected no error reading gzipped response body, got %v", err)
 	}
@@ -102,7 +102,7 @@ func getHost(t *testing.T, host, url string) []byte {
 	if resp.StatusCode != http.StatusOK {
 		t.Errorf("expected status code to be %d, got %d", http.StatusOK, resp.StatusCode)
 	}
-	b, err := ioutil.ReadAll(resp.Body)
+	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Fatalf("expected no error reading response body, got %v", err)
 	}

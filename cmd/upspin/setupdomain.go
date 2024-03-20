@@ -9,7 +9,6 @@ import (
 	"crypto/sha256"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"text/template"
@@ -153,7 +152,7 @@ If any state exists at the given location (-where) then the command aborts.
 	}); err != nil {
 		s.Exit(err)
 	}
-	if err := ioutil.WriteFile(dirConfig, dirBody.Bytes(), 0644); err != nil {
+	if err := os.WriteFile(dirConfig, dirBody.Bytes(), 0644); err != nil {
 		s.Exit(err)
 	}
 	var storeBody bytes.Buffer
@@ -166,7 +165,7 @@ If any state exists at the given location (-where) then the command aborts.
 	}); err != nil {
 		s.Exit(err)
 	}
-	if err := ioutil.WriteFile(storeConfig, storeBody.Bytes(), 0644); err != nil {
+	if err := os.WriteFile(storeConfig, storeBody.Bytes(), 0644); err != nil {
 		s.Exit(err)
 	}
 
@@ -257,7 +256,7 @@ func writeUserFile(configFile string) (userFile string, u upspin.UserName, err e
 	if err != nil {
 		return "", "", err
 	}
-	f, err := ioutil.TempFile("", "setupdomain-user")
+	f, err := os.CreateTemp("", "setupdomain-user")
 	if err != nil {
 		return "", "", err
 	}

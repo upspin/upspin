@@ -5,7 +5,6 @@
 package tree
 
 import (
-	"io/ioutil"
 	"os"
 	"reflect"
 	"testing"
@@ -1129,7 +1128,7 @@ var topDir string // where we write our test data.
 
 func TestMain(m *testing.M) {
 	var err error
-	topDir, err = ioutil.TempDir("", "Tree")
+	topDir, err = os.MkdirTemp("", "Tree")
 	if err != nil {
 		panic(err)
 	}
@@ -1263,7 +1262,7 @@ func newConfigForTesting(t *testing.T, userName upspin.UserName) (upspin.Config,
 	}
 	// Create a new tempdir as a subdir of topdir, so it gets garbage
 	// collected at the very end.
-	tmpDir, err := ioutil.TempDir(topDir, "test")
+	tmpDir, err := os.MkdirTemp(topDir, "test")
 	if err != nil {
 		t.Fatal(err)
 	}

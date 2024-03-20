@@ -13,7 +13,6 @@ import (
 	"crypto/sha256"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"math/big"
 	"os"
 	"path/filepath"
@@ -381,7 +380,7 @@ func ParsePublicKey(public upspin.PublicKey) (*ecdsa.PublicKey, error) {
 }
 
 func readFile(op errors.Op, dir, name string) ([]byte, error) {
-	b, err := ioutil.ReadFile(filepath.Join(dir, name))
+	b, err := os.ReadFile(filepath.Join(dir, name))
 	if os.IsNotExist(err) {
 		return nil, errors.E(op, errors.NotExist, err)
 	}

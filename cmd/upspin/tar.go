@@ -14,7 +14,6 @@ import (
 	"archive/tar"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"strings"
 
 	"flag"
@@ -240,7 +239,7 @@ func (a *archiver) unarchive(src io.ReadCloser) error {
 			if access.IsAccessFile(name) {
 				// Save Access files for later, to prevent
 				// being locked out from restoring sub-entries.
-				buf, err := ioutil.ReadAll(tr)
+				buf, err := io.ReadAll(tr)
 				if err != nil {
 					return err
 				}

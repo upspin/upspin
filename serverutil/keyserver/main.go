@@ -8,8 +8,8 @@ package keyserver // import "upspin.io/serverutil/keyserver"
 
 import (
 	"flag"
-	"io/ioutil"
 	"net/http"
+	"os"
 
 	"upspin.io/cloud/mail"
 	"upspin.io/cloud/mail/sendgrid"
@@ -78,7 +78,7 @@ func Main(setup func(upspin.KeyServer)) {
 		log.Info.Printf("keyserver: WARNING: -mail_config not supplied; no emails will be sent, they will be logged instead")
 		mc = &signup.MailConfig{Mail: mail.Logger(log.Info)}
 	} else {
-		data, err := ioutil.ReadFile(*mailConfigFile)
+		data, err := os.ReadFile(*mailConfigFile)
 		if err != nil {
 			log.Fatalf("keyserver: %v", err)
 		}

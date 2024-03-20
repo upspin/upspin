@@ -6,7 +6,6 @@ package disk
 
 import (
 	"fmt"
-	"io/ioutil"
 	"math/rand"
 	"os"
 	"testing"
@@ -16,7 +15,7 @@ import (
 )
 
 func TestList(t *testing.T) {
-	base, err := ioutil.TempDir("", "upspin-storage-disk-test")
+	base, err := os.MkdirTemp("", "upspin-storage-disk-test")
 	if err != nil {
 		t.Fatal(err)
 	}

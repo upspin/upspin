@@ -6,7 +6,6 @@
 package disk // import "upspin.io/cloud/storage/disk"
 
 import (
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -108,7 +107,7 @@ func (s *storageImpl) LinkBase() (base string, err error) {
 // Download implements storage.Storage.
 func (s *storageImpl) Download(ref string) ([]byte, error) {
 	const op errors.Op = "cloud/storage/disk.Download"
-	b, err := ioutil.ReadFile(s.path(ref))
+	b, err := os.ReadFile(s.path(ref))
 	if os.IsNotExist(err) {
 		return nil, errors.E(op, errors.NotExist, errors.Str(ref))
 	} else if err != nil {
@@ -124,7 +123,7 @@ func (s *storageImpl) Put(ref string, contents []byte) error {
 	if err := os.MkdirAll(filepath.Dir(p), 0700); err != nil {
 		return errors.E(op, errors.IO, err)
 	}
-	if err := ioutil.WriteFile(p, contents, 0600); err != nil {
+	if err := os.WriteFile(p, contents, 0600); err != nil {
 		return errors.E(op, errors.IO, err)
 	}
 	return nil

@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"net"
 	"os"
 	"path/filepath"
@@ -148,7 +147,7 @@ file and keys and only send the signup request to the key server.
 	if err != nil {
 		s.Exit(err)
 	}
-	err = ioutil.WriteFile(flags.Config, configContents.Bytes(), 0640)
+	err = os.WriteFile(flags.Config, configContents.Bytes(), 0640)
 	if err != nil {
 		// Directory doesn't exist, perhaps.
 		if !os.IsNotExist(err) {
@@ -162,7 +161,7 @@ file and keys and only send the signup request to the key server.
 		if mkdirErr := os.Mkdir(dir, 0700); mkdirErr != nil {
 			s.Exit(err)
 		}
-		err = ioutil.WriteFile(flags.Config, configContents.Bytes(), 0640)
+		err = os.WriteFile(flags.Config, configContents.Bytes(), 0640)
 		if err != nil {
 			s.Exit(err)
 		}

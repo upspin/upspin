@@ -8,7 +8,6 @@ package server
 // by using testenv or something similar.
 
 import (
-	"io/ioutil"
 	"os"
 	"sync"
 	"testing"
@@ -941,7 +940,7 @@ func TestPutBadGroup(t *testing.T) {
 
 func TestMain(m *testing.M) {
 	var err error
-	testDir, err = ioutil.TempDir("", "DirServer")
+	testDir, err = os.MkdirTemp("", "DirServer")
 	if err != nil {
 		panic(err)
 	}

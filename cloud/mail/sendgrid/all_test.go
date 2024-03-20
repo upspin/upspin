@@ -5,7 +5,7 @@
 package sendgrid
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -18,7 +18,7 @@ func TestSend(t *testing.T) {
 	var header http.Header
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var err error
-		request, err = ioutil.ReadAll(r.Body)
+		request, err = io.ReadAll(r.Body)
 		if err != nil {
 			w.WriteHeader(503)
 			return

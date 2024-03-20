@@ -6,7 +6,6 @@ package dircache
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"reflect"
 	"strings"
@@ -133,7 +132,7 @@ var names = []string{
 
 func TestLogFile(t *testing.T) {
 	log.SetLevel("debug")
-	dir, err := ioutil.TempDir("", "dircacheserverlog")
+	dir, err := os.MkdirTemp("", "dircacheserverlog")
 	if err != nil {
 		t.Fatalf("creating test directory: %v", err)
 	}
@@ -224,7 +223,7 @@ func TestLogFile(t *testing.T) {
 
 // TestLogGlob ensures that the glob saves all the included DirEntries and then a Glob record.
 func TestLogGlob(t *testing.T) {
-	dir, err := ioutil.TempDir("", "dircacheserverlog")
+	dir, err := os.MkdirTemp("", "dircacheserverlog")
 	if err != nil {
 		t.Fatal("creating test directory")
 	}

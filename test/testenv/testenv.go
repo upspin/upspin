@@ -9,7 +9,6 @@ package testenv
 import (
 	"crypto/rand"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strings"
 
@@ -205,7 +204,7 @@ func New(setup *Setup) (*Env, error) {
 			env.dirServer = dirserver_inprocess.New(cfg)
 		case "server":
 			// Create temporary directory for DirServer storage.
-			logDir, err := ioutil.TempDir("", "testenv-dirserver")
+			logDir, err := os.MkdirTemp("", "testenv-dirserver")
 			if err != nil {
 				return nil, errors.E(op, err)
 			}

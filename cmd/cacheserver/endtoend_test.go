@@ -6,7 +6,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"testing"
@@ -196,7 +195,7 @@ func startCacheServer(cfg upspin.Config) (*upspin.Endpoint, error) {
 	ep, _ := upspin.ParseEndpoint("remote," + addr)
 
 	// Create a directory for the cacheserver's log and data.
-	flags.CacheDir, err = ioutil.TempDir("", "cacheserver")
+	flags.CacheDir, err = os.MkdirTemp("", "cacheserver")
 	if err != nil {
 		return nil, err
 	}
