@@ -407,7 +407,7 @@ returned.
 *   Glob
     *   Caller needs List access for every directory whose entries match a
 wildcard in the argument pattern.
-        *   For instance, given u@google.com/a/*/b the caller needs List access
+        *   For instance, given `u@google.com/a/*/b` the caller needs List access
 for directory 'a' because Glob will search to match the '*'.
     *   Given the list of matching entries, the caller is only permitted to see
 those for which the caller has List access.
