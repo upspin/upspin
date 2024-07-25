@@ -1,6 +1,6 @@
 # Upspin
 
-![Augie](doc/images/augie.jpg)
+<img alt="Augie" src="doc/images/augie-transparent.png" width=360>
 
 Documentation: [upspin.io](https://upspin.io/)
 
