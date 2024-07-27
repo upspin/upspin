@@ -774,6 +774,14 @@ type Client interface {
 	// not the link target.
 	SetTime(name PathName, t Time) error
 
+	// SetTimeSequenced sets the time in name's DirEntry. 
+	// SetTimeSequenced with SeqIgnore is the same as SetTime.
+	//
+	// A successful SetTimeSequenced returns an incomplete DirEntry (see the
+	// description of AttrIncomplete) containing only the
+	// new sequence number.
+	SetTimeSequenced(name PathName, seq int64, t Time) (*DirEntry, error)
+
 	// Delete deletes the DirEntry associated with the name. The
 	// storage referenced by the DirEntry is not deleted,
 	// although the storage server may garbage collect unreferenced

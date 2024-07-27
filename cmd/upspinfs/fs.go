@@ -565,6 +565,7 @@ func (n *node) Remove(context gContext.Context, req *fuse.RemoveRequest) error {
 	for i, de := range n.de {
 		if uname == de.Name {
 			n.de = append(n.de[0:i], n.de[i+1:]...)
+			break
 		}
 	}
 
@@ -777,10 +778,12 @@ func (n *node) Setattr(context gContext.Context, req *fuse.SetattrRequest, resp 
 			return e2e(errors.E(op, n.uname, err))
 		}
 
-		// Set the time.
-		if err := n.f.client.SetTime(n.uname, upspin.TimeFromGo(req.Mtime)); err != nil {
+		// Set the time. Remember the new sequence number.
+		e, err := n.f.client.SetTimeSequenced(n.uname, n.seq, upspin.TimeFromGo(req.Mtime))
+		if err != nil {
 			return e2e(errors.E(op, err))
 		}
+		n.seq = e.Sequence
 		n.attr.Mtime = req.Mtime
 	}
 	// Ignore mode changes.

@@ -802,6 +802,9 @@ func TestSetTimes(t *testing.T) {
 	testSetTimes(t, upspin.PlainPack)
 	testSetTimes(t, upspin.EEPack)
 	testSetTimes(t, upspin.EEIntegrityPack)
+	testSetTimeSequenced(t, upspin.PlainPack)
+	testSetTimeSequenced(t, upspin.EEPack)
+	testSetTimeSequenced(t, upspin.EEIntegrityPack)
 }
 
 func testSetTimes(t *testing.T, packing upspin.Packing) {
@@ -826,6 +829,46 @@ func testSetTimes(t *testing.T, packing upspin.Packing) {
 	newDirEntry, err := client.Lookup(path, followFinalLink)
 	if err != nil {
 		t.Fatal("lookup file:", err)
+	}
+	if newDirEntry.Time != oldDirEntry.Time+100 {
+		t.Fatalf("time mismatch: got %d expected %d", newDirEntry.Time, oldDirEntry.Time+100)
+	}
+}
+
+func testSetTimeSequenced(t *testing.T, packing upspin.Packing) {
+	const (
+		user = "user1@google.com"
+		root = user + "/"
+	)
+	client := New(setup(baseCfg, user))
+	const (
+		fileName = root + "file"
+		text     = "hello sailor"
+	)
+
+	// Put the initial version, remembering the sequence.
+	oldDirEntry, err := client.PutSequenced(fileName, upspin.SeqIgnore, []byte(text))
+	if err != nil {
+		t.Fatal("put file:", err)
+	}
+	seq := oldDirEntry.Sequence
+
+	// Set time using that sequence number. This should work.
+	d, err := client.SetTimeSequenced(fileName, seq, oldDirEntry.Time+100)
+	if err != nil {
+		t.Fatal("set time sequenced file:", err)
+	}
+	if d.Time != oldDirEntry.Time+100 {
+		t.Fatalf("time mismatch: got %d expected %d", d.Time, oldDirEntry.Time+100)
+	}
+
+	// Make sure it was really updated.
+	newDirEntry, err := client.Lookup(fileName, followFinalLink)
+	if err != nil {
+		t.Fatal("lookup file:", err)
+	}
+	if newDirEntry.Sequence == seq {
+		t.Fatalf("sequence number should have advanced")
 	}
 	if newDirEntry.Time != oldDirEntry.Time+100 {
 		t.Fatalf("time mismatch: got %d expected %d", newDirEntry.Time, oldDirEntry.Time+100)
