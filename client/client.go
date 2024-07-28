@@ -744,29 +744,41 @@ func (c *Client) Rename(oldName, newName upspin.PathName) (*upspin.DirEntry, err
 
 // SetTime implements upspin.Client.
 func (c *Client) SetTime(name upspin.PathName, t upspin.Time) error {
-	const op errors.Op = "client.SetTime"
+	_, err := c.SetTimeSequenced(name, upspin.SeqIgnore, t)
+	return err
+}
+
+// SetTimeSequenced implements upspin.Client.
+func (c *Client) SetTimeSequenced(name upspin.PathName, seq int64, t upspin.Time) (*upspin.DirEntry, error) {
+	const op errors.Op = "client.SetTimeSequenced"
 	m, s := newMetric(op)
 	defer m.Done()
 
 	entry, _, err := c.lookup(op, &upspin.DirEntry{Name: name}, lookupLookupFn, doNotFollowFinalLink, s)
 	if err != nil {
-		return errors.E(op, err)
+		return nil, errors.E(op, err)
 	}
 
 	packer := pack.Lookup(entry.Packing)
 	if packer == nil {
-		return errors.E(op, name, errors.Invalid, errors.Errorf("unrecognized Packing %d", c.config.Packing()))
+		return nil, errors.E(op, name, errors.Invalid, errors.Errorf("unrecognized Packing %d", c.config.Packing()))
 	}
 	if err := packer.SetTime(c.config, entry, t); err != nil {
-		return errors.E(op, err)
+		return nil, errors.E(op, err)
 	}
 
 	// Record directory entry.
-	_, _, err = c.lookup(op, entry, putLookupFn, doNotFollowFinalLink, s)
+	entry.Sequence = seq
+	e , _, err := c.lookup(op, entry, putLookupFn, doNotFollowFinalLink, s)
 	if err != nil {
-		return errors.E(op, err)
+		return nil, errors.E(op, err)
 	}
-	return nil
+
+	// dir.Put returns an incomplete entry, with the updated sequence number.
+	if e != nil { // TODO: Can be nil only when talking to old servers.
+		entry.Sequence = e.Sequence
+	}
+	return entry, nil
 }
 
 func (c *Client) dupOrRename(op errors.Op, oldName, newName upspin.PathName, rename bool, s *metric.Span) (*upspin.DirEntry, error) {
