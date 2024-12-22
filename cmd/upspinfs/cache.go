@@ -580,7 +580,9 @@ func (cf *cachedFile) writeback(n *node) error {
 				// TODO(p): this might be improved by constraining
 				// to fewer error types.
 				cf.file.Pin()
-				break
+				// quit trying to write it back.
+				cf.dirty = false
+				return nil
 			}
 			return errors.E(op, err)
 		}
