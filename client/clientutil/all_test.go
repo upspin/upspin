@@ -8,6 +8,7 @@ import (
 	"crypto/sha256"
 	"encoding/binary"
 	"math/big"
+	"strconv"
 	"testing"
 
 	"upspin.io/bind"
@@ -126,7 +127,7 @@ func setupTestConfig(t *testing.T) upspin.Config {
 	for i := 0; i < 10; i++ {
 		loc := upspin.Location{
 			Endpoint:  inProcess,
-			Reference: upspin.Reference("ref" + string(i)),
+			Reference: upspin.Reference("ref" + strconv.Itoa(i)),
 		}
 		tLocs = append(tLocs, loc)
 	}
