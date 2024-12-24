@@ -181,6 +181,10 @@ type blockUnpacker struct {
 }
 
 func (bp *blockUnpacker) Unpack(ciphertext []byte) (cleartext []byte, err error) {
+	return bp.UnpackBlock(ciphertext, 0)
+}
+
+func (bp *blockUnpacker) UnpackBlock(ciphertext []byte, _ int) (cleartext []byte, err error) {
 	cleartext = ciphertext
 	return
 }
