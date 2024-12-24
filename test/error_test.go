@@ -78,7 +78,7 @@ func testGetErrors(t *testing.T, r *testenv.Runner) {
 		}
 		r.DirLookup(file)
 		if !r.GotIncompleteEntry(file) {
-			t.Fatalf(r.Diag())
+			t.Fatal(r.Diag())
 		}
 		r.Get(file)
 		if !r.Match(errPermission) {
