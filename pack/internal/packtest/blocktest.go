@@ -68,6 +68,10 @@ func TestMultiBlockRoundTrip(t *testing.T, ctx upspin.Config, packer upspin.Pack
 	if err := unpackEntryRandomly(ctx, store, packer, de, data, cleartextBlockOffsets); err != nil {
 		t.Fatalf("unpacking random entries: %v", err)
 	}
+
+	if err := unpackBlockEntryRandomly(ctx, store, packer, de, data); err != nil {
+		t.Fatalf("unpacking random block entries: %v", err)
+	}
 }
 
 func packEntry(ctx upspin.Config, store fakeStore, packer upspin.Packer, de *upspin.DirEntry, r io.Reader) error {
@@ -139,6 +143,49 @@ func unpackEntry(ctx upspin.Config, store fakeStore, packer upspin.Packer, de *u
 			return err
 		}
 	}
+}
+
+func unpackBlockEntryRandomly(cfg upspin.Config, store fakeStore, packer upspin.Packer, de *upspin.DirEntry, data []byte) error {
+	bu, err := packer.Unpack(cfg, de)
+	if err != nil {
+		return err
+	}
+
+	refs := make([]upspin.Reference, 0)
+	for {
+		b, ok := bu.NextBlock()
+		if !ok {
+			break
+		}
+		refs = append(refs, b.Location.Reference)
+	}
+
+	clearBlocks := make([][]byte, len(refs))
+	// Unpack blocks in a random order.
+	for _, n := range mRand.Perm(len(refs)) {
+		ref := refs[n]
+		cipher, ok := store[ref]
+		if !ok {
+			return fmt.Errorf("could not find reference %q in store", ref)
+		}
+
+		clear := make([]byte, len(cipher))
+		if err := bu.UnpackBlock(clear, cipher, n); err != nil {
+			return err
+		}
+		clearBlocks[n] = clear
+	}
+
+	var cleartext []byte
+	for _, clearBlock := range clearBlocks {
+		cleartext = append(cleartext, clearBlock...)
+	}
+
+	if !bytes.Equal(cleartext, data) {
+		return fmt.Errorf("got wrong cleartext")
+	}
+
+	return nil
 }
 
 func unpackEntryRandomly(ctx upspin.Config, store fakeStore, packer upspin.Packer, de *upspin.DirEntry, data []byte, cleartextBlockOffsets []int64) error {
