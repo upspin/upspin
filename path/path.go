@@ -145,7 +145,7 @@ func DropPath(pathName upspin.PathName, n int) upspin.PathName {
 	return upspin.PathName(str)
 }
 
-// FirstPath returns the path name with the first n elements dropped.
+// FirstPath returns the path name with only the first n elements after the user name.
 // It "cleans" the argument first, using the Clean function, which means
 // that if the path is malformed or contains dot-dot (..) elements the
 // result may be unexpected.
