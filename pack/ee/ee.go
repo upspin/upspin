@@ -342,17 +342,22 @@ type blockUnpacker struct {
 
 func (bp *blockUnpacker) Unpack(ciphertext []byte) (cleartext []byte, err error) {
 	const op errors.Op = "pack/ee.blockUnpacker.Unpack"
+	return bp.UnpackBlock(ciphertext, bp.Block)
+}
+
+func (bp *blockUnpacker) UnpackBlock(ciphertext []byte, n int) (cleartext []byte, err error) {
+	const op errors.Op = "pack/ee.blockUnpacker.UnpackBlock"
 	// Validate checksum.
 	b := sha256.Sum256(ciphertext)
 	sum := b[:]
-	if got, want := sum, bp.entry.Blocks[bp.Block].Packdata; !bytes.Equal(got, want) {
+	if got, want := sum, bp.entry.Blocks[n].Packdata; !bytes.Equal(got, want) {
 		return nil, errors.E(op, bp.entry.Name, "checksum mismatch")
 	}
 
 	cleartext = bp.buf.Bytes(len(ciphertext))
 
 	// Decrypt.
-	if err := crypt(cleartext, ciphertext, bp.cipher, bp.entry.Blocks[bp.Block].Offset); err != nil {
+	if err := crypt(cleartext, ciphertext, bp.cipher, bp.entry.Blocks[n].Offset); err != nil {
 		return nil, errors.E(op, bp.entry.Name, err)
 	}
 
