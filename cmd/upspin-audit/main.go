@@ -77,8 +77,7 @@ To delete the garbage references in a given store server:
   3. Run find-garbage to compile a list of references that are in the scan-store
      output but not in the combined output of the scan-dir runs.
   4. Run delete-garbage (as the store server user) to delete the blocks in the
-     find-garbage output.
-`
+     find-garbage output.`
 
 func main() {
 	const name = "audit"

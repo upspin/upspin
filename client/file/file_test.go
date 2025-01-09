@@ -155,3 +155,6 @@ func (d *dummyClient) Rename(oldName, newName upspin.PathName) (*upspin.DirEntry
 func (d *dummyClient) SetTime(name upspin.PathName, t upspin.Time) error {
 	return nil
 }
+func (d *dummyClient) SetTimeSequenced(name upspin.PathName,  seq int64, t upspin.Time) (*upspin.DirEntry, error) {
+	return nil, nil
+}
