@@ -369,6 +369,8 @@ func (bp *blockUnpacker) unpackBlock(op errors.Op, cleartext, ciphertext []byte,
 
 	// Decrypt.
 	if err := crypt(cleartext, ciphertext, bp.cipher, bp.entry.Blocks[n].Offset); err != nil {
+		// Zero out any partial results.
+		copy(cleartext, make([]byte, len(ciphertext)))
 		return errors.E(op, bp.entry.Name, err)
 	}
 
