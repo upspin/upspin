@@ -92,8 +92,9 @@ These exceptions are described below.
 Access control files are named exactly `Access`.
 Like `Group` files, they are plain text files and are stored in the owner's
 Upspin tree, only the owner may write them, and read access to the `Access`
-files themselves is granted by the Upspin access control mechanisms described
-here.
+files themselves is granted for users that have any defined rights on the path
+(not just Read). This is to allow for offline evaluation of access control
+rules, as when using a caching proxy server.
 The details about the format of the files are presented below; in this section
 we concentrate on the model itself.
 
@@ -397,7 +398,9 @@ DirServer operations and the rights they check are:
     *   The caller needs Read access to see full information, including storage
 references.
     *   If the caller has some rights but not Read, returned `DirEntry` has
-empty `Blocks` and `Packdata` fields, hiding where the data is stored.
+empty `Blocks` and `Packdata` fields, hiding where the data is stored (with the
+exception of `Access` and `Group` files, which can be read with any access
+right).
     *   If the caller has no rights, an "information withheld" error is
 returned.
 *   Put (including making directories and links)
@@ -418,8 +421,6 @@ corresponding DirEntries have empty Blocks and Packdata fields.
 *   WhichAccess
     *   Caller needs any right (any of Read, Write, Create, List, Delete) for
 the entry.
-    *   If the caller does not have Read access for the Access file itself, the
-returned `DirEntry` has empty `Blocks` and `Packdata` fields.
 
 As always, if the name steps through a link, the caller must have some access
 rights for the link entry itself.
