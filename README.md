@@ -1,3 +1,19 @@
+2025-02-11 announcement: Turning down Upspin infrastructure 
+
+Upspin, like Unix and Plan 9, was intended to foster communities of sharing, but has been less successful at that than we hoped. As a consequence, with regret, we have decided to turn down the central infrastructure such as the keyserver over the coming months 
+
+On March 4, we will turn off keyserver for a week. This warns even people not following this list that something is happening. Then on May 6, we will turn it off permanently. If this will cause more pain than we're aware, please email grosse@gmail.com and let's discuss options.
+
+There is much about Upspin that still seems attractive compared to alternatives. The combination of strong end-to-end encryption with the convenience of upspinfs letting you run existing apps effortlessly has been great. Bringing the idea of automatic nightly snapshots from Plan 9 to modern systems also feels great in use.
+
+Contributors have also proposed valuable improvements, and a backlog has developed on reviewing and installing these, which is part of what prompted this decision. Some examples are: switching from a central keyserver to ssh-like authorized_keys files in clients and dirservers, revised API for Block unpacking enabling parallel reads, a clearer model for permissions on Access and Group files, and post-quantum-cryptographic packing that can defend against future rogue governments. The question is whether the size of the community justifies the effort.
+
+We thank all who tried out Upspin!
+
+Andrew, Dave, Eric, and Rob
+
+-----------------------------------
+
 # Upspin
 
 <img alt="Augie" src="doc/images/augie-transparent.png" width=360>
