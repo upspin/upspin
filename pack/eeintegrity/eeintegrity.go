@@ -216,10 +216,15 @@ type blockUnpacker struct {
 // Unpack implements upspin.BlockUnpacker.
 func (bp *blockUnpacker) Unpack(ciphertext []byte) (cleartext []byte, err error) {
 	const op errors.Op = "pack/eeintegrity.blockUpacker.Unpack"
+	return bp.UnpackBlock(ciphertext, bp.Block)
+}
+
+func (bp *blockUnpacker) UnpackBlock(ciphertext []byte, n int) (cleartext []byte, err error) {
+	const op errors.Op = "pack/eeintegrity.blockUpacker.UnpackBlock"
 	// Validate checksum.
 	b := sha256.Sum256(ciphertext)
 	sum := b[:]
-	if got, want := sum, bp.entry.Blocks[bp.Block].Packdata; !bytes.Equal(got, want) {
+	if got, want := sum, bp.entry.Blocks[n].Packdata; !bytes.Equal(got, want) {
 		return nil, errors.E(op, bp.entry.Name, "checksum mismatch")
 	}
 
