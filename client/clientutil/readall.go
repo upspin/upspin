@@ -7,6 +7,8 @@
 package clientutil // import "upspin.io/client/clientutil"
 
 import (
+	"sync"
+
 	"upspin.io/access"
 	"upspin.io/bind"
 	"upspin.io/errors"
@@ -33,7 +35,6 @@ func ReadAll(cfg upspin.Config, entry *upspin.DirEntry) ([]byte, error) {
 		}
 	}
 
-	var data []byte
 	packer := pack.Lookup(entry.Packing)
 	if packer == nil {
 		return nil, errors.E(entry.Name, errors.Errorf("unrecognized Packing %d", entry.Packing))
@@ -42,24 +43,132 @@ func ReadAll(cfg upspin.Config, entry *upspin.DirEntry) ([]byte, error) {
 	if err != nil {
 		return nil, errors.E(entry.Name, err) // Showstopper.
 	}
-	for {
+
+	return readAll(cfg, bu, entry)
+}
+
+func readAll(cfg upspin.Config, bu upspin.BlockUnpacker, entry *upspin.DirEntry) ([]byte, error) {
+	var data []byte
+
+	done := make(chan error)
+	concurrency := 16
+	ciphers := make(chan nCipher)
+
+	go func() {
+		window := newSlidingWindow(concurrency)
+		pos := 0
+
+		for in := range ciphers {
+			if in.err != nil {
+				done <- in.err
+				return
+			}
+			// Got a block that should be unpacked in the future.
+			if in.blockNumber != pos {
+				window.append(in)
+				var found bool
+				in, found = window.pop(pos)
+				if !found {
+					continue
+				}
+			}
+
+			clear, err := bu.UnpackBlock(in.cipher, in.blockNumber)
+			if err != nil {
+				done <- errors.E(entry.Name, err)
+				return
+			}
+			data = append(data, clear...)
+			pos++
+		}
+
+		for window.len() > 0 {
+			in, found := window.pop(pos)
+			// TODO: I think should always be found.
+			if !found {
+				continue
+			}
+
+			clear, err := bu.UnpackBlock(in.cipher, in.blockNumber)
+			if err != nil {
+				done <- errors.E(entry.Name, err)
+				return
+			}
+			data = append(data, clear...)
+			pos++
+		}
+
+		close(done)
+	}()
+
+	sema := make(chan struct{}, concurrency)
+	var wg sync.WaitGroup
+
+	for n := 0; ; n++ {
 		block, ok := bu.NextBlock()
 		if !ok {
+			wg.Wait()
+			close(ciphers)
 			break // EOF
 		}
-		// block is known valid as per valid.DirEntry above.
 
-		cipher, err := ReadLocation(cfg, block.Location)
-		if err != nil {
-			return nil, errors.E(err)
-		}
-		clear, err := bu.Unpack(cipher)
-		if err != nil {
-			return nil, errors.E(entry.Name, err)
-		}
-		data = append(data, clear...) // TODO: Could avoid a copy if only one block.
+		sema <- struct{}{}
+		wg.Add(1)
+		go func(n int) {
+			defer wg.Done()
+			defer func() { <-sema }()
+
+			// block is known valid as per valid.DirEntry above.
+			cipher, err := ReadLocation(cfg, block.Location)
+			if err != nil {
+				ciphers <- nCipher{blockNumber: n, cipher: nil, err: errors.E(err)}
+				return
+			}
+
+			ciphers <- nCipher{blockNumber: n, cipher: cipher}
+		}(n)
 	}
+
+	if err := <-done; err != nil {
+		return nil, err
+	}
+
 	return data, nil
+}
+
+type slidingWindow struct {
+	window []nCipher
+}
+
+func newSlidingWindow(cap int) *slidingWindow {
+	return &slidingWindow{window: make([]nCipher, 0, cap)}
+}
+
+func (w *slidingWindow) len() int {
+	return len(w.window)
+}
+
+func (w *slidingWindow) append(nc nCipher) {
+	w.window = append(w.window, nc)
+}
+
+func (w *slidingWindow) pop(blockNumber int) (nc nCipher, found bool) {
+	for i, val := range w.window {
+		if val.blockNumber == blockNumber {
+			last := len(w.window) - 1
+			w.window[last], w.window[i] = w.window[i], w.window[last]
+			w.window = w.window[:len(w.window)-1]
+			return val, true
+		}
+	}
+
+	return nCipher{}, false
+}
+
+type nCipher struct {
+	blockNumber int
+	cipher      []byte
+	err         error
 }
 
 // ReadLocation uses the provided Config to fetch the contents of the given

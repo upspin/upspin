@@ -198,8 +198,19 @@ type BlockUnpacker interface {
 	// Unpack takes ciphertext returns the cleartext. If appropriate, the
 	// result is verified as correct according to the block's Packdata.
 	//
-	// The cleartext slice remains valid until the next call to Unpack.
+	// The cleartext slice remains valid until the next call to Unpack or
+	// UnpackBlock.
 	Unpack(ciphertext []byte) (cleartext []byte, err error)
+
+	// UnpackBlock takes ciphertext and the block number and returns the
+	// cleartext. If appropriate, the result is verified as correct according
+	// to the block's Packdata.
+	//
+	// UnpackBlock, different from Upack, is not affected by NextBlock.
+	//
+	// The cleartext slice remains valid until the next call to Unpack or
+	// UnpackBlock.
+	UnpackBlock(ciphertext []byte, n int) (cleartext []byte, err error)
 
 	// Close releases any resources associated with the unpacking
 	// operation.
@@ -774,7 +785,7 @@ type Client interface {
 	// not the link target.
 	SetTime(name PathName, t Time) error
 
-	// SetTimeSequenced sets the time in name's DirEntry. 
+	// SetTimeSequenced sets the time in name's DirEntry.
 	// SetTimeSequenced with SeqIgnore is the same as SetTime.
 	//
 	// A successful SetTimeSequenced returns an incomplete DirEntry (see the

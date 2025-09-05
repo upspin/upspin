@@ -122,7 +122,7 @@ func packdataLen() int {
 	return 2*marshalBufLen + binary.MaxVarintLen64 + 1
 }
 
-func setupTestConfig(t *testing.T) upspin.Config {
+func setupTestConfig(t testing.TB) upspin.Config {
 	// Create some test locations.
 	for i := 0; i < 10; i++ {
 		loc := upspin.Location{
