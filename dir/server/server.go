@@ -327,17 +327,22 @@ func (s *server) Put(entry *upspin.DirEntry) (*upspin.DirEntry, error) {
 
 	isAccess := access.IsAccessFile(p.Path())
 	isGroup := access.IsGroupFile(p.Path())
+	isGroupDir := p.NElem() == 1 && p.Elem(0) == access.GroupDir
 	isLink := entry.IsLink()
 
-	// Links can't be named Access or Group.
+	// Access and Group files cannot be links
 	if isLink {
 		if isAccess || isGroup {
-			return nil, errors.E(op, p.Path(), errors.Invalid, "link cannot be named Access or Group")
+			return nil, errors.E(op, p.Path(), errors.Invalid, "link cannot be named Access or be in the Group directory")
 		}
 	}
 	// Directories cannot have reserved names.
 	if isAccess && entry.IsDir() {
 		return nil, errors.E(op, errors.Invalid, entry.Name, "cannot make directory named Access")
+	}
+	// The Group special directory can't be a link or file.
+	if isGroupDir && !entry.IsDir() {
+		return nil, errors.E(op, p.Path(), errors.Invalid, "Group must be a directory")
 	}
 
 	// Special files must use integrity pack (plain text + signature).
